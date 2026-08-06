@@ -1,6 +1,5 @@
 import { memo, useCallback, useMemo } from 'react';
 import {
-  Box,
   Button,
   Divider,
   Drawer,
@@ -11,7 +10,6 @@ import {
   ListItemIcon,
   ListItemText,
   Tooltip,
-  useMediaQuery,
   useTheme
 } from '@mui/material';
 import { Launch, MenuBook } from '@mui/icons-material';
@@ -41,7 +39,6 @@ import MenuLinks, {
 } from './MenuLinks';
 import Translate from '../Translate';
 import LanguageSelector from '../LanguageSelector';
-import QuickSearch from '../../appli/QuickSearch';
 import { userguideLinks } from '../../../conf/externalLinks';
 
 // Height pinned to appBarHeight, NOT theme.mixins.toolbar: the mixin is 56px but
@@ -122,14 +119,13 @@ const ContributeButton = styled(Button, {
 // The whole menu body, shared by both drawers.
 //
 // Memoised because opening the mobile overlay is a Redux update: without it,
-// the body (a MUI Autocomplete, nine Tooltips, eight ripple-bearing rows) would
-// re-render synchronously in the commit that sets `open`, delaying the first
-// frame of the slide. Keep both props shallow-stable or the bailout is lost.
+// the body (nine Tooltips, eight ripple-bearing rows) would re-render
+// synchronously in the commit that sets `open`, delaying the first frame of the
+// slide. Keep both props shallow-stable or the bailout is lost.
 const SideMenuContent = memo(({ isExpanded, onNavigate }) => {
   const { locale } = useSelector(state => state.intl);
-  const theme = useTheme();
   const { formatMessage } = useIntl();
-  const isTopbarCompact = useMediaQuery(theme.breakpoints.down('sm'));
+  const isDesktop = useIsDesktopLayout();
   const isOnline = useOnlineStatus();
 
   const navigateToContribute = useAuthNavigate('/ui/entity/add', {
@@ -158,14 +154,6 @@ const SideMenuContent = memo(({ isExpanded, onNavigate }) => {
         />
       </Header>
       <Content>
-        {isTopbarCompact && (
-          <>
-            <Box sx={{ py: 0.5 }}>
-              <QuickSearch onClose={onNavigate} />
-            </Box>
-            <Divider />
-          </>
-        )}
         <MenuLinks toggle={onNavigate} isExpanded={isExpanded} />
         <Divider />
         {/* Every entity-creation form ends in an API write, so the whole
@@ -231,10 +219,11 @@ const SideMenuContent = memo(({ isExpanded, onNavigate }) => {
                 )}
               </ListItemButton>
             </Tooltip>
-            {/* Mobile only, so always in the expanded geometry — but it still
-                has to use the shared insets or it sits 8px right of the nav
-                rows above it. */}
-            {isTopbarCompact && (
+            {/* Only below `md`, where the AppBar gives its whole middle to the
+                search and has no room left for a language selector. Always in
+                the expanded geometry there — but it still has to use the shared
+                insets or it sits 8px right of the nav rows above it. */}
+            {!isDesktop && (
               <ListItem sx={menuItemSx(true)}>
                 <ListItemIcon sx={menuItemIconSx(true)}>
                   <LanguageIcon

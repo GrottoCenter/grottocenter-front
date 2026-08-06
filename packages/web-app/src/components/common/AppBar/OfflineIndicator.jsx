@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import { Box, IconButton, Popover, Tooltip, Typography } from '@mui/material';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
 import { useOnlineStatus } from '@/hooks';
+import { APP_BAR_ICON_SIZE } from './constants';
 
 const OfflineIndicator = () => {
   const isOnline = useOnlineStatus();
@@ -23,7 +24,7 @@ const OfflineIndicator = () => {
           color="warning"
           size="large"
           onClick={() => setIsOpen(true)}>
-          <WifiOffIcon sx={{ fontSize: 28 }} />
+          <WifiOffIcon sx={{ fontSize: APP_BAR_ICON_SIZE }} />
         </IconButton>
       </Tooltip>
       <Popover

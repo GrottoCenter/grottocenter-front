@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { AppBar as MuiAppBar, Box, Toolbar, IconButton } from '@mui/material';
@@ -5,7 +6,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { alpha, styled } from '@mui/material/styles';
-import GCLogo from '../GCLogo';
 
 import {
   displayLoginDialog,
@@ -27,6 +27,8 @@ import NotificationMenu from '../../appli/NotificationMenu';
 import MessagesIcon from './MessagesIcon';
 import OfflineIndicator from './OfflineIndicator';
 import QuickSearch from '../../appli/QuickSearch';
+import { MobileSearchTrigger, MobileSearchView } from './MobileSearch';
+import { APP_BAR_ICON_SIZE } from './constants';
 
 import UserMenu from './User';
 
@@ -58,20 +60,22 @@ const NavigationGroup = styled('div')(({ theme }) => ({
   }
 }));
 
+// Holds the middle of the compact bar, where the desktop chrome puts its tools.
+// Nothing lives there below `md`: the brand moved to the side menu and the
+// search is an icon among the actions.
 const Spacer = styled('div')({
   flexGrow: 1
 });
 
+// Desktop only — rendered conditionally rather than hidden by a media query, so
+// the bar has a single source of truth for which chrome it is showing.
 const ToolsGroup = styled('div')(({ theme }) => ({
   height: 56,
   display: 'flex',
   flexGrow: 1,
   gap: 12,
   alignItems: 'center',
-  padding: theme.spacing(1),
-  [theme.breakpoints.down('sm')]: {
-    display: 'none'
-  }
+  padding: theme.spacing(1)
 }));
 
 // A bare chevron is a thin glyph surrounded by air: on the brown bar it reads
@@ -83,17 +87,6 @@ const RailToggleButton = styled(IconButton)(({ theme }) => ({
   '&:hover': {
     borderColor: theme.palette.primary.contrastText,
     backgroundColor: alpha(theme.palette.primary.contrastText, 0.14)
-  }
-}));
-
-// Mobile only: on desktop the brand lives permanently in the side rail's
-// header, which is why it no longer appears here at all. Below `sm` the
-// wordmark is dropped and only the logo is kept, for room.
-const BrandLogo = styled(GCLogo)(({ theme }) => ({
-  marginRight: theme.spacing(1),
-  cursor: 'pointer',
-  [theme.breakpoints.down('sm')]: {
-    '& .MuiTypography-root': { display: 'none' }
   }
 }));
 
@@ -116,6 +109,17 @@ const AppBar = () => {
   const isExpanded = useSelector(state => state.sideMenu.isExpanded);
   const isDesktop = useIsDesktopLayout();
   const { width: sideMenuOffset, transition } = useSideMenuOffset();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const openSearch = useCallback(() => setIsSearchOpen(true), []);
+  const closeSearch = useCallback(() => setIsSearchOpen(false), []);
+
+  // Search mode only exists in the compact bar. Growing past `md` while it is
+  // open would otherwise strand the bar with no navigation and no way back,
+  // since the toolbar that owns the exit is the one being replaced.
+  useEffect(() => {
+    if (isDesktop) setIsSearchOpen(false);
+  }, [isDesktop]);
 
   // Desktop collapses the rail in place; mobile reveals the overlay.
   const menuButtonLabel = (() => {
@@ -140,12 +144,14 @@ const AppBar = () => {
   return (
     <>
       <StyledMuiAppBar $offset={sideMenuOffset} $transition={transition}>
-        <Toolbar variant="dense">
+        {/* `relative` so search mode can cover the bar instead of replacing its
+            content — see MobileSearch. */}
+        <Toolbar variant="dense" sx={{ position: 'relative' }}>
           <NavigationGroup>
             {/* A chevron, not a burger: on desktop the menu never goes away,
-                the button only folds it into its rail. No `edge="start"` here —
-                its negative margin would push the ring against the very edge of
-                the bar. */}
+                    the button only folds it into its rail. No `edge="start"`
+                    here — its negative margin would push the ring against the
+                    very edge of the bar. */}
             {isDesktop ? (
               <RailToggleButton
                 color="inherit"
@@ -161,22 +167,27 @@ const AppBar = () => {
                 edge="start"
                 onClick={handleMenuButtonClick}
                 size="large">
-                <MenuIcon sx={{ fontSize: 32 }} />
+                <MenuIcon sx={{ fontSize: APP_BAR_ICON_SIZE }} />
               </IconButton>
             )}
-            {/* Desktop has the brand in the rail header; repeating it here would
-                be the second Grottocenter logo on screen. */}
-            {!isDesktop && <BrandLogo size={34} showWordmark />}
+            {/* Next to the burger rather than among the actions on the
+                    right: search is navigation, not an account-side action. */}
+            {!isDesktop && <MobileSearchTrigger onClick={openSearch} />}
           </NavigationGroup>
-          <Spacer sx={{ display: { xs: 'block', sm: 'none' } }} />
-          <ToolsGroup>
-            <Box sx={{ flexGrow: 1 }}>
-              <QuickSearch />
-            </Box>
-            <Box sx={{ flexShrink: 0 }}>
-              <LanguageSelector />
-            </Box>
-          </ToolsGroup>
+          {/* The bar carries no brand at all: it lives in the side menu, in
+                  the rail header on desktop and in the drawer header below it. */}
+          {isDesktop ? (
+            <ToolsGroup>
+              <Box sx={{ flexGrow: 1 }}>
+                <QuickSearch />
+              </Box>
+              <Box sx={{ flexShrink: 0 }}>
+                <LanguageSelector />
+              </Box>
+            </ToolsGroup>
+          ) : (
+            <Spacer />
+          )}
           <ActionsGroup>
             <OfflineIndicator />
             <NotificationMenu />
@@ -189,6 +200,7 @@ const AppBar = () => {
               userNickname={authState?.authTokenDecoded?.nickname ?? null}
             />
           </ActionsGroup>
+          {isSearchOpen && <MobileSearchView onClose={closeSearch} />}
         </Toolbar>
       </StyledMuiAppBar>
       <Toolbar variant="dense" />

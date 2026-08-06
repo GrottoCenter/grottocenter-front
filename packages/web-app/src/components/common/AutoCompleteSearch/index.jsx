@@ -22,13 +22,11 @@ const StyledAutocomplete = styled(Autocomplete)`
   width: 100%;
 `;
 
-const InputWrapper = styled('div', {
-  shouldForwardProp: prop => prop[0] !== '$'
-})`
+const InputWrapper = styled('div')`
   display: flex;
-  margin-left: ${({ $hasFixWidth }) => ($hasFixWidth ? 'auto' : '0')};
+  margin-left: auto;
   width: 100%;
-  border-radius: ${({ theme }) => theme.shape.borderRadius};
+  border-radius: ${({ theme }) => theme.shape.borderRadius}px;
   background-color: ${({ theme }) => alpha(theme.palette.common.white, 0.15)};
   transition: 0.5s;
   &:hover {
@@ -62,10 +60,11 @@ const ResultsPopper = styled(Popper, {
     max-height: 70dvh;
   }
 
+  /* The panel is shaped one level down, on the paper: MUI writes the popper's
+     own width inline from the anchor, so a rule set on the popper never wins. */
   > div {
-    width: fit-content;
-    max-width: 80vw;
-    ${({ $hasFixWidth }) => !$hasFixWidth && 'float: right'};
+    ${({ $isFullWidth }) =>
+      $isFullWidth ? 'width: 100%;' : 'width: fit-content; max-width: 80vw;'}
   }
 `;
 
@@ -80,16 +79,23 @@ const InputAdornments = ({ isLoading, hasError }) =>
     </InputAdornment>
   ) : null;
 
-const StyledPopper = hasFixWidth =>
-  function (props) {
-    return (
-      <ResultsPopper
-        {...props}
-        $hasFixWidth={hasFixWidth}
-        placement="bottom-end"
-      />
-    );
-  };
+// Two components declared once rather than one built from a prop at render
+// time: MUI takes this as `PopperComponent`, i.e. as a component *identity*, so
+// a factory called during render hands React a brand new type on every
+// keystroke and remounts the whole result panel with it.
+//
+// Each one hangs from the edge its field is anchored to, so the panel and the
+// field always share a side. `bottom-end` for the hugging one: that field is
+// pushed right by `InputWrapper`'s `margin-left: auto`. `bottom-start` for the
+// full-width one: that field spans its container, so the left edge is the one
+// the eye is on — it is where the caret is.
+const HuggingResults = props => (
+  <ResultsPopper {...props} placement="bottom-end" />
+);
+const FullWidthResults = props => (
+  <ResultsPopper {...props} placement="bottom-start" $isFullWidth />
+);
+
 const AutoCompleteSearch = ({
   suggestions,
   renderOption,
@@ -101,7 +107,8 @@ const AutoCompleteSearch = ({
   hasError = false,
   isLoading = false,
   disabled = false,
-  hasFixWidth = true,
+  hasFullWidthResults = false,
+  autoFocus = false,
   noOptionsText = null,
   value
 }) => {
@@ -138,7 +145,7 @@ const AutoCompleteSearch = ({
     <StyledAutocomplete
       // clearOnBlur={false} // Usefull for development
       disabled={disabled}
-      id={`AutoCompleteSearch${hasFixWidth}${label}`}
+      id={`AutoCompleteSearch${label}`}
       inputValue={inputValue}
       onInputChange={handleInputChange}
       onChange={handleSelectionChange}
@@ -146,7 +153,7 @@ const AutoCompleteSearch = ({
       getOptionLabel={getOptionLabel ?? (e => e?.name ?? '')}
       renderOption={renderOption ?? entityOptionForSelector}
       loading={isLoading}
-      PopperComponent={StyledPopper(hasFixWidth)}
+      PopperComponent={hasFullWidthResults ? FullWidthResults : HuggingResults}
       color="inherit"
       // had to disable built-int filter
       // https://github.com/mui-org/material-ui/issues/20068
@@ -171,12 +178,13 @@ const AutoCompleteSearch = ({
       }}
       renderInput={params => (
         <DisabledTooltip disabled={disabled}>
-          <InputWrapper $hasFixWidth={hasFixWidth} disabled={disabled}>
+          <InputWrapper disabled={disabled}>
             <SearchIconWrapper>
               <SearchIcon color={disabled ? 'disabled' : 'inherit'} />
             </SearchIconWrapper>
             <StyledInputBase
               required={false}
+              autoFocus={autoFocus}
               disabled={params.disabled}
               ref={params.InputProps.ref}
               placeholder={label}
@@ -207,7 +215,12 @@ AutoCompleteSearch.propTypes = {
   hasError: PropTypes.bool,
   isLoading: PropTypes.bool,
   disabled: PropTypes.bool,
-  hasFixWidth: PropTypes.bool,
+  // Makes the results panel as wide as the field instead of hugging its own
+  // content. For fields that already span their container.
+  hasFullWidthResults: PropTypes.bool,
+  // Focuses the input on mount — for fields that only appear once the user has
+  // asked for them, so nothing else can reasonably hold focus.
+  autoFocus: PropTypes.bool,
   // Overrides the default "no result" wording — e.g. to explain that search
   // needs a connection rather than claim nothing was found.
   noOptionsText: PropTypes.node,

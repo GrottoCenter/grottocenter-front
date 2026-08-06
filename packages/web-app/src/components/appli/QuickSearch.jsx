@@ -14,7 +14,7 @@ import {
   AUTOCOMPLETE_MIN_CHARACTERS
 } from '../../conf/config';
 
-const QuickSearch = ({ hasFixWidth, onClose }) => {
+const QuickSearch = ({ hasFullWidthResults, autoFocus, onClose }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -90,7 +90,8 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
       onSelection={handleSelection}
       hasError={!!errors}
       isLoading={isLoading}
-      hasFixWidth={hasFixWidth}
+      hasFullWidthResults={hasFullWidthResults}
+      autoFocus={autoFocus}
       noOptionsText={
         isOnline ? undefined : formatMessage({ id: 'offlineSearchUnavailable' })
       }
@@ -101,6 +102,7 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
 export default QuickSearch;
 
 QuickSearch.propTypes = {
-  hasFixWidth: PropTypes.bool,
+  hasFullWidthResults: PropTypes.bool,
+  autoFocus: PropTypes.bool,
   onClose: PropTypes.func
 };
