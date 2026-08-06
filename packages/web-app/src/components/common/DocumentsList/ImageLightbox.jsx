@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Dialog, IconButton, Box, Typography } from '@mui/material';
+import { Box, ButtonBase, Dialog, IconButton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
   NavigateBefore,
   NavigateNext,
   Close,
-  Download
+  Download,
+  FitScreen
 } from '@mui/icons-material';
 import { useIntl } from 'react-intl';
 import {
@@ -62,7 +63,11 @@ const NavButton = styled(OverlayButton)`
   }
 `;
 
-const ZoomIndicator = styled(Box)`
+// The zoom readout only appears while zoomed in, which is exactly when
+// resetting is worth offering — so it doubles as the reset control instead of a
+// second chip beside it. Same overlay treatment as `OverlayButton`, with the
+// pill shape kept because the label is text, not an icon.
+const ZoomResetButton = styled(ButtonBase)`
   position: absolute;
   top: 12px;
   left: 12px;
@@ -77,11 +82,16 @@ const ZoomIndicator = styled(Box)`
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   font-size: 0.875rem;
   font-weight: 500;
-  pointer-events: none;
   user-select: none;
   transition: opacity 0.2s;
+
+  &:hover,
+  &:focus-visible {
+    background-color: rgba(0, 0, 0, 0.65);
+  }
 `;
 
 const TopBar = styled(Box)`
@@ -172,6 +182,14 @@ const ImageLightbox = ({
   const handleNext = useCallback(() => {
     setCurrentIndex(prev => (prev < images.length - 1 ? prev + 1 : 0));
   }, [images.length]);
+
+  // Resetting the pan alongside the zoom: at 100% the image fits the viewport,
+  // so a leftover offset would push it off-screen with no way left to drag it
+  // back (panning is gated on `zoom > 1`).
+  const handleResetZoom = useCallback(() => {
+    setZoom(1);
+    setPosition({ x: 0, y: 0 });
+  }, []);
 
   const handleWheel = useCallback(e => {
     e.preventDefault();
@@ -340,7 +358,21 @@ const ImageLightbox = ({
           }}
         />
 
-        {zoom !== 1 && <ZoomIndicator>{Math.round(zoom * 100)}%</ZoomIndicator>}
+        {zoom !== 1 && (
+          <ZoomResetButton
+            onClick={handleResetZoom}
+            // The image behind reads raw pointer and touch events to pan and to
+            // detect a double-tap zoom. Without stopping them here, pressing the
+            // button would also grab the image, and a tap would count towards
+            // the double-tap that zooms it back in — undoing the reset.
+            onMouseDown={e => e.stopPropagation()}
+            onTouchStart={e => e.stopPropagation()}
+            onTouchEnd={e => e.stopPropagation()}
+            aria-label={formatMessage({ id: 'Reset zoom' })}>
+            <FitScreen fontSize="small" />
+            {`${Math.round(zoom * 100)}%`}
+          </ZoomResetButton>
+        )}
 
         <TopBar>
           <OverlayButton
