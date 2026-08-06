@@ -379,7 +379,9 @@ export const Entry = ({
                             gap: 1
                           }}>
                           {entrance.isSensitive && isAdmin && (
-                            <SensitiveCaveWarning />
+                            <SensitiveCaveWarning
+                              isLocked={!!entrance.isSensitiveLocked}
+                            />
                           )}
                           {!entrance.isSensitive || isAdmin ? (
                             <Box sx={{ flex: 1, display: 'flex' }}>
