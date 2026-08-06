@@ -206,6 +206,11 @@ const Map = () => {
   // on its own: the cluster datasets are only fetched on mount, and the marker
   // tiles only on moveend — which is why leaving the page and coming back was
   // the only way to recover, panning being swallowed by the failure cooldown.
+  //
+  // Asymmetric on purpose: loadMapData() dispatches thunks, refetchMapViewport()
+  // is a plain function call. mapTileCache owns its own dispatch reference (see
+  // Map.js), so calling it directly is the correct shape — do not wrap it in
+  // dispatch().
   const reloadMap = useCallback(() => {
     loadMapData();
     refetchMapViewport();

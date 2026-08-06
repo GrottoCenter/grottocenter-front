@@ -40,6 +40,10 @@ export const isNetworkError = error => {
 
   // Last resort for error shapes we don't recognise: if the browser says we're
   // offline, a failure with no HTTP status almost certainly comes from that.
+  // Intentional catch-all — an unknown error shape (e.g. a bare string from
+  // an unrelated middleware) will be flagged as a network error when offline.
+  // False positives on the tail end are preferable to showing a red error for
+  // data the user simply cannot reach.
   return typeof navigator !== 'undefined' && navigator.onLine === false;
 };
 

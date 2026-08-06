@@ -33,9 +33,6 @@ export function useSessionExpiry() {
 
   return {
     isExpiringSoon,
-    // Milliseconds, so callers can hand it straight to Intl — the token carries
-    // seconds. Null when there is no session at all.
-    expiresAt: expiresAt ? expiresAt * 1000 : null,
     userId: authTokenDecoded?.id ?? null
   };
 }

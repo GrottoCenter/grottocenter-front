@@ -106,6 +106,9 @@ describe('NetworkStatusNotifier', () => {
   // leave "offlineIndicator" on screen for the whole session (#1489 follow-up).
   it('translates the offline message when the catalogue lands after mount', () => {
     setOnLine(false);
+    // `undefined` messages is deliberate, not a missing prop: it forces
+    // <FormattedMessage id="offlineIndicator" /> to fall back to rendering the
+    // raw id, mirroring the pre-catalogue state we want to reproduce.
     const { baseElement, rerender } = render(tree('en', undefined));
     expect(countTexts(baseElement, 'offlineIndicator')).toBe(1);
 

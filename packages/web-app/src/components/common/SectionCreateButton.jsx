@@ -21,8 +21,7 @@ import OfflineDisabled from './OfflineDisabled';
  *   opened a panel while online is trapped in it.
  *
  * Hence a single `isBlocked` driving all three of the wrapper, the tooltip and
- * the button: they cannot drift apart. The tooltip i
- * s blanked rather than left
+ * the button: they cannot drift apart. The tooltip is blanked rather than left
  * in place because a disabled <button> emits no hover — MUI warns about it, and
  * OfflineDisabled's own tooltip is the one that shows.
  */

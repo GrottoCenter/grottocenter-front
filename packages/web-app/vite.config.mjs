@@ -596,6 +596,11 @@ export default defineConfig(({ mode }) => {
                       // pagination correct, and the API exposes it through CORS
                       // (access-control-expose-headers).
                       //
+                      // The status/200 + Content-Range combo is non-standard
+                      // (Content-Range is defined for 206/416), but deliberate:
+                      // it is the shape the Cache API will actually store, and
+                      // callers only ever read the header value, not the code.
+                      //
                       // Status filtering lives in this same hook rather than in
                       // the `cacheableResponse` option: that option IS itself a
                       // cacheWillUpdate plugin, and whichever runs first wins —

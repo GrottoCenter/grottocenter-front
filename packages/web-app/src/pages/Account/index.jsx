@@ -70,11 +70,13 @@ import PasswordRules from '../../components/common/Form/PasswordRules';
 import SearchOrganizationForm from '../../components/appli/Form/SearchOrganizationForm';
 import Translate from '../../components/common/Translate';
 import {
+  useOnlineStatus,
   useUserProperties,
   usePermissions,
   useNotification
 } from '../../hooks';
 import AppLink from '../../components/common/AppLink';
+import OfflineDisabled from '../../components/common/OfflineDisabled';
 import SectionCreateButton from '../../components/common/SectionCreateButton';
 import { AVAILABLE_LANGUAGES, isPasswordValid } from '../../conf/config';
 import {
@@ -189,23 +191,28 @@ BoolValue.propTypes = {
   value: PropTypes.bool.isRequired
 };
 
-const EditActions = ({ isLoading, isDisabled = false, onCancel }) => (
-  <EditFooter>
-    <Button variant="outlined" onClick={onCancel} disabled={isLoading}>
-      <Translate>Cancel</Translate>
-    </Button>
-    <Button
-      type="submit"
-      variant="contained"
-      color="primary"
-      disabled={isLoading || isDisabled}
-      startIcon={
-        isLoading ? <CircularProgress size={16} color="inherit" /> : null
-      }>
-      <Translate>Save changes</Translate>
-    </Button>
-  </EditFooter>
-);
+const EditActions = ({ isLoading, isDisabled = false, onCancel }) => {
+  const isOnline = useOnlineStatus();
+  return (
+    <EditFooter>
+      <Button variant="outlined" onClick={onCancel} disabled={isLoading}>
+        <Translate>Cancel</Translate>
+      </Button>
+      <OfflineDisabled>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isLoading || isDisabled || !isOnline}
+          startIcon={
+            isLoading ? <CircularProgress size={16} color="inherit" /> : null
+          }>
+          <Translate>Save changes</Translate>
+        </Button>
+      </OfflineDisabled>
+    </EditFooter>
+  );
+};
 
 EditActions.propTypes = {
   isDisabled: PropTypes.bool,

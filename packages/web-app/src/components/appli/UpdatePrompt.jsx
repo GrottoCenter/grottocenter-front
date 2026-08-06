@@ -57,6 +57,13 @@ UpdateSnackbarActions.propTypes = {
 // Kept at module scope on purpose: notistack wants `action` as a `key => node`
 // function, and defining one inside the component would make React see a new
 // component type on every render (react/no-unstable-nested-components).
+//
+// It IS a factory — one call returns a fresh (named) component per invocation —
+// but that is benign here: the snackbar is keyed by UPDATE_SNACKBAR_KEY and
+// `preventDuplicate` means notistack drops every re-enqueue, so the action is
+// captured exactly once. Do NOT refactor this into a body-scoped component:
+// the lint rule fires, and closing over the handlers is what the enqueue call
+// needs anyway.
 const updateAction = (onUpdate, onDismiss) =>
   function UpdateAction() {
     return <UpdateSnackbarActions onUpdate={onUpdate} onDismiss={onDismiss} />;
