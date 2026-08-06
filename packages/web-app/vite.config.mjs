@@ -579,11 +579,49 @@ export default defineConfig(({ mode }) => {
                         maxEntries: 200,
                         maxAgeSeconds: 60 * 60 * 24 * 7
                       },
-                      cacheableResponse: { statuses: [0, 200] },
                       // Ignore Vary headers (API sends Vary: Accept-Encoding).
                       // Prevents a rare cache-miss when the browser negotiates a
                       // different encoding offline vs online.
-                      matchOptions: { ignoreVary: true }
+                      matchOptions: { ignoreVary: true },
+                      // Paginated endpoints answer 206 + Content-Range (documents,
+                      // notifications, messages/conversations…), and the Cache API
+                      // refuses cache.put() on a 206 outright — "Partial response
+                      // is unsupported" is the spec, not a Workbox rule. Left
+                      // alone, every list in the app is a blank page offline no
+                      // matter how often it was opened online.
+                      //
+                      // So rebuild the 206 as a 200 before storing it.
+                      // Content-Range is copied over: actions/utils.js
+                      // getTotalCount() reads it back on a cache hit to keep
+                      // pagination correct, and the API exposes it through CORS
+                      // (access-control-expose-headers).
+                      //
+                      // Status filtering lives in this same hook rather than in
+                      // the `cacheableResponse` option: that option IS itself a
+                      // cacheWillUpdate plugin, and whichever runs first wins —
+                      // it would reject the 206 before this ever sees it.
+                      //
+                      // ⚠️ No free variables: vite-plugin-pwa serialises this
+                      // with .toString() (see the apiPattern note at the top of
+                      // this file), so a closure would land as `undefined` in the
+                      // service worker and fail silently.
+                      plugins: [
+                        {
+                          cacheWillUpdate: async ({ response }) => {
+                            if (
+                              response.status === 0 ||
+                              response.status === 200
+                            )
+                              return response;
+                            if (response.status !== 206) return null;
+                            return new Response(await response.clone().blob(), {
+                              status: 200,
+                              statusText: 'OK',
+                              headers: response.headers
+                            });
+                          }
+                        }
+                      ]
                     }
                   }
                 ]

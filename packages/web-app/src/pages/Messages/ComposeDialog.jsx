@@ -15,9 +15,10 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import StandardDialog from '../../components/common/StandardDialog';
+import OfflineDisabled from '../../components/common/OfflineDisabled';
 import { sendMessage } from '../../actions/Messaging/SendMessage';
 import { fetchPerson } from '../../actions/Person/GetPerson';
-import { useEntitySearch } from '../../hooks';
+import { useEntitySearch, useOnlineStatus } from '../../hooks';
 import { AUTOCOMPLETE_MIN_CHARACTERS } from '../../conf/config';
 
 const PERSON_ENTITIES = ['persons'];
@@ -29,6 +30,7 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isOnline = useOnlineStatus();
 
   const { person: fetchedPerson, isFetching: isPersonFetching } = useSelector(
     state => state.person
@@ -175,20 +177,25 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
           <Button onClick={handleClose} disabled={isSending} variant="outlined">
             {formatMessage({ id: 'Cancel', defaultMessage: 'Cancel' })}
           </Button>
-          <Button
-            onClick={handleSend}
-            variant="contained"
-            color="primary"
-            disabled={!isFormValid || isSending}
-            startIcon={
-              isSending ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                <SendIcon />
-              )
-            }>
-            {formatMessage({ id: 'Send', defaultMessage: 'Send' })}
-          </Button>
+          {/* The dialog is still reachable offline through the ?composeTo=
+              deep link, which opens it on mount — so it needs its own guard
+              and cannot rely on the triggers being disabled. */}
+          <OfflineDisabled>
+            <Button
+              onClick={handleSend}
+              variant="contained"
+              color="primary"
+              disabled={!isOnline || !isFormValid || isSending}
+              startIcon={
+                isSending ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  <SendIcon />
+                )
+              }>
+              {formatMessage({ id: 'Send', defaultMessage: 'Send' })}
+            </Button>
+          </OfflineDisabled>
         </>
       }>
       <Box

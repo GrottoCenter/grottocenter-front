@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl, FormattedDate } from 'react-intl';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -29,8 +29,10 @@ import { styled } from '@mui/material/styles';
 
 import PageContainer from '@/components/common/Layouts/PageContainer';
 import UserAvatar from '@/components/common/UserAvatar';
+import FetchErrorState from '@/components/common/FetchErrorState';
+import OfflineDisabled from '@/components/common/OfflineDisabled';
+import { useOnlineStatus, useRefetchOnReconnect } from '@/hooks';
 import AuthChecker from '../../components/appli/AuthChecker';
-import Alert from '../../components/common/Alert';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import { fetchConversations } from '../../actions/Messaging/GetConversations';
 import { archiveConversation } from '../../actions/Messaging/ArchiveConversation';
@@ -106,6 +108,7 @@ const MessagesPage = () => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const isOnline = useOnlineStatus();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { conversationId } = useParams();
@@ -138,14 +141,25 @@ const MessagesPage = () => {
     error
   } = useSelector(state => state.messaging[listKey]);
 
+  const reloadConversations = useCallback(
+    () =>
+      dispatch(
+        fetchConversations(
+          { limit: PAGE_SIZE, skip: (page - 1) * PAGE_SIZE },
+          isArchived
+        )
+      ),
+    [dispatch, page, isArchived]
+  );
+
   useEffect(() => {
-    dispatch(
-      fetchConversations(
-        { limit: PAGE_SIZE, skip: (page - 1) * PAGE_SIZE },
-        isArchived
-      )
-    );
-  }, [dispatch, page, isArchived]);
+    reloadConversations();
+  }, [reloadConversations]);
+
+  // Only the current tab/page URL is ever cached, so switching to Archived or
+  // paging forward offline lands on an empty list. Refill it as soon as the
+  // connection is back, instead of leaving the user on a dead end.
+  useRefetchOnReconnect(reloadConversations, Boolean(error));
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -166,15 +180,16 @@ const MessagesPage = () => {
     }
 
     if (status === REDUCER_STATUS.FAILED) {
+      // Deliberately NOT `error.message`: makeErrorMessage() is called as
+      // makeErrorMessage(error.message, 'Fetching user conversations'), whose
+      // signature is (type, message) — so `message` holds the untranslated
+      // debug label, not the failure. FetchErrorState reads the shape properly
+      // and downgrades a network failure to an "unavailable offline" notice.
       return (
-        <Alert
-          severity="error"
-          title={
-            error?.message ||
-            formatMessage({
-              id: 'An error occurred while fetching conversations.'
-            })
-          }
+        <FetchErrorState
+          error={error}
+          onRetry={reloadConversations}
+          messageId="An error occurred while fetching conversations."
         />
       );
     }
@@ -214,30 +229,40 @@ const MessagesPage = () => {
               divider
               onClick={() => navigate(`/ui/messages/${conv.id}`)}
               secondaryAction={
-                <Tooltip
-                  title={formatMessage({
-                    id: isArchived ? 'Unarchive' : 'Archive'
-                  })}>
-                  <IconButton
-                    edge="end"
-                    aria-label={isArchived ? 'unarchive' : 'archive'}
-                    onClick={e => {
-                      e.stopPropagation();
-                      if (isArchived) {
-                        dispatch(unarchiveConversation(conv.id));
-                        if (conversationId === String(conv.id)) {
-                          navigate('/ui/messages');
+                // (Un)archiving is a PUT — blank the inner tooltip offline so
+                // OfflineDisabled's explanation is the one that shows, as a
+                // disabled button emits no hover of its own.
+                <OfflineDisabled>
+                  <Tooltip
+                    title={
+                      isOnline
+                        ? formatMessage({
+                            id: isArchived ? 'Unarchive' : 'Archive'
+                          })
+                        : ''
+                    }>
+                    <IconButton
+                      edge="end"
+                      disabled={!isOnline}
+                      aria-label={isArchived ? 'unarchive' : 'archive'}
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (isArchived) {
+                          dispatch(unarchiveConversation(conv.id));
+                          if (conversationId === String(conv.id)) {
+                            navigate('/ui/messages');
+                          }
+                        } else {
+                          dispatch(archiveConversation(conv.id));
+                          if (conversationId === String(conv.id)) {
+                            navigate('/ui/messages');
+                          }
                         }
-                      } else {
-                        dispatch(archiveConversation(conv.id));
-                        if (conversationId === String(conv.id)) {
-                          navigate('/ui/messages');
-                        }
-                      }
-                    }}>
-                    {isArchived ? <UnarchiveIcon /> : <ArchiveIcon />}
-                  </IconButton>
-                </Tooltip>
+                      }}>
+                      {isArchived ? <UnarchiveIcon /> : <ArchiveIcon />}
+                    </IconButton>
+                  </Tooltip>
+                </OfflineDisabled>
               }>
               <ListItemAvatar>
                 <Badge
@@ -320,16 +345,22 @@ const MessagesPage = () => {
                         defaultMessage: 'Conversations'
                       })}
                     </Typography>
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      startIcon={<RateReviewIcon />}
-                      onClick={() => {
-                        setComposeOpen(true);
-                      }}
-                      sx={{ display: { xs: 'none', md: 'inline-flex' } }}>
-                      {formatMessage({ id: 'New Message' })}
-                    </Button>
+                    {/* Composing ends in a POST, so it is a dead end offline —
+                        block it at the door rather than at the send button,
+                        once a message has been typed out. */}
+                    <OfflineDisabled>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        disabled={!isOnline}
+                        startIcon={<RateReviewIcon />}
+                        onClick={() => {
+                          setComposeOpen(true);
+                        }}
+                        sx={{ display: { xs: 'none', md: 'inline-flex' } }}>
+                        {formatMessage({ id: 'New Message' })}
+                      </Button>
+                    </OfflineDisabled>
                   </Box>
 
                   <Tabs
@@ -363,20 +394,30 @@ const MessagesPage = () => {
                       </Box>
                     )}
                   </Box>
-                  <Fab
-                    aria-label={formatMessage({ id: 'New Message' })}
-                    onClick={() => setComposeOpen(true)}
-                    sx={{
-                      display: { xs: 'inline-flex', md: 'none' },
-                      position: 'absolute',
-                      right: 20,
-                      bottom: `max(30px, calc(env(safe-area-inset-bottom) + 16px))`,
-                      bgcolor: 'secondary.main',
-                      color: '#fff',
-                      '&:hover': { bgcolor: 'secondary.dark' }
-                    }}>
-                    <RateReviewIcon />
-                  </Fab>
+                  {/* Mobile twin of the New Message button above — same POST,
+                      same block. The Fab stays absolutely positioned against
+                      the relative parent: OfflineDisabled's span is static, so
+                      it never becomes the containing block. */}
+                  <OfflineDisabled>
+                    <Fab
+                      aria-label={formatMessage({ id: 'New Message' })}
+                      disabled={!isOnline}
+                      onClick={() => setComposeOpen(true)}
+                      sx={{
+                        display: { xs: 'inline-flex', md: 'none' },
+                        position: 'absolute',
+                        right: 20,
+                        bottom: `max(30px, calc(env(safe-area-inset-bottom) + 16px))`,
+                        bgcolor: 'secondary.main',
+                        color: '#fff',
+                        '&:hover': { bgcolor: 'secondary.dark' },
+                        '&.Mui-disabled': {
+                          bgcolor: 'action.disabledBackground'
+                        }
+                      }}>
+                      <RateReviewIcon />
+                    </Fab>
+                  </OfflineDisabled>
                 </Box>
 
                 {/* Right Pane: Conversation Details */}
