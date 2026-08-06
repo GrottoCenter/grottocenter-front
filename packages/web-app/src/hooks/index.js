@@ -32,3 +32,5 @@ export { useLongPress } from './useLongPress';
 export { useJobPolling } from './useJobPolling';
 export { useOnlineStatus } from './useOnlineStatus';
 export { useRefetchOnReconnect } from './useRefetchOnReconnect';
+export { useIsDesktopLayout } from './useIsDesktopLayout';
+export { useSideMenuOffset } from './useSideMenuOffset';

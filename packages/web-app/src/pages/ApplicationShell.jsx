@@ -3,7 +3,6 @@ import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
 import createDebounce from 'redux-debounced';
-import { isMobileOnly } from 'react-device-detect';
 import { SnackbarContent, SnackbarProvider } from 'notistack';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { thunk } from 'redux-thunk';
@@ -19,7 +18,7 @@ import {
   hasLoadedMessages
 } from '../actions/Intl';
 import useLanguageSync from '../hooks/useLanguageSync';
-import { useRefetchOnReconnect } from '../hooks';
+import { useRefetchOnReconnect, useSideMenuOffset } from '../hooks';
 
 import ErrorHandler from '../components/appli/ErrorHandler';
 import NetworkStatusNotifier from '../components/common/NetworkStatusNotifier';
@@ -155,24 +154,16 @@ const SNACKBAR_COMPONENTS = {
   warning: AppSnackbar
 };
 
-const MainWrapper = styled('main')`
+const MainWrapper = styled('main', {
+  shouldForwardProp: prop => prop !== '$offset' && prop !== '$transition'
+})`
   flex-grow: 1;
-  transition: ${({ theme, $isSideMenuOpen }) =>
-    !isMobileOnly &&
-    theme.transitions.create('margin', {
-      easing: $isSideMenuOpen
-        ? theme.transitions.easing.easeOut
-        : theme.transitions.easing.sharp,
-      duration: $isSideMenuOpen
-        ? theme.transitions.duration.enteringScreen
-        : theme.transitions.duration.leavingScreen
-    })};
-  margin-left: ${({ theme, $isSideMenuOpen }) =>
-    !isMobileOnly && ($isSideMenuOpen ? theme.sideMenuWidth : 0)}px;
+  transition: ${({ $transition }) => $transition};
+  margin-left: ${({ $offset }) => $offset}px;
 `;
 
 const ApplicationLayout = () => {
-  const isSideMenuOpen = useSelector(state => state.sideMenu.open);
+  const { width: sideMenuOffset, transition } = useSideMenuOffset();
   useLanguageSync();
 
   const firstRender = useRef(true);
@@ -188,14 +179,16 @@ const ApplicationLayout = () => {
           MainWrapper:
           - AppBar is position:fixed and renders its own toolbar spacer, so a
             banner placed BEFORE it is hidden behind it;
-          - SideMenu is a persistent, fixed Drawer, and only MainWrapper carries
-            the matching `margin-left: theme.sideMenuWidth`. A banner that skips
-            it gets its first 240px covered on desktop — that was #1489.
-          Prefer a snackbar (position:fixed, no layout offset to get wrong); if
-          a banner is really needed, it has to reproduce MainWrapper's margin. */}
+          - SideMenu is a fixed Drawer, and only MainWrapper carries the matching
+            `margin-left`. A banner that skips it gets its first 240px covered on
+            desktop — that was #1489. This is now MORE of a trap, not less: the
+            desktop rail never fully retracts, so the margin is never 0 there.
+          Prefer a snackbar (position:fixed, no layout offset to get wrong); if a
+          banner is really needed, it has to reproduce MainWrapper's margin —
+          `useSideMenuOffset()` hands out exactly that number. */}
       <AppBar />
-      <SideMenu isOpen={isSideMenuOpen} />
-      <MainWrapper $isSideMenuOpen={isSideMenuOpen}>
+      <SideMenu />
+      <MainWrapper $offset={sideMenuOffset} $transition={transition}>
         <LoginDialog />
 
         {/* Where the individual routes will be rendered.

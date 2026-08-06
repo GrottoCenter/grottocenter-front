@@ -552,14 +552,7 @@ const MAP_TOUR_SESSION_KEY = `mapTourSeenThisSession_v${MAP_TOUR_VERSION}`;
 // Set VITE_DISABLE_MAP_TOUR=true in .env.local to prevent the tour from launching in dev.
 const MAP_TOUR_DISABLED = import.meta.env.VITE_DISABLE_MAP_TOUR === 'true';
 
-const Index = ({
-  center,
-  zoom,
-  isSideMenuOpen,
-  mapRef,
-  popupTarget = null,
-  ...props
-}) => {
+const Index = ({ center, zoom, mapRef, popupTarget = null, ...props }) => {
   const [runTour, setRunTour] = useState(
     () =>
       !MAP_TOUR_DISABLED &&
@@ -589,7 +582,6 @@ const Index = ({
         center={center}
         zoom={zoom}
         isFullscreenAllowed={false}
-        isSideMenuOpen={isSideMenuOpen}
         isLocationControlAlways
         mapRef={mapRef}
         renderer={renderer}>
@@ -620,7 +612,6 @@ HydratedMap.propTypes = {
 };
 
 Index.propTypes = {
-  isSideMenuOpen: PropTypes.bool,
   center: PropTypes.arrayOf(PropTypes.number),
   zoom: PropTypes.number,
   mapRef: PropTypes.shape({ current: PropTypes.shape({}) }),

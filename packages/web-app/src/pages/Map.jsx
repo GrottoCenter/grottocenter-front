@@ -135,7 +135,6 @@ const Map = () => {
   );
   const massifs = useSelector(state => state.map.massifs);
   const massifsCoordinates = useSelector(state => state.map.massifsCoordinates);
-  const { open } = useSelector(state => state.sideMenu);
   // urlDebounceRef: update the URL only once the user has truly settled,
   // avoiding lagging due to URL updates.
   // Leaflet always handles the visual movement immediately on its own.
@@ -260,7 +259,6 @@ const Map = () => {
         massifs={massifsCoordinates}
         massifPolygons={massifs}
         onUpdate={handleUpdate}
-        isSideMenuOpen={open}
         mapRef={mapRef}
         popupTarget={popupTarget}
       />

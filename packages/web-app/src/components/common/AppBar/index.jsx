@@ -1,18 +1,26 @@
 import { useDispatch, useSelector } from 'react-redux';
+import { useIntl } from 'react-intl';
 import { AppBar as MuiAppBar, Box, Toolbar, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { styled } from '@mui/material/styles';
-import { isMobileOnly } from 'react-device-detect';
-import AppLink from '../AppLink';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { alpha, styled } from '@mui/material/styles';
+import GCLogo from '../GCLogo';
 
 import {
   displayLoginDialog,
   hideLoginDialog,
   postLogout
 } from '../../../actions/Login';
-import { toggleSideMenu } from '../../../actions/SideMenu';
-import { usePermissions } from '../../../hooks';
-import { logoGC } from '../../../conf/config';
+import {
+  openMobileSideMenu,
+  setSideMenuExpanded
+} from '../../../actions/SideMenu';
+import {
+  useIsDesktopLayout,
+  usePermissions,
+  useSideMenuOffset
+} from '../../../hooks';
 
 import LanguageSelector from '../LanguageSelector';
 import NotificationMenu from '../../appli/NotificationMenu';
@@ -23,8 +31,8 @@ import QuickSearch from '../../appli/QuickSearch';
 import UserMenu from './User';
 
 const StyledMuiAppBar = styled(MuiAppBar, {
-  shouldForwardProp: prop => prop !== '$isSideMenuOpen'
-})(({ theme, $isSideMenuOpen }) => ({
+  shouldForwardProp: prop => prop !== '$offset' && prop !== '$transition'
+})(({ $offset, $transition }) => ({
   flexGrow: 1,
   // The bar overlays the full-screen map, which handles pinch itself. Without
   // this, a pinch that lands on the bar zooms the whole page instead — and the
@@ -32,20 +40,12 @@ const StyledMuiAppBar = styled(MuiAppBar, {
   // the gesture everywhere else. `pan-y` drops pinch- and double-tap-zoom while
   // keeping drag-to-scroll on the header.
   touchAction: 'pan-y',
-  ...(!isMobileOnly && {
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: $isSideMenuOpen
-        ? theme.transitions.easing.easeOut
-        : theme.transitions.easing.sharp,
-      duration: $isSideMenuOpen
-        ? theme.transitions.duration.enteringScreen
-        : theme.transitions.duration.leavingScreen
-    }),
-    ...($isSideMenuOpen && {
-      width: `calc(100% - ${theme.sideMenuWidth}px)`,
-      marginLeft: `${theme.sideMenuWidth}px`
-    })
-  })
+  transition: $transition,
+  // Must stay in lockstep with MainWrapper's margin (both come from
+  // useSideMenuOffset) or the bar and the content below it disagree on where
+  // the menu ends.
+  width: `calc(100% - ${$offset}px)`,
+  marginLeft: `${$offset}px`
 }));
 
 const NavigationGroup = styled('div')(({ theme }) => ({
@@ -74,29 +74,28 @@ const ToolsGroup = styled('div')(({ theme }) => ({
   }
 }));
 
-const LogoImage = styled('img')(({ theme }) => ({
-  height: 34,
-  marginRight: theme.spacing(1),
-  [theme.breakpoints.down('sm')]: {
-    height: 32
+// A bare chevron is a thin glyph surrounded by air: on the brown bar it reads
+// as decoration rather than as a control. The ring is what makes it look
+// pressable at a glance — the same treatment the reference designs give their
+// rail toggle. The burger needs none of this: it is already a solid mark.
+const RailToggleButton = styled(IconButton)(({ theme }) => ({
+  border: `1px solid ${alpha(theme.palette.primary.contrastText, 0.5)}`,
+  '&:hover': {
+    borderColor: theme.palette.primary.contrastText,
+    backgroundColor: alpha(theme.palette.primary.contrastText, 0.14)
   }
 }));
 
-export const AppTitle = styled('span')(({ theme }) => ({
-  ...theme.typography.h4
+// Mobile only: on desktop the brand lives permanently in the side rail's
+// header, which is why it no longer appears here at all. Below `sm` the
+// wordmark is dropped and only the logo is kept, for room.
+const BrandLogo = styled(GCLogo)(({ theme }) => ({
+  marginRight: theme.spacing(1),
+  cursor: 'pointer',
+  [theme.breakpoints.down('sm')]: {
+    '& .MuiTypography-root': { display: 'none' }
+  }
 }));
-
-const GrottoTxt = styled(AppTitle)(({ theme }) => ({
-  [theme.breakpoints.down('sm')]: { display: 'none' }
-}));
-
-export const StyledLink = styled(AppLink)`
-  color: inherit;
-  text-decoration: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-`;
 
 const ActionsGroup = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -111,9 +110,23 @@ const ActionsGroup = styled('div')(({ theme }) => ({
 
 const AppBar = () => {
   const dispatch = useDispatch();
+  const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const authState = useSelector(state => state.login);
-  const isSideMenuOpen = useSelector(state => state.sideMenu.open);
+  const isExpanded = useSelector(state => state.sideMenu.isExpanded);
+  const isDesktop = useIsDesktopLayout();
+  const { width: sideMenuOffset, transition } = useSideMenuOffset();
+
+  // Desktop collapses the rail in place; mobile reveals the overlay.
+  const menuButtonLabel = (() => {
+    if (!isDesktop) return formatMessage({ id: 'open drawer' });
+    return formatMessage({ id: isExpanded ? 'Collapse menu' : 'Expand menu' });
+  })();
+
+  const handleMenuButtonClick = () =>
+    dispatch(
+      isDesktop ? setSideMenuExpanded(!isExpanded) : openMobileSideMenu()
+    );
 
   const onLoginClick = () =>
     authState.isLoginDialogDisplayed
@@ -126,27 +139,34 @@ const AppBar = () => {
 
   return (
     <>
-      <StyledMuiAppBar $isSideMenuOpen={isSideMenuOpen}>
+      <StyledMuiAppBar $offset={sideMenuOffset} $transition={transition}>
         <Toolbar variant="dense">
           <NavigationGroup>
-            <IconButton
-              color="inherit"
-              aria-label="toggle drawer"
-              edge="start"
-              onClick={() => dispatch(toggleSideMenu())}
-              size="large">
-              <MenuIcon sx={{ fontSize: 32 }} />
-            </IconButton>
-            {(!isSideMenuOpen || isMobileOnly) && (
-              <StyledLink to="/">
-                <LogoImage
-                  id="grottocenter-logo"
-                  src={logoGC}
-                  alt="Grottocenter"
-                />
-                <GrottoTxt>Grottocenter</GrottoTxt>
-              </StyledLink>
+            {/* A chevron, not a burger: on desktop the menu never goes away,
+                the button only folds it into its rail. No `edge="start"` here —
+                its negative margin would push the ring against the very edge of
+                the bar. */}
+            {isDesktop ? (
+              <RailToggleButton
+                color="inherit"
+                aria-label={menuButtonLabel}
+                aria-expanded={isExpanded}
+                onClick={handleMenuButtonClick}>
+                {isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+              </RailToggleButton>
+            ) : (
+              <IconButton
+                color="inherit"
+                aria-label={menuButtonLabel}
+                edge="start"
+                onClick={handleMenuButtonClick}
+                size="large">
+                <MenuIcon sx={{ fontSize: 32 }} />
+              </IconButton>
             )}
+            {/* Desktop has the brand in the rail header; repeating it here would
+                be the second Grottocenter logo on screen. */}
+            {!isDesktop && <BrandLogo size={34} showWordmark />}
           </NavigationGroup>
           <Spacer sx={{ display: { xs: 'block', sm: 'none' } }} />
           <ToolsGroup>
