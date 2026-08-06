@@ -245,7 +245,12 @@ const ApplicationShell = () => {
           in a row and the second "Order updated" never appears, taking its Undo
           link with it (useMoveRelevanceWithUndo). The three persistent
           notifiers each pass `preventDuplicate` themselves, keyed, which is
-          where the flag actually belongs. */}
+          where the flag actually belongs.
+
+          Do not reinstate it here without checking the callers: message-based
+          dedupe compares by identity, and a snackbar whose message is a React
+          node (the notifiers all pass <FormattedMessage>) never matches itself,
+          so it would opt out of deduplication silently. */}
       <Provider store={gcStore}>
         <HydratedIntlProvider onError={customOnIntlError}>
           <SnackbarProvider

@@ -43,9 +43,6 @@ const tree = (locale, msgs) => (
   </IntlProvider>
 );
 
-// `locale` is what makes useIntl() hand out a fresh formatMessage identity,
-// which is exactly what used to re-run the effect and re-announce a
-// reconnection that never happened.
 const renderNotifier = (locale = 'en', msgs = messages) =>
   render(tree(locale, msgs));
 
@@ -78,6 +75,11 @@ describe('NetworkStatusNotifier', () => {
     expect(countTexts(baseElement, 'You are back online.')).toBe(1);
   });
 
+  // A locale change used to give useIntl() a fresh formatMessage identity, which
+  // re-ran the effect and re-announced a reconnection that never happened. Both
+  // messages are nodes now, so nothing locale-dependent is left in the deps and
+  // the effect cannot re-run on a language switch at all — this guards against
+  // reintroducing such a dependency.
   it('does not re-announce a reconnection when the locale changes', () => {
     const { baseElement, rerender } = renderNotifier();
     goOffline();
