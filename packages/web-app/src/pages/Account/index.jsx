@@ -20,12 +20,10 @@ import {
   Select,
   Skeleton,
   Switch,
-  Tooltip,
   Typography
 } from '@mui/material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -74,11 +72,10 @@ import Translate from '../../components/common/Translate';
 import {
   useUserProperties,
   usePermissions,
-  useNotification,
-  useOnlineStatus
+  useNotification
 } from '../../hooks';
 import AppLink from '../../components/common/AppLink';
-import OfflineDisabled from '../../components/common/OfflineDisabled';
+import SectionCreateButton from '../../components/common/SectionCreateButton';
 import { AVAILABLE_LANGUAGES, isPasswordValid } from '../../conf/config';
 import {
   languageIdToLocale,
@@ -1271,15 +1268,9 @@ const AccountPage = () => {
     state => state.subscriptions
   );
 
-  const isOnline = useOnlineStatus();
   const [isOrgSearchVisible, setIsOrgSearchVisible] = useState(false);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
   const [pendingLeaveOrg, setPendingLeaveOrg] = useState(null);
-  // Only OPENING a search panel needs the network — these same buttons become
-  // Cancel once open, and an open panel must stay closable. One expression per
-  // panel, so the tooltip, the wrapper and the button can never disagree.
-  const isJoinOrgBlocked = !isOnline && !isOrgSearchVisible;
-  const isAddEntranceBlocked = !isOnline && !isCaveSearchVisible;
 
   useEffect(() => {
     dispatch(fetchAccount());
@@ -1451,38 +1442,15 @@ const AccountPage = () => {
                 defaultExpanded={nbOrganizations > 0}
                 count={nbOrganizations}
                 icon={
-                  <OfflineDisabled disabled={isJoinOrgBlocked}>
-                    {/* Empty title while blocked: the button is disabled, so it
-                        emits no hover and MUI warns about it —
-                        OfflineDisabled's tooltip is the one that shows. */}
-                    <Tooltip
-                      title={
-                        isJoinOrgBlocked
-                          ? ''
-                          : formatMessage({
-                              id: isOrgSearchVisible
-                                ? 'Cancel this search'
-                                : 'Join'
-                            })
-                      }>
-                      <Button
-                        color={isOrgSearchVisible ? 'inherit' : 'secondary'}
-                        variant="outlined"
-                        disabled={isJoinOrgBlocked}
-                        onClick={() => setIsOrgSearchVisible(v => !v)}
-                        startIcon={
-                          isOrgSearchVisible ? (
-                            <CancelIcon />
-                          ) : (
-                            <PersonAddIcon />
-                          )
-                        }>
-                        {formatMessage({
-                          id: isOrgSearchVisible ? 'Cancel' : 'Join'
-                        })}
-                      </Button>
-                    </Tooltip>
-                  </OfflineDisabled>
+                  <SectionCreateButton
+                    isOpen={isOrgSearchVisible}
+                    onToggle={() => setIsOrgSearchVisible(v => !v)}
+                    label={formatMessage({ id: 'Join' })}
+                    tooltip={formatMessage({ id: 'Join' })}
+                    openTooltip={formatMessage({ id: 'Cancel this search' })}
+                    icon={<PersonAddIcon />}
+                    size="medium"
+                  />
                 }
                 content={
                   <>
@@ -1516,37 +1484,15 @@ const AccountPage = () => {
                 defaultExpanded={nbEntrances > 0}
                 count={nbEntrances}
                 icon={
-                  // Opening blocked offline, closing always allowed — see the
-                  // organizations trigger above.
-                  <OfflineDisabled disabled={isAddEntranceBlocked}>
-                    <Tooltip
-                      title={
-                        isAddEntranceBlocked
-                          ? ''
-                          : formatMessage({
-                              id: isCaveSearchVisible
-                                ? 'Cancel this search'
-                                : 'Add an entrance'
-                            })
-                      }>
-                      <Button
-                        color={isCaveSearchVisible ? 'inherit' : 'secondary'}
-                        variant="outlined"
-                        disabled={isAddEntranceBlocked}
-                        onClick={() => setIsCaveSearchVisible(v => !v)}
-                        startIcon={
-                          isCaveSearchVisible ? (
-                            <CancelIcon />
-                          ) : (
-                            <CheckCircleOutlineIcon />
-                          )
-                        }>
-                        {formatMessage({
-                          id: isCaveSearchVisible ? 'Cancel' : 'Add'
-                        })}
-                      </Button>
-                    </Tooltip>
-                  </OfflineDisabled>
+                  <SectionCreateButton
+                    isOpen={isCaveSearchVisible}
+                    onToggle={() => setIsCaveSearchVisible(v => !v)}
+                    label={formatMessage({ id: 'Add' })}
+                    tooltip={formatMessage({ id: 'Add an entrance' })}
+                    openTooltip={formatMessage({ id: 'Cancel this search' })}
+                    icon={<CheckCircleOutlineIcon />}
+                    size="medium"
+                  />
                 }
                 content={
                   <RelatedCaves

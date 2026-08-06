@@ -24,6 +24,8 @@ import Files from './Files';
 import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
 import Translate from '../Translate';
 import StandardDialog from '../StandardDialog';
+import OfflineDisabled from '../OfflineDisabled';
+import { useOnlineStatus } from '../../../hooks';
 import linkifyOptions from '../../../helpers/linkifyOptions';
 
 const Document = ({
@@ -36,6 +38,7 @@ const Document = ({
   const { formatMessage } = useIntl();
   const theme = useTheme();
   const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
+  const isOnline = useOnlineStatus();
   const [isUnlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [isClamped, setIsClamped] = useState(false);
@@ -105,15 +108,25 @@ const Document = ({
                   />
                 )}
                 {onUnlink && (
-                  <Tooltip
-                    title={formatMessage({ id: 'Unlink this document' })}>
-                    <Button
-                      onClick={() => setUnlinkDialogOpen(true)}
-                      color="primary"
-                      aria-label={formatMessage({ id: 'unlink' })}>
-                      <LinkOffIcon />
-                    </Button>
-                  </Tooltip>
+                  // Unlinking is an API write, so it goes down with the
+                  // connection. Guarded here rather than at each call site:
+                  // this is the single component every documents list renders.
+                  <OfflineDisabled>
+                    <Tooltip
+                      title={
+                        isOnline
+                          ? formatMessage({ id: 'Unlink this document' })
+                          : ''
+                      }>
+                      <Button
+                        onClick={() => setUnlinkDialogOpen(true)}
+                        color="primary"
+                        disabled={!isOnline}
+                        aria-label={formatMessage({ id: 'unlink' })}>
+                        <LinkOffIcon />
+                      </Button>
+                    </Tooltip>
+                  </OfflineDisabled>
                 )}
               </ButtonGroup>
             </Box>

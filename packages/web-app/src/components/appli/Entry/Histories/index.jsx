@@ -2,10 +2,9 @@ import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { Button, Divider, List, Tooltip } from '@mui/material';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
+import { Divider, List } from '@mui/material';
 
+import SectionCreateButton from '@/components/common/SectionCreateButton';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { HistoryPropTypes } from '../../../../types/entrance.type';
 import History from './History';
@@ -64,21 +63,13 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
       icon={
         permissions.isAuth &&
         isEditAllowed && (
-          <Tooltip
-            title={
-              isFormVisible
-                ? formatMessage({ id: 'Cancel adding a new history' })
-                : formatMessage({ id: 'Add a new history' })
-            }>
-            <Button
-              color={isFormVisible ? 'inherit' : 'secondary'}
-              size="small"
-              variant="outlined"
-              onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
-              {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
-            </Button>
-          </Tooltip>
+          <SectionCreateButton
+            isOpen={isFormVisible}
+            onToggle={() => setIsFormVisible(!isFormVisible)}
+            label={formatMessage({ id: 'New' })}
+            tooltip={formatMessage({ id: 'Add a new history' })}
+            openTooltip={formatMessage({ id: 'Cancel adding a new history' })}
+          />
         )
       }
       content={

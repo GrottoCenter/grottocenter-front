@@ -1,23 +1,19 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, Button, Divider, Tooltip } from '@mui/material';
+import { Box, Divider } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
-import CancelIcon from '@mui/icons-material/Cancel';
 import { styled } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
+import NewEntityButton from '@/components/common/NewEntityButton';
+import SectionCreateButton from '@/components/common/SectionCreateButton';
 import { linkDocumentToEntrance } from '../../../../actions/LinkDocumentToEntrance';
 import { unlinkDocumentToEntrance } from '../../../../actions/UnlinkDocumentToEntrance';
 import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../../SearchDocumentForm';
 import Alert from '../../../common/Alert';
-import OfflineDisabled from '../../../common/OfflineDisabled';
-import {
-  usePermissions,
-  useAuthNavigate,
-  useOnlineStatus
-} from '../../../../hooks';
+import { usePermissions } from '../../../../hooks';
 import DocumentsList from '../../../common/DocumentsList/DocumentsList';
 
 const DividerStyled = styled(Divider)`
@@ -26,16 +22,8 @@ const DividerStyled = styled(Divider)`
 const Documents = ({ documents, entranceId, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
-  const navigateToNewDocument = useAuthNavigate(
-    `/ui/entity/add/document?entranceId=${entranceId}`
-  );
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
   const dispatch = useDispatch();
-  const isOnline = useOnlineStatus();
-  // Opening the search panel needs the network; closing it never does — this
-  // same button becomes Cancel once open. One expression, so the tooltip, the
-  // wrapper and the button can never disagree about which of the two it is.
-  const isAssociateBlocked = !isOnline && !isDocumentSearchVisible;
 
   const onSubmitForm = newDocuments => {
     newDocuments.forEach(d => {
@@ -59,66 +47,28 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
         permissions.isAuth &&
         isEditAllowed && (
           <Box display="flex" gap={0.5}>
-            {/* Hand-rolled equivalent of NewEntityButton, which is already
-                guarded — align it rather than leave the odd one out. */}
-            <OfflineDisabled>
-              {/* Empty title while offline: the button is disabled, so it emits
-                  no hover and MUI warns about it — OfflineDisabled's tooltip is
-                  the one that shows. */}
-              <Tooltip
-                title={
-                  isOnline ? formatMessage({ id: 'Create a new document' }) : ''
-                }>
-                <Button
-                  color="secondary"
-                  size="small"
-                  variant="outlined"
-                  disabled={!isOnline}
-                  onClick={navigateToNewDocument}
-                  startIcon={<EntityIcon iconType="bibliography" size={20} />}>
-                  {formatMessage({ id: 'New' })}
-                </Button>
-              </Tooltip>
-            </OfflineDisabled>
-            <OfflineDisabled disabled={isAssociateBlocked}>
-              {/* Empty title while blocked: the button is disabled, so it emits
-                  no hover and MUI warns about it — OfflineDisabled's tooltip is
-                  the one that shows. */}
-              <Tooltip
-                title={
-                  isAssociateBlocked
-                    ? ''
-                    : formatMessage({
-                        id: isDocumentSearchVisible
-                          ? 'Cancel this search'
-                          : 'Assign an existing document'
-                      })
-                }>
-                <Button
-                  color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
-                  size="small"
-                  variant="outlined"
-                  disabled={isAssociateBlocked}
-                  onClick={() =>
-                    setIsDocumentSearchVisible(!isDocumentSearchVisible)
-                  }
-                  startIcon={
-                    isDocumentSearchVisible ? (
-                      <CancelIcon />
-                    ) : (
-                      <EntityIcon
-                        iconType="bibliography"
-                        size={20}
-                        BadgeIcon={LinkIcon}
-                      />
-                    )
-                  }>
-                  {formatMessage({
-                    id: isDocumentSearchVisible ? 'Cancel' : 'Associate'
-                  })}
-                </Button>
-              </Tooltip>
-            </OfflineDisabled>
+            <NewEntityButton
+              to={`/ui/entity/add/document?entranceId=${entranceId}`}
+              size="small"
+              tooltip={formatMessage({ id: 'Create a new document' })}
+              icon={<EntityIcon iconType="bibliography" size={20} />}
+            />
+            <SectionCreateButton
+              isOpen={isDocumentSearchVisible}
+              onToggle={() =>
+                setIsDocumentSearchVisible(!isDocumentSearchVisible)
+              }
+              label={formatMessage({ id: 'Associate' })}
+              tooltip={formatMessage({ id: 'Assign an existing document' })}
+              openTooltip={formatMessage({ id: 'Cancel this search' })}
+              icon={
+                <EntityIcon
+                  iconType="bibliography"
+                  size={20}
+                  BadgeIcon={LinkIcon}
+                />
+              }
+            />
           </Box>
         )
       }

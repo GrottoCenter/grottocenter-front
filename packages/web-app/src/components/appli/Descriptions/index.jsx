@@ -2,16 +2,8 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Button,
-  Divider,
-  Link as MuiLink,
-  List,
-  Tooltip,
-  Typography
-} from '@mui/material';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
+import { Divider, Link as MuiLink, List, Typography } from '@mui/material';
+import SectionCreateButton from '@/components/common/SectionCreateButton';
 import NetworkInlineLink from '../../common/NetworkInlineLink';
 
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
@@ -68,21 +60,15 @@ const Descriptions = ({
         permissions.isAuth &&
         isEditAllowed &&
         isAddAllowed && (
-          <Tooltip
-            title={
-              isFormVisible
-                ? formatMessage({ id: 'Cancel adding a new description' })
-                : formatMessage({ id: 'Add a new description' })
-            }>
-            <Button
-              color={isFormVisible ? 'inherit' : 'secondary'}
-              size="small"
-              variant="outlined"
-              onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
-              {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
-            </Button>
-          </Tooltip>
+          <SectionCreateButton
+            isOpen={isFormVisible}
+            onToggle={() => setIsFormVisible(!isFormVisible)}
+            label={formatMessage({ id: 'New' })}
+            tooltip={formatMessage({ id: 'Add a new description' })}
+            openTooltip={formatMessage({
+              id: 'Cancel adding a new description'
+            })}
+          />
         )
       }
       content={

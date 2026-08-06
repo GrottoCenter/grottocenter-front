@@ -11,8 +11,6 @@ import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShareIcon from '@mui/icons-material/Share';
 import AppLink from '../../common/AppLink';
@@ -28,9 +26,8 @@ import ManagedEntitiesSection from './ManagedEntitiesSection';
 import { GrottoFullPropTypes } from '../../../types/grotto.type';
 import Alert from '../../common/Alert';
 import FetchErrorState from '../../common/FetchErrorState';
-import OfflineDisabled from '../../common/OfflineDisabled';
+import SectionCreateButton from '../../common/SectionCreateButton';
 import {
-  useOnlineStatus,
   usePermissions,
   useRefetchOnReconnect,
   useSharePage
@@ -66,11 +63,6 @@ const Organization = ({ error, isLoading, organization }) => {
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
   const [pendingRemoveMember, setPendingRemoveMember] = useState(null);
   const handleShare = useSharePage();
-  const isOnline = useOnlineStatus();
-  // Opening the cave search needs the network; closing it never does — the same
-  // button turns into Cancel once open. One expression, so the tooltip, the
-  // wrapper and the button can never disagree about which of the two it is.
-  const isAddCaveBlocked = !isOnline && !isCaveSearchVisible;
 
   const currentUserId = authState?.authTokenDecoded?.id;
 
@@ -385,34 +377,14 @@ const Organization = ({ error, isLoading, organization }) => {
             count={nbNetworks + nbEntrances}
             icon={
               canManageCaves && (
-                <OfflineDisabled disabled={isAddCaveBlocked}>
-                  {/* Empty title while blocked: the button is disabled, so it
-                      emits no hover and MUI warns about it — OfflineDisabled's
-                      tooltip is the one that shows. */}
-                  <Tooltip
-                    title={
-                      isAddCaveBlocked
-                        ? ''
-                        : formatMessage({
-                            id: isCaveSearchVisible
-                              ? 'Cancel this search'
-                              : 'Add a cave'
-                          })
-                    }>
-                    <Button
-                      color={isCaveSearchVisible ? 'inherit' : 'secondary'}
-                      variant="outlined"
-                      disabled={isAddCaveBlocked}
-                      onClick={() => setIsCaveSearchVisible(v => !v)}
-                      startIcon={
-                        isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />
-                      }>
-                      {formatMessage({
-                        id: isCaveSearchVisible ? 'Cancel' : 'Add'
-                      })}
-                    </Button>
-                  </Tooltip>
-                </OfflineDisabled>
+                <SectionCreateButton
+                  isOpen={isCaveSearchVisible}
+                  onToggle={() => setIsCaveSearchVisible(v => !v)}
+                  label={formatMessage({ id: 'Add' })}
+                  tooltip={formatMessage({ id: 'Add a cave' })}
+                  openTooltip={formatMessage({ id: 'Cancel this search' })}
+                  size="medium"
+                />
               )
             }
             content={

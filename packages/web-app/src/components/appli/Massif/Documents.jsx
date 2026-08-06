@@ -1,18 +1,17 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Button, Divider, Tooltip } from '@mui/material';
+import { Divider } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import { useDispatch } from 'react-redux';
-import CancelIcon from '@mui/icons-material/Cancel';
+import SectionCreateButton from '@/components/common/SectionCreateButton';
 import { linkDocumentToMassif } from '../../../actions/LinkDocumentToMassif';
 import { unlinkDocumentToMassif } from '../../../actions/UnlinkDocumentToMassif';
 import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../SearchDocumentForm';
 import Alert from '../../common/Alert';
-import OfflineDisabled from '../../common/OfflineDisabled';
-import { usePermissions, useOnlineStatus } from '../../../hooks';
+import { usePermissions } from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 
 const Documents = ({ documents, massifId }) => {
@@ -20,11 +19,6 @@ const Documents = ({ documents, massifId }) => {
   const permissions = usePermissions();
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
   const dispatch = useDispatch();
-  const isOnline = useOnlineStatus();
-  // Opening the search panel needs the network; closing it never does — this
-  // same button becomes Cancel once open. One expression, so the tooltip, the
-  // wrapper and the button can never disagree about which of the two it is.
-  const isAssociateBlocked = !isOnline && !isDocumentSearchVisible;
 
   const onSubmitForm = newDocuments => {
     newDocuments.forEach(d => {
@@ -41,43 +35,20 @@ const Documents = ({ documents, massifId }) => {
       title={formatMessage({ id: 'Documents' })}
       icon={
         permissions.isAuth && (
-          <OfflineDisabled disabled={isAssociateBlocked}>
-            {/* Empty title while blocked: the button is disabled, so it emits
-                no hover and MUI warns about it — OfflineDisabled's tooltip is
-                the one that shows. */}
-            <Tooltip
-              title={
-                isAssociateBlocked
-                  ? ''
-                  : formatMessage({
-                      id: isDocumentSearchVisible
-                        ? 'Cancel this search'
-                        : 'Assign an existing document'
-                    })
-              }>
-              <Button
-                color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
-                size="small"
-                variant="outlined"
-                disabled={isAssociateBlocked}
-                onClick={() => setIsDocumentSearchVisible(v => !v)}
-                startIcon={
-                  isDocumentSearchVisible ? (
-                    <CancelIcon />
-                  ) : (
-                    <EntityIcon
-                      iconType="bibliography"
-                      size={20}
-                      BadgeIcon={LinkIcon}
-                    />
-                  )
-                }>
-                {formatMessage({
-                  id: isDocumentSearchVisible ? 'Cancel' : 'Associate'
-                })}
-              </Button>
-            </Tooltip>
-          </OfflineDisabled>
+          <SectionCreateButton
+            isOpen={isDocumentSearchVisible}
+            onToggle={() => setIsDocumentSearchVisible(v => !v)}
+            label={formatMessage({ id: 'Associate' })}
+            tooltip={formatMessage({ id: 'Assign an existing document' })}
+            openTooltip={formatMessage({ id: 'Cancel this search' })}
+            icon={
+              <EntityIcon
+                iconType="bibliography"
+                size={20}
+                BadgeIcon={LinkIcon}
+              />
+            }
+          />
         )
       }
       content={
