@@ -23,6 +23,7 @@ const FileListItem = styled(ListItem)`
 const Files = ({
   files = [],
   description,
+  documentTitle,
   onImageClick,
   imageIndexOffset = 0
 }) => {
@@ -106,6 +107,7 @@ const Files = ({
           images={imageFiles}
           initialIndex={lightboxIndex}
           description={description}
+          documentTitle={documentTitle}
         />
       )}
     </>
@@ -121,6 +123,7 @@ Files.propTypes = {
     })
   ),
   description: PropTypes.string,
+  documentTitle: PropTypes.string,
   onImageClick: PropTypes.func,
   imageIndexOffset: PropTypes.number
 };
