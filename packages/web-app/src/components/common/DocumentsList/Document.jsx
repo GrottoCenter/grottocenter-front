@@ -179,6 +179,7 @@ const Document = ({
             <Files
               files={document.files}
               description={document.description}
+              documentTitle={document.title}
               onImageClick={onImageClick}
               imageIndexOffset={imageIndexOffset}
             />

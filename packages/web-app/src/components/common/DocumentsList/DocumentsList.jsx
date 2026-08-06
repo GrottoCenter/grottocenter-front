@@ -61,7 +61,11 @@ const DocumentsList = ({
         doc.files
           .filter(file => isImageFile(file.fileName))
           .forEach(file =>
-            images.push({ ...file, description: doc.description })
+            images.push({
+              ...file,
+              description: doc.description,
+              documentTitle: doc.title
+            })
           );
       }
     });

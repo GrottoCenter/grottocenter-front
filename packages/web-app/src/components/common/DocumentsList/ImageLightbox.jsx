@@ -122,7 +122,8 @@ const ImageLightbox = ({
   onClose,
   images,
   initialIndex = 0,
-  description = null
+  description = null,
+  documentTitle = null
 }) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [zoom, setZoom] = useState(1);
@@ -370,7 +371,9 @@ const ImageLightbox = ({
           <Typography
             variant="caption"
             sx={{ color: 'rgba(255,255,255,0.6)', textAlign: 'center' }}>
-            {decodeFileName(currentImage.fileName)}
+            {currentImage.documentTitle ||
+              documentTitle ||
+              decodeFileName(currentImage.fileName)}
           </Typography>
           {(currentImage.description || description) && (
             <Typography
@@ -403,11 +406,13 @@ ImageLightbox.propTypes = {
       fileName: PropTypes.string.isRequired,
       completePath: PropTypes.string.isRequired,
       thumbnails: ThumbnailsPropTypes,
-      description: PropTypes.string
+      description: PropTypes.string,
+      documentTitle: PropTypes.string
     })
   ).isRequired,
   initialIndex: PropTypes.number,
-  description: PropTypes.string
+  description: PropTypes.string,
+  documentTitle: PropTypes.string
 };
 
 export default ImageLightbox;
