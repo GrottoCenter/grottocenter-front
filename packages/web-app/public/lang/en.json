@@ -1792,6 +1792,7 @@
   "News": "News",
   "Next": "Next",
   "Next image": "Next image",
+  "Next page": "Next page",
   "Next Page": "Next Page",
   "Nicaragua": "Nicaragua",
   "nickname": "nickname",
@@ -1945,6 +1946,7 @@
   "Original id from an imported database": "Original id from an imported database",
   "Other types": "Other types",
   "Output": "Output",
+  "Page {current} of {total}": "Page {current} of {total}",
   "Page {start} of {title}": "Page {start} of {title}",
   "Page Comment": "Page Comment",
   "Page history": "Page history",
@@ -2032,6 +2034,7 @@
   "Previous image": "Previous image",
   "Previous name": "Previous name",
   "Previous nickname": "Previous nickname",
+  "Previous page": "Previous page",
   "Previous Page": "Previous Page",
   "Previous surname": "Previous surname",
   "Print": "Print",
@@ -2533,6 +2536,7 @@
   "UK03": "United Kingdom: Scotland (Berwick, Perth, Sutherland, etc.)",
   "UK04": "United Kingdom: North Ireland (Fermanagh, Antrim etc.)",
   "Ukraine": "Ukraine",
+  "Unable to display this PDF.": "Unable to display this PDF.",
   "Unable to open the statistics dashboard. Please try again.": "Unable to open the statistics dashboard. Please try again.",
   "Unarchive": "Unarchive",
   "Underground time": "Underground time",
@@ -2749,5 +2753,7 @@
   "Zanzibar": "Tansania",
   "Zimbabwe": "Zimbabwe",
   "Zip code": "Zip code",
-  "Zone": "Zone"
+  "Zone": "Zone",
+  "Zoom in": "Zoom in",
+  "Zoom out": "Zoom out"
 }

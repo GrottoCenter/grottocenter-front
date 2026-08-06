@@ -1792,6 +1792,7 @@
   "News": "Νέα",
   "Next": "Επόμενο",
   "Next image": "Επόμενη εικόνα",
+  "Next page": "Επόμενη σελίδα",
   "Next Page": "Επόμενη σελίδα",
   "Nicaragua": "Νικαράγουα",
   "nickname": "ψευδώνυμο",
@@ -1945,6 +1946,7 @@
   "Original id from an imported database": "Αρχικό αναγνωριστικό από εισαγόμενη βάση δεδομένων",
   "Other types": "Άλλοι τύποι",
   "Output": "Έξοδος",
+  "Page {current} of {total}": "Σελίδα {current} από {total}",
   "Page {start} of {title}": "Σελίδα {start} από {title}",
   "Page Comment": "Σχόλιο σελίδας",
   "Page history": "Ιστορικό σελίδας",
@@ -2032,6 +2034,7 @@
   "Previous image": "Προηγούμενη εικόνα",
   "Previous name": "Προηγούμενο όνομα",
   "Previous nickname": "Προηγούμενο ψευδώνυμο",
+  "Previous page": "Προηγούμενη σελίδα",
   "Previous Page": "Προηγούμενη σελίδα",
   "Previous surname": "Προηγούμενο επώνυμο",
   "Print": "Εκτύπωση",
@@ -2533,6 +2536,7 @@
   "UK03": "Ηνωμένο Βασίλειο: Σκωτία",
   "UK04": "Ηνωμένο Βασίλειο: Βόρεια Ιρλανδία",
   "Ukraine": "Ουκρανία",
+  "Unable to display this PDF.": "Δεν είναι δυνατή η προβολή αυτού του PDF.",
   "Unable to open the statistics dashboard. Please try again.": "Δεν ήταν δυνατό το άνοιγμα του πίνακα στατιστικών. Δοκιμάστε ξανά.",
   "Unarchive": "Κατάργηση αρχειοθέτησης",
   "Underground time": "Υπόγειος χρόνος",
@@ -2749,5 +2753,7 @@
   "Zanzibar": "Ζανζιβάρη",
   "Zimbabwe": "Ζιμπάμπουε",
   "Zip code": "Ταχυδρομικός κωδικός",
-  "Zone": "Ζώνη"
+  "Zone": "Ζώνη",
+  "Zoom in": "Μεγέθυνση",
+  "Zoom out": "Σμίκρυνση"
 }

@@ -1792,6 +1792,7 @@
   "News": "חדשות",
   "Next": "הבא",
   "Next image": "תמונה הבאה",
+  "Next page": "העמוד הבא",
   "Next Page": "עמוד הבא",
   "Nicaragua": "ניקרגואה",
   "nickname": "כינוי",
@@ -1945,6 +1946,7 @@
   "Original id from an imported database": "מזהה מקורי מבסיס נתונים מיובא",
   "Other types": "סוגים אחרים",
   "Output": "פלט",
+  "Page {current} of {total}": "עמוד {current} מתוך {total}",
   "Page {start} of {title}": "עמוד {start} מתוך {title}",
   "Page Comment": "הערת עמוד",
   "Page history": "היסטוריית הדף",
@@ -2032,6 +2034,7 @@
   "Previous image": "תמונה קודמת",
   "Previous name": "שם קודם",
   "Previous nickname": "כינוי קודם",
+  "Previous page": "העמוד הקודם",
   "Previous Page": "עמוד קודם",
   "Previous surname": "שם משפחה קודם",
   "Print": "הדפסה",
@@ -2533,6 +2536,7 @@
   "UK03": "הממלכה המאוחדת: סקוטלנד (בריוויק, פרת', סאתרלנד וכו').",
   "UK04": "הממלכה המאוחדת: אירלנד הצפונית (פרמנה, אנטריים וכו').",
   "Ukraine": "אוקראינה",
+  "Unable to display this PDF.": "לא ניתן להציג קובץ PDF זה.",
   "Unable to open the statistics dashboard. Please try again.": "לא ניתן לפתוח את לוח המחוונים של הסטטיסטיקה. אנא נסו שוב.",
   "Unarchive": "בטל ארכוב",
   "Underground time": "זמן תת-קרקעי",
@@ -2749,5 +2753,7 @@
   "Zanzibar": "זנזיבר",
   "Zimbabwe": "זימבבואה",
   "Zip code": "מיקוד",
-  "Zone": "אזור"
+  "Zone": "אזור",
+  "Zoom in": "הגדלה",
+  "Zoom out": "הקטנה"
 }

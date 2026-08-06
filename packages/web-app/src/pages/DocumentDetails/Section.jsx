@@ -15,6 +15,7 @@ import { styled } from '@mui/material/styles';
 import { EventAvailable, InsertDriveFile } from '@mui/icons-material';
 import Linkify from 'linkify-react';
 
+import PdfPreview from '@/components/common/PdfPreview';
 import AppLink from '../../components/common/AppLink';
 import linkifyOptions from '../../helpers/linkifyOptions';
 import Property from '../../components/common/Properties/Property';
@@ -201,16 +202,6 @@ FileListElement.propTypes = {
   filePath: PropTypes.string.isRequired
 };
 
-const PdfPreview = styled('object')(({ theme }) => ({
-  border: 0,
-  width: '100%',
-  height: 320,
-  display: 'block',
-  background: theme.palette.grey[100],
-  [theme.breakpoints.up('sm')]: { height: 480 },
-  [theme.breakpoints.up('md')]: { height: 600 }
-}));
-
 const VideoPreview = styled('video')(({ theme }) => ({
   width: '100%',
   maxHeight: 320,
@@ -374,13 +365,7 @@ export const FilesSection = ({ files }) => {
               {decodeFileName(file.fileName)}
             </AppLink>
           </Box>
-          <PdfPreview data={file.completePath} type="application/pdf">
-            <Typography variant="body2">
-              <AppLink href={file.completePath}>
-                {formatMessage({ id: 'Open PDF' })}
-              </AppLink>
-            </Typography>
-          </PdfPreview>
+          <PdfPreview src={file.completePath} />
         </Box>
       ))}
       {videos.map(file => (

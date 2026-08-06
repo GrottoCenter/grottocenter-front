@@ -1792,6 +1792,7 @@
   "News": "أخبار",
   "Next": "التالي",
   "Next image": "الصورة التالية",
+  "Next page": "الصفحة التالية",
   "Next Page": "الصفحة التالية",
   "Nicaragua": "نيكاراغوا",
   "nickname": "اسم مستعار",
@@ -1945,6 +1946,7 @@
   "Original id from an imported database": "المعرف الأصلي من قاعدة بيانات مستوردة",
   "Other types": "أنواع أخرى",
   "Output": "إخراج",
+  "Page {current} of {total}": "الصفحة {current} من {total}",
   "Page {start} of {title}": "صفحة {start} من {title}",
   "Page Comment": "تعليق الصفحة",
   "Page history": "تاريخ الصفحة",
@@ -2032,6 +2034,7 @@
   "Previous image": "الصورة السابقة",
   "Previous name": "الاسم السابق",
   "Previous nickname": "اسم الشهرة السابق",
+  "Previous page": "الصفحة السابقة",
   "Previous Page": "الصفحة السابقة",
   "Previous surname": "اللقب السابق",
   "Print": "طباعة",
@@ -2533,6 +2536,7 @@
   "UK03": "المملكة المتحدة: اسكتلندا (بيرويك، بيرث، ساذرلاند، إلخ.)",
   "UK04": "المملكة المتحدة: أيرلندا الشمالية (فيرمانا، أنتريم وغيرها)",
   "Ukraine": "أوكرانيا",
+  "Unable to display this PDF.": "تعذّر عرض ملف PDF هذا.",
   "Unable to open the statistics dashboard. Please try again.": "تعذّر فتح لوحة الإحصاءات. يرجى المحاولة مرة أخرى.",
   "Unarchive": "إلغاء الأرشفة",
   "Underground time": "الوقت تحت الأرض",
@@ -2749,5 +2753,7 @@
   "Zanzibar": "زنجبار",
   "Zimbabwe": "زيمبابوي",
   "Zip code": "الرمز البريدي",
-  "Zone": "منطقة"
+  "Zone": "منطقة",
+  "Zoom in": "تكبير",
+  "Zoom out": "تصغير"
 }

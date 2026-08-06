@@ -1792,6 +1792,7 @@
   "News": "Nieuws",
   "Next": "Volgende",
   "Next image": "Volgende afbeelding",
+  "Next page": "Volgende pagina",
   "Next Page": "Volgende pagina",
   "Nicaragua": "Nicaragua",
   "nickname": "bijnaam",
@@ -1945,6 +1946,7 @@
   "Original id from an imported database": "Originele ID uit een geïmporteerde database",
   "Other types": "Andere typen",
   "Output": "Uitvoer",
+  "Page {current} of {total}": "Pagina {current} van {total}",
   "Page {start} of {title}": "Pagina {start} van {title}",
   "Page Comment": "Paginacommentaar",
   "Page history": "Paginageschiedenis",
@@ -2032,6 +2034,7 @@
   "Previous image": "Vorige afbeelding",
   "Previous name": "Vorige naam",
   "Previous nickname": "Vorige bijnaam",
+  "Previous page": "Vorige pagina",
   "Previous Page": "Vorige pagina",
   "Previous surname": "Vorige achternaam",
   "Print": "Afdrukken",
@@ -2533,6 +2536,7 @@
   "UK03": "Verenigd Koninkrijk: Schotland (Berwick, Perth, Sutherland, enz.)",
   "UK04": "Verenigd Koninkrijk: Noord-Ierland (Fermanagh, Antrim enz.)",
   "Ukraine": "Oekraïne",
+  "Unable to display this PDF.": "Kan deze PDF niet weergeven.",
   "Unable to open the statistics dashboard. Please try again.": "Kan het statistiekdashboard niet openen. Probeer het opnieuw.",
   "Unarchive": "Dearchiveren",
   "Underground time": "Ondergrondse tijd",
@@ -2749,5 +2753,7 @@
   "Zanzibar": "Zanzibar",
   "Zimbabwe": "Zimbabwe",
   "Zip code": "Postcode",
-  "Zone": "Zone"
+  "Zone": "Zone",
+  "Zoom in": "Inzoomen",
+  "Zoom out": "Uitzoomen"
 }

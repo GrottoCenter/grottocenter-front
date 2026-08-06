@@ -1792,6 +1792,7 @@
   "News": "Noutăți",
   "Next": "Mai departe",
   "Next image": "Imaginea următoare",
+  "Next page": "Pagina următoare",
   "Next Page": "Pagina următoare",
   "Nicaragua": "Nicaragua",
   "nickname": "poreclă",
@@ -1945,6 +1946,7 @@
   "Original id from an imported database": "ID original dintr-o bază de date importată",
   "Other types": "Alte tipuri",
   "Output": "Ieșire",
+  "Page {current} of {total}": "Pagina {current} din {total}",
   "Page {start} of {title}": "Pagina {start} din {title}",
   "Page Comment": "Comentați despre paginile în care puteți găsi un document.\nExemplu: un articol se află la paginile 10-14 ale unei reviste. Dacă există o pagină completă adăugată la pagina 13, puteți utiliza un „Comentariu de pagină” pentru a o indica.",
   "Page history": "Istoricul paginii",
@@ -2032,6 +2034,7 @@
   "Previous image": "Imaginea anterioară",
   "Previous name": "Nume anterior",
   "Previous nickname": "Pseudonim anterior",
+  "Previous page": "Pagina anterioară",
   "Previous Page": "Pagina anterioară",
   "Previous surname": "Prenume anterior",
   "Print": "Printează",
@@ -2533,6 +2536,7 @@
   "UK03": "Regatul Unit: Scoția (Berwick, Perth, Sutherland etc.)",
   "UK04": "Regatul Unit: Irlanda de Nord (Fermanagh, Antrim etc.)",
   "Ukraine": "Ucraina",
+  "Unable to display this PDF.": "Acest PDF nu poate fi afișat.",
   "Unable to open the statistics dashboard. Please try again.": "Nu s-a putut deschide panoul de statistici. Încercați din nou.",
   "Unarchive": "Dezarhivează",
   "Underground time": "Timp subteran",
@@ -2749,5 +2753,7 @@
   "Zanzibar": "Tanzania",
   "Zimbabwe": "Zimbabwe",
   "Zip code": "Cod poștal",
-  "Zone": "Zonă"
+  "Zone": "Zonă",
+  "Zoom in": "Mărire",
+  "Zoom out": "Micșorare"
 }

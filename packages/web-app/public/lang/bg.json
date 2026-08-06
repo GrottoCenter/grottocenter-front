@@ -1792,6 +1792,7 @@
   "News": "Новини",
   "Next": "Следващ",
   "Next image": "Следващо изображение",
+  "Next page": "Следваща страница",
   "Next Page": "Следваща страница",
   "Nicaragua": "Никарагуа",
   "nickname": "псевдоним",
@@ -1945,6 +1946,7 @@
   "Original id from an imported database": "Оригинален идентификатор от импортирана база данни",
   "Other types": "Други типове",
   "Output": "Изходи",
+  "Page {current} of {total}": "Страница {current} от {total}",
   "Page {start} of {title}": "Страница {start} от {title}",
   "Page Comment": "Коментар на страницата",
   "Page history": "История на страницата",
@@ -2032,6 +2034,7 @@
   "Previous image": "Предишно изображение",
   "Previous name": "Предишно име",
   "Previous nickname": "Предишен псевдоним",
+  "Previous page": "Предишна страница",
   "Previous Page": "Предишна страница",
   "Previous surname": "Предишна фамилия",
   "Print": "Принтирай",
@@ -2533,6 +2536,7 @@
   "UK03": "Обединено Кралство: Шотландия (Беруик, Пърт, Съзерланд и др.)",
   "UK04": "Обединено кралство: Северна Ирландия (Фермана, Антрим и др.)",
   "Ukraine": "Украйна",
+  "Unable to display this PDF.": "Този PDF файл не може да бъде показан.",
   "Unable to open the statistics dashboard. Please try again.": "Неуспешно отваряне на таблото със статистики. Моля, опитайте отново.",
   "Unarchive": "Разархивиране",
   "Underground time": "Време под земята",
@@ -2749,5 +2753,7 @@
   "Zanzibar": "Танзания",
   "Zimbabwe": "Зимбабве",
   "Zip code": "Пощенски код",
-  "Zone": "Зона"
+  "Zone": "Зона",
+  "Zoom in": "Увеличаване",
+  "Zoom out": "Намаляване"
 }
