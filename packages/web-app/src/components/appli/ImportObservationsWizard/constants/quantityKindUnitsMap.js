@@ -1,4 +1,4 @@
-// Source of truth: GrottoCenter API database (quantity_kind ↔ unit relationships).
+// Source of truth: Grottocenter API database (quantity_kind ↔ unit relationships).
 // If the backend adds a new mapping, this file must be updated manually.
 // TODO: Consider fetching these from an API endpoint to avoid drift.
 // Maps each quantity kind ID to an array of compatible unit IDs

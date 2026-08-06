@@ -1,4 +1,4 @@
-// Source of truth: GrottoCenter API database (t_medium table).
+// Source of truth: Grottocenter API database (t_medium table).
 // If the backend adds a new medium, this file must be updated manually.
 // TODO: Consider fetching these from an API endpoint to avoid drift.
 export const MEDIUMS = [

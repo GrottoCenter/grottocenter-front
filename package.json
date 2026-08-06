@@ -6,7 +6,7 @@
   "workspaces": [
     "packages/*"
   ],
-  "repository": "git@github.com:GrottoCenter/grottocenter-front.git",
+  "repository": "git@github.com:Grottocenter/grottocenter-front.git",
   "author": "Wikicaves",
   "license": "CC-BY-SA-3.0",
   "scripts": {

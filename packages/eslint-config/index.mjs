@@ -119,7 +119,7 @@ export default [
         'error',
         {
           allow: [
-            // GrottoCenter API wire format
+            // Grottocenter API wire format
             '_type',
             '_count',
             // Leaflet / leaflet-rotate internals we have to reach into

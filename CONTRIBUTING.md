@@ -1,4 +1,4 @@
-# Contributing to GrottoCenter Front
+# Contributing to Grottocenter Front
 
 Welcome! This guide covers everything you need to set up your environment and contribute to the project.
 

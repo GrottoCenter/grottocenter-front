@@ -2,11 +2,11 @@
 
 [![Better Stack Badge](https://uptime.betterstack.com/status-badges/v2/monitor/29ko2.svg)](https://wikicaves.betteruptime.com)
 
-The web app frontend for the [GrottoCenter project](https://fr.wikicaves.org/)
+The web app frontend for the [Grottocenter project](https://fr.wikicaves.org/)
 
 This project uses [Yarn](https://yarnpkg.com/) & [Yarn workspaces](https://yarnpkg.com/features/workspaces)
 
-> For the backend server see [GrottoCenter/grottocenter-api](https://github.com/GrottoCenter/grottocenter-api)
+> For the backend server see [Grottocenter/grottocenter-api](https://github.com/Grottocenter/grottocenter-api)
 
 ## Getting Started
 
@@ -52,14 +52,14 @@ Github Actions is running 2 tasks on push and pull requests on `develop` :
 
 ## Android app (Google Play, TWA)
 
-GrottoCenter is packaged for the Google Play Store as a **Trusted Web Activity**
+Grottocenter is packaged for the Google Play Store as a **Trusted Web Activity**
 that wraps the deployed PWA. See **[`twa/README.md`](twa/README.md)** for the full
 guide: PWA/service-worker setup, keystore generation, Play App Signing,
 `assetlinks.json`, the CI build workflow, and secret sharing.
 
 ## Production deployment (Azure)
 
-[Full wiki article](https://github.com/GrottoCenter/grottocenter-front/wiki/Production-deployment-(Azure))
+[Full wiki article](https://github.com/Grottocenter/grottocenter-front/wiki/Production-deployment-(Azure))
 
 ## 🤖 AI Agents
 
@@ -80,7 +80,7 @@ Reusable agent workflows are defined in [`.agents/skills/`](.agents/skills/):
 | Skill | Invocation | Description |
 | ----- | ---------- | ----------- |
 | `code-review` | `/code-review <PR-number>` | Fetches the diff, reads project conventions, and submits a structured review to GitHub |
-| `github-workflow` | `/github-workflow` | Guides through the GrottoCenter commit/branch/PR conventions |
+| `github-workflow` | `/github-workflow` | Guides through the Grottocenter commit/branch/PR conventions |
 
 ### Syncing skills to Claude Code
 

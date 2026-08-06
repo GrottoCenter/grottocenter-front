@@ -1,4 +1,4 @@
-// Source of truth: GrottoCenter API database (t_quantity_kind table).
+// Source of truth: Grottocenter API database (t_quantity_kind table).
 // If the backend adds a new quantity kind, this file must be updated manually.
 // TODO: Consider fetching these from an API endpoint to avoid drift.
 export const QUANTITY_KINDS = [

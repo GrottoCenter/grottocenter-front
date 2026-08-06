@@ -146,7 +146,7 @@ const Step4 = () => {
         )}
 
       {/* Submit / check rejection (e.g. the 403 "not authorized" body).
-          GrottoCenter uses the English string itself as the translation key, so
+          Grottocenter uses the English string itself as the translation key, so
           formatMessage localizes known messages and falls back to the raw text
           otherwise. Shown here — right above the Import button — because a
           rejected submission keeps the user on this step to retry. */}

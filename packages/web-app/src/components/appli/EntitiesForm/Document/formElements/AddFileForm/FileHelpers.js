@@ -11,7 +11,7 @@ export const IS_INTACT = 'IS_INTACT';
 export const AUTHORIZATION_FROM_AUTHOR = 'Author created this document';
 export const LICENSE_IN_FILE = 'License in files';
 export const DOCUMENT_AUTHORIZE_TO_PUBLISH =
-  'Authorization present in GrottoCenter';
+  'Authorization present in Grottocenter';
 
 /**
  * Validates and converts a FileList/array of File objects into the internal file entry format.

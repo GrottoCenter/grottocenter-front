@@ -1,10 +1,10 @@
 ---
 name: create-icon
-description: Create a new SVG icon for the GrottoCenter icon system from an MUI icon, following the brown-card style used by all other icons in src/assets/icons/.
+description: Create a new SVG icon for the Grottocenter icon system from an MUI icon, following the brown-card style used by all other icons in src/assets/icons/.
 argument-hint: "<slug> <MuiIconName> [accent-element-hint]"
 ---
 
-You are creating a new icon for the GrottoCenter icon system. All icons share the same visual style: a 100×100 SVG with a brown rounded card (`#5d4037`), shadow, and white icon content with an optional orange accent (`#f57c00`).
+You are creating a new icon for the Grottocenter icon system. All icons share the same visual style: a 100×100 SVG with a brown rounded card (`#5d4037`), shadow, and white icon content with an optional orange accent (`#f57c00`).
 
 `$ARGUMENTS` format: `<slug> <MuiIconName> [accent-element-hint]`
 - `slug`: kebab-case filename without extension (e.g. `scientific-observation`)
