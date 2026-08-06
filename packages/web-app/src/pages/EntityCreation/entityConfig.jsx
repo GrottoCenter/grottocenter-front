@@ -57,15 +57,22 @@ export const EntityIcon = ({
   <Box sx={{ position: 'relative', display: 'inline-flex' }}>
     <CustomIcon type={iconType} size={size} />
     <BadgeIcon
-      sx={{
+      sx={theme => ({
         position: 'absolute',
         top: -4,
         right: -4,
         fontSize: 16,
         color: 'secondary.main',
         bgcolor: 'background.paper',
-        borderRadius: '50%'
-      }}
+        borderRadius: '50%',
+        // The badge pins its own colour, so MUI's disabled text colour never
+        // reaches it either. Sibling of CustomIcon's own rule, not a parent of
+        // it, so the two can't compound into a double-faded icon.
+        '.Mui-disabled &': {
+          filter: 'grayscale(100%)',
+          opacity: theme.palette.action.disabledOpacity
+        }
+      })}
     />
   </Box>
 );

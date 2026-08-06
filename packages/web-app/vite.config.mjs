@@ -409,6 +409,29 @@ export default defineConfig(({ mode }) => {
               }
             },
             {
+              // Country flags (components/appli/Country/CountryList.jsx pulls
+              // them from flagcdn.com, both 1x and 2x). Tiny, immutable per ISO
+              // code, and a country list riddled with broken-image icons is one
+              // of the most visible offline regressions — so CacheFirst with a
+              // long TTL. 500 entries covers every country at both densities.
+              //
+              // `statuses: [0, ...]` matters here: this is a cross-origin
+              // request with no CORS headers, so the response is opaque and
+              // reports status 0. Without it Workbox would refuse to store it
+              // and the flags would never be cached at all.
+              urlPattern: ({ url }) => url.hostname === 'flagcdn.com',
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'country-flags',
+                expiration: {
+                  maxEntries: 500,
+                  maxAgeSeconds: 60 * 60 * 24 * 180,
+                  purgeOnQuotaError: true
+                },
+                cacheableResponse: { statuses: [0, 200] }
+              }
+            },
+            {
               // Google Fonts (stylesheets + font files).
               urlPattern: ({ url }) =>
                 url.origin === 'https://fonts.googleapis.com' ||

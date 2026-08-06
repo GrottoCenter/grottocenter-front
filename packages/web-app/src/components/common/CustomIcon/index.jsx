@@ -35,6 +35,11 @@ import {
   undergroundTimeIcon
 } from '../../../assets/icons';
 
+// These icons are <img> elements pointing at standalone SVG files, so they
+// carry their own colours and ignore `currentColor`. MUI greys a disabled
+// control by changing the text colour, which reaches labels and MUI's inline
+// SVG icons but leaves an <img> at full saturation — a button that reads half
+// disabled. Match the disabled treatment explicitly instead.
 const Icon = styled('span')`
   display: flex;
   align-items: center;
@@ -42,6 +47,11 @@ const Icon = styled('span')`
   width: ${({ size }) => size}px;
   height: ${({ size }) => size}px;
   margin: 0px 4px 0px 0px;
+
+  .Mui-disabled & {
+    filter: grayscale(100%);
+    opacity: ${({ theme }) => theme.palette.action.disabledOpacity};
+  }
 `;
 
 const Img = styled('img')`

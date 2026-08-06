@@ -24,11 +24,13 @@ import {
   fetchEntrances,
   fetchAllEntrancesCoordinates,
   fetchAllMassifsCoordinates,
-  fetchMassifs
+  fetchMassifs,
+  refetchMapViewport
 } from '../actions/Map';
 import { fetchProjections } from '../actions/Projections';
 import useGeolocation from '../hooks/useGeolocation';
 import useGeolocationPermission from '../hooks/useGeolocationPermission';
+import { useRefetchOnReconnect } from '../hooks';
 import 'leaflet/dist/leaflet.css';
 import { defaultZoom, defaultCoord, focusZoom } from '../conf/config';
 
@@ -187,14 +189,28 @@ const Map = () => {
     []
   );
 
-  useEffect(() => {
+  const loadMapData = useCallback(() => {
     dispatch(fetchProjections());
     dispatch(fetchAllEntrancesCoordinates());
     dispatch(fetchAllNetworksCoordinates());
     dispatch(fetchAllMassifsCoordinates());
     dispatch(fetchAllOrganizationsCoordinates());
+  }, [dispatch]);
+
+  useEffect(() => {
+    loadMapData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Both halves of the map need waking up on reconnection, and neither does it
+  // on its own: the cluster datasets are only fetched on mount, and the marker
+  // tiles only on moveend — which is why leaving the page and coming back was
+  // the only way to recover, panning being swallowed by the failure cooldown.
+  const reloadMap = useCallback(() => {
+    loadMapData();
+    refetchMapViewport();
+  }, [loadMapData]);
+  useRefetchOnReconnect(reloadMap);
 
   // When there is no URL target and no saved position, fall back to geolocation once available.
   const initialTargetRef = useRef(params.target);

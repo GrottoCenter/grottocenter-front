@@ -4,6 +4,7 @@ import {
   fetchForBounds,
   invalidateAll,
   invalidateTileAt,
+  refetchVisibleTiles,
   _resetForTests,
   CACHE_ZOOM
 } from './mapTileCache';
@@ -358,6 +359,44 @@ describe('mapTileCache', () => {
       );
       const finalData = successCalls[successCalls.length - 1][0].data;
       expect(finalData.some(item => item.id === 'A')).toBe(true);
+    });
+  });
+
+  describe('refetchVisibleTiles', () => {
+    // A tile that failed offline keeps a fresh `fetchedAt`, so the 30 s
+    // cooldown makes every pan a no-op — which is why coming back online used
+    // to look dead until the user left the page and came back.
+    it('retries a failed tile without waiting out the cooldown', async () => {
+      registerEntity(ENTITY, CONFIG);
+      const bounds = singleTileBounds(200, 200);
+
+      fetchMock.mockReturnValueOnce(Promise.reject(new Error('offline')));
+      fetchForBounds(ENTITY, bounds, CACHE_ZOOM, dispatch);
+      await flushPromises();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // A plain re-request is still swallowed by the cooldown.
+      fetchForBounds(ENTITY, bounds, CACHE_ZOOM, dispatch);
+      await flushPromises();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      fetchMock.mockReturnValueOnce(fetchOk([{ id: 7, name: 'back' }]));
+      refetchVisibleTiles(ENTITY);
+      await flushPromises();
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      const successCalls = dispatch.mock.calls.filter(
+        ([a]) => a.type === CONFIG.successType
+      );
+      expect(successCalls[successCalls.length - 1][0].data).toEqual([
+        { id: 7, name: 'back' }
+      ]);
+    });
+
+    it('does nothing when the entity has never been fetched', () => {
+      registerEntity(ENTITY, CONFIG);
+      expect(() => refetchVisibleTiles(ENTITY)).not.toThrow();
+      expect(fetchMock).not.toHaveBeenCalled();
     });
   });
 

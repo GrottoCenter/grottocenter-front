@@ -163,6 +163,10 @@ const fetchTile = (entity, tile, apiZoom) => {
       });
       s.tilesVersion += 1;
       evictIfNeeded(s.tiles);
+      // Deliberately no scheduleEmit here. The union is unchanged (the previous
+      // data is preserved above), and emitting would dispatch successType —
+      // which the reducer treats as "clear the error", wiping the failure this
+      // very branch just reported, one microtask later.
       s.dispatch?.({
         type: s.config.failureType,
         error: makeErrorMessage(error.message, `Fetching ${s.config.label}`)
@@ -218,6 +222,25 @@ export const fetchForBounds = (entity, bounds, apiZoom, dispatch) => {
       fetchTile(entity, tile, apiZoom).catch(() => {});
     }
   }
+};
+
+// Retry the tiles covering the current viewport, ignoring the cooldown that
+// normally holds a failed tile back for FAILURE_COOLDOWN_MS.
+//
+// That cooldown is what makes reconnecting feel broken without this: tiles that
+// failed while offline look "recently fetched", so a pan is a no-op and the map
+// stays empty until the user leaves the page and comes back. The `online` event
+// is precisely the signal the cooldown was designed to wait for, so honour it
+// instead of the clock.
+export const refetchVisibleTiles = entity => {
+  const s = state[entity];
+  if (!s || !s.config || !s.lastBounds || !s.dispatch) return;
+  s.tiles.forEach(rec => {
+    // Records are mutable by design — see invalidateAll.
+    // eslint-disable-next-line no-param-reassign
+    if (rec.failed) rec.fetchedAt = 0;
+  });
+  fetchForBounds(entity, s.lastBounds, s.lastApiZoom, s.dispatch);
 };
 
 // Mark every tile of an entity as stale and refetch tiles overlapping the

@@ -1,4 +1,4 @@
-import { useRef, useEffect, Suspense } from 'react';
+import { useCallback, useRef, useEffect, Suspense } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
@@ -13,8 +13,13 @@ import { Alert, Box, CircularProgress, useMediaQuery } from '@mui/material';
 
 import GCReducer from '../reducers/GCReducer';
 import mapCacheInvalidationMiddleware from '../middlewares/mapCacheInvalidationMiddleware';
-import { bootstrapIntl } from '../actions/Intl';
+import {
+  bootstrapIntl,
+  changeLocale,
+  hasLoadedMessages
+} from '../actions/Intl';
 import useLanguageSync from '../hooks/useLanguageSync';
+import { useRefetchOnReconnect } from '../hooks';
 
 import ErrorHandler from '../components/appli/ErrorHandler';
 import NetworkStatusNotifier from '../components/common/NetworkStatusNotifier';
@@ -71,6 +76,17 @@ const HydratedIntlProvider = ({ children }) => {
   useEffect(() => {
     dispatch(bootstrapIntl());
   }, [dispatch]);
+
+  // Launching offline before /lang/*.json ever reached the cache leaves the UI
+  // on raw message ids. Nothing else would ever ask again — the locale doesn't
+  // change on its own — so repair it the moment the connection is back rather
+  // than making the user reload.
+  const reloadMessages = useCallback(
+    () => dispatch(changeLocale(locale)),
+    [dispatch, locale]
+  );
+  useRefetchOnReconnect(reloadMessages, !hasLoadedMessages(messages, locale));
+
   return (
     <IntlProvider
       locale={locale}

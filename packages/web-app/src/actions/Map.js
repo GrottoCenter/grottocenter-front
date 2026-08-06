@@ -9,7 +9,11 @@ import {
   getMapMassifsCoordinatesUrl
 } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
-import { fetchForBounds, registerEntity } from '../utils/mapTileCache';
+import {
+  fetchForBounds,
+  refetchVisibleTiles,
+  registerEntity
+} from '../utils/mapTileCache';
 import { makeUrl } from './utils';
 
 export const FETCH_MAP_START_LOADING = 'FETCH_MAP_START_LOADING';
@@ -184,6 +188,14 @@ registerEntity('organizations', {
 
 export const fetchOrganizations = criteria => dispatch =>
   fetchForBounds('organizations', criteria, criteria.zoom, dispatch);
+
+// The three bounds-based entities, retried together. Not a thunk: the tile
+// cache holds its own dispatch reference from the last fetchForBounds call.
+export const refetchMapViewport = () => {
+  refetchVisibleTiles('entrances');
+  refetchVisibleTiles('networks');
+  refetchVisibleTiles('organizations');
+};
 
 // No dedicated /geoloc/organizationsCoordinates endpoint exists, so we hit the
 // normal organizations endpoint with world-wide bounds and strip everything
