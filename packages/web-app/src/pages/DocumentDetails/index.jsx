@@ -27,6 +27,7 @@ import DocumentTypeChip from '../../components/common/DocumentTypeChip';
 import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON,
+  DocumentTypes,
   documentTypeHelpers
 } from '../../utils/documentTypeHelpers';
 import {
@@ -75,6 +76,12 @@ import {
   DocumentChildPropTypes,
   DocumentPropTypes
 } from '../../types/document.type';
+
+// An authorization document is by definition of the "Authorization To Publish"
+// type, so its icon is fixed: the simple shape the API returns here carries no
+// `type` field to look it up from.
+const AuthorizationIcon =
+  DOCUMENT_TYPE_ICONS[DocumentTypes.AUTHORIZATION_TO_PUBLISH];
 
 const HalfSplitContainer = styled('div')`
   display: flex;
@@ -706,11 +713,21 @@ const Document = ({
                           <DetailItem
                             fullWidth
                             label={formatMessage({ id: 'Authorization' })}
-                            value={documentData?.authorizationDocument?.title}
-                            url={
-                              documentData?.authorizationDocument
-                                ? `/ui/documents/${documentData.authorizationDocument.id}`
-                                : undefined
+                            value={
+                              documentData.authorizationDocument?.title ? (
+                                <TextLink
+                                  icon={
+                                    <AuthorizationIcon
+                                      fontSize="small"
+                                      color="primary"
+                                    />
+                                  }
+                                  value={
+                                    documentData.authorizationDocument.title
+                                  }
+                                  url={`/ui/documents/${documentData.authorizationDocument.id}`}
+                                />
+                              ) : null
                             }
                           />
                         )}
