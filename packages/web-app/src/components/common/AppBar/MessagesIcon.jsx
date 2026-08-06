@@ -7,6 +7,7 @@ import { usePermissions } from '../../../hooks';
 import AppLink from '../AppLink';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { fetchUnreadMessageCount } from '../../../actions/Messaging/CountUnreadMessages';
+import { APP_BAR_ICON_SIZE } from './constants';
 
 const getBadgeContent = (nbMessages, status) => {
   switch (status) {
@@ -52,7 +53,7 @@ const MessagesIcon = () => {
         overlap="rectangular"
         color={status === REDUCER_STATUS.FAILED ? 'error' : 'secondary'}
         badgeContent={getBadgeContent(nbMessages, status)}>
-        <MailIcon sx={{ fontSize: 28 }} />
+        <MailIcon sx={{ fontSize: APP_BAR_ICON_SIZE }} />
       </Badge>
     </IconButton>
   );

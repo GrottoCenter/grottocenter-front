@@ -172,7 +172,6 @@ SearchBar.propTypes = {
   label: PropTypes.string,
   hasError: PropTypes.bool,
   isLoading: PropTypes.bool,
-  hasFixWidth: PropTypes.bool,
 
   inputValue: PropTypes.string
 };

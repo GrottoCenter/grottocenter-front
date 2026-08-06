@@ -4,6 +4,7 @@ import { Badge, CircularProgress, IconButton } from '@mui/material';
 import MuiNotificationsIcon from '@mui/icons-material/Notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import { APP_BAR_ICON_SIZE } from '@/components/common/AppBar/constants';
 import { usePermissions } from '../../../hooks';
 import { countUnreadNotifications } from '../../../actions/Notifications/CountUnreadNotifications';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
@@ -44,7 +45,7 @@ const NotificationsIcon = ({ onClick }) => {
         overlap="rectangular"
         color={status === REDUCER_STATUS.FAILED ? 'error' : 'secondary'}
         badgeContent={getBadgeContent(nbNotifications, status)}>
-        <MuiNotificationsIcon sx={{ fontSize: 28 }} />
+        <MuiNotificationsIcon sx={{ fontSize: APP_BAR_ICON_SIZE }} />
       </Badge>
     </IconButton>
   );
