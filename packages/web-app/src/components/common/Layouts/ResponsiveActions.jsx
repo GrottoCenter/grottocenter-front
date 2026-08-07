@@ -88,10 +88,14 @@ const ResponsiveActions = ({
   // trash never sits one pixel from "print" or "page history". Handled here
   // rather than by each caller inserting a separator: six pages build their own
   // items array, and a rule that has to be repeated six times is a rule that
-  // gets forgotten.
+  // gets forgotten. `startsGroup` on an item is the general-purpose escape
+  // hatch for the same idea when the split isn't destructive — e.g. a
+  // user-scoped action ("Add to my explored entrances") sitting above the
+  // page-level routine actions.
   const startsNewGroup = (item, previous) =>
     Boolean(previous) &&
-    Boolean(previous.destructive) !== Boolean(item.destructive);
+    (Boolean(previous.destructive) !== Boolean(item.destructive) ||
+      Boolean(item.startsGroup));
 
   if (isDesktop) {
     // Grouping runs on visibleItems, so a group's first item is a rendered one
@@ -232,7 +236,11 @@ ResponsiveActions.propTypes = {
       busy: PropTypes.bool,
       // Sets the item apart from the routine actions (separate ButtonGroup on
       // desktop, divider in the popup menu). For delete and the like.
-      destructive: PropTypes.bool
+      destructive: PropTypes.bool,
+      // Forces a group break before this item — for non-destructive splits
+      // that still deserve a divider, like a personal / user-scoped action
+      // sitting above the page-level routine ones.
+      startsGroup: PropTypes.bool
     })
   ),
   // Whole-group pending state. Short-circuits `items` and renders a single
