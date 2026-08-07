@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
+import { MemoryRouter } from 'react-router-dom';
 import ActionButtons from './ActionButtons';
 
 const messages = {
@@ -14,7 +15,8 @@ const messages = {
   Edit: 'Edit',
   'Cancel edit': 'Cancel edit',
   edit: 'edit',
-  Cancel: 'Cancel'
+  Cancel: 'Cancel',
+  History: 'History'
 };
 
 const baseProps = {
@@ -24,16 +26,18 @@ const baseProps = {
   isDeleted: false,
   canEdit: true,
   canDelete: true,
-  snapshotEl: <button type="button">Snapshot</button>,
+  snapshotProps: { id: 1, type: 'descriptions' },
   onDeletePress: vi.fn(),
   onRestorePress: vi.fn()
 };
 
 const renderActionButtons = (props = {}) =>
   render(
-    <IntlProvider locale="en" messages={messages}>
-      <ActionButtons {...baseProps} {...props} />
-    </IntlProvider>
+    <MemoryRouter>
+      <IntlProvider locale="en" messages={messages}>
+        <ActionButtons {...baseProps} {...props} />
+      </IntlProvider>
+    </MemoryRouter>
   );
 
 /**

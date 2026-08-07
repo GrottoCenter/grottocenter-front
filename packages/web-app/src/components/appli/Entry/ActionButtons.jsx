@@ -1,30 +1,17 @@
 import PropTypes from 'prop-types';
-import {
-  ButtonGroup,
-  Button,
-  CircularProgress,
-  Tooltip,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { useIntl } from 'react-intl';
-
+import HistoryIcon from '@mui/icons-material/History';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteRounded';
 import DeleteForeverIcon from '@mui/icons-material/RemoveCircleRounded';
 import RestoreIcon from '@mui/icons-material/RestoreFromTrashRounded';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
-import { useOnlineStatus } from '../../../hooks';
-import OfflineDisabled from '../../common/OfflineDisabled';
 
-const LoadingActionButton = () => (
-  <ButtonGroup color="primary" size="small" orientation="vertical">
-    <Button disabled color="primary">
-      <CircularProgress size={20} />
-    </Button>
-  </ButtonGroup>
-);
+import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
+import OfflineDisabled from '../../common/OfflineDisabled';
+import { useSnapshotUrl } from './Snapshots/UtilityFunction';
 
 const ActionButtons = ({
   isLoading,
@@ -38,7 +25,7 @@ const ActionButtons = ({
   // restricts permanent deletion further (e.g. guidelines: admin-only) pass a
   // narrower value.
   canPermanentlyDelete = canDelete,
-  snapshotEl,
+  snapshotProps,
   onDeletePress,
   onRestorePress,
   onMoveUp,
@@ -48,91 +35,85 @@ const ActionButtons = ({
   isMoveLoading
 }) => {
   const { formatMessage } = useIntl();
-  const theme = useTheme();
-  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
-  const isOnline = useOnlineStatus();
+  // The `?? { id: 0, type: '' }` keeps the destructuring inside useSnapshotUrl
+  // safe when the caller has no snapshot to link to — the resulting URL is
+  // ignored because the `snapshot` item is hidden below.
+  const snapshotUrl = useSnapshotUrl(snapshotProps ?? { id: 0, type: '' });
 
-  if (isLoading) return <LoadingActionButton />;
+  if (isLoading) {
+    return (
+      <OfflineDisabled>
+        <ResponsiveActions
+          loading
+          loadingLabel={formatMessage({ id: 'Loading ...' })}
+        />
+      </OfflineDisabled>
+    );
+  }
 
-  const showReorder = onMoveUp && onMoveDown;
+  const showReorder = Boolean(onMoveUp && onMoveDown);
 
-  // Every action here writes to the API (edit, delete, restore, reorder) or
-  // fetches history, so the whole group goes down together offline. Disabling
-  // at the group level lets MUI propagate it to each Button, and the wrapper
-  // carries the explanation the per-button tooltips can no longer show
-  // (a disabled button swallows the hover).
-  //
-  // Blanking those titles offline is what keeps MUI quiet: it warns for every
-  // Tooltip whose child is a disabled <button>, and there are five of them.
-  const actionTitle = id => (isOnline ? formatMessage({ id }) : '');
+  const items = [
+    {
+      key: 'restore',
+      icon: <RestoreIcon />,
+      label: formatMessage({ id: 'Restore' }),
+      onClick: onRestorePress,
+      hidden: !(!isUpdating && canDelete && isDeleted)
+    },
+    {
+      key: 'edit',
+      icon: <EditIcon />,
+      label: formatMessage({ id: 'Edit' }),
+      onClick: () => setIsUpdating(true),
+      hidden: !(!isDeleted && canEdit && !isUpdating)
+    },
+    {
+      key: 'move-loading',
+      icon: <CircularProgress size={20} />,
+      label: formatMessage({ id: 'Loading ...' }),
+      disabled: true,
+      busy: true,
+      hidden: !(showReorder && !isUpdating && isMoveLoading)
+    },
+    {
+      key: 'move-up',
+      icon: <ArrowUpward fontSize="small" />,
+      label: formatMessage({ id: 'Move up' }),
+      onClick: onMoveUp,
+      hidden: !(showReorder && !isUpdating && !isMoveLoading && !isFirst)
+    },
+    {
+      key: 'move-down',
+      icon: <ArrowDownward fontSize="small" />,
+      label: formatMessage({ id: 'Move down' }),
+      onClick: onMoveDown,
+      hidden: !(showReorder && !isUpdating && !isMoveLoading && !isLast)
+    },
+    {
+      key: 'snapshot',
+      icon: <HistoryIcon />,
+      label: formatMessage({ id: 'History' }),
+      href: snapshotUrl,
+      hidden: !(!isUpdating && snapshotProps)
+    },
+    {
+      key: 'delete',
+      icon: isDeleted ? <DeleteForeverIcon color="error" /> : <DeleteIcon />,
+      label: formatMessage({
+        id: isDeleted ? 'Permanently delete' : 'Delete'
+      }),
+      onClick: () => onDeletePress(isDeleted),
+      destructive: true,
+      hidden: !(!isUpdating && (isDeleted ? canPermanentlyDelete : canDelete))
+    }
+  ];
 
-  const actions = (
-    <ButtonGroup
-      color="primary"
-      size="small"
-      disabled={!isOnline}
-      orientation={isSmall ? 'vertical' : 'horizontal'}>
-      {!isUpdating && canDelete && isDeleted && (
-        <Tooltip title={actionTitle('Restore')}>
-          <Button
-            onClick={() => onRestorePress()}
-            color="primary"
-            aria-label={formatMessage({ id: 'restore' })}>
-            <RestoreIcon />
-          </Button>
-        </Tooltip>
-      )}
-      {!isDeleted && canEdit && !isUpdating && (
-        <Tooltip title={actionTitle('Edit')}>
-          <Button
-            onClick={() => setIsUpdating(true)}
-            color="primary"
-            aria-label={formatMessage({ id: 'edit' })}>
-            <EditIcon />
-          </Button>
-        </Tooltip>
-      )}
-      {showReorder && !isUpdating && isMoveLoading && (
-        <Button disabled color="primary">
-          <CircularProgress size={20} />
-        </Button>
-      )}
-      {showReorder && !isUpdating && !isMoveLoading && !isFirst && (
-        <Tooltip title={actionTitle('Move up')}>
-          <Button
-            onClick={onMoveUp}
-            color="primary"
-            aria-label={formatMessage({ id: 'Move up' })}>
-            <ArrowUpward fontSize="small" />
-          </Button>
-        </Tooltip>
-      )}
-      {showReorder && !isUpdating && !isMoveLoading && !isLast && (
-        <Tooltip title={actionTitle('Move down')}>
-          <Button
-            onClick={onMoveDown}
-            color="primary"
-            aria-label={formatMessage({ id: 'Move down' })}>
-            <ArrowDownward fontSize="small" />
-          </Button>
-        </Tooltip>
-      )}
-      {!isUpdating && snapshotEl}
-      {!isUpdating && (isDeleted ? canPermanentlyDelete : canDelete) && (
-        <Tooltip
-          title={actionTitle(isDeleted ? 'Permanently delete' : 'Delete')}>
-          <Button
-            onClick={() => onDeletePress(isDeleted)}
-            color="primary"
-            aria-label={formatMessage({ id: 'delete' })}>
-            {isDeleted ? <DeleteForeverIcon color="error" /> : <DeleteIcon />}
-          </Button>
-        </Tooltip>
-      )}
-    </ButtonGroup>
+  return (
+    <OfflineDisabled>
+      <ResponsiveActions items={items} />
+    </OfflineDisabled>
   );
-
-  return <OfflineDisabled>{actions}</OfflineDisabled>;
 };
 
 export default ActionButtons;
@@ -145,7 +126,17 @@ ActionButtons.propTypes = {
   canEdit: PropTypes.bool.isRequired,
   canDelete: PropTypes.bool.isRequired,
   canPermanentlyDelete: PropTypes.bool,
-  snapshotEl: PropTypes.element.isRequired,
+  // Everything the snapshot page needs to build its URL. Omit entirely to hide
+  // the history action.
+  snapshotProps: PropTypes.shape({
+    id: PropTypes.number,
+    type: PropTypes.string,
+    isNetwork: PropTypes.bool,
+    getAll: PropTypes.bool,
+    parentId: PropTypes.number,
+    parentType: PropTypes.string,
+    isDeleted: PropTypes.bool
+  }),
   onDeletePress: PropTypes.func.isRequired,
   onRestorePress: PropTypes.func.isRequired,
   onMoveUp: PropTypes.func,

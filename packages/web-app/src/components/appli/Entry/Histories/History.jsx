@@ -11,7 +11,6 @@ import { restoreHistory } from '../../../../actions/History/RestoreHistory';
 import ActionButtons from '../ActionButtons';
 import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
-import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const ListItemStyled = styled(ListItem)`
   display: flex;
@@ -99,14 +98,12 @@ const History = ({
           isDeleted={history.isDeleted}
           canEdit={isEditAllowed && permissions.isAuth}
           canDelete={isEditAllowed && permissions.isModerator}
-          snapshotEl={
-            <SnapshotButton
-              id={history.id}
-              type="histories"
-              parentId={entranceId}
-              parentType="entrances"
-            />
-          }
+          snapshotProps={{
+            id: history.id,
+            type: 'histories',
+            parentId: entranceId,
+            parentType: 'entrances'
+          }}
           onDeletePress={onDeletePress}
           onRestorePress={onRestorePress}
           {...(isEditAllowed && permissions.isAuth && !history.isDeleted

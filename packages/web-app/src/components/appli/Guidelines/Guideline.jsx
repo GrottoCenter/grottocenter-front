@@ -4,7 +4,6 @@ import { Box, ListItem, ListItemText } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import { SnapshotButton } from '../Entry/Snapshots/UtilityFunction';
 import GuidelinePropTypes from '../../../types/guideline.type';
 import GuidelineForm from '../EntitiesForm/Guideline/index';
 import { patchGuideline } from '../../../actions/Guideline/UpdateGuideline';
@@ -96,13 +95,11 @@ const Guideline = ({ guideline, isEditAllowed }) => {
             // Permanent deletion of a guideline is admin-only on the API
             // (guideline/delete.js), unlike its soft-delete which moderators may do.
             canPermanentlyDelete={isEditAllowed && permissions.isAdmin}
-            snapshotEl={
-              <SnapshotButton
-                id={guideline.id}
-                type="guidelines"
-                isDeleted={guideline.isDeleted}
-              />
-            }
+            snapshotProps={{
+              id: guideline.id,
+              type: 'guidelines',
+              isDeleted: guideline.isDeleted
+            }}
             onDeletePress={onDeletePress}
             onRestorePress={onRestorePress}
           />

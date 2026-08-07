@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
+import { MemoryRouter } from 'react-router-dom';
 import Locations from './index';
 
 // Mock react-redux with a controllable dispatch
@@ -34,7 +35,9 @@ vi.mock('../../../../hooks', () => ({
   useAnchorScroll: () => {},
   // ActionButtons disables itself offline; assume a connection here so the
   // reorder buttons stay clickable.
-  useOnlineStatus: () => true
+  useOnlineStatus: () => true,
+  // SectionCreateButton reads the viewport to pick its icon-only mobile shape.
+  useIsDesktopLayout: () => true
 }));
 
 vi.mock('../../../../actions/Location/CreateLocation', () => ({
@@ -47,7 +50,8 @@ vi.mock('../../../common/Contribution/Contribution', () => {
 });
 
 vi.mock('../Snapshots/UtilityFunction', () => ({
-  SnapshotButton: () => <button type="button">Snapshot</button>
+  SnapshotButton: () => <button type="button">Snapshot</button>,
+  useSnapshotUrl: () => '/mock-snapshot-url'
 }));
 
 const messages = {
@@ -112,14 +116,16 @@ const locations = [
 
 const renderLocations = (props = {}) =>
   render(
-    <IntlProvider locale="en" messages={messages}>
-      <Locations
-        entranceId={1}
-        locations={locations}
-        isEditAllowed
-        {...props}
-      />
-    </IntlProvider>
+    <MemoryRouter>
+      <IntlProvider locale="en" messages={messages}>
+        <Locations
+          entranceId={1}
+          locations={locations}
+          isEditAllowed
+          {...props}
+        />
+      </IntlProvider>
+    </MemoryRouter>
   );
 
 beforeEach(() => {

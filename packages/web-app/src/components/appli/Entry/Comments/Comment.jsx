@@ -17,7 +17,6 @@ import Ratings from '../Ratings';
 import Contribution from '../../../common/Contribution/Contribution';
 import AuthorAndDate from '../../../common/Contribution/AuthorAndDate';
 import Duration from '../../../common/Properties/Duration';
-import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const ListItemStyled = styled(ListItem)`
   display: flow-root;
@@ -98,14 +97,12 @@ const Comment = ({
           isDeleted={comment.isDeleted}
           canEdit={isEditAllowed && permissions.isAuth && canEdit}
           canDelete={isEditAllowed && permissions.isModerator}
-          snapshotEl={
-            <SnapshotButton
-              id={comment.id}
-              type="comments"
-              parentId={entranceId}
-              parentType="entrances"
-            />
-          }
+          snapshotProps={{
+            id: comment.id,
+            type: 'comments',
+            parentId: entranceId,
+            parentType: 'entrances'
+          }}
           onDeletePress={onDeletePress}
           onRestorePress={onRestorePress}
           {...(isEditAllowed && permissions.isAuth && !comment.isDeleted
