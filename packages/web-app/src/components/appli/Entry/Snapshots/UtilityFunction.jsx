@@ -46,6 +46,41 @@ const getAccordionBodyFromType = (type, data, isNetwork, previous) => {
   }
 };
 
+// URL-building logic extracted so consumers that render their own history
+// affordance (e.g. an item in a menu list) don't need to render a whole
+// SnapshotButton and reach into its internals.
+const useSnapshotUrl = ({
+  id,
+  type,
+  isNetwork,
+  getAll = false,
+  parentId,
+  parentType,
+  isDeleted
+}) => {
+  const location = useLocation();
+
+  // Remember the page the history was opened from so the snapshot page's "back"
+  // button returns here. Some entities (e.g. guidelines) have no standalone
+  // route of their own, and others (regions) live under nested URLs, so we can't
+  // reliably rebuild the origin URL from `type`/`id` alone.
+  const backTo = encodeURIComponent(`${location.pathname}${location.search}`);
+
+  return `/ui/${type}/${id}/snapshots?${[
+    isNetwork !== undefined ? `isNetwork=${isNetwork}` : '',
+    getAll ? `all=true` : '',
+    parentId !== undefined ? `parentId=${parentId}` : '',
+    parentType ? `parentType=${parentType}` : '',
+    // Entities without a standalone route (e.g. guidelines) can't be re-fetched
+    // by the snapshot page, so carry the current soft-delete state along to gate
+    // the rollback button (a deleted item must be restored before rolling back).
+    isDeleted !== undefined ? `isDeleted=${isDeleted}` : '',
+    `backTo=${backTo}`
+  ]
+    .filter(e => e)
+    .join('&')}`;
+};
+
 const SnapshotButton = ({
   id,
   type,
@@ -60,27 +95,15 @@ const SnapshotButton = ({
   ...grpProps
 }) => {
   const { formatMessage } = useIntl();
-  const location = useLocation();
-
-  // Remember the page the history was opened from so the snapshot page's "back"
-  // button returns here. Some entities (e.g. guidelines) have no standalone
-  // route of their own, and others (regions) live under nested URLs, so we can't
-  // reliably rebuild the origin URL from `type`/`id` alone.
-  const backTo = encodeURIComponent(`${location.pathname}${location.search}`);
-
-  const url = `/ui/${type}/${id}/snapshots?${[
-    isNetwork !== undefined ? `isNetwork=${isNetwork}` : '',
-    getAll ? `all=true` : '',
-    parentId !== undefined ? `parentId=${parentId}` : '',
-    parentType ? `parentType=${parentType}` : '',
-    // Entities without a standalone route (e.g. guidelines) can't be re-fetched
-    // by the snapshot page, so carry the current soft-delete state along to gate
-    // the rollback button (a deleted item must be restored before rolling back).
-    isDeleted !== undefined ? `isDeleted=${isDeleted}` : '',
-    `backTo=${backTo}`
-  ]
-    .filter(e => e)
-    .join('&')}`;
+  const url = useSnapshotUrl({
+    id,
+    type,
+    isNetwork,
+    getAll,
+    parentId,
+    parentType,
+    isDeleted
+  });
 
   return (
     <Tooltip
@@ -130,4 +153,9 @@ const sortSnapshots = dataToStore => {
   return sortedItems;
 };
 
-export { SnapshotButton, getAccordionBodyFromType, sortSnapshots };
+export {
+  SnapshotButton,
+  useSnapshotUrl,
+  getAccordionBodyFromType,
+  sortSnapshots
+};

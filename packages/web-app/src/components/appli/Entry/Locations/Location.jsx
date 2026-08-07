@@ -12,7 +12,6 @@ import { LocationPropTypes } from '../../../../types/entrance.type';
 import CreateLocationForm from '../../EntitiesForm/Location';
 import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
-import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const ListItemStyled = styled(ListItem)`
   display: flow-root;
@@ -73,14 +72,12 @@ const Location = ({
           isDeleted={location.isDeleted}
           canEdit={isEditAllowed && permissions.isAuth}
           canDelete={isEditAllowed && permissions.isModerator}
-          snapshotEl={
-            <SnapshotButton
-              id={location.id}
-              type="locations"
-              parentId={entranceId}
-              parentType="entrances"
-            />
-          }
+          snapshotProps={{
+            id: location.id,
+            type: 'locations',
+            parentId: entranceId,
+            parentType: 'entrances'
+          }}
           onDeletePress={onDeletePress}
           onRestorePress={onRestorePress}
           {...(isEditAllowed && permissions.isAuth && !location.isDeleted

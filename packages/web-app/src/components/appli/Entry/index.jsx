@@ -43,7 +43,7 @@ import Riggings from './Riggings/Riggings';
 import Comments from './Comments/index';
 import Documents from './Documents';
 import Histories from './Histories';
-import Science from './Science';
+import Science from '../Science';
 import { deleteEntrance } from '../../../actions/Entrance/DeleteEntrance';
 import { restoreEntrance } from '../../../actions/Entrance/RestoreEntrance';
 import {

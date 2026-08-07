@@ -11,7 +11,6 @@ import CreateRiggingsForm from '../../EntitiesForm/Riggings';
 import { RiggingPropTypes } from '../../../../types/entrance.type';
 import Contribution from '../../../common/Contribution/Contribution';
 import RiggingTable from './RiggingTable';
-import { SnapshotButton } from '../Snapshots/UtilityFunction';
 import DiscardChangesDialog from '../../../common/DiscardChangesDialog';
 
 const Rigging = ({
@@ -86,14 +85,12 @@ const Rigging = ({
           isDeleted={rigging.isDeleted}
           canEdit={isEditAllowed && permissions.isAuth}
           canDelete={isEditAllowed && permissions.isModerator}
-          snapshotEl={
-            <SnapshotButton
-              id={rigging.id}
-              type="riggings"
-              parentId={entranceId}
-              parentType="entrances"
-            />
-          }
+          snapshotProps={{
+            id: rigging.id,
+            type: 'riggings',
+            parentId: entranceId,
+            parentType: 'entrances'
+          }}
           onDeletePress={onDeletePress}
           onRestorePress={onRestorePress}
           {...(isEditAllowed && permissions.isAuth && !rigging.isDeleted

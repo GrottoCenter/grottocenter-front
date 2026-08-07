@@ -24,6 +24,7 @@ import { patchGuideline } from '../../../actions/Guideline/UpdateGuideline';
 import { getGuidelinesUrl } from '../../../conf/apiRoutes';
 import { checkAndGetStatus } from '../../../actions/utils';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
+import SectionCreateButton from '../../common/SectionCreateButton';
 import { FormActionRow } from '../EntitiesForm/utils/FormContainers';
 import Alert from '../../common/Alert';
 
@@ -187,6 +188,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
               isNew
               closeForm={closeForm}
               onSubmit={onSubmitCreateForm}
+              hideCancel
             />
           </Box>
         );
@@ -299,7 +301,6 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                 isCenter
                 isSubmitting={isSubmitting}
                 disabled={!selectedGuideline}
-                onCancel={closeForm}
                 submitLabel={formatMessage({ id: 'guidelines.btn_attach' })}
               />
             </form>
@@ -319,26 +320,27 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
       count={guidelines?.length ?? 0}
       defaultExpanded={guidelines?.length > 0}
       icon={
-        permissions.isAuth &&
-        mode === MODE_NONE && (
-          <Button
-            size="small"
-            color="secondary"
-            variant="outlined"
-            onClick={() => {
-              setMode(MODE_ATTACH);
-              setAttachFetchTrigger(prev => prev + 1);
+        permissions.isAuth && (
+          <SectionCreateButton
+            isOpen={mode !== MODE_NONE}
+            onToggle={() => {
+              if (mode === MODE_NONE) {
+                setMode(MODE_ATTACH);
+                setAttachFetchTrigger(prev => prev + 1);
+              } else {
+                closeForm();
+              }
             }}
-            startIcon={
+            label={formatMessage({ id: 'Associate' })}
+            icon={
               <EntityIcon
                 iconType="guidelines"
                 size={20}
                 BadgeIcon={LinkIcon}
               />
             }
-            data-testid="add-guideline-btn">
-            <FormattedMessage id="Associate" />
-          </Button>
+            testId="add-guideline-btn"
+          />
         )
       }
       content={

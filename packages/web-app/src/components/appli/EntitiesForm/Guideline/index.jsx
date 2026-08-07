@@ -15,7 +15,13 @@ const getDefaultValues = language => ({
   language
 });
 
-const GuidelineForm = ({ closeForm, onSubmit, values, isNew }) => {
+const GuidelineForm = ({
+  closeForm,
+  onSubmit,
+  values,
+  isNew,
+  hideCancel = false
+}) => {
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
   const { formatMessage } = useIntl();
 
@@ -83,7 +89,7 @@ const GuidelineForm = ({ closeForm, onSubmit, values, isNew }) => {
         <FormActionRow
           isNew={isNew}
           isSubmitting={isSubmitting}
-          onCancel={closeForm}
+          onCancel={hideCancel ? undefined : closeForm}
           isCenter
         />
       </form>
@@ -95,7 +101,11 @@ GuidelineForm.propTypes = {
   closeForm: PropTypes.func.isRequired,
   isNew: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  values: GuidelinePropTypes
+  values: GuidelinePropTypes,
+  // Hide the form's own Cancel button when the caller already exposes a close
+  // affordance (e.g. a section header's SectionCreateButton), so the two do not
+  // stack.
+  hideCancel: PropTypes.bool
 };
 
 export default GuidelineForm;

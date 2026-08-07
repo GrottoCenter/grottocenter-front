@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Box, ListItem, ListItemText } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
-import { SnapshotButton } from '../Entry/Snapshots/UtilityFunction';
 import { DescriptionPropTypes } from '../../../types/description.type';
 import CreateDescriptionForm from '../EntitiesForm/Description/index';
 import { updateDescription } from '../../../actions/Description/UpdateDescription';
@@ -74,14 +73,12 @@ const Description = ({
           isDeleted={description.isDeleted}
           canEdit={isEditAllowed && permissions.isAuth}
           canDelete={isEditAllowed && permissions.isModerator}
-          snapshotEl={
-            <SnapshotButton
-              id={description.id}
-              type="descriptions"
-              parentId={parentId}
-              parentType={`${parentType}s`}
-            />
-          }
+          snapshotProps={{
+            id: description.id,
+            type: 'descriptions',
+            parentId,
+            parentType: `${parentType}s`
+          }}
           onDeletePress={onDeletePress}
           onRestorePress={onRestorePress}
           {...(isEditAllowed && permissions.isAuth && !description.isDeleted

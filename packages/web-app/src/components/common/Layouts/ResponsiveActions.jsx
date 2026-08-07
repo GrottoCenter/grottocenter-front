@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  CircularProgress,
   ClickAwayListener,
   Divider,
   ListItemIcon,
@@ -19,28 +20,63 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import AppLink from '../AppLink';
 
-const ResponsiveActions = ({ items }) => {
+const ResponsiveActions = ({ items, loading = false, loadingLabel }) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const [anchorEl, setAnchorEl] = useState(null);
+
+  // A pending action is a state of the whole group, not one more item alongside
+  // Edit/Delete: rendering it inline in `items` would let it be tabbed to and
+  // clicked (an empty onClick). We short-circuit here so the group collapses to
+  // a single non-interactive spinner that keeps the geometry stable.
+  if (loading) {
+    return (
+      <ButtonGroup color="primary">
+        <Button disabled aria-busy="true" aria-label={loadingLabel}>
+          <CircularProgress size={20} />
+        </Button>
+      </ButtonGroup>
+    );
+  }
 
   const visibleItems = items?.filter(item => !item.hidden) ?? [];
   if (visibleItems.length === 0) return null;
 
   const closeMenu = () => setAnchorEl(null);
 
-  const renderButton = ({ key, icon, label, onClick, href, target, color }) => (
-    <Tooltip key={key} title={label}>
+  const renderButton = ({
+    key,
+    icon,
+    label,
+    onClick,
+    href,
+    target,
+    color,
+    disabled,
+    busy
+  }) => {
+    const button = (
       <Button
         color={color || 'primary'}
         onClick={onClick}
+        disabled={disabled}
+        aria-busy={busy ? 'true' : undefined}
+        aria-label={label}
         {...(href
           ? { component: AppLink, to: href, target, rel: 'noopener noreferrer' }
           : {})}>
         {icon}
       </Button>
-    </Tooltip>
-  );
+    );
+    // A disabled <button> emits no hover events, so the Tooltip needs a live
+    // element to bind to. Blank the title in that case rather than wrapping
+    // every button in a span (MUI warns otherwise for the whole grid).
+    return (
+      <Tooltip key={key} title={disabled ? '' : label}>
+        {button}
+      </Tooltip>
+    );
+  };
 
   // An item marked `destructive` is set apart from the routine actions, so the
   // trash never sits one pixel from "print" or "page history". Handled here
@@ -73,13 +109,23 @@ const ResponsiveActions = ({ items }) => {
     );
   }
 
+  // One visible action doesn't warrant a burger — a menu with a single entry
+  // costs an extra tap for no navigation payoff. Render it inline exactly like
+  // desktop does.
+  if (visibleItems.length === 1) {
+    return (
+      <ButtonGroup color="primary">{renderButton(visibleItems[0])}</ButtonGroup>
+    );
+  }
+
   // Built as a flat array rather than with Fragments: MenuList inspects its
   // children to drive keyboard focus, and wrapping items would break that.
   const menuEntries = [];
   visibleItems.forEach((item, index) => {
     if (startsNewGroup(item, visibleItems[index - 1]))
       menuEntries.push(<Divider key={`divider-before-${item.key}`} />);
-    const { key, icon, label, onClick, href, target, color } = item;
+    const { key, icon, label, onClick, href, target, color, disabled, busy } =
+      item;
     const colorSx =
       color === 'secondary' || color === 'success'
         ? { color: `${color}.main` }
@@ -87,6 +133,8 @@ const ResponsiveActions = ({ items }) => {
     menuEntries.push(
       <MenuItem
         key={key}
+        disabled={disabled}
+        aria-busy={busy ? 'true' : undefined}
         onClick={() => {
           onClick?.();
           closeMenu();
@@ -149,11 +197,25 @@ ResponsiveActions.propTypes = {
       target: PropTypes.string,
       color: PropTypes.string,
       hidden: PropTypes.bool,
+      // Non-interactive: the item is visible but cannot be triggered. Use for
+      // per-item pending states (e.g. a row-scoped reorder that is mid-flight
+      // while other actions in the same group stay live).
+      disabled: PropTypes.bool,
+      // Announces the item as in-progress to assistive tech. Independent of
+      // `disabled` — a request can be pending without the button being
+      // disabled, or the button can be disabled for reasons unrelated to
+      // loading (permissions, offline).
+      busy: PropTypes.bool,
       // Sets the item apart from the routine actions (separate ButtonGroup on
       // desktop, divider in the popup menu). For delete and the like.
       destructive: PropTypes.bool
     })
-  )
+  ),
+  // Whole-group pending state. Short-circuits `items` and renders a single
+  // non-interactive spinner button, keeping the geometry stable while the
+  // caller has nothing yet to offer.
+  loading: PropTypes.bool,
+  loadingLabel: PropTypes.string
 };
 
 export default ResponsiveActions;

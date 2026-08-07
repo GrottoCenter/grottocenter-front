@@ -10,6 +10,7 @@ import AssociationForm from './AssociationForm';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import Alert from '../../common/Alert';
 import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
+import SectionCreateButton from '../../common/SectionCreateButton';
 import StandardDialog from '../../common/StandardDialog';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import {
@@ -156,16 +157,14 @@ const AssociationSection = ({
   const isEmpty = !organizations || organizations.length === 0;
 
   const associateButton = canManageAssociations && (
-    <Button
-      size="small"
-      color="secondary"
-      variant="outlined"
-      onClick={() => setIsFormOpen(true)}
-      startIcon={
+    <SectionCreateButton
+      isOpen={isFormOpen}
+      onToggle={() => setIsFormOpen(o => !o)}
+      label={formatMessage({ id: 'Associate' })}
+      icon={
         <EntityIcon iconType="organization" size={20} BadgeIcon={LinkIcon} />
-      }>
-      {formatMessage({ id: 'Associate' })}
-    </Button>
+      }
+    />
   );
 
   return (

@@ -26,7 +26,7 @@ import CustomIcon from '../../common/CustomIcon';
 import GuidelinesGrouped from '../Guidelines/GuidelinesGrouped';
 import EntrancesMap from './EntrancesMap';
 import Properties from './Properties';
-import Science from './Science';
+import Science from '../Science';
 import { deleteCave } from '../../../actions/Cave/DeleteCave';
 import { restoreCave } from '../../../actions/Cave/RestoreCave';
 import { NetworkForm } from '../EntitiesForm';
