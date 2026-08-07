@@ -6,10 +6,8 @@ import { List, Typography, Button, ListItemButton } from '@mui/material';
 import CallMergeIcon from '@mui/icons-material/CallMerge';
 import PeopleIcon from '@mui/icons-material/People';
 import DocumentListIcon from '@mui/icons-material/PlaylistAddCheck';
-import ListAltIcon from '@mui/icons-material/ListAlt';
 import PublishIcon from '@mui/icons-material/Publish';
 import ArchiveIcon from '@mui/icons-material/Archive';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import { styled } from '@mui/material/styles';
 import { fetchDBExportUrl } from '../actions/DBExport';
 
@@ -46,7 +44,9 @@ const Dashboard = () => {
   const handleOnListItemClick = url => navigate(url);
 
   useEffect(() => {
-    if (!permissions.isAuth) {
+    const hasDashboardAccess =
+      permissions.isAdmin || permissions.isModerator || permissions.isLeader;
+    if (!permissions.isAuth || !hasDashboardAccess) {
       navigate('/');
     }
   }, [permissions, navigate]);
@@ -60,7 +60,7 @@ const Dashboard = () => {
 
   return (
     <Layout
-      title={formatMessage({ id: 'Dashboard' })}
+      title={formatMessage({ id: 'Management tools' })}
       content={
         <>
           {permissions.isAdmin && (
@@ -149,31 +149,6 @@ const Dashboard = () => {
                     </Typography>
                   </StyledListItemDBExport>
                 )}
-              </StyledList>
-            </DashboardBlock>
-          )}
-          {permissions.isAuth && (
-            <DashboardBlock>
-              <Typography variant="h2">
-                {formatMessage({ id: 'User' })}
-              </Typography>
-              <StyledList cols={6}>
-                <StyledListItem
-                  key="my-contributions-user-tile-key"
-                  onClick={() => handleOnListItemClick('/ui/contributions')}>
-                  <ListAltIcon fontSize="large" color="primary" />
-                  <Typography variant="h4" align="center">
-                    {formatMessage({ id: 'My contributions' })}
-                  </Typography>
-                </StyledListItem>
-                <StyledListItem
-                  key="my-notifications-user-tile-key"
-                  onClick={() => handleOnListItemClick('/ui/notifications')}>
-                  <NotificationsIcon fontSize="large" color="primary" />
-                  <Typography variant="h4" align="center">
-                    {formatMessage({ id: 'My notifications' })}
-                  </Typography>
-                </StyledListItem>
               </StyledList>
             </DashboardBlock>
           )}
