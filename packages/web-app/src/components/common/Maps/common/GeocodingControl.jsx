@@ -399,6 +399,9 @@ const GeocodingControl = ({ onLocationSelect }) => {
     setQuery('');
     setResults(EMPTY_RESULTS);
     setCoordinateResult(null);
+    // Every branch below jumps the view somewhere the user chose; release the
+    // location control's follow so the next fix doesn't snap straight back.
+    map.fire('followdetach');
 
     if (result.resultType === 'coordinates') {
       const { latitude: lat, longitude: lng } = result;

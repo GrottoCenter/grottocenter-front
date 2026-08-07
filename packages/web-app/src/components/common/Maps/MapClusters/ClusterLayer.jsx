@@ -247,6 +247,9 @@ const ClusterLayer = ({
       marker._count = displayCount;
 
       marker.on('click', () => {
+        // Every branch below moves the view, so release the location control's
+        // follow — it would otherwise recenter on the user right after.
+        map.fire('followdetach');
         if (isCluster) {
           // getClusterExpansionZoom returns the exact zoom where this cluster
           // splits — often just +1/+2. Boost it so a click feels like a real

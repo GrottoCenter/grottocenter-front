@@ -6,6 +6,7 @@ import CustomMapContainer from '../common/MapContainer';
 import useMarkers from '../common/Markers/useMarkers';
 import { EntranceMarker } from '../common/Markers/Components';
 import MeasureControl from '../common/MeasureControl';
+import WaypointControl from '../common/Waypoint/WaypointControl';
 
 export const filterValidPositions = positions =>
   (positions ?? []).filter(
@@ -67,12 +68,12 @@ const MapMultipleMarkers = ({ style, zoom, positions }) => {
       scrollWheelZoom={false}
       style={style}
       zoom={zoom || 14}
-      // Field-navigation helpers, only in fullscreen. The compass button
-      // self-hides on non-touch devices, so it stays mobile-only.
-      isLocateControlInFullscreen
-      isCompassControlInFullscreen>
+      // Field-navigation helpers, only in fullscreen. The compass part of the
+      // control self-degrades on non-touch devices.
+      isLocationControlInFullscreen>
       <MultipleMarkers validPositions={validPositions} />
       <MeasureControl />
+      <WaypointControl />
     </CustomMapContainer>
   );
 };

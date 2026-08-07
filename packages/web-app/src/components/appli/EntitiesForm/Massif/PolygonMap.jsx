@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { useNotification, useProjections } from '../../../../hooks';
 import useGeolocation from '../../../../hooks/useGeolocation';
+import useGeolocationPermission from '../../../../hooks/useGeolocationPermission';
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
 import FullscreenControl from '../../../common/Maps/common/FullscreenControl';
@@ -34,7 +35,7 @@ import {
 } from '../../../../utils/polygonValidation';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import { defaultZoom, focusZoom } from '../../../../conf/config';
+import { defaultCoord, defaultZoom, focusZoom } from '../../../../conf/config';
 
 // SVG from MUI ErrorOutline icon, rendered as a Leaflet DivIcon
 const KINK_ICON_SIZE = 24;
@@ -114,7 +115,13 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
   // hasBlockingErrors changes, not when the parent passes a new reference.
   const onValidationChangeRef = useRef(onValidationChange);
   onValidationChangeRef.current = onValidationChange;
-  const { location: geoLocation, hasLocation } = useGeolocation();
+  // Only when the permission is already granted: opening the polygon editor is
+  // not asking to be located, so it must not raise a permission dialog on its
+  // own. Reading the state never prompts (see useGeolocationPermission).
+  const geolocationPermission = useGeolocationPermission();
+  const { location: geoLocation, hasLocation } = useGeolocation({
+    enabled: geolocationPermission === 'granted'
+  });
   const { onError, onSuccess } = useNotification();
   const [map, setMap] = useState();
   const [featureGroupRef, setFeatureGroupRef] = useState(null);
@@ -237,7 +244,7 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
     ? getMultiPolygonCentroid(
         data.type === 'Polygon' ? data.coordinates[0] : data.coordinates[0][0]
       )
-    : geoLocation;
+    : (geoLocation ?? defaultCoord);
   const ZOOM_LEVEL = hasCoordinates || hasLocation ? focusZoom : defaultZoom;
 
   useEffect(() => {

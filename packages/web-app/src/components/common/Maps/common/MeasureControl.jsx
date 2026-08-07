@@ -6,6 +6,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { useTheme } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 
+import { formatDistance } from '@/utils/geo';
 import CustomControl from './CustomControl';
 
 const STATES = {
@@ -13,8 +14,6 @@ const STATES = {
   MEASURING: 'MEASURING',
   MEASURED: 'MEASURED'
 };
-
-const METERS_PER_MILE = 1609.344;
 
 const btnStyle = (active, secondary) => ({
   all: 'unset',
@@ -43,28 +42,6 @@ const finishBtnStyle = {
   whiteSpace: 'nowrap',
   boxSizing: 'border-box',
   touchAction: 'manipulation'
-};
-
-const formatDistance = (meters, locale) => {
-  const fmtMeter = new Intl.NumberFormat(locale, {
-    style: 'unit',
-    unit: 'meter',
-    maximumFractionDigits: 0
-  });
-  const fmtKm = new Intl.NumberFormat(locale, {
-    style: 'unit',
-    unit: 'kilometer',
-    maximumFractionDigits: 2
-  });
-  const fmtMile = new Intl.NumberFormat(locale, {
-    style: 'unit',
-    unit: 'mile',
-    maximumFractionDigits: 2
-  });
-  const metricStr =
-    meters < 1000 ? fmtMeter.format(meters) : fmtKm.format(meters / 1000);
-  const imperialStr = fmtMile.format(meters / METERS_PER_MILE);
-  return `${metricStr} · ${imperialStr}`;
 };
 
 const makeDotIcon = color =>

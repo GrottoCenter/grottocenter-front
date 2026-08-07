@@ -17,7 +17,7 @@ import {
   Typography,
   useMediaQuery
 } from '@mui/material';
-import { ContentCopy, Tune } from '@mui/icons-material';
+import { ContentCopy, LocationOn, Tune } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import GeocodingControl from '../common/GeocodingControl';
@@ -35,6 +35,7 @@ import {
   getCRSLabel
 } from '../../../../hooks';
 import useLocalStorage from '../../../../hooks/useLocalStorage';
+import useWaypoint from '../../../../hooks/useWaypoint';
 import { displayLoginDialog } from '../../../../actions/Login';
 import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import CRSMenu from '../../CRSMenu';
@@ -45,6 +46,8 @@ import MassifPolygons, { massifPolygonType } from './MassifPolygons';
 import ExploredOverlay from './ExploredOverlay';
 import useExploredEntrances from './useExploredEntrances';
 import PopupTargetHandler from './PopupTargetHandler';
+import WaypointNavigation from '../common/Waypoint/WaypointNavigation';
+import { WAYPOINT_COLOR } from '../common/Waypoint/waypointIcon';
 import CustomMapContainer from '../common/MapContainer';
 import {
   MARKERS_LIMIT,
@@ -110,6 +113,10 @@ const HydratedMap = ({
   const [formatMenuAnchor, setFormatMenuAnchor] = useState(null);
   const [preferred, setPref] = useCoordinatePreference();
   const isTouch = useMediaQuery('(pointer: coarse)');
+
+  // Temporary navigation waypoint (mobile/touch only), shared with the
+  // fullscreen entrance map through a single storage key — see useWaypoint.
+  const [waypoint, setWaypoint] = useWaypoint();
 
   const [showExplored, setShowExplored] = useLocalStorage(
     'grottocenter_showExploredCaves',
@@ -329,14 +336,23 @@ const HydratedMap = ({
     }
   }, [contextCoords, isAuth, navigate, dispatch]);
 
-  useMapEvent('contextmenu', e => {
+  const handlePlaceWaypoint = useCallback(() => {
+    setWaypoint({ lat: contextCoords.lat, lng: contextCoords.lng });
+    setContextCoords(null);
+  }, [contextCoords, setWaypoint]);
+
+  // Stable handler: react-leaflet's useMapEvent leaks the previous listener
+  // whenever the callback identity changes, so an inline arrow would
+  // accumulate one Leaflet listener per render.
+  const handleContextMenu = useCallback(e => {
     e.originalEvent.preventDefault();
     setContextCoords({ lat: e.latlng.lat, lng: e.latlng.lng });
     setContextMenuAnchor({
       top: e.originalEvent.clientY,
       left: e.originalEvent.clientX
     });
-  });
+  }, []);
+  useMapEvent('contextmenu', handleContextMenu);
 
   // moveend fires after ALL map movement has finished - including mobile inertia.
   useMapEvent('moveend', handleUpdate);
@@ -415,6 +431,16 @@ const HydratedMap = ({
       />
       <MassifPolygons massifs={showMassifPolygons ? massifPolygons : []} />
       <PopupTargetHandler popupTarget={popupTarget} />
+      {/* HydratedMap is always rendered inside CustomMapContainer's
+          MapLocationProvider, so WaypointNavigation needs no provider of its
+          own — the provider only starts subscribing on the first
+          enable()/requestHeading() call, so non-touch users pay nothing. */}
+      {isTouch && waypoint && (
+        <WaypointNavigation
+          waypoint={waypoint}
+          onDelete={() => setWaypoint(null)}
+        />
+      )}
       <Menu
         open={Boolean(contextCoords)}
         onClose={handleContextMenuClose}
@@ -464,6 +490,18 @@ const HydratedMap = ({
             {formatMessage({ id: 'Create an entrance here' })}
           </ListItemText>
         </MenuItem>
+        {isTouch && (
+          <MenuItem onClick={handlePlaceWaypoint}>
+            <ListItemIcon>
+              <LocationOn fontSize="small" sx={{ color: WAYPOINT_COLOR }} />
+            </ListItemIcon>
+            <ListItemText>
+              {formatMessage({
+                id: waypoint ? 'Move waypoint here' : 'Place a waypoint here'
+              })}
+            </ListItemText>
+          </MenuItem>
+        )}
       </Menu>
       <CRSMenu
         anchorEl={formatMenuAnchor}
@@ -522,8 +560,7 @@ const Index = ({
         zoom={zoom}
         isFullscreenAllowed={false}
         isSideMenuOpen={isSideMenuOpen}
-        isLocateControl
-        isCompassControl
+        isLocationControlAlways
         mapRef={mapRef}
         renderer={renderer}>
         <HydratedMap {...props} popupTarget={popupTarget} />
