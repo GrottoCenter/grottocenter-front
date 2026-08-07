@@ -29,6 +29,7 @@ import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
 import documents from './DocumentsReducer';
 import documentType from './DocumentTypeReducer';
+import duplicatesCount from './DuplicatesCountReducer';
 import duplicatesImport from './DuplicatesImportReducer';
 import dynamicNumber from './DynamicNumberReducer';
 import entrance from './EntranceReducer';
@@ -57,6 +58,7 @@ import notifications from './NotificationsReducer';
 import organization from './OrganizationReducer';
 import parentDocument from './ParentDocumentReducer';
 import partnersCarousel from './PartnersCarouselReducer';
+import pendingDocumentsCount from './PendingDocumentsCountReducer';
 import person from './PersonReducer';
 import processDocuments from './ProcessDocumentsReducer';
 import projections from './Projections';
@@ -136,6 +138,7 @@ const GCReducer = combineReducers({
   documentDetails,
   documents,
   documentType,
+  duplicatesCount,
   duplicatesImport,
   dynamicNumber,
   entrance,
@@ -165,6 +168,7 @@ const GCReducer = combineReducers({
   organization,
   parentDocument,
   partnersCarousel,
+  pendingDocumentsCount,
   person,
   processDocuments,
   projections,
