@@ -60,6 +60,11 @@ const keepFocusInSearch = event => event.preventDefault();
 const SearchViewRoot = styled('div')(({ theme }) => ({
   position: 'absolute',
   inset: 0,
+  // Above `.MuiBadge-badge`, which MUI pins at `z-index: 1` to clear the ripple.
+  // Without this the covered icons hide but their badges keep painting through,
+  // since a positioned `z-index: 1` beats every `z-index: auto` sibling whatever
+  // the DOM order.
+  zIndex: 2,
   display: 'flex',
   alignItems: 'center',
   paddingLeft: theme.spacing(2),

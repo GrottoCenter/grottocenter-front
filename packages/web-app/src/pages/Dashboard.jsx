@@ -23,8 +23,6 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import { styled } from '@mui/material/styles';
 
 import { fetchDBExportUrl } from '../actions/DBExport';
-import { fetchDuplicatesCount } from '../actions/DuplicatesCount';
-import { fetchPendingDocumentsCount } from '../actions/PendingDocumentsCount';
 import { usePermissions } from '../hooks';
 import REDUCER_STATUS from '../reducers/ReducerStatus';
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
@@ -240,12 +238,8 @@ const Dashboard = () => {
     if (permissions.isLeader) {
       dispatch(fetchDBExportUrl());
     }
-    if (permissions.isModerator) {
-      dispatch(fetchPendingDocumentsCount());
-      dispatch(fetchDuplicatesCount());
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, permissions.isLeader, permissions.isModerator]);
+  }, [dispatch, permissions.isLeader]);
 
   const showDataSection = permissions.isModerator || permissions.isLeader;
 

@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   IconButton,
   Menu,
@@ -13,12 +14,16 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import BuildIcon from '@mui/icons-material/Build';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import { useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
 
+import { fetchDuplicatesCount } from '../../../actions/DuplicatesCount';
+import { fetchPendingDocumentsCount } from '../../../actions/PendingDocumentsCount';
+import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import UserAvatar from '@/components/common/UserAvatar';
 import Translate from '../Translate';
 import { usePermissions, useUserProperties } from '../../../hooks';
@@ -36,13 +41,33 @@ const UserMenu = ({
   const { formatDate, formatMessage, formatTime } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const userProperties = useUserProperties();
   const permissions = usePermissions();
+  const pendingDocumentsCount = useSelector(
+    state => state.pendingDocumentsCount
+  );
+  const duplicatesCount = useSelector(state => state.duplicatesCount);
 
   const userId = pathOr(null, ['id'], userProperties);
   const open = Boolean(anchorEl);
   const hasDashboardAccess =
     permissions.isAdmin || permissions.isModerator || permissions.isLeader;
+
+  const bothCountsSucceeded =
+    pendingDocumentsCount.status === REDUCER_STATUS.SUCCEEDED &&
+    duplicatesCount.status === REDUCER_STATUS.SUCCEEDED;
+  const hasPendingTasks =
+    pendingDocumentsCount.value + duplicatesCount.value > 0;
+  const showPendingDot =
+    permissions.isModerator && bothCountsSucceeded && hasPendingTasks;
+
+  useEffect(() => {
+    if (permissions.isModerator) {
+      dispatch(fetchPendingDocumentsCount());
+      dispatch(fetchDuplicatesCount());
+    }
+  }, [dispatch, permissions.isModerator]);
 
   const isSessionExpired = authTokenExpirationDate < Date.now();
 
@@ -90,7 +115,22 @@ const UserMenu = ({
         onClick={handleMenu}
         color="inherit"
         size="large">
-        <UserAvatar username={userNickname} />
+        <Badge
+          overlap="circular"
+          variant="dot"
+          color="secondary"
+          invisible={!showPendingDot}
+          sx={{
+            '& .MuiBadge-dot': {
+              minWidth: 10,
+              height: 10,
+              borderRadius: '50%',
+              border: '1px solid #fff',
+              boxSizing: 'content-box'
+            }
+          }}>
+          <UserAvatar username={userNickname} />
+        </Badge>
       </IconButton>
       <Menu
         id="menu-appbar"
@@ -170,6 +210,17 @@ const UserMenu = ({
               <BuildIcon />
             </ListItemIcon>
             <Translate>Management tools</Translate>
+            {showPendingDot && (
+              <Box
+                sx={{
+                  ml: 'auto',
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  bgcolor: 'secondary.main'
+                }}
+              />
+            )}
           </MenuItem>
         ]}
 
