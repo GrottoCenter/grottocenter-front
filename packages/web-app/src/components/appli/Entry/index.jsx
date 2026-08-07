@@ -169,7 +169,12 @@ export const Entry = ({
           key: 'print',
           icon: <Print />,
           label: formatMessage({ id: 'Print' }),
-          onClick: handlePrint
+          onClick: handlePrint,
+          // Splits the user-scoped "Add to my explored entrances" (which
+          // renders just above when visible) from the page-level routine
+          // actions. Harmless when explored is hidden: `startsGroup` on the
+          // first visible item is a no-op.
+          startsGroup: true
         },
         {
           key: 'share',
