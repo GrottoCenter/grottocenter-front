@@ -169,6 +169,7 @@ const AssociationSection = ({
 
   return (
     <ScrollableContent
+      dense
       anchorId="organizations"
       title={formatMessage({ id: 'Responsible organizations' })}
       subheader={formatMessage({
@@ -186,6 +187,15 @@ const AssociationSection = ({
           />
         ) : (
           <Box sx={{ my: 0.5 }}>
+            {isFormOpen && (
+              <AssociationForm
+                onClose={() => setIsFormOpen(false)}
+                onSubmit={handleSet}
+                status={isPending ? status : undefined}
+                error={error}
+              />
+            )}
+
             <EntitiesList
               type="organization"
               entities={organizations}
@@ -208,16 +218,6 @@ const AssociationSection = ({
                 />
               }
             />
-
-            {isFormOpen && (
-              <AssociationForm
-                open={isFormOpen}
-                onClose={() => setIsFormOpen(false)}
-                onSubmit={handleSet}
-                status={isPending ? status : undefined}
-                error={error}
-              />
-            )}
 
             <StandardDialog
               open={!!orgToRemove}
