@@ -11,7 +11,8 @@ import {
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import DashboardIcon from '@mui/icons-material/Dashboard';
+import BuildIcon from '@mui/icons-material/Build';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
@@ -20,7 +21,7 @@ import { pathOr } from 'ramda';
 
 import UserAvatar from '@/components/common/UserAvatar';
 import Translate from '../Translate';
-import { useUserProperties } from '../../../hooks';
+import { usePermissions, useUserProperties } from '../../../hooks';
 
 // Constants
 const MENU_MIN_WIDTH = 250;
@@ -36,9 +37,12 @@ const UserMenu = ({
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const userProperties = useUserProperties();
+  const permissions = usePermissions();
 
   const userId = pathOr(null, ['id'], userProperties);
   const open = Boolean(anchorEl);
+  const hasDashboardAccess =
+    permissions.isAdmin || permissions.isModerator || permissions.isLeader;
 
   const isSessionExpired = authTokenExpirationDate < Date.now();
 
@@ -60,6 +64,11 @@ const UserMenu = ({
   const handleMyAccountClick = useCallback(() => {
     handleClose();
     navigate('/ui/account');
+  }, [handleClose, navigate]);
+
+  const handleMyContributionsClick = useCallback(() => {
+    handleClose();
+    navigate('/ui/contributions');
   }, [handleClose, navigate]);
 
   const handleDashboardClick = useCallback(() => {
@@ -148,12 +157,21 @@ const UserMenu = ({
           </ListItemIcon>
           <Translate>My Account</Translate>
         </MenuItem>
-        <MenuItem onClick={handleDashboardClick}>
+        <MenuItem onClick={handleMyContributionsClick}>
           <ListItemIcon>
-            <DashboardIcon />
+            <ListAltIcon />
           </ListItemIcon>
-          <Translate>Dashboard</Translate>
+          <Translate>My contributions</Translate>
         </MenuItem>
+        {hasDashboardAccess && [
+          <Divider key="management-tools-divider" />,
+          <MenuItem key="management-tools" onClick={handleDashboardClick}>
+            <ListItemIcon>
+              <BuildIcon />
+            </ListItemIcon>
+            <Translate>Management tools</Translate>
+          </MenuItem>
+        ]}
 
         {/* Session expired warning */}
         {isSessionExpired && (
