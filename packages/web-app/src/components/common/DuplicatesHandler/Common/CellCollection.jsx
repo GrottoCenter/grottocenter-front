@@ -113,7 +113,7 @@ export const MiddleCellCollection = ({
             <MarginLeftDiv>
               <Fab
                 onClick={() => updateState(state)}
-                color="primary"
+                color="error"
                 size="small">
                 <RemoveIcon />
               </Fab>

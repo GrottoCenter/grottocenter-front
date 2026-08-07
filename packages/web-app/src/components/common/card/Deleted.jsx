@@ -305,6 +305,7 @@ export const DeleteConfirmationDialog = ({
             <Button
               variant="contained"
               color="error"
+              startIcon={<DeleteForeverIcon />}
               disabled={isSearchMandatory && !selectedEntity}
               onClick={() => {
                 onConfirmation(selectedEntity);

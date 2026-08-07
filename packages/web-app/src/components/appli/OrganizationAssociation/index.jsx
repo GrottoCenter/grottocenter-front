@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { Skeleton, Box, Button, Typography } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { usePermissions, useNotification } from '../../../hooks';
 
 import AssociationForm from './AssociationForm';
@@ -234,6 +235,7 @@ const AssociationSection = ({
                   <Button
                     color="error"
                     variant="contained"
+                    startIcon={<LinkOffIcon />}
                     onClick={handleRemove}
                     disabled={isPending && status === REDUCER_STATUS.LOADING}>
                     {formatMessage({ id: 'Remove' })}

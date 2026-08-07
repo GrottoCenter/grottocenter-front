@@ -1,3 +1,4 @@
+import { cloneElement, isValidElement } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Tooltip } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -15,8 +16,8 @@ import OfflineDisabled from './OfflineDisabled';
  * to only ends in an API write — but with nothing to close, so it is simply
  * disabled whenever there is no connection.
  *
- * Below `md` the label collapses into a tooltip and the button becomes an
- * IconButton: the entity glyph already carries an AddCircle badge, so the "+"
+ * Below `md` the label collapses into a tooltip and the button becomes
+ * icon-only: the entity glyph already carries an AddCircle badge, so the "+"
  * meaning survives without the "New" text taking a whole line on phones.
  *
  * The tooltip is blanked while disabled because a disabled <button> emits no
@@ -36,9 +37,30 @@ const NewEntityButton = ({
   const label = formatMessage({ id: 'New' });
   const tooltipText = tooltip || label;
 
+  // On mobile the label collapses to a tooltip, so the icon becomes the whole
+  // affordance and gets scaled up for page-header usages. Section-header
+  // usages (size="small") keep the caller's icon size so they line up with the
+  // adjacent SectionCreateButton / ResponsiveActions burger.
+  //
+  // cloneElement overrides `size` — the prop EntityIcon (used by every real
+  // caller) understands. The AddCircleIcon fallback ignores it, which is fine:
+  // no caller in the codebase relies on that fallback.
+  const mobileIcon =
+    size === 'small' || !isValidElement(icon)
+      ? icon
+      : cloneElement(icon, { size: 26 });
+
   // Same outlined Button on both breakpoints — the only difference on mobile is
   // that the label collapses to the tooltip and the button becomes square, so
   // the outline stays consistent instead of the icon floating unbounded.
+  //
+  // Mobile minWidth is size-aware:
+  //   - size="small"  → 40px, so section-header usages line up with the
+  //                     ResponsiveActions burger sitting next to them.
+  //   - size="medium" → MUI default (64px), so page-header usages (Documents,
+  //                     Entrances, Massifs, Organizations search pages) keep a
+  //                     tappable, visible primary action instead of collapsing
+  //                     to a tiny icon.
   const button = isDesktop ? (
     <Button
       color="secondary"
@@ -57,8 +79,8 @@ const NewEntityButton = ({
       disabled={!isOnline}
       onClick={handleClick}
       aria-label={tooltipText}
-      sx={{ minWidth: 0, padding: 0.5 }}>
-      {icon}
+      sx={size === 'small' ? { minWidth: 40, padding: 0.5 } : undefined}>
+      {mobileIcon}
     </Button>
   );
 

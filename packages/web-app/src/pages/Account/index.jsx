@@ -33,6 +33,7 @@ import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import TuneIcon from '@mui/icons-material/Tune';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -1583,6 +1584,7 @@ const AccountPage = () => {
               onClick={handleConfirmLeaveOrg}
               variant="contained"
               color="error"
+              startIcon={<PersonRemoveIcon />}
               autoFocus>
               {formatMessage({ id: 'Leave' })}
             </Button>

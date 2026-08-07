@@ -20,7 +20,12 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import AppLink from '../AppLink';
 
-const ResponsiveActions = ({ items, loading = false, loadingLabel }) => {
+const ResponsiveActions = ({
+  items,
+  loading = false,
+  loadingLabel,
+  size
+}) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const [anchorEl, setAnchorEl] = useState(null);
@@ -31,7 +36,7 @@ const ResponsiveActions = ({ items, loading = false, loadingLabel }) => {
   // a single non-interactive spinner that keeps the geometry stable.
   if (loading) {
     return (
-      <ButtonGroup color="primary">
+      <ButtonGroup color="primary" size={size}>
         <Button disabled aria-busy="true" aria-label={loadingLabel}>
           <CircularProgress size={20} />
         </Button>
@@ -53,11 +58,12 @@ const ResponsiveActions = ({ items, loading = false, loadingLabel }) => {
     target,
     color,
     disabled,
-    busy
+    busy,
+    destructive
   }) => {
     const button = (
       <Button
-        color={color || 'primary'}
+        color={color || (destructive ? 'error' : 'primary')}
         onClick={onClick}
         disabled={disabled}
         aria-busy={busy ? 'true' : undefined}
@@ -101,7 +107,10 @@ const ResponsiveActions = ({ items, loading = false, loadingLabel }) => {
         {groups
           .filter(group => group.length > 0)
           .map(group => (
-            <ButtonGroup key={group[0].key} color="primary">
+            <ButtonGroup
+              key={group[0].key}
+              size={size}
+              color={group[0].destructive ? 'error' : 'primary'}>
               {group.map(renderButton)}
             </ButtonGroup>
           ))}
@@ -114,7 +123,9 @@ const ResponsiveActions = ({ items, loading = false, loadingLabel }) => {
   // desktop does.
   if (visibleItems.length === 1) {
     return (
-      <ButtonGroup color="primary">{renderButton(visibleItems[0])}</ButtonGroup>
+      <ButtonGroup color="primary" size={size}>
+        {renderButton(visibleItems[0])}
+      </ButtonGroup>
     );
   }
 
@@ -124,11 +135,24 @@ const ResponsiveActions = ({ items, loading = false, loadingLabel }) => {
   visibleItems.forEach((item, index) => {
     if (startsNewGroup(item, visibleItems[index - 1]))
       menuEntries.push(<Divider key={`divider-before-${item.key}`} />);
-    const { key, icon, label, onClick, href, target, color, disabled, busy } =
-      item;
+    const {
+      key,
+      icon,
+      label,
+      onClick,
+      href,
+      target,
+      color,
+      disabled,
+      busy,
+      destructive
+    } = item;
+    const effectiveColor = color || (destructive ? 'error' : undefined);
     const colorSx =
-      color === 'secondary' || color === 'success'
-        ? { color: `${color}.main` }
+      effectiveColor === 'secondary' ||
+      effectiveColor === 'success' ||
+      effectiveColor === 'error'
+        ? { color: `${effectiveColor}.main` }
         : {};
     menuEntries.push(
       <MenuItem
@@ -156,7 +180,7 @@ const ResponsiveActions = ({ items, loading = false, loadingLabel }) => {
 
   return (
     <>
-      <ButtonGroup color="primary">
+      <ButtonGroup color="primary" size={size}>
         <Button
           aria-label="actions"
           aria-haspopup="true"
@@ -215,7 +239,12 @@ ResponsiveActions.propTypes = {
   // non-interactive spinner button, keeping the geometry stable while the
   // caller has nothing yet to offer.
   loading: PropTypes.bool,
-  loadingLabel: PropTypes.string
+  loadingLabel: PropTypes.string,
+  // MUI ButtonGroup size. Default (medium) suits page-header actions where the
+  // group is the primary affordance. Section-item usages (see ActionButtons)
+  // pass `small` so a row of icon-only buttons doesn't outweigh the section
+  // header's own create button.
+  size: PropTypes.oneOf(['small', 'medium', 'large'])
 };
 
 export default ResponsiveActions;
