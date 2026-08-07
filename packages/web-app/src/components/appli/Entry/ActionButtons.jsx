@@ -45,6 +45,7 @@ const ActionButtons = ({
       <OfflineDisabled>
         <ResponsiveActions
           loading
+          size="small"
           loadingLabel={formatMessage({ id: 'Loading ...' })}
         />
       </OfflineDisabled>
@@ -111,7 +112,7 @@ const ActionButtons = ({
 
   return (
     <OfflineDisabled>
-      <ResponsiveActions items={items} />
+      <ResponsiveActions items={items} size="small" />
     </OfflineDisabled>
   );
 };

@@ -309,7 +309,7 @@ const Organization = ({ error, isLoading, organization }) => {
                   })}>
                   <Button
                     variant="outlined"
-                    color="primary"
+                    color={isMember ? 'error' : 'primary'}
                     onClick={handleJoinLeave}
                     disabled={isJoining}
                     startIcon={
@@ -419,6 +419,7 @@ const Organization = ({ error, isLoading, organization }) => {
               onClick={handleConfirmRemoveMember}
               variant="contained"
               color="error"
+              startIcon={<PersonRemoveIcon />}
               autoFocus>
               {formatMessage({ id: 'Remove' })}
             </Button>

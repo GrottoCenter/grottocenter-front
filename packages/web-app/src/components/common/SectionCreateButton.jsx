@@ -71,8 +71,11 @@ const SectionCreateButton = ({
             {currentLabel}
           </Button>
         ) : (
-          // Same outlined Button on mobile — squared off so the icon doesn't
-          // float unbounded next to the section title.
+          // Same outlined Button on mobile — narrower than a standalone Button
+          // to match the width of the ResponsiveActions burger (which lives in
+          // a ButtonGroup and inherits its 40px minWidth). Standalone Button's
+          // default 64px was visibly wider than the burger sitting next to it
+          // in other section headers.
           <Button
             color={currentColor}
             size={size}
@@ -81,7 +84,7 @@ const SectionCreateButton = ({
             onClick={onToggle}
             data-testid={testId}
             aria-label={currentLabel}
-            sx={{ minWidth: 0, padding: 0.5 }}>
+            sx={{ minWidth: 40 }}>
             {currentIcon}
           </Button>
         )}

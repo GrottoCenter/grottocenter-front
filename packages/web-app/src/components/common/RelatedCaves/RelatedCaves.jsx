@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { Box, Button, Typography } from '@mui/material';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 
 import EntitiesList from '../entitiesList/EntitiesList';
 import Alert from '../Alert';
@@ -238,6 +239,7 @@ const RelatedCaves = ({
               onClick={handleConfirmRemove}
               variant="contained"
               color="error"
+              startIcon={<LinkOffIcon />}
               autoFocus>
               {formatMessage({ id: 'Remove' })}
             </Button>
