@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { styled, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import {
   Box,
-  Button,
   Checkbox,
   Divider,
-  IconButton,
   LinearProgress,
+  MenuItem,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -21,8 +21,8 @@ import {
   TableSortLabel,
   TextField,
   Toolbar,
-  Tooltip,
-  Typography
+  Typography,
+  tablePaginationClasses
 } from '@mui/material';
 
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -35,17 +35,68 @@ import useOpenLink from '../../../hooks/useOpenLink';
 import entitiesConfig from './entitiesConfig';
 import ExportFormatDropdown from './ExportFormatDropdown';
 import { LoadingTableHead, LoadingTableBodyInner } from './LoadingTable';
+import ToolbarActionButton from './ToolbarActionButton';
 import VisibleColumnsMenu from './VisibleColumnsMenu';
-import { SORT_FIELD_MAP, getStoredRowsPerPage, renderCell } from './tableUtils';
+import {
+  SORT_FIELD_MAP,
+  TOOLBAR_ACTION_HEIGHT,
+  getStoredRowsPerPage,
+  renderCell
+} from './tableUtils';
 import Translate from '../Translate';
 
 const MAX_DOCUMENTS_TO_EXPORT_IN_CSV = 10000;
 
-const StyledTablePagination = styled(TablePagination)`
-  p {
-    margin: inherit !important;
+// Stock TablePagination is dimensioned as a standalone table footer: a 52px
+// toolbar, a 16px gutter, a spacer set to `flex: 1 1 100%` and a 20px margin
+// before the arrows. Riding inside the 48px results toolbar instead, all of
+// that turns into dead space between "1 / 722" and the arrows.
+//
+// The row range it also renders ("1–200 of 144374") says nothing the results
+// count and that same "1 / 722" do not already say, right next to it. MUI emits
+// its <p> unconditionally, and even empty it would still earn a slot in the
+// toolbar's flex `gap`.
+const INLINE_PAGINATION_SX = {
+  [`& .${tablePaginationClasses.toolbar}`]: { minHeight: 0, pl: 0 },
+  [`& .${tablePaginationClasses.spacer}`]: { display: 'none' },
+  [`& .${tablePaginationClasses.displayedRows}`]: { display: 'none' },
+  [`& .${tablePaginationClasses.actions}`]: { ml: 0 }
+};
+
+// MUI ships this as `visuallyHidden`, but only from @mui/utils, which is a
+// transitive dependency here — inlined rather than promoting a whole package to
+// a direct one for a single style object.
+const VISUALLY_HIDDEN = {
+  border: 0,
+  clip: 'rect(0 0 0 0)',
+  height: '1px',
+  margin: -1,
+  overflow: 'hidden',
+  padding: 0,
+  position: 'absolute',
+  whiteSpace: 'nowrap',
+  width: '1px'
+};
+
+// Nearest ancestor that actually scrolls vertically. The table sits in one on
+// every current page (FixedContent's CardContent), but which element that is
+// belongs to the layout, not here — so it is found rather than assumed.
+const getScrollParent = node => {
+  for (let el = node?.parentElement; el; el = el.parentElement) {
+    const { overflowY } = window.getComputedStyle(el);
+    if (overflowY === 'auto' || overflowY === 'scroll') return el;
   }
-`;
+  return null;
+};
+
+// MUI's default aria-labels are hardcoded English (`Go to ${type} page`), which
+// is the only text in this bar that would not go through react-intl.
+const PAGE_BUTTON_LABEL = {
+  first: 'First page',
+  previous: 'Previous page',
+  next: 'Next page',
+  last: 'Last page'
+};
 
 const EntityTableHead = ({
   columns,
@@ -122,36 +173,36 @@ const EmptyState = () => (
   </Box>
 );
 
-const JumpToPage = ({ page, count, rowsPerPage, onPageChange }) => {
+const JumpToPage = ({ page, totalPages, onPageChange, showLabel = true }) => {
   const { formatMessage } = useIntl();
-  const totalPages = Math.max(1, Math.ceil(count / rowsPerPage));
   const [inputValue, setInputValue] = useState(String(page + 1));
-  const [pending, setPending] = useState(false);
 
   useEffect(() => {
     setInputValue(String(Math.min(page + 1, totalPages)));
-    setPending(false);
   }, [page, totalPages]);
 
+  // Out-of-range input is clamped rather than reverted: silently snapping "999"
+  // back to the current page leaves no way to tell a rejected entry from an
+  // applied one. Only non-numeric input restores what was there.
   const commit = value => {
-    if (pending) return;
-    const parsed = parseInt(value, 10);
-    if (/^\d+$/.test(value) && parsed >= 1 && parsed <= totalPages) {
-      setPending(true);
-      onPageChange(null, parsed - 1);
-    } else {
+    if (!/^\d+$/.test(value)) {
       setInputValue(String(page + 1));
+      return;
     }
+    const target = Math.min(Math.max(parseInt(value, 10), 1), totalPages) - 1;
+    setInputValue(String(target + 1));
+    if (target !== page) onPageChange(null, target);
   };
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 1 }}>
-      <Typography variant="body2" noWrap>
-        <Translate>Go to page</Translate>
-      </Typography>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      {showLabel && (
+        <Typography variant="body2" color="text.secondary" noWrap>
+          <Translate>Go to page</Translate>
+        </Typography>
+      )}
       <TextField
         size="small"
-        disabled={pending}
         value={inputValue}
         onChange={e => setInputValue(e.target.value)}
         onBlur={e => commit(e.target.value)}
@@ -162,24 +213,31 @@ const JumpToPage = ({ page, count, rowsPerPage, onPageChange }) => {
           htmlInput: {
             inputMode: 'numeric',
             pattern: '[0-9]*',
-            style: { textAlign: 'center', padding: '2px 6px' },
             'aria-label': formatMessage({ id: 'Go to page' })
           }
         }}
         sx={{
-          width: 56,
-          '& input': { fontSize: theme => theme.typography.body2.fontSize }
+          width: 60,
+          '& input': {
+            fontSize: theme => theme.typography.body2.fontSize,
+            textAlign: 'center',
+            // Tight enough for a 48px bar, tall enough to stay a pointer target.
+            paddingBlock: 0.75,
+            paddingInline: 0.75
+          }
         }}
       />
-      <Typography variant="body2">/ {totalPages}</Typography>
+      <Typography variant="body2" color="text.secondary" noWrap>
+        / {totalPages}
+      </Typography>
     </Box>
   );
 };
 JumpToPage.propTypes = {
   page: PropTypes.number.isRequired,
-  count: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired
+  totalPages: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+  showLabel: PropTypes.bool
 };
 
 const DesktopEntityTable = ({
@@ -204,7 +262,11 @@ const DesktopEntityTable = ({
   const { formatMessage } = useIntl();
   const openLink = useOpenLink();
   const theme = useTheme();
-  const isSmall = useMediaQuery(theme.breakpoints.down('md'));
+  // Compacted one breakpoint earlier than the layout would suggest: between md
+  // and lg the full labels ("Export to CSV", "Change columns") no longer fit
+  // next to the pagination, and everything but the results count is
+  // `flexShrink: 0` — so the overflow lands on the action buttons.
+  const isSmall = useMediaQuery(theme.breakpoints.down('lg'));
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(() =>
     getStoredRowsPerPage(pageSizeOptions)
@@ -216,6 +278,7 @@ const DesktopEntityTable = ({
   // scroller; the header sits just below the toolbar, at its measured height
   // (see hook). 0 when the toolbar isn't rendered (shouldHideFooter).
   const [toolbarRef, toolbarHeight] = useMeasuredHeight();
+  const topRef = useRef(null);
 
   const entityConfig = entitiesConfig[entityType ?? 'placeholder'];
 
@@ -223,8 +286,33 @@ const DesktopEntityTable = ({
   const exportColumns = visibleColumns.map(e => e.apiField || e.field);
   const exportColumnLabels = visibleColumns.map(e => e.label);
 
+  // Back to the top of the TABLE, never to the top of the page: the sentinel
+  // marks the start of this block, which on a search page sits below the filter
+  // form in the same scroller. Only worth doing once the reader has scrolled
+  // past that top — while it is still visible, the filters above it are part of
+  // what they are looking at and nothing should move.
+  //
+  // Two things this must not be. Not `scrollIntoView`, which walks up and
+  // scrolls *every* scrollable ancestor, dragging the window along and taking
+  // the page header off screen. And not a bare `scrollTop` write, which the
+  // scroller's `scroll-behavior: smooth` turns into an animation rather than
+  // the immediate correction this is meant to be.
+  //
+  // One call, on click, is enough: the rows stay in place through the reload
+  // (see `isStale`), so nothing reflows underneath afterwards.
+  const keepTableTopOnReload = () => {
+    const top = topRef.current;
+    const scroller = getScrollParent(top);
+    if (!top || !scroller) return;
+    const delta =
+      top.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+    if (delta > -1) return;
+    scroller.scrollTo({ top: scroller.scrollTop + delta, behavior: 'instant' });
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
+    keepTableTopOnReload();
     if (onPageChange) onPageChange(newPage, rowsPerPage);
   };
 
@@ -233,6 +321,7 @@ const DesktopEntityTable = ({
     setRowsPerPage(nbRowPerPage);
     localStorage.setItem('entityTable_rowsPerPage', nbRowPerPage);
     setPage(0);
+    keepTableTopOnReload();
     if (onPageChange) onPageChange(0, nbRowPerPage);
   };
 
@@ -279,6 +368,9 @@ const DesktopEntityTable = ({
       return;
     }
     const apiField = fieldMap[property];
+    // A re-sort reshuffles the whole result set, so staying at row 150 is as
+    // wrong as it is after a page change.
+    keepTableTopOnReload();
     if (orderBy === property) {
       let newOrder = 'asc';
       if (order === 'asc') newOrder = 'desc';
@@ -313,6 +405,40 @@ const DesktopEntityTable = ({
   }, [isNewQuery]);
 
   const colSpan = visibleColumns.length + (onSelected ? 1 : 0);
+
+  // Plain CSV export (every entity type but entrances, which gets a format
+  // menu). A tooltip only where it adds something: the reason the button is
+  // dead, or the name of an icon left without its label.
+  const isCsvExportDisabled = nbTotalRows > MAX_DOCUMENTS_TO_EXPORT_IN_CSV;
+  const csvLabel = formatMessage({ id: 'Export to CSV' });
+  let csvTooltip = null;
+  if (isCsvExportDisabled) {
+    csvTooltip = formatMessage({
+      id: 'Export unavailable above 10000 results'
+    });
+  } else if (isSmall) {
+    csvTooltip = csvLabel;
+  }
+
+  // Two loading shapes: `isPending` has nothing on screen yet and gets the
+  // skeleton, `isStale` still holds the rows it is about to replace and keeps
+  // showing them.
+  const isPending = isLoading && pageRows.length === 0;
+  const isStale = isLoading && pageRows.length > 0;
+
+  const totalPages =
+    nbTotalRows == null ? 1 : Math.max(1, Math.ceil(nbTotalRows / rowsPerPage));
+
+  // Two independent conditions, because the two controls stop being useful at
+  // different moments. Navigation is dead as soon as everything fits on one
+  // page — showing "1 / 1" next to four disabled arrows is pure noise. The size
+  // selector has to survive that case: with 50 results and 200/page remembered
+  // from a previous search, it is the only way back to a smaller page.
+  const hasNavigation = onPageChange && nbTotalRows != null && totalPages > 1;
+  const hasPageSizeSelector =
+    onPageChange &&
+    nbTotalRows != null &&
+    nbTotalRows > Math.min(...pageSizeOptions);
 
   const TableContent =
     pageRows.length === 0 ? (
@@ -354,6 +480,10 @@ const DesktopEntityTable = ({
 
   return (
     <Box sx={{ width: '100%' }}>
+      {/* Marks the top of the table for scrollToTableTop. Deliberately outside
+          the sticky wrapper: a pinned element reports its pinned box, so it
+          could never tell us how far the rows have been scrolled. */}
+      <div ref={topRef} />
       {!shouldHideFooter && (
         <Box
           ref={toolbarRef}
@@ -369,116 +499,179 @@ const DesktopEntityTable = ({
             sx={{
               display: 'flex',
               alignItems: 'center',
+              // Wider than the 8px used inside each group, so the three
+              // clusters (count, pagination, actions) read as separate.
+              gap: 2,
               minHeight: 48,
-              overflow: 'hidden'
+              // Last resort if a locale still overflows at its narrowest
+              // labels: wrapping keeps every control reachable, where clipping
+              // would silently swallow the rightmost button. The sticky table
+              // header follows along, since useMeasuredHeight tracks the height.
+              flexWrap: 'wrap',
+              rowGap: 0.5
             }}>
-            {nbTotalRows != null && !isLoading && (
+            {nbTotalRows != null && (
+              // Stays mounted while loading. Unmounting it slid the whole
+              // pagination cluster ~145px left mid-click, so the arrow the user
+              // had just pressed moved out from under the cursor.
               <Typography
                 variant="body2"
                 color="text.secondary"
+                aria-live="polite"
                 sx={{
-                  flex: 1,
-                  minWidth: 100,
+                  minWidth: 0,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  opacity: isLoading ? 0.5 : 1,
+                  transition: theme.transitions.create('opacity', {
+                    duration: theme.transitions.duration.shortest
+                  })
                 }}>
                 {formatMessage({ id: 'results_count' }, { count: nbTotalRows })}
+                {hasNavigation && (
+                  <Box component="span" sx={VISUALLY_HIDDEN}>
+                    {formatMessage(
+                      { id: 'page_position' },
+                      { page: page + 1, total: totalPages }
+                    )}
+                  </Box>
+                )}
               </Typography>
+            )}
+            {/* Pagination rides in this bar rather than in a footer of its own:
+                the bar is already sticky and already paid for, so the controls
+                cost zero extra height and cannot fall below the fold. */}
+            {hasNavigation && (
+              <Box
+                component="nav"
+                aria-label={formatMessage({ id: 'Pagination' })}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  flexShrink: 0
+                }}>
+                <JumpToPage
+                  page={page}
+                  totalPages={totalPages}
+                  onPageChange={handleChangePage}
+                  showLabel={!isSmall}
+                />
+                <TablePagination
+                  showFirstButton={!isSmall}
+                  showLastButton={!isSmall}
+                  // Empty on purpose: the page-size selector lives in the
+                  // settings cluster on the right, so only the arrows remain.
+                  rowsPerPageOptions={[]}
+                  component="div"
+                  count={nbTotalRows}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  sx={INLINE_PAGINATION_SX}
+                  getItemAriaLabel={type =>
+                    formatMessage({ id: PAGE_BUTTON_LABEL[type] })
+                  }
+                  slotProps={{
+                    actions: {
+                      // Prev/next carry the traffic, so they are the two that
+                      // get the accent; first/last stay neutral behind them.
+                      previousButton: {
+                        color: 'primary',
+                        title: formatMessage({ id: 'Previous page' })
+                      },
+                      nextButton: {
+                        color: 'primary',
+                        title: formatMessage({ id: 'Next page' })
+                      },
+                      firstButton: {
+                        title: formatMessage({ id: 'First page' })
+                      },
+                      lastButton: { title: formatMessage({ id: 'Last page' }) }
+                    }
+                  }}
+                  onPageChange={handleChangePage}
+                />
+              </Box>
             )}
             <Box
               sx={{
                 minWidth: 0,
                 display: 'flex',
                 gap: 0.5,
-                alignItems: 'center'
+                alignItems: 'center',
+                flexShrink: 0,
+                ml: 'auto'
               }}>
+              {hasPageSizeSelector && (
+                // A display setting, same family as "Change columns" — hence
+                // this cluster rather than the navigation one, where it used to
+                // sit between the page number and the arrows it has nothing to
+                // do with.
+                <Select
+                  variant="standard"
+                  value={rowsPerPage}
+                  onChange={handleChangeRowsPerPage}
+                  renderValue={value =>
+                    formatMessage(
+                      { id: 'rows_per_page_short' },
+                      { count: value }
+                    )
+                  }
+                  slotProps={{
+                    input: {
+                      'aria-label': formatMessage({ id: 'Results per page:' })
+                    }
+                  }}
+                  sx={{
+                    fontSize: theme.typography.body2.fontSize,
+                    color: 'text.secondary',
+                    height: TOOLBAR_ACTION_HEIGHT
+                  }}>
+                  {pageSizeOptions.map(size => (
+                    <MenuItem key={size} value={size}>
+                      {size}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
               {onExport && entityType === 'entrances' && (
                 <ExportFormatDropdown
                   disabled={nbTotalRows > MAX_DOCUMENTS_TO_EXPORT_IN_CSV}
+                  iconOnly={isSmall}
                   onExport={format => {
                     onExport(exportColumns, exportColumnLabels, format);
                   }}
                 />
               )}
-              {onExport &&
-                entityType !== 'entrances' &&
-                (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => {
-                      onExport(exportColumns, exportColumnLabels);
-                    }}
-                    startIcon={<FileDownloadIcon />}
-                    sx={{ minWidth: 0 }}>
-                    <Box
-                      component="span"
-                      sx={{
-                        minWidth: 0,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                      }}>
-                      {isSmall ? 'CSV' : <Translate>Export to CSV</Translate>}
-                    </Box>
-                  </Button>
-                ) : (
-                  <Tooltip
-                    title={formatMessage({
-                      id: 'Export unavailable above 10000 results'
-                    })}>
-                    <span>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        disabled
-                        startIcon={<FileDownloadIcon />}
-                        sx={{ minWidth: 0 }}>
-                        <Box
-                          component="span"
-                          sx={{
-                            minWidth: 0,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                          }}>
-                          {isSmall ? (
-                            'CSV'
-                          ) : (
-                            <Translate>Export to CSV</Translate>
-                          )}
-                        </Box>
-                      </Button>
-                    </span>
-                  </Tooltip>
-                ))}
+              {onExport && entityType !== 'entrances' && (
+                <ToolbarActionButton
+                  icon={FileDownloadIcon}
+                  label={isSmall ? null : csvLabel}
+                  tooltip={csvTooltip}
+                  disabled={isCsvExportDisabled}
+                  onClick={() => {
+                    onExport(exportColumns, exportColumnLabels);
+                  }}
+                />
+              )}
               {!compact && (
                 <VisibleColumnsMenu
                   columns={entityColumns}
                   setColumns={setEntityColumns}
                   entityType={entityType}
-                  label="Change columns"
+                  label={isSmall ? null : 'Change columns'}
                   menuTitle="Change columns"
                   icon={ViewColumnIcon}
                 />
               )}
-              <Tooltip
-                title={formatMessage({
+              <ToolbarActionButton
+                icon={ViewListIcon}
+                tooltip={formatMessage({
                   id: viewMode === 'table' ? 'Card view' : 'Table view'
-                })}>
-                <IconButton
-                  size="small"
-                  onClick={onViewToggle}
-                  color="primary"
-                  sx={{
-                    border: '1px solid',
-                    borderColor: 'primary.main',
-                    borderRadius: 1
-                  }}>
-                  <ViewListIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
+                })}
+                onClick={onViewToggle}
+              />
             </Box>
           </Toolbar>
           <Divider />
@@ -499,8 +692,26 @@ const DesktopEntityTable = ({
               // wide tables is handled there instead.
               { overflow: 'visible' }
         }>
-        <Table stickyHeader sx={{ minWidth: compact ? 300 : 750 }} size="small">
-          {isLoading ? (
+        <Table
+          stickyHeader
+          size="small"
+          aria-busy={isLoading}
+          sx={{
+            minWidth: compact ? 300 : 750,
+            // Stale-while-revalidate: the rows being replaced stay put, dimmed,
+            // instead of collapsing into a skeleton. Swapping them out changed
+            // the scroller's height by thousands of pixels mid-reload, which
+            // moved the reader away from the rows they were on. Nothing to
+            // preserve on a first load, so the skeleton still runs there.
+            ...(isStale && {
+              opacity: 0.5,
+              pointerEvents: 'none',
+              transition: theme.transitions.create('opacity', {
+                duration: theme.transitions.duration.shortest
+              })
+            })
+          }}>
+          {isPending ? (
             <LoadingTableHead stickyTop={toolbarHeight} />
           ) : (
             <EntityTableHead
@@ -515,38 +726,10 @@ const DesktopEntityTable = ({
             />
           )}
           <TableBody>
-            {isLoading ? <LoadingTableBodyInner /> : TableContent}
+            {isPending ? <LoadingTableBodyInner /> : TableContent}
           </TableBody>
         </Table>
       </TableContainer>
-      {!shouldHideFooter && onPageChange && (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            flexWrap: 'wrap'
-          }}>
-          <JumpToPage
-            page={page}
-            count={nbTotalRows}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handleChangePage}
-          />
-          <StyledTablePagination
-            showFirstButton
-            showLastButton
-            rowsPerPageOptions={pageSizeOptions}
-            component="div"
-            count={nbTotalRows}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            labelRowsPerPage={formatMessage({ id: 'Results per page:' })}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Box>
-      )}
     </Box>
   );
 };
