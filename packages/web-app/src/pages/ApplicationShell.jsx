@@ -1,7 +1,7 @@
-import { useRef, useEffect, useState, Suspense } from 'react';
+import { useRef, useEffect, Suspense } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
-import { IntlProvider, useIntl } from 'react-intl';
+import { IntlProvider } from 'react-intl';
 import createDebounce from 'redux-debounced';
 import { isMobileOnly } from 'react-device-detect';
 import { SnackbarContent, SnackbarProvider } from 'notistack';
@@ -10,7 +10,6 @@ import { thunk } from 'redux-thunk';
 import PropTypes from 'prop-types';
 import { styled, useTheme } from '@mui/material/styles';
 import { Alert, Box, CircularProgress, useMediaQuery } from '@mui/material';
-import { usePermissions } from '../hooks';
 
 import GCReducer from '../reducers/GCReducer';
 import mapCacheInvalidationMiddleware from '../middlewares/mapCacheInvalidationMiddleware';
@@ -19,6 +18,7 @@ import useLanguageSync from '../hooks/useLanguageSync';
 
 import ErrorHandler from '../components/appli/ErrorHandler';
 import NetworkStatusNotifier from '../components/common/NetworkStatusNotifier';
+import SessionExpiryNotifier from '../components/common/SessionExpiryNotifier';
 import ErrorBoundary from '../components/appli/PageErrorBounary';
 import UpdatePrompt from '../components/appli/UpdatePrompt';
 import SideMenu from '../components/common/SideMenu';
@@ -155,47 +155,6 @@ const MainWrapper = styled('main')`
     !isMobileOnly && ($isSideMenuOpen ? theme.sideMenuWidth : 0)}px;
 `;
 
-const SECONDS_IN_DAY = 86400;
-
-const AdminSessionExpiryBanner = () => {
-  const { formatMessage } = useIntl();
-  const { isAdmin } = usePermissions();
-  const authTokenDecoded = useSelector(state => state.login.authTokenDecoded);
-  const userId = authTokenDecoded?.id;
-  const storageKey = userId
-    ? `mfaExpiryBannerDismissed_${userId}`
-    : 'mfaExpiryBannerDismissed';
-  const [dismissed, setDismissed] = useState(
-    () => sessionStorage.getItem(storageKey) === 'true'
-  );
-  const [, setTick] = useState(0);
-
-  useEffect(() => {
-    if (!isAdmin || dismissed || !authTokenDecoded?.exp) return undefined;
-    const msUntilThreshold =
-      (authTokenDecoded.exp - SECONDS_IN_DAY) * 1000 - Date.now();
-    if (msUntilThreshold <= 0) return undefined;
-    const timer = setTimeout(() => setTick(t => t + 1), msUntilThreshold);
-    return () => clearTimeout(timer);
-  }, [authTokenDecoded?.exp, isAdmin, dismissed]);
-
-  if (!isAdmin || dismissed || !authTokenDecoded?.exp) return null;
-
-  const secondsUntilExpiry = authTokenDecoded.exp - Date.now() / 1000;
-  if (secondsUntilExpiry >= SECONDS_IN_DAY) return null;
-
-  const handleDismiss = () => {
-    sessionStorage.setItem(storageKey, 'true');
-    setDismissed(true);
-  };
-
-  return (
-    <Alert severity="warning" onClose={handleDismiss} sx={{ borderRadius: 0 }}>
-      {formatMessage({ id: 'mfaSessionExpiryWarning' })}
-    </Alert>
-  );
-};
-
 const ApplicationLayout = () => {
   const isSideMenuOpen = useSelector(state => state.sideMenu.open);
   useLanguageSync();
@@ -209,11 +168,16 @@ const ApplicationLayout = () => {
 
   return (
     <>
-      {/* AppBar is position:fixed and renders its own toolbar spacer, so any
-          banner rendered BEFORE it would be visually hidden behind it. Keep
-          banners after <AppBar /> so they sit right below the toolbar. */}
+      {/* Two traps for anything full-width rendered here rather than inside
+          MainWrapper:
+          - AppBar is position:fixed and renders its own toolbar spacer, so a
+            banner placed BEFORE it is hidden behind it;
+          - SideMenu is a persistent, fixed Drawer, and only MainWrapper carries
+            the matching `margin-left: theme.sideMenuWidth`. A banner that skips
+            it gets its first 240px covered on desktop — that was #1489.
+          Prefer a snackbar (position:fixed, no layout offset to get wrong); if
+          a banner is really needed, it has to reproduce MainWrapper's margin. */}
       <AppBar />
-      <AdminSessionExpiryBanner />
       <SideMenu isOpen={isSideMenuOpen} />
       <MainWrapper $isSideMenuOpen={isSideMenuOpen}>
         <LoginDialog />
@@ -266,6 +230,7 @@ const ApplicationShell = () => {
                 app, offering the update is exactly what fixes it. */}
             <UpdatePrompt />
             <NetworkStatusNotifier />
+            <SessionExpiryNotifier />
             <ErrorBoundary>
               <ApplicationLayout />
             </ErrorBoundary>
