@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { useSnackbar } from 'notistack';
 import { useIntl } from 'react-intl';
 import { Link } from '@mui/material';
+import { useNotification } from './useNotification';
 
 export const useMoveRelevanceWithUndo = moveThunk => {
   const dispatch = useDispatch();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { onError, onSuccess, onClose } = useNotification();
   const { formatMessage } = useIntl();
   const [movingId, setMovingId] = useState(null);
 
@@ -16,16 +16,15 @@ export const useMoveRelevanceWithUndo = moveThunk => {
       dispatch(moveThunk(entityId, direction))
         .then(result => {
           if (result?.error) {
-            enqueueSnackbar(
+            onError(
               typeof result.error === 'string'
                 ? result.error
                 : formatMessage({ id: 'genericError' }),
-              { variant: 'error', autoHideDuration: 6000 }
+              { autoHideDuration: 6000 }
             );
             return;
           }
-          enqueueSnackbar(formatMessage({ id: 'Order updated' }), {
-            variant: 'success',
+          onSuccess(formatMessage({ id: 'Order updated' }), {
             autoHideDuration: 6000,
             action: snackbarId => (
               <Link
@@ -34,21 +33,19 @@ export const useMoveRelevanceWithUndo = moveThunk => {
                 underline="always"
                 sx={{ cursor: 'pointer', fontSize: '0.875rem' }}
                 onClick={() => {
-                  closeSnackbar(snackbarId);
+                  onClose(snackbarId);
                   setMovingId(entityId);
                   dispatch(moveThunk(entityId, direction * -1))
                     .then(undoResult => {
                       if (undoResult?.error) {
-                        enqueueSnackbar(formatMessage({ id: 'genericError' }), {
-                          variant: 'error',
+                        onError(formatMessage({ id: 'genericError' }), {
                           autoHideDuration: 6000
                         });
                         return;
                       }
-                      enqueueSnackbar(
-                        formatMessage({ id: 'Undo successful' }),
-                        { variant: 'success', autoHideDuration: 3000 }
-                      );
+                      onSuccess(formatMessage({ id: 'Undo successful' }), {
+                        autoHideDuration: 3000
+                      });
                     })
                     .finally(() => setMovingId(null));
                 }}>
@@ -59,7 +56,7 @@ export const useMoveRelevanceWithUndo = moveThunk => {
         })
         .finally(() => setMovingId(null));
     },
-    [dispatch, moveThunk, enqueueSnackbar, closeSnackbar, formatMessage]
+    [dispatch, moveThunk, onError, onSuccess, onClose, formatMessage]
   );
 
   return { movingId, handleMove };

@@ -1,26 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import { useNotification, useOnlineStatus } from '../../hooks';
+import { createCloseAction } from './snackbarActions';
 
 const OFFLINE_SNACKBAR_KEY = 'network-offline';
-
-// Kept at module scope on purpose: notistack wants `action` as a `key => node`
-// function, and defining one inside the component would make React see a new
-// component type on every render (react/no-unstable-nested-components).
-const closeAction = (onClose, label) =>
-  function (key) {
-    return (
-      <IconButton
-        size="small"
-        color="inherit"
-        aria-label={label}
-        onClick={() => onClose(key)}>
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    );
-  };
 
 /**
  * Announces connectivity changes. Renders nothing itself.
@@ -54,8 +37,7 @@ const NetworkStatusNotifier = () => {
         key: OFFLINE_SNACKBAR_KEY,
         persist: true,
         preventDuplicate: true,
-        anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
-        action: closeAction(onClose, formatMessage({ id: 'Close' }))
+        action: createCloseAction(onClose, formatMessage({ id: 'Close' }))
       });
       return;
     }
@@ -66,9 +48,7 @@ const NetworkStatusNotifier = () => {
       // online (a locale change gives formatMessage a new identity) cannot
       // announce a reconnection that never happened.
       hasBeenOffline.current = false;
-      onSuccess(formatMessage({ id: 'backOnline' }), {
-        anchorOrigin: { vertical: 'bottom', horizontal: 'center' }
-      });
+      onSuccess(formatMessage({ id: 'backOnline' }));
     }
   }, [isOnline, formatMessage, onWarning, onSuccess, onClose]);
 

@@ -8,8 +8,8 @@ import { SnackbarContent, SnackbarProvider } from 'notistack';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { thunk } from 'redux-thunk';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
-import { Alert, Box, CircularProgress } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import { Alert, Box, CircularProgress, useMediaQuery } from '@mui/material';
 import { usePermissions } from '../hooks';
 
 import GCReducer from '../reducers/GCReducer';
@@ -94,7 +94,12 @@ HydratedIntlProvider.propTypes = {
 // own MaterialDesignContent calls `action(id)` when it is a function, and a
 // custom component has to do the same or a function action would be rendered
 // as a React child and throw.
-const AppSnackbar = ({ id, message, variant, action, ref, ...rest }) => {
+// `icon` is destructured out for the same reason as `action`: notistack
+// forwards unknown enqueueSnackbar options to the custom component, and letting
+// it fall into `rest` would spread a React element onto SnackbarContent's div.
+// Pulling it out is also what lets a caller override the severity icon
+// (UpdatePrompt uses SystemUpdateAltIcon); `undefined` keeps Alert's default.
+const AppSnackbar = ({ id, message, variant, action, icon, ref, ...rest }) => {
   const severity = variant === 'default' ? 'info' : variant;
   const resolvedAction = typeof action === 'function' ? action(id) : action;
   return (
@@ -102,7 +107,15 @@ const AppSnackbar = ({ id, message, variant, action, ref, ...rest }) => {
       <Alert
         severity={severity}
         action={resolvedAction}
-        sx={{ width: '100%', typography: 'body1' }}>
+        icon={icon}
+        sx={{
+          width: '100%',
+          alignItems: 'center',
+          typography: 'body1',
+          // Alert's action slot is top-aligned and padded by default, which
+          // reads as off-centre as soon as the message wraps to two lines.
+          '& .MuiAlert-action': { alignItems: 'center', pt: 0 }
+        }}>
         {message}
       </Alert>
     </SnackbarContent>
@@ -114,6 +127,7 @@ AppSnackbar.propTypes = {
   message: PropTypes.node,
   variant: PropTypes.string,
   action: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  icon: PropTypes.node,
   ref: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 };
 
@@ -225,23 +239,41 @@ const ApplicationLayout = () => {
   );
 };
 
-const ApplicationShell = () => (
-  <div>
-    <SnackbarProvider maxSnack={3} Components={SNACKBAR_COMPONENTS}>
-      <Provider store={gcStore}>
-        <HydratedIntlProvider onError={customOnIntlError}>
-          <ErrorHandler />
-          {/* Outside the boundary on purpose: when a stale build crashes the
-              app, offering the update is exactly what fixes it. */}
-          <UpdatePrompt />
-          <NetworkStatusNotifier />
-          <ErrorBoundary>
-            <ApplicationLayout />
-          </ErrorBoundary>
-        </HydratedIntlProvider>
-      </Provider>
-    </SnackbarProvider>
-  </div>
-);
+const ApplicationShell = () => {
+  const theme = useTheme();
+  const isCompact = useMediaQuery(theme.breakpoints.down('sm'));
+
+  return (
+    <div>
+      {/* Single snackbar system for the whole app — nothing renders a bare MUI
+          <Snackbar>, or it would stack independently and overlap this one.
+
+          maxSnack MUST stay greater than the number of `persist` snackbars that
+          can coexist (network-offline, sw-update, session-expiry): once every
+          slot holds a persistent one, notistack stops queueing and dismisses the
+          oldest instead, silently killing e.g. the update prompt. Adding a
+          fourth persistent notification means raising maxSnack with it. */}
+      <SnackbarProvider
+        maxSnack={4}
+        preventDuplicate
+        dense={isCompact}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        Components={SNACKBAR_COMPONENTS}>
+        <Provider store={gcStore}>
+          <HydratedIntlProvider onError={customOnIntlError}>
+            <ErrorHandler />
+            {/* Outside the boundary on purpose: when a stale build crashes the
+                app, offering the update is exactly what fixes it. */}
+            <UpdatePrompt />
+            <NetworkStatusNotifier />
+            <ErrorBoundary>
+              <ApplicationLayout />
+            </ErrorBoundary>
+          </HydratedIntlProvider>
+        </Provider>
+      </SnackbarProvider>
+    </div>
+  );
+};
 
 export default ApplicationShell;
