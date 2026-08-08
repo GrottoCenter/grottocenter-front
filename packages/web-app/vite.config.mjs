@@ -342,7 +342,18 @@ export default defineConfig(({ mode }) => {
                         'tile.openstreetmap.org'
                       );
                       return url.toString();
-                    }
+                    },
+                    // Offline over an area never visited online: nothing cached,
+                    // nothing reachable. CacheFirst then rejects with
+                    // `no-response`, which surfaces as an uncaught promise per
+                    // tile — dozens per pan, drowning the console. An empty SVG
+                    // (an <img> loads it fine) resolves the request instead, so
+                    // the missing area renders as plain map background.
+                    handlerDidError: async () =>
+                      new Response(
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"/>',
+                        { headers: { 'Content-Type': 'image/svg+xml' } }
+                      )
                   }
                 ]
               }
@@ -370,7 +381,14 @@ export default defineConfig(({ mode }) => {
                         'tile.opentopomap.org'
                       );
                       return url.toString();
-                    }
+                    },
+                    // Same as the OSM rule: swallow the `no-response` rejection
+                    // for tiles missing offline (see comment above).
+                    handlerDidError: async () =>
+                      new Response(
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"/>',
+                        { headers: { 'Content-Type': 'image/svg+xml' } }
+                      )
                   }
                 ]
               }
