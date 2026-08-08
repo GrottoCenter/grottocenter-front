@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Box, Breadcrumbs, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -50,7 +50,11 @@ import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildre
 import { deleteDocument } from '../../actions/Document/DeleteDocument';
 import { restoreDocument } from '../../actions/Document/RestoreDocument';
 import { loadLanguages } from '../../actions/Language';
-import { usePermissions, useSharePage } from '../../hooks';
+import {
+  usePermissions,
+  useRefetchOnReconnect,
+  useSharePage
+} from '../../hooks';
 import PageContainer from '../../components/common/Layouts/PageContainer';
 import PageHeader from '../../components/common/Layouts/PageHeader';
 import SectionStack from '../../components/common/Layouts/SectionStack';
@@ -59,6 +63,7 @@ import ScrollableContent, {
   CountBadge
 } from '../../components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '../../components/common/Alert';
+import FetchErrorState from '../../components/common/FetchErrorState';
 import {
   DeleteConfirmationDialog,
   Deleted,
@@ -114,6 +119,7 @@ const SideColumn = styled('div', {
 const Document = ({
   isLoading = true,
   error,
+  onRetry = null,
   documentData,
   documentChildren,
   hideActions = false
@@ -518,11 +524,10 @@ const Document = ({
         {error && (
           <ScrollableContent
             content={
-              <Alert
-                title={formatMessage({
-                  id: 'Error, the document data you are looking for is not available.'
-                })}
-                severity="error"
+              <FetchErrorState
+                error={error}
+                onRetry={onRetry}
+                messageId="Error, the document data you are looking for is not available."
               />
             }
           />
@@ -823,13 +828,18 @@ const DocumentDetails = ({ id, hideActions = false }) => {
     }
   }, [dispatch, isLanguagesLoaded]);
 
+  const reloadDocument = useCallback(() => {
+    if (!documentId) return;
+    dispatch(fetchDocumentDetails(documentId));
+    dispatch(fetchDocumentChildren(documentId));
+  }, [dispatch, documentId]);
+
   useEffect(() => {
-    if (documentId) {
-      dispatch(fetchDocumentDetails(documentId));
-      dispatch(fetchDocumentChildren(documentId));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [documentId]);
+    reloadDocument();
+  }, [reloadDocument]);
+
+  const fetchError = error ?? childrenError;
+  useRefetchOnReconnect(reloadDocument, Boolean(fetchError));
 
   return details?.isDeleted && !permissions.isModerator ? (
     <Deleted entityType={DELETED_ENTITIES.document} entity={details} />
@@ -851,7 +861,8 @@ const DocumentDetails = ({ id, hideActions = false }) => {
       // Deliberately not exclusive: a children-fetch failure alongside a
       // successful detail fetch still renders the document content plus the
       // error card, as a degraded state rather than blanking the whole page.
-      error={error ?? childrenError}
+      error={fetchError}
+      onRetry={reloadDocument}
       documentData={details}
       documentChildren={children}
       hideActions={hideActions}
@@ -864,6 +875,7 @@ export default DocumentDetails;
 Document.propTypes = {
   isLoading: PropTypes.bool,
   error: PropTypes.shape({}),
+  onRetry: PropTypes.func,
   documentData: DocumentPropTypes,
   documentChildren: PropTypes.arrayOf(DocumentChildPropTypes),
   hideActions: PropTypes.bool

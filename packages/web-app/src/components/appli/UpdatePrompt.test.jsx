@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
+import { SnackbarProvider } from 'notistack';
 import UpdatePrompt from './UpdatePrompt';
 
 const useRegisterSWMock = vi.fn();
@@ -15,10 +16,14 @@ const messages = {
   'A new version is available': 'A new version is available'
 };
 
+// UpdatePrompt renders nothing itself — the prompt goes through the app-wide
+// notistack stack, so the provider is what puts it in the DOM.
 const renderUpdatePrompt = () =>
   render(
     <IntlProvider locale="en" messages={messages}>
-      <UpdatePrompt />
+      <SnackbarProvider>
+        <UpdatePrompt />
+      </SnackbarProvider>
     </IntlProvider>
   );
 

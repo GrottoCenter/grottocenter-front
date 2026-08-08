@@ -2,41 +2,46 @@ import * as React from 'react';
 import { useSnackbar } from 'notistack';
 
 export const useNotification = () => {
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
+  // `options` is forwarded as-is to notistack, so callers can reach for `key`,
+  // `persist`, `anchorOrigin`, … without bypassing this hook. Used by
+  // NetworkStatusNotifier to keep an offline message on screen until the
+  // connection is back, then close it by key.
   const enqueueNotification = React.useCallback(
-    type => message => {
+    type => (message, options) => {
       enqueueSnackbar(message instanceof Error ? message.message : message, {
-        variant: type
+        variant: type,
+        ...options
       });
     },
     [enqueueSnackbar]
   );
 
   const handleError = React.useCallback(
-    message => {
-      enqueueNotification('error')(message);
+    (message, options) => {
+      enqueueNotification('error')(message, options);
     },
     [enqueueNotification]
   );
 
   const handleWarning = React.useCallback(
-    message => {
-      enqueueNotification('warning')(message);
+    (message, options) => {
+      enqueueNotification('warning')(message, options);
     },
     [enqueueNotification]
   );
 
   const handleSuccess = React.useCallback(
-    message => {
-      enqueueNotification('success')(message);
+    (message, options) => {
+      enqueueNotification('success')(message, options);
     },
     [enqueueNotification]
   );
 
   const handleInfo = React.useCallback(
-    message => {
-      enqueueNotification('info')(message);
+    (message, options) => {
+      enqueueNotification('info')(message, options);
     },
     [enqueueNotification]
   );
@@ -45,6 +50,7 @@ export const useNotification = () => {
     onError: handleError,
     onWarning: handleWarning,
     onSuccess: handleSuccess,
-    onInfo: handleInfo
+    onInfo: handleInfo,
+    onClose: closeSnackbar
   };
 };

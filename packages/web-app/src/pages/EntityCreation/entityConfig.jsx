@@ -57,15 +57,26 @@ export const EntityIcon = ({
   <Box sx={{ position: 'relative', display: 'inline-flex' }}>
     <CustomIcon type={iconType} size={size} />
     <BadgeIcon
-      sx={{
+      sx={theme => ({
         position: 'absolute',
         top: -4,
         right: -4,
         fontSize: 16,
         color: 'secondary.main',
         bgcolor: 'background.paper',
-        borderRadius: '50%'
-      }}
+        borderRadius: '50%',
+        // The badge pins its own colour, so MUI's disabled text colour never
+        // reaches it either. Sibling of CustomIcon's own rule, not a parent of
+        // it, so the two can't compound into a double-faded icon.
+        //
+        // Dimmed by COLOUR only — never `opacity`. The badge sits on top of the
+        // entity icon and relies on its own opaque disc to mask it; fading that
+        // disc lets the icon show straight through the badge, which is exactly
+        // what it exists to prevent. The glyph colour alone carries "disabled".
+        '.Mui-disabled &': {
+          color: theme.palette.action.disabled
+        }
+      })}
     />
   </Box>
 );

@@ -58,6 +58,24 @@ const usePanes = paneLayers => {
   }, [map, paneLayers]);
 };
 
+// Shown in place of a basemap tile that failed to load — offline, that means
+// the tile was never cached for this area. A faint dotted grid reads as "no
+// map data here" and tiles seamlessly with its neighbours, whereas Leaflet's
+// default (the browser's broken-image icon) reads as a bug. Inlined as a data
+// URI so it needs no network of its own.
+//
+// OSM and OpenTopoMap never reach this path: their service-worker rules answer
+// missing tiles themselves (to silence Workbox's `no-response` rejections), so
+// Leaflet sees a success and no error tile. Those rules repeat this exact
+// markup — keep the two in step, or a missing tile ends up looking different
+// depending on which layer it belongs to. See vite.config.mjs, runtimeCaching.
+const ERROR_TILE_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">' +
+    '<rect width="256" height="256" fill="#f5f5f5"/>' +
+    '<path d="M0 128h256M128 0v256" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4 6"/>' +
+    '</svg>'
+)}`;
+
 const createWMTSTileLayer = (layer, opacity = 1) => (
   <TileLayer
     pane={layer.pane}
@@ -71,6 +89,7 @@ const createWMTSTileLayer = (layer, opacity = 1) => (
       new L.LatLngBounds(new L.LatLng(-90, -180), new L.LatLng(90, 180))
     }
     opacity={opacity}
+    errorTileUrl={ERROR_TILE_URL}
     referrerPolicy={layer.referrerPolicy}
   />
 );
@@ -95,6 +114,7 @@ const createWMSTileLayer = (layer, opacity = 1) => {
       transparent={transparent}
       version={version}
       opacity={opacity}
+      errorTileUrl={ERROR_TILE_URL}
     />
   );
 };

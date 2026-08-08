@@ -7,6 +7,7 @@ const CountryPropTypes = {
   country: countryType,
   error: PropTypes.shape({}),
   status: PropTypes.oneOf(Object.values(REDUCER_STATUS)),
+  onRetry: PropTypes.func,
   onSubscribe: PropTypes.func.isRequired,
   onUnsubscribe: PropTypes.func.isRequired,
   regions: PropTypes.arrayOf(

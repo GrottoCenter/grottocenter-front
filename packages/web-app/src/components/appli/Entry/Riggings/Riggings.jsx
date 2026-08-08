@@ -1,10 +1,9 @@
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Divider, Tooltip, Button } from '@mui/material';
+import { Divider } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import React, { useState } from 'react';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
+import SectionCreateButton from '@/components/common/SectionCreateButton';
 import { usePermissions } from '../../../../hooks';
 import { postRiggings } from '../../../../actions/Riggings/CreateRigging';
 import { moveRiggingRelevance } from '../../../../actions/Riggings/MoveRelevance';
@@ -61,21 +60,13 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
       icon={
         permissions.isAuth &&
         isEditAllowed && (
-          <Tooltip
-            title={
-              isFormVisible
-                ? formatMessage({ id: 'Cancel adding a new rigging' })
-                : formatMessage({ id: 'Add a new rigging' })
-            }>
-            <Button
-              color={isFormVisible ? 'inherit' : 'secondary'}
-              size="small"
-              variant="outlined"
-              onClick={handleToggleForm}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
-              {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
-            </Button>
-          </Tooltip>
+          <SectionCreateButton
+            isOpen={isFormVisible}
+            onToggle={handleToggleForm}
+            label={formatMessage({ id: 'New' })}
+            tooltip={formatMessage({ id: 'Add a new rigging' })}
+            openTooltip={formatMessage({ id: 'Cancel adding a new rigging' })}
+          />
         )
       }
       content={

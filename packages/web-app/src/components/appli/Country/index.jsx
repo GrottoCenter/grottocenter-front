@@ -20,7 +20,7 @@ import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
-import Alert from '../../common/Alert';
+import FetchErrorState from '../../common/FetchErrorState';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
 import CountryPropTypes from './propTypes';
@@ -35,6 +35,7 @@ const Country = ({
   canSubscribe,
   country,
   error,
+  onRetry = null,
   onSubscribe,
   onUnsubscribe,
   status
@@ -140,11 +141,10 @@ const Country = ({
         {error && (
           <SectionStack>
             <Card sx={{ p: 2 }}>
-              <Alert
-                title={formatMessage({
-                  id: 'Error, the country data you are looking for is not available.'
-                })}
-                severity="error"
+              <FetchErrorState
+                error={error}
+                onRetry={onRetry}
+                messageId="Error, the country data you are looking for is not available."
               />
             </Card>
           </SectionStack>

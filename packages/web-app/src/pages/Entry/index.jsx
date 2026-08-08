@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Entry from '../../components/appli/Entry';
@@ -7,7 +7,7 @@ import {
   fetchNetworkCaveDescriptionsCount,
   resetNetworkCaveDescriptionsCount
 } from '../../actions/Cave/GetNetworkCaveDescriptionsCount';
-import { usePermissions } from '../../hooks';
+import { usePermissions, useRefetchOnReconnect } from '../../hooks';
 import {
   Deleted,
   DELETED_ENTITIES
@@ -22,10 +22,19 @@ const EntryPage = () => {
     state => state.cave.networkDescriptionsCount
   );
 
+  const reloadEntrance = useCallback(
+    () => dispatch(fetchEntrance(entranceId)),
+    [dispatch, entranceId]
+  );
+
   useEffect(() => {
-    dispatch(fetchEntrance(entranceId));
+    reloadEntrance();
     dispatch(resetNetworkCaveDescriptionsCount());
-  }, [entranceId, dispatch]);
+  }, [reloadEntrance, dispatch]);
+
+  // Repair the page on its own when the connection returns, so a caver who
+  // lost signal mid-read finds the content rather than an error.
+  useRefetchOnReconnect(reloadEntrance, Boolean(error));
 
   const networkCaveId =
     data?.cave?.entrances?.length > 1 ? data?.cave?.id : undefined;
@@ -41,6 +50,7 @@ const EntryPage = () => {
     <Entry
       isLoading={loading}
       error={error}
+      onRetry={reloadEntrance}
       entrance={data}
       networkDescriptionsCount={networkDescriptionsCount}
     />

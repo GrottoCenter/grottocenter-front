@@ -1,23 +1,29 @@
-import { useRef, useEffect, useState, Suspense } from 'react';
+import { useCallback, useRef, useEffect, Suspense } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
-import { IntlProvider, useIntl } from 'react-intl';
+import { IntlProvider } from 'react-intl';
 import createDebounce from 'redux-debounced';
 import { isMobileOnly } from 'react-device-detect';
 import { SnackbarContent, SnackbarProvider } from 'notistack';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { thunk } from 'redux-thunk';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
-import { Alert, Box, CircularProgress } from '@mui/material';
-import { usePermissions } from '../hooks';
+import { styled, useTheme } from '@mui/material/styles';
+import { Alert, Box, CircularProgress, useMediaQuery } from '@mui/material';
 
 import GCReducer from '../reducers/GCReducer';
 import mapCacheInvalidationMiddleware from '../middlewares/mapCacheInvalidationMiddleware';
-import { bootstrapIntl } from '../actions/Intl';
+import {
+  bootstrapIntl,
+  changeLocale,
+  hasLoadedMessages
+} from '../actions/Intl';
 import useLanguageSync from '../hooks/useLanguageSync';
+import { useRefetchOnReconnect } from '../hooks';
 
 import ErrorHandler from '../components/appli/ErrorHandler';
+import NetworkStatusNotifier from '../components/common/NetworkStatusNotifier';
+import SessionExpiryNotifier from '../components/common/SessionExpiryNotifier';
 import ErrorBoundary from '../components/appli/PageErrorBounary';
 import UpdatePrompt from '../components/appli/UpdatePrompt';
 import SideMenu from '../components/common/SideMenu';
@@ -70,6 +76,17 @@ const HydratedIntlProvider = ({ children }) => {
   useEffect(() => {
     dispatch(bootstrapIntl());
   }, [dispatch]);
+
+  // Launching offline before /lang/*.json ever reached the cache leaves the UI
+  // on raw message ids. Nothing else would ever ask again — the locale doesn't
+  // change on its own — so repair it the moment the connection is back rather
+  // than making the user reload.
+  const reloadMessages = useCallback(
+    () => dispatch(changeLocale(locale)),
+    [dispatch, locale]
+  );
+  useRefetchOnReconnect(reloadMessages, !hasLoadedMessages(messages, locale));
+
   return (
     <IntlProvider
       locale={locale}
@@ -84,12 +101,37 @@ HydratedIntlProvider.propTypes = {
   children: PropTypes.node
 };
 
-// Custom notistack snackbar with standard MUI typography (body1 = 1rem)
-const AppSnackbar = ({ id: _id, message, variant, ref, ...rest }) => {
+// Custom notistack snackbar with standard MUI typography (body1 = 1rem).
+// `action` is pulled out of the rest props and handed to the Alert rather than
+// the SnackbarContent wrapper: it is what renders the close button a persistent
+// snackbar needs to be dismissible (see NetworkStatusNotifier).
+//
+// notistack hands custom components the raw `action` option, unresolved — its
+// own MaterialDesignContent calls `action(id)` when it is a function, and a
+// custom component has to do the same or a function action would be rendered
+// as a React child and throw.
+// `icon` is destructured out for the same reason as `action`: notistack
+// forwards unknown enqueueSnackbar options to the custom component, and letting
+// it fall into `rest` would spread a React element onto SnackbarContent's div.
+// Pulling it out is also what lets a caller override the severity icon
+// (UpdatePrompt uses SystemUpdateAltIcon); `undefined` keeps Alert's default.
+const AppSnackbar = ({ id, message, variant, action, icon, ref, ...rest }) => {
   const severity = variant === 'default' ? 'info' : variant;
+  const resolvedAction = typeof action === 'function' ? action(id) : action;
   return (
     <SnackbarContent ref={ref} {...rest}>
-      <Alert severity={severity} sx={{ width: '100%', typography: 'body1' }}>
+      <Alert
+        severity={severity}
+        action={resolvedAction}
+        icon={icon}
+        sx={{
+          width: '100%',
+          alignItems: 'center',
+          typography: 'body1',
+          // Alert's action slot is top-aligned and padded by default, which
+          // reads as off-centre as soon as the message wraps to two lines.
+          '& .MuiAlert-action': { alignItems: 'center', pt: 0 }
+        }}>
         {message}
       </Alert>
     </SnackbarContent>
@@ -97,9 +139,11 @@ const AppSnackbar = ({ id: _id, message, variant, ref, ...rest }) => {
 };
 AppSnackbar.displayName = 'AppSnackbar';
 AppSnackbar.propTypes = {
-  id: PropTypes.string,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   message: PropTypes.node,
   variant: PropTypes.string,
+  action: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  icon: PropTypes.node,
   ref: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 };
 
@@ -127,47 +171,6 @@ const MainWrapper = styled('main')`
     !isMobileOnly && ($isSideMenuOpen ? theme.sideMenuWidth : 0)}px;
 `;
 
-const SECONDS_IN_DAY = 86400;
-
-const AdminSessionExpiryBanner = () => {
-  const { formatMessage } = useIntl();
-  const { isAdmin } = usePermissions();
-  const authTokenDecoded = useSelector(state => state.login.authTokenDecoded);
-  const userId = authTokenDecoded?.id;
-  const storageKey = userId
-    ? `mfaExpiryBannerDismissed_${userId}`
-    : 'mfaExpiryBannerDismissed';
-  const [dismissed, setDismissed] = useState(
-    () => sessionStorage.getItem(storageKey) === 'true'
-  );
-  const [, setTick] = useState(0);
-
-  useEffect(() => {
-    if (!isAdmin || dismissed || !authTokenDecoded?.exp) return undefined;
-    const msUntilThreshold =
-      (authTokenDecoded.exp - SECONDS_IN_DAY) * 1000 - Date.now();
-    if (msUntilThreshold <= 0) return undefined;
-    const timer = setTimeout(() => setTick(t => t + 1), msUntilThreshold);
-    return () => clearTimeout(timer);
-  }, [authTokenDecoded?.exp, isAdmin, dismissed]);
-
-  if (!isAdmin || dismissed || !authTokenDecoded?.exp) return null;
-
-  const secondsUntilExpiry = authTokenDecoded.exp - Date.now() / 1000;
-  if (secondsUntilExpiry >= SECONDS_IN_DAY) return null;
-
-  const handleDismiss = () => {
-    sessionStorage.setItem(storageKey, 'true');
-    setDismissed(true);
-  };
-
-  return (
-    <Alert severity="warning" onClose={handleDismiss} sx={{ borderRadius: 0 }}>
-      {formatMessage({ id: 'mfaSessionExpiryWarning' })}
-    </Alert>
-  );
-};
-
 const ApplicationLayout = () => {
   const isSideMenuOpen = useSelector(state => state.sideMenu.open);
   useLanguageSync();
@@ -181,11 +184,16 @@ const ApplicationLayout = () => {
 
   return (
     <>
-      {/* AppBar is position:fixed and renders its own toolbar spacer, so any
-          banner rendered BEFORE it would be visually hidden behind it. Keep
-          banners after <AppBar /> so they sit right below the toolbar. */}
+      {/* Two traps for anything full-width rendered here rather than inside
+          MainWrapper:
+          - AppBar is position:fixed and renders its own toolbar spacer, so a
+            banner placed BEFORE it is hidden behind it;
+          - SideMenu is a persistent, fixed Drawer, and only MainWrapper carries
+            the matching `margin-left: theme.sideMenuWidth`. A banner that skips
+            it gets its first 240px covered on desktop — that was #1489.
+          Prefer a snackbar (position:fixed, no layout offset to get wrong); if
+          a banner is really needed, it has to reproduce MainWrapper's margin. */}
       <AppBar />
-      <AdminSessionExpiryBanner />
       <SideMenu isOpen={isSideMenuOpen} />
       <MainWrapper $isSideMenuOpen={isSideMenuOpen}>
         <LoginDialog />
@@ -211,22 +219,59 @@ const ApplicationLayout = () => {
   );
 };
 
-const ApplicationShell = () => (
-  <div>
-    <SnackbarProvider maxSnack={3} Components={SNACKBAR_COMPONENTS}>
+const ApplicationShell = () => {
+  const theme = useTheme();
+  const isCompact = useMediaQuery(theme.breakpoints.down('sm'));
+
+  return (
+    <div>
+      {/* Single snackbar system for the whole app — nothing renders a bare MUI
+          <Snackbar>, or it would stack independently and overlap this one.
+
+          SnackbarProvider sits INSIDE Provider and HydratedIntlProvider, not
+          around them: notistack renders snackbar content in its own subtree, so
+          it must be below every context that content reads. That is what lets a
+          persistent snackbar carry a <FormattedMessage> node and keep following
+          the locale — see NetworkStatusNotifier.
+
+          maxSnack MUST stay greater than the number of `persist` snackbars that
+          can coexist (network-offline, sw-update, session-expiry): once every
+          slot holds a persistent one, notistack stops queueing and dismisses the
+          oldest instead, silently killing e.g. the update prompt. Adding a
+          fourth persistent notification means raising maxSnack with it.
+
+          NO `preventDuplicate` here: without a `key` notistack dedupes on the
+          MESSAGE, which silently swallows legitimate repeats — reorder two rows
+          in a row and the second "Order updated" never appears, taking its Undo
+          link with it (useMoveRelevanceWithUndo). The three persistent
+          notifiers each pass `preventDuplicate` themselves, keyed, which is
+          where the flag actually belongs.
+
+          Do not reinstate it here without checking the callers: message-based
+          dedupe compares by identity, and a snackbar whose message is a React
+          node (the notifiers all pass <FormattedMessage>) never matches itself,
+          so it would opt out of deduplication silently. */}
       <Provider store={gcStore}>
         <HydratedIntlProvider onError={customOnIntlError}>
-          <ErrorHandler />
-          {/* Outside the boundary on purpose: when a stale build crashes the
-              app, offering the update is exactly what fixes it. */}
-          <UpdatePrompt />
-          <ErrorBoundary>
-            <ApplicationLayout />
-          </ErrorBoundary>
+          <SnackbarProvider
+            maxSnack={4}
+            dense={isCompact}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            Components={SNACKBAR_COMPONENTS}>
+            <ErrorHandler />
+            {/* Outside the boundary on purpose: when a stale build crashes the
+                app, offering the update is exactly what fixes it. */}
+            <UpdatePrompt />
+            <NetworkStatusNotifier />
+            <SessionExpiryNotifier />
+            <ErrorBoundary>
+              <ApplicationLayout />
+            </ErrorBoundary>
+          </SnackbarProvider>
         </HydratedIntlProvider>
       </Provider>
-    </SnackbarProvider>
-  </div>
-);
+    </div>
+  );
+};
 
 export default ApplicationShell;

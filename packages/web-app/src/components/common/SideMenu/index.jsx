@@ -21,7 +21,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { styled, alpha } from '@mui/material/styles';
 import AppLink from '../AppLink';
 import { openSideMenu, closeSideMenu } from '../../../actions/SideMenu';
-import { useAuthNavigate } from '../../../hooks';
+import { useAuthNavigate, useOnlineStatus } from '../../../hooks';
+import OfflineDisabled from '../OfflineDisabled';
 import { AppTitle } from '../AppBar';
 import MenuLinks from './MenuLinks';
 import Translate from '../Translate';
@@ -85,6 +86,7 @@ const SideMenu = ({ isOpen }) => {
   const { locale } = useSelector(state => state.intl);
   const theme = useTheme();
   const isTopbarCompact = useMediaQuery(theme.breakpoints.down('sm'));
+  const isOnline = useOnlineStatus();
 
   const navigateToContribute = useAuthNavigate('/ui/entity/add', {
     onBeforeNavigate: isMobile ? handleClose : undefined
@@ -136,13 +138,20 @@ const SideMenu = ({ isOpen }) => {
         )}
         <MenuLinks toggle={isMobile ? handleClose : undefined} />
         <Divider />
-        <ContributeButton
-          variant="outlined"
-          color="secondary"
-          startIcon={<AddCircleIcon />}
-          onClick={handleContributeClick}>
-          <Translate>Contribute</Translate>
-        </ContributeButton>
+        {/* Every entity-creation form ends in an API write, so the whole
+            contribution flow is a dead end offline — block it at the door
+            rather than at the submit button. fullWidth so the wrapper doesn't
+            shrink the button to its label. */}
+        <OfflineDisabled fullWidth>
+          <ContributeButton
+            variant="outlined"
+            color="secondary"
+            disabled={!isOnline}
+            startIcon={<AddCircleIcon />}
+            onClick={handleContributeClick}>
+            <Translate>Contribute</Translate>
+          </ContributeButton>
+        </OfflineDisabled>
         <Footer>
           <Divider />
           <List>

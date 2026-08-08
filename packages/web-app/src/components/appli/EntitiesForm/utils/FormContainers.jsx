@@ -8,6 +8,8 @@ import {
 } from '@mui/material';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import OfflineDisabled from '@/components/common/OfflineDisabled';
+import { useOnlineStatus } from '@/hooks';
 import ActionButton from '../../../common/ActionButton';
 import Translate from '../../../common/Translate';
 
@@ -86,6 +88,7 @@ export const FormActionRow = ({
   submitLabel
 }) => {
   const { formatMessage } = useIntl();
+  const isOnline = useOnlineStatus();
   return (
     <Box
       sx={{
@@ -95,6 +98,9 @@ export const FormActionRow = ({
         gap: 1,
         mt: 2
       }}>
+      {/* Cancel stays enabled offline: it only discards local form state.
+          Only the submit is wrapped, so losing the connection mid-typing
+          blocks the save instead of failing it — and says why. */}
       {onCancel && (
         <MuiButton
           variant="outlined"
@@ -103,16 +109,22 @@ export const FormActionRow = ({
           {formatMessage({ id: 'Cancel' })}
         </MuiButton>
       )}
-      <ActionButton
-        label={
-          submitLabel ?? formatMessage({ id: isNew ? 'Create' : 'Update' })
-        }
-        loading={isSubmitting}
-        disabled={disabled}
-        color="primary"
-        type="submit"
-        sx={{ width: { xs: '100%', sm: 'auto' } }}
-      />
+      {/* No `fullWidth` here: this Box is the flex container, so the wrapper
+          is stretched by align-items on the mobile column layout and sized to
+          its content on the desktop row — which is exactly the button's own
+          `width: { xs: '100%', sm: 'auto' }`. */}
+      <OfflineDisabled>
+        <ActionButton
+          label={
+            submitLabel ?? formatMessage({ id: isNew ? 'Create' : 'Update' })
+          }
+          loading={isSubmitting}
+          disabled={disabled || !isOnline}
+          color="primary"
+          type="submit"
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        />
+      </OfflineDisabled>
     </Box>
   );
 };

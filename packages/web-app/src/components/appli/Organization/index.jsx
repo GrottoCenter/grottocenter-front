@@ -11,8 +11,6 @@ import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShareIcon from '@mui/icons-material/Share';
 import AppLink from '../../common/AppLink';
@@ -27,7 +25,13 @@ import Details from './Details';
 import ManagedEntitiesSection from './ManagedEntitiesSection';
 import { GrottoFullPropTypes } from '../../../types/grotto.type';
 import Alert from '../../common/Alert';
-import { usePermissions, useSharePage } from '../../../hooks';
+import FetchErrorState from '../../common/FetchErrorState';
+import SectionCreateButton from '../../common/SectionCreateButton';
+import {
+  usePermissions,
+  useRefetchOnReconnect,
+  useSharePage
+} from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
@@ -100,6 +104,8 @@ const Organization = ({ error, isLoading, organization }) => {
   const handleRefresh = useCallback(() => {
     dispatch(fetchOrganization(organizationId));
   }, [dispatch, organizationId]);
+
+  useRefetchOnReconnect(handleRefresh, Boolean(error));
 
   const handleJoinLeave = useCallback(async () => {
     if (!currentUserId) return;
@@ -240,11 +246,10 @@ const Organization = ({ error, isLoading, organization }) => {
       {error && (
         <SectionStack>
           <Card sx={{ p: 2 }}>
-            <Alert
-              title={formatMessage({
-                id: 'Error, the organization data you are looking for is not available.'
-              })}
-              severity="error"
+            <FetchErrorState
+              error={error}
+              onRetry={handleRefresh}
+              messageId="Error, the organization data you are looking for is not available."
             />
           </Card>
         </SectionStack>
@@ -372,24 +377,14 @@ const Organization = ({ error, isLoading, organization }) => {
             count={nbNetworks + nbEntrances}
             icon={
               canManageCaves && (
-                <Tooltip
-                  title={formatMessage({
-                    id: isCaveSearchVisible
-                      ? 'Cancel this search'
-                      : 'Add a cave'
-                  })}>
-                  <Button
-                    color={isCaveSearchVisible ? 'inherit' : 'secondary'}
-                    variant="outlined"
-                    onClick={() => setIsCaveSearchVisible(v => !v)}
-                    startIcon={
-                      isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />
-                    }>
-                    {formatMessage({
-                      id: isCaveSearchVisible ? 'Cancel' : 'Add'
-                    })}
-                  </Button>
-                </Tooltip>
+                <SectionCreateButton
+                  isOpen={isCaveSearchVisible}
+                  onToggle={() => setIsCaveSearchVisible(v => !v)}
+                  label={formatMessage({ id: 'Add' })}
+                  tooltip={formatMessage({ id: 'Add a cave' })}
+                  openTooltip={formatMessage({ id: 'Cancel this search' })}
+                  size="medium"
+                />
               )
             }
             content={

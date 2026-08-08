@@ -2,10 +2,9 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { Box, Button, Divider, Paper, Tooltip } from '@mui/material';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
+import { Box, Divider, Paper } from '@mui/material';
 
+import SectionCreateButton from '@/components/common/SectionCreateButton';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { CommentPropTypes } from '../../../../types/entrance.type';
 import Comment from './Comment';
@@ -51,21 +50,13 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
       icon={
         permissions.isAuth &&
         isEditAllowed && (
-          <Tooltip
-            title={
-              isFormVisible
-                ? formatMessage({ id: 'Cancel adding a new comment' })
-                : formatMessage({ id: 'Add a new comment' })
-            }>
-            <Button
-              color={isFormVisible ? 'inherit' : 'secondary'}
-              size="small"
-              variant="outlined"
-              onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
-              {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
-            </Button>
-          </Tooltip>
+          <SectionCreateButton
+            isOpen={isFormVisible}
+            onToggle={() => setIsFormVisible(!isFormVisible)}
+            label={formatMessage({ id: 'New' })}
+            tooltip={formatMessage({ id: 'Add a new comment' })}
+            openTooltip={formatMessage({ id: 'Cancel adding a new comment' })}
+          />
         )
       }
       content={

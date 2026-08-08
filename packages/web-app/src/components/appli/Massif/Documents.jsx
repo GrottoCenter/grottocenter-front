@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Button, Divider, Tooltip } from '@mui/material';
+import { Divider } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import { useDispatch } from 'react-redux';
-import CancelIcon from '@mui/icons-material/Cancel';
+import SectionCreateButton from '@/components/common/SectionCreateButton';
 import { linkDocumentToMassif } from '../../../actions/LinkDocumentToMassif';
 import { unlinkDocumentToMassif } from '../../../actions/UnlinkDocumentToMassif';
 import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
@@ -35,33 +35,20 @@ const Documents = ({ documents, massifId }) => {
       title={formatMessage({ id: 'Documents' })}
       icon={
         permissions.isAuth && (
-          <Tooltip
-            title={formatMessage({
-              id: isDocumentSearchVisible
-                ? 'Cancel this search'
-                : 'Assign an existing document'
-            })}>
-            <Button
-              color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
-              size="small"
-              variant="outlined"
-              onClick={() => setIsDocumentSearchVisible(v => !v)}
-              startIcon={
-                isDocumentSearchVisible ? (
-                  <CancelIcon />
-                ) : (
-                  <EntityIcon
-                    iconType="bibliography"
-                    size={20}
-                    BadgeIcon={LinkIcon}
-                  />
-                )
-              }>
-              {formatMessage({
-                id: isDocumentSearchVisible ? 'Cancel' : 'Associate'
-              })}
-            </Button>
-          </Tooltip>
+          <SectionCreateButton
+            isOpen={isDocumentSearchVisible}
+            onToggle={() => setIsDocumentSearchVisible(v => !v)}
+            label={formatMessage({ id: 'Associate' })}
+            tooltip={formatMessage({ id: 'Assign an existing document' })}
+            openTooltip={formatMessage({ id: 'Cancel this search' })}
+            icon={
+              <EntityIcon
+                iconType="bibliography"
+                size={20}
+                BadgeIcon={LinkIcon}
+              />
+            }
+          />
         )
       }
       content={

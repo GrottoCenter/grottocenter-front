@@ -4,6 +4,8 @@ import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Box, Button } from '@mui/material';
 
+import OfflineDisabled from '@/components/common/OfflineDisabled';
+import { useOnlineStatus } from '@/hooks';
 import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
@@ -15,6 +17,7 @@ import SearchResults from '../../AdvancedSearch/SearchResults';
 const SearchCaveForm = ({ onSubmit, submitLabel = null }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
+  const isOnline = useOnlineStatus();
   const [selectedEntrances, setSelectedEntrances] = useState([]);
 
   const startAdvancedsearch = (formValues, resourceType) => {
@@ -54,14 +57,19 @@ const SearchCaveForm = ({ onSubmit, submitLabel = null }) => {
         entityType={ADVANCED_SEARCH_TYPES.ENTRANCES}
       />
       <Box sx={{ mt: 1, mb: 2, textAlign: 'center' }}>
-        <Button
-          disabled={selectedEntrances.length === 0}
-          color="primary"
-          variant="contained"
-          type="submit"
-          onClick={handleOnSubmit}>
-          {submitLabel ?? formatMessage({ id: 'Associate' })}
-        </Button>
+        {/* The parent turns this into a linkCave write — see the note in
+            SearchOrganizationForm for why the guard is needed even when the
+            user never disconnects mid-flow. */}
+        <OfflineDisabled>
+          <Button
+            disabled={selectedEntrances.length === 0 || !isOnline}
+            color="primary"
+            variant="contained"
+            type="submit"
+            onClick={handleOnSubmit}>
+            {submitLabel ?? formatMessage({ id: 'Associate' })}
+          </Button>
+        </OfflineDisabled>
       </Box>
     </Box>
   );

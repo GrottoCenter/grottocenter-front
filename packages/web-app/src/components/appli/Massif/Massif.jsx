@@ -34,6 +34,7 @@ import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import Alert from '../../common/Alert';
+import FetchErrorState from '../../common/FetchErrorState';
 import MapMassif from './MapMassif';
 import Documents from './Documents';
 import Guidelines from '../Guidelines';
@@ -49,7 +50,7 @@ import {
 import { MassifTypes } from '../../../types/massif.type';
 import AssociationSection from '../OrganizationAssociation';
 
-const Massif = ({ isLoading, error, massif }) => {
+const Massif = ({ isLoading, error, onRetry = null, massif }) => {
   const dispatch = useDispatch();
   const { massifId } = useParams();
   const massifIdInt = parseInt(massifId, 10);
@@ -207,11 +208,10 @@ const Massif = ({ isLoading, error, massif }) => {
             {error && (
               <SectionStack>
                 <Card sx={{ p: 2 }}>
-                  <Alert
-                    title={formatMessage({
-                      id: 'Error, the massif data you are looking for is not available.'
-                    })}
-                    severity="error"
+                  <FetchErrorState
+                    error={error}
+                    onRetry={onRetry}
+                    messageId="Error, the massif data you are looking for is not available."
                   />
                 </Card>
               </SectionStack>
@@ -386,6 +386,7 @@ const Massif = ({ isLoading, error, massif }) => {
 Massif.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
+  onRetry: PropTypes.func,
   massif: MassifTypes
 };
 

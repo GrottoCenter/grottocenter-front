@@ -9,7 +9,11 @@ import {
   getMapMassifsCoordinatesUrl
 } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
-import { fetchForBounds, registerEntity } from '../utils/mapTileCache';
+import {
+  fetchForBounds,
+  refetchVisibleTiles,
+  registerEntity
+} from '../utils/mapTileCache';
 import { makeUrl } from './utils';
 
 export const FETCH_MAP_START_LOADING = 'FETCH_MAP_START_LOADING';
@@ -61,7 +65,16 @@ export const LOADINGS = {
 
 // Retries the fetch up to maxRetries times with exponential backoff (1 s, 2 s, 4 s…).
 // Rejects only after all attempts are exhausted.
+//
+// Offline, retrying is pointless: the service worker either has a cached copy
+// (and answers on the first attempt) or it doesn't, and no amount of waiting
+// will bring the network back. Skipping the backoff saves 7 s of dead time
+// before the failure surfaces in the UI.
 const fetchWithRetry = (url, maxRetries = 3) => {
+  const attempts =
+    typeof navigator !== 'undefined' && navigator.onLine === false
+      ? 0
+      : maxRetries;
   const attempt = (retriesLeft, delay) =>
     fetch(url)
       .then(response => {
@@ -74,7 +87,7 @@ const fetchWithRetry = (url, maxRetries = 3) => {
           setTimeout(resolve, delay);
         }).then(() => attempt(retriesLeft - 1, delay * 2));
       });
-  return attempt(maxRetries, 1000);
+  return attempt(attempts, 1000);
 };
 
 const MAX_BOUNDS = {
@@ -175,6 +188,14 @@ registerEntity('organizations', {
 
 export const fetchOrganizations = criteria => dispatch =>
   fetchForBounds('organizations', criteria, criteria.zoom, dispatch);
+
+// The three bounds-based entities, retried together. Not a thunk: the tile
+// cache holds its own dispatch reference from the last fetchForBounds call.
+export const refetchMapViewport = () => {
+  refetchVisibleTiles('entrances');
+  refetchVisibleTiles('networks');
+  refetchVisibleTiles('organizations');
+};
 
 // No dedicated /geoloc/organizationsCoordinates endpoint exists, so we hit the
 // normal organizations endpoint with world-wide bounds and strip everything

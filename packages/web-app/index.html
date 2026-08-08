@@ -216,11 +216,16 @@
       // Swallow errors (e.g. offline first-launch of the PWA) so the app still
       // boots — react-intl will fall back to raw message ids until a later
       // fetch succeeds.
+      //
+      // Resolve to null, NOT {}: bootstrapIntl stores whatever lands here as
+      // the locale's messages, and an empty object is indistinguishable from a
+      // real (empty) translation file. It would mark the locale loaded forever,
+      // so the retry on reconnect could never fire.
       intlBootstrap.initialFetchP = fetch(
         `/lang/${intlBootstrap.initialLocale}.json`
       )
         .then(r => r.json())
-        .catch(() => ({}));
+        .catch(() => null);
     </script>
     <script type="module" src="/src/index.jsx"></script>
   </body>

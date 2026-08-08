@@ -34,15 +34,26 @@ export default defineConfig(({ mode }) => {
       '[vite-plugin-pwa] VITE_API_URL is not set — API runtime caching disabled.'
     );
   }
+  // ⚠️ Every /geoloc rule below MUST include the API version segment: routes are
+  // built as `${VITE_API_URL}/api/${apiVersion}/…` (see src/conf/apiRoutes.js),
+  // so the real path is `/api/v1/geoloc/…`. A pattern written `/api/geoloc/…`
+  // matches nothing — and fails silently, because the generic `api-get` rule
+  // below cannot pick up the slack either (its `sw_lat` lookahead excludes
+  // exactly these URLs). The result is a map with zero offline data. Matched as
+  // `v\d+` rather than a literal `v1` so bumping apiVersion doesn't quietly
+  // disable offline support again.
+  const apiVersionedPrefix = apiOrigin
+    ? `^${escapeRegex(apiOrigin)}/api/v\\d+`
+    : null;
   // /geoloc/{entrances,networks,massifs}Coordinates — server recomputes these
   // in a daily batch job, so stale-while-revalidate is safe and dramatic: a
   // reload serves the ~MB-sized point payload from cache instantly, then
   // refreshes in the background. The dedicated `Coordinates` path suffix (vs
   // the viewport endpoints `/geoloc/entrances`, `/geoloc/networks`, …) is
   // what lets us match them narrowly.
-  const bulkDailyCoordsPattern = apiOrigin
+  const bulkDailyCoordsPattern = apiVersionedPrefix
     ? new RegExp(
-        `^${escapeRegex(apiOrigin)}/api/geoloc/(entrances|networks|massifs)Coordinates(\\?|$)`
+        `${apiVersionedPrefix}/geoloc/(entrances|networks|massifs)Coordinates(\\?|$)`
       )
     : null;
   // /geoloc/organizations with world-wide bounds (sw_lat=-90) — same URL as
@@ -50,9 +61,25 @@ export default defineConfig(({ mode }) => {
   // be created/edited at any moment by any user, so NetworkFirst (fresh
   // online, cache fallback offline) with a short timeout to keep bad
   // connections snappy.
-  const orgsBulkPattern = apiOrigin
+  const orgsBulkPattern = apiVersionedPrefix
+    ? new RegExp(`${apiVersionedPrefix}/geoloc/organizations\\?sw_lat=-90&`)
+    : null;
+  // Map viewport data, requested on a FIXED slippy-tile grid (see
+  // src/utils/mapTileCache.js): bounds are derived from {z,x,y} at CACHE_ZOOM,
+  // so the same tile always produces the same URL. That is what makes these
+  // cacheable at all — the general api-get rule still excludes free-form
+  // `?sw_lat=` viewport queries, whose URLs are unique per pan/zoom.
+  //
+  // The `Coordinates` suffix of the bulk endpoints sits before the `?`, so
+  // `/geoloc/entrancesCoordinates?…` never matches this pattern. The bulk
+  // organizations fetch DOES share this URL shape, but its own rule is
+  // registered earlier and Workbox routes to the first match — deliberately
+  // no negative lookahead here: it would depend on the parameter order
+  // produced by makeUrl (i.e. on the key order of MAX_BOUNDS in
+  // actions/Map.js), an invisible coupling across files.
+  const mapTilePattern = apiVersionedPrefix
     ? new RegExp(
-        `^${escapeRegex(apiOrigin)}/api/geoloc/organizations\\?sw_lat=-90&`
+        `${apiVersionedPrefix}/geoloc/(entrances|networks|organizations)\\?`
       )
     : null;
 
@@ -324,7 +351,29 @@ export default defineConfig(({ mode }) => {
                         'tile.openstreetmap.org'
                       );
                       return url.toString();
-                    }
+                    },
+                    // Offline over an area never visited online: nothing cached,
+                    // nothing reachable. CacheFirst then rejects with
+                    // `no-response`, which surfaces as an uncaught promise per
+                    // tile — dozens per pan, drowning the console. Resolving
+                    // with an SVG (an <img> loads it fine) silences that.
+                    //
+                    // Byte-identical to ERROR_TILE_URL in
+                    // src/components/common/Maps/common/LayersControl.jsx — a
+                    // missing tile must look the same whichever layer it came
+                    // from, and answering here means Leaflet never sees an
+                    // error, so `errorTileUrl` can't cover these two hosts.
+                    // Kept literal on purpose: workbox-build serializes this
+                    // function with toString(), so a closure variable would not
+                    // survive into the generated service worker.
+                    handlerDidError: async () =>
+                      new Response(
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">' +
+                          '<rect width="256" height="256" fill="#f5f5f5"/>' +
+                          '<path d="M0 128h256M128 0v256" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4 6"/>' +
+                          '</svg>',
+                        { headers: { 'Content-Type': 'image/svg+xml' } }
+                      )
                   }
                 ]
               }
@@ -352,9 +401,43 @@ export default defineConfig(({ mode }) => {
                         'tile.opentopomap.org'
                       );
                       return url.toString();
-                    }
+                    },
+                    // Same as the OSM rule: swallow the `no-response` rejection
+                    // for tiles missing offline, with the same placeholder
+                    // (see comment above).
+                    handlerDidError: async () =>
+                      new Response(
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">' +
+                          '<rect width="256" height="256" fill="#f5f5f5"/>' +
+                          '<path d="M0 128h256M128 0v256" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4 6"/>' +
+                          '</svg>',
+                        { headers: { 'Content-Type': 'image/svg+xml' } }
+                      )
                   }
                 ]
+              }
+            },
+            {
+              // Country flags (components/appli/Country/CountryList.jsx pulls
+              // them from flagcdn.com, both 1x and 2x). Tiny, immutable per ISO
+              // code, and a country list riddled with broken-image icons is one
+              // of the most visible offline regressions — so CacheFirst with a
+              // long TTL. 500 entries covers every country at both densities.
+              //
+              // `statuses: [0, ...]` matters here: this is a cross-origin
+              // request with no CORS headers, so the response is opaque and
+              // reports status 0. Without it Workbox would refuse to store it
+              // and the flags would never be cached at all.
+              urlPattern: ({ url }) => url.hostname === 'flagcdn.com',
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'country-flags',
+                expiration: {
+                  maxEntries: 500,
+                  maxAgeSeconds: 60 * 60 * 24 * 180,
+                  purgeOnQuotaError: true
+                },
+                cacheableResponse: { statuses: [0, 200] }
               }
             },
             {
@@ -386,6 +469,12 @@ export default defineConfig(({ mode }) => {
             // Placed BEFORE the api-get rule so the sw_lat lookahead in api-get
             // (which excludes viewport queries and would sweep these in too)
             // is shadowed for these specific paths.
+            //
+            // maxEntries is NOT just "3 global datasets": the massif page fetches
+            // entrancesCoordinates with a per-massif bbox (see MapMassif.jsx), so
+            // every visited massif adds an entry to this same LRU. At 5, browsing
+            // a couple of massifs evicted the world-wide entrance dataset
+            // (~700 KB gzipped) and emptied the global map's clusters offline.
             ...(bulkDailyCoordsPattern
               ? [
                   {
@@ -394,8 +483,9 @@ export default defineConfig(({ mode }) => {
                     options: {
                       cacheName: 'api-map-coords-daily',
                       expiration: {
-                        maxEntries: 5,
-                        maxAgeSeconds: 60 * 60 * 24 * 2
+                        maxEntries: 40,
+                        maxAgeSeconds: 60 * 60 * 24 * 2,
+                        purgeOnQuotaError: true
                       },
                       cacheableResponse: { statuses: [0, 200] },
                       matchOptions: { ignoreVary: true }
@@ -424,6 +514,59 @@ export default defineConfig(({ mode }) => {
                   }
                 ]
               : []),
+            // Map viewport tiles. MUST stay after the two bulk rules above (they
+            // win by registration order) and before api-get (whose sw_lat
+            // lookahead would otherwise never let these through).
+            //
+            // StaleWhileRevalidate: paint instantly from cache, refresh in the
+            // background. NetworkFirst would add latency to every pan while
+            // online; CacheFirst would never refresh a changed tile.
+            //
+            // Without this rule the tile cache lives only in memory
+            // (src/utils/mapTileCache.js), so relaunching the PWA offline showed
+            // an empty map above the clustering threshold — precisely the field
+            // use case. maxEntries is a starting point: Workbox can only bound a
+            // number of entries, never a byte budget, so recalibrate against the
+            // real payload size of a dense karst tile.
+            ...(mapTilePattern
+              ? [
+                  {
+                    urlPattern: mapTilePattern,
+                    handler: 'StaleWhileRevalidate',
+                    options: {
+                      cacheName: 'api-map-tiles',
+                      expiration: {
+                        maxEntries: 300,
+                        maxAgeSeconds: 60 * 60 * 24 * 7,
+                        purgeOnQuotaError: true
+                      },
+                      cacheableResponse: { statuses: [0, 200] },
+                      matchOptions: { ignoreVary: true },
+                      plugins: [
+                        {
+                          // `zoom` is sent by mapTileCache but read by no
+                          // /geoloc controller (they only use sw_lat/sw_lng/
+                          // ne_lat/ne_lng + massifId). Dropping it from the CACHE
+                          // KEY — rather than from the request — keeps one entry
+                          // per tile instead of one per tile×zoom pair, without
+                          // touching the map code. Same idiom as the OSM
+                          // subdomain normalization above.
+                          //
+                          // The coupling with mapTileCache is one-directional:
+                          // should it stop sending `zoom`, the delete() finds
+                          // nothing and the key is already the canonical one —
+                          // the hook degrades to a no-op instead of breaking.
+                          cacheKeyWillBeUsed: async ({ request }) => {
+                            const url = new URL(request.url);
+                            url.searchParams.delete('zoom');
+                            return url.toString();
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              : []),
             // Backend API (GET only — workbox defaults runtimeCaching to GET).
             // NetworkFirst so users see fresh data when online but still get the
             // last-known response offline. networkTimeoutSeconds keeps a bad
@@ -441,11 +584,54 @@ export default defineConfig(({ mode }) => {
                         maxEntries: 200,
                         maxAgeSeconds: 60 * 60 * 24 * 7
                       },
-                      cacheableResponse: { statuses: [0, 200] },
                       // Ignore Vary headers (API sends Vary: Accept-Encoding).
                       // Prevents a rare cache-miss when the browser negotiates a
                       // different encoding offline vs online.
-                      matchOptions: { ignoreVary: true }
+                      matchOptions: { ignoreVary: true },
+                      // Paginated endpoints answer 206 + Content-Range (documents,
+                      // notifications, messages/conversations…), and the Cache API
+                      // refuses cache.put() on a 206 outright — "Partial response
+                      // is unsupported" is the spec, not a Workbox rule. Left
+                      // alone, every list in the app is a blank page offline no
+                      // matter how often it was opened online.
+                      //
+                      // So rebuild the 206 as a 200 before storing it.
+                      // Content-Range is copied over: actions/utils.js
+                      // getTotalCount() reads it back on a cache hit to keep
+                      // pagination correct, and the API exposes it through CORS
+                      // (access-control-expose-headers).
+                      //
+                      // The status/200 + Content-Range combo is non-standard
+                      // (Content-Range is defined for 206/416), but deliberate:
+                      // it is the shape the Cache API will actually store, and
+                      // callers only ever read the header value, not the code.
+                      //
+                      // Status filtering lives in this same hook rather than in
+                      // the `cacheableResponse` option: that option IS itself a
+                      // cacheWillUpdate plugin, and whichever runs first wins —
+                      // it would reject the 206 before this ever sees it.
+                      //
+                      // ⚠️ No free variables: vite-plugin-pwa serialises this
+                      // with .toString() (see the apiPattern note at the top of
+                      // this file), so a closure would land as `undefined` in the
+                      // service worker and fail silently.
+                      plugins: [
+                        {
+                          cacheWillUpdate: async ({ response }) => {
+                            if (
+                              response.status === 0 ||
+                              response.status === 200
+                            )
+                              return response;
+                            if (response.status !== 206) return null;
+                            return new Response(await response.clone().blob(), {
+                              status: 200,
+                              statusText: 'OK',
+                              headers: response.headers
+                            });
+                          }
+                        }
+                      ]
                     }
                   }
                 ]

@@ -20,12 +20,10 @@ import {
   Select,
   Skeleton,
   Switch,
-  Tooltip,
   Typography
 } from '@mui/material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -72,18 +70,26 @@ import PasswordRules from '../../components/common/Form/PasswordRules';
 import SearchOrganizationForm from '../../components/appli/Form/SearchOrganizationForm';
 import Translate from '../../components/common/Translate';
 import {
+  useOnlineStatus,
   useUserProperties,
   usePermissions,
   useNotification
 } from '../../hooks';
 import AppLink from '../../components/common/AppLink';
+import OfflineDisabled from '../../components/common/OfflineDisabled';
+import SectionCreateButton from '../../components/common/SectionCreateButton';
 import { AVAILABLE_LANGUAGES, isPasswordValid } from '../../conf/config';
 import {
   languageIdToLocale,
   localeToLanguageId
 } from '../../utils/languageMapping';
 import { notificationPreferencesUrl } from '../../conf/apiRoutes';
-import { clearOfflineData, getStorageUsage } from '../../utils/offlineCache';
+import {
+  clearOfflineData,
+  getOfflineDataUsage,
+  isStoragePersisted,
+  rememberOfflineBaseline
+} from '../../utils/offlineCache';
 
 // ─── Shared styled components ─────────────────────────────────────────────────
 
@@ -185,23 +191,28 @@ BoolValue.propTypes = {
   value: PropTypes.bool.isRequired
 };
 
-const EditActions = ({ isLoading, isDisabled = false, onCancel }) => (
-  <EditFooter>
-    <Button variant="outlined" onClick={onCancel} disabled={isLoading}>
-      <Translate>Cancel</Translate>
-    </Button>
-    <Button
-      type="submit"
-      variant="contained"
-      color="primary"
-      disabled={isLoading || isDisabled}
-      startIcon={
-        isLoading ? <CircularProgress size={16} color="inherit" /> : null
-      }>
-      <Translate>Save changes</Translate>
-    </Button>
-  </EditFooter>
-);
+const EditActions = ({ isLoading, isDisabled = false, onCancel }) => {
+  const isOnline = useOnlineStatus();
+  return (
+    <EditFooter>
+      <Button variant="outlined" onClick={onCancel} disabled={isLoading}>
+        <Translate>Cancel</Translate>
+      </Button>
+      <OfflineDisabled>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isLoading || isDisabled || !isOnline}
+          startIcon={
+            isLoading ? <CircularProgress size={16} color="inherit" /> : null
+          }>
+          <Translate>Save changes</Translate>
+        </Button>
+      </OfflineDisabled>
+    </EditFooter>
+  );
+};
 
 EditActions.propTypes = {
   isDisabled: PropTypes.bool,
@@ -1119,10 +1130,11 @@ const OfflineDataSection = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [usageBytes, setUsageBytes] = useState(null);
+  const [isPersisted, setIsPersisted] = useState(false);
 
   const refreshUsage = useCallback(async () => {
-    const usage = await getStorageUsage();
-    setUsageBytes(usage);
+    setUsageBytes(await getOfflineDataUsage());
+    setIsPersisted((await isStoragePersisted()) === true);
   }, []);
 
   useEffect(() => {
@@ -1133,9 +1145,17 @@ const OfflineDataSection = () => {
     setIsClearing(true);
     try {
       await clearOfflineData();
+      // Every runtime cache is gone, so the offline copy weighs 0 by
+      // construction. Say so now rather than re-reading the usage: the
+      // browser's quota figure lags the deletion by a second or two, so a
+      // reading taken here would still report the pre-clear size and the
+      // counter would look stuck.
+      setUsageBytes(0);
+      // Background, deliberately not awaited: it only records the floor for
+      // the next visit (see rememberOfflineBaseline).
+      rememberOfflineBaseline();
       onSuccess(formatMessage({ id: 'offlineDataCleared' }));
       setIsDialogOpen(false);
-      refreshUsage();
     } catch {
       onError(
         formatMessage({
@@ -1170,14 +1190,27 @@ const OfflineDataSection = () => {
               {formatMessage({ id: 'Offline data' })}
             </Typography>
           </SectionHeaderTitle>
-          {formattedUsage && (
-            <Chip
-              size="small"
-              variant="outlined"
-              label={formattedUsage}
-              sx={{ fontWeight: 600 }}
-            />
-          )}
+          <SectionHeaderTitle>
+            {/* Shown only when granted. A "not protected" state would be pure
+                anxiety: the user has no way to change it — the browser decides
+                on its own (see ensurePersistentStorage). */}
+            {isPersisted && (
+              <Chip
+                size="small"
+                color="success"
+                variant="outlined"
+                label={formatMessage({ id: 'offlineStoragePersisted' })}
+              />
+            )}
+            {formattedUsage && (
+              <Chip
+                size="small"
+                variant="outlined"
+                label={formattedUsage}
+                sx={{ fontWeight: 600 }}
+              />
+            )}
+          </SectionHeaderTitle>
         </SectionHeader>
         <Divider />
         <SectionBody>
@@ -1424,22 +1457,15 @@ const AccountPage = () => {
                 defaultExpanded={nbOrganizations > 0}
                 count={nbOrganizations}
                 icon={
-                  <Tooltip
-                    title={formatMessage({
-                      id: isOrgSearchVisible ? 'Cancel this search' : 'Join'
-                    })}>
-                    <Button
-                      color={isOrgSearchVisible ? 'inherit' : 'secondary'}
-                      variant="outlined"
-                      onClick={() => setIsOrgSearchVisible(v => !v)}
-                      startIcon={
-                        isOrgSearchVisible ? <CancelIcon /> : <PersonAddIcon />
-                      }>
-                      {formatMessage({
-                        id: isOrgSearchVisible ? 'Cancel' : 'Join'
-                      })}
-                    </Button>
-                  </Tooltip>
+                  <SectionCreateButton
+                    isOpen={isOrgSearchVisible}
+                    onToggle={() => setIsOrgSearchVisible(v => !v)}
+                    label={formatMessage({ id: 'Join' })}
+                    tooltip={formatMessage({ id: 'Join' })}
+                    openTooltip={formatMessage({ id: 'Cancel this search' })}
+                    icon={<PersonAddIcon />}
+                    size="medium"
+                  />
                 }
                 content={
                   <>
@@ -1473,28 +1499,15 @@ const AccountPage = () => {
                 defaultExpanded={nbEntrances > 0}
                 count={nbEntrances}
                 icon={
-                  <Tooltip
-                    title={formatMessage({
-                      id: isCaveSearchVisible
-                        ? 'Cancel this search'
-                        : 'Add an entrance'
-                    })}>
-                    <Button
-                      color={isCaveSearchVisible ? 'inherit' : 'secondary'}
-                      variant="outlined"
-                      onClick={() => setIsCaveSearchVisible(v => !v)}
-                      startIcon={
-                        isCaveSearchVisible ? (
-                          <CancelIcon />
-                        ) : (
-                          <CheckCircleOutlineIcon />
-                        )
-                      }>
-                      {formatMessage({
-                        id: isCaveSearchVisible ? 'Cancel' : 'Add'
-                      })}
-                    </Button>
-                  </Tooltip>
+                  <SectionCreateButton
+                    isOpen={isCaveSearchVisible}
+                    onToggle={() => setIsCaveSearchVisible(v => !v)}
+                    label={formatMessage({ id: 'Add' })}
+                    tooltip={formatMessage({ id: 'Add an entrance' })}
+                    openTooltip={formatMessage({ id: 'Cancel this search' })}
+                    icon={<CheckCircleOutlineIcon />}
+                    size="medium"
+                  />
                 }
                 content={
                   <RelatedCaves

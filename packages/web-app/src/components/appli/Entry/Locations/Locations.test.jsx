@@ -31,7 +31,10 @@ const mockPermissions = {
 };
 vi.mock('../../../../hooks', () => ({
   usePermissions: () => mockPermissions,
-  useAnchorScroll: () => {}
+  useAnchorScroll: () => {},
+  // ActionButtons disables itself offline; assume a connection here so the
+  // reorder buttons stay clickable.
+  useOnlineStatus: () => true
 }));
 
 vi.mock('../../../../actions/Location/CreateLocation', () => ({

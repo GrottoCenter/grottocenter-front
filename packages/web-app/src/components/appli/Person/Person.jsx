@@ -16,7 +16,7 @@ import PageHeader from '@/components/common/Layouts/PageHeader';
 import SectionStack from '@/components/common/Layouts/SectionStack';
 import ResponsiveActions from '@/components/common/Layouts/ResponsiveActions';
 import CustomIcon from '@/components/common/CustomIcon';
-import Alert from '@/components/common/Alert';
+import FetchErrorState from '@/components/common/FetchErrorState';
 import { deletePerson } from '@/actions/Person/DeletePerson';
 import { fetchPerson } from '@/actions/Person/GetPerson';
 import { fetchConversations } from '@/actions/Messaging/GetConversations';
@@ -28,7 +28,7 @@ import {
 import AuthorBody from './AuthorBody';
 import CaverBody from './CaverBody';
 
-const Person = ({ isLoading, person, error }) => {
+const Person = ({ isLoading, person, error, onRetry = null }) => {
   const dispatch = useDispatch();
   const store = useStore();
   const activeConversations = useSelector(
@@ -214,11 +214,10 @@ const Person = ({ isLoading, person, error }) => {
       {!!error && (
         <SectionStack>
           <Card sx={{ p: 2 }}>
-            <Alert
-              title={formatMessage({
-                id: 'Error, the person you are looking for is not available.'
-              })}
-              severity="error"
+            <FetchErrorState
+              error={error}
+              onRetry={onRetry}
+              messageId="Error, the person you are looking for is not available."
             />
           </Card>
         </SectionStack>
@@ -251,6 +250,7 @@ const Person = ({ isLoading, person, error }) => {
 Person.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
+  onRetry: PropTypes.func,
   person: PersonPropTypes
 };
 

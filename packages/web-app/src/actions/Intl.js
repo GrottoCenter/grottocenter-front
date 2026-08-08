@@ -26,8 +26,16 @@ export const changeLocaleLoadFailure = error => ({
   error
 });
 
+// A locale counts as loaded only if it actually carries messages. An empty
+// object is what a failed fetch used to leave behind, and because the guard
+// below is a plain `in` test, that empty entry made the locale permanently
+// "loaded": every later attempt short-circuited and the UI stayed on raw
+// message ids until a full reload — including after the connection came back.
+export const hasLoadedMessages = (messages, locale) =>
+  Object.keys(messages?.[locale] ?? {}).length > 0;
+
 export const changeLocale = locale => (dispatch, getState) => {
-  if (locale in getState().intl.messages) {
+  if (hasLoadedMessages(getState().intl.messages, locale)) {
     // The locale is already loaded
     return dispatch(changeLocaleSuccess(locale));
   }
@@ -43,7 +51,19 @@ export const changeLocale = locale => (dispatch, getState) => {
 };
 
 export const bootstrapIntl = () => dispatch => {
-  intlBootstrap.initialFetchP.then(data =>
-    dispatch(changeLocaleLoadSuccess(intlBootstrap.initialLocale, data))
-  );
+  intlBootstrap.initialFetchP.then(data => {
+    // index.html resolves to null when its head-start fetch failed (offline
+    // first launch, or a launch before the service worker ever cached
+    // /lang/*.json). Storing that as messages would poison the locale — see
+    // hasLoadedMessages. Fail instead, so a retry stays possible.
+    if (!data || Object.keys(data).length === 0) {
+      dispatch(
+        changeLocaleLoadFailure(
+          new Error(`Could not load /lang/${intlBootstrap.initialLocale}.json`)
+        )
+      );
+      return;
+    }
+    dispatch(changeLocaleLoadSuccess(intlBootstrap.initialLocale, data));
+  });
 };

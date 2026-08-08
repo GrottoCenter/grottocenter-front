@@ -4,6 +4,8 @@ import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Box, Button } from '@mui/material';
 
+import OfflineDisabled from '@/components/common/OfflineDisabled';
+import { useOnlineStatus } from '@/hooks';
 import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
@@ -15,6 +17,7 @@ import SearchResults from '../../AdvancedSearch/SearchResults';
 const SearchOrganizationForm = ({ onSubmit }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
+  const isOnline = useOnlineStatus();
   const [selectedOrganizations, setSelectedOrganizations] = useState([]);
 
   const startAdvancedSearch = (formValues, resourceType) => {
@@ -52,15 +55,21 @@ const SearchOrganizationForm = ({ onSubmit }) => {
         compact
         entityType={ADVANCED_SEARCH_TYPES.ORGANIZATIONS}
       />
+      {/* The parent turns this into a joinOrganization write, so it needs the
+          network. Guarding matters even without a mid-flow disconnection:
+          advancedsearch results survive unmount, so reopening this panel
+          offline re-displays a previous online selection, ready to submit. */}
       <Box sx={{ mt: 1, mb: 2, textAlign: 'center' }}>
-        <Button
-          disabled={selectedOrganizations.length === 0}
-          color="primary"
-          variant="contained"
-          type="submit"
-          onClick={handleOnSubmit}>
-          {formatMessage({ id: 'Join' })}
-        </Button>
+        <OfflineDisabled>
+          <Button
+            disabled={selectedOrganizations.length === 0 || !isOnline}
+            color="primary"
+            variant="contained"
+            type="submit"
+            onClick={handleOnSubmit}>
+            {formatMessage({ id: 'Join' })}
+          </Button>
+        </OfflineDisabled>
       </Box>
     </Box>
   );

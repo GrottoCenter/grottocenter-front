@@ -31,9 +31,15 @@ import AppLink from '../../components/common/AppLink';
 import { fetchConversationMessages } from '../../actions/Messaging/GetConversationMessages';
 import { sendMessage } from '../../actions/Messaging/SendMessage';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
-import Alert from '../../components/common/Alert';
+import FetchErrorState from '../../components/common/FetchErrorState';
+import OfflineDisabled from '../../components/common/OfflineDisabled';
 import StandardDialog from '../../components/common/StandardDialog';
-import { useNotification, useLongPress } from '../../hooks';
+import {
+  useNotification,
+  useLongPress,
+  useOnlineStatus,
+  useRefetchOnReconnect
+} from '../../hooks';
 
 const MESSAGES_PAGE_SIZE = 20;
 const GROUP_GAP_MS = 5 * 60 * 1000; // Consecutive messages within 5 min are grouped
@@ -380,6 +386,7 @@ const ConversationDetail = () => {
   const [selectedMessageToReport, setSelectedMessageToReport] = useState(null);
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const { onSuccess, onError } = useNotification();
+  const isOnline = useOnlineStatus();
 
   const {
     items: messages,
@@ -449,16 +456,29 @@ const ConversationDetail = () => {
     isFirstLoad.current = true;
   }, [conversationId]);
 
-  useEffect(() => {
-    if (conversationId) {
-      dispatch(
-        fetchConversationMessages(conversationId, {
-          limit: MESSAGES_PAGE_SIZE,
-          skip: 0
-        })
-      );
-    }
+  // The single loader for this thread, shared by three callers: the mount/
+  // navigation effect below, the reconnect refetch, and FetchErrorState's Retry.
+  // Its identity is the navigation signal — switching threads changes
+  // conversationId, which changes the callback, which re-runs the effect and is
+  // picked up by useRefetchOnReconnect through its own ref sync.
+  const reloadMessages = useCallback(() => {
+    if (!conversationId) return;
+    dispatch(
+      fetchConversationMessages(conversationId, {
+        limit: MESSAGES_PAGE_SIZE,
+        skip: 0
+      })
+    );
   }, [dispatch, conversationId]);
+
+  useEffect(() => {
+    reloadMessages();
+  }, [reloadMessages]);
+
+  // Reopening a conversation offline that was never read online leaves the
+  // thread empty — fill it back in on reconnection rather than waiting for a
+  // click on a Retry button that FetchErrorState deliberately hides offline.
+  useRefetchOnReconnect(reloadMessages, Boolean(error));
 
   useEffect(() => {
     if (messages.length > 0 && isFirstLoad.current) {
@@ -547,14 +567,15 @@ const ConversationDetail = () => {
   }
 
   if (status === REDUCER_STATUS.FAILED) {
+    // `error.message` is NOT the failure here — makeErrorMessage() is called
+    // as (error.message, 'Fetching conversation messages'), so `message` holds
+    // the untranslated debug label. FetchErrorState reads the shape correctly.
     return (
       <Box sx={{ p: 2 }}>
-        <Alert
-          severity="error"
-          title={
-            error?.message ||
-            formatMessage({ id: 'An error occurred while fetching messages.' })
-          }
+        <FetchErrorState
+          error={error}
+          onRetry={reloadMessages}
+          messageId="An error occurred while fetching messages."
         />
       </Box>
     );
@@ -703,45 +724,55 @@ Message Body: ${body}`;
         )}
       </MessagesList>
       <InputArea>
-        <InputRow>
-          <RoundInput
-            fullWidth
-            multiline
-            maxRows={4}
-            variant="outlined"
-            placeholder={formatMessage({ id: 'Type a message...' })}
-            value={replyText}
-            onChange={e => setReplyText(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && !e.shiftKey && !hasVirtualKeyboard) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-            slotProps={{
-              htmlInput: {
-                maxLength: 5100,
-                enterKeyHint: hasVirtualKeyboard ? 'enter' : 'send'
-              }
-            }}
-            error={replyText.length > 5000}
-            size="small"
-          />
-          <SendButton
-            onClick={handleSend}
-            // Pressing a button moves focus to it, which closes the virtual
-            // keyboard. Suppressing the default keeps focus in the input.
-            onMouseDown={e => e.preventDefault()}
-            disabled={
-              !replyText.trim() || replyText.length > 5000 || isSending
-            }>
-            {isSending ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              <SendIcon fontSize="small" />
-            )}
-          </SendButton>
-        </InputRow>
+        {/* Sending is a POST. Disabling the input as well as the button is the
+            point: letting someone compose a long reply offline only to reject
+            it on send is the worst of both. fullWidth so the wrapper doesn't
+            collapse the row it replaces. */}
+        <OfflineDisabled fullWidth>
+          <InputRow>
+            <RoundInput
+              fullWidth
+              multiline
+              maxRows={4}
+              variant="outlined"
+              disabled={!isOnline}
+              placeholder={formatMessage({ id: 'Type a message...' })}
+              value={replyText}
+              onChange={e => setReplyText(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && !e.shiftKey && !hasVirtualKeyboard) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              slotProps={{
+                htmlInput: {
+                  maxLength: 5100,
+                  enterKeyHint: hasVirtualKeyboard ? 'enter' : 'send'
+                }
+              }}
+              error={replyText.length > 5000}
+              size="small"
+            />
+            <SendButton
+              onClick={handleSend}
+              // Pressing a button moves focus to it, which closes the virtual
+              // keyboard. Suppressing the default keeps focus in the input.
+              onMouseDown={e => e.preventDefault()}
+              disabled={
+                !isOnline ||
+                !replyText.trim() ||
+                replyText.length > 5000 ||
+                isSending
+              }>
+              {isSending ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                <SendIcon fontSize="small" />
+              )}
+            </SendButton>
+          </InputRow>
+        </OfflineDisabled>
         {replyText.length >= 4000 && (
           <Box
             sx={{
