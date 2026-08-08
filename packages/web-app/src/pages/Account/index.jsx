@@ -1275,6 +1275,11 @@ const AccountPage = () => {
   const [isOrgSearchVisible, setIsOrgSearchVisible] = useState(false);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
   const [pendingLeaveOrg, setPendingLeaveOrg] = useState(null);
+  // Only OPENING a search panel needs the network — these same buttons become
+  // Cancel once open, and an open panel must stay closable. One expression per
+  // panel, so the tooltip, the wrapper and the button can never disagree.
+  const isJoinOrgBlocked = !isOnline && !isOrgSearchVisible;
+  const isAddEntranceBlocked = !isOnline && !isCaveSearchVisible;
 
   useEffect(() => {
     dispatch(fetchAccount());
@@ -1446,19 +1451,24 @@ const AccountPage = () => {
                 defaultExpanded={nbOrganizations > 0}
                 count={nbOrganizations}
                 icon={
-                  // Only block OPENING the panel offline — this same button
-                  // becomes Cancel once open, and an open panel must stay
-                  // closable. The inner Tooltip is left as is: a disabled
-                  // button emits no hover, so only OfflineDisabled's shows.
-                  <OfflineDisabled>
+                  <OfflineDisabled disabled={isJoinOrgBlocked}>
+                    {/* Empty title while blocked: the button is disabled, so it
+                        emits no hover and MUI warns about it —
+                        OfflineDisabled's tooltip is the one that shows. */}
                     <Tooltip
-                      title={formatMessage({
-                        id: isOrgSearchVisible ? 'Cancel this search' : 'Join'
-                      })}>
+                      title={
+                        isJoinOrgBlocked
+                          ? ''
+                          : formatMessage({
+                              id: isOrgSearchVisible
+                                ? 'Cancel this search'
+                                : 'Join'
+                            })
+                      }>
                       <Button
                         color={isOrgSearchVisible ? 'inherit' : 'secondary'}
                         variant="outlined"
-                        disabled={!isOnline && !isOrgSearchVisible}
+                        disabled={isJoinOrgBlocked}
                         onClick={() => setIsOrgSearchVisible(v => !v)}
                         startIcon={
                           isOrgSearchVisible ? (
@@ -1508,17 +1518,21 @@ const AccountPage = () => {
                 icon={
                   // Opening blocked offline, closing always allowed — see the
                   // organizations trigger above.
-                  <OfflineDisabled>
+                  <OfflineDisabled disabled={isAddEntranceBlocked}>
                     <Tooltip
-                      title={formatMessage({
-                        id: isCaveSearchVisible
-                          ? 'Cancel this search'
-                          : 'Add an entrance'
-                      })}>
+                      title={
+                        isAddEntranceBlocked
+                          ? ''
+                          : formatMessage({
+                              id: isCaveSearchVisible
+                                ? 'Cancel this search'
+                                : 'Add an entrance'
+                            })
+                      }>
                       <Button
                         color={isCaveSearchVisible ? 'inherit' : 'secondary'}
                         variant="outlined"
-                        disabled={!isOnline && !isCaveSearchVisible}
+                        disabled={isAddEntranceBlocked}
                         onClick={() => setIsCaveSearchVisible(v => !v)}
                         startIcon={
                           isCaveSearchVisible ? (

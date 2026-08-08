@@ -1901,7 +1901,6 @@
   "Offline data": "Data offline",
   "offlineActionUnavailable": "Tidak tersedia saat luring",
   "offlineContentUnavailable": "Konten ini belum disimpan di perangkat Anda. Konten akan dimuat segera setelah Anda kembali daring.",
-  "offlineContentUnavailableTitle": "Tidak tersedia saat luring",
   "offlineDataCleared": "Data offline dihapus.",
   "offlineDataClearError": "Terjadi kesalahan. Silakan coba lagi.",
   "offlineDataConfirmation": "Ini akan menghapus semua halaman, gambar, dan respons API yang di-cache. Aplikasi akan tetap berfungsi — data baru akan diambil pada saat Anda online berikutnya.",

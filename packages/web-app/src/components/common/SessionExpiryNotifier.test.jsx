@@ -64,7 +64,7 @@ describe('SessionExpiryNotifier', () => {
   });
 
   it('does not warn again once dismissed in this session', () => {
-    sessionStorage.setItem(`sessionExpiryDismissed_${USER_ID}`, 'true');
+    sessionStorage.setItem(`mfaExpiryBannerDismissed_${USER_ID}`, 'true');
     const { baseElement } = renderNotifier(loginState({ hoursLeft: 3 }));
     expect(countTexts(baseElement, WARNING)).toBe(0);
   });

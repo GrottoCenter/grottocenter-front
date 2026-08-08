@@ -1901,7 +1901,6 @@
   "Offline data": "Données hors-ligne",
   "offlineActionUnavailable": "Indisponible hors connexion",
   "offlineContentUnavailable": "Ce contenu n'a pas encore été enregistré sur votre appareil. Il se chargera dès votre retour en ligne.",
-  "offlineContentUnavailableTitle": "Indisponible hors connexion",
   "offlineDataCleared": "Données hors-ligne effacées.",
   "offlineDataClearError": "Une erreur s'est produite. Veuillez réessayer.",
   "offlineDataConfirmation": "Cela supprimera toutes les pages, images et réponses d'API mises en cache. L'application continuera de fonctionner — les nouvelles données seront récupérées à votre prochaine connexion.",

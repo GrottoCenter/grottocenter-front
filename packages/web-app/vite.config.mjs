@@ -346,12 +346,23 @@ export default defineConfig(({ mode }) => {
                     // Offline over an area never visited online: nothing cached,
                     // nothing reachable. CacheFirst then rejects with
                     // `no-response`, which surfaces as an uncaught promise per
-                    // tile — dozens per pan, drowning the console. An empty SVG
-                    // (an <img> loads it fine) resolves the request instead, so
-                    // the missing area renders as plain map background.
+                    // tile — dozens per pan, drowning the console. Resolving
+                    // with an SVG (an <img> loads it fine) silences that.
+                    //
+                    // Byte-identical to ERROR_TILE_URL in
+                    // src/components/common/Maps/common/LayersControl.jsx — a
+                    // missing tile must look the same whichever layer it came
+                    // from, and answering here means Leaflet never sees an
+                    // error, so `errorTileUrl` can't cover these two hosts.
+                    // Kept literal on purpose: workbox-build serializes this
+                    // function with toString(), so a closure variable would not
+                    // survive into the generated service worker.
                     handlerDidError: async () =>
                       new Response(
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"/>',
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">' +
+                          '<rect width="256" height="256" fill="#f5f5f5"/>' +
+                          '<path d="M0 128h256M128 0v256" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4 6"/>' +
+                          '</svg>',
                         { headers: { 'Content-Type': 'image/svg+xml' } }
                       )
                   }
@@ -383,10 +394,14 @@ export default defineConfig(({ mode }) => {
                       return url.toString();
                     },
                     // Same as the OSM rule: swallow the `no-response` rejection
-                    // for tiles missing offline (see comment above).
+                    // for tiles missing offline, with the same placeholder
+                    // (see comment above).
                     handlerDidError: async () =>
                       new Response(
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"/>',
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">' +
+                          '<rect width="256" height="256" fill="#f5f5f5"/>' +
+                          '<path d="M0 128h256M128 0v256" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4 6"/>' +
+                          '</svg>',
                         { headers: { 'Content-Type': 'image/svg+xml' } }
                       )
                   }

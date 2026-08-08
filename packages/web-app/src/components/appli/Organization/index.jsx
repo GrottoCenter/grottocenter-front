@@ -67,6 +67,10 @@ const Organization = ({ error, isLoading, organization }) => {
   const [pendingRemoveMember, setPendingRemoveMember] = useState(null);
   const handleShare = useSharePage();
   const isOnline = useOnlineStatus();
+  // Opening the cave search needs the network; closing it never does — the same
+  // button turns into Cancel once open. One expression, so the tooltip, the
+  // wrapper and the button can never disagree about which of the two it is.
+  const isAddCaveBlocked = !isOnline && !isCaveSearchVisible;
 
   const currentUserId = authState?.authTokenDecoded?.id;
 
@@ -381,19 +385,24 @@ const Organization = ({ error, isLoading, organization }) => {
             count={nbNetworks + nbEntrances}
             icon={
               canManageCaves && (
-                // Opening blocked offline, closing always allowed: the same
-                // button turns into Cancel once the search panel is open.
-                <OfflineDisabled>
+                <OfflineDisabled disabled={isAddCaveBlocked}>
+                  {/* Empty title while blocked: the button is disabled, so it
+                      emits no hover and MUI warns about it — OfflineDisabled's
+                      tooltip is the one that shows. */}
                   <Tooltip
-                    title={formatMessage({
-                      id: isCaveSearchVisible
-                        ? 'Cancel this search'
-                        : 'Add a cave'
-                    })}>
+                    title={
+                      isAddCaveBlocked
+                        ? ''
+                        : formatMessage({
+                            id: isCaveSearchVisible
+                              ? 'Cancel this search'
+                              : 'Add a cave'
+                          })
+                    }>
                     <Button
                       color={isCaveSearchVisible ? 'inherit' : 'secondary'}
                       variant="outlined"
-                      disabled={!isOnline && !isCaveSearchVisible}
+                      disabled={isAddCaveBlocked}
                       onClick={() => setIsCaveSearchVisible(v => !v)}
                       startIcon={
                         isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />

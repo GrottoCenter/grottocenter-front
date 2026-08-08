@@ -1901,7 +1901,6 @@
   "Offline data": "Dati offline",
   "offlineActionUnavailable": "Non disponibile offline",
   "offlineContentUnavailable": "Questo contenuto non è ancora stato salvato sul dispositivo. Verrà caricato non appena tornerai online.",
-  "offlineContentUnavailableTitle": "Non disponibile offline",
   "offlineDataCleared": "Dati offline cancellati.",
   "offlineDataClearError": "Si è verificato un errore. Riprova.",
   "offlineDataConfirmation": "Verranno rimosse tutte le pagine, immagini e risposte API memorizzate nella cache. L'app continuerà a funzionare — i nuovi dati verranno recuperati la prossima volta che sarai online.",

@@ -1901,7 +1901,6 @@
   "Offline data": "Offline-Daten",
   "offlineActionUnavailable": "Offline nicht verfügbar",
   "offlineContentUnavailable": "Dieser Inhalt wurde noch nicht auf Ihrem Gerät gespeichert. Er wird geladen, sobald Sie wieder online sind.",
-  "offlineContentUnavailableTitle": "Offline nicht verfügbar",
   "offlineDataCleared": "Offline-Daten gelöscht.",
   "offlineDataClearError": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
   "offlineDataConfirmation": "Dies entfernt alle zwischengespeicherten Seiten, Bilder und API-Antworten. Die App funktioniert weiterhin — neue Daten werden beim nächsten Online-Zugriff geladen.",

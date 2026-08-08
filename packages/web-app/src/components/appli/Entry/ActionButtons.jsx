@@ -61,6 +61,11 @@ const ActionButtons = ({
   // at the group level lets MUI propagate it to each Button, and the wrapper
   // carries the explanation the per-button tooltips can no longer show
   // (a disabled button swallows the hover).
+  //
+  // Blanking those titles offline is what keeps MUI quiet: it warns for every
+  // Tooltip whose child is a disabled <button>, and there are five of them.
+  const actionTitle = id => (isOnline ? formatMessage({ id }) : '');
+
   const actions = (
     <ButtonGroup
       color="primary"
@@ -68,7 +73,7 @@ const ActionButtons = ({
       disabled={!isOnline}
       orientation={isSmall ? 'vertical' : 'horizontal'}>
       {!isUpdating && canDelete && isDeleted && (
-        <Tooltip title={formatMessage({ id: 'Restore' })}>
+        <Tooltip title={actionTitle('Restore')}>
           <Button
             onClick={() => onRestorePress()}
             color="primary"
@@ -78,7 +83,7 @@ const ActionButtons = ({
         </Tooltip>
       )}
       {!isDeleted && canEdit && !isUpdating && (
-        <Tooltip title={formatMessage({ id: 'Edit' })}>
+        <Tooltip title={actionTitle('Edit')}>
           <Button
             onClick={() => setIsUpdating(true)}
             color="primary"
@@ -93,7 +98,7 @@ const ActionButtons = ({
         </Button>
       )}
       {showReorder && !isUpdating && !isMoveLoading && !isFirst && (
-        <Tooltip title={formatMessage({ id: 'Move up' })}>
+        <Tooltip title={actionTitle('Move up')}>
           <Button
             onClick={onMoveUp}
             color="primary"
@@ -103,7 +108,7 @@ const ActionButtons = ({
         </Tooltip>
       )}
       {showReorder && !isUpdating && !isMoveLoading && !isLast && (
-        <Tooltip title={formatMessage({ id: 'Move down' })}>
+        <Tooltip title={actionTitle('Move down')}>
           <Button
             onClick={onMoveDown}
             color="primary"
@@ -115,11 +120,7 @@ const ActionButtons = ({
       {!isUpdating && snapshotEl}
       {!isUpdating && (isDeleted ? canPermanentlyDelete : canDelete) && (
         <Tooltip
-          title={
-            isDeleted
-              ? formatMessage({ id: 'Permanently delete' })
-              : formatMessage({ id: 'Delete' })
-          }>
+          title={actionTitle(isDeleted ? 'Permanently delete' : 'Delete')}>
           <Button
             onClick={() => onDeletePress(isDeleted)}
             color="primary"

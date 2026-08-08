@@ -1901,7 +1901,6 @@
   "Offline data": "オフラインデータ",
   "offlineActionUnavailable": "オフラインでは利用できません",
   "offlineContentUnavailable": "このコンテンツはまだ端末に保存されていません。オンラインに戻り次第、読み込まれます。",
-  "offlineContentUnavailableTitle": "オフラインでは利用できません",
   "offlineDataCleared": "オフラインデータを消去しました。",
   "offlineDataClearError": "エラーが発生しました。もう一度お試しください。",
   "offlineDataConfirmation": "キャッシュされたすべてのページ、画像、API レスポンスが削除されます。アプリは引き続き動作します — 次回オンラインになったときに新しいデータが取得されます。",

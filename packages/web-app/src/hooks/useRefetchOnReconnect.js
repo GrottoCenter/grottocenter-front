@@ -18,9 +18,13 @@ export const useRefetchOnReconnect = (refetch, enabled = true) => {
   const isOnline = useOnlineStatus();
   const hasBeenOffline = useRef(false);
   // Kept in a ref so an inline arrow function (the common call site) doesn't
-  // re-run the effect on every render and refetch in a loop.
+  // re-run the effect on every render and refetch in a loop. Synced from an
+  // effect rather than during render: a render-phase write is a side effect
+  // React is allowed to throw away and re-run.
   const refetchRef = useRef(refetch);
-  refetchRef.current = refetch;
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   useEffect(() => {
     if (!isOnline) {

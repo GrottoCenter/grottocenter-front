@@ -1901,7 +1901,6 @@
   "Offline data": "נתונים לא מקוונים",
   "offlineActionUnavailable": "לא זמין במצב לא מקוון",
   "offlineContentUnavailable": "התוכן הזה עדיין לא נשמר במכשיר שלך. הוא ייטען ברגע שתחזור למצב מקוון.",
-  "offlineContentUnavailableTitle": "לא זמין במצב לא מקוון",
   "offlineDataCleared": "הנתונים הלא מקוונים נמחקו.",
   "offlineDataClearError": "אירעה שגיאה. אנא נסה שוב.",
   "offlineDataConfirmation": "פעולה זו תסיר את כל הדפים, התמונות ותגובות ה-API השמורים במטמון. האפליקציה תמשיך לעבוד — נתונים חדשים ייטענו בפעם הבאה שתהיה מחובר.",

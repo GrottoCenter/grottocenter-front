@@ -381,8 +381,15 @@ const HydratedMap = ({
       networkMarkers.length > 0) ||
     (visibleMarkers.includes(layerTypes.ORGANIZATIONS) &&
       organizationMarkers.length > 0);
+  // `visibleMarkers.length > 0` is the guard against blaming the cache for an
+  // empty map the user emptied themselves: unticking every marker layer in the
+  // LayersControl leaves the same "nothing drawn" state, and telling them to
+  // zoom out would be wrong — the data is there, they hid it.
   const showOfflineDetailNotice =
-    !isOnline && isMarkersMode && !hasVisibleMarkers;
+    !isOnline &&
+    isMarkersMode &&
+    visibleMarkers.length > 0 &&
+    !hasVisibleMarkers;
 
   const clusterConfigs = [
     {

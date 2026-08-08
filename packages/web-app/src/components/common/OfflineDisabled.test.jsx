@@ -61,4 +61,16 @@ describe('OfflineDisabled', () => {
       width: '100%'
     });
   });
+
+  // The toggle buttons that become "Cancel" once their panel is open stay
+  // usable offline. Wrapping them anyway put "Unavailable offline" on a working
+  // button — and stacked it on top of the button's own tooltip, since the
+  // hover bubbles from the button up to the span.
+  it('stays out of the way when the child is not actually disabled', () => {
+    setOnLine(false);
+    const { container } = renderWrapped({ disabled: false });
+
+    expect(screen.getByText('Save')).toBeInTheDocument();
+    expect(container.querySelector('span[style]')).not.toBeInTheDocument();
+  });
 });

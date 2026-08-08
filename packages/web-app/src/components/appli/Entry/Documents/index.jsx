@@ -32,6 +32,10 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
   const dispatch = useDispatch();
   const isOnline = useOnlineStatus();
+  // Opening the search panel needs the network; closing it never does — this
+  // same button becomes Cancel once open. One expression, so the tooltip, the
+  // wrapper and the button can never disagree about which of the two it is.
+  const isAssociateBlocked = !isOnline && !isDocumentSearchVisible;
 
   const onSubmitForm = newDocuments => {
     newDocuments.forEach(d => {
@@ -58,7 +62,13 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
             {/* Hand-rolled equivalent of NewEntityButton, which is already
                 guarded — align it rather than leave the odd one out. */}
             <OfflineDisabled>
-              <Tooltip title={formatMessage({ id: 'Create a new document' })}>
+              {/* Empty title while offline: the button is disabled, so it emits
+                  no hover and MUI warns about it — OfflineDisabled's tooltip is
+                  the one that shows. */}
+              <Tooltip
+                title={
+                  isOnline ? formatMessage({ id: 'Create a new document' }) : ''
+                }>
                 <Button
                   color="secondary"
                   size="small"
@@ -70,20 +80,25 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
                 </Button>
               </Tooltip>
             </OfflineDisabled>
-            {/* Opening blocked offline, closing always allowed: this same
-                button becomes Cancel while the search panel is open. */}
-            <OfflineDisabled>
+            <OfflineDisabled disabled={isAssociateBlocked}>
+              {/* Empty title while blocked: the button is disabled, so it emits
+                  no hover and MUI warns about it — OfflineDisabled's tooltip is
+                  the one that shows. */}
               <Tooltip
                 title={
-                  isDocumentSearchVisible
-                    ? formatMessage({ id: 'Cancel this search' })
-                    : formatMessage({ id: 'Assign an existing document' })
+                  isAssociateBlocked
+                    ? ''
+                    : formatMessage({
+                        id: isDocumentSearchVisible
+                          ? 'Cancel this search'
+                          : 'Assign an existing document'
+                      })
                 }>
                 <Button
                   color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
                   size="small"
                   variant="outlined"
-                  disabled={!isOnline && !isDocumentSearchVisible}
+                  disabled={isAssociateBlocked}
                   onClick={() =>
                     setIsDocumentSearchVisible(!isDocumentSearchVisible)
                   }

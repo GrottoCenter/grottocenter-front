@@ -3,7 +3,7 @@ import { IntlProvider } from 'react-intl';
 import FetchErrorState from './FetchErrorState';
 
 const messages = {
-  offlineContentUnavailableTitle: 'Not available offline',
+  offlineActionUnavailable: 'Unavailable offline',
   offlineContentUnavailable: 'This content has not been saved yet.',
   Retry: 'Retry',
   'entity-error': 'Error, the entrance data is not available.'
@@ -33,7 +33,7 @@ describe('FetchErrorState', () => {
       setOnLine(false);
       renderState({ error: networkError });
 
-      expect(screen.getByText('Not available offline')).toBeInTheDocument();
+      expect(screen.getByText('Unavailable offline')).toBeInTheDocument();
       expect(
         screen.queryByText('Error, the entrance data is not available.')
       ).not.toBeInTheDocument();
@@ -64,9 +64,7 @@ describe('FetchErrorState', () => {
       expect(
         screen.getByText('Error, the entrance data is not available.')
       ).toBeInTheDocument();
-      expect(
-        screen.queryByText('Not available offline')
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText('Unavailable offline')).not.toBeInTheDocument();
       expect(screen.getByTestId('fetch-error-state')).toHaveClass(
         'MuiAlert-standardError'
       );

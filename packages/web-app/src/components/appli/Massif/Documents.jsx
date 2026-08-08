@@ -21,6 +21,10 @@ const Documents = ({ documents, massifId }) => {
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
   const dispatch = useDispatch();
   const isOnline = useOnlineStatus();
+  // Opening the search panel needs the network; closing it never does — this
+  // same button becomes Cancel once open. One expression, so the tooltip, the
+  // wrapper and the button can never disagree about which of the two it is.
+  const isAssociateBlocked = !isOnline && !isDocumentSearchVisible;
 
   const onSubmitForm = newDocuments => {
     newDocuments.forEach(d => {
@@ -37,20 +41,25 @@ const Documents = ({ documents, massifId }) => {
       title={formatMessage({ id: 'Documents' })}
       icon={
         permissions.isAuth && (
-          // Opening blocked offline, closing always allowed: this same button
-          // becomes Cancel while the search panel is open.
-          <OfflineDisabled>
+          <OfflineDisabled disabled={isAssociateBlocked}>
+            {/* Empty title while blocked: the button is disabled, so it emits
+                no hover and MUI warns about it — OfflineDisabled's tooltip is
+                the one that shows. */}
             <Tooltip
-              title={formatMessage({
-                id: isDocumentSearchVisible
-                  ? 'Cancel this search'
-                  : 'Assign an existing document'
-              })}>
+              title={
+                isAssociateBlocked
+                  ? ''
+                  : formatMessage({
+                      id: isDocumentSearchVisible
+                        ? 'Cancel this search'
+                        : 'Assign an existing document'
+                    })
+              }>
               <Button
                 color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
                 size="small"
                 variant="outlined"
-                disabled={!isOnline && !isDocumentSearchVisible}
+                disabled={isAssociateBlocked}
                 onClick={() => setIsDocumentSearchVisible(v => !v)}
                 startIcon={
                   isDocumentSearchVisible ? (

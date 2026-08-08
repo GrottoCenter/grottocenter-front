@@ -29,8 +29,11 @@ const FetchErrorState = ({ error, messageId, onRetry = null }) => {
     <Alert
       data-testid="fetch-error-state"
       severity={isOffline ? 'info' : 'error'}
+      // Shares OfflineDisabled's label rather than carrying its own: the two
+      // said the same thing in every language but English, so the second key
+      // was pure translation debt.
       title={formatMessage({
-        id: isOffline ? 'offlineContentUnavailableTitle' : messageId
+        id: isOffline ? 'offlineActionUnavailable' : messageId
       })}
       content={
         isOffline ? formatMessage({ id: 'offlineContentUnavailable' }) : null

@@ -1901,7 +1901,6 @@
   "Offline data": "Datos sin conexión",
   "offlineActionUnavailable": "No disponible sin conexión",
   "offlineContentUnavailable": "Este contenido aún no se ha guardado en su dispositivo. Se cargará en cuanto vuelva a estar en línea.",
-  "offlineContentUnavailableTitle": "No disponible sin conexión",
   "offlineDataCleared": "Datos sin conexión borrados.",
   "offlineDataClearError": "Se produjo un error. Por favor, inténtelo de nuevo.",
   "offlineDataConfirmation": "Esto eliminará todas las páginas, imágenes y respuestas de API almacenadas en caché. La aplicación seguirá funcionando — los datos nuevos se descargarán la próxima vez que estés en línea.",

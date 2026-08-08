@@ -216,10 +216,16 @@ const ApplicationShell = () => {
           can coexist (network-offline, sw-update, session-expiry): once every
           slot holds a persistent one, notistack stops queueing and dismisses the
           oldest instead, silently killing e.g. the update prompt. Adding a
-          fourth persistent notification means raising maxSnack with it. */}
+          fourth persistent notification means raising maxSnack with it.
+
+          NO `preventDuplicate` here: without a `key` notistack dedupes on the
+          MESSAGE, which silently swallows legitimate repeats — reorder two rows
+          in a row and the second "Order updated" never appears, taking its Undo
+          link with it (useMoveRelevanceWithUndo). The three persistent
+          notifiers each pass `preventDuplicate` themselves, keyed, which is
+          where the flag actually belongs. */}
       <SnackbarProvider
         maxSnack={4}
-        preventDuplicate
         dense={isCompact}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         Components={SNACKBAR_COMPONENTS}>

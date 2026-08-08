@@ -1901,7 +1901,6 @@
   "Offline data": "البيانات دون اتصال",
   "offlineActionUnavailable": "غير متاح دون اتصال",
   "offlineContentUnavailable": "لم يتم حفظ هذا المحتوى على جهازك بعد. سيتم تحميله بمجرد عودتك إلى الاتصال بالإنترنت.",
-  "offlineContentUnavailableTitle": "غير متاح دون اتصال",
   "offlineDataCleared": "تم مسح البيانات دون اتصال.",
   "offlineDataClearError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
   "offlineDataConfirmation": "سيؤدي ذلك إلى إزالة جميع الصفحات والصور واستجابات API المخزنة مؤقتًا. سيستمر التطبيق في العمل — سيتم جلب البيانات الجديدة عند الاتصال بالإنترنت في المرة القادمة.",

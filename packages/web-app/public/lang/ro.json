@@ -1901,7 +1901,6 @@
   "Offline data": "Date offline",
   "offlineActionUnavailable": "Indisponibil offline",
   "offlineContentUnavailable": "Acest conținut nu a fost încă salvat pe dispozitivul dumneavoastră. Se va încărca imediat ce reveniți online.",
-  "offlineContentUnavailableTitle": "Indisponibil offline",
   "offlineDataCleared": "Date offline șterse.",
   "offlineDataClearError": "A apărut o eroare. Vă rugăm să încercați din nou.",
   "offlineDataConfirmation": "Aceasta va elimina toate paginile, imaginile și răspunsurile API din cache. Aplicația va continua să funcționeze — noile date vor fi preluate la următoarea conectare.",

@@ -102,7 +102,7 @@ const AutoCompleteSearch = ({
   isLoading = false,
   disabled = false,
   hasFixWidth = true,
-  noOptionsText,
+  noOptionsText = null,
   value
 }) => {
   const { formatMessage } = useIntl();

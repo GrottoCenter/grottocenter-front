@@ -5,8 +5,11 @@ import { createCloseAction } from './snackbarActions';
 
 const SESSION_EXPIRY_SNACKBAR_KEY = 'session-expiry';
 
+// Key kept from the banner this replaced, despite the now-inaccurate name:
+// renaming it would make every admin who had already dismissed the warning in
+// the current tab see it again after deploy, for no gain.
 const dismissStorageKey = userId =>
-  userId ? `sessionExpiryDismissed_${userId}` : 'sessionExpiryDismissed';
+  userId ? `mfaExpiryBannerDismissed_${userId}` : 'mfaExpiryBannerDismissed';
 
 /**
  * Warns an admin that the current session is about to expire. Renders nothing.

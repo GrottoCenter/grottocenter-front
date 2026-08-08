@@ -1901,7 +1901,6 @@
   "Offline data": "Dades sense connexió",
   "offlineActionUnavailable": "No disponible sense connexió",
   "offlineContentUnavailable": "Aquest contingut encara no s'ha desat al vostre dispositiu. Es carregarà quan torneu a estar en línia.",
-  "offlineContentUnavailableTitle": "No disponible sense connexió",
   "offlineDataCleared": "Dades sense connexió esborrades.",
   "offlineDataClearError": "S'ha produït un error. Torneu-ho a intentar.",
   "offlineDataConfirmation": "Això eliminarà totes les pàgines, imatges i respostes d'API emmagatzemades a la memòria cau. L'aplicació continuarà funcionant — les dades noves es descarregaran la propera vegada que estiguis en línia.",

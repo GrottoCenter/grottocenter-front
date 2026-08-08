@@ -835,12 +835,8 @@ const DocumentDetails = ({ id, hideActions = false }) => {
   }, [dispatch, documentId]);
 
   useEffect(() => {
-    if (documentId) {
-      dispatch(fetchDocumentDetails(documentId));
-      dispatch(fetchDocumentChildren(documentId));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [documentId]);
+    reloadDocument();
+  }, [reloadDocument]);
 
   const fetchError = error ?? childrenError;
   useRefetchOnReconnect(reloadDocument, Boolean(fetchError));
