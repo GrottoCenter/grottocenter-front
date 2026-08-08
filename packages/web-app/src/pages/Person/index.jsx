@@ -1,17 +1,25 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Person from '../../components/appli/Person/Person';
 import { fetchPerson } from '../../actions/Person/GetPerson';
+import { useRefetchOnReconnect } from '../../hooks';
 
 const PersonPage = () => {
   const { personId } = useParams();
   const dispatch = useDispatch();
   const { person, error, isFetching } = useSelector(state => state.person);
 
+  const reloadPerson = useCallback(
+    () => dispatch(fetchPerson(personId)),
+    [dispatch, personId]
+  );
+
   useEffect(() => {
-    dispatch(fetchPerson(personId));
-  }, [personId, dispatch]);
+    reloadPerson();
+  }, [reloadPerson]);
+
+  useRefetchOnReconnect(reloadPerson, Boolean(error));
 
   return (
     <Person
@@ -19,6 +27,7 @@ const PersonPage = () => {
       isLoading={isFetching}
       person={person}
       error={error}
+      onRetry={reloadPerson}
     />
   );
 };

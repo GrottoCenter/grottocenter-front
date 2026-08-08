@@ -40,6 +40,8 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import { sxPropType } from '@/types/mui.type';
 import { fetchFieldSearch } from '../../../actions/FieldSearch';
 import Translate from '../../common/Translate';
+import OfflineDisabled from '../../common/OfflineDisabled';
+import { useOnlineStatus } from '../../../hooks';
 import { AUTOCOMPLETE_DEBOUNCE_DELAY } from '../../../conf/config';
 
 const StyledForm = styled('form')`
@@ -789,31 +791,40 @@ SearchFilterAccordion.propTypes = {
   children: PropTypes.node.isRequired
 };
 
-export const SearchActionButtons = ({ onReset, showReset = true }) => (
-  <CardActions
-    sx={{ padding: 0.25, justifyContent: 'flex-end', width: '100%' }}>
-    {showReset && (
-      <Button
-        type="button"
-        variant="text"
-        size="medium"
-        color="inherit"
-        startIcon={<ClearIcon />}
-        onClick={() => onReset()}
-        sx={{ color: 'text.secondary' }}>
-        <Translate>Reset</Translate>
-      </Button>
-    )}
+export const SearchActionButtons = ({ onReset, showReset = true }) => {
+  // Reset stays available offline (it only clears local form state); searching
+  // hits the API's index, which is never cached.
+  const isOnline = useOnlineStatus();
 
-    <Button
-      type="submit"
-      variant="contained"
-      size="medium"
-      startIcon={<SearchIcon />}>
-      <Translate>Search</Translate>
-    </Button>
-  </CardActions>
-);
+  return (
+    <CardActions
+      sx={{ padding: 0.25, justifyContent: 'flex-end', width: '100%' }}>
+      {showReset && (
+        <Button
+          type="button"
+          variant="text"
+          size="medium"
+          color="inherit"
+          startIcon={<ClearIcon />}
+          onClick={() => onReset()}
+          sx={{ color: 'text.secondary' }}>
+          <Translate>Reset</Translate>
+        </Button>
+      )}
+
+      <OfflineDisabled>
+        <Button
+          type="submit"
+          variant="contained"
+          size="medium"
+          disabled={!isOnline}
+          startIcon={<SearchIcon />}>
+          <Translate>Search</Translate>
+        </Button>
+      </OfflineDisabled>
+    </CardActions>
+  );
+};
 
 SearchActionButtons.propTypes = {
   onReset: PropTypes.func.isRequired,

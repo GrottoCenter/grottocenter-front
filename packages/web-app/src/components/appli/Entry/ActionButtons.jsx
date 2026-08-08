@@ -9,6 +9,9 @@ import {
 } from '@mui/material';
 import { useIntl } from 'react-intl';
 
+import OfflineDisabled from '../../common/OfflineDisabled';
+import { useOnlineStatus } from '../../../hooks';
+
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteRounded';
 import DeleteForeverIcon from '@mui/icons-material/RemoveCircleRounded';
@@ -48,15 +51,22 @@ const ActionButtons = ({
   const { formatMessage } = useIntl();
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+  const isOnline = useOnlineStatus();
 
   if (isLoading) return <LoadingActionButton />;
 
   const showReorder = onMoveUp && onMoveDown;
 
-  return (
+  // Every action here writes to the API (edit, delete, restore, reorder) or
+  // fetches history, so the whole group goes down together offline. Disabling
+  // at the group level lets MUI propagate it to each Button, and the wrapper
+  // carries the explanation the per-button tooltips can no longer show
+  // (a disabled button swallows the hover).
+  const actions = (
     <ButtonGroup
       color="primary"
       size="small"
+      disabled={!isOnline}
       orientation={isSmall ? 'vertical' : 'horizontal'}>
       {!isUpdating && canDelete && isDeleted && (
         <Tooltip title={formatMessage({ id: 'Restore' })}>
@@ -121,6 +131,8 @@ const ActionButtons = ({
       )}
     </ButtonGroup>
   );
+
+  return <OfflineDisabled>{actions}</OfflineDisabled>;
 };
 
 export default ActionButtons;

@@ -1,10 +1,14 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchCountry } from '../../actions/Country/GetCountry';
 import Country from '../../components/appli/Country';
-import { usePermissions, useUserProperties } from '../../hooks';
+import {
+  usePermissions,
+  useRefetchOnReconnect,
+  useUserProperties
+} from '../../hooks';
 import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
 import { subscribeToCountry } from '../../actions/Subscriptions/SubscribeToCountry';
 import { unsubscribeFromCountry } from '../../actions/Subscriptions/UnsubscribeFromCountry';
@@ -19,6 +23,11 @@ const CountryPage = () => {
   const onUnsubscribe = () => dispatch(unsubscribeFromCountry(countryId));
   const canSubscribe = permissions.isLeader;
 
+  const reloadCountry = useCallback(
+    () => dispatch(fetchCountry(countryId)),
+    [dispatch, countryId]
+  );
+
   useEffect(() => {
     dispatch(fetchCountry(countryId));
     if (permissions.isAuth) {
@@ -27,12 +36,15 @@ const CountryPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, countryId]);
 
+  useRefetchOnReconnect(reloadCountry, Boolean(error));
+
   return (
     <Country
       key={countryId}
       canSubscribe={canSubscribe}
       country={country}
       error={error}
+      onRetry={reloadCountry}
       onSubscribe={onSubscribe}
       onUnsubscribe={onUnsubscribe}
       status={status}

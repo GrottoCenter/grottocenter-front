@@ -18,6 +18,7 @@ import { bootstrapIntl } from '../actions/Intl';
 import useLanguageSync from '../hooks/useLanguageSync';
 
 import ErrorHandler from '../components/appli/ErrorHandler';
+import NetworkStatusNotifier from '../components/common/NetworkStatusNotifier';
 import ErrorBoundary from '../components/appli/PageErrorBounary';
 import UpdatePrompt from '../components/appli/UpdatePrompt';
 import SideMenu from '../components/common/SideMenu';
@@ -84,12 +85,24 @@ HydratedIntlProvider.propTypes = {
   children: PropTypes.node
 };
 
-// Custom notistack snackbar with standard MUI typography (body1 = 1rem)
-const AppSnackbar = ({ id: _id, message, variant, ref, ...rest }) => {
+// Custom notistack snackbar with standard MUI typography (body1 = 1rem).
+// `action` is pulled out of the rest props and handed to the Alert rather than
+// the SnackbarContent wrapper: it is what renders the close button a persistent
+// snackbar needs to be dismissible (see NetworkStatusNotifier).
+//
+// notistack hands custom components the raw `action` option, unresolved — its
+// own MaterialDesignContent calls `action(id)` when it is a function, and a
+// custom component has to do the same or a function action would be rendered
+// as a React child and throw.
+const AppSnackbar = ({ id, message, variant, action, ref, ...rest }) => {
   const severity = variant === 'default' ? 'info' : variant;
+  const resolvedAction = typeof action === 'function' ? action(id) : action;
   return (
     <SnackbarContent ref={ref} {...rest}>
-      <Alert severity={severity} sx={{ width: '100%', typography: 'body1' }}>
+      <Alert
+        severity={severity}
+        action={resolvedAction}
+        sx={{ width: '100%', typography: 'body1' }}>
         {message}
       </Alert>
     </SnackbarContent>
@@ -97,9 +110,10 @@ const AppSnackbar = ({ id: _id, message, variant, ref, ...rest }) => {
 };
 AppSnackbar.displayName = 'AppSnackbar';
 AppSnackbar.propTypes = {
-  id: PropTypes.string,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   message: PropTypes.node,
   variant: PropTypes.string,
+  action: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   ref: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 };
 
@@ -220,6 +234,7 @@ const ApplicationShell = () => (
           {/* Outside the boundary on purpose: when a stale build crashes the
               app, offering the update is exactly what fixes it. */}
           <UpdatePrompt />
+          <NetworkStatusNotifier />
           <ErrorBoundary>
             <ApplicationLayout />
           </ErrorBoundary>

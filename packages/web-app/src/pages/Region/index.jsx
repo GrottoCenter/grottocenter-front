@@ -1,10 +1,14 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchRegion } from '../../actions/Region/GetRegion';
 import Region from '../../components/appli/Region';
-import { usePermissions, useUserProperties } from '../../hooks';
+import {
+  usePermissions,
+  useRefetchOnReconnect,
+  useUserProperties
+} from '../../hooks';
 import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
 import { subscribeToRegion } from '../../actions/Subscriptions/SubscribeToRegion';
 import { unsubscribeFromRegion } from '../../actions/Subscriptions/UnsubscribeFromRegion';
@@ -21,6 +25,11 @@ const RegionPage = () => {
     dispatch(unsubscribeFromRegion(countryId, regionId));
   const canSubscribe = permissions.isLeader;
 
+  const reloadRegion = useCallback(
+    () => dispatch(fetchRegion(countryId, regionId)),
+    [dispatch, countryId, regionId]
+  );
+
   useEffect(() => {
     dispatch(fetchRegion(countryId, regionId));
     if (permissions.isAuth) {
@@ -29,12 +38,15 @@ const RegionPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, countryId, regionId]);
 
+  useRefetchOnReconnect(reloadRegion, Boolean(error));
+
   return (
     <Region
       key={`${countryId}-${regionId}`}
       canSubscribe={canSubscribe}
       region={region}
       error={error}
+      onRetry={reloadRegion}
       onSubscribe={onSubscribe}
       onUnsubscribe={onUnsubscribe}
       status={status}

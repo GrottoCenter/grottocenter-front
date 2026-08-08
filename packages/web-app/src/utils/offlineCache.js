@@ -34,3 +34,42 @@ export async function getStorageUsage() {
     return null;
   }
 }
+
+/**
+ * Whether this origin's storage is exempt from automatic eviction. Returns
+ * null when the Storage API is unavailable.
+ */
+export async function isStoragePersisted() {
+  if (typeof navigator === 'undefined' || !navigator.storage?.persisted) {
+    return null;
+  }
+  try {
+    return await navigator.storage.persisted();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Ask the browser not to evict our caches under storage pressure. Without it,
+ * everything the user saved for a trip can vanish silently when the device
+ * runs low on space.
+ *
+ * Deliberately NOT exposed as a user setting: the answer isn't the user's to
+ * give. Chrome never prompts and decides from its own engagement heuristics,
+ * Firefox prompts for a concept nobody can act on, and Safari applies its own
+ * policy regardless — a "protect my data" button would therefore be an
+ * unactionable control that fails without explanation. Callers should invoke
+ * this on a strong intent signal instead (see src/index.jsx: installed app).
+ *
+ * Returns true/false once settled, or null when the API is unavailable.
+ */
+export async function ensurePersistentStorage() {
+  const already = await isStoragePersisted();
+  if (already !== false) return already; // true, or null when unsupported
+  try {
+    return await navigator.storage.persist();
+  } catch {
+    return null;
+  }
+}

@@ -31,6 +31,7 @@ import copyToClipboard from '../../../../helpers/clipboard';
 import {
   useNotification,
   useCoordinatePreference,
+  useOnlineStatus,
   usePermissions,
   getCRSLabel
 } from '../../../../hooks';
@@ -44,6 +45,7 @@ import ClusterLayer, { ClusterGlobalCss } from './ClusterLayer';
 import Markers from './Markers';
 import MassifPolygons, { massifPolygonType } from './MassifPolygons';
 import ExploredOverlay from './ExploredOverlay';
+import OfflineDetailNotice from './OfflineDetailNotice';
 import useExploredEntrances from './useExploredEntrances';
 import PopupTargetHandler from './PopupTargetHandler';
 import WaypointNavigation from '../common/Waypoint/WaypointNavigation';
@@ -101,6 +103,7 @@ const HydratedMap = ({
   const { formatMessage } = useIntl();
   const { onSuccess } = useNotification();
   const { isAuth } = usePermissions();
+  const isOnline = useOnlineStatus();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const projections = useSelector(
@@ -366,6 +369,19 @@ const HydratedMap = ({
   // MASSIFS_POLYGON_LIMIT (8). Rebuilt every render, but data (entrances,
   // networks, ...) are stable Redux references that only change when new tile
   // data arrives, so useCluster's kD-tree isn't rebuilt on unrelated renders.
+  // Offline at detail zoom with nothing drawn: the tiles covering this area
+  // were never fetched online, so they aren't in the service worker cache.
+  // Checked against the layers actually visible — a hidden layer holding data
+  // must not suppress the notice, and a visible one holding data must.
+  const hasVisibleMarkers =
+    (visibleMarkers.includes(layerTypes.ENTRANCES) &&
+      filteredEntranceMarkers.length > 0) ||
+    (visibleMarkers.includes(layerTypes.NETWORKS) && networkMarkers.length > 0) ||
+    (visibleMarkers.includes(layerTypes.ORGANIZATIONS) &&
+      organizationMarkers.length > 0);
+  const showOfflineDetailNotice =
+    !isOnline && isMarkersMode && !hasVisibleMarkers;
+
   const clusterConfigs = [
     {
       type: 'entrance',
@@ -415,6 +431,7 @@ const HydratedMap = ({
         useLeafletControl
       />
       <ExploredOverlay points={showExplored && isAuth ? exploredPoints : []} />
+      <OfflineDetailNotice show={showOfflineDetailNotice} />
       {clusterConfigs.map(({ type, layer, data, off }) => (
         <ClusterLayer
           key={type}

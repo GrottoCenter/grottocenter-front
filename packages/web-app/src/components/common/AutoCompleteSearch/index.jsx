@@ -102,6 +102,7 @@ const AutoCompleteSearch = ({
   isLoading = false,
   disabled = false,
   hasFixWidth = true,
+  noOptionsText,
   value
 }) => {
   const { formatMessage } = useIntl();
@@ -153,10 +154,13 @@ const AutoCompleteSearch = ({
       onOpen={handleOpen}
       onClose={handleClose}
       open={disabled ? false : isOpen}
-      noOptionsText={formatMessage(
-        { id: 'No result (enter at least {count} characters)' },
-        { count: AUTOCOMPLETE_MIN_CHARACTERS }
-      )}
+      noOptionsText={
+        noOptionsText ??
+        formatMessage(
+          { id: 'No result (enter at least {count} characters)' },
+          { count: AUTOCOMPLETE_MIN_CHARACTERS }
+        )
+      }
       value={value}
       isOptionEqualToValue={(option, val) => {
         if (!option || !val) return false;
@@ -204,6 +208,9 @@ AutoCompleteSearch.propTypes = {
   isLoading: PropTypes.bool,
   disabled: PropTypes.bool,
   hasFixWidth: PropTypes.bool,
+  // Overrides the default "no result" wording — e.g. to explain that search
+  // needs a connection rather than claim nothing was found.
+  noOptionsText: PropTypes.node,
   // Whatever shape the caller's options carry; compared by reference.
   value: PropTypes.oneOfType([
     PropTypes.string,

@@ -23,7 +23,7 @@ import PageHeader from '../../common/Layouts/PageHeader';
 import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
-import Alert from '../../common/Alert';
+import FetchErrorState from '../../common/FetchErrorState';
 import GuidelinePropTypes from '../../../types/guideline.type';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
@@ -39,6 +39,7 @@ const Region = ({
   canSubscribe,
   region,
   error,
+  onRetry = null,
   onSubscribe,
   onUnsubscribe,
   status,
@@ -144,11 +145,10 @@ const Region = ({
         {error && (
           <SectionStack>
             <Card sx={{ p: 2 }}>
-              <Alert
-                title={formatMessage({
-                  id: 'Error, the region data you are looking for is not available.'
-                })}
-                severity="error"
+              <FetchErrorState
+                error={error}
+                onRetry={onRetry}
+                messageId="Error, the region data you are looking for is not available."
               />
             </Card>
           </SectionStack>
@@ -224,6 +224,7 @@ Region.propTypes = {
     organizations: PropTypes.arrayOf(PropTypes.shape({}))
   }),
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  onRetry: PropTypes.func,
   onSubscribe: PropTypes.func,
   onUnsubscribe: PropTypes.func,
   status: PropTypes.string,

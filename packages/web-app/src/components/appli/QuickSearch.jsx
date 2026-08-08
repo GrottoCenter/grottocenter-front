@@ -8,7 +8,7 @@ import {
   fetchQuicksearchResult,
   resetQuicksearch
 } from '../../actions/Quicksearch';
-import { useDebounce } from '../../hooks';
+import { useDebounce, useOnlineStatus } from '../../hooks';
 import {
   AUTOCOMPLETE_DEBOUNCE_DELAY,
   AUTOCOMPLETE_MIN_CHARACTERS
@@ -21,6 +21,7 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
   const { results, errors, isLoading } = useSelector(
     state => state.quicksearch
   );
+  const isOnline = useOnlineStatus();
   const [input, setInput] = useState('');
 
   const debouncedInput = useDebounce(input, AUTOCOMPLETE_DEBOUNCE_DELAY);
@@ -63,6 +64,13 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
       dispatch(resetQuicksearch());
       return;
     }
+    // Search runs on the API's index, which is never cached — offline every
+    // keystroke would fail and paint the field red, as if the user had typed
+    // something wrong. Skip the request and explain instead (see noOptionsText).
+    if (!isOnline) {
+      dispatch(resetQuicksearch());
+      return;
+    }
     const criterias = {
       query: debouncedInput.trim(),
       entities: ['entrances', 'caves', 'organizations', 'massifs']
@@ -71,7 +79,7 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
     dispatch(fetchQuicksearchResult(criterias));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedInput]);
+  }, [debouncedInput, isOnline]);
 
   return (
     <AutoCompleteSearch
@@ -83,6 +91,9 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
       hasError={!!errors}
       isLoading={isLoading}
       hasFixWidth={hasFixWidth}
+      noOptionsText={
+        isOnline ? undefined : formatMessage({ id: 'offlineSearchUnavailable' })
+      }
     />
   );
 };

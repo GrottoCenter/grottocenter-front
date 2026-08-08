@@ -55,6 +55,24 @@ export default defineConfig(({ mode }) => {
         `^${escapeRegex(apiOrigin)}/api/geoloc/organizations\\?sw_lat=-90&`
       )
     : null;
+  // Map viewport data, requested on a FIXED slippy-tile grid (see
+  // src/utils/mapTileCache.js): bounds are derived from {z,x,y} at CACHE_ZOOM,
+  // so the same tile always produces the same URL. That is what makes these
+  // cacheable at all — the general api-get rule still excludes free-form
+  // `?sw_lat=` viewport queries, whose URLs are unique per pan/zoom.
+  //
+  // The `Coordinates` suffix of the bulk endpoints sits before the `?`, so
+  // `/geoloc/entrancesCoordinates?…` never matches this pattern. The bulk
+  // organizations fetch DOES share this URL shape, but its own rule is
+  // registered earlier and Workbox routes to the first match — deliberately
+  // no negative lookahead here: it would depend on the parameter order
+  // produced by makeUrl (i.e. on the key order of MAX_BOUNDS in
+  // actions/Map.js), an invisible coupling across files.
+  const mapTilePattern = apiOrigin
+    ? new RegExp(
+        `^${escapeRegex(apiOrigin)}/api/geoloc/(entrances|networks|organizations)\\?`
+      )
+    : null;
 
   return {
     plugins: [
@@ -386,6 +404,12 @@ export default defineConfig(({ mode }) => {
             // Placed BEFORE the api-get rule so the sw_lat lookahead in api-get
             // (which excludes viewport queries and would sweep these in too)
             // is shadowed for these specific paths.
+            //
+            // maxEntries is NOT just "3 global datasets": the massif page fetches
+            // entrancesCoordinates with a per-massif bbox (see MapMassif.jsx), so
+            // every visited massif adds an entry to this same LRU. At 5, browsing
+            // a couple of massifs evicted the world-wide entrance dataset
+            // (~700 KB gzipped) and emptied the global map's clusters offline.
             ...(bulkDailyCoordsPattern
               ? [
                   {
@@ -394,8 +418,9 @@ export default defineConfig(({ mode }) => {
                     options: {
                       cacheName: 'api-map-coords-daily',
                       expiration: {
-                        maxEntries: 5,
-                        maxAgeSeconds: 60 * 60 * 24 * 2
+                        maxEntries: 40,
+                        maxAgeSeconds: 60 * 60 * 24 * 2,
+                        purgeOnQuotaError: true
                       },
                       cacheableResponse: { statuses: [0, 200] },
                       matchOptions: { ignoreVary: true }
@@ -420,6 +445,54 @@ export default defineConfig(({ mode }) => {
                       },
                       cacheableResponse: { statuses: [0, 200] },
                       matchOptions: { ignoreVary: true }
+                    }
+                  }
+                ]
+              : []),
+            // Map viewport tiles. MUST stay after the two bulk rules above (they
+            // win by registration order) and before api-get (whose sw_lat
+            // lookahead would otherwise never let these through).
+            //
+            // StaleWhileRevalidate: paint instantly from cache, refresh in the
+            // background. NetworkFirst would add latency to every pan while
+            // online; CacheFirst would never refresh a changed tile.
+            //
+            // Without this rule the tile cache lives only in memory
+            // (src/utils/mapTileCache.js), so relaunching the PWA offline showed
+            // an empty map above the clustering threshold — precisely the field
+            // use case. maxEntries is a starting point: Workbox can only bound a
+            // number of entries, never a byte budget, so recalibrate against the
+            // real payload size of a dense karst tile.
+            ...(mapTilePattern
+              ? [
+                  {
+                    urlPattern: mapTilePattern,
+                    handler: 'StaleWhileRevalidate',
+                    options: {
+                      cacheName: 'api-map-tiles',
+                      expiration: {
+                        maxEntries: 300,
+                        maxAgeSeconds: 60 * 60 * 24 * 7,
+                        purgeOnQuotaError: true
+                      },
+                      cacheableResponse: { statuses: [0, 200] },
+                      matchOptions: { ignoreVary: true },
+                      plugins: [
+                        {
+                          // `zoom` is sent by mapTileCache but read by no
+                          // /geoloc controller (they only use sw_lat/sw_lng/
+                          // ne_lat/ne_lng + massifId). Dropping it from the CACHE
+                          // KEY — rather than from the request — keeps one entry
+                          // per tile instead of one per tile×zoom pair, without
+                          // touching the map code. Same idiom as the OSM
+                          // subdomain normalization above.
+                          cacheKeyWillBeUsed: async ({ request }) => {
+                            const url = new URL(request.url);
+                            url.searchParams.delete('zoom');
+                            return url.toString();
+                          }
+                        }
+                      ]
                     }
                   }
                 ]

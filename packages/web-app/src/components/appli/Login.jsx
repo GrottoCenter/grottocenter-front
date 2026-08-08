@@ -32,7 +32,8 @@ import Translate from '../common/Translate';
 import StandardDialog from '../common/StandardDialog';
 import LoginForm from '../common/LoginForm';
 import MfaEnrollment from './MfaEnrollment';
-import { useNotification } from '../../hooks';
+import OfflineDisabled from '../common/OfflineDisabled';
+import { useNotification, useOnlineStatus } from '../../hooks';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -54,6 +55,7 @@ const Login = () => {
   const [resendTimeout, setResendTimeout] = React.useState(0);
   const navigate = useNavigate();
   const { onSuccess } = useNotification();
+  const isOnline = useOnlineStatus();
   const { formatMessage } = useIntl();
 
   const isPlainLogin =
@@ -183,23 +185,30 @@ const Login = () => {
   const isSubmitting =
     authState.isFetching || resendVerificationState.isFetching;
 
+  // Logging in needs the server. Offline, submitting would fail with a network
+  // error the user would read as "wrong password" — so we block it and say why.
+  // Note this only affects signing IN: an existing session survives offline,
+  // since the token lives in localStorage.
   const LoginButton = (
-    <Button
-      type="submit"
-      fullWidth
-      size="large"
-      variant="contained"
-      disabled={
-        isSubmitting ||
-        (resendTimeout > 0 && authState.isNotVerifiedMessageDisplayed)
-      }
-      sx={{ mt: 1 }}>
-      {isSubmitting ? (
-        <CircularProgress size="1.75rem" color="inherit" />
-      ) : (
-        getLoginButtonLabel()
-      )}
-    </Button>
+    <OfflineDisabled>
+      <Button
+        type="submit"
+        fullWidth
+        size="large"
+        variant="contained"
+        disabled={
+          !isOnline ||
+          isSubmitting ||
+          (resendTimeout > 0 && authState.isNotVerifiedMessageDisplayed)
+        }
+        sx={{ mt: 1 }}>
+        {isSubmitting ? (
+          <CircularProgress size="1.75rem" color="inherit" />
+        ) : (
+          getLoginButtonLabel()
+        )}
+      </Button>
+    </OfflineDisabled>
   );
 
   const handleCreateAccount = () => {

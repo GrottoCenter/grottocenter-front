@@ -32,7 +32,7 @@ import { restoreCave } from '../../../actions/Cave/RestoreCave';
 import { NetworkForm } from '../EntitiesForm';
 import StandardDialog from '../../common/StandardDialog';
 import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
-import Alert from '../../common/Alert';
+import FetchErrorState from '../../common/FetchErrorState';
 import EntrancesList from './EntrancesList';
 import Descriptions from '../Descriptions';
 import { CavePropTypes } from '../../../types/cave.type';
@@ -54,7 +54,7 @@ const HalfSplitContainer = styled('div')`
   }
 `;
 
-export const Network = ({ isLoading, error, cave }) => {
+export const Network = ({ isLoading, error, onRetry = null, cave }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
@@ -229,11 +229,10 @@ export const Network = ({ isLoading, error, cave }) => {
             {error && (
               <SectionStack>
                 <Card sx={{ p: 2 }}>
-                  <Alert
-                    title={formatMessage({
-                      id: 'Error, the network data you are looking for is not available.'
-                    })}
-                    severity="error"
+                  <FetchErrorState
+                    error={error}
+                    onRetry={onRetry}
+                    messageId="Error, the network data you are looking for is not available."
                   />
                 </Card>
               </SectionStack>
@@ -372,6 +371,7 @@ export const Network = ({ isLoading, error, cave }) => {
 Network.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
+  onRetry: PropTypes.func,
   cave: CavePropTypes
 };
 

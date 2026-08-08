@@ -2,20 +2,25 @@ import PropTypes from 'prop-types';
 import { Button } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { useIntl } from 'react-intl';
-import { useAuthNavigate } from '../../hooks';
+import { useAuthNavigate, useOnlineStatus } from '../../hooks';
+import OfflineDisabled from './OfflineDisabled';
 
 const NewEntityButton = ({ to, icon = <AddCircleIcon /> }) => {
   const { formatMessage } = useIntl();
   const handleClick = useAuthNavigate(to);
+  const isOnline = useOnlineStatus();
 
   return (
-    <Button
-      color="secondary"
-      variant="outlined"
-      startIcon={icon}
-      onClick={handleClick}>
-      {formatMessage({ id: 'New' })}
-    </Button>
+    <OfflineDisabled>
+      <Button
+        color="secondary"
+        variant="outlined"
+        startIcon={icon}
+        disabled={!isOnline}
+        onClick={handleClick}>
+        {formatMessage({ id: 'New' })}
+      </Button>
+    </OfflineDisabled>
   );
 };
 

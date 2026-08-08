@@ -83,7 +83,11 @@ import {
   localeToLanguageId
 } from '../../utils/languageMapping';
 import { notificationPreferencesUrl } from '../../conf/apiRoutes';
-import { clearOfflineData, getStorageUsage } from '../../utils/offlineCache';
+import {
+  clearOfflineData,
+  getStorageUsage,
+  isStoragePersisted
+} from '../../utils/offlineCache';
 
 // ─── Shared styled components ─────────────────────────────────────────────────
 
@@ -1119,10 +1123,12 @@ const OfflineDataSection = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [usageBytes, setUsageBytes] = useState(null);
+  const [isPersisted, setIsPersisted] = useState(false);
 
   const refreshUsage = useCallback(async () => {
     const usage = await getStorageUsage();
     setUsageBytes(usage);
+    setIsPersisted((await isStoragePersisted()) === true);
   }, []);
 
   useEffect(() => {
@@ -1170,14 +1176,27 @@ const OfflineDataSection = () => {
               {formatMessage({ id: 'Offline data' })}
             </Typography>
           </SectionHeaderTitle>
-          {formattedUsage && (
-            <Chip
-              size="small"
-              variant="outlined"
-              label={formattedUsage}
-              sx={{ fontWeight: 600 }}
-            />
-          )}
+          <SectionHeaderTitle>
+            {/* Shown only when granted. A "not protected" state would be pure
+                anxiety: the user has no way to change it — the browser decides
+                on its own (see ensurePersistentStorage). */}
+            {isPersisted && (
+              <Chip
+                size="small"
+                color="success"
+                variant="outlined"
+                label={formatMessage({ id: 'offlineStoragePersisted' })}
+              />
+            )}
+            {formattedUsage && (
+              <Chip
+                size="small"
+                variant="outlined"
+                label={formattedUsage}
+                sx={{ fontWeight: 600 }}
+              />
+            )}
+          </SectionHeaderTitle>
         </SectionHeader>
         <Divider />
         <SectionBody>

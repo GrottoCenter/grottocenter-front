@@ -27,7 +27,12 @@ import Details from './Details';
 import ManagedEntitiesSection from './ManagedEntitiesSection';
 import { GrottoFullPropTypes } from '../../../types/grotto.type';
 import Alert from '../../common/Alert';
-import { usePermissions, useSharePage } from '../../../hooks';
+import FetchErrorState from '../../common/FetchErrorState';
+import {
+  usePermissions,
+  useRefetchOnReconnect,
+  useSharePage
+} from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
@@ -100,6 +105,8 @@ const Organization = ({ error, isLoading, organization }) => {
   const handleRefresh = useCallback(() => {
     dispatch(fetchOrganization(organizationId));
   }, [dispatch, organizationId]);
+
+  useRefetchOnReconnect(handleRefresh, Boolean(error));
 
   const handleJoinLeave = useCallback(async () => {
     if (!currentUserId) return;
@@ -240,11 +247,10 @@ const Organization = ({ error, isLoading, organization }) => {
       {error && (
         <SectionStack>
           <Card sx={{ p: 2 }}>
-            <Alert
-              title={formatMessage({
-                id: 'Error, the organization data you are looking for is not available.'
-              })}
-              severity="error"
+            <FetchErrorState
+              error={error}
+              onRetry={handleRefresh}
+              messageId="Error, the organization data you are looking for is not available."
             />
           </Card>
         </SectionStack>

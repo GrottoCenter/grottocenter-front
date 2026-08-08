@@ -56,7 +56,7 @@ import useOpenLink from '../../../hooks/useOpenLink';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
 import SensitiveLocationPlaceholder from './SensitiveLocationPlaceholder';
 import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
-import Alert from '../../common/Alert';
+import FetchErrorState from '../../common/FetchErrorState';
 import Map from '../../common/Maps/MapMultipleMarkers';
 import { EntrancePropTypes } from '../../../types/entrance.type';
 import {
@@ -80,6 +80,7 @@ const HalfSplitContainer = styled('div')`
 export const Entry = ({
   isLoading,
   error,
+  onRetry = null,
   entrance,
   networkDescriptionsCount = 0
 }) => {
@@ -326,11 +327,10 @@ export const Entry = ({
             {error && (
               <SectionStack>
                 <Card sx={{ p: 2 }}>
-                  <Alert
-                    title={formatMessage({
-                      id: 'Error, the entrance data you are looking for is not available.'
-                    })}
-                    severity="error"
+                  <FetchErrorState
+                    error={error}
+                    onRetry={onRetry}
+                    messageId="Error, the entrance data you are looking for is not available."
                   />
                 </Card>
               </SectionStack>
@@ -524,6 +524,7 @@ export const Entry = ({
 Entry.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
+  onRetry: PropTypes.func,
   entrance: EntrancePropTypes,
   networkDescriptionsCount: PropTypes.number
 };
