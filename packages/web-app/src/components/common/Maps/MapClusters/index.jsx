@@ -46,7 +46,9 @@ import ClusterLayer, { ClusterGlobalCss } from './ClusterLayer';
 import Markers from './Markers';
 import MassifPolygons, { massifPolygonType } from './MassifPolygons';
 import ExploredOverlay from './ExploredOverlay';
-import OfflineDetailNotice from './OfflineDetailNotice';
+import OfflineDetailNotice, {
+  shouldShowOfflineDetailNotice
+} from './OfflineDetailNotice';
 import useExploredEntrances from './useExploredEntrances';
 import PopupTargetHandler from './PopupTargetHandler';
 import WaypointNavigation from '../common/Waypoint/WaypointNavigation';
@@ -373,24 +375,19 @@ const HydratedMap = ({
 
   // Offline at detail zoom with nothing drawn: the tiles covering this area
   // were never fetched online, so they aren't in the service worker cache.
-  // Checked against the layers actually visible — a hidden layer holding data
-  // must not suppress the notice, and a visible one holding data must.
-  const hasVisibleMarkers =
-    (visibleMarkers.includes(layerTypes.ENTRANCES) &&
-      filteredEntranceMarkers.length > 0) ||
-    (visibleMarkers.includes(layerTypes.NETWORKS) &&
-      networkMarkers.length > 0) ||
-    (visibleMarkers.includes(layerTypes.ORGANIZATIONS) &&
-      organizationMarkers.length > 0);
-  // `visibleMarkers.length > 0` is the guard against blaming the cache for an
-  // empty map the user emptied themselves: unticking every marker layer in the
-  // LayersControl leaves the same "nothing drawn" state, and telling them to
-  // zoom out would be wrong — the data is there, they hid it.
-  const showOfflineDetailNotice =
-    !isOnline &&
-    isMarkersMode &&
-    visibleMarkers.length > 0 &&
-    !hasVisibleMarkers;
+  // The decision itself sits next to the notice it drives, as a pure predicate,
+  // so the "user unticked every layer" case is covered by a test instead of
+  // resting on a manual pass over a Leaflet map.
+  const showOfflineDetailNotice = shouldShowOfflineDetailNotice({
+    isOnline,
+    isMarkersMode,
+    visibleMarkers,
+    markerCounts: {
+      [layerTypes.ENTRANCES]: filteredEntranceMarkers.length,
+      [layerTypes.NETWORKS]: networkMarkers.length,
+      [layerTypes.ORGANIZATIONS]: organizationMarkers.length
+    }
+  });
 
   const clusterConfigs = [
     {

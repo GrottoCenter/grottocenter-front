@@ -81,21 +81,30 @@ const sleep = ms =>
  * or two. Keeping the lowest sample lands on the floor without having to know
  * how long that takes, and without a "did it drop yet?" heuristic that a clear
  * freeing nothing would defeat anyway.
+ *
+ * The whole body is wrapped: at 8 × 300 ms this outlives a navigation, and an
+ * unhandled rejection from a context whose storage has gone away would surface
+ * in the console for a value nothing on screen is waiting for. Losing the
+ * sampling run just means the next clear establishes the floor instead.
  */
 export async function rememberOfflineBaseline(
   samples = 8,
   intervalMs = 300,
   lowest = Infinity
 ) {
-  const usage = await getStorageUsage();
-  if (usage == null) return;
-  const best = Math.min(lowest, usage);
-  if (samples > 1) {
-    await sleep(intervalMs);
-    await rememberOfflineBaseline(samples - 1, intervalMs, best);
-    return;
+  try {
+    const usage = await getStorageUsage();
+    if (usage == null) return;
+    const best = Math.min(lowest, usage);
+    if (samples > 1) {
+      await sleep(intervalMs);
+      await rememberOfflineBaseline(samples - 1, intervalMs, best);
+      return;
+    }
+    writeBaseline(best);
+  } catch {
+    // Fire-and-forget: there is no caller to report to and nothing to retry.
   }
-  writeBaseline(best);
 }
 
 /**

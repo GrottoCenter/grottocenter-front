@@ -456,6 +456,11 @@ const ConversationDetail = () => {
     isFirstLoad.current = true;
   }, [conversationId]);
 
+  // The single loader for this thread, shared by three callers: the mount/
+  // navigation effect below, the reconnect refetch, and FetchErrorState's Retry.
+  // Its identity is the navigation signal — switching threads changes
+  // conversationId, which changes the callback, which re-runs the effect and is
+  // picked up by useRefetchOnReconnect through its own ref sync.
   const reloadMessages = useCallback(() => {
     if (!conversationId) return;
     dispatch(

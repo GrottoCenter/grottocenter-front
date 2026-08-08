@@ -30,9 +30,9 @@ const FetchErrorState = ({ error, messageId, onRetry = null }) => {
       data-testid="fetch-error-state"
       severity={isOffline ? 'info' : 'error'}
       // Reuses the i18n key `offlineActionUnavailable` (also used by
-      // OfflineDisabled) as the Alert title rather than carrying its own: the
-      // two surfaces said the same thing in every language but English, so a
-      // second key was pure translation debt.
+      // OfflineDisabled) as the Alert title rather than carrying its own: one
+      // key already covers both surfaces, so a second one would be the same
+      // sentence to translate twice, in every language.
       title={formatMessage({
         id: isOffline ? 'offlineActionUnavailable' : messageId
       })}

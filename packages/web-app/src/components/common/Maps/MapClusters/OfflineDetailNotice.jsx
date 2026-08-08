@@ -3,6 +3,39 @@ import { useIntl } from 'react-intl';
 import { Alert, Box } from '@mui/material';
 
 /**
+ * Whether the notice below applies to the map as it currently stands.
+ *
+ * Split out of the component (and out of its caller) so the four-way decision
+ * can be read — and tested — on its own; the component itself stays a `show`
+ * boolean away from any map state. Layer-agnostic: it looks `markerCounts` up
+ * through whatever ids `visibleMarkers` holds, so a marker layer added to
+ * MARKER_LAYERS later is covered without touching this predicate.
+ *
+ * @param {boolean} isOnline
+ * @param {boolean} isMarkersMode true above MARKERS_LIMIT, where markers come
+ *   from per-tile fetches — the only regime in which an empty map can be
+ *   blamed on the cache. Below it, clusters come from the bulk fetch.
+ * @param {string[]} visibleMarkers layer ids currently drawn as real markers.
+ * @param {Object<string, number>} markerCounts markers held per layer id.
+ */
+export const shouldShowOfflineDetailNotice = ({
+  isOnline,
+  isMarkersMode,
+  visibleMarkers,
+  markerCounts
+}) => {
+  if (isOnline || !isMarkersMode) return false;
+  // The guard against blaming the cache for a map the user emptied themselves:
+  // unticking every marker layer in the LayersControl leaves the same "nothing
+  // drawn" state, and telling them to zoom out would be wrong — the data is
+  // there, they hid it.
+  if (visibleMarkers.length === 0) return false;
+  // Counted over the layers actually visible — a hidden layer holding data must
+  // not suppress the notice, and a visible one holding data must.
+  return !visibleMarkers.some(layer => (markerCounts[layer] ?? 0) > 0);
+};
+
+/**
  * Explains an empty map at detail zoom while offline.
  *
  * Above MARKERS_LIMIT the map draws real markers fetched per tile. Those tiles

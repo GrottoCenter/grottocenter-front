@@ -53,6 +53,11 @@ const NetworkStatusNotifier = () => {
     }
 
     onClose(OFFLINE_SNACKBAR_KEY);
+    // Armed by going offline, disarmed by announcing the return — so "back
+    // online" only ever follows an offline period this component witnessed.
+    // The reset (rather than a one-shot flag) is what makes every subsequent
+    // offline → online round-trip announce itself too; an `online` event with
+    // no offline before it stays silent, which is the point.
     if (hasBeenOffline.current) {
       hasBeenOffline.current = false;
       onSuccess(<FormattedMessage id="backOnline" />);

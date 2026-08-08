@@ -396,8 +396,11 @@ const MessagesPage = () => {
                   </Box>
                   {/* Mobile twin of the New Message button above — same POST,
                       same block. The Fab stays absolutely positioned against
-                      the relative parent: OfflineDisabled's span is static, so
-                      it never becomes the containing block. */}
+                      the relative parent: OfflineDisabled's span is
+                      inline-flex with no `position`, so it never becomes the
+                      containing block. Load-bearing — giving that span a
+                      position (or any other containing-block trigger) would
+                      re-anchor the Fab to it and park it off-corner. */}
                   <OfflineDisabled>
                     <Fab
                       aria-label={formatMessage({ id: 'New Message' })}

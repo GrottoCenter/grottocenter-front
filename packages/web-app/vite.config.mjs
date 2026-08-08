@@ -551,6 +551,11 @@ export default defineConfig(({ mode }) => {
                           // per tile instead of one per tile×zoom pair, without
                           // touching the map code. Same idiom as the OSM
                           // subdomain normalization above.
+                          //
+                          // The coupling with mapTileCache is one-directional:
+                          // should it stop sending `zoom`, the delete() finds
+                          // nothing and the key is already the canonical one —
+                          // the hook degrades to a no-op instead of breaking.
                           cacheKeyWillBeUsed: async ({ request }) => {
                             const url = new URL(request.url);
                             url.searchParams.delete('zoom');
