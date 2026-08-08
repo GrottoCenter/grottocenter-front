@@ -3,6 +3,12 @@ import entitiesConfig from './entitiesConfig';
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [20, 100, 200];
 
+// The results toolbar's action cluster is built on ToolbarActionButton, but the
+// page-size Select cannot be — so the height they have to agree on lives here
+// rather than in either of them. 32px is what a small bordered button already
+// measures, so nothing grows to meet it.
+export const TOOLBAR_ACTION_HEIGHT = 32;
+
 // Maps display field -> API sort field for sortable columns, per entity type.
 export const SORT_FIELD_MAP = Object.fromEntries(
   Object.entries(entitiesConfig)

@@ -5,12 +5,10 @@ import {
   Box,
   Button,
   Divider,
-  IconButton,
   ListItemIcon,
   Menu,
   MenuItem,
-  Toolbar,
-  Tooltip
+  Toolbar
 } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
@@ -18,6 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import ViewListIcon from '@mui/icons-material/ViewList';
+import ToolbarActionButton from './ToolbarActionButton';
 import VisibleColumnsMenu from './VisibleColumnsMenu';
 import Translate from '../Translate';
 
@@ -160,26 +159,13 @@ const MobileToolbar = ({
         />
       )}
       {exportSlot}
-      <Tooltip
-        title={formatMessage({
+      <ToolbarActionButton
+        icon={viewMode === 'cards' ? TableChartIcon : ViewListIcon}
+        tooltip={formatMessage({
           id: viewMode === 'cards' ? 'Table view' : 'Card view'
-        })}>
-        <IconButton
-          size="small"
-          onClick={onViewToggle}
-          color="primary"
-          sx={{
-            border: '1px solid',
-            borderColor: 'primary.main',
-            borderRadius: 1
-          }}>
-          {viewMode === 'cards' ? (
-            <TableChartIcon fontSize="small" />
-          ) : (
-            <ViewListIcon fontSize="small" />
-          )}
-        </IconButton>
-      </Tooltip>
+        })}
+        onClick={onViewToggle}
+      />
     </Toolbar>
   );
 };

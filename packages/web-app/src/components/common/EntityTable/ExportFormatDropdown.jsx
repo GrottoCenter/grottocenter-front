@@ -1,95 +1,46 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import {
-  Box,
-  Button,
-  IconButton,
-  Menu,
-  MenuItem,
-  Tooltip
-} from '@mui/material';
+import { Menu, MenuItem } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 import { EXPORT_FORMATS } from '../../../conf/exportFormats';
+import ToolbarActionButton from './ToolbarActionButton';
 
 const ExportFormatDropdown = ({ disabled, onExport, iconOnly = false }) => {
   const { formatMessage } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
 
-  const handleClick = event => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const exportLabel = formatMessage({ id: 'Export' });
+  // A tooltip only where it adds something: the reason the button is dead, or
+  // the name of an icon that carries no text.
+  let tooltip = null;
+  if (disabled) {
+    tooltip = formatMessage({ id: 'Export unavailable above 10000 results' });
+  } else if (iconOnly) {
+    tooltip = exportLabel;
+  }
 
   const handleSelect = value => {
-    handleClose();
+    setAnchorEl(null);
     onExport(value);
   };
 
-  const button = iconOnly ? (
-    <IconButton
-      size="small"
-      color="primary"
-      disabled={disabled}
-      onClick={handleClick}
-      sx={{
-        border: '1px solid',
-        borderColor: disabled ? 'action.disabled' : 'primary.main',
-        borderRadius: 1
-      }}>
-      <FileDownloadIcon fontSize="small" />
-    </IconButton>
-  ) : (
-    <Button
-      variant="outlined"
-      size="small"
-      color="primary"
-      disabled={disabled}
-      onClick={handleClick}
-      startIcon={<FileDownloadIcon />}
-      endIcon={<ArrowDropDownIcon />}
-      sx={{ minWidth: 0 }}>
-      <Box
-        component="span"
-        sx={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap'
-        }}>
-        {formatMessage({ id: 'Export' })}
-      </Box>
-    </Button>
-  );
-
-  if (disabled) {
-    return (
-      <Tooltip
-        title={formatMessage({
-          id: 'Export unavailable above 10000 results'
-        })}>
-        <span>{button}</span>
-      </Tooltip>
-    );
-  }
-
-  const trigger = iconOnly ? (
-    <Tooltip title={formatMessage({ id: 'Export' })}>
-      <span>{button}</span>
-    </Tooltip>
-  ) : (
-    button
-  );
-
   return (
     <>
-      {trigger}
-      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+      <ToolbarActionButton
+        icon={FileDownloadIcon}
+        label={iconOnly ? null : exportLabel}
+        tooltip={tooltip}
+        endIcon={iconOnly ? null : <ArrowDropDownIcon />}
+        disabled={disabled}
+        onClick={event => setAnchorEl(event.currentTarget)}
+      />
+      <Menu
+        anchorEl={anchorEl}
+        open={!!anchorEl}
+        onClose={() => setAnchorEl(null)}>
         {EXPORT_FORMATS.map(({ value, label }) => (
           <MenuItem key={value} onClick={() => handleSelect(value)}>
             {label}

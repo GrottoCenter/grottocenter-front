@@ -35,6 +35,8 @@ LoadingTableHead.propTypes = {
   stickyTop: PropTypes.number
 };
 
+// First load only. A reload that already has rows on screen keeps them instead
+// of collapsing into this — see `isStale` in DesktopEntityTable.
 export const LoadingTableBodyInner = () => (
   <>
     {Array(8)

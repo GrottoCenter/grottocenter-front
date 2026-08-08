@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, Button, Checkbox, Menu, MenuItem } from '@mui/material';
+import { Checkbox, Menu, MenuItem } from '@mui/material';
 import DatasetIcon from '@mui/icons-material/Dataset';
+import ToolbarActionButton from './ToolbarActionButton';
 import Translate from '../Translate';
 
 const VisibleColumnsMenu = ({
@@ -19,25 +20,14 @@ const VisibleColumnsMenu = ({
 
   return (
     <>
-      <Button
-        variant="outlined"
-        size="small"
-        color="primary"
-        startIcon={<Icon fontSize="small" />}
+      <ToolbarActionButton
+        icon={Icon}
+        label={label ? formatMessage({ id: label }) : null}
+        // Unlabelled, the menu title is the only thing that can name it.
+        tooltip={label ? null : formatMessage({ id: menuTitle })}
         onClick={event => setAnchorEl(event.currentTarget)}
-        sx={{ minWidth: 0, ...sx }}>
-        {label && (
-          <Box
-            component="span"
-            sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
-            }}>
-            <Translate>{label}</Translate>
-          </Box>
-        )}
-      </Button>
+        sx={sx}
+      />
       <Menu
         anchorEl={anchorEl}
         open={!!anchorEl}

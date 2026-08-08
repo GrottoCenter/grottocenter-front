@@ -1,13 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
-import {
-  Box,
-  Divider,
-  IconButton,
-  LinearProgress,
-  Tooltip
-} from '@mui/material';
+import { Box, Divider, LinearProgress } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useIntl } from 'react-intl';
 
@@ -16,6 +10,7 @@ import DesktopEntityTable from './DesktopEntityTable';
 import ExportFormatDropdown from './ExportFormatDropdown';
 import MobileEntityList from './MobileEntityList';
 import MobileToolbar from './MobileToolbar';
+import ToolbarActionButton from './ToolbarActionButton';
 import {
   SORT_FIELD_MAP,
   applyColumnVisibility,
@@ -145,29 +140,16 @@ const EntityTable = ({
         );
       } else {
         exportSlot = (
-          <Tooltip
-            title={formatMessage({
+          <ToolbarActionButton
+            icon={FileDownloadIcon}
+            tooltip={formatMessage({
               id: exportDisabled
                 ? 'Export unavailable above 10000 results'
                 : 'Export'
-            })}>
-            <span>
-              <IconButton
-                size="small"
-                color="primary"
-                disabled={exportDisabled}
-                onClick={() => onExport(exportCols, exportLabels)}
-                sx={{
-                  border: '1px solid',
-                  borderColor: exportDisabled
-                    ? 'action.disabled'
-                    : 'primary.main',
-                  borderRadius: 1
-                }}>
-                <FileDownloadIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
+            })}
+            disabled={exportDisabled}
+            onClick={() => onExport(exportCols, exportLabels)}
+          />
         );
       }
     }
