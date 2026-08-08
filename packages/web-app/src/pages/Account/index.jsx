@@ -74,9 +74,11 @@ import Translate from '../../components/common/Translate';
 import {
   useUserProperties,
   usePermissions,
-  useNotification
+  useNotification,
+  useOnlineStatus
 } from '../../hooks';
 import AppLink from '../../components/common/AppLink';
+import OfflineDisabled from '../../components/common/OfflineDisabled';
 import { AVAILABLE_LANGUAGES, isPasswordValid } from '../../conf/config';
 import {
   languageIdToLocale,
@@ -1269,6 +1271,7 @@ const AccountPage = () => {
     state => state.subscriptions
   );
 
+  const isOnline = useOnlineStatus();
   const [isOrgSearchVisible, setIsOrgSearchVisible] = useState(false);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
   const [pendingLeaveOrg, setPendingLeaveOrg] = useState(null);
@@ -1443,22 +1446,33 @@ const AccountPage = () => {
                 defaultExpanded={nbOrganizations > 0}
                 count={nbOrganizations}
                 icon={
-                  <Tooltip
-                    title={formatMessage({
-                      id: isOrgSearchVisible ? 'Cancel this search' : 'Join'
-                    })}>
-                    <Button
-                      color={isOrgSearchVisible ? 'inherit' : 'secondary'}
-                      variant="outlined"
-                      onClick={() => setIsOrgSearchVisible(v => !v)}
-                      startIcon={
-                        isOrgSearchVisible ? <CancelIcon /> : <PersonAddIcon />
-                      }>
-                      {formatMessage({
-                        id: isOrgSearchVisible ? 'Cancel' : 'Join'
-                      })}
-                    </Button>
-                  </Tooltip>
+                  // Only block OPENING the panel offline — this same button
+                  // becomes Cancel once open, and an open panel must stay
+                  // closable. The inner Tooltip is left as is: a disabled
+                  // button emits no hover, so only OfflineDisabled's shows.
+                  <OfflineDisabled>
+                    <Tooltip
+                      title={formatMessage({
+                        id: isOrgSearchVisible ? 'Cancel this search' : 'Join'
+                      })}>
+                      <Button
+                        color={isOrgSearchVisible ? 'inherit' : 'secondary'}
+                        variant="outlined"
+                        disabled={!isOnline && !isOrgSearchVisible}
+                        onClick={() => setIsOrgSearchVisible(v => !v)}
+                        startIcon={
+                          isOrgSearchVisible ? (
+                            <CancelIcon />
+                          ) : (
+                            <PersonAddIcon />
+                          )
+                        }>
+                        {formatMessage({
+                          id: isOrgSearchVisible ? 'Cancel' : 'Join'
+                        })}
+                      </Button>
+                    </Tooltip>
+                  </OfflineDisabled>
                 }
                 content={
                   <>
@@ -1492,28 +1506,33 @@ const AccountPage = () => {
                 defaultExpanded={nbEntrances > 0}
                 count={nbEntrances}
                 icon={
-                  <Tooltip
-                    title={formatMessage({
-                      id: isCaveSearchVisible
-                        ? 'Cancel this search'
-                        : 'Add an entrance'
-                    })}>
-                    <Button
-                      color={isCaveSearchVisible ? 'inherit' : 'secondary'}
-                      variant="outlined"
-                      onClick={() => setIsCaveSearchVisible(v => !v)}
-                      startIcon={
-                        isCaveSearchVisible ? (
-                          <CancelIcon />
-                        ) : (
-                          <CheckCircleOutlineIcon />
-                        )
-                      }>
-                      {formatMessage({
-                        id: isCaveSearchVisible ? 'Cancel' : 'Add'
-                      })}
-                    </Button>
-                  </Tooltip>
+                  // Opening blocked offline, closing always allowed — see the
+                  // organizations trigger above.
+                  <OfflineDisabled>
+                    <Tooltip
+                      title={formatMessage({
+                        id: isCaveSearchVisible
+                          ? 'Cancel this search'
+                          : 'Add an entrance'
+                      })}>
+                      <Button
+                        color={isCaveSearchVisible ? 'inherit' : 'secondary'}
+                        variant="outlined"
+                        disabled={!isOnline && !isCaveSearchVisible}
+                        onClick={() => setIsCaveSearchVisible(v => !v)}
+                        startIcon={
+                          isCaveSearchVisible ? (
+                            <CancelIcon />
+                          ) : (
+                            <CheckCircleOutlineIcon />
+                          )
+                        }>
+                        {formatMessage({
+                          id: isCaveSearchVisible ? 'Cancel' : 'Add'
+                        })}
+                      </Button>
+                    </Tooltip>
+                  </OfflineDisabled>
                 }
                 content={
                   <RelatedCaves

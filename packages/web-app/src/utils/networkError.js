@@ -6,7 +6,8 @@
 // Chrome "Failed to fetch", Firefox "NetworkError when attempting to fetch
 // resource.", Safari "Load failed", React Native / some WebViews "Network
 // request failed".
-const NETWORK_MESSAGE = /failed to fetch|networkerror|load failed|network request failed/i;
+const NETWORK_MESSAGE =
+  /failed to fetch|networkerror|load failed|network request failed/i;
 
 /**
  * @param {*} error - any of the error shapes this app stores in Redux:

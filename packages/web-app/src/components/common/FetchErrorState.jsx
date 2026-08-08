@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Button } from '@mui/material';
@@ -20,7 +19,11 @@ import { useOnlineStatus } from '../../hooks';
 const FetchErrorState = ({ error, messageId, onRetry = null }) => {
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
-  const isOffline = isNetworkError(error);
+  // isNetworkError also matches "Failed to fetch" raised while ONLINE — API
+  // down, DNS, CORS. Promising that content "will load once you are back
+  // online" to someone who never left would be wrong, and the Retry button
+  // shown next to it would contradict it. Only claim offline when we are.
+  const isOffline = isNetworkError(error) && !isOnline;
 
   return (
     <Alert

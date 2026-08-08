@@ -29,7 +29,7 @@ const MassifPage = () => {
 
   // Initial data fetch
   useEffect(() => {
-    dispatch(loadMassif(massifId));
+    reloadMassif();
     if (permissions.isAuth) {
       dispatch(fetchSubscriptions(userProperties.id));
     }

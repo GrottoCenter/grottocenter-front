@@ -28,7 +28,9 @@ import ManagedEntitiesSection from './ManagedEntitiesSection';
 import { GrottoFullPropTypes } from '../../../types/grotto.type';
 import Alert from '../../common/Alert';
 import FetchErrorState from '../../common/FetchErrorState';
+import OfflineDisabled from '../../common/OfflineDisabled';
 import {
+  useOnlineStatus,
   usePermissions,
   useRefetchOnReconnect,
   useSharePage
@@ -64,6 +66,7 @@ const Organization = ({ error, isLoading, organization }) => {
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
   const [pendingRemoveMember, setPendingRemoveMember] = useState(null);
   const handleShare = useSharePage();
+  const isOnline = useOnlineStatus();
 
   const currentUserId = authState?.authTokenDecoded?.id;
 
@@ -378,24 +381,29 @@ const Organization = ({ error, isLoading, organization }) => {
             count={nbNetworks + nbEntrances}
             icon={
               canManageCaves && (
-                <Tooltip
-                  title={formatMessage({
-                    id: isCaveSearchVisible
-                      ? 'Cancel this search'
-                      : 'Add a cave'
-                  })}>
-                  <Button
-                    color={isCaveSearchVisible ? 'inherit' : 'secondary'}
-                    variant="outlined"
-                    onClick={() => setIsCaveSearchVisible(v => !v)}
-                    startIcon={
-                      isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />
-                    }>
-                    {formatMessage({
-                      id: isCaveSearchVisible ? 'Cancel' : 'Add'
-                    })}
-                  </Button>
-                </Tooltip>
+                // Opening blocked offline, closing always allowed: the same
+                // button turns into Cancel once the search panel is open.
+                <OfflineDisabled>
+                  <Tooltip
+                    title={formatMessage({
+                      id: isCaveSearchVisible
+                        ? 'Cancel this search'
+                        : 'Add a cave'
+                    })}>
+                    <Button
+                      color={isCaveSearchVisible ? 'inherit' : 'secondary'}
+                      variant="outlined"
+                      disabled={!isOnline && !isCaveSearchVisible}
+                      onClick={() => setIsCaveSearchVisible(v => !v)}
+                      startIcon={
+                        isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />
+                      }>
+                      {formatMessage({
+                        id: isCaveSearchVisible ? 'Cancel' : 'Add'
+                      })}
+                    </Button>
+                  </Tooltip>
+                </OfflineDisabled>
               )
             }
             content={

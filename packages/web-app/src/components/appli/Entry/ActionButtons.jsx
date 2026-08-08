@@ -9,15 +9,14 @@ import {
 } from '@mui/material';
 import { useIntl } from 'react-intl';
 
-import OfflineDisabled from '../../common/OfflineDisabled';
-import { useOnlineStatus } from '../../../hooks';
-
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteRounded';
 import DeleteForeverIcon from '@mui/icons-material/RemoveCircleRounded';
 import RestoreIcon from '@mui/icons-material/RestoreFromTrashRounded';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
+import { useOnlineStatus } from '../../../hooks';
+import OfflineDisabled from '../../common/OfflineDisabled';
 
 const LoadingActionButton = () => (
   <ButtonGroup color="primary" size="small" orientation="vertical">

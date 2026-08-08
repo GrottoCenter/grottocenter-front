@@ -1,10 +1,26 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNotification, useOnlineStatus } from '../../hooks';
 
 const OFFLINE_SNACKBAR_KEY = 'network-offline';
+
+// Kept at module scope on purpose: notistack wants `action` as a `key => node`
+// function, and defining one inside the component would make React see a new
+// component type on every render (react/no-unstable-nested-components).
+const closeAction = (onClose, label) =>
+  function (key) {
+    return (
+      <IconButton
+        size="small"
+        color="inherit"
+        aria-label={label}
+        onClick={() => onClose(key)}>
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    );
+  };
 
 /**
  * Announces connectivity changes. Renders nothing itself.
@@ -30,26 +46,26 @@ const NetworkStatusNotifier = () => {
   useEffect(() => {
     if (!isOnline) {
       hasBeenOffline.current = true;
+      // Changing the language while offline re-runs this effect (formatMessage
+      // is a new identity), but preventDuplicate keys on OFFLINE_SNACKBAR_KEY,
+      // so the snackbar is not re-added — it just keeps its original wording
+      // until the connection is back. Accepted: replacing it would flash.
       onWarning(formatMessage({ id: 'offlineIndicator' }), {
         key: OFFLINE_SNACKBAR_KEY,
         persist: true,
         preventDuplicate: true,
         anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
-        action: key => (
-          <IconButton
-            size="small"
-            color="inherit"
-            aria-label={formatMessage({ id: 'Close' })}
-            onClick={() => onClose(key)}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        )
+        action: closeAction(onClose, formatMessage({ id: 'Close' }))
       });
       return;
     }
 
     onClose(OFFLINE_SNACKBAR_KEY);
     if (hasBeenOffline.current) {
+      // Reset BEFORE announcing, so a later re-run of this effect while still
+      // online (a locale change gives formatMessage a new identity) cannot
+      // announce a reconnection that never happened.
+      hasBeenOffline.current = false;
       onSuccess(formatMessage({ id: 'backOnline' }), {
         anchorOrigin: { vertical: 'bottom', horizontal: 'center' }
       });

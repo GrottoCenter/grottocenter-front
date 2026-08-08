@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Tooltip } from '@mui/material';
@@ -22,7 +21,7 @@ import { useOnlineStatus } from '../../hooks';
  * on a disabled button, so the Tooltip would never receive the hover that
  * triggers it.
  */
-const OfflineDisabled = ({ children, title = null }) => {
+const OfflineDisabled = ({ children, title = null, fullWidth = false }) => {
   const isOnline = useOnlineStatus();
   const { formatMessage } = useIntl();
 
@@ -31,8 +30,17 @@ const OfflineDisabled = ({ children, title = null }) => {
   return (
     <Tooltip title={title ?? formatMessage({ id: 'offlineActionUnavailable' })}>
       {/* inline-flex so the wrapper is layout-neutral: a plain inline <span>
-          would break button groups and flex rows it gets dropped into. */}
-      <span style={{ display: 'inline-flex' }}>{children}</span>
+          would break button groups and flex rows it gets dropped into.
+          It shrinks to its content though, which silently cancels a `fullWidth`
+          button inside — hence the opt-in below rather than a width on every
+          wrapper, which would stretch the inline cases instead. */}
+      <span
+        style={{
+          display: 'inline-flex',
+          width: fullWidth ? '100%' : undefined
+        }}>
+        {children}
+      </span>
     </Tooltip>
   );
 };
@@ -40,7 +48,9 @@ const OfflineDisabled = ({ children, title = null }) => {
 OfflineDisabled.propTypes = {
   children: PropTypes.node.isRequired,
   // Overrides the generic wording when a screen can say something better.
-  title: PropTypes.string
+  title: PropTypes.string,
+  // Required when wrapping a `fullWidth` button, or it collapses to its label.
+  fullWidth: PropTypes.bool
 };
 
 export default OfflineDisabled;

@@ -29,7 +29,7 @@ const CountryPage = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchCountry(countryId));
+    reloadCountry();
     if (permissions.isAuth) {
       dispatch(fetchSubscriptions(userProperties.id));
     }

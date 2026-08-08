@@ -12,7 +12,12 @@ import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../../SearchDocumentForm';
 import Alert from '../../../common/Alert';
-import { usePermissions, useAuthNavigate } from '../../../../hooks';
+import OfflineDisabled from '../../../common/OfflineDisabled';
+import {
+  usePermissions,
+  useAuthNavigate,
+  useOnlineStatus
+} from '../../../../hooks';
 import DocumentsList from '../../../common/DocumentsList/DocumentsList';
 
 const DividerStyled = styled(Divider)`
@@ -26,6 +31,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
   );
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
   const dispatch = useDispatch();
+  const isOnline = useOnlineStatus();
 
   const onSubmitForm = newDocuments => {
     newDocuments.forEach(d => {
@@ -49,45 +55,55 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
         permissions.isAuth &&
         isEditAllowed && (
           <Box display="flex" gap={0.5}>
-            <Tooltip title={formatMessage({ id: 'Create a new document' })}>
-              <Button
-                color="secondary"
-                size="small"
-                variant="outlined"
-                onClick={navigateToNewDocument}
-                startIcon={<EntityIcon iconType="bibliography" size={20} />}>
-                {formatMessage({ id: 'New' })}
-              </Button>
-            </Tooltip>
-            <Tooltip
-              title={
-                isDocumentSearchVisible
-                  ? formatMessage({ id: 'Cancel this search' })
-                  : formatMessage({ id: 'Assign an existing document' })
-              }>
-              <Button
-                color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
-                size="small"
-                variant="outlined"
-                onClick={() =>
-                  setIsDocumentSearchVisible(!isDocumentSearchVisible)
-                }
-                startIcon={
-                  isDocumentSearchVisible ? (
-                    <CancelIcon />
-                  ) : (
-                    <EntityIcon
-                      iconType="bibliography"
-                      size={20}
-                      BadgeIcon={LinkIcon}
-                    />
-                  )
+            {/* Hand-rolled equivalent of NewEntityButton, which is already
+                guarded — align it rather than leave the odd one out. */}
+            <OfflineDisabled>
+              <Tooltip title={formatMessage({ id: 'Create a new document' })}>
+                <Button
+                  color="secondary"
+                  size="small"
+                  variant="outlined"
+                  disabled={!isOnline}
+                  onClick={navigateToNewDocument}
+                  startIcon={<EntityIcon iconType="bibliography" size={20} />}>
+                  {formatMessage({ id: 'New' })}
+                </Button>
+              </Tooltip>
+            </OfflineDisabled>
+            {/* Opening blocked offline, closing always allowed: this same
+                button becomes Cancel while the search panel is open. */}
+            <OfflineDisabled>
+              <Tooltip
+                title={
+                  isDocumentSearchVisible
+                    ? formatMessage({ id: 'Cancel this search' })
+                    : formatMessage({ id: 'Assign an existing document' })
                 }>
-                {formatMessage({
-                  id: isDocumentSearchVisible ? 'Cancel' : 'Associate'
-                })}
-              </Button>
-            </Tooltip>
+                <Button
+                  color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
+                  size="small"
+                  variant="outlined"
+                  disabled={!isOnline && !isDocumentSearchVisible}
+                  onClick={() =>
+                    setIsDocumentSearchVisible(!isDocumentSearchVisible)
+                  }
+                  startIcon={
+                    isDocumentSearchVisible ? (
+                      <CancelIcon />
+                    ) : (
+                      <EntityIcon
+                        iconType="bibliography"
+                        size={20}
+                        BadgeIcon={LinkIcon}
+                      />
+                    )
+                  }>
+                  {formatMessage({
+                    id: isDocumentSearchVisible ? 'Cancel' : 'Associate'
+                  })}
+                </Button>
+              </Tooltip>
+            </OfflineDisabled>
           </Box>
         )
       }

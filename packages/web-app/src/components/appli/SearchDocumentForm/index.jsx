@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 import { Box, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
+import OfflineDisabled from '@/components/common/OfflineDisabled';
+import { useOnlineStatus } from '@/hooks';
 import { resetAdvancedSearchResults } from '../../../actions/Advancedsearch';
 import DocumentSearch from '../AdvancedSearch/DocumentSearch';
 import SearchResults from '../AdvancedSearch/SearchResults';
@@ -18,6 +20,7 @@ const SpacedButton = styled(Button)`
 const SearchDocumentForm = ({ closeForm, onSubmit }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
+  const isOnline = useOnlineStatus();
   const [selectedDocuments, setSelectedDocuments] = useState([]);
 
   const resetAdvancedSearch = () => {
@@ -77,13 +80,18 @@ const SearchDocumentForm = ({ closeForm, onSubmit }) => {
         <SpacedButton variant="outlined" onClick={resetForm}>
           {formatMessage({ id: 'Reset' })}
         </SpacedButton>
-        <SpacedButton
-          disabled={selectedDocuments.length === 0}
-          color="primary"
-          type="submit"
-          onClick={handleOnSubmit}>
-          {associateMessage}
-        </SpacedButton>
+        {/* The parent turns this into a linkDocumentToEntrance write and closes
+            the panel straight away without reading the failure — so offline
+            this used to look like it had worked. See SearchOrganizationForm. */}
+        <OfflineDisabled>
+          <SpacedButton
+            disabled={selectedDocuments.length === 0 || !isOnline}
+            color="primary"
+            type="submit"
+            onClick={handleOnSubmit}>
+            {associateMessage}
+          </SpacedButton>
+        </OfflineDisabled>
       </Box>
     </Box>
   );

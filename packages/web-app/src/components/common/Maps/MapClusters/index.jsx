@@ -369,6 +369,7 @@ const HydratedMap = ({
   // MASSIFS_POLYGON_LIMIT (8). Rebuilt every render, but data (entrances,
   // networks, ...) are stable Redux references that only change when new tile
   // data arrives, so useCluster's kD-tree isn't rebuilt on unrelated renders.
+
   // Offline at detail zoom with nothing drawn: the tiles covering this area
   // were never fetched online, so they aren't in the service worker cache.
   // Checked against the layers actually visible — a hidden layer holding data
@@ -376,7 +377,8 @@ const HydratedMap = ({
   const hasVisibleMarkers =
     (visibleMarkers.includes(layerTypes.ENTRANCES) &&
       filteredEntranceMarkers.length > 0) ||
-    (visibleMarkers.includes(layerTypes.NETWORKS) && networkMarkers.length > 0) ||
+    (visibleMarkers.includes(layerTypes.NETWORKS) &&
+      networkMarkers.length > 0) ||
     (visibleMarkers.includes(layerTypes.ORGANIZATIONS) &&
       organizationMarkers.length > 0);
   const showOfflineDetailNotice =

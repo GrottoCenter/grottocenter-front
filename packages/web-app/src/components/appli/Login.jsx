@@ -190,7 +190,7 @@ const Login = () => {
   // Note this only affects signing IN: an existing session survives offline,
   // since the token lives in localStorage.
   const LoginButton = (
-    <OfflineDisabled>
+    <OfflineDisabled fullWidth>
       <Button
         type="submit"
         fullWidth

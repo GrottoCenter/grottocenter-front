@@ -11,7 +11,8 @@ import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../SearchDocumentForm';
 import Alert from '../../common/Alert';
-import { usePermissions } from '../../../hooks';
+import OfflineDisabled from '../../common/OfflineDisabled';
+import { usePermissions, useOnlineStatus } from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 
 const Documents = ({ documents, massifId }) => {
@@ -19,6 +20,7 @@ const Documents = ({ documents, massifId }) => {
   const permissions = usePermissions();
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
   const dispatch = useDispatch();
+  const isOnline = useOnlineStatus();
 
   const onSubmitForm = newDocuments => {
     newDocuments.forEach(d => {
@@ -35,33 +37,38 @@ const Documents = ({ documents, massifId }) => {
       title={formatMessage({ id: 'Documents' })}
       icon={
         permissions.isAuth && (
-          <Tooltip
-            title={formatMessage({
-              id: isDocumentSearchVisible
-                ? 'Cancel this search'
-                : 'Assign an existing document'
-            })}>
-            <Button
-              color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
-              size="small"
-              variant="outlined"
-              onClick={() => setIsDocumentSearchVisible(v => !v)}
-              startIcon={
-                isDocumentSearchVisible ? (
-                  <CancelIcon />
-                ) : (
-                  <EntityIcon
-                    iconType="bibliography"
-                    size={20}
-                    BadgeIcon={LinkIcon}
-                  />
-                )
-              }>
-              {formatMessage({
-                id: isDocumentSearchVisible ? 'Cancel' : 'Associate'
-              })}
-            </Button>
-          </Tooltip>
+          // Opening blocked offline, closing always allowed: this same button
+          // becomes Cancel while the search panel is open.
+          <OfflineDisabled>
+            <Tooltip
+              title={formatMessage({
+                id: isDocumentSearchVisible
+                  ? 'Cancel this search'
+                  : 'Assign an existing document'
+              })}>
+              <Button
+                color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
+                size="small"
+                variant="outlined"
+                disabled={!isOnline && !isDocumentSearchVisible}
+                onClick={() => setIsDocumentSearchVisible(v => !v)}
+                startIcon={
+                  isDocumentSearchVisible ? (
+                    <CancelIcon />
+                  ) : (
+                    <EntityIcon
+                      iconType="bibliography"
+                      size={20}
+                      BadgeIcon={LinkIcon}
+                    />
+                  )
+                }>
+                {formatMessage({
+                  id: isDocumentSearchVisible ? 'Cancel' : 'Associate'
+                })}
+              </Button>
+            </Tooltip>
+          </OfflineDisabled>
         )
       }
       content={

@@ -31,7 +31,7 @@ const RegionPage = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchRegion(countryId, regionId));
+    reloadRegion();
     if (permissions.isAuth) {
       dispatch(fetchSubscriptions(userProperties.id));
     }

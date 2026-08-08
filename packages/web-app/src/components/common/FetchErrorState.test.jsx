@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import FetchErrorState from './FetchErrorState';
@@ -54,6 +53,24 @@ describe('FetchErrorState', () => {
       renderState({ error: networkError, onRetry: vi.fn() });
 
       expect(screen.queryByText('Retry')).not.toBeInTheDocument();
+    });
+
+    // "Failed to fetch" also covers an unreachable API while the browser is
+    // perfectly online. Claiming the content "will load once you are back
+    // online" would be wrong there — and Retry can genuinely work.
+    it('keeps the entity error wording when the browser is still online', () => {
+      renderState({ error: networkError, onRetry: vi.fn() });
+
+      expect(
+        screen.getByText('Error, the entrance data is not available.')
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText('Not available offline')
+      ).not.toBeInTheDocument();
+      expect(screen.getByTestId('fetch-error-state')).toHaveClass(
+        'MuiAlert-standardError'
+      );
+      expect(screen.getByText('Retry')).toBeInTheDocument();
     });
   });
 
