@@ -218,11 +218,7 @@ const RelatedCaves = ({
           submitLabel={formatMessage({ id: 'Mark as explored' })}
         />
       )}
-      {!isOrganization && userId && (
-        <Box sx={{ mt: isCaveSearchVisible ? 0.25 : -2 }}>
-          <ExploredEntrancesMap userId={userId} />
-        </Box>
-      )}
+      {!isOrganization && userId && <ExploredEntrancesMap userId={userId} />}
       {listContent}
       <StandardDialog
         open={!!pendingRemove}
