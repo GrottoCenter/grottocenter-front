@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Box, Skeleton, Typography } from '@mui/material';
+import { Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 const Row = styled('div')(({ theme }) => ({
@@ -41,10 +41,19 @@ const Actions = styled('div')({
   flexShrink: 0
 });
 
+// The title collapses its leading (`lineHeight: 1` above) so the inline icon
+// centers on the em-box — which also removes the space that used to separate it
+// from the subheader. Put it back here, on the container, like Row does.
+const Root = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(0.5)
+}));
+
 const PageTitle = ({ title, icon, titleAdornment, subheader, actions }) => {
   const hasTitle = title !== undefined && title !== null;
   return (
-    <Box>
+    <Root>
       <Row>
         <TitleGroup>
           {hasTitle ? (
@@ -61,8 +70,8 @@ const PageTitle = ({ title, icon, titleAdornment, subheader, actions }) => {
         </TitleGroup>
         {actions && <Actions>{actions}</Actions>}
       </Row>
-      {subheader && <Box>{subheader}</Box>}
-    </Box>
+      {subheader}
+    </Root>
   );
 };
 
