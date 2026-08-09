@@ -20,12 +20,7 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import AppLink from '../AppLink';
 
-const ResponsiveActions = ({
-  items,
-  loading = false,
-  loadingLabel,
-  size
-}) => {
+const ResponsiveActions = ({ items, loading = false, loadingLabel, size }) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const [anchorEl, setAnchorEl] = useState(null);

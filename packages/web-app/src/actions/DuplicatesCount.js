@@ -10,10 +10,9 @@ export function fetchDuplicatesCount() {
   return (dispatch, getState) => {
     dispatch({ type: FETCH_DUPLICATES_COUNT });
 
-    return fetch(
-      makeUrl(getDuplicatesEntranceUrl, { limit: 1, skip: 0 }),
-      { headers: getState().login.authorizationHeader }
-    )
+    return fetch(makeUrl(getDuplicatesEntranceUrl, { limit: 1, skip: 0 }), {
+      headers: getState().login.authorizationHeader
+    })
       .then(checkAuthStatus(dispatch))
       .then(response => {
         const contentRange = response.headers.get('Content-Range');
