@@ -51,7 +51,9 @@ describe('AppLink', () => {
   });
 
   it('routes in-app when both props carry the same destination', () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
     renderLink(
       <AppLink to="/ui/map" href="/ui/map">
         Map
@@ -67,7 +69,9 @@ describe('AppLink', () => {
   });
 
   it('reports two destinations that disagree', () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
     renderLink(
       <AppLink to="/ui/map" href="https://example.org">
         Map
@@ -81,7 +85,12 @@ describe('AppLink', () => {
   });
 
   it('renders inert children when there is no destination', () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    // A destination-less AppLink is exactly what this test asserts against, so
+    // the rule that forbids one everywhere else has nothing to catch here.
+    // eslint-disable-next-line jsx-a11y/anchor-is-valid
     renderLink(<AppLink>Nowhere</AppLink>);
 
     expect(screen.queryByRole('link')).toBeNull();

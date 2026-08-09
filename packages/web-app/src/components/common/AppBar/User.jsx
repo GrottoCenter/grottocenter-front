@@ -21,10 +21,10 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
 
+import UserAvatar from '@/components/common/UserAvatar';
 import { fetchDuplicatesCount } from '../../../actions/DuplicatesCount';
 import { fetchPendingDocumentsCount } from '../../../actions/PendingDocumentsCount';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
-import UserAvatar from '@/components/common/UserAvatar';
 import Translate from '../Translate';
 import { usePermissions, useUserProperties } from '../../../hooks';
 

@@ -93,9 +93,7 @@ const ToolCard = ({
 
   return (
     <Card variant="outlined">
-      <CardActionArea
-        onClick={onClick}
-        aria-label={`${title} — ${roleLabel}`}>
+      <CardActionArea onClick={onClick} aria-label={`${title} — ${roleLabel}`}>
         <CardContent sx={{ position: 'relative', p: 2, pt: 3 }}>
           <Chip
             variant="outlined"
@@ -238,7 +236,6 @@ const Dashboard = () => {
     if (permissions.isLeader) {
       dispatch(fetchDBExportUrl());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, permissions.isLeader]);
 
   const showDataSection = permissions.isModerator || permissions.isLeader;
@@ -262,7 +259,9 @@ const Dashboard = () => {
                 <ToolCard
                   icon={<PeopleIcon />}
                   title={formatMessage({ id: 'Manage users' })}
-                  description={formatMessage({ id: 'Manage users description' })}
+                  description={formatMessage({
+                    id: 'Manage users description'
+                  })}
                   roleId="Administrator"
                   onClick={() => goTo('/ui/admin/users')}
                 />
