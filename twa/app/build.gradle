@@ -55,7 +55,10 @@ android {
     namespace "org.grottocenter.twa"
     defaultConfig {
         applicationId "org.grottocenter.twa"
-        minSdkVersion 21
+        // 23 (Android 6.0), not Bubblewrap's default of 21: androidbrowserhelper 2.7.x
+        // declares minSdk 23 and the manifest merger refuses anything lower. Forcing it
+        // with tools:overrideLibrary would only move the failure to runtime.
+        minSdkVersion 23
         targetSdkVersion 36
         versionCode 4
         versionName "4"
@@ -165,6 +168,13 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            // Without an explicit proguardFiles block AGP injects no default config at
+            // all, so R8 runs on the AAPT-generated rules only and its optimizer stays
+            // idle — which is what the Play Console reports as "optimization is not
+            // enabled". Use the `-optimize` variant: plain proguard-android.txt carries
+            // `-dontoptimize` and is deprecated.
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            shrinkResources true
             signingConfig signingConfigs.release
         }
     }
@@ -223,6 +233,10 @@ dependencies {
 
         implementation 'com.google.androidbrowserhelper:locationdelegation:1.1.2'
 
-        implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.6.2'
+        // Pinned ahead of Bubblewrap, which still generates 2.6.2. 2.7.x is what makes
+        // the splash screen edge-to-edge: it draws the system bar colors through
+        // androidx ProtectionLayout/ColorProtection instead of the Window.set*BarColor
+        // setters Android 15 deprecated. Re-check this line after any `bubblewrap update`.
+        implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.2'
 
 }

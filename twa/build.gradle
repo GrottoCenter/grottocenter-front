@@ -20,7 +20,7 @@ buildscript {
 
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.9.1'
@@ -30,10 +30,12 @@ buildscript {
     }
 }
 
+// jcenter() was in the Bubblewrap template but the repository has been shut down
+// since 2022 — every artifact here resolves from google() or mavenCentral().
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
