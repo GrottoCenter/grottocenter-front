@@ -14,10 +14,10 @@ import { NavigateNext } from '@mui/icons-material';
 import { LicenseBadge } from '@/components/common/LicenseTag';
 import { fetchLicense } from '@/actions/Licenses';
 import {
-  CHILDREN_SORT_ORDERS,
-  DEFAULT_CHILDREN_SORT_ORDER,
-  sortDocumentChildren
-} from '@/utils/documentChildrenSort';
+  DEFAULT_DOCUMENT_SORT_ORDER,
+  DOCUMENT_SORT_ORDERS,
+  sortDocuments
+} from '@/utils/documentSort';
 import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
 import AppLink from '../../components/common/AppLink';
 
@@ -142,15 +142,15 @@ const Document = ({
   const licensesLoading = useSelector(state => state.licenses.loading);
   const licensesError = useSelector(state => state.licenses.error);
   const [issuesSortOrder, setIssuesSortOrder] = useState(
-    DEFAULT_CHILDREN_SORT_ORDER
+    DEFAULT_DOCUMENT_SORT_ORDER
   );
   // Articles inside a collection rarely carry their own publication date, so
   // the alphabetical order is the one that actually helps here.
   const [articlesSortOrder, setArticlesSortOrder] = useState(
-    CHILDREN_SORT_ORDERS.TITLE
+    DOCUMENT_SORT_ORDERS.TITLE
   );
   const [otherSortOrder, setOtherSortOrder] = useState(
-    DEFAULT_CHILDREN_SORT_ORDER
+    DEFAULT_DOCUMENT_SORT_ORDER
   );
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
@@ -280,7 +280,7 @@ const Document = ({
     [documentChildren]
   );
   const sortedChildIssues = useMemo(
-    () => sortDocumentChildren(childIssues, issuesSortOrder, locale),
+    () => sortDocuments(childIssues, issuesSortOrder, locale),
     [childIssues, issuesSortOrder, locale]
   );
   const childArticles = useMemo(
@@ -288,7 +288,7 @@ const Document = ({
     [documentChildren]
   );
   const sortedChildArticles = useMemo(
-    () => sortDocumentChildren(childArticles, articlesSortOrder, locale),
+    () => sortDocuments(childArticles, articlesSortOrder, locale),
     [childArticles, articlesSortOrder, locale]
   );
   const childOther = useMemo(
@@ -299,7 +299,7 @@ const Document = ({
     [documentChildren]
   );
   const sortedChildOther = useMemo(
-    () => sortDocumentChildren(childOther, otherSortOrder, locale),
+    () => sortDocuments(childOther, otherSortOrder, locale),
     [childOther, otherSortOrder, locale]
   );
 

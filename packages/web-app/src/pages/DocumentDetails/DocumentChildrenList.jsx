@@ -1,28 +1,16 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import {
-  Box,
-  Chip,
-  List,
-  ListItem,
-  MenuItem,
-  Select,
-  Tooltip,
-  Typography
-} from '@mui/material';
+import { Box, Chip, List, ListItem, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import SwapVertIcon from '@mui/icons-material/SwapVert';
 import Linkify from 'linkify-react';
 
 import AppLink from '@/components/common/AppLink';
+import DocumentSortSelect from '@/components/common/DocumentSortSelect';
 import { getFileIcon } from '@/components/common/DocumentsList/utils/fileIcons';
 import linkifyOptions from '@/helpers/linkifyOptions';
-import {
-  canReorderDocumentChildren,
-  CHILDREN_SORT_ORDERS
-} from '@/utils/documentChildrenSort';
+import { canSortDocuments, DOCUMENT_SORT_ORDERS } from '@/utils/documentSort';
 import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON
@@ -96,58 +84,6 @@ AvailabilityMarker.propTypes = {
 };
 
 /* -------------------------------------------------------------------------- */
-/* Sort control                                                               */
-/* -------------------------------------------------------------------------- */
-
-const ChildrenSortSelect = ({ value, onChange }) => {
-  const { formatMessage } = useIntl();
-  const labels = {
-    [CHILDREN_SORT_ORDERS.DATE_DESC]: formatMessage({ id: 'Newest first' }),
-    [CHILDREN_SORT_ORDERS.DATE_ASC]: formatMessage({ id: 'Oldest first' }),
-    [CHILDREN_SORT_ORDERS.TITLE]: formatMessage({ id: 'Title' })
-  };
-  return (
-    <Select
-      variant="standard"
-      disableUnderline
-      value={value}
-      onChange={event => onChange(event.target.value)}
-      inputProps={{ 'aria-label': formatMessage({ id: 'Sort by' }) }}
-      renderValue={selected => (
-        <>
-          <SwapVertIcon fontSize="small" />
-          {labels[selected]}
-        </>
-      )}
-      // A control, not content: it stays muted and a notch below the body size
-      // so it reads without competing with the list it acts on.
-      sx={theme => ({
-        flexShrink: 0,
-        color: 'text.secondary',
-        '& .MuiSelect-select': {
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.5,
-          fontSize: theme.typography.body2.fontSize,
-          paddingTop: 0,
-          paddingBottom: 0
-        }
-      })}>
-      {Object.entries(labels).map(([order, label]) => (
-        <MenuItem key={order} value={order}>
-          {label}
-        </MenuItem>
-      ))}
-    </Select>
-  );
-};
-
-ChildrenSortSelect.propTypes = {
-  value: PropTypes.oneOf(Object.values(CHILDREN_SORT_ORDERS)).isRequired,
-  onChange: PropTypes.func.isRequired
-};
-
-/* -------------------------------------------------------------------------- */
 /* Header controls                                                            */
 /* -------------------------------------------------------------------------- */
 
@@ -169,10 +105,9 @@ const ControlsRow = styled('div')(({ theme }) => ({
  * section heading or straight into a card's own header row — where, unlike a row
  * added inside the card body, it costs no vertical space at all.
  *
- * The sort control only appears when a handler is passed AND reordering could
- * actually change the list — offering three orders that all produce the same
- * result, as happens when every document carries the same date, is noise. The
- * legend likewise only lists the states actually present.
+ * The sort control only appears when a handler is passed AND there is more than
+ * one document to order. The legend likewise only lists the states actually
+ * present.
  *
  * With neither — including when `documents` is missing entirely — the component
  * returns null rather than an empty row: an element that always renders still
@@ -186,15 +121,12 @@ export const ChildrenControls = ({
   const { formatMessage } = useIntl();
   // Up to four of these are instantiated per page render, and the parent
   // re-renders on every dialog / sort / license state change — so the array scan
-  // and the Set built by canReorderDocumentChildren are kept off that path.
+  // is kept off that path.
   const hasFiles = useMemo(
     () => (documents ?? []).some(doc => getAttachedFileName(doc)),
     [documents]
   );
-  const showSort = useMemo(
-    () => Boolean(onSortOrderChange) && canReorderDocumentChildren(documents),
-    [documents, onSortOrderChange]
-  );
+  const showSort = Boolean(onSortOrderChange) && canSortDocuments(documents);
   if (!hasFiles && !showSort) return null;
 
   return (
@@ -216,7 +148,7 @@ export const ChildrenControls = ({
         />
       )}
       {showSort && (
-        <ChildrenSortSelect value={sortOrder} onChange={onSortOrderChange} />
+        <DocumentSortSelect value={sortOrder} onChange={onSortOrderChange} />
       )}
     </ControlsRow>
   );
@@ -224,7 +156,7 @@ export const ChildrenControls = ({
 
 ChildrenControls.propTypes = {
   documents: PropTypes.arrayOf(DocumentChildPropTypes),
-  sortOrder: PropTypes.oneOf(Object.values(CHILDREN_SORT_ORDERS)),
+  sortOrder: PropTypes.oneOf(Object.values(DOCUMENT_SORT_ORDERS)),
   onSortOrderChange: PropTypes.func
 };
 

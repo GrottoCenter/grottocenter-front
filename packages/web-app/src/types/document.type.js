@@ -21,9 +21,11 @@ export const DocumentSimplePropTypes = PropTypes.shape({
   description: PropTypes.string
 });
 
-// Shape returned by GET /documents/{id}/children — richer than the simple
-// shape: it carries the publication date the list is ordered on and the files
-// the availability indicator is derived from.
+// The shape of a document as it comes attached to something else: the children
+// of a collection (GET /documents/{id}/children) and the documents of an
+// entrance, massif, organization or person, which the API returns identically.
+// Richer than the simple shape: it carries the dates the lists are ordered on
+// and the files the availability indicator is derived from.
 export const DocumentChildPropTypes = PropTypes.shape({
   id: PropTypes.number.isRequired,
   type: PropTypes.string,

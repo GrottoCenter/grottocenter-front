@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { useIntl } from 'react-intl';
 import {
   List,
   Typography,
@@ -10,6 +11,13 @@ import {
   Skeleton
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import DocumentSortSelect from '../DocumentSortSelect';
+import {
+  canSortDocuments,
+  DOCUMENT_SORT_ORDERS,
+  sortDocuments
+} from '../../../utils/documentSort';
+import { DocumentChildPropTypes } from '../../../types/document.type';
 import Document from './Document';
 import ImageLightbox from './ImageLightbox';
 import { isImageFile } from './utils/imageUtils';
@@ -65,13 +73,29 @@ const DocumentsList = ({
   onUnlink,
   itemsPerPage = 10
 }) => {
+  // Not `useSelector(state => state.intl)`: this component sits in `common/` and
+  // has no Redux dependency, and the provider's locale is the same value.
+  const { locale } = useIntl();
   const [page, setPage] = useState(1);
+  // Not the publication order the collections default to: a document attached
+  // to an entity is as often a survey or a photo as a publication, and those
+  // carry no publication date at all — they would all pile up at the end. What
+  // just arrived on the page is the useful answer here.
+  const [sortOrder, setSortOrder] = useState(DOCUMENT_SORT_ORDERS.ADDED_DESC);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
+  // Everything below reads this array, never `documents`: the image offsets are
+  // positional, so sorting anywhere downstream would make a thumbnail open its
+  // neighbour's picture in the lightbox.
+  const sortedDocuments = useMemo(
+    () => sortDocuments(documents, sortOrder, locale),
+    [documents, sortOrder, locale]
+  );
+
   const totalPages = useMemo(
-    () => Math.ceil((documents?.length || 0) / itemsPerPage),
-    [documents, itemsPerPage]
+    () => Math.ceil((sortedDocuments.length || 0) / itemsPerPage),
+    [sortedDocuments, itemsPerPage]
   );
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -80,7 +104,7 @@ const DocumentsList = ({
     const images = [];
     const offsets = [];
     const wide = [];
-    (documents ?? []).forEach(doc => {
+    sortedDocuments.forEach(doc => {
       const start = images.length;
       offsets.push(start);
       if (doc.files) {
@@ -99,7 +123,7 @@ const DocumentsList = ({
       wide.push(images.length - start >= GALLERY_MIN_IMAGES);
     });
     return { allImages: images, imageOffsets: offsets, isWide: wide };
-  }, [documents]);
+  }, [sortedDocuments]);
 
   const handleImageClick = useCallback(globalIndex => {
     setLightboxIndex(globalIndex);
@@ -116,17 +140,43 @@ const DocumentsList = ({
     );
   }
 
-  if (!documents?.length) return emptyMessageComponent ?? null;
+  if (!sortedDocuments.length) return emptyMessageComponent ?? null;
 
   return (
     <>
-      {title && (
-        <Typography variant="h3" gutterBottom>
-          {title}
-        </Typography>
+      {/* One row for the title and the control, so the select costs no vertical
+          space of its own on the lists that already have a heading. */}
+      {(title || canSortDocuments(sortedDocuments)) && (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: title ? 'space-between' : 'flex-end',
+            flexWrap: 'wrap',
+            columnGap: 2,
+            rowGap: 0.5,
+            mb: 0.5
+          }}>
+          {title && <Typography variant="h3">{title}</Typography>}
+          {canSortDocuments(sortedDocuments) && (
+            // Print keeps the title but drops the control: on paper the order is
+            // already fixed, and a dropdown is not something you can operate.
+            <Box sx={{ '@media print': { display: 'none' } }}>
+              <DocumentSortSelect
+                value={sortOrder}
+                onChange={order => {
+                  setSortOrder(order);
+                  // The document that was on screen is now somewhere else
+                  // entirely; landing back on page 1 is the only honest answer.
+                  setPage(1);
+                }}
+              />
+            </Box>
+          )}
+        </Box>
       )}
       <DocumentsGrid dense disablePadding>
-        {documents.map((document, i) => {
+        {sortedDocuments.map((document, i) => {
           const isOnPage = i >= startIndex && i < endIndex;
           return (
             <Box
@@ -176,7 +226,9 @@ const DocumentsList = ({
 };
 
 DocumentsList.propTypes = {
-  documents: PropTypes.arrayOf(PropTypes.shape(Document.propTypes)),
+  // Not `shape(Document.propTypes)`: that describes the component's prop table,
+  // not a document, so it validated nothing.
+  documents: PropTypes.arrayOf(DocumentChildPropTypes),
   isLoading: PropTypes.bool,
   title: PropTypes.node,
   emptyMessageComponent: PropTypes.node,
