@@ -336,6 +336,7 @@ const Organization = ({ error, isLoading, organization }) => {
                   toolTipTitle={formatMessage({
                     id: 'Remove from organization'
                   })}
+                  removeIcon={<PersonRemoveIcon />}
                   emptyMessage={
                     <Alert
                       severity="info"
@@ -383,7 +384,6 @@ const Organization = ({ error, isLoading, organization }) => {
                   label={formatMessage({ id: 'Add' })}
                   tooltip={formatMessage({ id: 'Add a cave' })}
                   openTooltip={formatMessage({ id: 'Cancel this search' })}
-                  size="medium"
                 />
               )
             }
