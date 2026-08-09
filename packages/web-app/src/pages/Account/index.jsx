@@ -1465,7 +1465,6 @@ const AccountPage = () => {
                     tooltip={formatMessage({ id: 'Join' })}
                     openTooltip={formatMessage({ id: 'Cancel this search' })}
                     icon={<PersonAddIcon />}
-                    size="medium"
                   />
                 }
                 content={
@@ -1507,7 +1506,6 @@ const AccountPage = () => {
                     tooltip={formatMessage({ id: 'Add an entrance' })}
                     openTooltip={formatMessage({ id: 'Cancel this search' })}
                     icon={<CheckCircleOutlineIcon />}
-                    size="medium"
                   />
                 }
                 content={
