@@ -16,7 +16,8 @@ const EntitiesList = ({
   entities = [],
   onItemRemove,
   emptyMessage = null,
-  toolTipTitle = 'Remove'
+  toolTipTitle = 'Remove',
+  removeIcon = <RemoveCircleIcon />
 }) => {
   const { formatMessage } = useIntl();
   const compareKey = type === 'person' ? 'nickname' : 'name';
@@ -39,7 +40,7 @@ const EntitiesList = ({
             onClick={() => onItemRemove(e.id)}
             color="error"
             sx={{ touchAction: 'manipulation' }}>
-            <RemoveCircleIcon />
+            {removeIcon}
           </IconButton>
         </Tooltip>
       )
@@ -95,7 +96,8 @@ EntitiesList.propTypes = {
   type: PropTypes.oneOf(['cave', 'person', 'entrance', 'organization']),
   emptyMessage: PropTypes.node,
   toolTipTitle: PropTypes.string,
-  onItemRemove: PropTypes.func
+  onItemRemove: PropTypes.func,
+  removeIcon: PropTypes.node
 };
 
 export default EntitiesList;

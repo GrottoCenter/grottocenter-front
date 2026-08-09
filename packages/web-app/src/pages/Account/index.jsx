@@ -1479,6 +1479,7 @@ const AccountPage = () => {
                       entities={person?.organizations}
                       onItemRemove={requestLeaveOrganization}
                       toolTipTitle={formatMessage({ id: 'Leave organization' })}
+                      removeIcon={<PersonRemoveIcon />}
                       emptyMessage={
                         !isOrgSearchVisible && (
                           <Alert
