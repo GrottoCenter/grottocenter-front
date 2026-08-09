@@ -300,14 +300,19 @@ bubblewrap update            # apply twa-manifest.json changes to the project
 >     }
 >     buildTypes {
 >         release {
->             minifyEnabled true
->             signingConfig signingConfigs.release   // ← add this line
+>             minifyEnabled true                     // ← Bubblewrap emits only this
+>             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+>             shrinkResources = true
+>             signingConfig = signingConfigs.release
 >         }
 >     }
 > }
 > ```
 >
-> Without it the release build is unsigned and Play rejects it.
+> Without the `signingConfig` the release build is unsigned and Play rejects it;
+> without the other two the Play Console reports the app as unoptimized. Bubblewrap
+> regenerates the `release` block with `minifyEnabled` alone, so all three lines have
+> to come back by hand.
 >
 > ⚠️ Same problem for **`targetSdkVersion`**: it is not exposed in
 > `twa-manifest.json`, so `bubblewrap update` resets it to whatever the installed
