@@ -202,6 +202,11 @@ FileListElement.propTypes = {
   filePath: PropTypes.string.isRequired
 };
 
+// The images *are* the document here, not entries in a list, so they get a
+// taller cap than the documents list default — the ceiling VideoPreview below
+// uses at `md`.
+const DOCUMENT_IMAGE_MAX_HEIGHT = 600;
+
 const VideoPreview = styled('video')(({ theme }) => ({
   width: '100%',
   maxHeight: 320,
@@ -344,6 +349,7 @@ export const FilesSection = ({ files }) => {
                 key={file.completePath}
                 src={src}
                 srcSet={srcSet}
+                maxHeight={DOCUMENT_IMAGE_MAX_HEIGHT}
                 alt={decodeFileName(file.fileName)}
                 onClick={() => setLightboxIndex(idx)}
               />

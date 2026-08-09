@@ -9,9 +9,33 @@ import {
   Paper,
   Skeleton
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import Document from './Document';
 import ImageLightbox from './ImageLightbox';
 import { isImageFile } from './utils/imageUtils';
+import { GALLERY_MIN_IMAGES } from './ImageThumbnail';
+
+// Documents are wildly uneven: a bare article needn't eat a whole desktop row
+// while a 15-photo gallery legitimately does. The 420px floor is wider than any
+// phone viewport, so `auto-fill` collapses to one column on mobile with no
+// breakpoint to maintain — and `min(100%, …)` stops that same floor overflowing
+// a 390px container sideways.
+const DocumentsGrid = styled(List)(({ theme }) => ({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))',
+  // Lets a short card backfill the hole a full-width gallery leaves behind.
+  gridAutoFlow: 'row dense',
+  alignItems: 'start',
+  gap: theme.spacing(1),
+  // The grid owns its spacing: without this the rhythm would come from the
+  // dense padding of a ListItem two components away, in another file.
+  '& .MuiListItem-root': { paddingTop: 0, paddingBottom: 0 },
+  // `gap` stops applying once the grid falls back to block flow.
+  '@media print': {
+    display: 'block',
+    '& > *': { marginBottom: theme.spacing(1) }
+  }
+}));
 
 const DocumentSkeleton = () => (
   <ListItem
@@ -52,11 +76,13 @@ const DocumentsList = ({
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
-  const { allImages, imageOffsets } = useMemo(() => {
+  const { allImages, imageOffsets, isWide } = useMemo(() => {
     const images = [];
     const offsets = [];
+    const wide = [];
     (documents ?? []).forEach(doc => {
-      offsets.push(images.length);
+      const start = images.length;
+      offsets.push(start);
       if (doc.files) {
         doc.files
           .filter(file => isImageFile(file.fileName))
@@ -68,8 +94,11 @@ const DocumentsList = ({
             })
           );
       }
+      // A gallery earns the full row: past the threshold its tiles no longer
+      // fit one card. Derived here rather than recounted at render time.
+      wide.push(images.length - start >= GALLERY_MIN_IMAGES);
     });
-    return { allImages: images, imageOffsets: offsets };
+    return { allImages: images, imageOffsets: offsets, isWide: wide };
   }, [documents]);
 
   const handleImageClick = useCallback(globalIndex => {
@@ -79,11 +108,11 @@ const DocumentsList = ({
 
   if (isLoading) {
     return (
-      <List dense disablePadding>
+      <DocumentsGrid dense disablePadding>
         {[0, 1, 2].map(i => (
           <DocumentSkeleton key={i} />
         ))}
-      </List>
+      </DocumentsGrid>
     );
   }
 
@@ -96,7 +125,7 @@ const DocumentsList = ({
           {title}
         </Typography>
       )}
-      <List dense disablePadding>
+      <DocumentsGrid dense disablePadding>
         {documents.map((document, i) => {
           const isOnPage = i >= startIndex && i < endIndex;
           return (
@@ -104,6 +133,9 @@ const DocumentsList = ({
               key={document.id}
               sx={{
                 display: isOnPage ? 'block' : 'none',
+                // `1 / -1` rather than `span 2`: a no-op in a single column,
+                // instead of forcing an implicit second one.
+                gridColumn: isWide[i] ? '1 / -1' : 'auto',
                 '@media print': { display: 'block' }
               }}>
               <Document
@@ -116,7 +148,7 @@ const DocumentsList = ({
             </Box>
           );
         })}
-      </List>
+      </DocumentsGrid>
       {totalPages > 1 && (
         <Box
           mt={1}

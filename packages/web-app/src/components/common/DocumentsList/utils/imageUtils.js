@@ -92,16 +92,15 @@ export const downloadFile = async (url, fileName) => {
   }
 };
 
+const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
+
 /**
  * Check if a file is an image based on its extension
  * @param {string} fileName - The name of the file
  * @returns {boolean} True if the file is an image
  */
-export const isImageFile = fileName => {
-  const extension = getFileExtension(fileName);
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-  return imageExtensions.includes(extension);
-};
+export const isImageFile = fileName =>
+  IMAGE_EXTENSIONS.has(getFileExtension(fileName));
 
 /**
  * Build `src`/`srcSet` for a responsive thumbnail card, falling back to
