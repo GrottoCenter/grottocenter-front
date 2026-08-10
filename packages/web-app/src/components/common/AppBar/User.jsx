@@ -53,13 +53,13 @@ const UserMenu = ({
   const hasDashboardAccess =
     permissions.isAdmin || permissions.isModerator || permissions.isLeader;
 
-  const bothCountsSucceeded =
-    pendingDocumentsCount.status === REDUCER_STATUS.SUCCEEDED &&
-    duplicatesCount.status === REDUCER_STATUS.SUCCEEDED;
+  // Counted per source rather than gated on both having succeeded: the two
+  // fetches are independent, so one failing must not hide what the other found.
+  const countOf = ({ status, value }) =>
+    status === REDUCER_STATUS.SUCCEEDED ? value : 0;
   const hasPendingTasks =
-    pendingDocumentsCount.value + duplicatesCount.value > 0;
-  const showPendingDot =
-    permissions.isModerator && bothCountsSucceeded && hasPendingTasks;
+    countOf(pendingDocumentsCount) + countOf(duplicatesCount) > 0;
+  const showPendingDot = permissions.isModerator && hasPendingTasks;
 
   useEffect(() => {
     if (permissions.isModerator) {
@@ -208,9 +208,7 @@ const UserMenu = ({
           <Translate>My contributions</Translate>
         </MenuItem>
         {hasDashboardAccess && (
-          <MenuItem
-            onClick={handleDashboardClick}
-            divider={!isSessionExpired}>
+          <MenuItem onClick={handleDashboardClick} divider={!isSessionExpired}>
             <ListItemIcon>
               <BuildIcon />
             </ListItemIcon>

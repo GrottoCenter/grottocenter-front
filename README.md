@@ -20,7 +20,7 @@ This project uses [Yarn](https://yarnpkg.com/) & [Yarn workspaces](https://yarnp
 
 ### Configuration
 
-By default the app uses the production API as backend. To change it, edit the `REACT_APP_API_URL` variable in `packages/web-app/.env`.
+By default the app uses the production API as backend. To change it, edit the `VITE_API_URL` variable in `packages/web-app/.env`.
 
 ### Packages
 

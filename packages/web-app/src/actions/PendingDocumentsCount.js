@@ -8,6 +8,9 @@ export const FETCH_PENDING_DOCUMENTS_COUNT_SUCCESS =
 export const FETCH_PENDING_DOCUMENTS_COUNT_FAILURE =
   'FETCH_PENDING_DOCUMENTS_COUNT_FAILURE';
 
+// TODO: replace with GET /api/v1/documents/count-pending-validation once the
+// API endpoint lands (GrottoCenter/grottocenter-api#1560). Until then the count
+// is read from the Content-Range of a 1-row page of the unvalidated list.
 export function fetchPendingDocumentsCount() {
   return (dispatch, getState) => {
     dispatch({ type: FETCH_PENDING_DOCUMENTS_COUNT });

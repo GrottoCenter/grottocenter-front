@@ -17,6 +17,13 @@ import {
 } from './utils/imageUtils';
 import { ThumbnailsPropTypes } from '../../../types/document.type';
 
+// The image is already scaled to fit the frame at 1, so anything below it would
+// shrink it inside an otherwise empty viewport — and panning is gated on
+// `zoom > MIN_ZOOM`, leaving no way to use the space it frees. Same floor as
+// `PdfPreview`'s `MIN_ZOOM`, for the same reason.
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 5;
+
 const LightboxDialog = styled(Dialog)`
   .MuiDialog-paper {
     background-color: rgba(0, 0, 0, 0.95);
@@ -148,17 +155,17 @@ const ImageLightbox = ({
   documentTitle = null
 }) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(MIN_ZOOM);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchPanning, setIsTouchPanning] = useState(false);
 
   // Only a zoomed-in image can be panned, so only it gets a grab cursor.
   let panCursor = 'default';
-  if (zoom > 1) panCursor = isDragging ? 'grabbing' : 'grab';
+  if (zoom > MIN_ZOOM) panCursor = isDragging ? 'grabbing' : 'grab';
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const touchStartDistance = useRef(null);
-  const zoomAtPinchStart = useRef(1);
+  const zoomAtPinchStart = useRef(MIN_ZOOM);
   const touchPanStart = useRef(null);
   const lastTapTime = useRef(0);
   const { formatMessage } = useIntl();
@@ -168,7 +175,7 @@ const ImageLightbox = ({
   }, [open, initialIndex]);
 
   useEffect(() => {
-    setZoom(1);
+    setZoom(MIN_ZOOM);
     setPosition({ x: 0, y: 0 });
   }, [currentIndex, open]);
 
@@ -185,9 +192,9 @@ const ImageLightbox = ({
 
   // Resetting the pan alongside the zoom: at 100% the image fits the viewport,
   // so a leftover offset would push it off-screen with no way left to drag it
-  // back (panning is gated on `zoom > 1`).
+  // back (panning is gated on `zoom > MIN_ZOOM`).
   const handleResetZoom = useCallback(() => {
-    setZoom(1);
+    setZoom(MIN_ZOOM);
     setPosition({ x: 0, y: 0 });
   }, []);
 
@@ -195,7 +202,7 @@ const ImageLightbox = ({
     e.preventDefault();
     e.stopPropagation();
     const delta = e.deltaY > 0 ? -0.2 : 0.2;
-    setZoom(prev => Math.min(Math.max(prev + delta, 0.5), 5));
+    setZoom(prev => Math.min(Math.max(prev + delta, MIN_ZOOM), MAX_ZOOM));
   }, []);
 
   const handleTouchMove = useCallback(e => {
@@ -209,9 +216,9 @@ const ImageLightbox = ({
         Math.min(
           Math.max(
             zoomAtPinchStart.current * (dist / touchStartDistance.current),
-            0.5
+            MIN_ZOOM
           ),
-          5
+          MAX_ZOOM
         )
       );
     } else if (e.touches.length === 1 && touchPanStart.current !== null) {
@@ -245,7 +252,7 @@ const ImageLightbox = ({
   );
 
   const handleMouseDown = e => {
-    if (zoom > 1) {
+    if (zoom > MIN_ZOOM) {
       e.preventDefault();
       setIsDragging(true);
       setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
@@ -269,7 +276,7 @@ const ImageLightbox = ({
         touchStartDistance.current = Math.sqrt(dx * dx + dy * dy);
         zoomAtPinchStart.current = zoom;
         touchPanStart.current = null;
-      } else if (e.touches.length === 1 && zoom > 1) {
+      } else if (e.touches.length === 1 && zoom > MIN_ZOOM) {
         touchStartDistance.current = null;
         touchPanStart.current = {
           x: e.touches[0].clientX,
@@ -293,7 +300,7 @@ const ImageLightbox = ({
     if (!wasPinch && e.changedTouches.length === 1) {
       const now = Date.now();
       if (now - lastTapTime.current < 300) {
-        setZoom(prev => (prev > 1 ? 1 : 2.5));
+        setZoom(prev => (prev > MIN_ZOOM ? MIN_ZOOM : 2.5));
         setPosition({ x: 0, y: 0 });
         lastTapTime.current = 0;
       } else {
@@ -358,7 +365,7 @@ const ImageLightbox = ({
           }}
         />
 
-        {zoom !== 1 && (
+        {zoom !== MIN_ZOOM && (
           <ZoomResetButton
             onClick={handleResetZoom}
             // The image behind reads raw pointer and touch events to pan and to

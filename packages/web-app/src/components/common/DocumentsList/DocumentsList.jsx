@@ -97,7 +97,12 @@ const DocumentsList = ({
     () => Math.ceil((sortedDocuments.length || 0) / itemsPerPage),
     [sortedDocuments, itemsPerPage]
   );
-  const startIndex = (page - 1) * itemsPerPage;
+  // `page` is state but the list under it is a prop: navigating to another
+  // entity, or unlinking the last document of the last page, can drop the count
+  // below it and leave the user on a blank page. Clamping rather than resetting
+  // to 1 moves them only when the page they were on stopped existing.
+  const currentPage = Math.min(page, Math.max(totalPages, 1));
+  const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
   const { allImages, imageOffsets, isWide } = useMemo(() => {
@@ -207,7 +212,7 @@ const DocumentsList = ({
           sx={{ '@media print': { display: 'none' } }}>
           <Pagination
             count={totalPages}
-            page={page}
+            page={currentPage}
             onChange={(_, newPage) => setPage(newPage)}
             color="primary"
           />
