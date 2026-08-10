@@ -6,7 +6,6 @@ import {
   MenuItem,
   Box,
   Typography,
-  Divider,
   Alert,
   ListItemIcon
 } from '@mui/material';
@@ -134,12 +133,12 @@ const UserMenu = ({
       </IconButton>
       <Menu
         id="menu-appbar"
+        disableAutoFocusItem
         anchorEl={anchorEl}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'right'
         }}
-        keepMounted
         transformOrigin={{
           vertical: 'top',
           horizontal: 'right'
@@ -158,10 +157,15 @@ const UserMenu = ({
         }}>
         {/* Primary content: User info */}
         <Box
+          component="li"
+          role="presentation"
+          muiSkipListHighlight
           sx={{
             px: 1,
             py: 1,
             bgcolor: 'action.hover',
+            borderBottom: 1,
+            borderColor: 'divider',
             display: 'flex',
             flexDirection: 'column'
           }}>
@@ -188,8 +192,6 @@ const UserMenu = ({
           </Typography>
         </Box>
 
-        <Divider />
-
         {/* Primary actions */}
         <MenuItem disabled={!userId} onClick={handleMyAccountClick}>
           <ListItemIcon>
@@ -197,15 +199,18 @@ const UserMenu = ({
           </ListItemIcon>
           <Translate>My Account</Translate>
         </MenuItem>
-        <MenuItem onClick={handleMyContributionsClick}>
+        <MenuItem
+          onClick={handleMyContributionsClick}
+          divider={!isSessionExpired}>
           <ListItemIcon>
             <ListAltIcon />
           </ListItemIcon>
           <Translate>My contributions</Translate>
         </MenuItem>
-        {hasDashboardAccess && [
-          <Divider key="management-tools-divider" />,
-          <MenuItem key="management-tools" onClick={handleDashboardClick}>
+        {hasDashboardAccess && (
+          <MenuItem
+            onClick={handleDashboardClick}
+            divider={!isSessionExpired}>
             <ListItemIcon>
               <BuildIcon />
             </ListItemIcon>
@@ -222,11 +227,15 @@ const UserMenu = ({
               />
             )}
           </MenuItem>
-        ]}
+        )}
 
         {/* Session expired warning */}
         {isSessionExpired && (
-          <Box sx={{ px: 1, py: '12px' }}>
+          <Box
+            component="li"
+            role="presentation"
+            muiSkipListHighlight
+            sx={{ px: 1, py: '12px' }}>
             <Alert severity="error">
               {formatMessage({
                 id: 'Your session has expired: please log in again.'
@@ -234,8 +243,6 @@ const UserMenu = ({
             </Alert>
           </Box>
         )}
-
-        <Divider />
 
         {/* Secondary actions */}
         <MenuItem onClick={handleLogoutClick}>
