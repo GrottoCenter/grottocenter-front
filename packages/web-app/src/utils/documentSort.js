@@ -13,6 +13,8 @@ export const DOCUMENT_SORT_ORDERS = {
 // The default here means "for the children of a collection": entity-attached
 // documents pick their own default (see DocumentsList) because a survey or a
 // photo carries no publication date, and they would all pile up at the end.
+// Value is `PUBLICATION_DESC` — most recent issue first, the reading order for a
+// collection.
 export const DEFAULT_COLLECTION_SORT_ORDER =
   DOCUMENT_SORT_ORDERS.PUBLICATION_DESC;
 

@@ -21,11 +21,11 @@ import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
 
 import UserAvatar from '@/components/common/UserAvatar';
-import { fetchDuplicatesCount } from '../../../actions/DuplicatesCount';
-import { fetchPendingDocumentsCount } from '../../../actions/PendingDocumentsCount';
-import REDUCER_STATUS from '../../../reducers/ReducerStatus';
+import { fetchDuplicatesCount } from '@/actions/DuplicatesCount';
+import { fetchPendingDocumentsCount } from '@/actions/PendingDocumentsCount';
+import REDUCER_STATUS from '@/reducers/ReducerStatus';
+import { usePermissions, useUserProperties } from '@/hooks';
 import Translate from '../Translate';
-import { usePermissions, useUserProperties } from '../../../hooks';
 
 // Constants
 const MENU_MIN_WIDTH = 250;

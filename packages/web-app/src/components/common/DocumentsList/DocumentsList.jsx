@@ -101,6 +101,9 @@ const DocumentsList = ({
   // entity, or unlinking the last document of the last page, can drop the count
   // below it and leave the user on a blank page. Clamping rather than resetting
   // to 1 moves them only when the page they were on stopped existing.
+  // State is left intentionally unclamped: the next Pagination click or entity
+  // load resets it naturally, so writing `setPage(currentPage)` here would only
+  // add a render.
   const currentPage = Math.min(page, Math.max(totalPages, 1));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
