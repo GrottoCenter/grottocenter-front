@@ -11,8 +11,8 @@
 
 - **Type**: React SPA · Yarn monorepo
 - **License**: CC-BY-SA-3.0
-- **Repository**: <https://github.com/Grottocenter/grottocenter-front>
-- **Backend API**: <https://github.com/Grottocenter/grottocenter-api>
+- **Repository**: <https://github.com/GrottoCenter/grottocenter-front>
+- **Backend API**: <https://github.com/GrottoCenter/grottocenter-api>
 - **Production**: <https://fr.wikicaves.org/>
 - **API Swagger UI**: <https://grottocenter.org/ui/api/1>
 - **API raw spec**: <https://api.grottocenter.org/api/v1/swagger.yaml>
@@ -498,9 +498,9 @@ size and the lower one, being no lighter, reads as the louder of the two.
 
 ## 📚 References
 
-- [Repository](https://github.com/Grottocenter/grottocenter-front)
-- [Wiki](https://github.com/Grottocenter/grottocenter-front/wiki)
-- [Backend API](https://github.com/Grottocenter/grottocenter-api)
+- [Repository](https://github.com/GrottoCenter/grottocenter-front)
+- [Wiki](https://github.com/GrottoCenter/grottocenter-front/wiki)
+- [Backend API](https://github.com/GrottoCenter/grottocenter-api)
 - [ESLint Airbnb](https://github.com/airbnb/javascript)
 - [Redux Style Guide](https://redux.js.org/style-guide)
 - [React-Intl](https://formatjs.io/docs/react-intl/)

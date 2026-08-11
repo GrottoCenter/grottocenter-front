@@ -1,7 +1,7 @@
 # Grottocenter Front
 
-[![Lint](https://github.com/Grottocenter/grottocenter-front/actions/workflows/lint.yml/badge.svg?branch=develop)](https://github.com/Grottocenter/grottocenter-front/actions/workflows/lint.yml)
-[![Test](https://github.com/Grottocenter/grottocenter-front/actions/workflows/test.yml/badge.svg?branch=develop)](https://github.com/Grottocenter/grottocenter-front/actions/workflows/test.yml)
+[![Lint](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/lint.yml/badge.svg?branch=develop)](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/lint.yml)
+[![Test](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/test.yml/badge.svg?branch=develop)](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/test.yml)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
 [![Uptime](https://uptime.betterstack.com/status-badges/v2/monitor/29ko2.svg)](https://wikicaves.betteruptime.com)
 
@@ -10,7 +10,7 @@ Web app frontend for [Grottocenter](https://fr.wikicaves.org/), the Wiki databas
 This project uses [Yarn](https://yarnpkg.com/) & [Yarn workspaces](https://yarnpkg.com/features/workspaces).
 
 > [!NOTE]
-> For the backend server see [Grottocenter/grottocenter-api](https://github.com/Grottocenter/grottocenter-api).
+> For the backend server see [Grottocenter/grottocenter-api](https://github.com/GrottoCenter/grottocenter-api).
 
 ## 🚀 Getting Started
 
@@ -68,7 +68,7 @@ guide: PWA/service-worker setup, keystore generation, Play App Signing,
 
 ## ☁️ Production deployment (Azure)
 
-[Full wiki article](https://github.com/Grottocenter/grottocenter-front/wiki/Production-deployment-(Azure))
+[Full wiki article](https://github.com/GrottoCenter/grottocenter-front/wiki/Production-deployment-(Azure))
 
 ## 🤖 AI Agents
 
