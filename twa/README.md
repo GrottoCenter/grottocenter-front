@@ -314,6 +314,31 @@ bubblewrap update            # apply twa-manifest.json changes to the project
 > Bubblewrap version emits. Google Play requires the target API to be at most one
 > year behind the latest Android release (**API 36 minimum from 2026-08-31**), so
 > check that line after every regeneration.
+>
+> ⚠️ The same goes for everything below — Bubblewrap 1.25 still generates an AGP 8
+> project with an unoptimized R8 setup, so a regeneration silently undoes all of it
+> and the Play Console warnings come back:
+>
+> In `app/build.gradle`:
+>
+> - `androidbrowserhelper:2.7.2` — Bubblewrap still pins 2.6.2, and 2.7.x is what
+>   makes the splash screen edge-to-edge
+> - `minSdk 23` — 2.7.x will not merge below it
+> - `shrinkResources`, `proguardFiles …-optimize.txt`, `proguard-rules.pro`
+> - AGP 9 DSL — `compileSdk`/`minSdk`/`targetSdk`, `lint {}`,
+>   `buildFeatures { resValues = true }`
+>
+> Elsewhere:
+>
+> - `build.gradle` — `com.android.tools.build:gradle:9.3.1`, `mavenCentral()`
+>   instead of the shut-down `jcenter()`
+> - `gradle.properties` — `android.enableR8.fullMode=true`
+> - `app/src/main/res/raw/keep.xml` — a new file Bubblewrap never generates
+> - `app/src/main/AndroidManifest.xml` — no `package=` attribute (AGP 9 rejects it)
+>
+> `buildFeatures { resValues = true }` is the dangerous one: without it AGP 9 builds
+> an app whose every generated string and color resolves to nothing, and the build
+> still succeeds.
 
 Then **commit the regenerated project** so CI builds the updated app:
 

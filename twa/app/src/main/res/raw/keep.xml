@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    androidbrowserhelper resolves this string through Resources.getIdentifier(), by
+    name, so no compiled reference points at it and the shrinker cannot see it is
+    used. AGP 9's optimized resource shrinking drops it as a result, and the
+    "your Chrome is out of date" toast then silently never shows — ChromeUpdatePrompt
+    treats a missing resource as "skip the toast" rather than failing loudly.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@string/update_chrome_toast" />
