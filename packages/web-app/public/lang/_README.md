@@ -23,4 +23,4 @@ Here is an example locale stringfile for the Spanish language (`lang/es.json`):
 
 ## Usage
 
-See [our dedicated wiki page](https://github.com/Grottocenter/grottocenter-front/wiki/Translation-workflow) for more information.
+See [our dedicated wiki page](https://github.com/GrottoCenter/grottocenter-front/wiki/Translation-workflow) for more information.
