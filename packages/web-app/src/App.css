@@ -17,7 +17,15 @@ code {
   transition: opacity 0.5s;
 }
 
-.leaflet-popup-content {
+/*
+ * Every popup rule that has a Leaflet counterpart is scoped with
+ * `.leaflet-container` (popups always live inside it) to sit one class above
+ * it. Source order cannot break those ties in our favour: the build splits
+ * `leaflet.css` into its own chunk, which index.html loads AFTER this file, so
+ * an equal-specificity Leaflet rule wins every time. The extra class settles it
+ * regardless of injection order.
+ */
+.leaflet-container .leaflet-popup-content {
   margin: 10px 14px;
   max-width: 260px;
 }
@@ -29,7 +37,11 @@ code {
   gap: 6px;
 }
 
-.map-popup-property p {
+/* Outranks Leaflet's `.leaflet-popup-content p { margin: 1.3em 0 }`. That one
+   used to be ~10px per side under the app's former 62.5% root and is now ~17px,
+   and the margins do not collapse (the <p> is a flex item), so losing this tie
+   pushes the popup rows a full line apart. */
+.leaflet-container .map-popup-property p {
   margin: 2px 0;
 }
 
@@ -58,8 +70,10 @@ code {
  * detached popup HTML it falls back to the browser-default blue). Align with
  * the app convention: MUI <Link> defaults to palette.primary.main (brown[700]).
  * Also avoids clashing with blue, which now means "network highlight".
+ * Scoped as above: unqualified, this rule ties with Leaflet's
+ * `.leaflet-container a { color: #0078A8 }` and loses on order.
  */
-.leaflet-popup-content a {
+.leaflet-container .leaflet-popup-content a {
   color: #5d4037;
 }
 
