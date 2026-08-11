@@ -10,6 +10,12 @@
 # here. The one such case is the TrustedWebActivityService binding: the platform
 # resolves it through the manifest, but R8 full mode strips the no-arg constructor
 # of classes it thinks are never instantiated from code.
+#
+# locationdelegation.PermissionRequestActivity is not listed below: Chrome / the
+# TWA host resolves it through PackageManager intent resolution, so the class
+# itself is kept by R8's activity rules derived from the manifest. If the
+# geolocation permission prompt ever stops working under R8, add:
+#   -keep class com.google.androidbrowserhelper.locationdelegation.PermissionRequestActivity { <init>(); }
 -keep class com.google.androidbrowserhelper.trusted.DelegationService { <init>(); }
 -keep class org.grottocenter.twa.DelegationService { <init>(); }
 

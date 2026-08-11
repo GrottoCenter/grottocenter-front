@@ -175,7 +175,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled = true
             // Without an explicit proguardFiles block AGP injects no default config at
             // all, so R8 runs on the AAPT-generated rules only and its optimizer stays
             // idle — which is what the Play Console reports as "optimization is not
@@ -199,7 +199,7 @@ android {
 // configuration phase, so it rewrote a tracked source file on every invocation —
 // even `./gradlew tasks`. Registering it and moving the work into doLast makes it
 // an ordinary task: lazily created, and only writing when it actually runs.
-tasks.register('generateShorcutsFile') {
+tasks.register('generateShortcutsFile') {
     doLast {
         assert twaManifest.shortcuts.size() < 5, "You can have at most 4 shortcuts."
         twaManifest.shortcuts.eachWithIndex { s, i ->
@@ -254,7 +254,7 @@ tasks.register('generateShorcutsFile') {
     }
 }
 
-tasks.named('preBuild') { dependsOn('generateShorcutsFile') }
+tasks.named('preBuild') { dependsOn('generateShortcutsFile') }
 
 repositories {
 

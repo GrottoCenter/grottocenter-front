@@ -300,7 +300,7 @@ bubblewrap update            # apply twa-manifest.json changes to the project
 >     }
 >     buildTypes {
 >         release {
->             minifyEnabled true                     // ← Bubblewrap emits only this
+>             minifyEnabled = true                   // ← Bubblewrap emits `minifyEnabled true`
 >             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 >             shrinkResources = true
 >             signingConfig = signingConfigs.release
@@ -332,6 +332,11 @@ bubblewrap update            # apply twa-manifest.json changes to the project
 > - `shrinkResources`, `proguardFiles …-optimize.txt`, `proguard-rules.pro`
 > - AGP 9 DSL — `compileSdk`/`minSdk`/`targetSdk`, `lint {}`,
 >   `buildFeatures { resValues = true }`
+> - `tasks.register('generateShortcutsFile') { doLast { … } }` and
+>   `tasks.named('preBuild') { dependsOn('generateShortcutsFile') }` — Bubblewrap
+>   emits a bare `task generateShorcutsFile { … }` (note the typo) whose body runs
+>   during Gradle's configuration phase, so it rewrites `shortcuts.xml` on every
+>   invocation. The registered form makes it lazy and only writes when it runs.
 >
 > Elsewhere:
 >
