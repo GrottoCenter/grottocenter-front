@@ -1,6 +1,6 @@
 import {
   canSortDocuments,
-  DEFAULT_DOCUMENT_SORT_ORDER,
+  DEFAULT_COLLECTION_SORT_ORDER,
   DOCUMENT_SORT_ORDERS,
   sortDocuments
 } from './documentSort';
@@ -30,15 +30,18 @@ describe('canSortDocuments', () => {
 
 describe('sortDocuments', () => {
   it('defaults to publication date, newest first', () => {
-    expect(DEFAULT_DOCUMENT_SORT_ORDER).toBe(
-      DOCUMENT_SORT_ORDERS.PUBLICATION_DESC
-    );
     const sorted = sortDocuments([
       doc('b', '2001'),
       doc('c', '2003'),
       doc('a', '2002')
     ]);
     expect(titles(sorted)).toEqual(['c', 'a', 'b']);
+  });
+
+  it('exports the same order as the collection default', () => {
+    expect(DEFAULT_COLLECTION_SORT_ORDER).toBe(
+      DOCUMENT_SORT_ORDERS.PUBLICATION_DESC
+    );
   });
 
   it('sorts by publication date, oldest first on request', () => {

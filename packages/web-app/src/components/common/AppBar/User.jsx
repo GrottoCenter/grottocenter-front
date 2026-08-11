@@ -59,6 +59,9 @@ const UserMenu = ({
     status === REDUCER_STATUS.SUCCEEDED ? value : 0;
   const hasPendingTasks =
     countOf(pendingDocumentsCount) + countOf(duplicatesCount) > 0;
+  // Deliberately narrower than `hasDashboardAccess`: only moderators act on the
+  // duplicates and pending-documents queues, so the dot would be noise for
+  // admins and leaders even though they can reach the dashboard too.
   const showPendingDot = permissions.isModerator && hasPendingTasks;
 
   useEffect(() => {

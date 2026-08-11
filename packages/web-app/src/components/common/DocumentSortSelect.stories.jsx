@@ -2,13 +2,13 @@ import { useState } from 'react';
 
 import DocumentSortSelect from './DocumentSortSelect';
 import {
-  DEFAULT_DOCUMENT_SORT_ORDER,
+  DEFAULT_COLLECTION_SORT_ORDER,
   DOCUMENT_SORT_ORDERS
 } from '../../utils/documentSort';
 
 // The control is fully controlled, so a plain `args` story would never move.
 const StatefulSelect = () => {
-  const [value, setValue] = useState(DEFAULT_DOCUMENT_SORT_ORDER);
+  const [value, setValue] = useState(DEFAULT_COLLECTION_SORT_ORDER);
   return <DocumentSortSelect value={value} onChange={setValue} />;
 };
 
