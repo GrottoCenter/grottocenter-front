@@ -33,7 +33,7 @@ const RecentChanges = () => {
         <HistoryOutlined color="primary" sx={{ fontSize: 28 }} />
         <Typography
           id="recent-changes-title"
-          variant="h5"
+          variant="h3"
           component="h2"
           fontWeight={600}
           color="primary">

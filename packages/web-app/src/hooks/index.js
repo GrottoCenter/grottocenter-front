@@ -34,3 +34,4 @@ export { useOnlineStatus } from './useOnlineStatus';
 export { useRefetchOnReconnect } from './useRefetchOnReconnect';
 export { useIsDesktopLayout } from './useIsDesktopLayout';
 export { useSideMenuOffset } from './useSideMenuOffset';
+export { useCanPromoteApp } from './useCanPromoteApp';

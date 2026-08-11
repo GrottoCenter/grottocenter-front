@@ -9,7 +9,9 @@ import { usePermissions } from '../../hooks';
 
 import Header from './Header';
 import HeroStats from './HeroStats';
+import AppPromoBanner from './AppPromoBanner';
 import Welcome from './Welcome';
+import JoinCommunity from './JoinCommunity';
 import Footer from './Footer';
 import FeedbackButton from '../../components/common/FeedbackButton';
 
@@ -43,7 +45,9 @@ const HomePage = () => {
       <Header />
       <Box component="main">
         <HeroStats />
+        <AppPromoBanner />
         <Welcome />
+        <JoinCommunity />
         <Suspense fallback={<Box sx={{ minHeight: 200 }} />}>
           <RandomEntry />
           <RecentChanges />

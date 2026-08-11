@@ -38,9 +38,7 @@ const GoalCard = styled(Box)({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
-  gap: 8,
-  transition: 'background-color 0.2s',
-  '&:hover': { backgroundColor: 'rgba(255,255,255,0.12)' }
+  gap: 8
 });
 
 const GOALS = [
@@ -107,7 +105,7 @@ const Association = () => {
           </Box>
           <Typography
             id="association-title"
-            variant="h5"
+            variant="h3"
             component="h2"
             fontWeight={600}
             sx={{ color: 'secondary.main' }}>
@@ -207,7 +205,18 @@ const Association = () => {
             target="_blank"
             rel="noopener noreferrer"
             startIcon={<FavoriteBorder />}
-            sx={{ fontWeight: 600, px: 3, textTransform: 'none' }}>
+            sx={theme => ({
+              fontWeight: 600,
+              px: 3,
+              textTransform: 'none',
+              borderRadius: 999,
+              boxShadow: theme.shadows[3],
+              transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: theme.shadows[6]
+              }
+            })}>
             {formatMessage({ id: 'Donate now' })}
           </Button>
         </Box>

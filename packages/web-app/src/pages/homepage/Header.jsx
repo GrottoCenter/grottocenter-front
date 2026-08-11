@@ -49,7 +49,15 @@ const CTARow = styled(Box)(({ theme }) => ({
     gap: 16
   },
   '& > .MuiButton-root': {
-    minWidth: 220
+    minWidth: 220,
+    borderRadius: 999,
+    padding: '10px 28px',
+    boxShadow: theme.shadows[3],
+    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+    '&:hover': {
+      transform: 'translateY(-2px)',
+      boxShadow: theme.shadows[6]
+    }
   }
 }));
 
