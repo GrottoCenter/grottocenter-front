@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { alpha, styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import { useCanPromoteApp } from '../../hooks';
 
@@ -23,7 +23,7 @@ const Banner = styled('section')(({ theme }) => ({
     flexDirection: 'column',
     gap: 8,
     padding: '0 20px 10px',
-    textAlign: 'center',
+    textAlign: 'center'
   }
 }));
 

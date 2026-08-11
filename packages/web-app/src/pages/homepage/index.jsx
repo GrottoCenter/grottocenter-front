@@ -10,6 +10,7 @@ import { usePermissions } from '../../hooks';
 import Header from './Header';
 import HeroStats from './HeroStats';
 import AppPromoBanner from './AppPromoBanner';
+import IosInstallPrompt from './IosInstallPrompt';
 import Welcome from './Welcome';
 import JoinCommunity from './JoinCommunity';
 import Footer from './Footer';
@@ -58,6 +59,7 @@ const HomePage = () => {
       </Box>
       <Footer />
       <FeedbackButton />
+      <IosInstallPrompt />
     </HomepageWrapper>
   );
 };

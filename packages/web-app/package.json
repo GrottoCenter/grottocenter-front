@@ -60,6 +60,7 @@
     "react-error-boundary": "^6.1.2",
     "react-hook-form": "^7.83.0",
     "react-intl": "^8.1.4",
+    "react-ios-pwa-prompt": "^2.0.6",
     "react-leaflet": "^5.0.0",
     "react-leaflet-draw": "^0.21.0",
     "react-papaparse": "^4.4.0",

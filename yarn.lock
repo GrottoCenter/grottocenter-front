@@ -2247,6 +2247,7 @@ __metadata:
     react-error-boundary: "npm:^6.1.2"
     react-hook-form: "npm:^7.83.0"
     react-intl: "npm:^8.1.4"
+    react-ios-pwa-prompt: "npm:^2.0.6"
     react-leaflet: "npm:^5.0.0"
     react-leaflet-draw: "npm:^0.21.0"
     react-papaparse: "npm:^4.4.0"
@@ -11764,6 +11765,16 @@ __metadata:
     typescript:
       optional: true
   checksum: 10/22f16ea88d09104663053d25fe57b4f1764e4aa7b8537857d6bd5e5bfd4147c26f506b4503eb8dbc9090d80434ea1c94142a64535a369704934a5646d6847679
+  languageName: node
+  linkType: hard
+
+"react-ios-pwa-prompt@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "react-ios-pwa-prompt@npm:2.0.6"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 10/473062976e499958ab2d62871e591a1317efa4fc9212ecd6ace2deb07de728c338bebf4a55fee2be391b7172ff52bdbc5f408019eb888c69ea4ea22122ff2b0b
   languageName: node
   linkType: hard
 

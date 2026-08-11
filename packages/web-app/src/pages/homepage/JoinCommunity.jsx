@@ -108,7 +108,10 @@ const JoinCommunity = () => {
             id: 'Create a free account and unlock the full contribution power of Grottocenter.'
           })}
         </Subtitle>
-        <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: { xs: 3, sm: 4 } }}>
+        <Grid
+          container
+          spacing={{ xs: 2, sm: 3 }}
+          sx={{ mb: { xs: 3, sm: 4 } }}>
           {BENEFITS.map(({ id, Icon }) => (
             <Grid key={id} size={{ xs: 6, sm: 3 }}>
               <BenefitTile>
