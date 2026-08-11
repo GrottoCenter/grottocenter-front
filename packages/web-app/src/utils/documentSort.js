@@ -10,7 +10,10 @@ export const DOCUMENT_SORT_ORDERS = {
   TITLE: 'title'
 };
 
-export const DEFAULT_DOCUMENT_SORT_ORDER =
+// The default here means "for the children of a collection": entity-attached
+// documents pick their own default (see DocumentsList) because a survey or a
+// photo carries no publication date, and they would all pile up at the end.
+export const DEFAULT_COLLECTION_SORT_ORDER =
   DOCUMENT_SORT_ORDERS.PUBLICATION_DESC;
 
 const DATE_FIELDS = {
@@ -66,7 +69,7 @@ export const canSortDocuments = documents => (documents?.length ?? 0) >= 2;
 
 export const sortDocuments = (
   documents,
-  order = DEFAULT_DOCUMENT_SORT_ORDER,
+  order = DOCUMENT_SORT_ORDERS.PUBLICATION_DESC,
   locale = 'en'
 ) => {
   const sorted = [...(documents ?? [])];
@@ -90,9 +93,10 @@ export const sortDocuments = (
   }
   // An unknown order lands on the default rather than leaving the list in the
   // raw API order, which is what the sort exists to replace.
-  const field = DATE_FIELDS[order] ?? DATE_FIELDS[DEFAULT_DOCUMENT_SORT_ORDER];
+  const field =
+    DATE_FIELDS[order] ?? DATE_FIELDS[DOCUMENT_SORT_ORDERS.PUBLICATION_DESC];
   const direction =
-    DIRECTIONS[order] ?? DIRECTIONS[DEFAULT_DOCUMENT_SORT_ORDER];
+    DIRECTIONS[order] ?? DIRECTIONS[DOCUMENT_SORT_ORDERS.PUBLICATION_DESC];
   return sorted.sort((a, b) =>
     compareByDate(a, b, { field, compare, direction })
   );

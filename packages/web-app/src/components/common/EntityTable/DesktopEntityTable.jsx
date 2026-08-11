@@ -325,6 +325,10 @@ const DesktopEntityTable = ({
     if (onPageChange) onPageChange(0, nbRowPerPage);
   };
 
+  // Mount-only: syncs the parent to the rowsPerPage restored from localStorage
+  // when it differs from the default. Adding `rowsPerPage`/`onPageChange` to the
+  // deps would fire again on every user-driven change and reset `page` to 0
+  // after the handlers above have already positioned it.
   useEffect(() => {
     if (onPageChange && rowsPerPage !== pageSizeOptions[0]) {
       onPageChange(0, rowsPerPage);

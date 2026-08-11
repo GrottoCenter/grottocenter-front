@@ -14,7 +14,7 @@ import { NavigateNext } from '@mui/icons-material';
 import { LicenseBadge } from '@/components/common/LicenseTag';
 import { fetchLicense } from '@/actions/Licenses';
 import {
-  DEFAULT_DOCUMENT_SORT_ORDER,
+  DEFAULT_COLLECTION_SORT_ORDER,
   DOCUMENT_SORT_ORDERS,
   sortDocuments
 } from '@/utils/documentSort';
@@ -142,7 +142,7 @@ const Document = ({
   const licensesLoading = useSelector(state => state.licenses.loading);
   const licensesError = useSelector(state => state.licenses.error);
   const [issuesSortOrder, setIssuesSortOrder] = useState(
-    DEFAULT_DOCUMENT_SORT_ORDER
+    DEFAULT_COLLECTION_SORT_ORDER
   );
   // Articles inside a collection rarely carry their own publication date, so
   // the alphabetical order is the one that actually helps here.
@@ -150,7 +150,7 @@ const Document = ({
     DOCUMENT_SORT_ORDERS.TITLE
   );
   const [otherSortOrder, setOtherSortOrder] = useState(
-    DEFAULT_DOCUMENT_SORT_ORDER
+    DEFAULT_COLLECTION_SORT_ORDER
   );
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
