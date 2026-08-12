@@ -97,6 +97,7 @@ const DocumentValidationPage = () => {
                   isLoading={isLoading}
                   pageRows={data.documents}
                   nbTotalRows={totalCount}
+                  selectedIds={selectedIds}
                   onPageChange={(pageNum, pageSize) => {
                     setPage(pageNum);
                     setRowsPerPage(pageSize);

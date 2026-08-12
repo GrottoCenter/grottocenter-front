@@ -172,14 +172,16 @@ const MobileEntityList = ({
   icon,
   renderCellFn,
   onSelected = null,
+  selectedIds: controlledSelectedIds,
   onRowClick = null
 }) => {
   const [allRows, setAllRows] = useState(rows ?? []);
   const [page, setPage] = useState(0);
-  const [selectedIds, setSelectedIds] = useState([]);
+  const [internalSelectedIds, setInternalSelectedIds] = useState([]);
+  const selectedIds = controlledSelectedIds ?? internalSelectedIds;
   const isAppending = useRef(false);
   const hasInteracted = useRef(false);
-  // Keep a stable ref to the callback so handleToggle never changes reference
+  // Keep callback changes from retriggering the internal selection effect.
   const onSelectedRef = useRef(onSelected);
   onSelectedRef.current = onSelected;
 
@@ -187,7 +189,7 @@ const MobileEntityList = ({
     if (!isNewQuery) return;
     setAllRows([]);
     setPage(0);
-    setSelectedIds([]);
+    setInternalSelectedIds([]);
     hasInteracted.current = false;
     isAppending.current = false;
   }, [isNewQuery]);
@@ -211,16 +213,27 @@ const MobileEntityList = ({
   // stable and avoid triggering on every parent re-render that recreates the callback.
   useEffect(() => {
     if (!hasInteracted.current) return;
-    if (onSelectedRef.current) onSelectedRef.current(selectedIds);
-  }, [selectedIds]);
+    if (onSelectedRef.current) onSelectedRef.current(internalSelectedIds);
+  }, [internalSelectedIds]);
 
-  // Stable reference — does not depend on onSelected directly
-  const handleToggle = useCallback(id => {
-    hasInteracted.current = true;
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  }, []);
+  // In controlled mode the parent owns the selection, so report the next
+  // value directly. Existing callers keep the internal-state behavior.
+  const handleToggle = useCallback(
+    id => {
+      const nextSelectedIds = selectedIds.includes(id)
+        ? selectedIds.filter(selectedId => selectedId !== id)
+        : [...selectedIds, id];
+
+      if (controlledSelectedIds !== undefined) {
+        if (onSelectedRef.current) onSelectedRef.current(nextSelectedIds);
+        return;
+      }
+
+      hasInteracted.current = true;
+      setInternalSelectedIds(nextSelectedIds);
+    },
+    [controlledSelectedIds, selectedIds]
+  );
 
   const handleLoadMore = () => {
     isAppending.current = true;
@@ -302,6 +315,9 @@ MobileEntityList.propTypes = {
   icon: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   renderCellFn: PropTypes.func.isRequired,
   onSelected: PropTypes.func,
+  selectedIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  ),
   onRowClick: PropTypes.func
 };
 
