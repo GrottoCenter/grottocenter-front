@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -9,6 +9,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useIntl } from 'react-intl';
 import AppLink from '../../components/common/AppLink';
 import { usePermissions } from '../../hooks';
+import AttractiveButton from './AttractiveButton';
 
 const JoinSection = styled('section')(({ theme }) => ({
   padding: '32px 20px',
@@ -59,20 +60,6 @@ const BenefitIcon = styled(Box)(({ theme }) => ({
     width: 48,
     height: 48,
     '& svg': { fontSize: 24 }
-  }
-}));
-
-const AttractiveButton = styled(Button)(({ theme }) => ({
-  padding: '14px 40px',
-  fontSize: '1rem',
-  fontWeight: 700,
-  borderRadius: 999,
-  textTransform: 'none',
-  boxShadow: theme.shadows[3],
-  transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-  '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: theme.shadows[6]
   }
 }));
 
@@ -131,7 +118,14 @@ const JoinCommunity = () => {
           variant="contained"
           color="secondary"
           size="large"
-          endIcon={<ArrowForwardIcon />}>
+          endIcon={<ArrowForwardIcon />}
+          sx={{
+            px: 5,
+            py: 1.75,
+            fontSize: '1rem',
+            fontWeight: 700,
+            textTransform: 'none'
+          }}>
           {formatMessage({ id: 'Create an account' })}
         </AttractiveButton>
       </Inner>

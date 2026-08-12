@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import {
   CampaignOutlined,
   NatureOutlined,
@@ -11,6 +11,7 @@ import { styled } from '@mui/material/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
 import GCLogo from '../../components/common/GCLogo';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
+import AttractiveButton from './AttractiveButton';
 import {
   wikicavesLink,
   wikiBBSLinks,
@@ -197,7 +198,7 @@ const Association = () => {
         </Typography>
 
         <Box sx={{ textAlign: 'center' }}>
-          <Button
+          <AttractiveButton
             variant="contained"
             color="secondary"
             size="large"
@@ -205,20 +206,9 @@ const Association = () => {
             target="_blank"
             rel="noopener noreferrer"
             startIcon={<FavoriteBorder />}
-            sx={theme => ({
-              fontWeight: 600,
-              px: 3,
-              textTransform: 'none',
-              borderRadius: 999,
-              boxShadow: theme.shadows[3],
-              transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: theme.shadows[6]
-              }
-            })}>
+            sx={{ fontWeight: 600, px: 3, textTransform: 'none' }}>
             {formatMessage({ id: 'Donate now' })}
-          </Button>
+          </AttractiveButton>
         </Box>
       </Inner>
     </Section>

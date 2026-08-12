@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { isIOS } from 'react-device-detect';
 import { useIntl } from 'react-intl';
 import { useCanPromoteApp } from '../../hooks';
 
@@ -8,7 +9,10 @@ const PLAY_STORE_URL =
 
 // Google's officially-hosted "Get it on Google Play" badge. Google publishes
 // this asset explicitly for third-party embedding under their branding
-// guidelines — don't reproduce or restyle it locally.
+// guidelines — don't reproduce or restyle it locally. The flip side is that
+// rendering the banner issues an external request to Google's CDN, which
+// aggressive privacy extensions or a strict CSP may block; the badge is
+// therefore lazy-loaded so it only costs anything once it scrolls into view.
 const BADGE_URL =
   'https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png';
 
@@ -40,13 +44,16 @@ const AppPromoBanner = () => {
   const { formatMessage } = useIntl();
   const canPromote = useCanPromoteApp();
 
-  if (!canPromote) return null;
+  // Google Play does not exist on iOS: `useCanPromoteApp` only tells us the
+  // visitor isn't already in the installed app, so the platform check belongs
+  // here. iOS visitors get `IosInstallPrompt` (Add to Home Screen) instead.
+  if (!canPromote || isIOS) return null;
 
   return (
     <Banner aria-label={formatMessage({ id: 'Grottocenter in your pocket' })}>
       <Box>
         <Typography
-          variant="h6"
+          variant="subtitle1"
           component="p"
           sx={{ fontWeight: 600, m: 0, lineHeight: 1.2 }}>
           {formatMessage({ id: 'Grottocenter in your pocket' })}
@@ -67,6 +74,7 @@ const AppPromoBanner = () => {
         <img
           src={BADGE_URL}
           alt={formatMessage({ id: 'Get it on Google Play' })}
+          loading="lazy"
         />
       </BadgeLink>
     </Banner>

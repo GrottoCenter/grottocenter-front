@@ -1,4 +1,4 @@
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MapIcon from '@mui/icons-material/Map';
 import SearchIcon from '@mui/icons-material/Search';
@@ -6,6 +6,7 @@ import { useIntl } from 'react-intl';
 import { fseLinks, uisLinks } from '../../conf/externalLinks';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import GCLogo from '../../components/common/GCLogo';
+import AttractiveButton from './AttractiveButton';
 
 const HeaderRoot = styled(Box)({
   width: '100%',
@@ -48,16 +49,11 @@ const CTARow = styled(Box)(({ theme }) => ({
     justifyContent: 'center',
     gap: 16
   },
+  // Sizing is a concern of the row (both CTAs must match); the pill shape and
+  // the hover lift come from AttractiveButton.
   '& > .MuiButton-root': {
     minWidth: 220,
-    borderRadius: 999,
-    padding: '10px 28px',
-    boxShadow: theme.shadows[3],
-    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-    '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: theme.shadows[6]
-    }
+    padding: theme.spacing(1.25, 3.5)
   }
 }));
 
@@ -100,7 +96,7 @@ const Header = () => {
             })}
           </Slogan>
           <CTARow>
-            <Button
+            <AttractiveButton
               variant="contained"
               color="secondary"
               component="a"
@@ -108,15 +104,15 @@ const Header = () => {
               startIcon={<MapIcon />}
               sx={{ fontWeight: 600 }}>
               {formatMessage({ id: 'Explore the map' })}
-            </Button>
-            <Button
+            </AttractiveButton>
+            <AttractiveButton
               color="primary"
               component="a"
               href="/ui/entrances"
               startIcon={<SearchIcon />}
               sx={{ fontWeight: 600 }}>
               {formatMessage({ id: 'Find an entrance' })}
-            </Button>
+            </AttractiveButton>
           </CTARow>
         </BrandRow>
 
