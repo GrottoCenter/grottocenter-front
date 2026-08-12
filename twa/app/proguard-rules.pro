@@ -22,4 +22,9 @@
 # Keep the line numbers of crash reports readable in the Play Console. R8 emits the
 # mapping file to app/build/outputs/mapping/release/ — upload it if a stack trace
 # ever needs deobfuscating.
+#
+# renamesourcefileattribute replaces the real filename in the DEX with the literal
+# string "SourceFile"; retrace resolves it back through the mapping file, so the
+# stack traces stay readable while the class-internal names stay out of the APK.
 -keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile

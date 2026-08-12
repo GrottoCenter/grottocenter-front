@@ -51,7 +51,7 @@ def twaManifest = [
 ]
 
 android {
-    compileSdk 36
+    compileSdk = 36
     namespace = "org.grottocenter.twa"
 
     // AGP 9 flipped android.defaults.buildfeatures.resvalues to false. Nearly every
@@ -62,14 +62,14 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.grottocenter.twa"
+        applicationId = "org.grottocenter.twa"
         // 23 (Android 6.0), not Bubblewrap's default of 21: androidbrowserhelper 2.7.x
         // declares minSdk 23 and the manifest merger refuses anything lower. Forcing it
         // with tools:overrideLibrary would only move the failure to runtime.
-        minSdk 23
-        targetSdk 36
-        versionCode 4
-        versionName "4"
+        minSdk = 23
+        targetSdk = 36
+        versionCode = 4
+        versionName = "4"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name
@@ -167,10 +167,10 @@ android {
             // the Java signing API (no shell command is built), so special
             // characters in the password are safe — unlike Bubblewrap's apksigner
             // invocation, which mangles them via shell quoting.
-            storeFile file(System.getenv("KEYSTORE_FILE") ?: "android.keystore")
-            storePassword System.getenv("KEYSTORE_PASSWORD")
-            keyAlias System.getenv("KEY_ALIAS")
-            keyPassword System.getenv("KEY_PASSWORD")
+            storeFile = file(System.getenv("KEYSTORE_FILE") ?: "android.keystore")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
         }
     }
     buildTypes {
@@ -187,8 +187,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     lint {
         checkReleaseBuilds = false
@@ -205,8 +205,8 @@ tasks.register('generateShortcutsFile') {
         twaManifest.shortcuts.eachWithIndex { s, i ->
             assert s.name != null, 'Missing `name` in shortcut #' + i
             assert s.short_name != null, 'Missing `short_name` in shortcut #' + i
-            assert s.url != null, 'Missing `icon` in shortcut #' + i
-            assert s.icon != null, 'Missing `url` in shortcut #' + i
+            assert s.url != null, 'Missing `url` in shortcut #' + i
+            assert s.icon != null, 'Missing `icon` in shortcut #' + i
         }
 
         def shortcutsFile = new File("$projectDir/src/main/res/xml", "shortcuts.xml")
