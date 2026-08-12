@@ -14,13 +14,10 @@
      limitations under the License.
 -->
 
-<!-- The "package" attribute is rewritten by the Gradle build with the value of applicationId.
-     It is still required here, as it is used to derive paths, for instance when referring
-     to an Activity by ".MyActivity" instead of the full name. If more Activities are added to the
-     application, the package attribute will need to reflect the correct path in order to use
-     the abbreviated format. -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.grottocenter.twa">
+<!-- The namespace lives in app/build.gradle, not here: AGP stopped honouring the
+     `package` attribute and now rejects it outright. Abbreviated class names such as
+     ".LauncherActivity" still resolve against that namespace. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     
         <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>

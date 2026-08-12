@@ -300,20 +300,55 @@ bubblewrap update            # apply twa-manifest.json changes to the project
 >     }
 >     buildTypes {
 >         release {
->             minifyEnabled true
->             signingConfig signingConfigs.release   // ← add this line
+>             minifyEnabled = true                   // ← Bubblewrap emits `minifyEnabled true`
+>             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+>             shrinkResources = true
+>             signingConfig = signingConfigs.release
 >         }
 >     }
 > }
 > ```
 >
-> Without it the release build is unsigned and Play rejects it.
+> Without the `signingConfig` the release build is unsigned and Play rejects it;
+> without the other two the Play Console reports the app as unoptimized. Bubblewrap
+> regenerates the `release` block with `minifyEnabled` alone, so all three lines have
+> to come back by hand.
 >
 > ⚠️ Same problem for **`targetSdkVersion`**: it is not exposed in
 > `twa-manifest.json`, so `bubblewrap update` resets it to whatever the installed
 > Bubblewrap version emits. Google Play requires the target API to be at most one
 > year behind the latest Android release (**API 36 minimum from 2026-08-31**), so
 > check that line after every regeneration.
+>
+> ⚠️ The same goes for everything below — Bubblewrap 1.25 still generates an AGP 8
+> project with an unoptimized R8 setup, so a regeneration silently undoes all of it
+> and the Play Console warnings come back:
+>
+> In `app/build.gradle`:
+>
+> - `androidbrowserhelper:2.7.2` — Bubblewrap still pins 2.6.2, and 2.7.x is what
+>   makes the splash screen edge-to-edge
+> - `minSdk 23` — 2.7.x will not merge below it
+> - `shrinkResources`, `proguardFiles …-optimize.txt`, `proguard-rules.pro`
+> - AGP 9 DSL — `compileSdk`/`minSdk`/`targetSdk`, `lint {}`,
+>   `buildFeatures { resValues = true }`
+> - `tasks.register('generateShortcutsFile') { doLast { … } }` and
+>   `tasks.named('preBuild') { dependsOn('generateShortcutsFile') }` — Bubblewrap
+>   emits a bare `task generateShorcutsFile { … }` (note the typo) whose body runs
+>   during Gradle's configuration phase, so it rewrites `shortcuts.xml` on every
+>   invocation. The registered form makes it lazy and only writes when it runs.
+>
+> Elsewhere:
+>
+> - `build.gradle` — `com.android.tools.build:gradle:9.3.1`, `mavenCentral()`
+>   instead of the shut-down `jcenter()`
+> - `gradle.properties` — `android.enableR8.fullMode=true`
+> - `app/src/main/res/raw/keep.xml` — a new file Bubblewrap never generates
+> - `app/src/main/AndroidManifest.xml` — no `package=` attribute (AGP 9 rejects it)
+>
+> `buildFeatures { resValues = true }` is the dangerous one: without it AGP 9 builds
+> an app whose every generated string and color resolves to nothing, and the build
+> still succeeds.
 
 Then **commit the regenerated project** so CI builds the updated app:
 

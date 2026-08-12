@@ -51,14 +51,25 @@ def twaManifest = [
 ]
 
 android {
-    compileSdkVersion 36
-    namespace "org.grottocenter.twa"
+    compileSdk = 36
+    namespace = "org.grottocenter.twa"
+
+    // AGP 9 flipped android.defaults.buildfeatures.resvalues to false. Nearly every
+    // string and color this app uses is a resValue below, so leaving this off does
+    // not fail the build — it produces an app whose resources resolve to nothing.
+    buildFeatures {
+        resValues = true
+    }
+
     defaultConfig {
-        applicationId "org.grottocenter.twa"
-        minSdkVersion 21
-        targetSdkVersion 36
-        versionCode 4
-        versionName "4"
+        applicationId = "org.grottocenter.twa"
+        // 23 (Android 6.0), not Bubblewrap's default of 21: androidbrowserhelper 2.7.x
+        // declares minSdk 23 and the manifest merger refuses anything lower. Forcing it
+        // with tools:overrideLibrary would only move the failure to runtime.
+        minSdk = 23
+        targetSdk = 36
+        versionCode = 4
+        versionName = "4"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name
@@ -156,63 +167,94 @@ android {
             // the Java signing API (no shell command is built), so special
             // characters in the password are safe — unlike Bubblewrap's apksigner
             // invocation, which mangles them via shell quoting.
-            storeFile file(System.getenv("KEYSTORE_FILE") ?: "android.keystore")
-            storePassword System.getenv("KEYSTORE_PASSWORD")
-            keyAlias System.getenv("KEY_ALIAS")
-            keyPassword System.getenv("KEY_PASSWORD")
+            storeFile = file(System.getenv("KEYSTORE_FILE") ?: "android.keystore")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
         }
     }
     buildTypes {
         release {
-            minifyEnabled true
-            signingConfig signingConfigs.release
+            minifyEnabled = true
+            // Without an explicit proguardFiles block AGP injects no default config at
+            // all, so R8 runs on the AAPT-generated rules only and its optimizer stays
+            // idle — which is what the Play Console reports as "optimization is not
+            // enabled". Use the `-optimize` variant: plain proguard-android.txt carries
+            // `-dontoptimize` and is deprecated.
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            shrinkResources = true
+            signingConfig = signingConfigs.release
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
-    lintOptions {
-        checkReleaseBuilds false
+    lint {
+        checkReleaseBuilds = false
     }
 }
 
-task generateShorcutsFile {
-    assert twaManifest.shortcuts.size() < 5, "You can have at most 4 shortcuts."
-    twaManifest.shortcuts.eachWithIndex { s, i ->
-        assert s.name != null, 'Missing `name` in shortcut #' + i
-        assert s.short_name != null, 'Missing `short_name` in shortcut #' + i
-        assert s.url != null, 'Missing `icon` in shortcut #' + i
-        assert s.icon != null, 'Missing `url` in shortcut #' + i
-    }
+// Bubblewrap generated this as a bare `task { … }` whose body ran during Gradle's
+// configuration phase, so it rewrote a tracked source file on every invocation —
+// even `./gradlew tasks`. Registering it and moving the work into doLast makes it
+// an ordinary task: lazily created, and only writing when it actually runs.
+tasks.register('generateShortcutsFile') {
+    doLast {
+        assert twaManifest.shortcuts.size() < 5, "You can have at most 4 shortcuts."
+        twaManifest.shortcuts.eachWithIndex { s, i ->
+            assert s.name != null, 'Missing `name` in shortcut #' + i
+            assert s.short_name != null, 'Missing `short_name` in shortcut #' + i
+            assert s.url != null, 'Missing `url` in shortcut #' + i
+            assert s.icon != null, 'Missing `icon` in shortcut #' + i
+        }
 
-    def shortcutsFile = new File("$projectDir/src/main/res/xml", "shortcuts.xml")
+        def shortcutsFile = new File("$projectDir/src/main/res/xml", "shortcuts.xml")
 
-    def xmlWriter = new StringWriter()
-    def xmlMarkup = new MarkupBuilder(new IndentPrinter(xmlWriter, "    ", true))
+        def xmlWriter = new StringWriter()
+        def xmlMarkup = new MarkupBuilder(new IndentPrinter(xmlWriter, "    ", true))
 
-    xmlMarkup
-        .'shortcuts'('xmlns:android': 'http://schemas.android.com/apk/res/android') {
-            twaManifest.shortcuts.eachWithIndex { s, i ->
-                'shortcut'(
-                        'android:shortcutId': 'shortcut' + i,
-                        'android:enabled': 'true',
-                        'android:icon': '@drawable/' + s.icon,
-                        'android:shortcutShortLabel': '@string/shortcut_short_name_' + i,
-                        'android:shortcutLongLabel': '@string/shortcut_name_' + i) {
-                    'intent'(
-                            'android:action': 'android.intent.action.MAIN',
-                            'android:targetPackage': twaManifest.applicationId,
-                            'android:targetClass': twaManifest.applicationId + '.LauncherActivity',
-                            'android:data': s.url)
-                    'categories'('android:name': 'android.intent.category.LAUNCHER')
+        xmlMarkup
+            .'shortcuts'('xmlns:android': 'http://schemas.android.com/apk/res/android') {
+                twaManifest.shortcuts.eachWithIndex { s, i ->
+                    'shortcut'(
+                            'android:shortcutId': 'shortcut' + i,
+                            'android:enabled': 'true',
+                            'android:icon': '@drawable/' + s.icon,
+                            'android:shortcutShortLabel': '@string/shortcut_short_name_' + i,
+                            'android:shortcutLongLabel': '@string/shortcut_name_' + i) {
+                        'intent'(
+                                'android:action': 'android.intent.action.MAIN',
+                                'android:targetPackage': twaManifest.applicationId,
+                                'android:targetClass': twaManifest.applicationId + '.LauncherActivity',
+                                'android:data': s.url)
+                        'categories'('android:name': 'android.intent.category.LAUNCHER')
+                    }
                 }
             }
-        }
-    shortcutsFile.text = xmlWriter.toString() + '\n'
+        // Emitted so the generated file matches the committed one byte for byte —
+        // otherwise every build leaves shortcuts.xml modified in the working tree.
+        def licenseHeader = '''<!--
+    Copyright 2019 Google Inc. All Rights Reserved.
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+'''
+        shortcutsFile.text = licenseHeader + xmlWriter.toString() + '\n'
+    }
 }
 
-preBuild.dependsOn(generateShorcutsFile)
+tasks.named('preBuild') { dependsOn('generateShortcutsFile') }
 
 repositories {
 
@@ -223,6 +265,10 @@ dependencies {
 
         implementation 'com.google.androidbrowserhelper:locationdelegation:1.1.2'
 
-        implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.6.2'
+        // Pinned ahead of Bubblewrap, which still generates 2.6.2. 2.7.x is what makes
+        // the splash screen edge-to-edge: it draws the system bar colors through
+        // androidx ProtectionLayout/ColorProtection instead of the Window.set*BarColor
+        // setters Android 15 deprecated. Re-check this line after any `bubblewrap update`.
+        implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.2'
 
 }
