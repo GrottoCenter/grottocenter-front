@@ -37,7 +37,7 @@ const RandomEntry = () => {
         <ExploreOutlined sx={{ fontSize: 28, color: 'white' }} />
         <Typography
           id="random-entry-title"
-          variant="h5"
+          variant="h3"
           component="h2"
           fontWeight={600}
           color="white">

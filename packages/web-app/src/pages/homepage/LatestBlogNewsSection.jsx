@@ -38,7 +38,7 @@ const LatestBlogNewsSection = () => {
         <FeedOutlined color="primary" sx={{ fontSize: 28 }} />
         <Typography
           id="news-title"
-          variant="h5"
+          variant="h3"
           component="h2"
           fontWeight={600}
           color="primary">

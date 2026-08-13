@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import {
   CampaignOutlined,
   NatureOutlined,
@@ -11,6 +11,7 @@ import { styled } from '@mui/material/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
 import GCLogo from '../../components/common/GCLogo';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
+import AttractiveButton from './AttractiveButton';
 import {
   wikicavesLink,
   wikiBBSLinks,
@@ -38,9 +39,7 @@ const GoalCard = styled(Box)({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
-  gap: 8,
-  transition: 'background-color 0.2s',
-  '&:hover': { backgroundColor: 'rgba(255,255,255,0.12)' }
+  gap: 8
 });
 
 const GOALS = [
@@ -107,7 +106,7 @@ const Association = () => {
           </Box>
           <Typography
             id="association-title"
-            variant="h5"
+            variant="h3"
             component="h2"
             fontWeight={600}
             sx={{ color: 'secondary.main' }}>
@@ -199,7 +198,7 @@ const Association = () => {
         </Typography>
 
         <Box sx={{ textAlign: 'center' }}>
-          <Button
+          <AttractiveButton
             variant="contained"
             color="secondary"
             size="large"
@@ -209,7 +208,7 @@ const Association = () => {
             startIcon={<FavoriteBorder />}
             sx={{ fontWeight: 600, px: 3, textTransform: 'none' }}>
             {formatMessage({ id: 'Donate now' })}
-          </Button>
+          </AttractiveButton>
         </Box>
       </Inner>
     </Section>

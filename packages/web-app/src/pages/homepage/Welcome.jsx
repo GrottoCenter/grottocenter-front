@@ -1,10 +1,7 @@
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { brown } from '@mui/material/colors';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { useIntl } from 'react-intl';
-import AppLink from '../../components/common/AppLink';
-import { usePermissions } from '../../hooks';
 
 const WelcomeSection = styled('section')(({ theme }) => ({
   backgroundColor: brown[50],
@@ -49,7 +46,6 @@ const BLOCKS = [
 
 const Welcome = () => {
   const { formatMessage } = useIntl();
-  const { isAuth } = usePermissions();
 
   return (
     <WelcomeSection aria-label={formatMessage({ id: 'Free access' })}>
@@ -69,23 +65,6 @@ const Welcome = () => {
             </Grid>
           ))}
         </Grid>
-        {!isAuth && (
-          <Box sx={{ textAlign: 'center', mt: { xs: 4, sm: 5 } }}>
-            <Button
-              component={AppLink}
-              to="/ui/signup"
-              color="secondary"
-              startIcon={<AccountBoxIcon />}
-              sx={{
-                px: 6,
-                py: '16px',
-                fontSize: '0.875rem',
-                fontWeight: 600
-              }}>
-              {formatMessage({ id: 'Create an account' })}
-            </Button>
-          </Box>
-        )}
       </Inner>
     </WelcomeSection>
   );
