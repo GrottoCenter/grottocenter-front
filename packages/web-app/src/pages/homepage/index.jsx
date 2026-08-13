@@ -59,6 +59,7 @@ const HomePage = () => {
       </Box>
       <Footer />
       <FeedbackButton />
+      {/* PWAPrompt renders a fixed overlay outside the main landmark. */}
       <IosInstallPrompt />
     </HomepageWrapper>
   );

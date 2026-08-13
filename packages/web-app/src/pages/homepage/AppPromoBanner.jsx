@@ -50,9 +50,10 @@ const AppPromoBanner = () => {
   if (!canPromote || isIOS) return null;
 
   return (
-    <Banner aria-label={formatMessage({ id: 'Grottocenter in your pocket' })}>
+    <Banner aria-labelledby="app-promo-title">
       <Box>
         <Typography
+          id="app-promo-title"
           variant="subtitle1"
           component="p"
           sx={{ fontWeight: 600, m: 0, lineHeight: 1.2 }}>

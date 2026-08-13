@@ -4,6 +4,8 @@ import { useState } from 'react';
 // i.e. they are NOT already running the installed PWA / Android TWA. Same
 // display-mode heuristic as src/index.jsx's ensurePersistentStorage gate, plus
 // a referrer check for the Android TWA (`android-app://org.grottocenter.twa`).
+// This is intentionally captured once: promotion depends on the launch context,
+// not on browser UI changes during the session.
 export function useCanPromoteApp() {
   const [canPromote] = useState(() => {
     if (typeof window === 'undefined') return false;
