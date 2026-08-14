@@ -179,6 +179,7 @@ const MobileEntityList = ({
   const [page, setPage] = useState(0);
   const [internalSelectedIds, setInternalSelectedIds] = useState([]);
   const selectedIds = controlledSelectedIds ?? internalSelectedIds;
+  const isSelectionControlled = controlledSelectedIds !== undefined;
   const isAppending = useRef(false);
   const hasInteracted = useRef(false);
   // Keep callback changes from retriggering the internal selection effect.
@@ -190,9 +191,12 @@ const MobileEntityList = ({
     setAllRows([]);
     setPage(0);
     setInternalSelectedIds([]);
+    if (isSelectionControlled && onSelectedRef.current) {
+      onSelectedRef.current([]);
+    }
     hasInteracted.current = false;
     isAppending.current = false;
-  }, [isNewQuery]);
+  }, [isNewQuery, isSelectionControlled]);
 
   useEffect(() => {
     if (isAppending.current) {
@@ -224,7 +228,7 @@ const MobileEntityList = ({
         ? selectedIds.filter(selectedId => selectedId !== id)
         : [...selectedIds, id];
 
-      if (controlledSelectedIds !== undefined) {
+      if (isSelectionControlled) {
         if (onSelectedRef.current) onSelectedRef.current(nextSelectedIds);
         return;
       }
@@ -232,7 +236,7 @@ const MobileEntityList = ({
       hasInteracted.current = true;
       setInternalSelectedIds(nextSelectedIds);
     },
-    [controlledSelectedIds, selectedIds]
+    [isSelectionControlled, selectedIds]
   );
 
   const handleLoadMore = () => {

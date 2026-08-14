@@ -14,6 +14,7 @@ vi.mock('./VisibleColumnsMenu', () => {
 vi.mock('../../../hooks/useOpenLink', () => ({ default: () => vi.fn() }));
 
 const messages = {
+  Name: 'Name',
   Export: 'Export',
   'Export to CSV': 'Export to CSV',
   'Export unavailable above 10000 results':
@@ -232,6 +233,9 @@ describe('DesktopEntityTable - Controlled selection', () => {
       </IntlProvider>
     );
 
+    checkboxes = screen.getAllByRole('checkbox');
+    expect(checkboxes[checkboxes.length - 1]).toBeChecked();
+
     rerender(
       <IntlProvider locale="en" messages={messages}>
         <DesktopEntityTable
@@ -247,5 +251,13 @@ describe('DesktopEntityTable - Controlled selection', () => {
     fireEvent.click(checkboxes[checkboxes.length - 1]);
 
     expect(onSelected).toHaveBeenLastCalledWith([2]);
+  });
+
+  it('requests a controlled selection reset for a new query', () => {
+    const onSelected = vi.fn();
+
+    renderTable({ isNewQuery: true, onSelected, selectedIds: [1] });
+
+    expect(onSelected).toHaveBeenCalledWith([]);
   });
 });

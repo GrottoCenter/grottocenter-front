@@ -246,7 +246,7 @@ const DesktopEntityTable = ({
   setEntityColumns,
   isLoading,
   onSelected,
-  selectedIds,
+  selectedIds: controlledSelectedIds,
   pageRows,
   nbTotalRows,
   onRowClick,
@@ -275,7 +275,10 @@ const DesktopEntityTable = ({
   const [order, setOrder] = useState('');
   const [orderBy, setOrderBy] = useState('');
   const [internalSelectedIds, setInternalSelectedIds] = useState([]);
-  const selected = selectedIds ?? internalSelectedIds;
+  const selected = controlledSelectedIds ?? internalSelectedIds;
+  const isSelectionControlled = controlledSelectedIds !== undefined;
+  const onSelectedRef = useRef(onSelected);
+  onSelectedRef.current = onSelected;
   // Sticky results toolbar + sticky table header both pin to the same card
   // scroller; the header sits just below the toolbar, at its measured height
   // (see hook). 0 when the toolbar isn't rendered (shouldHideFooter).
@@ -347,7 +350,7 @@ const DesktopEntityTable = ({
     } else {
       newSelected.splice(selectedIndex, 1);
     }
-    if (selectedIds === undefined) setInternalSelectedIds(newSelected);
+    if (!isSelectionControlled) setInternalSelectedIds(newSelected);
     onSelected(newSelected);
   };
 
@@ -398,7 +401,7 @@ const DesktopEntityTable = ({
     if (event.target.checked) {
       newSelected = pageRows.map(n => n.id);
     }
-    if (selectedIds === undefined) setInternalSelectedIds(newSelected);
+    if (!isSelectionControlled) setInternalSelectedIds(newSelected);
     onSelected(newSelected);
   };
 
@@ -408,7 +411,10 @@ const DesktopEntityTable = ({
     setOrder('');
     setOrderBy('');
     setInternalSelectedIds([]);
-  }, [isNewQuery]);
+    if (isSelectionControlled && onSelectedRef.current) {
+      onSelectedRef.current([]);
+    }
+  }, [isNewQuery, isSelectionControlled]);
 
   const colSpan = visibleColumns.length + (onSelected ? 1 : 0);
 

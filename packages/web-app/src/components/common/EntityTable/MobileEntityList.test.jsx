@@ -3,6 +3,8 @@ import { IntlProvider } from 'react-intl';
 
 import MobileEntityList from './MobileEntityList';
 
+const messages = { Name: 'Name' };
+
 const columns = [
   { field: 'name', label: 'Name', visible: true, isTitle: true }
 ];
@@ -20,7 +22,7 @@ const defaultProps = {
 
 const renderList = props =>
   render(
-    <IntlProvider locale="en">
+    <IntlProvider locale="en" messages={messages}>
       <MobileEntityList {...defaultProps} {...props} />
     </IntlProvider>
   );
@@ -34,7 +36,7 @@ describe('MobileEntityList - Controlled selection', () => {
     expect(onSelected).toHaveBeenLastCalledWith([1]);
 
     rerender(
-      <IntlProvider locale="en">
+      <IntlProvider locale="en" messages={messages}>
         <MobileEntityList
           {...defaultProps}
           onSelected={onSelected}
@@ -43,8 +45,10 @@ describe('MobileEntityList - Controlled selection', () => {
       </IntlProvider>
     );
 
+    expect(screen.getByRole('checkbox')).toBeChecked();
+
     rerender(
-      <IntlProvider locale="en">
+      <IntlProvider locale="en" messages={messages}>
         <MobileEntityList
           {...defaultProps}
           rows={[{ id: 2, name: 'Cave B' }]}
@@ -57,5 +61,13 @@ describe('MobileEntityList - Controlled selection', () => {
     fireEvent.click(screen.getByRole('checkbox'));
 
     expect(onSelected).toHaveBeenLastCalledWith([2]);
+  });
+
+  it('requests a controlled selection reset for a new query', () => {
+    const onSelected = vi.fn();
+
+    renderList({ isNewQuery: true, onSelected, selectedIds: [1] });
+
+    expect(onSelected).toHaveBeenCalledWith([]);
   });
 });
