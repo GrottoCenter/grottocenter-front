@@ -19,10 +19,13 @@ const SensitivityLockToggle = ({ isLocked, onChange, disabled = false }) => {
       {/* A disabled IconButton fires no events, so the tooltip needs a wrapper
           element to keep listening for them. */}
       <span>
+        {/* Warning colour, not primary, while locked: a closed padlock is a
+            state with consequences for other contributors, so it has to read
+            as one. */}
         <IconButton
           aria-label={label}
           aria-pressed={isLocked}
-          color={isLocked ? 'primary' : 'default'}
+          color={isLocked ? 'warning' : 'default'}
           disabled={disabled}
           onClick={() => onChange(!isLocked)}>
           {isLocked ? <LockOutlinedIcon /> : <LockOpenOutlinedIcon />}
