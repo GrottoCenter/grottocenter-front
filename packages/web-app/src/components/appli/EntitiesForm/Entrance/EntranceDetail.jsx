@@ -1,11 +1,10 @@
-import { Box, FormControlLabel, Switch } from '@mui/material';
+import { Box } from '@mui/material';
 import { useRef, useState } from 'react';
-import { Controller, useWatch } from 'react-hook-form';
+import { useController, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { usePermissions, useNearbyEntrances } from '../../../../hooks';
-import Alert from '../../../common/Alert';
-import SensitivityLockToggle from '../../../common/SensitivityLockToggle';
+import SensitivitySection from '../../../common/SensitivitySection';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormSection } from '../utils/FormContainers';
 import NumberField from '../utils/NumberField';
@@ -39,11 +38,20 @@ const EntranceDetail = ({
   const values = getValues();
   const initialIsSensitive = useRef(values.entrance.isSensitive).current;
 
-  const isSensitive = useWatch({ control, name: 'entrance.isSensitive' });
-  const isSensitiveLocked = !!useWatch({
+  // useController rather than a render-prop Controller: the panel needs both
+  // fields at once, and nesting two Controllers to reach it reads far worse.
+  // No defaultValue on the lock, so an entrance the API returned without one
+  // keeps submitting `undefined` and the transformer can still omit the key.
+  const { field: sensitiveField } = useController({
+    control,
+    name: 'entrance.isSensitive',
+    defaultValue: false
+  });
+  const { field: lockField } = useController({
     control,
     name: 'entrance.isSensitiveLocked'
   });
+  const isSensitiveLocked = !!lockField.value;
 
   // The precise location of an already sensitive entrance stays hidden from
   // non-admin users, who therefore can't unrestrict it either.
@@ -64,10 +72,12 @@ const EntranceDetail = ({
       severity: 'info',
       id: "You can't unrestrict a cave access."
     };
-  } else if (isSensitive) {
+  } else if (isSensitiveLocked) {
+    // Administrators keep editing a locked entrance, but the lock is still
+    // worth stating: it is what stops everybody else from touching it.
     sensitivityAlert = {
-      severity: 'warning',
-      id: 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
+      severity: 'info',
+      id: 'The sensitivity of this entrance is locked. Other contributors cannot change it.'
     };
   }
 
@@ -104,41 +114,28 @@ const EntranceDetail = ({
           unit="m"
           isError={!!errors.entrance?.altitude}
         />
-        <Controller
-          name="entrance.isSensitive"
-          control={control}
-          defaultValue={false}
-          render={({ field: { ref, value, onChange } }) => (
-            <FormControlLabel
-              control={
-                <Switch
-                  inputRef={ref}
-                  disabled={isSensitiveDisabled}
-                  checked={value}
-                  onChange={e => onChange(e.target.checked)}
-                />
-              }
-              label={formatMessage({ id: 'Restricted access entrance' })}
-            />
-          )}
-        />
-        {permissions.isAdmin && (
-          <Controller
-            name="entrance.isSensitiveLocked"
-            control={control}
-            defaultValue={false}
-            render={({ field: { value, onChange } }) => (
-              <SensitivityLockToggle isLocked={!!value} onChange={onChange} />
-            )}
-          />
-        )}
       </Box>
-      {sensitivityAlert && (
-        <Alert
-          severity={sensitivityAlert.severity}
-          content={formatMessage({ id: sensitivityAlert.id })}
-        />
-      )}
+      {/* Same panel as the massif form: the rules are identical, so the two
+          entities should not look like two different features. */}
+      <SensitivitySection
+        title="Sensitivity Management"
+        explanation={formatMessage({
+          id: 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
+        })}
+        switchLabel="Restricted access entrance"
+        isSensitive={!!sensitiveField.value}
+        onSensitiveChange={sensitiveField.onChange}
+        isSensitiveDisabled={isSensitiveDisabled}
+        showLock={permissions.isAdmin}
+        isLocked={isSensitiveLocked}
+        onLockChange={lockField.onChange}
+        alert={
+          sensitivityAlert && {
+            severity: sensitivityAlert.severity,
+            content: formatMessage({ id: sensitivityAlert.id })
+          }
+        }
+      />
     </FormSection>
   );
 };
