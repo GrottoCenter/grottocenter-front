@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Tooltip } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Alert from '../../common/Alert';
 
@@ -17,7 +17,17 @@ const SensitiveCaveWarning = ({ isLocked = false }) => {
       action={
         isLocked ? (
           <Tooltip title={lockLabel}>
-            <LockOutlinedIcon aria-label={lockLabel} fontSize="small" />
+            {/* MUI marks a bare SvgIcon aria-hidden, and an svg takes no
+                focus: both the accessible name and the tab stop have to live
+                on the wrapper, or the tooltip stays pointer-only. */}
+            <Box
+              component="span"
+              role="img"
+              tabIndex={0}
+              aria-label={lockLabel}
+              sx={{ display: 'inline-flex', alignItems: 'center' }}>
+              <LockOutlinedIcon fontSize="small" />
+            </Box>
           </Tooltip>
         ) : undefined
       }
