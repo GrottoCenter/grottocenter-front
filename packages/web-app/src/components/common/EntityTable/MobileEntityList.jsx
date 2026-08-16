@@ -213,8 +213,8 @@ const MobileEntityList = ({
   }, [rows]);
 
   // Notify parent only when selection actually changes, not on mount.
-  // onSelectedRef is a ref — intentionally excluded from deps to keep the effect
-  // stable and avoid triggering on every parent re-render that recreates the callback.
+  // Uncontrolled path only: controlled mode notifies through handleToggle and
+  // never writes internalSelectedIds, so this effect stays idle.
   useEffect(() => {
     if (!hasInteracted.current) return;
     if (onSelectedRef.current) onSelectedRef.current(internalSelectedIds);
