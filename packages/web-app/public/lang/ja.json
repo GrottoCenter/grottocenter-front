@@ -2784,5 +2784,14 @@
   "Zip code": "郵便番号",
   "Zone": "ゾーン",
   "Zoom in": "拡大",
-  "Zoom out": "縮小"
+  "Zoom out": "縮小",
+  "Viewing site as": "表示中の役割：",
+  "Switch impersonated role": "なりすまし役割を切り替え",
+  "Stop previewing": "プレビューを停止",
+  "Anonymous": "未ログイン",
+  "Preview the site as another role": "別の役割でサイトをプレビュー",
+  "Impersonation launcher description": "これはUIの表示にのみ影響します。注意：APIの応答は依然として実際のアクセス権を反映します。",
+  "Preview already active": "プレビューはすでに有効です。ページ上部のインジケーターで役割を切り替えるか停止してください。",
+  "Role": "役割",
+  "Start preview": "プレビューを開始"
 }

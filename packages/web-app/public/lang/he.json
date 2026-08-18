@@ -2784,5 +2784,14 @@
   "Zip code": "מיקוד",
   "Zone": "אזור",
   "Zoom in": "הגדלה",
-  "Zoom out": "הקטנה"
+  "Zoom out": "הקטנה",
+  "Viewing site as": "צופה כ",
+  "Switch impersonated role": "החלף תפקיד מזוייף",
+  "Stop previewing": "הפסק תצוגה מקדימה",
+  "Anonymous": "לא מחובר",
+  "Preview the site as another role": "תצוגה מקדימה של האתר בתפקיד אחר",
+  "Impersonation launcher description": "זה משפיע רק על מה שממשק המשתמש מציג; זהירות, תגובות ה-API עדיין משקפות את הגישה האמיתית שלך.",
+  "Preview already active": "תצוגה מקדימה כבר פעילה. השתמש במחוון בראש הדף כדי להחליף תפקיד או לעצור.",
+  "Role": "תפקיד",
+  "Start preview": "התחל תצוגה מקדימה"
 }

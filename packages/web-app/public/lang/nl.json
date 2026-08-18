@@ -2784,5 +2784,14 @@
   "Zip code": "Postcode",
   "Zone": "Zone",
   "Zoom in": "Inzoomen",
-  "Zoom out": "Uitzoomen"
+  "Zoom out": "Uitzoomen",
+  "Viewing site as": "Bekeken als",
+  "Switch impersonated role": "Nagebootste rol wisselen",
+  "Stop previewing": "Voorvertoning stoppen",
+  "Anonymous": "Niet ingelogd",
+  "Preview the site as another role": "Site voorvertonen als andere rol",
+  "Impersonation launcher description": "Dit heeft alleen invloed op wat de UI toont; let op, API-antwoorden weerspiegelen nog steeds je werkelijke toegang.",
+  "Preview already active": "Er is al een voorvertoning actief. Gebruik de indicator boven aan de pagina om van rol te wisselen of te stoppen.",
+  "Role": "Rol",
+  "Start preview": "Voorvertoning starten"
 }

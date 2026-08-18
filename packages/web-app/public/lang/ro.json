@@ -2784,5 +2784,14 @@
   "Zip code": "Cod poștal",
   "Zone": "Zonă",
   "Zoom in": "Mărire",
-  "Zoom out": "Micșorare"
+  "Zoom out": "Micșorare",
+  "Viewing site as": "Vizualizare ca",
+  "Switch impersonated role": "Schimbă rolul simulat",
+  "Stop previewing": "Oprește previzualizarea",
+  "Anonymous": "Neconectat",
+  "Preview the site as another role": "Previzualizează site-ul cu alt rol",
+  "Impersonation launcher description": "Aceasta afectează doar ceea ce afișează interfața; atenție, răspunsurile API continuă să reflecte accesul dvs. real.",
+  "Preview already active": "O previzualizare este deja activă. Utilizați indicatorul din partea de sus a paginii pentru a schimba rolul sau a opri.",
+  "Role": "Rol",
+  "Start preview": "Începe previzualizarea"
 }

@@ -26,6 +26,7 @@ import { fetchDBExportUrl } from '../actions/DBExport';
 import { usePermissions } from '../hooks';
 import REDUCER_STATUS from '../reducers/ReducerStatus';
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
+import ImpersonationLauncher from '../components/appli/ImpersonationLauncher';
 
 const Section = styled(Box)(({ theme }) => ({
   '& + &': {
@@ -265,6 +266,7 @@ const Dashboard = () => {
                   roleId="Administrator"
                   onClick={() => goTo('/ui/admin/users')}
                 />
+                <ImpersonationLauncher />
               </ToolGrid>
             </Section>
           )}

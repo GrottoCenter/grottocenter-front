@@ -2784,5 +2784,14 @@
   "Zip code": "Codi postal",
   "Zone": "Zona",
   "Zoom in": "Ampliar",
-  "Zoom out": "Reduir"
+  "Zoom out": "Reduir",
+  "Viewing site as": "Veient el lloc com a",
+  "Switch impersonated role": "Canviar el rol simulat",
+  "Stop previewing": "Aturar la previsualització",
+  "Anonymous": "No connectat",
+  "Preview the site as another role": "Previsualitzar el lloc com un altre rol",
+  "Impersonation launcher description": "Això només afecta el que mostra la interfície; compte, les respostes de l'API continuen reflectint el vostre accés real.",
+  "Preview already active": "Ja hi ha una previsualització activa. Utilitzeu l'indicador de la part superior de la pàgina per canviar de rol o aturar-la.",
+  "Role": "Rol",
+  "Start preview": "Iniciar la previsualització"
 }

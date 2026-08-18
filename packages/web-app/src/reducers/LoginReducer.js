@@ -10,12 +10,38 @@ import {
   DISPLAY_LOGIN_DIALOG,
   HIDE_LOGIN_DIALOG,
   LOGOUT,
+  SET_IMPERSONATED_ROLE,
+  CLEAR_IMPERSONATION,
   decodeJWT
 } from '../actions/Login';
 import { authTokenName } from '../conf/config';
 
+// Per-tab so a forgotten impersonation cannot leak across tabs or persist after
+// the browser is closed. See ImpersonationBar for the UI.
+const IMPERSONATED_ROLE_KEY = 'grottocenter_impersonated_role';
+
 const removeTokenFromLocalStorage = () => {
   window.localStorage.removeItem(authTokenName);
+};
+
+const readImpersonatedRole = () => {
+  try {
+    return window.sessionStorage.getItem(IMPERSONATED_ROLE_KEY) || null;
+  } catch {
+    return null;
+  }
+};
+
+const writeImpersonatedRole = roleName => {
+  try {
+    if (roleName) {
+      window.sessionStorage.setItem(IMPERSONATED_ROLE_KEY, roleName);
+    } else {
+      window.sessionStorage.removeItem(IMPERSONATED_ROLE_KEY);
+    }
+  } catch {
+    /* sessionStorage disabled — impersonation just won't survive a refresh */
+  }
 };
 
 const getRawTokenIfNotExpired = () => {
@@ -39,6 +65,7 @@ const initialState = {
   },
   enrollmentToken: null,
   error: null,
+  impersonatedRole: readImpersonatedRole(),
   isFetching: false,
   isLoginDialogDisplayed: false,
   isMfaRequiredDisplayed: false,
@@ -143,11 +170,25 @@ const reducer = (state = initialState, action) => {
       };
     case LOGOUT:
       removeTokenFromLocalStorage();
+      writeImpersonatedRole(null);
       return {
         ...state,
         authToken: undefined,
         authorizationHeader: undefined,
-        authTokenDecoded: null
+        authTokenDecoded: null,
+        impersonatedRole: null
+      };
+    case SET_IMPERSONATED_ROLE:
+      writeImpersonatedRole(action.roleName);
+      return {
+        ...state,
+        impersonatedRole: action.roleName
+      };
+    case CLEAR_IMPERSONATION:
+      writeImpersonatedRole(null);
+      return {
+        ...state,
+        impersonatedRole: null
       };
     default:
       return state;

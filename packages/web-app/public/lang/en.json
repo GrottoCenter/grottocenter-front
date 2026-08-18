@@ -2784,5 +2784,14 @@
   "Zip code": "Zip code",
   "Zone": "Zone",
   "Zoom in": "Zoom in",
-  "Zoom out": "Zoom out"
+  "Zoom out": "Zoom out",
+  "Viewing site as": "Viewing site as",
+  "Switch impersonated role": "Switch impersonated role",
+  "Stop previewing": "Stop previewing",
+  "Anonymous": "Not logged in",
+  "Preview the site as another role": "Preview the site as another role",
+  "Impersonation launcher description": "This only affects what the UI shows, be careful API responses still reflect your real access.",
+  "Preview already active": "A preview is already active. Use the indicator at the top of the page to switch role or stop.",
+  "Role": "Role",
+  "Start preview": "Start preview"
 }

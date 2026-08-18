@@ -2784,5 +2784,14 @@
   "Zip code": "Postleitzahl",
   "Zone": "Zone",
   "Zoom in": "Vergrößern",
-  "Zoom out": "Verkleinern"
+  "Zoom out": "Verkleinern",
+  "Viewing site as": "Ansicht als",
+  "Switch impersonated role": "Simulierte Rolle wechseln",
+  "Stop previewing": "Vorschau beenden",
+  "Anonymous": "Nicht angemeldet",
+  "Preview the site as another role": "Website als andere Rolle ansehen",
+  "Impersonation launcher description": "Dies wirkt sich nur auf die Anzeige der Oberfläche aus; Vorsicht, API-Antworten spiegeln weiterhin Ihre tatsächlichen Zugriffsrechte wider.",
+  "Preview already active": "Eine Vorschau ist bereits aktiv. Verwenden Sie den Indikator oben auf der Seite, um die Rolle zu wechseln oder zu beenden.",
+  "Role": "Rolle",
+  "Start preview": "Vorschau starten"
 }

@@ -2784,5 +2784,14 @@
   "Zip code": "الرمز البريدي",
   "Zone": "منطقة",
   "Zoom in": "تكبير",
-  "Zoom out": "تصغير"
+  "Zoom out": "تصغير",
+  "Viewing site as": "عرض الموقع بصفة",
+  "Switch impersonated role": "تبديل الدور المنتحل",
+  "Stop previewing": "إيقاف المعاينة",
+  "Anonymous": "غير مسجل الدخول",
+  "Preview the site as another role": "معاينة الموقع بدور آخر",
+  "Impersonation launcher description": "يؤثر هذا فقط على ما تعرضه الواجهة، لكن انتبه: تظل استجابات واجهة برمجة التطبيقات تعكس صلاحياتك الفعلية.",
+  "Preview already active": "المعاينة نشطة بالفعل. استخدم المؤشر في أعلى الصفحة لتبديل الدور أو الإيقاف.",
+  "Role": "الدور",
+  "Start preview": "بدء المعاينة"
 }

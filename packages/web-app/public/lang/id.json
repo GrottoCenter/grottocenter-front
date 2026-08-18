@@ -2784,5 +2784,14 @@
   "Zip code": "Kode pos",
   "Zone": "Zona",
   "Zoom in": "Perbesar",
-  "Zoom out": "Perkecil"
+  "Zoom out": "Perkecil",
+  "Viewing site as": "Melihat sebagai",
+  "Switch impersonated role": "Ganti peran yang disamarkan",
+  "Stop previewing": "Hentikan pratinjau",
+  "Anonymous": "Belum masuk",
+  "Preview the site as another role": "Pratinjau situs sebagai peran lain",
+  "Impersonation launcher description": "Ini hanya memengaruhi tampilan antarmuka; hati-hati, respons API tetap mencerminkan akses Anda yang sebenarnya.",
+  "Preview already active": "Pratinjau sudah aktif. Gunakan indikator di bagian atas halaman untuk mengganti peran atau menghentikan.",
+  "Role": "Peran",
+  "Start preview": "Mulai pratinjau"
 }
