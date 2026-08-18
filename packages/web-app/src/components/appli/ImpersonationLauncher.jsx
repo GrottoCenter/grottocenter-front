@@ -17,12 +17,9 @@ import {
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-import { setImpersonatedRole } from '../../actions/Login';
-import { usePermissions } from '../../hooks';
-
-// Ordered most-privileged → least. "Anonymous" is synthetic (see
-// usePermissions) and represents "not logged in".
-const IMPERSONATABLE_ROLES = ['Moderator', 'Leader', 'User', 'Anonymous'];
+import { setImpersonatedRole } from '@/actions/Login';
+import { usePermissions } from '@/hooks';
+import { IMPERSONATABLE_ROLES } from '@/utils/impersonation';
 
 const ImpersonationLauncher = () => {
   const { formatMessage } = useIntl();
@@ -92,6 +89,7 @@ const ImpersonationLauncher = () => {
             {formatMessage({ id: 'Role', defaultMessage: 'Role' })}
           </InputLabel>
           <Select
+            data-testid="impersonation-role-select"
             labelId="impersonation-role-label"
             value={selectedRole}
             label={formatMessage({ id: 'Role', defaultMessage: 'Role' })}
@@ -106,6 +104,7 @@ const ImpersonationLauncher = () => {
       </CardContent>
       <CardActions sx={{ px: 2, pb: 2, pt: 0 }}>
         <Button
+          data-testid="impersonation-start-button"
           variant="outlined"
           size="small"
           onClick={handleStart}

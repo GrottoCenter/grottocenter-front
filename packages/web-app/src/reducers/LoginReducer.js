@@ -15,10 +15,13 @@ import {
   decodeJWT
 } from '../actions/Login';
 import { authTokenName } from '../conf/config';
+import {
+  IMPERSONATED_ROLE_KEY,
+  isImpersonatableRole
+} from '../utils/impersonation';
 
 // Per-tab so a forgotten impersonation cannot leak across tabs or persist after
-// the browser is closed. See ImpersonationBar for the UI.
-const IMPERSONATED_ROLE_KEY = 'grottocenter_impersonated_role';
+// the browser is closed. See ImpersonationIndicator for the UI.
 
 const removeTokenFromLocalStorage = () => {
   window.localStorage.removeItem(authTokenName);
@@ -26,7 +29,11 @@ const removeTokenFromLocalStorage = () => {
 
 const readImpersonatedRole = () => {
   try {
-    return window.sessionStorage.getItem(IMPERSONATED_ROLE_KEY) || null;
+    const roleName =
+      window.sessionStorage.getItem(IMPERSONATED_ROLE_KEY) || null;
+    if (isImpersonatableRole(roleName)) return roleName;
+    window.sessionStorage.removeItem(IMPERSONATED_ROLE_KEY);
+    return null;
   } catch {
     return null;
   }
@@ -93,6 +100,7 @@ const reducer = (state = initialState, action) => {
       };
     case FETCH_LOGIN_SUCCESS:
       window.localStorage.setItem(authTokenName, action.token);
+      writeImpersonatedRole(null);
       return {
         ...state,
         authToken: action.token,
@@ -102,7 +110,8 @@ const reducer = (state = initialState, action) => {
         isFetching: false,
         isMfaRequiredDisplayed: false,
         isMfaEnrollmentRequiredDisplayed: false,
-        authTokenDecoded: action.tokenDecoded
+        authTokenDecoded: action.tokenDecoded,
+        impersonatedRole: null
       };
     case FETCH_LOGIN_MUST_RESET:
       return {
@@ -179,6 +188,7 @@ const reducer = (state = initialState, action) => {
         impersonatedRole: null
       };
     case SET_IMPERSONATED_ROLE:
+      if (!isImpersonatableRole(action.roleName)) return state;
       writeImpersonatedRole(action.roleName);
       return {
         ...state,

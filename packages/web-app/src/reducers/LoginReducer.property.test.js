@@ -1,5 +1,11 @@
 import fc from 'fast-check';
-import { LOGOUT, FETCH_LOGIN_SUCCESS } from '../actions/Login';
+import {
+  CLEAR_IMPERSONATION,
+  FETCH_LOGIN_SUCCESS,
+  LOGOUT,
+  SET_IMPERSONATED_ROLE
+} from '../actions/Login';
+import { IMPERSONATED_ROLE_KEY } from '../utils/impersonation';
 
 /**
  * Property 9: Logout clears auth state
@@ -37,6 +43,26 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock
 });
 
+const sessionStorageMock = (() => {
+  let store = {};
+  return {
+    getItem: vi.fn(key => store[key] ?? null),
+    setItem: vi.fn((key, value) => {
+      store[key] = String(value);
+    }),
+    removeItem: vi.fn(key => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    })
+  };
+})();
+
+Object.defineProperty(window, 'sessionStorage', {
+  value: sessionStorageMock
+});
+
 // Import reducer after localStorage mock is in place (top-level await keeps
 // the import order so getRawTokenIfNotExpired() sees the mocked localStorage).
 const reducer = (await import('./LoginReducer')).default;
@@ -44,6 +70,7 @@ const reducer = (await import('./LoginReducer')).default;
 describe('Property 9: Logout clears auth state', () => {
   beforeEach(() => {
     localStorageMock.clear();
+    sessionStorageMock.clear();
     vi.clearAllMocks();
   });
 
@@ -130,6 +157,55 @@ describe('Property 9: Logout clears auth state', () => {
         expect(loggedOutState.authTokenDecoded).toBeNull();
       }),
       { numRuns: 100 }
+    );
+  });
+});
+
+describe('Impersonation state', () => {
+  beforeEach(() => {
+    sessionStorageMock.clear();
+    vi.clearAllMocks();
+  });
+
+  it('persists a supported role in session storage', () => {
+    const nextState = reducer(
+      { impersonatedRole: null },
+      { type: SET_IMPERSONATED_ROLE, roleName: 'Leader' }
+    );
+
+    expect(nextState.impersonatedRole).toBe('Leader');
+    expect(sessionStorageMock.setItem).toHaveBeenCalledWith(
+      IMPERSONATED_ROLE_KEY,
+      'Leader'
+    );
+  });
+
+  it('ignores unsupported roles', () => {
+    const state = { impersonatedRole: null };
+    const nextState = reducer(state, {
+      type: SET_IMPERSONATED_ROLE,
+      roleName: 'Administrator'
+    });
+
+    expect(nextState).toBe(state);
+    expect(sessionStorageMock.setItem).not.toHaveBeenCalled();
+  });
+
+  it('clears the preview explicitly and after login', () => {
+    const impersonatedState = { impersonatedRole: 'Moderator' };
+    const clearedState = reducer(impersonatedState, {
+      type: CLEAR_IMPERSONATION
+    });
+    const loggedInState = reducer(impersonatedState, {
+      type: FETCH_LOGIN_SUCCESS,
+      token: 'token',
+      tokenDecoded: { groups: [{ name: 'User' }] }
+    });
+
+    expect(clearedState.impersonatedRole).toBeNull();
+    expect(loggedInState.impersonatedRole).toBeNull();
+    expect(sessionStorageMock.removeItem).toHaveBeenCalledWith(
+      IMPERSONATED_ROLE_KEY
     );
   });
 });

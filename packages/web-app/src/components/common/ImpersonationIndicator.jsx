@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import {
+  Box,
   FormControl,
   IconButton,
   MenuItem,
@@ -11,18 +12,12 @@ import {
   Typography
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-import {
-  clearImpersonation,
-  setImpersonatedRole
-} from '../../actions/Login';
-import { usePermissions } from '../../hooks';
-
-// Ordered most-privileged → least; "Anonymous" is a synthetic value (see
-// usePermissions) that flips isAuth off so the UI reacts as it would for a
-// visitor with no session at all.
-const IMPERSONATABLE_ROLES = ['Moderator', 'Leader', 'User', 'Anonymous'];
+import { clearImpersonation, setImpersonatedRole } from '@/actions/Login';
+import { usePermissions } from '@/hooks';
+import { IMPERSONATABLE_ROLES } from '@/utils/impersonation';
 
 const ImpersonationIndicator = () => {
   const { formatMessage } = useIntl();
@@ -56,9 +51,15 @@ const ImpersonationIndicator = () => {
     id: 'Stop previewing',
     defaultMessage: 'Stop previewing'
   });
+  const limitationLabel = formatMessage({
+    id: 'Impersonation launcher description',
+    defaultMessage:
+      'This only affects what the UI shows. API responses still reflect your real access.'
+  });
 
   return (
     <Paper
+      data-testid="impersonation-indicator"
       role="status"
       aria-live="polite"
       elevation={8}
@@ -96,6 +97,7 @@ const ImpersonationIndicator = () => {
       </Typography>
       <FormControl size="small" variant="standard">
         <Select
+          data-testid="impersonation-switch-select"
           value={impersonatedRole ?? ''}
           onChange={handleRoleChange}
           disableUnderline
@@ -119,8 +121,18 @@ const ImpersonationIndicator = () => {
           ))}
         </Select>
       </FormControl>
+      <Tooltip title={limitationLabel}>
+        <Box
+          component="span"
+          tabIndex={0}
+          aria-label={limitationLabel}
+          sx={{ color: 'inherit', display: 'flex' }}>
+          <InfoOutlinedIcon fontSize="small" />
+        </Box>
+      </Tooltip>
       <Tooltip title={stopLabel}>
         <IconButton
+          data-testid="impersonation-stop-button"
           size="small"
           onClick={handleStop}
           aria-label={stopLabel}
