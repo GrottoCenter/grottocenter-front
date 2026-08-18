@@ -1,8 +1,10 @@
 describe('Administrator role preview', () => {
   beforeEach(() => {
     cy.mockApiCatchAll();
-    cy.loginAs({ groups: ['Administrator', 'User'] });
-    cy.visit('/ui/dashboard');
+    cy.visitAuthenticated('/dashboard', {
+      groups: ['Administrator', 'User']
+    });
+    cy.location('pathname').should('eq', '/ui/dashboard');
   });
 
   it('persists an anonymous preview across navigation and stops from the banner', () => {
