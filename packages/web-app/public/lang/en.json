@@ -1255,7 +1255,7 @@
   "Image": "Image",
   "Image {current} of {total}": "Image {current} of {total}",
   "Image only": "Image only",
-  "Impersonation launcher description": "This only affects what the UI shows, be careful API responses still reflect your real access.",
+  "Impersonation launcher description": "This only affects what the UI shows. API responses still reflect your real access.",
   "Import": "Import",
   "Import geometry": "Import geometry",
   "Import Id": "Import Id",

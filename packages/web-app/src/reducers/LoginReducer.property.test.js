@@ -5,7 +5,10 @@ import {
   LOGOUT,
   SET_IMPERSONATED_ROLE
 } from '../actions/Login';
-import { IMPERSONATED_ROLE_KEY } from '../utils/impersonation';
+import {
+  IMPERSONATABLE_ROLES,
+  IMPERSONATED_ROLE_KEY
+} from '../utils/impersonation';
 
 /**
  * Property 9: Logout clears auth state
@@ -162,48 +165,79 @@ describe('Property 9: Logout clears auth state', () => {
 });
 
 describe('Impersonation state', () => {
+  const impersonatedRoleArb = fc.constantFrom(...IMPERSONATABLE_ROLES);
+  const optionalImpersonatedRoleArb = fc.option(impersonatedRoleArb, {
+    nil: null
+  });
+  const unsupportedRoleArb = fc
+    .string()
+    .filter(roleName => !IMPERSONATABLE_ROLES.includes(roleName));
+
   beforeEach(() => {
     sessionStorageMock.clear();
     vi.clearAllMocks();
   });
 
-  it('persists a supported role in session storage', () => {
-    const nextState = reducer(
-      { impersonatedRole: null },
-      { type: SET_IMPERSONATED_ROLE, roleName: 'Leader' }
-    );
+  it('persists any supported role in session storage', () => {
+    fc.assert(
+      fc.property(
+        optionalImpersonatedRoleArb,
+        impersonatedRoleArb,
+        (currentRole, roleName) => {
+          const nextState = reducer(
+            { impersonatedRole: currentRole },
+            { type: SET_IMPERSONATED_ROLE, roleName }
+          );
 
-    expect(nextState.impersonatedRole).toBe('Leader');
-    expect(sessionStorageMock.setItem).toHaveBeenCalledWith(
-      IMPERSONATED_ROLE_KEY,
-      'Leader'
+          expect(nextState.impersonatedRole).toBe(roleName);
+          expect(sessionStorageMock.setItem).toHaveBeenLastCalledWith(
+            IMPERSONATED_ROLE_KEY,
+            roleName
+          );
+        }
+      ),
+      { numRuns: 100 }
     );
   });
 
-  it('ignores unsupported roles', () => {
-    const state = { impersonatedRole: null };
-    const nextState = reducer(state, {
-      type: SET_IMPERSONATED_ROLE,
-      roleName: 'Administrator'
-    });
+  it('ignores any unsupported role', () => {
+    fc.assert(
+      fc.property(
+        optionalImpersonatedRoleArb,
+        unsupportedRoleArb,
+        (currentRole, roleName) => {
+          const state = { impersonatedRole: currentRole };
+          const nextState = reducer(state, {
+            type: SET_IMPERSONATED_ROLE,
+            roleName
+          });
 
-    expect(nextState).toBe(state);
+          expect(nextState).toBe(state);
+        }
+      ),
+      { numRuns: 100 }
+    );
     expect(sessionStorageMock.setItem).not.toHaveBeenCalled();
   });
 
-  it('clears the preview explicitly and after login', () => {
-    const impersonatedState = { impersonatedRole: 'Moderator' };
-    const clearedState = reducer(impersonatedState, {
-      type: CLEAR_IMPERSONATION
-    });
-    const loggedInState = reducer(impersonatedState, {
-      type: FETCH_LOGIN_SUCCESS,
-      token: 'token',
-      tokenDecoded: { groups: [{ name: 'User' }] }
-    });
+  it('clears any preview explicitly and after login', () => {
+    fc.assert(
+      fc.property(impersonatedRoleArb, impersonatedRole => {
+        const impersonatedState = { impersonatedRole };
+        const clearedState = reducer(impersonatedState, {
+          type: CLEAR_IMPERSONATION
+        });
+        const loggedInState = reducer(impersonatedState, {
+          type: FETCH_LOGIN_SUCCESS,
+          token: 'token',
+          tokenDecoded: { groups: [{ name: 'User' }] }
+        });
 
-    expect(clearedState.impersonatedRole).toBeNull();
-    expect(loggedInState.impersonatedRole).toBeNull();
+        expect(clearedState.impersonatedRole).toBeNull();
+        expect(loggedInState.impersonatedRole).toBeNull();
+      }),
+      { numRuns: 100 }
+    );
     expect(sessionStorageMock.removeItem).toHaveBeenCalledWith(
       IMPERSONATED_ROLE_KEY
     );

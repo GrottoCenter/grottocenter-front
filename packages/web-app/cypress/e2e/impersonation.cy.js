@@ -12,6 +12,11 @@ describe('Administrator role preview', () => {
     cy.get('[role="option"]').contains('Not logged in').click();
     cy.get('[data-testid="impersonation-start-button"]').click();
 
+    cy.location('pathname').should('eq', '/ui/dashboard');
+    cy.get('[data-testid="impersonation-role-select"]').should(
+      'contain.text',
+      'Not logged in'
+    );
     cy.get('[data-testid="impersonation-indicator"]').should('be.visible');
     cy.contains('Log in').should('be.visible');
 
@@ -25,6 +30,8 @@ describe('Administrator role preview', () => {
   });
 
   it('switches role directly from the banner', () => {
+    cy.get('[data-testid="impersonation-role-select"]').click();
+    cy.get('[role="option"]').contains('Moderator').click();
     cy.get('[data-testid="impersonation-start-button"]').click();
     cy.get('[data-testid="impersonation-switch-select"]').click();
     cy.get('[role="option"]').contains('Leader').click();

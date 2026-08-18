@@ -61,7 +61,6 @@ const ImpersonationIndicator = () => {
     <Paper
       data-testid="impersonation-indicator"
       role="status"
-      aria-live="polite"
       elevation={8}
       sx={theme => ({
         position: 'fixed',

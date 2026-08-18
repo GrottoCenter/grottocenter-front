@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 
-import loginReducer from '../../reducers/LoginReducer';
+import loginReducer from '@/reducers/LoginReducer';
 import ImpersonationIndicator from './ImpersonationIndicator';
 
 const initialLoginState = {

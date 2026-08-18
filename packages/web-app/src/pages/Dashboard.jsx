@@ -227,8 +227,12 @@ const Dashboard = () => {
 
   useEffect(() => {
     const hasDashboardAccess =
-      permissions.isAdmin || permissions.isModerator || permissions.isLeader;
-    if (!permissions.isAuth || !hasDashboardAccess) {
+      (permissions.isRealAdmin && !permissions.isTokenExpired) ||
+      (permissions.isAuth &&
+        (permissions.isAdmin ||
+          permissions.isModerator ||
+          permissions.isLeader));
+    if (!hasDashboardAccess) {
       navigate('/');
     }
   }, [permissions, navigate]);
@@ -251,21 +255,23 @@ const Dashboard = () => {
       }
       content={
         <>
-          {permissions.isAdmin && (
+          {permissions.isRealAdmin && (
             <Section>
               <SectionTitle variant="overline">
                 {formatMessage({ id: 'Users' })}
               </SectionTitle>
               <ToolGrid>
-                <ToolCard
-                  icon={<PeopleIcon />}
-                  title={formatMessage({ id: 'Manage users' })}
-                  description={formatMessage({
-                    id: 'Manage users description'
-                  })}
-                  roleId="Administrator"
-                  onClick={() => goTo('/ui/admin/users')}
-                />
+                {permissions.isAdmin && (
+                  <ToolCard
+                    icon={<PeopleIcon />}
+                    title={formatMessage({ id: 'Manage users' })}
+                    description={formatMessage({
+                      id: 'Manage users description'
+                    })}
+                    roleId="Administrator"
+                    onClick={() => goTo('/ui/admin/users')}
+                  />
+                )}
                 <ImpersonationLauncher />
               </ToolGrid>
             </Section>

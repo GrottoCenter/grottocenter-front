@@ -24,7 +24,7 @@ import { IMPERSONATABLE_ROLES } from '@/utils/impersonation';
 const ImpersonationLauncher = () => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
-  const { isRealAdmin, isImpersonating } = usePermissions();
+  const { isRealAdmin, isImpersonating, impersonatedRole } = usePermissions();
   const [selectedRole, setSelectedRole] = useState('Moderator');
 
   const handleSelectChange = useCallback(event => {
@@ -68,7 +68,7 @@ const ImpersonationLauncher = () => {
           {formatMessage({
             id: 'Impersonation launcher description',
             defaultMessage:
-              'Be careful API responses still reflect your real access'
+              'This only affects what the UI shows. API responses still reflect your real access.'
           })}
         </Typography>
         {isImpersonating && (
@@ -91,7 +91,7 @@ const ImpersonationLauncher = () => {
           <Select
             data-testid="impersonation-role-select"
             labelId="impersonation-role-label"
-            value={selectedRole}
+            value={impersonatedRole ?? selectedRole}
             label={formatMessage({ id: 'Role', defaultMessage: 'Role' })}
             onChange={handleSelectChange}>
             {IMPERSONATABLE_ROLES.map(role => (
