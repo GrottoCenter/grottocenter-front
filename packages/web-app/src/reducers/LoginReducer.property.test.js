@@ -69,6 +69,10 @@ Object.defineProperty(window, 'sessionStorage', {
 // Import reducer after localStorage mock is in place (top-level await keeps
 // the import order so getRawTokenIfNotExpired() sees the mocked localStorage).
 const reducer = (await import('./LoginReducer')).default;
+const impersonatedRoleArb = fc.constantFrom(...IMPERSONATABLE_ROLES);
+const optionalImpersonatedRoleArb = fc.option(impersonatedRoleArb, {
+  nil: null
+});
 
 describe('Property 9: Logout clears auth state', () => {
   beforeEach(() => {
@@ -102,19 +106,29 @@ describe('Property 9: Logout clears auth state', () => {
       fc.option(
         fc.string({ minLength: 1, maxLength: 50 }).map(msg => new Error(msg)),
         { nil: null }
-      )
+      ),
+      optionalImpersonatedRoleArb
     )
-    .map(([{ token, decoded }, isFetching, isLoginDialogDisplayed, error]) => ({
-      authToken: token,
-      authorizationHeader: { Authorization: `Bearer ${token}` },
-      authTokenDecoded: decoded,
-      error,
-      isFetching,
-      isLoginDialogDisplayed,
-      isMustResetMessageDisplayed: false
-    }));
+    .map(
+      ([
+        { token, decoded },
+        isFetching,
+        isLoginDialogDisplayed,
+        error,
+        impersonatedRole
+      ]) => ({
+        authToken: token,
+        authorizationHeader: { Authorization: `Bearer ${token}` },
+        authTokenDecoded: decoded,
+        error,
+        impersonatedRole,
+        isFetching,
+        isLoginDialogDisplayed,
+        isMustResetMessageDisplayed: false
+      })
+    );
 
-  it('clears authToken, authorizationHeader, and authTokenDecoded for any login state', () => {
+  it('clears authentication and impersonation for any login state', () => {
     fc.assert(
       fc.property(loginStateArb, loginState => {
         const nextState = reducer(loginState, { type: LOGOUT });
@@ -122,6 +136,7 @@ describe('Property 9: Logout clears auth state', () => {
         expect(nextState.authToken).toBeUndefined();
         expect(nextState.authorizationHeader).toBeUndefined();
         expect(nextState.authTokenDecoded).toBeNull();
+        expect(nextState.impersonatedRole).toBeNull();
       }),
       { numRuns: 100 }
     );
@@ -158,6 +173,7 @@ describe('Property 9: Logout clears auth state', () => {
         expect(loggedOutState.authToken).toBeUndefined();
         expect(loggedOutState.authorizationHeader).toBeUndefined();
         expect(loggedOutState.authTokenDecoded).toBeNull();
+        expect(loggedOutState.impersonatedRole).toBeNull();
       }),
       { numRuns: 100 }
     );
@@ -165,10 +181,6 @@ describe('Property 9: Logout clears auth state', () => {
 });
 
 describe('Impersonation state', () => {
-  const impersonatedRoleArb = fc.constantFrom(...IMPERSONATABLE_ROLES);
-  const optionalImpersonatedRoleArb = fc.option(impersonatedRoleArb, {
-    nil: null
-  });
   const unsupportedRoleArb = fc
     .string()
     .filter(roleName => !IMPERSONATABLE_ROLES.includes(roleName));
