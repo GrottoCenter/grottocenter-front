@@ -50,6 +50,7 @@ const EntityTable = ({
   entityColumnsModifier,
   isLoading = true,
   onSelected,
+  selectedIds,
   pageRows,
   nbTotalRows,
   onRowClick,
@@ -192,6 +193,7 @@ const EntityTable = ({
           icon={entityConfig.icon}
           renderCellFn={renderCell}
           onSelected={onSelected}
+          selectedIds={selectedIds}
           onRowClick={onRowClick}
         />
       </Box>
@@ -205,6 +207,7 @@ const EntityTable = ({
       setEntityColumns={setEntityColumns}
       isLoading={isLoading}
       onSelected={onSelected}
+      selectedIds={selectedIds}
       pageRows={pageRows}
       nbTotalRows={nbTotalRows}
       onRowClick={onRowClick}
@@ -226,6 +229,9 @@ EntityTable.propTypes = {
   entityColumnsModifier: PropTypes.func,
   isLoading: PropTypes.bool,
   onSelected: PropTypes.func,
+  selectedIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  ),
   pageRows: PropTypes.arrayOf(PropTypes.shape({})),
   nbTotalRows: PropTypes.number,
   onRowClick: PropTypes.func,

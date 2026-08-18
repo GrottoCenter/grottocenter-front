@@ -246,6 +246,7 @@ const DesktopEntityTable = ({
   setEntityColumns,
   isLoading,
   onSelected,
+  selectedIds: controlledSelectedIds,
   pageRows,
   nbTotalRows,
   onRowClick,
@@ -273,7 +274,11 @@ const DesktopEntityTable = ({
   );
   const [order, setOrder] = useState('');
   const [orderBy, setOrderBy] = useState('');
-  const [selected, setSelected] = useState([]);
+  const [internalSelectedIds, setInternalSelectedIds] = useState([]);
+  const selected = controlledSelectedIds ?? internalSelectedIds;
+  const isSelectionControlled = controlledSelectedIds !== undefined;
+  const onSelectedRef = useRef(onSelected);
+  onSelectedRef.current = onSelected;
   // Sticky results toolbar + sticky table header both pin to the same card
   // scroller; the header sits just below the toolbar, at its measured height
   // (see hook). 0 when the toolbar isn't rendered (shouldHideFooter).
@@ -345,7 +350,7 @@ const DesktopEntityTable = ({
     } else {
       newSelected.splice(selectedIndex, 1);
     }
-    setSelected(newSelected);
+    if (!isSelectionControlled) setInternalSelectedIds(newSelected);
     onSelected(newSelected);
   };
 
@@ -396,7 +401,7 @@ const DesktopEntityTable = ({
     if (event.target.checked) {
       newSelected = pageRows.map(n => n.id);
     }
-    setSelected(newSelected);
+    if (!isSelectionControlled) setInternalSelectedIds(newSelected);
     onSelected(newSelected);
   };
 
@@ -405,8 +410,11 @@ const DesktopEntityTable = ({
     setPage(0);
     setOrder('');
     setOrderBy('');
-    setSelected([]);
-  }, [isNewQuery]);
+    setInternalSelectedIds([]);
+    if (isSelectionControlled && onSelectedRef.current) {
+      onSelectedRef.current([]);
+    }
+  }, [isNewQuery, isSelectionControlled]);
 
   const colSpan = visibleColumns.length + (onSelected ? 1 : 0);
 
@@ -744,6 +752,9 @@ DesktopEntityTable.propTypes = {
   setEntityColumns: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
   onSelected: PropTypes.func,
+  selectedIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  ),
   pageRows: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   nbTotalRows: PropTypes.number,
   onRowClick: PropTypes.func,

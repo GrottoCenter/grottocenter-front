@@ -14,6 +14,7 @@ vi.mock('./VisibleColumnsMenu', () => {
 vi.mock('../../../hooks/useOpenLink', () => ({ default: () => vi.fn() }));
 
 const messages = {
+  Name: 'Name',
   Export: 'Export',
   'Export to CSV': 'Export to CSV',
   'Export unavailable above 10000 results':
@@ -207,5 +208,56 @@ describe('DesktopEntityTable - Export controls', () => {
       screen.queryByRole('button', { name: /Export/i })
     ).not.toBeInTheDocument();
     expect(screen.queryByText('Export to CSV')).not.toBeInTheDocument();
+  });
+});
+
+describe('DesktopEntityTable - Controlled selection', () => {
+  it('starts a new selection after the parent clears selected ids', () => {
+    const onSelected = vi.fn();
+    const { rerender } = renderTable({
+      onSelected,
+      selectedIds: []
+    });
+
+    let checkboxes = screen.getAllByRole('checkbox');
+    fireEvent.click(checkboxes[checkboxes.length - 1]);
+    expect(onSelected).toHaveBeenLastCalledWith([1]);
+
+    rerender(
+      <IntlProvider locale="en" messages={messages}>
+        <DesktopEntityTable
+          {...defaultProps}
+          onSelected={onSelected}
+          selectedIds={[1]}
+        />
+      </IntlProvider>
+    );
+
+    checkboxes = screen.getAllByRole('checkbox');
+    expect(checkboxes[checkboxes.length - 1]).toBeChecked();
+
+    rerender(
+      <IntlProvider locale="en" messages={messages}>
+        <DesktopEntityTable
+          {...defaultProps}
+          pageRows={[{ id: 2, name: 'Cave B' }]}
+          onSelected={onSelected}
+          selectedIds={[]}
+        />
+      </IntlProvider>
+    );
+
+    checkboxes = screen.getAllByRole('checkbox');
+    fireEvent.click(checkboxes[checkboxes.length - 1]);
+
+    expect(onSelected).toHaveBeenLastCalledWith([2]);
+  });
+
+  it('requests a controlled selection reset for a new query', () => {
+    const onSelected = vi.fn();
+
+    renderTable({ isNewQuery: true, onSelected, selectedIds: [1] });
+
+    expect(onSelected).toHaveBeenCalledWith([]);
   });
 });
