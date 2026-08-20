@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 import { Skeleton, Box, Button, Typography } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
@@ -31,7 +32,7 @@ import {
 } from '../../../actions/Massif/MassifOrganization';
 import { fetchCountry } from '../../../actions/Country/GetCountry';
 import { fetchRegion } from '../../../actions/Region/GetRegion';
-import { loadMassif } from '../../../actions/Massif/GetMassif';
+import { massifKeys } from '../../../api/queryKeys';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 
 // Maps an entityType to its Redux reducer key registered in GCReducer.
@@ -50,6 +51,7 @@ const AssociationSection = ({
 }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { onError } = useNotification();
 
   const { isAuth } = usePermissions();
@@ -79,7 +81,9 @@ const AssociationSection = ({
         dispatch(fetchRegion(parentEntityId, entityId));
         dispatch(resetRegionOrganization());
       } else if (entityType === 'massif') {
-        dispatch(loadMassif(entityId));
+        queryClient.invalidateQueries({
+          queryKey: massifKeys.detail(entityId)
+        });
         dispatch(resetMassifOrganization());
       }
 
@@ -104,6 +108,7 @@ const AssociationSection = ({
     status,
     error,
     dispatch,
+    queryClient,
     entityType,
     entityId,
     parentEntityId,

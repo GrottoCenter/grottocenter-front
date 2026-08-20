@@ -1,14 +1,9 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Massif from '../../components/appli/Massif/Massif';
-import { loadMassif } from '../../actions/Massif/GetMassif';
 import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
-import {
-  usePermissions,
-  useRefetchOnReconnect,
-  useUserProperties
-} from '../../hooks';
+import { useMassif, usePermissions, useUserProperties } from '../../hooks';
 import {
   Deleted,
   DELETED_ENTITIES
@@ -20,32 +15,30 @@ const MassifPage = () => {
   const permissions = usePermissions();
   const userProperties = useUserProperties();
 
-  const { massif, isFetching, error } = useSelector(state => state.massif);
+  const {
+    data: massif,
+    isPending,
+    isPaused,
+    error,
+    refetch
+  } = useMassif(massifId);
 
-  const reloadMassif = useCallback(
-    () => dispatch(loadMassif(massifId)),
-    [dispatch, massifId]
-  );
-
-  // Initial data fetch
   useEffect(() => {
-    reloadMassif();
     if (permissions.isAuth) {
       dispatch(fetchSubscriptions(userProperties.id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [massifId, dispatch]);
 
-  useRefetchOnReconnect(reloadMassif, Boolean(error));
-
   return massif?.isDeleted && !permissions.isModerator ? (
     <Deleted entityType={DELETED_ENTITIES.massif} entity={massif} />
   ) : (
     <Massif
       key={massifId}
-      isLoading={isFetching}
+      isLoading={isPending}
       error={error}
-      onRetry={reloadMassif}
+      isPaused={isPaused}
+      onRetry={refetch}
       massif={massif}
     />
   );

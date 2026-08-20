@@ -42,7 +42,6 @@ import latestBlogNews from './LatestBlogNewsReducer';
 import linkDocumentToEntrance from './LinkDocumentToEntrance';
 import login from './LoginReducer';
 import map from './Map';
-import massif from './MassifReducer';
 import massifEntrances from './MassifEntrancesDataQualityReducer';
 import mfa from './MfaReducer';
 import menuNotifications from './MenuNotificationsReducer';
@@ -143,7 +142,6 @@ const GCReducer = combineReducers({
   linkDocumentToEntrance,
   login,
   map,
-  massif,
   massifEntrances,
   massifOrganization,
   mfa,

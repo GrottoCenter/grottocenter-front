@@ -14,11 +14,10 @@ import SectionStack from '../../../common/Layouts/SectionStack';
 import { fetchSnapshot } from '../../../../actions/Snapshot/GetSnapshots';
 import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
 import { fetchCave } from '../../../../actions/Cave/GetCave';
-import { loadMassif } from '../../../../actions/Massif/GetMassif';
 import { fetchPerson } from '../../../../actions/Person/GetPerson';
 import { fetchOrganization } from '../../../../actions/Organization/GetOrganization';
-import { useDocument } from '../../../../hooks';
-import { documentKeys } from '../../../../api/queryKeys';
+import { useDocument, useMassif } from '../../../../hooks';
+import { documentKeys, massifKeys } from '../../../../api/queryKeys';
 import REDUCER_STATUS from '../../../../reducers/ReducerStatus';
 import SensitiveCaveWarning from '../SensitiveCaveWarning';
 import AccordionSnapshotList from './AccordionSnapshotList';
@@ -62,14 +61,18 @@ const SnapshotPage = () => {
   const { cave: currentCave, loading: isCaveLoading } = useSelector(
     s => s.cave
   );
-  // useDocument is gated on type so the query stays disabled — no wasted
-  // request — when this page renders any other entity.
+  // useDocument/useMassif are gated on type so the query stays disabled — no
+  // wasted request — when this page renders any other entity. Same pattern
+  // applied to each entity as it migrates to React Query.
   const documentQuery = useDocument(type === 'documents' ? id : undefined);
   const currentDocument = documentQuery.data ?? null;
   const isDocumentLoading = documentQuery.isFetching;
-  const { massif: currentMassif, isFetching: isMassifLoading } = useSelector(
-    s => s.massif
-  );
+  let relevantMassifId;
+  if (type === 'massifs') relevantMassifId = id;
+  else if (parentType === 'massifs') relevantMassifId = parentId;
+  const massifQuery = useMassif(relevantMassifId);
+  const currentMassif = massifQuery.data ?? null;
+  const isMassifLoading = massifQuery.isFetching;
   const { person: currentPerson, isFetching: isPersonLoading } = useSelector(
     s => s.person
   );
@@ -94,13 +97,15 @@ const SnapshotPage = () => {
       caves: () => dispatch(fetchCave(id)),
       documents: () =>
         queryClient.invalidateQueries({ queryKey: documentKeys.detail(id) }),
-      massifs: () => dispatch(loadMassif(id)),
+      massifs: () =>
+        queryClient.invalidateQueries({ queryKey: massifKeys.detail(id) }),
       persons: () => dispatch(fetchPerson(id)),
       organizations: () => dispatch(fetchOrganization(id))
     };
     const fetchParentByType = {
       entrances: pId => dispatch(fetchEntrance(pId)),
-      massifs: pId => dispatch(loadMassif(pId))
+      massifs: pId =>
+        queryClient.invalidateQueries({ queryKey: massifKeys.detail(pId) })
     };
     if (isSubEntityType) {
       if (parentId) {

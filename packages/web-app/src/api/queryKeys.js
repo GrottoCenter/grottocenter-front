@@ -36,3 +36,8 @@ export const documentKeys = {
   all: ['document'],
   detail: detailKey('document')
 };
+
+export const massifKeys = {
+  all: ['massif'],
+  detail: detailKey('massif')
+};

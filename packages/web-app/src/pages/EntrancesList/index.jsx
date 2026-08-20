@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 
 import { fetchCountry } from '../../actions/Country/GetCountry';
 import { fetchRegion } from '../../actions/Region/GetRegion';
-import { loadMassif } from '../../actions/Massif/GetMassif';
+import { useMassif } from '../../hooks';
 import getLocalizedCountryName from '../../helpers/countryName';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import EntitySearchPage from '../../components/appli/AdvancedSearch/EntitySearchPage';
@@ -31,18 +31,12 @@ const EntrancesListPage = () => {
   const { region, status: regionStatus } = useSelector(
     state => state.regionDetails
   );
-  const { massif, isFetching: massifFetching } = useSelector(
-    state => state.massif
-  );
+  const { data: massif, isPending: massifFetching } = useMassif(massifId);
 
   useEffect(() => {
     if (countryId) dispatch(fetchCountry(countryId));
     if (regionId && countryId) dispatch(fetchRegion(countryId, regionId));
   }, [countryId, regionId, dispatch]);
-
-  useEffect(() => {
-    if (massifId) dispatch(loadMassif(massifId));
-  }, [massifId, dispatch]);
 
   let initialFilter = {};
   let lockedFilter = [];

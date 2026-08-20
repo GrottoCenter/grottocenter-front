@@ -1,7 +1,6 @@
 import fc from 'fast-check';
 import entranceReducer from './EntranceReducer';
 import caveReducer from './CaveReducer';
-import massifReducer from './MassifReducer';
 import { MOVE_LOCATION_RELEVANCE_SUCCESS } from '../actions/Location/MoveRelevance';
 import { MOVE_DESCRIPTION_RELEVANCE_SUCCESS } from '../actions/Description/MoveRelevance';
 
@@ -142,42 +141,8 @@ describe('Property 3: Reducer swap correctness', () => {
     });
   });
 
-  describe('MassifReducer — MOVE_DESCRIPTION_RELEVANCE_SUCCESS', () => {
-    it('updates moved and swapped descriptions, leaves others unchanged', () => {
-      fc.assert(
-        fc.property(entityListArb, ({ list, moved, swapped }) => {
-          const state = {
-            massif: { descriptions: list },
-            isFetching: false,
-            error: null
-          };
-
-          const action = {
-            type: MOVE_DESCRIPTION_RELEVANCE_SUCCESS,
-            moved,
-            swapped
-          };
-
-          const result = massifReducer(state, action);
-          const resultDescs = result.massif.descriptions;
-
-          expect(resultDescs).toHaveLength(list.length);
-
-          const resultMoved = resultDescs.find(e => e.id === moved.id);
-          expect(resultMoved.relevance).toBe(moved.relevance);
-
-          const resultSwapped = resultDescs.find(e => e.id === swapped.id);
-          expect(resultSwapped.relevance).toBe(swapped.relevance);
-
-          for (const original of list) {
-            if (original.id === moved.id || original.id === swapped.id)
-              continue;
-            const found = resultDescs.find(e => e.id === original.id);
-            expect(found).toEqual(original);
-          }
-        }),
-        { numRuns: 100 }
-      );
-    });
-  });
+  // MassifReducer used to have an equivalent branch; state.massif was removed
+  // when the massif detail migrated to React Query. The move-relevance path
+  // for massifs now runs through middlewares/queryInvalidationBridge, so the
+  // reducer-level property no longer applies.
 });

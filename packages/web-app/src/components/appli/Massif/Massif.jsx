@@ -17,6 +17,8 @@ import { useReactToPrint } from 'react-to-print';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import {
+  useDeleteMassif,
+  useRestoreMassif,
   usePermissions,
   useSubscriptions,
   useScrollToHashOnLoad,
@@ -24,8 +26,6 @@ import {
 } from '../../../hooks';
 import { subscribeToMassif } from '../../../actions/Subscriptions/SubscribeToMassif';
 import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
-import { deleteMassif } from '../../../actions/Massif/DeleteMassif';
-import { restoreMassif } from '../../../actions/Massif/RestoreMassif';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
@@ -50,7 +50,13 @@ import {
 import { MassifTypes } from '../../../types/massif.type';
 import AssociationSection from '../OrganizationAssociation';
 
-const Massif = ({ isLoading, error, onRetry = null, massif }) => {
+const Massif = ({
+  isLoading,
+  error,
+  isPaused = false,
+  onRetry = null,
+  massif
+}) => {
   const dispatch = useDispatch();
   const { massifId } = useParams();
   const massifIdInt = parseInt(massifId, 10);
@@ -58,6 +64,8 @@ const Massif = ({ isLoading, error, onRetry = null, massif }) => {
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
   const componentRef = useRef();
+  const deleteMutation = useDeleteMassif();
+  const restoreMutation = useRestoreMassif();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -89,12 +97,12 @@ const Massif = ({ isLoading, error, onRetry = null, massif }) => {
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    dispatch(deleteMassif({ id: massifId, entityId, isPermanent }));
+    deleteMutation.mutate({ id: massifId, entityId, isPermanent });
     if (isPermanent) navigate('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreMassif({ id: massifId }));
+    restoreMutation.mutate({ id: massifId });
   };
 
   const {
@@ -205,11 +213,12 @@ const Massif = ({ isLoading, error, onRetry = null, massif }) => {
                 </Card>
               </SectionStack>
             )}
-            {error && (
+            {(error || isPaused) && (
               <SectionStack>
                 <Card sx={{ p: 2 }}>
                   <FetchErrorState
                     error={error}
+                    isPaused={isPaused}
                     onRetry={onRetry}
                     messageId="Error, the massif data you are looking for is not available."
                   />
@@ -386,6 +395,7 @@ const Massif = ({ isLoading, error, onRetry = null, massif }) => {
 Massif.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
+  isPaused: PropTypes.bool,
   onRetry: PropTypes.func,
   massif: MassifTypes
 };

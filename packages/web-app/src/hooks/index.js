@@ -17,9 +17,16 @@ export { useIdentifierTypes } from './queries/useIdentifierTypes';
 export { useSubjects } from './queries/useSubjects';
 export { useLanguages } from './queries/useLanguages';
 export { useDocument } from './queries/useDocument';
+export { useMassif } from './queries/useMassif';
 // Server-state writes live in ./mutations, same convention.
 export { useDeleteDocument } from './mutations/useDeleteDocument';
 export { useRestoreDocument } from './mutations/useRestoreDocument';
+export { useDeleteMassif } from './mutations/useDeleteMassif';
+export { useRestoreMassif } from './mutations/useRestoreMassif';
+export {
+  useLinkDocumentToMassif,
+  useUnlinkDocumentToMassif
+} from './mutations/useLinkDocumentToMassif';
 export { useNotification } from './useNotification';
 export { usePermissions } from './usePermissions';
 export { useSessionExpiry } from './useSessionExpiry';

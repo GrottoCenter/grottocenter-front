@@ -3,26 +3,28 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Divider } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
-import { useDispatch } from 'react-redux';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
-import { linkDocumentToMassif } from '../../../actions/LinkDocumentToMassif';
-import { unlinkDocumentToMassif } from '../../../actions/UnlinkDocumentToMassif';
 import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../SearchDocumentForm';
 import Alert from '../../common/Alert';
-import { usePermissions } from '../../../hooks';
+import {
+  useLinkDocumentToMassif,
+  useUnlinkDocumentToMassif,
+  usePermissions
+} from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 
 const Documents = ({ documents, massifId }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
-  const dispatch = useDispatch();
+  const linkMutation = useLinkDocumentToMassif();
+  const unlinkMutation = useUnlinkDocumentToMassif();
 
   const onSubmitForm = newDocuments => {
     newDocuments.forEach(d => {
-      dispatch(linkDocumentToMassif({ massifId, document: d }));
+      linkMutation.mutate({ massifId, document: d });
     });
     setIsDocumentSearchVisible(false);
   };
@@ -72,14 +74,11 @@ const Documents = ({ documents, massifId }) => {
             onUnlink={
               !permissions.isModerator
                 ? false
-                : async document => {
-                    dispatch(
-                      unlinkDocumentToMassif({
-                        massifId,
-                        documentId: document.id
-                      })
-                    );
-                  }
+                : document =>
+                    unlinkMutation.mutate({
+                      massifId,
+                      documentId: document.id
+                    })
             }
           />
         </>
