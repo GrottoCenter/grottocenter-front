@@ -19,6 +19,7 @@ import {
 import isStepValid from './ImportSteps/ImportStepsHelper';
 import { defaultValuesTypes } from './types';
 import { useBoolean } from '../../../hooks/useBoolean';
+import { useImportCsvSession } from '../../../hooks/useImportCsvSession';
 import { ENTRANCE } from './constants';
 
 const defaultFormSteps = [
@@ -61,6 +62,7 @@ const Provider = ({ children, defaultValues = {} }) => {
     true: setFormValid,
     false: setFormInvalid
   } = useBoolean(false);
+  const importSession = useImportCsvSession();
   const updateAttribute = useCallback((attributeName, newValue) => {
     switch (attributeName) {
       case 'selectedType':
@@ -85,7 +87,8 @@ const Provider = ({ children, defaultValues = {} }) => {
     setState(defaultContext.importAttributes);
     setCurrentStep(pathOr(null, [0, 'id'], defaultFormSteps));
     setValidatedSteps([]);
-  }, [setState, setCurrentStep, setValidatedSteps]);
+    importSession.reset();
+  }, [setState, setCurrentStep, setValidatedSteps, importSession]);
 
   useEffect(() => {
     const invalidateSteps = without(__, validatedSteps);
@@ -124,7 +127,8 @@ const Provider = ({ children, defaultValues = {} }) => {
       resetContext,
       updateAttribute,
       updateCurrentStep: setCurrentStep,
-      validatedSteps
+      validatedSteps,
+      importSession
     }),
     [
       currentStep,
@@ -134,7 +138,8 @@ const Provider = ({ children, defaultValues = {} }) => {
       resetContext,
       selectedType,
       updateAttribute,
-      validatedSteps
+      validatedSteps,
+      importSession
     ]
   );
 

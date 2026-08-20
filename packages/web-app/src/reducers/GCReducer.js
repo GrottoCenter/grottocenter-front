@@ -16,7 +16,6 @@ import dynamicNumber from './DynamicNumberReducer';
 import error from './ErrorReducer';
 import forgotPassword from './ForgotPasswordReducer';
 import groups from './GroupsReducer';
-import importCsv from './ImportCsvReducer';
 import importWizard from './ImportWizardReducer';
 import intl from './IntlReducer';
 import invalidEmailCavers from './InvalidEmailCaversReducer';
@@ -60,7 +59,6 @@ const GCReducer = combineReducers({
   error,
   forgotPassword,
   groups,
-  importCsv,
   importWizard,
   intl,
   invalidEmailCavers,

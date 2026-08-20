@@ -1,11 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import { useCSVReader, formatFileSize } from 'react-papaparse';
 import { useIntl } from 'react-intl';
-import { useDispatch } from 'react-redux';
 import Alert from '../../../common/Alert';
 import { ImportPageContentContext } from '../Provider';
 import checkData from '../checkData';
-import { resetImportState } from '../../../../actions/ImportCsv';
 
 // From https://github.com/Bunlong/react-papaparse/blob/v4.0.0/examples/CSVReaderClickAndDragUpload.tsx
 const GREY = '#CCC';
@@ -74,10 +72,10 @@ const styles = {
 };
 
 const Step2 = () => {
-  const { updateAttribute, selectedType } = useContext(
+  const { updateAttribute, selectedType, importSession } = useContext(
     ImportPageContentContext
   );
-  const dispatch = useDispatch();
+  const { reset: resetImportSession } = importSession;
 
   const { formatMessage } = useIntl();
   const { CSVReader } = useCSVReader();
@@ -85,21 +83,20 @@ const Step2 = () => {
   const [rowErrors, setRowErrors] = useState([]);
   const [zoneHover, setZoneHover] = useState(false);
 
-  // react-papaparse reset its content if go back to that step, so do we.
-  // Also reset the Redux import state here: going back to the file input step
-  // is the point where the user starts over, so any batchId/progress/result
-  // from a previous import must not leak into the next one.
+  // react-papaparse resets its content when we come back to this step; clear
+  // the import session at the same time so any batchId / progress / result
+  // from a previous run does not leak into the next one.
   useEffect(() => {
     updateAttribute('importData', undefined);
     updateAttribute('fileImported', false);
-    dispatch(resetImportState());
-  }, [updateAttribute, dispatch]);
+    resetImportSession();
+  }, [updateAttribute, resetImportSession]);
 
   const handleOnRemove = () => {
     setRowErrors([]);
     updateAttribute('importData', undefined);
     updateAttribute('fileImported', false);
-    dispatch(resetImportState());
+    resetImportSession();
   };
 
   return (

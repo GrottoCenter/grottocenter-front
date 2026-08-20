@@ -1,16 +1,10 @@
 import { useContext, useEffect, useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import PublishIcon from '@mui/icons-material/Publish';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { ImportPageContentContext } from '../Provider';
-import {
-  checkRowsInBdd,
-  importDocumentRows,
-  importEntranceRows
-} from '../../../../actions/ImportCsv';
 import ActionButton from '../../../common/ActionButton';
-import { ENTRANCE, STEP_IMPORT } from '../constants';
+import { STEP_IMPORT } from '../constants';
 import Alert from '../../../common/Alert';
 
 // Step 4 — Confirmation: shows the dry-run review (what will / won't be
@@ -19,29 +13,35 @@ import Alert from '../../../common/Alert';
 // is accepted, so a rejected submission (e.g. a 403) stays here and can be
 // retried.
 const Step4 = () => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const importCsv = useSelector(state => state.importCsv);
-  const { importData, selectedType, updateCurrentStep } = useContext(
-    ImportPageContentContext
-  );
+  const { importData, selectedType, updateCurrentStep, importSession } =
+    useContext(ImportPageContentContext);
+
+  const {
+    resultCheck,
+    checkRows,
+    importRows,
+    isChecking,
+    isImporting,
+    batchId,
+    isPolling,
+    resultImport,
+    error,
+    isLoading
+  } = importSession;
 
   const {
     willBeCreated: willBeCreatedData,
     willBeCreatedAsDuplicates: willBeCreatedAsDuplicatesData,
     wontBeCreated: wontBeCreateData
-  } = importCsv.resultCheck;
-  const { batchId, isPolling, resultImport } = importCsv;
-
-  const isEntranceImport = selectedType === ENTRANCE;
+  } = resultCheck;
 
   const handleOnClick = () => {
-    const rows = [...willBeCreatedData, ...willBeCreatedAsDuplicatesData];
-    if (isEntranceImport) {
-      dispatch(importEntranceRows(rows));
-    } else {
-      dispatch(importDocumentRows(rows));
-    }
+    const rows = [
+      ...(willBeCreatedData ?? []),
+      ...(willBeCreatedAsDuplicatesData ?? [])
+    ];
+    importRows(selectedType, rows);
   };
 
   // Move to the Import step only once the submission is accepted: an async
@@ -57,16 +57,15 @@ const Step4 = () => {
   // Only trigger the check-rows dry-run when landing on this step fresh. If an
   // import is already ongoing or completed (batchId/resultImport set), the
   // effect above forwards to step 5 instead of re-running a check-rows POST for
-  // thousands of rows. Captured once so the guard doesn't flip mid-render.
-  const skipInitialCheck = useRef(
-    importCsv.batchId !== null || importCsv.resultImport !== null
-  );
+  // thousands of rows. Captured once so the guard does not flip mid-render.
+  const skipInitialCheck = useRef(batchId !== null || resultImport !== null);
 
   useEffect(() => {
     if (!skipInitialCheck.current) {
-      dispatch(checkRowsInBdd(selectedType, importData));
+      checkRows(selectedType, importData);
     }
-  }, [dispatch, selectedType, importData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedType, importData]);
 
   const somethingWillBeCreated =
     (willBeCreatedData && willBeCreatedData.length > 0) ||
@@ -85,10 +84,9 @@ const Step4 = () => {
       </Typography>
 
       {/* Loading feedback while the initial dry-run or the submission is in
-          flight — both set isLoading and we stay on this step until it
-          resolves, so a generic message fits both. Once the submission is
-          accepted the effect advances to the Import step. */}
-      {importCsv.isLoading && (
+          flight — both stall the button, so a generic message fits both. Once
+          the submission is accepted the effect advances to the Import step. */}
+      {isLoading && (
         <Typography>
           {formatMessage({ id: 'Processing, this may take some time...' })}
         </Typography>
@@ -146,17 +144,17 @@ const Step4 = () => {
         )}
 
       {/* Submit / check rejection (e.g. the 403 "not authorized" body).
-          Grottocenter uses the English string itself as the translation key, so
-          formatMessage localizes known messages and falls back to the raw text
-          otherwise. Shown here — right above the Import button — because a
+          Grottocenter uses the English string itself as the translation key,
+          so formatMessage localizes known messages and falls back to the raw
+          text. Shown here — right above the Import button — because a
           rejected submission keeps the user on this step to retry. */}
-      {importCsv.error && (
+      {error && (
         <Alert
           data-testid="csv-import-error-alert"
           severity="error"
           title={formatMessage({
-            id: importCsv.error,
-            defaultMessage: importCsv.error
+            id: error,
+            defaultMessage: error
           })}
         />
       )}
@@ -167,7 +165,7 @@ const Step4 = () => {
             data-testid="csv-import-submit-button"
             label={formatMessage({ id: 'Import' })}
             onClick={handleOnClick}
-            loading={importCsv.isLoading}
+            loading={isChecking || isImporting}
             icon={<PublishIcon />}
           />
         </Box>

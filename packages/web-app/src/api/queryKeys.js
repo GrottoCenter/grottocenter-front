@@ -133,3 +133,11 @@ export const moderationKeys = {
   all: ['moderation'],
   dbExport: () => ['moderation', 'dbExport']
 };
+
+// Async CSV import batch job — polled from useJobStatus with refetchInterval
+// until status becomes terminal (completed / failed). Batch ids are never
+// reused, so a single detail-style key is enough.
+export const importKeys = {
+  all: ['import'],
+  batch: batchId => ['import', 'batch', batchId]
+};
