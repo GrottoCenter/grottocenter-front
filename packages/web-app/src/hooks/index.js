@@ -38,6 +38,13 @@ export {
   useMoveEntranceToCave,
   useDetachEntranceToNewCave
 } from './mutations/useAdminActions';
+export {
+  useChangePassword,
+  useSignUp,
+  useVerifyEmail,
+  useForgotPassword,
+  useResendVerificationEmail
+} from './mutations/useAuthFlows';
 export { useMassif } from './queries/useMassif';
 export { useCave } from './queries/useCave';
 export { useEntrance } from './queries/useEntrance';

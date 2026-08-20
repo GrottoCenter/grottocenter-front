@@ -22,10 +22,6 @@ import {
   displayLoginDialog
 } from '../../actions/Login';
 import { postMfaLogin } from '../../actions/Mfa';
-import {
-  postResendVerificationEmail,
-  resetResendVerification
-} from '../../actions/ResendVerificationEmail';
 
 import { isValidEmail } from '../../conf/config';
 import Translate from '../common/Translate';
@@ -33,7 +29,11 @@ import StandardDialog from '../common/StandardDialog';
 import LoginForm from '../common/LoginForm';
 import MfaEnrollment from './MfaEnrollment';
 import OfflineDisabled from '../common/OfflineDisabled';
-import { useNotification, useOnlineStatus } from '../../hooks';
+import {
+  useNotification,
+  useOnlineStatus,
+  useResendVerificationEmail
+} from '../../hooks';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -41,9 +41,7 @@ const Login = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const authState = useSelector(state => state.login);
   const mfaVerifyState = useSelector(state => state.mfa.verify);
-  const resendVerificationState = useSelector(
-    state => state.resendVerificationEmail
-  );
+  const resendVerificationMutation = useResendVerificationEmail();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const lockedCredentials = React.useRef({ email: '', password: '' });
@@ -94,7 +92,7 @@ const Login = () => {
   const onLogin = event => {
     event.preventDefault();
 
-    if (authState.isFetching || resendVerificationState.isFetching) return;
+    if (authState.isFetching || resendVerificationMutation.isPending) return;
 
     const newFieldErrors = {
       email: isPlainLogin ? validateEmail() : '',
@@ -114,7 +112,7 @@ const Login = () => {
       );
     } else if (authState.isNotVerifiedMessageDisplayed) {
       if (resendTimeout > 0) return;
-      dispatch(postResendVerificationEmail(email));
+      resendVerificationMutation.mutate(email);
     } else {
       lockedCredentials.current = { email, password };
       dispatch(postLogin(email, password));
@@ -145,12 +143,18 @@ const Login = () => {
   }, [authState.isLoginDialogDisplayed]);
 
   useEffect(() => {
-    if (resendVerificationState.success) {
+    if (resendVerificationMutation.isSuccess) {
       onSuccess(formatMessage({ id: 'Verification email sent!' }));
-      dispatch(resetResendVerification());
+      // Reset the mutation state so a subsequent resend re-fires this effect.
+      resendVerificationMutation.reset();
       setResendTimeout(60);
     }
-  }, [resendVerificationState.success, onSuccess, formatMessage, dispatch]);
+  }, [
+    resendVerificationMutation.isSuccess,
+    onSuccess,
+    formatMessage,
+    resendVerificationMutation
+  ]);
 
   useEffect(() => {
     let interval = null;
@@ -183,7 +187,7 @@ const Login = () => {
   };
 
   const isSubmitting =
-    authState.isFetching || resendVerificationState.isFetching;
+    authState.isFetching || resendVerificationMutation.isPending;
 
   // Logging in needs the server. Offline, submitting would fail with a network
   // error the user would read as "wrong password" — so we block it and say why.
