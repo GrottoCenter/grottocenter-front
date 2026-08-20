@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
@@ -132,24 +132,36 @@ export const useImportCsvSession = () => {
     if (isSuccess) setErrorCount(0);
   }, [isSuccess, dataUpdatedAt]);
 
+  // RQ v5's useMutation returns a brand-new result object each render, so
+  // `checkMutation`/`importMutation` as useCallback deps would recreate the
+  // callbacks on every render — Step2's mount effect uses `reset` in its dep
+  // list and would then infinite-loop (React #185). Hold the latest mutations
+  // in refs so the exposed actions have a stable identity.
+  const checkMutationRef = useRef(checkMutation);
+  const importMutationRef = useRef(importMutation);
+  checkMutationRef.current = checkMutation;
+  importMutationRef.current = importMutation;
+
   const reset = useCallback(() => {
     setBatchId(null);
     setSyncResult(null);
     setSubmitProgress(null);
     setErrorCount(0);
     setPollError(null);
-    checkMutation.reset();
-    importMutation.reset();
-  }, [checkMutation, importMutation]);
+    checkMutationRef.current.reset();
+    importMutationRef.current.reset();
+  }, []);
 
   const checkRows = useCallback(
-    (selectedType, rows) => checkMutation.mutate({ selectedType, rows }),
-    [checkMutation]
+    (selectedType, rows) =>
+      checkMutationRef.current.mutate({ selectedType, rows }),
+    []
   );
 
   const importRows = useCallback(
-    (selectedType, rows) => importMutation.mutate({ selectedType, rows }),
-    [importMutation]
+    (selectedType, rows) =>
+      importMutationRef.current.mutate({ selectedType, rows }),
+    []
   );
 
   const jobData = jobQuery.data;
