@@ -83,6 +83,53 @@ describe('useAdvancedSearch (module singleton semantics)', () => {
     expect(result.current.isNewQuery).toBe(false);
   });
 
+  it('keeps the current results while a refined page is loading', async () => {
+    const firstPage = {
+      results: [{ id: 1, name: 'First page' }],
+      totalResults: 5609
+    };
+    const secondPage = {
+      results: [{ id: 201, name: 'Second page' }],
+      totalResults: 5609
+    };
+    let resolveSecondPage;
+    apiClient.apiPost.mockResolvedValueOnce(firstPage).mockImplementationOnce(
+      () =>
+        new Promise(resolve => {
+          resolveSecondPage = resolve;
+        })
+    );
+
+    const { result } = renderHook(() => useAdvancedSearch(), {
+      wrapper: makeWrapper(queryClient)
+    });
+
+    act(() => {
+      startAdvancedSearch({ entity: 'documents', page: 1, size: 200 });
+    });
+    await waitFor(() => {
+      expect(result.current.data).toEqual(firstPage);
+    });
+
+    act(() => {
+      refineAdvancedSearch({ entity: 'documents', page: 2, size: 200 });
+    });
+    await waitFor(() => {
+      expect(apiClient.apiPost).toHaveBeenCalledTimes(2);
+    });
+
+    expect(result.current.data).toEqual(firstPage);
+    expect(result.current.isPlaceholderData).toBe(true);
+
+    await act(async () => {
+      resolveSecondPage(secondPage);
+    });
+    await waitFor(() => {
+      expect(result.current.data).toEqual(secondPage);
+    });
+    expect(result.current.isPlaceholderData).toBe(false);
+  });
+
   it('shares state across two independent consumers (singleton contract)', async () => {
     const wrapper = makeWrapper(queryClient);
     const a = renderHook(() => useAdvancedSearch(), { wrapper });

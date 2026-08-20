@@ -1,5 +1,5 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { advancedSearchUrl } from '../../conf/apiRoutes';
 import { apiPost } from '../../api/client';
@@ -56,6 +56,11 @@ export const useAdvancedSearch = () => {
     queryKey: advancedSearchKeys.results(params),
     queryFn: () => apiPost(advancedSearchUrl, params),
     enabled: !!params?.entity,
+    // Pagination and sorting change the query key. Keep the current page in
+    // place while its continuation loads so EntityTable is not unmounted and
+    // does not lose its local page state. A genuinely new search deliberately
+    // starts from its loading state and resets the table controls instead.
+    placeholderData: isNewQuery ? undefined : keepPreviousData,
     staleTime: STALE.VOLATILE,
     gcTime: 60 * 1000
   });
