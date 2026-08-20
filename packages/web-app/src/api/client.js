@@ -32,3 +32,21 @@ export const apiGet = async url => {
 // Write verbs (apiPost/apiPut/apiPatch/apiDelete) land with the mutation phase.
 // They are not added ahead of a caller: an untested wrapper nobody imports is
 // the kind of dead code this migration is meant to remove, not create.
+//
+// Expected shape when the first mutation lands — sketch, not code, to keep the
+// first caller aligned with apiGet's conventions:
+//
+//   export const apiPost = async (url, body) => {
+//     const response = await fetch(url, {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json', ...authHeaders() },
+//       body: JSON.stringify(body)
+//     });
+//     await checkAndGetStatus(response);
+//     if (response.status === 204) return null;
+//     return response.json();
+//   };
+//
+// Same auth header discipline as apiGet (read at call time, never captured),
+// same checkAndGetStatus so the QueryClient's global onError sees the same
+// `body`/`status` shape whether the failure came from a query or a mutation.

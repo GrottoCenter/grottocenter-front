@@ -88,3 +88,30 @@ in the same change — `refetchOnReconnect` is on by default and the two would d
 - The half-migrated state — two paradigms, two caches — is worse than either end.
   Mitigated by keeping each domain independent and reversible: the migration can stop
   at any point in a coherent state.
+- **401 is handled twice while both paradigms coexist.** Legacy thunks call
+  `checkAuthStatus` (see `actions/utils.js`), and the `QueryClient` global
+  `onError` dispatches `postLogout()` (see `conf/queryClient.js`). The two paths
+  must stay aligned — if one drops the logout dispatch, the user experience of
+  a session expiry will depend on which layer fired the request. Converges to a
+  single path only once the last thunk is migrated.
+
+### Conventions
+
+- **List hooks** (`useLanguages`, `useSubjects`, `useDocumentTypes`, …) return
+  the raw `useQuery` object. Callers destructure and default the list:
+  `const { data: languages = [], isLoading } = useLanguages();`. That keeps
+  `refetch`, `isFetching`, `isPending`, `error` at hand without a wrapper that
+  would hide them.
+- **Transformed hooks** (`useFileFormats`) expose the derived fields at the top
+  level of the return, alongside `isLoading` and `error` — same names as
+  `useQuery` so the two shapes never disagree.
+- **Options** go in an object, not positional arguments:
+  `useLicenses({ enabled: showAuthorization })`. Positional booleans do not
+  survive the second option being added.
+- **Sorting and shaping** go inside `select`, at module scope so the identity
+  is stable across renders. The array is copied first — `select` receives the
+  cache array itself and mutating it corrupts what every other observer reads.
+- **Cross-caller lookups** (`findLicenseByName`, and future siblings) are
+  colocated with their hook and re-exported from `hooks/index.js`. A
+  `licenses.find(l => l.name === x)` reinvented in three components is the
+  duplication this migration is meant to remove, not accumulate.
