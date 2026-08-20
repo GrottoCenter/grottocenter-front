@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Box, Paper } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchStatisticsCountry } from '../../../actions/Country/GetStatisticsCountry';
-import { fetchStatisticsMassif } from '../../../actions/Massif/GetStatisticsMassif';
-import { fetchStatisticsRegion } from '../../../actions/Region/GetStatisticsRegion';
+import {
+  useStatisticsCountry,
+  useStatisticsMassif,
+  useStatisticsRegion
+} from '../../../hooks';
 import SpecificsCaves from './components/SpecificsCaves';
 import CavesData from './components/CavesData/index';
 import CavesStatistics from './components/CavesStatistics';
@@ -19,50 +19,29 @@ const StatisticsDataDashboard = ({
   regionId,
   description
 }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
 
-  const { dataMassif, loadingMassif, errorMassif } = useSelector(
-    state => state.statisticsMassif
-  );
-  const { dataCountry, loadingCountry, errorCountry } = useSelector(
-    state => state.statisticsCountry
-  );
-  const { statistics: dataRegion, status: statusRegion } = useSelector(
-    state => state.statisticsRegion
-  );
-  const loadingRegion = statusRegion === 'LOADING';
-  const errorRegion = statusRegion === 'FAILED';
+  // All three fire so consumers don't have to branch on entity type before the
+  // hook call — {enabled} gates on presence of the corresponding ids, so only
+  // the relevant one hits the network.
+  const regionQuery = useStatisticsRegion(countryId, regionId);
+  const countryQuery = useStatisticsCountry(regionId ? null : countryId);
+  const massifQuery = useStatisticsMassif(massifId);
 
-  useEffect(() => {
-    if (regionId && countryId) {
-      dispatch(fetchStatisticsRegion(countryId, regionId));
-    } else if (countryId) {
-      dispatch(fetchStatisticsCountry(countryId));
-    } else {
-      dispatch(fetchStatisticsMassif(massifId));
-    }
-  }, [countryId, massifId, regionId, dispatch]);
-
-  let data;
+  let query;
   let entityType;
   if (regionId && countryId) {
-    data = dataRegion;
+    query = regionQuery;
     entityType = 'region';
   } else if (countryId) {
-    data = dataCountry;
+    query = countryQuery;
     entityType = 'country';
   } else {
-    data = dataMassif;
+    query = massifQuery;
     entityType = 'massif';
   }
 
-  const requestState = {
-    region: { isLoading: loadingRegion, hasError: errorRegion },
-    country: { isLoading: loadingCountry, hasError: errorCountry },
-    massif: { isLoading: loadingMassif, hasError: errorMassif }
-  }[entityType];
-  const { isLoading, hasError } = requestState;
+  const { data, isPending: isLoading, isError: hasError } = query;
   const hasData = data && data.nb_caves > 0 && !hasError;
   const isEmpty =
     !isLoading &&

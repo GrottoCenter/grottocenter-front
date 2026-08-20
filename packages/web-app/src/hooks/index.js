@@ -155,6 +155,13 @@ export {
   useInvalidEmailCavers
 } from './queries/useAdminLists';
 export {
+  useDynamicNumber,
+  useCumulatedLength,
+  useStatisticsCountry,
+  useStatisticsRegion,
+  useStatisticsMassif
+} from './queries/useStats';
+export {
   useCreateOrganization,
   useUpdateOrganization
 } from './mutations/useOrganizationForm';

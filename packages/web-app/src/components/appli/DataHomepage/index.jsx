@@ -1,11 +1,8 @@
-import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Box, Grid, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useDispatch, useSelector } from 'react-redux';
 import { Handshake } from '@mui/icons-material';
-import { loadDynamicNumber } from '../../../actions/DynamicNumber';
-import { fetchCumulatedLength } from '../../../actions/CumulatedLength';
+import { useCumulatedLength, useDynamicNumber } from '../../../hooks';
 import DataCard from './components/DataCard';
 import DataLine from './components/DataLine';
 import CustomIcon from '../../common/CustomIcon';
@@ -32,31 +29,15 @@ const StyledLink = props => (
 
 const DataHomepage = () => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-  const { languageObject } = useSelector(state => state.intl);
 
-  // get Object : { isFetching: bool, number: Number }
-  const {
-    documents,
-    entrances,
-    officialPartners,
-    organizations,
-    users,
-    countries
-  } = useSelector(state => state.dynamicNumber);
-  const { cumulatedLength, loadingCumulatedLength } = useSelector(
-    state => state.cumulatedLength
-  );
-
-  useEffect(() => {
-    dispatch(loadDynamicNumber('documents'));
-    dispatch(loadDynamicNumber('entrances'));
-    dispatch(loadDynamicNumber('officialPartners'));
-    dispatch(loadDynamicNumber('organizations'));
-    dispatch(loadDynamicNumber('users'));
-    dispatch(loadDynamicNumber('countries'));
-    dispatch(fetchCumulatedLength());
-  }, [dispatch, languageObject]);
+  const documents = useDynamicNumber('documents');
+  const entrances = useDynamicNumber('entrances');
+  const officialPartners = useDynamicNumber('officialPartners');
+  const organizations = useDynamicNumber('organizations');
+  const users = useDynamicNumber('users');
+  const countries = useDynamicNumber('countries');
+  const { data: cumulatedLength, isPending: loadingCumulatedLength } =
+    useCumulatedLength();
 
   return (
     <Box sx={{ margin: '10px 5%' }}>
@@ -65,23 +46,23 @@ const DataHomepage = () => {
       </SectionTitle>
       <div>
         {/* First line */}
-        {officialPartners && (
+        {officialPartners.data != null && (
           <DataLine
-            numberData={officialPartners.number}
-            isFetching={officialPartners.isFetching}
+            numberData={officialPartners.data}
+            isFetching={officialPartners.isPending}
             icon={<Handshake sx={{ fontSize: 55 }} color="primary" />}
           />
         )}
         {/* Rest of the grid */}
         <Grid container>
           <Grid size={{ xs: 12, sm: 4 }}>
-            {entrances && (
+            {entrances.data != null && (
               <StyledLink to="/ui/entrances">
                 <DataCard
                   isColored={false}
                   icon={<CustomIcon type="entrance" size={55} />}
-                  numberData={entrances.number}
-                  isFetching={entrances.isFetching}
+                  numberData={entrances.data}
+                  isFetching={entrances.isPending}
                   title={formatMessage({ id: 'caves' })}
                   globalText={formatMessage({ id: 'are accessible.' })}
                 />
@@ -90,13 +71,13 @@ const DataHomepage = () => {
           </Grid>
 
           <Grid size={{ xs: 12, sm: 4 }}>
-            {users && (
+            {users.data != null && (
               <StyledLink to="/ui/persons">
                 <DataCard
                   isColored
                   icon={<CustomIcon type="caver" size={55} />}
-                  numberData={users.number}
-                  isFetching={users.isFetching}
+                  numberData={users.data}
+                  isFetching={users.isPending}
                   title={formatMessage({ id: 'cavers' })}
                   globalText={formatMessage({
                     id: 'take part, day after day, in improving and expanding the database.'
@@ -106,13 +87,13 @@ const DataHomepage = () => {
             )}
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
-            {documents && (
+            {documents.data != null && (
               <StyledLink to="/ui/documents">
                 <DataCard
                   isColored={false}
                   icon={<CustomIcon type="bibliography" size={55} />}
-                  numberData={documents.number}
-                  isFetching={documents.isFetching}
+                  numberData={documents.data}
+                  isFetching={documents.isPending}
                   title={formatMessage({ id: 'documents' })}
                   globalText={formatMessage({
                     id: 'are referenced.'
@@ -123,13 +104,13 @@ const DataHomepage = () => {
           </Grid>
 
           <Grid size={{ xs: 12, sm: 4 }}>
-            {countries && (
+            {countries.data != null && (
               <StyledLink to="/ui/countries">
                 <DataCard
                   isColored
                   icon={<CustomIcon size={55} type="country" />}
-                  numberData={countries.number}
-                  isFetching={countries.isFetching}
+                  numberData={countries.data}
+                  isFetching={countries.isPending}
                   title={formatMessage({ id: 'countries' })}
                   globalText={formatMessage({
                     id: 'are represented on this website.'
@@ -163,13 +144,13 @@ const DataHomepage = () => {
             )}
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
-            {organizations && (
+            {organizations.data != null && (
               <StyledLink to="/ui/organizations">
                 <DataCard
                   isColored
                   icon={<CustomIcon type="organization" size={55} />}
-                  numberData={organizations.number}
-                  isFetching={organizations.isFetching}
+                  numberData={organizations.data}
+                  isFetching={organizations.isPending}
                   title={formatMessage({ id: 'organizations' })}
                   globalText={formatMessage({
                     id: 'are registered on the website.'

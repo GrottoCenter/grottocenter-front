@@ -10,7 +10,6 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { Print } from '@mui/icons-material';
 import ShareIcon from '@mui/icons-material/Share';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { useReactToPrint } from 'react-to-print';
 import { isMobile } from 'react-device-detect';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
@@ -23,7 +22,12 @@ import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import FetchErrorState from '../../common/FetchErrorState';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
 import CountryPropTypes from './propTypes';
-import { usePermissions, useSubscriptions, useSharePage } from '../../../hooks';
+import {
+  usePermissions,
+  useStatisticsCountry,
+  useSubscriptions,
+  useSharePage
+} from '../../../hooks';
 import getLocalizedCountryName from '../../../helpers/countryName';
 import CustomIcon from '../../common/CustomIcon';
 import Guidelines from '../Guidelines';
@@ -54,7 +58,7 @@ const Country = ({
   } = useSubscriptions();
   const isSubscribed = country ? isSubscribedMethod(country.id) : false;
 
-  const { dataCountry } = useSelector(state => state.statisticsCountry);
+  const { data: dataCountry } = useStatisticsCountry(country?.id);
 
   const position =
     country?.latitude && country?.longitude

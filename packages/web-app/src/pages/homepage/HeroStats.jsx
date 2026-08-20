@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
 import { Box, Grid, Skeleton, Typography, useMediaQuery } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import { useSelector, useDispatch } from 'react-redux';
+import { useQueries } from '@tanstack/react-query';
 import { useIntl } from 'react-intl';
 import CustomIcon from '../../components/common/CustomIcon';
 import AppLink from '../../components/common/AppLink';
-import { loadDynamicNumber } from '../../actions/DynamicNumber';
+import { dynamicNumbersUrl } from '../../conf/apiRoutes';
+import { apiGet } from '../../api/client';
+import { statsKeys } from '../../api/queryKeys';
+import { STALE } from '../../conf/queryClient';
 
 const StatsStrip = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.primary.veryLight,
@@ -65,32 +67,38 @@ const STATS = [
 ];
 
 const HeroStats = () => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const dynamicNumber = useSelector(state => state.dynamicNumber);
 
-  useEffect(() => {
-    STATS.forEach(({ key }) => dispatch(loadDynamicNumber(key)));
-  }, [dispatch]);
+  // useQueries: one query per stat, all fire in parallel. Same cache key /
+  // queryFn shape as useDynamicNumber so the homepage cards and this strip
+  // share cache entries.
+  const queries = useQueries({
+    queries: STATS.map(({ key }) => ({
+      queryKey: statsKeys.dynamicNumber(key),
+      queryFn: async () => {
+        const data = await apiGet(dynamicNumbersUrl[key]);
+        return data?.count ?? null;
+      },
+      staleTime: STALE.STANDARD
+    }))
+  });
 
   return (
     <StatsStrip>
       <Grid container justifyContent="center">
-        {STATS.map(({ key, iconType, labelId, href, staticValue }) => {
-          const stat = dynamicNumber?.[key];
-          // Static entries carry their own value; dynamic ones read it
-          // from the store once the fetch lands.
+        {STATS.map(({ key, iconType, labelId, href, staticValue }, idx) => {
+          const stat = queries[idx];
+          const number = stat?.data;
           let statPrefix = '';
-          if (stat?.number) statPrefix = `${stat.number.toLocaleString()} `;
+          if (number) statPrefix = `${number.toLocaleString()} `;
           else if (staticValue) statPrefix = `${staticValue} `;
           let statValue = staticValue;
           if (!statValue) {
-            if (stat?.isFetching) {
+            if (stat?.isPending) {
               statValue = <Skeleton variant="text" width={80} />;
-            } else
-              statValue = stat?.number ? stat.number.toLocaleString() : '—';
+            } else statValue = number ? number.toLocaleString() : '—';
           }
           return (
             <Grid key={key} size={{ xs: 4, md: 2 }}>

@@ -1,11 +1,9 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Box, Skeleton, Typography } from '@mui/material';
 import { HandshakeOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import PartnersCarouselContainer from '../../containers/PartnersCarouselContainer';
-import { loadDynamicNumber } from '../../actions/DynamicNumber';
+import { useDynamicNumber } from '../../hooks';
 
 const Section = styled('section')(({ theme }) => ({
   padding: '32px 24px',
@@ -30,15 +28,9 @@ const Description = styled(Typography)({
 });
 
 const PartnersSection = () => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const officialPartners = useSelector(
-    state => state.dynamicNumber?.officialPartners
-  );
-
-  useEffect(() => {
-    dispatch(loadDynamicNumber('officialPartners'));
-  }, [dispatch]);
+  const { data: officialPartners, isPending } =
+    useDynamicNumber('officialPartners');
 
   return (
     <Section>
@@ -50,12 +42,11 @@ const PartnersSection = () => {
             component="h2"
             fontWeight={600}
             color="primary">
-            {officialPartners?.isFetching ? (
+            {isPending ? (
               <Skeleton variant="text" width={120} />
             ) : (
               <>
-                {officialPartners?.number &&
-                  `${officialPartners.number.toLocaleString()} `}
+                {officialPartners && `${officialPartners.toLocaleString()} `}
                 {formatMessage({ id: 'partners' })}
               </>
             )}

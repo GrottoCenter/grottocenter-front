@@ -155,3 +155,14 @@ export const listKeys = {
   invalidEmailCavers: () => ['list', 'invalidEmailCavers'],
   groups: () => ['list', 'groups']
 };
+
+// Homepage aggregate counters + per-entity statistics blocks. All are
+// long-cache-friendly aggregate reads.
+export const statsKeys = {
+  all: ['stats'],
+  dynamicNumber: type => ['stats', 'dynamicNumber', type],
+  cumulatedLength: () => ['stats', 'cumulatedLength'],
+  country: countryId => ['stats', 'country', countryId],
+  region: (countryId, regionId) => ['stats', 'region', countryId, regionId],
+  massif: massifId => ['stats', 'massif', massifId]
+};

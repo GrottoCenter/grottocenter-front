@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
 import { Button, Card, CircularProgress, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
@@ -22,6 +21,7 @@ import {
   usePermissions,
   useScrollToHashOnLoad,
   useSharePage,
+  useStatisticsMassif,
   useSubscribeToMassif,
   useSubscriptions,
   useUnsubscribeFromMassif
@@ -79,7 +79,7 @@ const Massif = ({
     if (massif) setWantedDeletedState(massif.isDeleted);
   }, [massif]);
 
-  const { dataMassif } = useSelector(state => state.statisticsMassif);
+  const { data: dataMassif } = useStatisticsMassif(massifIdInt);
   useScrollToHashOnLoad(dataMassif);
 
   let onEdit = null;

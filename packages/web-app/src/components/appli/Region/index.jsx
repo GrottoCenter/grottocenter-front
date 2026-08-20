@@ -9,7 +9,6 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { Print } from '@mui/icons-material';
 import ShareIcon from '@mui/icons-material/Share';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useReactToPrint } from 'react-to-print';
 import { isMobile } from 'react-device-detect';
@@ -28,6 +27,7 @@ import GuidelinePropTypes from '../../../types/guideline.type';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
 import {
   usePermissions,
+  useStatisticsRegion,
   useSubscriptions,
   useScrollToHashOnLoad,
   useSharePage
@@ -60,9 +60,7 @@ const Region = ({
   } = useSubscriptions();
   const isSubscribed = region ? isSubscribedMethod(region.id) : false;
 
-  const { statistics: dataRegion } = useSelector(
-    state => state.statisticsRegion
-  );
+  const { data: dataRegion } = useStatisticsRegion(countryId, regionId);
   useScrollToHashOnLoad(dataRegion);
 
   const handleChangeSubscribe = () => {
