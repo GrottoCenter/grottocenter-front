@@ -1,13 +1,15 @@
-import { useCallback, useRef, useEffect, Suspense } from 'react';
+import { useCallback, useRef, useEffect, Suspense, lazy } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
 import { SnackbarContent, SnackbarProvider } from 'notistack';
+import { QueryClientProvider } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import { styled, useTheme } from '@mui/material/styles';
 import { Alert, Box, CircularProgress, useMediaQuery } from '@mui/material';
 
 import store from '../store';
+import queryClient from '../conf/queryClient';
 import {
   bootstrapIntl,
   changeLocale,
@@ -46,6 +48,18 @@ async function transitionToReact() {
     loaderEl.remove();
   }, 410);
 }
+
+// import.meta.env.DEV is statically replaced at build time, so the ternary folds
+// to null in production and the dynamic import becomes unreachable — the
+// devtools bundle is never emitted. Keep the guard inline for that reason; a
+// runtime check would ship the chunk.
+const ReactQueryDevtools = import.meta.env.DEV
+  ? lazy(() =>
+      import('@tanstack/react-query-devtools').then(m => ({
+        default: m.ReactQueryDevtools
+      }))
+    )
+  : null;
 
 const customOnIntlError = err => {
   // Custom handler for missing translation.
@@ -240,23 +254,32 @@ const ApplicationShell = () => {
           node (the notifiers all pass <FormattedMessage>) never matches itself,
           so it would opt out of deduplication silently. */}
       <Provider store={store}>
-        <HydratedIntlProvider onError={customOnIntlError}>
-          <SnackbarProvider
-            maxSnack={4}
-            dense={isCompact}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            Components={SNACKBAR_COMPONENTS}>
-            <ErrorHandler />
-            {/* Outside the boundary on purpose: when a stale build crashes the
-                app, offering the update is exactly what fixes it. */}
-            <UpdatePrompt />
-            <NetworkStatusNotifier />
-            <SessionExpiryNotifier />
-            <ErrorBoundary>
-              <ApplicationLayout />
-            </ErrorBoundary>
-          </SnackbarProvider>
-        </HydratedIntlProvider>
+        {/* Inside Provider: the QueryClient's global error handler dispatches to
+            the store, and its toasts are rendered by the SnackbarProvider below. */}
+        <QueryClientProvider client={queryClient}>
+          <HydratedIntlProvider onError={customOnIntlError}>
+            <SnackbarProvider
+              maxSnack={4}
+              dense={isCompact}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+              Components={SNACKBAR_COMPONENTS}>
+              <ErrorHandler />
+              {/* Outside the boundary on purpose: when a stale build crashes the
+                  app, offering the update is exactly what fixes it. */}
+              <UpdatePrompt />
+              <NetworkStatusNotifier />
+              <SessionExpiryNotifier />
+              <ErrorBoundary>
+                <ApplicationLayout />
+              </ErrorBoundary>
+            </SnackbarProvider>
+          </HydratedIntlProvider>
+          {ReactQueryDevtools && (
+            <Suspense fallback={null}>
+              <ReactQueryDevtools initialIsOpen={false} />
+            </Suspense>
+          )}
+        </QueryClientProvider>
       </Provider>
     </div>
   );
