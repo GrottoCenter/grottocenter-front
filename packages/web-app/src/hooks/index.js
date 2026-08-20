@@ -257,6 +257,7 @@ export { useMeasuredHeight } from './useMeasuredHeight';
 export { useMeasuredWidth } from './useMeasuredWidth';
 export { useLongPress } from './useLongPress';
 export { useOnlineStatus } from './useOnlineStatus';
+// Non-RQ reconnect paths: map viewport, intl catalogue and Leaflet tile redraw.
 export { useRefetchOnReconnect } from './useRefetchOnReconnect';
 export { useIsDesktopLayout } from './useIsDesktopLayout';
 export { useSideMenuOffset } from './useSideMenuOffset';
