@@ -1,32 +1,30 @@
 import { useEffect } from 'react';
 import { Typography } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
-import { fetchAdvancedSearchResults } from '../../actions/Advancedsearch';
+import {
+  useUserProperties,
+  useAdvancedSearch,
+  startAdvancedSearch,
+  refineAdvancedSearch
+} from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import { useUserProperties } from '../../hooks';
 import AuthChecker from '../../components/appli/AuthChecker';
-
 import EntityTable from '../../components/common/EntityTable';
 import Translate from '../../components/common/Translate';
 
 const ContributionsPage = () => {
   const userId = useUserProperties()?.id;
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-
-  const { queryParams, isLoading, results, totalResults } = useSelector(
-    state => state.advancedsearch
-  );
+  const { data, isFetching, params } = useAdvancedSearch();
+  const results = data?.results;
+  const totalResults = data?.totalResults ?? 0;
 
   useEffect(() => {
-    dispatch(
-      fetchAdvancedSearchResults({
-        entity: 'documents',
-        filter: { creatorId: userId }
-      })
-    );
+    startAdvancedSearch({
+      entity: 'documents',
+      filter: { creatorId: userId }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -46,21 +44,20 @@ const ContributionsPage = () => {
                   const c = columns.find(e => e.field === 'dateInscription');
                   c.visible = true;
                 }}
-                isLoading={isLoading}
+                isLoading={isFetching}
                 pageRows={results}
                 nbTotalRows={totalResults}
                 onPageChange={(pageNum, pageSize) => {
-                  if (!queryParams) return;
-                  const newQueryParams = { ...queryParams };
-                  newQueryParams.page = pageNum + 1;
-                  newQueryParams.size = pageSize;
-                  dispatch(fetchAdvancedSearchResults(newQueryParams, false));
+                  if (!params) return;
+                  refineAdvancedSearch({
+                    ...params,
+                    page: pageNum + 1,
+                    size: pageSize
+                  });
                 }}
                 onSortChange={sort => {
-                  if (!queryParams) return;
-                  const newQueryParams = { ...queryParams };
-                  newQueryParams.sort = sort;
-                  dispatch(fetchAdvancedSearchResults(newQueryParams, false));
+                  if (!params) return;
+                  refineAdvancedSearch({ ...params, sort });
                 }}
               />
             </>

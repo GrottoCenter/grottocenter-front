@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
 import {
-  fetchAdvancedSearchResults,
-  resetAdvancedSearchResults
-} from '../../../actions/Advancedsearch';
-import { useDocumentTypes, useSubjects } from '../../../hooks';
+  useDocumentTypes,
+  useSubjects,
+  startAdvancedSearch,
+  resetAdvancedSearch
+} from '../../../hooks';
 import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON
@@ -108,7 +108,6 @@ SubjectEntry.propTypes = {
 };
 
 const DocumentSearch = () => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const { filterState, updateFilter, handleRemoveFilter, resetFilter } =
     useSearchFilter(initialFilterState);
@@ -125,16 +124,14 @@ const DocumentSearch = () => {
     overrideFilter,
     overrideMatchAll
   ) =>
-    dispatch(
-      fetchAdvancedSearchResults({
-        entity: searchEntity,
-        query: overrideQuery !== undefined ? overrideQuery : query,
-        filter: overrideFilter !== undefined ? overrideFilter : filterState,
-        matchAllFields:
-          overrideMatchAll !== undefined ? overrideMatchAll : matchAllFields,
-        size: getStoredRowsPerPage()
-      })
-    );
+    startAdvancedSearch({
+      entity: searchEntity,
+      query: overrideQuery !== undefined ? overrideQuery : query,
+      filter: overrideFilter !== undefined ? overrideFilter : filterState,
+      matchAllFields:
+        overrideMatchAll !== undefined ? overrideMatchAll : matchAllFields,
+      size: getStoredRowsPerPage()
+    });
 
   const advancedFilterCount = countActiveFilters(filterState, [
     'title',
@@ -387,7 +384,7 @@ const DocumentSearch = () => {
           setMatchAllFields(true);
           resetFilter();
           setAdvancedExpanded(false);
-          dispatch(resetAdvancedSearchResults());
+          resetAdvancedSearch();
           // Override params are required: React state updates from the calls above are async,
           // so filterState/query/matchAllFields still hold stale values at this point.
           startAdvancedsearch('', initialFilterState, true);

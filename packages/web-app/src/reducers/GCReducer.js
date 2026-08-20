@@ -1,6 +1,5 @@
 import { combineReducers } from 'redux';
 import account from './AccountReducer';
-import advancedsearch from './AdvancedsearchReducer';
 import banCaver from './BanCaverReducer';
 import changeEmail from './ChangeEmail';
 import changePassword from './ChangePassword';
@@ -26,7 +25,6 @@ import verifyEmail from './VerifyEmailReducer';
 
 const GCReducer = combineReducers({
   account,
-  advancedsearch,
   banCaver,
   changeEmail,
   changePassword,

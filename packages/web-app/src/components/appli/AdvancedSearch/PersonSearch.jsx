@@ -1,13 +1,9 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Box, Chip } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 
-import {
-  fetchAdvancedSearchResults,
-  resetAdvancedSearchResults
-} from '../../../actions/Advancedsearch';
+import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
 import {
   SearchForm,
   SearchActionButtons,
@@ -26,21 +22,18 @@ const TYPE_OPTIONS = [
 ];
 
 const PersonSearch = () => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const [query, setQuery] = useState('');
   const [personType, setPersonType] = useState(DEFAULT_PERSON_TYPE);
 
   const startAdvancedsearch = (overrideQuery, overrideType) => {
     const type = overrideType !== undefined ? overrideType : personType;
-    dispatch(
-      fetchAdvancedSearchResults({
-        entity: ADVANCED_SEARCH_TYPES.PERSONS,
-        query: overrideQuery !== undefined ? overrideQuery : query,
-        filter: type ? { type } : {},
-        size: getStoredRowsPerPage()
-      })
-    );
+    startAdvancedSearch({
+      entity: ADVANCED_SEARCH_TYPES.PERSONS,
+      query: overrideQuery !== undefined ? overrideQuery : query,
+      filter: type ? { type } : {},
+      size: getStoredRowsPerPage()
+    });
   };
 
   const handleTypeChange = value => {
@@ -76,7 +69,7 @@ const PersonSearch = () => {
         onReset={() => {
           setQuery('');
           setPersonType(DEFAULT_PERSON_TYPE);
-          dispatch(resetAdvancedSearchResults());
+          resetAdvancedSearch();
           startAdvancedsearch('', DEFAULT_PERSON_TYPE);
         }}
       />

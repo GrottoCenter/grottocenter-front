@@ -19,6 +19,12 @@ export { useLanguages } from './queries/useLanguages';
 export { useDocument } from './queries/useDocument';
 export { useDocumentChildren } from './queries/useDocumentChildren';
 export { useDocuments } from './queries/useDocuments';
+export {
+  useAdvancedSearch,
+  startAdvancedSearch,
+  refineAdvancedSearch,
+  resetAdvancedSearch
+} from './queries/useAdvancedSearch';
 export { useMassif } from './queries/useMassif';
 export { useCave } from './queries/useCave';
 export { useEntrance } from './queries/useEntrance';

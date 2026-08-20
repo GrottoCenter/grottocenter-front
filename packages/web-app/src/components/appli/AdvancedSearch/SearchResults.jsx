@@ -1,50 +1,41 @@
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  fetchAdvancedSearchResults,
-  downloadAdvancedSearchResults
-} from '../../../actions/Advancedsearch';
+import { useAdvancedSearch, refineAdvancedSearch } from '../../../hooks';
+import { downloadAdvancedSearchResults } from '../../../actions/Advancedsearch';
 import EntityTable from '../../common/EntityTable';
 
 const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
-  const dispatch = useDispatch();
-  const { isNewQuery, queryParams, isLoading, results, totalResults } =
-    useSelector(state => state.advancedsearch);
+  const { data, isFetching, isNewQuery, params } = useAdvancedSearch();
+  const results = data?.results;
+  const totalResults = data?.totalResults ?? 0;
 
-  if (entityType && queryParams?.entity !== entityType) return null;
+  if (entityType && params?.entity !== entityType) return null;
 
   return (
     <EntityTable
-      entityType={queryParams?.entity}
-      isLoading={isLoading}
+      entityType={params?.entity}
+      isLoading={isFetching}
       isNewQuery={isNewQuery}
       pageRows={results}
       nbTotalRows={totalResults}
       onPageChange={
-        queryParams
-          ? (pageNum, pageSize) => {
-              const newQueryParams = { ...queryParams };
-              newQueryParams.page = pageNum + 1;
-              newQueryParams.size = pageSize;
-              dispatch(fetchAdvancedSearchResults(newQueryParams, false));
-            }
+        params
+          ? (pageNum, pageSize) =>
+              refineAdvancedSearch({
+                ...params,
+                page: pageNum + 1,
+                size: pageSize
+              })
           : null
       }
       onSortChange={
-        queryParams
-          ? sort => {
-              const newQueryParams = { ...queryParams };
-              newQueryParams.sort = sort;
-              dispatch(fetchAdvancedSearchResults(newQueryParams, false));
-            }
-          : null
+        params ? sort => refineAdvancedSearch({ ...params, sort }) : null
       }
       onExport={
         hideExport
           ? null
           : (columns, columnsName, format) => {
               downloadAdvancedSearchResults({
-                ...queryParams,
+                ...params,
                 columns,
                 columnsName,
                 format

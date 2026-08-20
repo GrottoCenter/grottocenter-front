@@ -157,6 +157,15 @@ export const listKeys = {
   groups: () => ['list', 'groups']
 };
 
+// Cross-entity full-text + faceted search backing the /search page and the
+// SearchDocumentForm/SearchOrganizationForm/SearchCaveForm dialogs. Only one
+// search is active app-wide at a time (matches the pre-migration global
+// reducer state), so `results(params)` is the only key.
+export const advancedSearchKeys = {
+  all: ['advancedSearch'],
+  results: params => ['advancedSearch', 'results', params]
+};
+
 // Homepage aggregate counters + per-entity statistics blocks. All are
 // long-cache-friendly aggregate reads.
 export const statsKeys = {

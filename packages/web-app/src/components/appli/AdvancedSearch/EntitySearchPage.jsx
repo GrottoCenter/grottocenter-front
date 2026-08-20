@@ -1,14 +1,10 @@
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Divider } from '@mui/material';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import CustomIcon from '../../common/CustomIcon';
-import {
-  fetchAdvancedSearchResults,
-  resetAdvancedSearchResults
-} from '../../../actions/Advancedsearch';
+import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
 import { getStoredRowsPerPage } from '../../common/EntityTable';
 import SearchResults from './SearchResults';
 
@@ -29,24 +25,21 @@ const EntitySearchPage = ({
   children,
   initialFilter = {}
 }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const iconType = ENTITY_ICON_TYPE[entityType] ?? 'entrance';
   useEffect(() => {
-    dispatch(resetAdvancedSearchResults());
-    dispatch(
-      fetchAdvancedSearchResults({
-        entity: entityType,
-        query: '',
-        filter: initialFilter,
-        matchAllFields: true,
-        size: getStoredRowsPerPage()
-      })
-    );
+    resetAdvancedSearch();
+    startAdvancedSearch({
+      entity: entityType,
+      query: '',
+      filter: initialFilter,
+      matchAllFields: true,
+      size: getStoredRowsPerPage()
+    });
     // initialFilter is intentionally excluded: it's fixed at mount time.
     // Consumers must use key={searchKey} to force remounting when the filter changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, entityType]);
+  }, [entityType]);
 
   const resolvedTitle =
     typeof title === 'string' ? formatMessage({ id: title }) : title;

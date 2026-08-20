@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Box, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import OfflineDisabled from '@/components/common/OfflineDisabled';
-import { useOnlineStatus } from '@/hooks';
-import { resetAdvancedSearchResults } from '../../../actions/Advancedsearch';
+import { useOnlineStatus, resetAdvancedSearch } from '@/hooks';
 import DocumentSearch from '../AdvancedSearch/DocumentSearch';
 import SearchResults from '../AdvancedSearch/SearchResults';
 import Alert from '../../common/Alert';
@@ -18,14 +16,9 @@ const SpacedButton = styled(Button)`
 `;
 
 const SearchDocumentForm = ({ closeForm, onSubmit }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
   const [selectedDocuments, setSelectedDocuments] = useState([]);
-
-  const resetAdvancedSearch = () => {
-    dispatch(resetAdvancedSearchResults());
-  };
 
   const resetForm = () => {
     resetAdvancedSearch();

@@ -1,13 +1,9 @@
 import { useState, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { useIntl } from 'react-intl';
 import DataUsageIcon from '@mui/icons-material/DataUsage';
-import {
-  fetchAdvancedSearchResults,
-  resetAdvancedSearchResults
-} from '../../../actions/Advancedsearch';
+import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
 import SearchInput from '../../common/SearchInput';
 
 import useSearchFilter from '../../../hooks/useSearchFilter';
@@ -97,8 +93,6 @@ const EntrancesSearch = ({
   lockedFilter = [],
   valueLabels = {}
 }) => {
-  const dispatch = useDispatch();
-
   const mergedInitialState = useMemo(
     () => ({ ...initialFilterState, ...initialFilter }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -117,16 +111,14 @@ const EntrancesSearch = ({
     overrideFilter,
     overrideMatchAll
   ) =>
-    dispatch(
-      fetchAdvancedSearchResults({
-        entity: searchEntity,
-        query: overrideQuery !== undefined ? overrideQuery : query,
-        filter: overrideFilter !== undefined ? overrideFilter : filterState,
-        matchAllFields:
-          overrideMatchAll !== undefined ? overrideMatchAll : matchAllFields,
-        size: getStoredRowsPerPage()
-      })
-    );
+    startAdvancedSearch({
+      entity: searchEntity,
+      query: overrideQuery !== undefined ? overrideQuery : query,
+      filter: overrideFilter !== undefined ? overrideFilter : filterState,
+      matchAllFields:
+        overrideMatchAll !== undefined ? overrideMatchAll : matchAllFields,
+      size: getStoredRowsPerPage()
+    });
 
   const { formatMessage } = useIntl();
 
@@ -319,7 +311,7 @@ const EntrancesSearch = ({
           setMatchAllFields(true);
           resetFilter();
           setAdvancedExpanded(false);
-          dispatch(resetAdvancedSearchResults());
+          resetAdvancedSearch();
           // Override params are required: React state updates from the calls above are async,
           // so filterState/query/matchAllFields still hold stale values at this point.
           startAdvancedsearch('', mergedInitialState, true);
