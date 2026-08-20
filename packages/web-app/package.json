@@ -39,7 +39,6 @@
     "d3-polygon": "^3.0.1",
     "date-fns": "^4.4.0",
     "diff": "^8.0.4",
-    "isomorphic-fetch": "^3.0.0",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
     "leaflet-rotate": "^0.2.8",

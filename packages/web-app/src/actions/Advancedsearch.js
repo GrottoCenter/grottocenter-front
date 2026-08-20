@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import { advancedSearchExportUrl } from '../conf/apiRoutes';
 import { VALID_EXPORT_FORMATS } from '../conf/exportFormats';
 import { checkAndGetStatus } from './utils';

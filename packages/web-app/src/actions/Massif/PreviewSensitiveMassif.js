@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import { previewMassifSensitiveUrl } from '../../conf/apiRoutes';
 import { checkAuthStatus } from '../utils';
 

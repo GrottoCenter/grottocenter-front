@@ -1,9 +1,9 @@
 import fc from 'fast-check';
 import { downloadAdvancedSearchResults } from './Advancedsearch';
 
-// Mock isomorphic-fetch (hoisted so it can be referenced in the hoisted vi.mock)
-const { mockFetch } = vi.hoisted(() => ({ mockFetch: vi.fn() }));
-vi.mock('isomorphic-fetch', () => ({ default: mockFetch }));
+// The action calls the global `fetch` directly (isomorphic-fetch was removed
+// in Phase I3). Stub the global in beforeEach; restore in afterEach.
+const mockFetch = vi.fn();
 
 // Mock apiRoutes
 vi.mock('../conf/apiRoutes', () => ({
@@ -21,6 +21,7 @@ describe('downloadAdvancedSearchResults', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal('fetch', mockFetch);
     window.URL.createObjectURL = vi
       .fn()
       .mockReturnValue('blob:http://localhost/fake');
@@ -33,6 +34,7 @@ describe('downloadAdvancedSearchResults', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   const setupFetchBlob = () => {

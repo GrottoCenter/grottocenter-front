@@ -40,7 +40,6 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { styled } from '@mui/material/styles';
 
-import fetch from 'isomorphic-fetch';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchAccount } from '../../actions/Account/GetAccount';
 import { checkAuthStatus } from '../../actions/utils';

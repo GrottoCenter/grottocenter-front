@@ -1,5 +1,3 @@
-import fetch from 'isomorphic-fetch';
-
 import store from '../store';
 import { checkAndGetStatus } from '../actions/utils';
 

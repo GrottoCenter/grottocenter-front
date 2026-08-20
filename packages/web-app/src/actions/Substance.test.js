@@ -1,13 +1,9 @@
-import fetch from 'isomorphic-fetch';
 import { searchSubstances, createSubstance } from './Substance';
 
 // Mock the Login module to prevent issues with checkAuthStatus
 vi.mock('./Login', () => ({
   postLogout: () => () => {}
 }));
-
-// Mock isomorphic-fetch (default import)
-vi.mock('isomorphic-fetch', () => ({ default: vi.fn() }));
 
 const mockGetState = () => ({
   login: {
@@ -22,13 +18,17 @@ const mockDispatch = vi.fn(action => {
   return action;
 });
 
+const mockFetch = vi.fn();
+
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.stubGlobal('fetch', mockFetch);
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 afterEach(() => {
   console.error.mockRestore();
+  vi.unstubAllGlobals();
 });
 
 describe('searchSubstances', () => {
@@ -52,7 +52,7 @@ describe('searchSubstances', () => {
       }
     ];
 
-    fetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       status: 200,
       json: () => Promise.resolve(mockResults)
     });
@@ -60,14 +60,14 @@ describe('searchSubstances', () => {
     const result = await searchSubstances('nitra')(mockDispatch, mockGetState);
 
     expect(result).toEqual(mockResults);
-    expect(fetch).toHaveBeenCalledWith(
+    expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/substances?search=nitra'),
       expect.objectContaining({ method: 'GET' })
     );
   });
 
   it('returns empty array on network error', async () => {
-    fetch.mockRejectedValueOnce(new Error('Network error'));
+    mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
     const result = await searchSubstances('nitra')(mockDispatch, mockGetState);
 
@@ -75,7 +75,7 @@ describe('searchSubstances', () => {
   });
 
   it('returns empty array on server error (5xx)', async () => {
-    fetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       status: 500,
       json: () => Promise.resolve({ message: 'Internal error' })
     });
@@ -86,7 +86,7 @@ describe('searchSubstances', () => {
   });
 
   it('returns empty array on auth error (401)', async () => {
-    fetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       status: 401,
       json: () => Promise.resolve({ message: 'Unauthorized' })
     });
@@ -108,7 +108,7 @@ describe('createSubstance', () => {
       externalSource: 'PubChem'
     };
 
-    fetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       status: 201,
       json: () => Promise.resolve(substance)
     });
@@ -122,7 +122,7 @@ describe('createSubstance', () => {
     const result = await createSubstance(data)(mockDispatch, mockGetState);
 
     expect(result).toEqual(substance);
-    expect(fetch).toHaveBeenCalledWith(
+    expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/substances'),
       expect.objectContaining({
         method: 'POST',
@@ -141,7 +141,7 @@ describe('createSubstance', () => {
       externalSource: 'PubChem'
     };
 
-    fetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       status: 200,
       json: () => Promise.resolve(existing)
     });
@@ -155,7 +155,7 @@ describe('createSubstance', () => {
   });
 
   it('throws on server error', async () => {
-    fetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       status: 500,
       json: () => Promise.resolve({ message: 'Internal server error' })
     });
@@ -166,7 +166,7 @@ describe('createSubstance', () => {
   });
 
   it('returns undefined on auth error (401)', async () => {
-    fetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       status: 401,
       json: () => Promise.resolve({ message: 'Unauthorized' })
     });

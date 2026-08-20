@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import { substancesUrl, substancesSearchUrl } from '../conf/apiRoutes';
 import { checkAuthStatus } from './utils';
 

@@ -1,4 +1,3 @@
-// import fetch from 'isomorphic-fetch';
 import { loginUrl, forgotPasswordUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 

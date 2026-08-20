@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import { fieldSearchUrl } from '../conf/apiRoutes';
 import { checkAndGetStatus } from './utils';
 

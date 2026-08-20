@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import { checkAuthStatus } from '../utils';
 import { linkExploredEntranceUrl } from '../../conf/apiRoutes';
 

@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import { checkAndGetStatus } from './utils';
 
 export const CHANGE_LOCALE = 'CHANGE_LOCALE';
