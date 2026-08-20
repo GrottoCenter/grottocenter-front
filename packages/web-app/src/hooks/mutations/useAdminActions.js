@@ -99,9 +99,12 @@ export const useDetachEntranceToNewCave = () => {
       try {
         return await emptyPatch(moveEntranceToCaveUrl(entrance.id, newCave.id));
       } catch (moveError) {
-        // Best-effort rollback; swallow any rollback error.
+        // Best-effort rollback; swallow any rollback error. Pass
+        // `isPermanent: true` so the never-used cave doesn't linger in
+        // the trash bearing the entrance's name — deleteCaveUrl defaults
+        // to a soft delete otherwise.
         try {
-          await apiDelete(deleteCaveUrl(newCave.id, {}));
+          await apiDelete(deleteCaveUrl(newCave.id, { isPermanent: true }));
         } catch {
           /* rollback failure is intentionally silent */
         }

@@ -49,7 +49,8 @@ const NotificationMenu = () => {
   const { formatMessage } = useIntl();
   const { isAuth } = usePermissions();
   const { data: menuData, isPending } = useMenuNotifications({
-    size: NUMBER_OF_NOTIFICATIONS
+    size: NUMBER_OF_NOTIFICATIONS,
+    enabled: isAuth
   });
   const notifications = menuData?.notifications;
   const { data: nbNotifications = 0 } = useUnreadNotificationsCount({

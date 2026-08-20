@@ -74,13 +74,16 @@ const Person = ({
       // Reuse the cache if the Messages page has already loaded the first
       // active conversations page; otherwise fetchQuery does exactly one
       // request and hydrates the same cache entry the Messages page uses.
+      // Keep pageSize in sync with pages/Messages/index.jsx (PAGE_SIZE = 20)
+      // — RQ hashes the key structurally, so a mismatched pageSize keys a
+      // separate cache entry and defeats the intended reuse.
       // TODO: replace with a dedicated /conversations?participant=id endpoint
-      // — if the target conversation is beyond the first 50, it won't be found.
-      const criteria = { isArchived: false, page: 1, pageSize: 50 };
+      // — if the target conversation is beyond the first page, it won't be found.
+      const criteria = { isArchived: false, page: 1, pageSize: 20 };
       const { data } = await queryClient.fetchQuery({
         queryKey: messageKeys.conversations(criteria),
         queryFn: () =>
-          apiGetWithRange(makeUrl(getConversationsUrl, { limit: 50, skip: 0 }))
+          apiGetWithRange(makeUrl(getConversationsUrl, { limit: 20, skip: 0 }))
       });
       const items = data?.conversations ?? [];
       const existingConv = items.find(

@@ -207,7 +207,11 @@ export const DeleteConfirmationDialog = ({
     isFetching: isQuickSearchLoading
   } = useQuickSearch({
     query: debouncedInput,
-    entities: [entityType.searchType]
+    entities: [entityType.searchType],
+    // Preserve the legacy `debouncedInput.length > 2` threshold — the hook
+    // defaults to AUTOCOMPLETE_MIN_CHARACTERS (2), which would fire one
+    // character earlier than the pre-migration behavior of this dialog.
+    minChars: 3
   });
   const suggestions = data?.results ?? [];
 

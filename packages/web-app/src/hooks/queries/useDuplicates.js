@@ -13,7 +13,7 @@ import {
   createNewEntranceFromDuplicateUrl
 } from '../../conf/apiRoutes';
 import { apiDelete, apiGetWithRange, apiPost } from '../../api/client';
-import { duplicateKeys } from '../../api/queryKeys';
+import { countKeys, duplicateKeys } from '../../api/queryKeys';
 import { STALE } from '../../conf/queryClient';
 import { getTotalCount, makeUrl } from '../../actions/utils';
 
@@ -69,7 +69,7 @@ export const useDuplicate = (type, id) => {
 };
 
 // Delete a batch of duplicates by id list. Invalidates the whole domain so
-// both list and any detail refetch cleanly.
+// both list and any detail refetch cleanly, plus the AppBar counter.
 export const useDeleteDuplicates = type => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -78,19 +78,24 @@ export const useDeleteDuplicates = type => {
       const query = ids.map(id => `id=${encodeURIComponent(id)}`).join('&');
       return apiDelete(`${base}?${query}`);
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: duplicateKeys.all })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: duplicateKeys.all });
+      queryClient.invalidateQueries({ queryKey: countKeys.duplicates() });
+    }
   });
 };
 
 // Delete one duplicate row. Same invalidation scope — the caller relies on
-// it firing so the queue refreshes after each merge step.
+// it firing so the queue refreshes after each merge step, and the badge
+// count in AppBar reflects the empty queue.
 export const useDeleteDuplicate = type => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: id => apiDelete(deleteOneUrlByType[type](id)),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: duplicateKeys.all })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: duplicateKeys.all });
+      queryClient.invalidateQueries({ queryKey: countKeys.duplicates() });
+    }
   });
 };
 
@@ -100,7 +105,9 @@ export const useCreateEntityFromDuplicate = type => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: id => apiPost(createNewFromUrlByType[type](id), undefined),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: duplicateKeys.all })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: duplicateKeys.all });
+      queryClient.invalidateQueries({ queryKey: countKeys.duplicates() });
+    }
   });
 };

@@ -8,7 +8,7 @@ import {
 } from '../../conf/apiRoutes';
 import { apiPost, apiPut } from '../../api/client';
 import { caveKeys, entranceKeys } from '../../api/queryKeys';
-import { invalidateAll } from '../../utils/mapTileCache';
+import { invalidateAll, invalidateTileAt } from '../../utils/mapTileCache';
 
 // Networks on the map are the projection of caves — every create/update
 // touches the networks tile cache so a moderator sees the marker move.
@@ -48,11 +48,20 @@ export const useCreateCaveAndEntrance = () => {
       });
       return { cave, entrance };
     },
-    onSuccess: () => {
+    onSuccess: ({ entrance } = {}) => {
       queryClient.invalidateQueries({ queryKey: caveKeys.all });
       queryClient.invalidateQueries({ queryKey: entranceKeys.all });
-      invalidateAll('entrances');
-      invalidateAll('networks');
+      // Same targeted-then-fallback pattern as useCreateEntrance so a new
+      // cave+entrance pair doesn't invalidate every cached tile.
+      const latitude = entrance?.latitude;
+      const longitude = entrance?.longitude;
+      if (latitude != null && longitude != null) {
+        invalidateTileAt('entrances', latitude, longitude);
+        invalidateTileAt('networks', latitude, longitude);
+      } else {
+        invalidateAll('entrances');
+        invalidateAll('networks');
+      }
     }
   });
 };

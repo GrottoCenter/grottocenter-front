@@ -74,8 +74,16 @@ export const useVerifyEmail = token =>
 // the login dialog with a forgot-password context. Redux dispatch happens
 // inline for that branch — cleaner than adding onError options at every
 // call site, and the login slice stays authoritative for that path.
+//
+// The mutation must NOT resolve as success on NotVerified: the
+// ForgotPasswordPage flips its "Check your email to reset your password."
+// confirmation on mutation.isSuccess, which would falsely tell the user a
+// reset email was sent (none was — the API returned 401). We throw a
+// tagged sentinel that lets the page suppress its success view while
+// meta.skip401Logout keeps the global handler quiet (no logout, no toast).
 export const useForgotPassword = () =>
   useMutation({
+    meta: { skip401Logout: true },
     mutationFn: async data => {
       try {
         return await apiPost(forgotPasswordUrl, data);
@@ -83,10 +91,10 @@ export const useForgotPassword = () =>
         if (err?.status === 401 && err?.body?.status === 'NotVerified') {
           store.dispatch(displayLoginDialog('forgotPassword'));
           store.dispatch(fetchLoginNotVerified('forgotPassword', data.email));
-          // Return undefined so the mutation isn't marked as errored — the
-          // UI already handled the redirect and would otherwise flash an
-          // error banner during the transition.
-          return undefined;
+          const handled = new Error('NotVerified');
+          handled.status = 401;
+          handled.isNotVerified = true;
+          throw handled;
         }
         throw err;
       }

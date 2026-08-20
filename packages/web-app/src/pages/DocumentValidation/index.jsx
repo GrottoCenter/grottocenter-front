@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import { isMobileOnly } from 'react-device-detect';
@@ -34,7 +34,7 @@ const DocumentValidationPage = () => {
   const closeDetailedView = () => setDetailedView(null);
   const closeEditView = () => setEditView(null);
 
-  const { isLoading, data } = useDocuments({
+  const { isFetching, data } = useDocuments({
     isValidated: false,
     limit: rowsPerPage,
     skip: page * rowsPerPage
@@ -45,10 +45,11 @@ const DocumentValidationPage = () => {
   // useProcessDocuments already invalidates documentKeys.all, so the queue
   // refetches on validate/decline. This callback only resets the UI selection
   // and closes the details modal (side effects that stay local to this page).
-  const handleProcessed = () => {
+  // Memoized so Actions' onProcessed effect doesn't re-fire on every render.
+  const handleProcessed = useCallback(() => {
     setSelectedIds([]);
     closeDetailedView();
-  };
+  }, []);
 
   // useUpdateDocument invalidates documentKeys.all on success — the queue
   // refetches automatically. This page just closes the edit modal.
@@ -74,7 +75,7 @@ const DocumentValidationPage = () => {
                 </Typography>
                 <EntityTable
                   entityType="documents"
-                  isLoading={isLoading}
+                  isLoading={isFetching}
                   pageRows={documents}
                   nbTotalRows={totalCount}
                   selectedIds={selectedIds}

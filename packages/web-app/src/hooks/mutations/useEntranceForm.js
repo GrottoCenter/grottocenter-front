@@ -7,23 +7,35 @@ import {
 } from '../../conf/apiRoutes';
 import { apiPost, apiPut } from '../../api/client';
 import { entranceKeys } from '../../api/queryKeys';
-import { invalidateAll } from '../../utils/mapTileCache';
+import { invalidateAll, invalidateTileAt } from '../../utils/mapTileCache';
 
 // Entrance form mutations. Both Create and Update invalidate the entrance
 // details cache and the map tile caches (entrances + networks projection)
 // so a moderator who edits an entrance sees the map redraw its markers
 // without a reload.
-const invalidateEntranceAndMap = queryClient => {
+//
+// The map tile refresh prefers `invalidateTileAt` when the response carries
+// coords (mirrors the legacy invalidateAtOrFallback middleware): a full
+// invalidateAll nukes every cached tile the user has explored, so panning
+// after a single create/update kicks off a burst of refetches.
+const invalidateEntranceAndMap = (queryClient, response) => {
   queryClient.invalidateQueries({ queryKey: entranceKeys.all });
-  invalidateAll('entrances');
-  invalidateAll('networks');
+  const latitude = response?.latitude;
+  const longitude = response?.longitude;
+  if (latitude != null && longitude != null) {
+    invalidateTileAt('entrances', latitude, longitude);
+    invalidateTileAt('networks', latitude, longitude);
+  } else {
+    invalidateAll('entrances');
+    invalidateAll('networks');
+  }
 };
 
 export const useCreateEntrance = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: data => apiPost(postCreateEntranceUrl, data),
-    onSuccess: () => invalidateEntranceAndMap(queryClient)
+    onSuccess: response => invalidateEntranceAndMap(queryClient, response)
   });
 };
 
@@ -32,7 +44,7 @@ export const useUpdateEntrance = () => {
   return useMutation({
     mutationFn: entranceData =>
       apiPut(putEntranceUrl(entranceData.id), entranceData),
-    onSuccess: () => invalidateEntranceAndMap(queryClient)
+    onSuccess: response => invalidateEntranceAndMap(queryClient, response)
   });
 };
 
@@ -59,6 +71,6 @@ export const useUpdateEntranceWithNewEntities = () => {
         newRiggings,
         newComments
       }),
-    onSuccess: () => invalidateEntranceAndMap(queryClient)
+    onSuccess: response => invalidateEntranceAndMap(queryClient, response)
   });
 };

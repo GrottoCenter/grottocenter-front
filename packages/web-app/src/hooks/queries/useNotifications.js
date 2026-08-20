@@ -33,13 +33,17 @@ export const useNotifications = (opts = {}) => {
  * Short list backing the AppBar dropdown. Same endpoint as
  * useNotifications, different queryKey so pagination on /notifications does
  * not evict the menu cache.
+ *
+ * `enabled` is required for the AppBar consumer: anonymous page loads must
+ * not fire this GET or the 401 trips queryClient's postLogout handler.
  */
 export const useMenuNotifications = (opts = {}) => {
-  const { size = 10 } = opts;
+  const { size = 10, enabled = true } = opts;
   const criteria = { size };
   return useQuery({
     queryKey: notificationKeys.menu(criteria),
     queryFn: () => apiGetWithRange(makeUrl(fetchNotificationsUrl, criteria)),
+    enabled,
     select: selectList,
     staleTime: STALE.VOLATILE
   });

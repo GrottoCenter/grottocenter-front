@@ -1254,7 +1254,11 @@ const AccountPage = () => {
   );
   // useSubscriptions internally reads the current user's id and fires the
   // query — no dispatch needed here.
-  const { subscriptions } = useSubscriptions();
+  const {
+    subscriptions,
+    isPending: isSubscriptionsPending,
+    isError: isSubscriptionsError
+  } = useSubscriptions();
 
   const [isOrgSearchVisible, setIsOrgSearchVisible] = useState(false);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
@@ -1304,6 +1308,10 @@ const AccountPage = () => {
         caverId: userId,
         organizationId: id
       });
+    } catch {
+      // Toast is emitted globally by mutationCache.onError — the button
+      // handler is fire-and-forget so an escaping rejection would surface
+      // as an unhandled promise rejection.
     } finally {
       setPendingLeaveOrg(null);
     }
@@ -1505,7 +1513,8 @@ const AccountPage = () => {
                   <SubscriptionsList
                     canUnsubscribe
                     subscriptions={subscriptions}
-                    isLoading={!subscriptions}
+                    isLoading={isSubscriptionsPending}
+                    isError={isSubscriptionsError}
                     userId={userId}
                   />
                 }

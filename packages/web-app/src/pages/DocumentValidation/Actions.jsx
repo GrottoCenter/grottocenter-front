@@ -42,8 +42,7 @@ const Wrapper = styled('div')`
 const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
   const { formatMessage } = useIntl();
   const processMutation = useProcessDocuments();
-  const isLoading = processMutation.isPending;
-  const success = processMutation.isSuccess;
+  const { isPending: isLoading, isSuccess: success, reset } = processMutation;
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false);
   const [actionType, setActionType] = useState(null);
@@ -56,13 +55,17 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
     setIsConfirmationDialogOpen(true);
   };
 
+  // Reset the mutation so `success` doesn't stay sticky across renders — if it
+  // did, an unmemoized `onProcessed` from the parent would re-fire this effect
+  // and re-invoke setSelectedIds([]) → infinite update loop.
   useEffect(() => {
     if (success) {
       setIsConfirmationDialogOpen(false);
       setComment('');
       if (onProcessed) onProcessed();
+      reset();
     }
-  }, [success, onProcessed]);
+  }, [success, onProcessed, reset]);
 
   return (
     <>

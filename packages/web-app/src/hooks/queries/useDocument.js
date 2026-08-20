@@ -17,7 +17,11 @@ import { STALE } from '../../conf/queryClient';
  */
 export const useDocument = (documentId, { requireUpdate } = {}) =>
   useQuery({
-    queryKey: documentKeys.detail(documentId, requireUpdate),
+    // Normalize `false` to absent: the queryFn only emits ?requireUpdate=…
+    // when truthy, so `false` and no-opts hit the exact same URL — keying
+    // them separately would double-fetch the same payload and split
+    // invalidations across two cache entries.
+    queryKey: documentKeys.detail(documentId, requireUpdate || undefined),
     queryFn: () => {
       const suffix = requireUpdate ? `?requireUpdate=${requireUpdate}` : '';
       return apiGet(`${getDocumentDetailsUrl}${documentId}${suffix}`);

@@ -27,7 +27,11 @@ const isMutatingBy =
 export const useSubscriptions = () => {
   const userProperties = useUserProperties();
   const caverId = userProperties?.id;
-  const { data: subscriptions } = useSubscriptionsList(caverId);
+  const {
+    data: subscriptions,
+    isPending,
+    isError
+  } = useSubscriptionsList(caverId);
 
   const isSubscribed = useCallback(
     id => {
@@ -44,6 +48,11 @@ export const useSubscriptions = () => {
   return {
     subscriptions,
     isSubscribed,
+    // Exposed so callers can differentiate "still fetching" from "fetch
+    // failed" — `!subscriptions` collapses both into a permanent spinner
+    // and hides SubscriptionsList's error branch from users.
+    isPending,
+    isError,
     isCountryLoading:
       useIsMutating({ predicate: isMutatingBy('country-subscription') }) > 0,
     isRegionLoading:

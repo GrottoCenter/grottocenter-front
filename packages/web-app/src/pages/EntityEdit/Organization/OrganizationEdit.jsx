@@ -13,11 +13,7 @@ const OrganizationEdit = () => {
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
 
-  const {
-    data: organization,
-    isFetching,
-    error
-  } = useOrganization(organizationId);
+  const { data: organization, error } = useOrganization(organizationId);
 
   if (!isNil(error)) {
     return (
@@ -34,13 +30,13 @@ const OrganizationEdit = () => {
         formatMessage({ id: 'Loading the organization data...' })
       }
       content={
-        !isFetching && !organization ? (
-          <CircularProgress />
-        ) : (
+        organization ? (
           <OrganizationForm
             organizationValues={makeOrganizationValueData(organization)}
             onCancel={() => navigate(`/ui/organizations/${organizationId}`)}
           />
+        ) : (
+          <CircularProgress />
         )
       }
     />

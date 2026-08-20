@@ -18,6 +18,12 @@ const fetchSnapshots = url =>
 /**
  * Revision history for a given entity (entrance / cave / massif / …).
  *
+ * `refetchOnMount: 'always'` mirrors the legacy SnapshotReducer contract:
+ * every edit/rollback creates a new revision on the server, and no CRUD
+ * mutation currently invalidates snapshotKeys, so we refetch on every mount
+ * of a History tab (cached data shows immediately, background fetch keeps
+ * the list current).
+ *
  * @param {number|string} typeId  parent entity id
  * @param {string}        typeName parent entity type (plural, matches the URL segment)
  * @param {object}        [opts]   { isNetwork, getAll }
@@ -29,7 +35,8 @@ export const useSnapshots = (typeId, typeName, opts = {}) => {
     queryFn: () =>
       fetchSnapshots(getSnapshotsUrl(typeId, typeName, isNetwork, getAll)),
     enabled: Boolean(typeId && typeName),
-    staleTime: STALE.STANDARD
+    staleTime: STALE.STANDARD,
+    refetchOnMount: 'always'
   });
 };
 

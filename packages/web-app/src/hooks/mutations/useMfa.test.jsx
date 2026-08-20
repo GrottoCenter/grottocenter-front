@@ -1,8 +1,14 @@
 import { renderHook, act } from '@testing-library/react';
-import { QueryClientProvider } from '@tanstack/react-query';
+import {
+  QueryClient,
+  QueryClientProvider,
+  MutationCache,
+  QueryCache
+} from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 
-import { createTestQueryClient } from '../../test/renderWithProviders';
+import store from '../../store';
+import { postLogout } from '../../actions/Login';
 import { useMfaVerify, useMfaLogin, useMfaEnroll } from './useMfa';
 
 // Redux store mock — used both by useMfa's raw fetch helper (reads
@@ -34,6 +40,35 @@ vi.mock('../../actions/Login', () => ({
 // test — we only check whether postLogout was dispatched or not.
 vi.mock('notistack', () => ({ enqueueSnackbar: vi.fn() }));
 
+// Rebuild the production MutationCache/QueryCache wiring in the test so
+// meta.skip401Logout actually gates a dispatchable POST_LOGOUT. A bare
+// createTestQueryClient would install no onError handler, and every
+// "postLogout never fires" assertion below would be vacuously green —
+// removing the meta flag from useMfa* would leave CI green while breaking
+// production. Ties directly to conf/queryClient.js#notifyError.
+const dispatchLogoutOn401 = (error, meta) => {
+  // Uses the mocked store above; postLogout is also mocked to a plain
+  // { type: 'POST_LOGOUT' } action so the assertion is easy to write.
+  if (error?.status === 401 && !meta?.skip401Logout) {
+    store.dispatch(postLogout());
+  }
+};
+
+const createProductionLikeQueryClient = () =>
+  new QueryClient({
+    queryCache: new QueryCache({
+      onError: (error, query) => dispatchLogoutOn401(error, query.meta)
+    }),
+    mutationCache: new MutationCache({
+      onError: (error, _variables, _context, mutation) =>
+        dispatchLogoutOn401(error, mutation.meta)
+    }),
+    defaultOptions: {
+      queries: { retry: false, networkMode: 'always', gcTime: Infinity },
+      mutations: { retry: false, networkMode: 'always' }
+    }
+  });
+
 const makeWrapper = client => {
   const Wrapper = ({ children }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
@@ -46,7 +81,7 @@ describe('useMfa mutations (regression: 401 must not sign the user out)', () => 
   let queryClient;
 
   beforeEach(() => {
-    queryClient = createTestQueryClient();
+    queryClient = createProductionLikeQueryClient();
     mockDispatch.mockReset();
     global.fetch = vi.fn();
   });

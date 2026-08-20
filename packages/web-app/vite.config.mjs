@@ -757,12 +757,7 @@ export default defineConfig(({ mode }) => {
     optimizeDeps: {
       // CJS deps that need pre-bundling for ESM interop (notably leaflet-draw,
       // which has no default export but react-leaflet-draw imports one).
-      include: [
-        'swagger-ui-react',
-        '@asymmetrik/leaflet-d3',
-        'ramda',
-        'react-leaflet-draw'
-      ]
+      include: ['swagger-ui-react', 'ramda', 'react-leaflet-draw']
     },
     test: {
       environment: 'jsdom',

@@ -596,6 +596,12 @@ const ConversationDetail = () => {
         body: replyText.trim()
       });
       setReplyText('');
+      // Reset pagination so the freshly-sent message is visible: sending
+      // shifts every message down by one, so refetching the current skip>0
+      // page would overlap the previous page and hide the new message at
+      // skip=0. Snapping back to skip=0 reloads the head of the thread.
+      setSkip(0);
+      setAccumulated([]);
     } catch (err) {
       console.error('Failed to send reply:', err);
       onError(formatMessage({ id: 'Failed to send message.' }));

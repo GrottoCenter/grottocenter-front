@@ -45,6 +45,10 @@ export const useImportCsvSession = () => {
   // Synchronous import (documents, and the legacy entrance path before the
   // async queue) returns the result immediately — no batchId, no polling.
   const [syncResult, setSyncResult] = useState(null);
+  // Seed of totalRows/totalChunks/... carried by the POST response so Step5
+  // can render a determinate "0/N rows" bar during the ~3s gap before the
+  // first poll returns. Legacy IMPORT_ROWS_SUBMITTED did the same.
+  const [submitProgress, setSubmitProgress] = useState(null);
   // Consecutive tick failures. Legacy behaviour: give up after 3.
   // Only the setter is read: the counter drives the effect below, and the
   // running value is closed over via the functional updater.
@@ -74,9 +78,13 @@ export const useImportCsvSession = () => {
       if (result?.batchId) {
         setBatchId(result.batchId);
         setSyncResult(null);
+        // Seed progress from the POST response so Step5 shows a determinate
+        // "0/N rows" bar during the ~3s gap before the first poll returns.
+        setSubmitProgress(result.progress ?? null);
       } else {
         setBatchId(null);
         setSyncResult(result);
+        setSubmitProgress(null);
       }
       setErrorCount(0);
       setPollError(null);
@@ -86,9 +94,13 @@ export const useImportCsvSession = () => {
   const jobQuery = useQuery({
     queryKey: importKeys.batch(batchId),
     queryFn: () => apiGet(jobStatusUrl(batchId)),
-    enabled: Boolean(batchId),
+    // Also freeze once pollError latches: refetchInterval alone doesn't stop
+    // an enabled query, so the tick would keep hammering /jobStatus after the
+    // 3-consecutive-errors banner shows (legacy useJobPolling.stop() parity).
+    enabled: Boolean(batchId) && !pollError,
     // Terminal = stop polling; pending / running = keep polling.
     refetchInterval: query => {
+      if (pollError) return false;
       const status = query.state.data?.status;
       if (status === 'completed' || status === 'failed') return false;
       return POLL_INTERVAL_MS;
@@ -123,6 +135,7 @@ export const useImportCsvSession = () => {
   const reset = useCallback(() => {
     setBatchId(null);
     setSyncResult(null);
+    setSubmitProgress(null);
     setErrorCount(0);
     setPollError(null);
     checkMutation.reset();
@@ -179,7 +192,7 @@ export const useImportCsvSession = () => {
     batchId,
     isPolling,
     status: jobData?.status ?? null,
-    progress: jobData?.progress ?? null,
+    progress: jobData?.progress ?? submitProgress,
     resultImport,
     // combined
     isLoading: checkMutation.isPending || importMutation.isPending,
