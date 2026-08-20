@@ -12,7 +12,6 @@ import countryRegions from './CountryRegionsReducer';
 import createCave from './CreateCaveReducer';
 import createDocument from './CreateDocumentReducer';
 import createEntrance from './CreateEntranceReducer';
-import createGuideline from './CreateGuidelineReducer';
 import createHistory from './CreateHistory';
 import createLocation from './CreateLocation';
 import createMassif from './CreateMassifReducer';
@@ -20,7 +19,6 @@ import createOrganization from './CreateOrganization';
 import createPerson from './CreatePerson';
 import cumulatedLength from './CumulatedLengthReducer';
 import dbExport from './DBExportReducer';
-import deleteGuideline from './DeleteGuidelineReducer';
 import detachEntrance from './DetachEntranceReducer';
 import documents from './DocumentsReducer';
 import duplicatesCount from './DuplicatesCountReducer';
@@ -56,8 +54,6 @@ import region from './RegionReducer';
 import regionDetails from './RegionDetailsReducer';
 import regionEntrances from './RegionEntrancesDataQualityReducer';
 import resendVerificationEmail from './ResendVerificationEmailReducer';
-import restoreGuideline from './RestoreGuidelineReducer';
-import rollbackGuideline from './RollbackGuidelineReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
 import snapshots from './SnapshotReducer';
@@ -75,7 +71,6 @@ import updateAccount from './UpdateAccountReducer';
 import updateCave from './UpdateCaveReducer';
 import updateDocument from './UpdateDocumentReducer';
 import updateEntrance from './UpdateEntranceReducer';
-import updateGuideline from './UpdateGuidelineReducer';
 import updateHistory from './UpdateHistory';
 import updateLocation from './UpdateLocation';
 import updateMassif from './UpdateMassifReducer';
@@ -103,7 +98,6 @@ const GCReducer = combineReducers({
   createCave,
   createDocument,
   createEntrance,
-  createGuideline,
   createHistory,
   createLocation,
   createMassif,
@@ -111,7 +105,6 @@ const GCReducer = combineReducers({
   createPerson,
   cumulatedLength,
   dbExport,
-  deleteGuideline,
   detachEntrance,
   documents,
   duplicatesCount,
@@ -149,8 +142,6 @@ const GCReducer = combineReducers({
   regionEntrances,
   regionOrganization,
   resendVerificationEmail,
-  restoreGuideline,
-  rollbackGuideline,
   sideMenu,
   signUp,
   snapshots,
@@ -168,7 +159,6 @@ const GCReducer = combineReducers({
   updateCave,
   updateDocument,
   updateEntrance,
-  updateGuideline,
   updateHistory,
   updateLocation,
   updateMassif,

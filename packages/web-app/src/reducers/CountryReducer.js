@@ -3,14 +3,14 @@ import {
   FETCH_COUNTRY_FAILURE,
   FETCH_COUNTRY_SUCCESS
 } from '../actions/Country/GetCountry';
-import { POST_GUIDELINE_SUCCESS } from '../actions/Guideline/CreateGuideline';
-import { PATCH_GUIDELINE_SUCCESS } from '../actions/Guideline/UpdateGuideline';
 import {
+  POST_GUIDELINE_SUCCESS,
+  PATCH_GUIDELINE_SUCCESS,
   DELETE_GUIDELINE_SUCCESS,
-  DELETE_GUIDELINE_PERMANENT_SUCCESS
-} from '../actions/Guideline/DeleteGuideline';
-import { RESTORE_GUIDELINE_SUCCESS } from '../actions/Guideline/RestoreGuideline';
-import { ROLLBACK_GUIDELINE_SUCCESS } from '../actions/Guideline/RollbackGuideline';
+  DELETE_GUIDELINE_PERMANENT_SUCCESS,
+  RESTORE_GUIDELINE_SUCCESS,
+  ROLLBACK_GUIDELINE_SUCCESS
+} from '../actions/Guideline/actionTypes';
 
 import REDUCER_STATUS from './ReducerStatus';
 

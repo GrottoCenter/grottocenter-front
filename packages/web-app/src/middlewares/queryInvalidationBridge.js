@@ -12,8 +12,6 @@ import { entranceKeys, massifKeys } from '../api/queryKeys';
 // and drops out of this file. The bridge shrinks as the migration completes,
 // and disappears when the last shared mutation is converted.
 
-const asId = ref => (typeof ref === 'object' && ref !== null ? ref.id : ref);
-
 // getQueryClient() returns null during the store's own module init — the
 // bridge only fires on dispatched actions, which happen well after
 // conf/queryClient.js has run setQueryClient(). Guarding anyway so a
@@ -32,17 +30,6 @@ const MASSIF_PAYLOAD_ACTIONS = new Set([
   'UPDATE_MASSIF_SUCCESS',
   'MARK_MASSIF_SENSITIVE_SUCCESS',
   'UNMARK_MASSIF_SENSITIVE_SUCCESS'
-]);
-
-// Actions carrying `action.guideline` — guideline has a many-to-many
-// relationship with massifs (payload includes `massifs` array).
-const GUIDELINE_ACTIONS = new Set([
-  'POST_GUIDELINE_SUCCESS',
-  'PATCH_GUIDELINE_SUCCESS',
-  'DELETE_GUIDELINE_SUCCESS',
-  'DELETE_GUIDELINE_PERMANENT_SUCCESS',
-  'RESTORE_GUIDELINE_SUCCESS',
-  'ROLLBACK_GUIDELINE_SUCCESS'
 ]);
 
 // Entrance-only shared children: their payloads always concern the current
@@ -85,8 +72,6 @@ const queryInvalidationBridge = () => next => action => {
 
   if (MASSIF_PAYLOAD_ACTIONS.has(action.type)) {
     invalidateMassif(action.massif?.id);
-  } else if (GUIDELINE_ACTIONS.has(action.type)) {
-    (action.guideline?.massifs ?? []).forEach(m => invalidateMassif(asId(m)));
   } else if (ENTRANCE_CHILD_ACTIONS.has(action.type)) {
     invalidate(entranceKeys.all);
   }

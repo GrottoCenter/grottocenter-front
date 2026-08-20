@@ -17,9 +17,9 @@ import { updateHistory } from '../../../../../actions/History/UpdateHistory';
 import { updateRiggings } from '../../../../../actions/Riggings/UpdateRigging';
 import { updateLocation } from '../../../../../actions/Location/UpdateLocation';
 import { updateComment } from '../../../../../actions/Comment/UpdateComment';
-import { rollbackGuideline } from '../../../../../actions/Guideline/RollbackGuideline';
 import {
   useUpdateDescription,
+  useRollbackGuideline,
   usePermissions,
   useUserProperties
 } from '../../../../../hooks';
@@ -35,6 +35,7 @@ function sleep(ms) {
 const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
   const dispatch = useDispatch();
   const updateDescriptionMutation = useUpdateDescription();
+  const rollbackGuidelineMutation = useRollbackGuideline();
   const userId = pathOr(null, ['id'], useUserProperties());
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
@@ -134,12 +135,10 @@ const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
           );
           break;
         case 'guidelines':
-          await dispatch(
-            rollbackGuideline({
-              id: content.t_id,
-              snapshotId: content.id
-            })
-          );
+          await rollbackGuidelineMutation.mutateAsync({
+            id: content.t_id,
+            snapshotId: content.id
+          });
           break;
         default:
           break;
