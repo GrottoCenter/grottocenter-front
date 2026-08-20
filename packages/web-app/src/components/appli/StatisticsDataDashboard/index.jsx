@@ -53,7 +53,9 @@ const StatisticsDataDashboard = ({
       anchorId="statistics"
       defaultExpanded={hasData}
       title={formatMessage({ id: 'More information' })}
-      subheader={description}
+      subheader={`${description} ${formatMessage({
+        id: 'Statistics are recomputed periodically and may not reflect the latest changes.'
+      })}`}
       content={
         <>
           {isLoading && <Skeleton height={200} width="100%" />}

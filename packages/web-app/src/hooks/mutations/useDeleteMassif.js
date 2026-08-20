@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { deleteMassifUrl } from '../../conf/apiRoutes';
 import { apiDelete } from '../../api/client';
-import { massifKeys } from '../../api/queryKeys';
+import { massifKeys, statsKeys } from '../../api/queryKeys';
 
 export const useDeleteMassif = () => {
   const queryClient = useQueryClient();
@@ -15,6 +15,9 @@ export const useDeleteMassif = () => {
       } else {
         queryClient.invalidateQueries({ queryKey: massifKeys.detail(id) });
       }
+      // Country's nb_massifs and every downstream aggregate depend on the
+      // massif being live — invalidate the whole stats domain.
+      queryClient.invalidateQueries({ queryKey: statsKeys.all });
     }
   });
 };
