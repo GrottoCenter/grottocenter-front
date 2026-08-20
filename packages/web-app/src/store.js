@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import GCReducer from './reducers/GCReducer';
+import { SET_FILE } from './actions/Observations/importWizardTypes';
 
 // The store lives here rather than inside ApplicationShell so that code running
 // outside React can reach it — the QueryClient's global error handler is created
@@ -17,10 +18,16 @@ const store = configureStore({
     getDefaultMiddleware({
       // Both dev-only checks deep-traverse the whole state on every action. The
       // `map` slice holds the bulk /geoloc payloads (megabytes of coordinates),
-      // which makes that traversal cost real time on every pan. Excluding it
-      // keeps the guard where it is cheap and useful.
-      immutableCheck: { ignoredPaths: ['map'] },
-      serializableCheck: { ignoredPaths: ['map'] }
+      // which makes that traversal cost real time on every pan. The import
+      // wizard intentionally retains the selected browser File across steps;
+      // browsers and parsers may lazily attach properties such as
+      // `lastModifiedDate` to that native mutable object. Exclude only that
+      // leaf while keeping both guards active for the rest of the wizard.
+      immutableCheck: { ignoredPaths: ['map', 'importWizard.file'] },
+      serializableCheck: {
+        ignoredPaths: ['map', 'importWizard.file'],
+        ignoredActions: [SET_FILE]
+      }
     })
 });
 
