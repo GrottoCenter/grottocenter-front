@@ -9,7 +9,7 @@ import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../SearchDocumentForm';
 import Alert from '../../common/Alert';
 import {
-  useLinkDocumentToMassif,
+  useLinkDocumentsToMassif,
   useUnlinkDocumentToMassif,
   usePermissions
 } from '../../../hooks';
@@ -19,14 +19,11 @@ const Documents = ({ documents, massifId }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
-  const linkMutation = useLinkDocumentToMassif();
+  const linkMutation = useLinkDocumentsToMassif();
   const unlinkMutation = useUnlinkDocumentToMassif();
 
-  const onSubmitForm = newDocuments => {
-    newDocuments.forEach(d => {
-      linkMutation.mutate({ massifId, document: d });
-    });
-    setIsDocumentSearchVisible(false);
+  const onSubmitForm = async newDocuments => {
+    await linkMutation.mutateAsync({ massifId, documents: newDocuments });
   };
 
   return (
@@ -57,7 +54,10 @@ const Documents = ({ documents, massifId }) => {
         <>
           {isDocumentSearchVisible && (
             <>
-              <SearchDocumentForm onSubmit={onSubmitForm} />
+              <SearchDocumentForm
+                onSubmit={onSubmitForm}
+                onSuccess={() => setIsDocumentSearchVisible(false)}
+              />
               <Divider />
             </>
           )}

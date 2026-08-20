@@ -26,8 +26,13 @@ export const referenceKeys = {
 // has to be cached under different shapes (documents with `requireUpdate` fetch
 // a snapshot the moderator can act on — different payload, different key).
 
+const normalizeId = id => (id == null ? id : String(id));
+
 const detailKey = domain => (id, opts) => {
-  const key = [domain, 'detail', id];
+  // Route params are strings while API payloads generally expose numeric ids.
+  // A single representation keeps mutations and page queries on the same cache
+  // entry (`42` and `'42'` identify the same entity).
+  const key = [domain, 'detail', normalizeId(id)];
   if (opts !== undefined) key.push(opts);
   return key;
 };

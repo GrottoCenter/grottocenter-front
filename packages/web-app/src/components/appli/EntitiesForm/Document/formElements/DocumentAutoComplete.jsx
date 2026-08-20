@@ -8,7 +8,10 @@ import { DocumentFormContext } from '../Provider';
 import { useQuickSearch } from '../../../../../hooks';
 import { entityOptionForSelector } from '../../../../../helpers/Entity';
 
-import { documentTypeHelpers } from '../../../../../utils/documentTypeHelpers';
+import {
+  documentTypeHelpers,
+  filterParentDocumentResults
+} from '../../../../../utils/documentTypeHelpers';
 import SearchBar from './SearchBar';
 
 import FormAutoCompleteComponent from '../../../../common/Form/FormAutoComplete';
@@ -51,7 +54,10 @@ const DocumentAutoComplete = ({
     entities: DOC_ENTITIES,
     filter: searchFilter
   });
-  const quicksearchResult = data?.results ?? [];
+  const quicksearchResult = filterParentDocumentResults(
+    data?.results ?? [],
+    document.id
+  );
 
   const getDocumentName = doc => `[${doc.type}] ${doc.title}`;
 

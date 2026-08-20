@@ -74,6 +74,7 @@ export { useDeleteMassif } from './mutations/useDeleteMassif';
 export { useRestoreMassif } from './mutations/useRestoreMassif';
 export {
   useLinkDocumentToMassif,
+  useLinkDocumentsToMassif,
   useUnlinkDocumentToMassif
 } from './mutations/useLinkDocumentToMassif';
 export { useDeleteCave } from './mutations/useDeleteCave';
@@ -82,6 +83,7 @@ export { useDeleteEntrance } from './mutations/useDeleteEntrance';
 export { useRestoreEntrance } from './mutations/useRestoreEntrance';
 export {
   useLinkDocumentToEntrance,
+  useLinkDocumentsToEntrance,
   useUnlinkDocumentToEntrance
 } from './mutations/useLinkDocumentToEntrance';
 export {

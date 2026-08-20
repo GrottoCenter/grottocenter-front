@@ -15,19 +15,31 @@ const SpacedButton = styled(Button)`
   margin: 0 ${theme.spacing(0.5)};`}
 `;
 
-const SearchDocumentForm = ({ closeForm, onSubmit }) => {
+const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
   const [selectedDocuments, setSelectedDocuments] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetForm = () => {
     resetAdvancedSearch();
     setSelectedDocuments([]);
   };
 
-  const handleOnSubmit = () => {
-    onSubmit(selectedDocuments);
-    resetForm();
+  const handleOnSubmit = async () => {
+    setIsSubmitting(true);
+    let isSuccessful = true;
+    try {
+      await onSubmit(selectedDocuments);
+    } catch (_error) {
+      // Mutation errors are surfaced by the QueryClient's global notifier.
+      isSuccessful = false;
+    }
+    setIsSubmitting(false);
+    if (isSuccessful) {
+      resetForm();
+      if (onSuccess) onSuccess();
+    }
   };
 
   let associateMessage = formatMessage({ id: 'Associate' });
@@ -73,12 +85,11 @@ const SearchDocumentForm = ({ closeForm, onSubmit }) => {
         <SpacedButton variant="outlined" onClick={resetForm}>
           {formatMessage({ id: 'Reset' })}
         </SpacedButton>
-        {/* The parent turns this into a linkDocumentToEntrance write and closes
-            the panel straight away without reading the failure — so offline
-            this used to look like it had worked. See SearchOrganizationForm. */}
         <OfflineDisabled>
           <SpacedButton
-            disabled={selectedDocuments.length === 0 || !isOnline}
+            disabled={
+              selectedDocuments.length === 0 || !isOnline || isSubmitting
+            }
             color="primary"
             type="submit"
             onClick={handleOnSubmit}>
@@ -92,7 +103,8 @@ const SearchDocumentForm = ({ closeForm, onSubmit }) => {
 
 SearchDocumentForm.propTypes = {
   closeForm: PropTypes.func,
-  onSubmit: PropTypes.func.isRequired
+  onSubmit: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func
 };
 
 export default SearchDocumentForm;

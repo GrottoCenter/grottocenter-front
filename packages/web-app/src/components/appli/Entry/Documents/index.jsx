@@ -11,7 +11,7 @@ import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../../SearchDocumentForm';
 import Alert from '../../../common/Alert';
 import {
-  useLinkDocumentToEntrance,
+  useLinkDocumentsToEntrance,
   useUnlinkDocumentToEntrance,
   usePermissions
 } from '../../../../hooks';
@@ -24,14 +24,11 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
-  const linkMutation = useLinkDocumentToEntrance();
+  const linkMutation = useLinkDocumentsToEntrance();
   const unlinkMutation = useUnlinkDocumentToEntrance();
 
-  const onSubmitForm = newDocuments => {
-    newDocuments.forEach(d => {
-      linkMutation.mutate({ entranceId, document: d });
-    });
-    setIsDocumentSearchVisible(false);
+  const onSubmitForm = async newDocuments => {
+    await linkMutation.mutateAsync({ entranceId, documents: newDocuments });
   };
 
   return (
@@ -73,7 +70,10 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
         <>
           {isDocumentSearchVisible && (
             <>
-              <SearchDocumentForm onSubmit={onSubmitForm} />
+              <SearchDocumentForm
+                onSubmit={onSubmitForm}
+                onSuccess={() => setIsDocumentSearchVisible(false)}
+              />
               <DividerStyled />
             </>
           )}

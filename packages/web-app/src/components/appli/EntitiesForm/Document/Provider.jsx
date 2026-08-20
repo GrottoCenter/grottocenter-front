@@ -6,7 +6,10 @@ import {
   useMemo
 } from 'react';
 import PropTypes from 'prop-types';
-import { DocumentTypes } from '../../../../utils/documentTypeHelpers';
+import {
+  DocumentTypes,
+  isDocumentSelfParent
+} from '../../../../utils/documentTypeHelpers';
 import {
   IS_INTACT,
   IS_DELETED,
@@ -71,6 +74,13 @@ const checkFormValidation = document => {
     (document.type === DocumentTypes.ISSUE ||
       document.type === DocumentTypes.ARTICLE) &&
     !document.parent
+  )
+    isValid = false;
+
+  if (
+    (document.type === DocumentTypes.ISSUE ||
+      document.type === DocumentTypes.ARTICLE) &&
+    isDocumentSelfParent(document)
   )
     isValid = false;
 
