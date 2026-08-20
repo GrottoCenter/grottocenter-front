@@ -11,7 +11,7 @@ import {
   fetchDuplicate
 } from '../../../actions/DuplicatesImport';
 import DuplicatesHandler from '../../common/DuplicatesHandler';
-import { updateEntranceWithNewEntities } from '../../../actions/Entrance/UpdateEntrance';
+import { useUpdateEntranceWithNewEntities } from '../../../hooks';
 
 const LinearProgress = styled(MuiLinearProgress)`
   visibility: ${({ $isLoading }) => ($isLoading ? 'visible' : 'hidden')};
@@ -23,8 +23,7 @@ const HydratedEntranceDuplicates = ({
   goBack,
   selectedDuplicates
 }) => {
-  const { loading: loadingSubmitAction, latestHttpCode: httpCodeUpdateEntry } =
-    useSelector(state => state.updateEntrance);
+  const updateMutation = useUpdateEntranceWithNewEntities();
   const {
     loading: loadingDuplicate,
     duplicate,
@@ -36,7 +35,7 @@ const HydratedEntranceDuplicates = ({
   const { formatMessage } = useIntl();
   const [currentDuplicate, setCurrentDuplicate] = useState(0);
 
-  const loading = loadingSubmitAction || loadingDuplicate;
+  const loading = updateMutation.isPending || loadingDuplicate;
   const currentDuplicateId = selectedDuplicates[currentDuplicate];
 
   useEffect(() => {
@@ -49,11 +48,11 @@ const HydratedEntranceDuplicates = ({
   }, [currentDuplicate]);
 
   useEffect(() => {
-    if ([200, 204].includes(httpCodeUpdateEntry)) {
+    if (updateMutation.isSuccess) {
       dispatch(deleteDuplicate(currentDuplicateId, 'entrance'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpCodeUpdateEntry]);
+  }, [updateMutation.isSuccess]);
 
   useEffect(() => {
     if ([200, 204].includes(latestHttpCodeOnDelete)) {
@@ -72,16 +71,14 @@ const HydratedEntranceDuplicates = ({
   }, [latestHttpCodeOnCreate]);
 
   const updateEntry = (entryObject, newRelatedEntitiesObject) => {
-    dispatch(
-      updateEntranceWithNewEntities(
-        entryObject,
-        newRelatedEntitiesObject.newNames,
-        newRelatedEntitiesObject.newDescriptions,
-        newRelatedEntitiesObject.newLocations,
-        newRelatedEntitiesObject.newRiggings,
-        newRelatedEntitiesObject.newComments
-      )
-    );
+    updateMutation.mutate({
+      entrance: entryObject,
+      newNames: newRelatedEntitiesObject.newNames,
+      newDescriptions: newRelatedEntitiesObject.newDescriptions,
+      newLocations: newRelatedEntitiesObject.newLocations,
+      newRiggings: newRelatedEntitiesObject.newRiggings,
+      newComments: newRelatedEntitiesObject.newComments
+    });
   };
 
   const createEntry = () => {

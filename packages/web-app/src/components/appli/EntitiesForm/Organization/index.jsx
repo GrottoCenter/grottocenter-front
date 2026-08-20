@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateName } from '../../../../actions/Name';
+import { useUpdateName } from '../../../../hooks';
 import { postOrganization } from '../../../../actions/Organization/CreateOrganization';
 import { updateOrganization } from '../../../../actions/Organization/UpdateOrganization';
 import FormProgressInfo from '../utils/FormProgressInfo';
@@ -44,9 +44,9 @@ export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
   } = useSelector(state =>
     isNewOrganization ? state.createOrganization : state.updateOrganization
   );
-  const { error: nameError, loading: nameLoading } = useSelector(
-    state => state.updateName
-  );
+  const updateNameMutation = useUpdateName();
+  const nameError = updateNameMutation.error;
+  const nameLoading = updateNameMutation.isPending;
 
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
   defaultOrganizationValues.language = AVAILABLE_LANGUAGES[locale].id;
@@ -85,12 +85,10 @@ export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
       dispatch(postOrganization(organizationToPost));
     } else {
       if (data.organization.name !== organizationValues) {
-        dispatch(
-          updateName({
-            id: organizationValues.nameId,
-            name: data.organization.name
-          })
-        );
+        updateNameMutation.mutate({
+          id: organizationValues.nameId,
+          name: data.organization.name
+        });
       }
 
       const organizationToUpdate = makePutOrganizationData(

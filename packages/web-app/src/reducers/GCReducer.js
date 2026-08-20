@@ -9,10 +9,7 @@ import countUnreadNotifications from './CountUnreadNotificationsReducer';
 import country from './CountryReducer';
 import countryEntrances from './CountryEntrancesDataQualityReducer';
 import countryRegions from './CountryRegionsReducer';
-import createCave from './CreateCaveReducer';
 import createDocument from './CreateDocumentReducer';
-import createEntrance from './CreateEntranceReducer';
-import createMassif from './CreateMassifReducer';
 import createOrganization from './CreateOrganization';
 import createPerson from './CreatePerson';
 import cumulatedLength from './CumulatedLengthReducer';
@@ -66,11 +63,7 @@ import unsubscribeFromCountry from './UnsubscribeFromCountryReducer';
 import unsubscribeFromMassif from './UnsubscribeFromMassifReducer';
 import unsubscribeFromRegion from './UnsubscribeFromRegionReducer';
 import updateAccount from './UpdateAccountReducer';
-import updateCave from './UpdateCaveReducer';
 import updateDocument from './UpdateDocumentReducer';
-import updateEntrance from './UpdateEntranceReducer';
-import updateMassif from './UpdateMassifReducer';
-import updateName from './UpdateNameReducer';
 import updateOrganization from './UpdateOrganization';
 import updatePerson from './UpdatePerson';
 import countryOrganization from './CountryOrganizationReducer';
@@ -91,10 +84,7 @@ const GCReducer = combineReducers({
   countryEntrances,
   countryOrganization,
   countryRegions,
-  createCave,
   createDocument,
-  createEntrance,
-  createMassif,
   createOrganization,
   createPerson,
   cumulatedLength,
@@ -150,11 +140,7 @@ const GCReducer = combineReducers({
   unsubscribeFromMassif,
   unsubscribeFromRegion,
   updateAccount,
-  updateCave,
   updateDocument,
-  updateEntrance,
-  updateMassif,
-  updateName,
   updateOrganization,
   updatePerson,
   updatePersonGroups,

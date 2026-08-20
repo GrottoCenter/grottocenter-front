@@ -2,7 +2,6 @@ import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { enqueueSnackbar } from 'notistack';
 
 import store from '../store';
-import { setQueryClient } from '../api/queryClientRef';
 import { postLogout } from '../actions/Login';
 
 /**
@@ -93,9 +92,5 @@ const queryClient = new QueryClient({
     }
   }
 });
-
-// Publish the singleton for non-React callers (middlewares/queryInvalidationBridge)
-// that cannot import this file directly without closing a cycle.
-setQueryClient(queryClient);
 
 export default queryClient;

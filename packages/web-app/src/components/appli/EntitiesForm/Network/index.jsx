@@ -1,8 +1,8 @@
 import { useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
-import { useSelector, useDispatch } from 'react-redux';
-import { updateCave } from '../../../../actions/Cave/UpdateCave';
+import { useSelector } from 'react-redux';
+import { useUpdateCave } from '../../../../hooks';
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
 import InputText from '../utils/InputText';
 import InputLanguage from '../utils/InputLanguage';
@@ -12,13 +12,7 @@ import CaveDetail from '../Entrance/CaveDetail';
 // A Network can't be created. It's always starting with an entrance with a cave and then,
 // entrance are being attached to the initial cave to form a network.
 export const NetworkForm = ({ networkValues, onCancel }) => {
-  const {
-    error: networkError,
-    loading: networkLoading,
-    data: networkData
-  } = useSelector(state => state.updateCave);
-
-  const dispatch = useDispatch();
+  const updateCaveMutation = useUpdateCave();
   const defaultNetworkValue = useRef({ ...networkValues });
 
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
@@ -41,30 +35,28 @@ export const NetworkForm = ({ networkValues, onCancel }) => {
   }, [reset]);
 
   const onSubmit = async data => {
-    dispatch(
-      updateCave({
-        depth: data.cave.depth,
-        id: data.cave.id,
-        isDiving: data.cave.isDiving,
-        length: data.cave.length,
-        name: {
-          language: data.cave.language,
-          text: data.cave.name
-        },
-        temperature: data.cave.temperature
-      })
-    );
+    updateCaveMutation.mutate({
+      depth: data.cave.depth,
+      id: data.cave.id,
+      isDiving: data.cave.isDiving,
+      length: data.cave.length,
+      name: {
+        language: data.cave.language,
+        text: data.cave.name
+      },
+      temperature: data.cave.temperature
+    });
   };
 
   if (isSubmitSuccessful) {
     return (
       <FormProgressInfo
-        isLoading={networkLoading || !networkData}
-        isError={!!networkError}
+        isLoading={updateCaveMutation.isPending || !updateCaveMutation.data}
+        isError={updateCaveMutation.isError}
         labelLoading="Updating network..."
         labelError="'An error occurred when updating the network!'"
         resetFn={handleReset}
-        getRedirectFn={() => `/ui/caves/${networkData.id}`}
+        getRedirectFn={() => `/ui/caves/${updateCaveMutation.data?.id}`}
       />
     );
   }

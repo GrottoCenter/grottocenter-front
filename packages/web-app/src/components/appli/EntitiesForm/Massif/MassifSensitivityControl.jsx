@@ -11,9 +11,12 @@ import {
 } from '@mui/material';
 import StandardDialog from '../../../common/StandardDialog';
 import { previewSensitiveMassif } from '../../../../actions/Massif/PreviewSensitiveMassif';
-import { markMassifSensitive } from '../../../../actions/Massif/MarkSensitiveMassif';
-import { unmarkMassifSensitive } from '../../../../actions/Massif/UnmarkSensitiveMassif';
-import { useNotification, usePermissions } from '../../../../hooks';
+import {
+  useMarkMassifSensitive,
+  useUnmarkMassifSensitive,
+  useNotification,
+  usePermissions
+} from '../../../../hooks';
 import { MassifTypes } from '../../../../types/massif.type';
 
 const MassifSensitivityControl = ({ massif }) => {
@@ -21,6 +24,8 @@ const MassifSensitivityControl = ({ massif }) => {
   const dispatch = useDispatch();
   const notification = useNotification();
   const permissions = usePermissions();
+  const markMutation = useMarkMassifSensitive();
+  const unmarkMutation = useUnmarkMassifSensitive();
 
   const isSensitive = massif?.isSensitive;
   const { isAdmin } = permissions;
@@ -65,7 +70,7 @@ const MassifSensitivityControl = ({ massif }) => {
     setIsActionLoading(true);
     try {
       if (!isSensitive) {
-        await dispatch(markMassifSensitive(massif.id));
+        await markMutation.mutateAsync(massif.id);
         const count = previewCount ?? 0;
         notification.onSuccess(
           formatMessage(
@@ -79,7 +84,7 @@ const MassifSensitivityControl = ({ massif }) => {
           )
         );
       } else {
-        await dispatch(unmarkMassifSensitive(massif.id));
+        await unmarkMutation.mutateAsync(massif.id);
         notification.onSuccess(
           formatMessage({ id: 'Massif unmarked as sensitive.' })
         );

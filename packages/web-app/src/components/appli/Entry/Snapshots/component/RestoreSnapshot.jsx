@@ -1,6 +1,5 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
 import {
   Button,
   Dialog,
@@ -20,11 +19,11 @@ import {
   useUpdateRigging,
   useUpdateComment,
   useRollbackGuideline,
+  useUpdateEntrance,
+  useUpdateCaveAndEntrance,
   usePermissions,
   useUserProperties
 } from '../../../../../hooks';
-import { updateEntrance } from '../../../../../actions/Entrance/UpdateEntrance';
-import { updateCaveAndEntrance } from '../../../../../actions/CaveAndEntrance';
 import Translate from '../../../../common/Translate';
 import { durationStringToMinutes } from '../../../../../utils/dateTimeDuration';
 
@@ -33,13 +32,14 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
-  const dispatch = useDispatch();
   const updateDescriptionMutation = useUpdateDescription();
   const updateHistoryMutation = useUpdateHistory();
   const updateLocationMutation = useUpdateLocation();
   const updateRiggingMutation = useUpdateRigging();
   const updateCommentMutation = useUpdateComment();
   const rollbackGuidelineMutation = useRollbackGuideline();
+  const updateEntranceMutation = useUpdateEntrance();
+  const updateCaveAndEntranceMutation = useUpdateCaveAndEntrance();
   const userId = pathOr(null, ['id'], useUserProperties());
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
@@ -93,7 +93,7 @@ const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
             id: content.t_id
           };
           if (isNetwork) {
-            await dispatch(updateEntrance(updatedEntrance));
+            await updateEntranceMutation.mutateAsync(updatedEntrance);
           } else {
             const updatedCave = {
               name: {
@@ -108,7 +108,10 @@ const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
               temperature: Number(content.cave.temperature),
               id: content.cave?.id
             };
-            await dispatch(updateCaveAndEntrance(updatedCave, updatedEntrance));
+            await updateCaveAndEntranceMutation.mutateAsync({
+              caveData: updatedCave,
+              entranceData: updatedEntrance
+            });
           }
           break;
         }

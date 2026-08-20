@@ -80,6 +80,24 @@ export {
   useRestoreComment,
   useMoveCommentRelevance
 } from './mutations/useComment';
+export {
+  useCreateEntrance,
+  useUpdateEntrance,
+  useUpdateEntranceWithNewEntities
+} from './mutations/useEntranceForm';
+export {
+  useCreateCave,
+  useUpdateCave,
+  useCreateCaveAndEntrance,
+  useUpdateCaveAndEntrance
+} from './mutations/useCaveForm';
+export {
+  useCreateMassif,
+  useUpdateMassif,
+  useMarkMassifSensitive,
+  useUnmarkMassifSensitive
+} from './mutations/useMassifForm';
+export { useUpdateName } from './mutations/useUpdateName';
 export { useNotification } from './useNotification';
 export { usePermissions } from './usePermissions';
 export { useSessionExpiry } from './useSessionExpiry';
