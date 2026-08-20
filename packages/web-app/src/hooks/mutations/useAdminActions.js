@@ -10,6 +10,7 @@ import {
 } from '../../conf/apiRoutes';
 import { apiPost, apiPatch, apiDelete } from '../../api/client';
 import {
+  accountKeys,
   caveKeys,
   entranceKeys,
   listKeys,
@@ -51,14 +52,20 @@ export const useUnbanCaver = () => {
   });
 };
 
-// Self-service account update. The Redux `account` slice stays (see anti-scope
-// in the roadmap ADR) — callers dispatch fetchAccount after mutateAsync so the
-// side-panel re-reads a fresh account. `mutateAsync` also propagates the thrown
-// error, which callers translate (nickname 409 conflict, etc.).
-export const useUpdateAccount = () =>
-  useMutation({
-    mutationFn: fields => apiPatch(accountUrl, fields)
+// Self-service account update. Invalidates the accountKeys.current() query so
+// the side-panel and any other consumer of useAccount re-reads a fresh
+// account without a manual invalidation from the caller. mutateAsync still
+// propagates the thrown error, which callers translate (nickname 409
+// conflict, etc.).
+export const useUpdateAccount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: fields => apiPatch(accountUrl, fields),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountKeys.current() });
+    }
   });
+};
 
 // Attach an entrance to an existing cave (either another network or a solo
 // cave). Both the entrance (parent cave changed) and both caves (member set

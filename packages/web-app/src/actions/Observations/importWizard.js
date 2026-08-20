@@ -7,55 +7,48 @@ import {
   getCaveUrl,
   getCaverUrl
 } from '../../conf/apiRoutes';
-import { checkAuthStatus, makeUrl } from '../utils';
+import { makeUrl } from '../utils';
+import { postLogout } from '../Login';
+import queryClient, { STALE } from '../../conf/queryClient';
+import { apiGet, apiPost, apiPostForm } from '../../api/client';
+import { caveKeys, personKeys } from '../../api/queryKeys';
 import { detectEncoding } from '../../components/appli/ImportObservationsWizard/utils/encodingDetector';
 import { parseFile } from '../../components/appli/ImportObservationsWizard/utils/csvParser';
+import {
+  SET_FILE,
+  SET_ENCODING,
+  SET_RAW_ROWS,
+  SET_DEVICES,
+  FETCH_SENSOR_CONFIGS,
+  FETCH_SENSOR_CONFIGS_SUCCESS,
+  FETCH_SENSOR_CONFIGS_FAILURE,
+  CREATE_SENSOR_CONFIG,
+  CREATE_SENSOR_CONFIG_SUCCESS,
+  CREATE_SENSOR_CONFIG_FAILURE,
+  SUBMIT_OBSERVATIONS_IMPORT,
+  SUBMIT_OBSERVATIONS_IMPORT_SUCCESS,
+  SUBMIT_OBSERVATIONS_IMPORT_FAILURE
+} from './importWizardTypes';
 
-// ===== Wizard navigation
-export const SET_WIZARD_STEP = 'SET_WIZARD_STEP';
-export const RESET_WIZARD = 'RESET_WIZARD';
+// Action type constants live in ./importWizardTypes so ImportWizardReducer
+// can import them without dragging in the thunks (which would create a
+// cycle through queryClient → store → GCReducer → ImportWizardReducer).
+// Re-exported here so existing importers of `SET_CONTEXT` etc. keep working.
+export * from './importWizardTypes';
 
-// ===== Upload step
-export const SET_FILE = 'SET_FILE';
-export const SET_PROFILE_FILE_NAME = 'SET_PROFILE_FILE_NAME';
-export const SET_ENCODING = 'SET_ENCODING';
-export const SET_RAW_ROWS = 'SET_RAW_ROWS';
-export const SET_HEADER_ROW = 'SET_HEADER_ROW';
-export const SET_SKIP_LAST_ROWS = 'SET_SKIP_LAST_ROWS';
-export const SET_SKIP_FIRST_ROWS = 'SET_SKIP_FIRST_ROWS';
-export const SET_NUMBER_LOCALE = 'SET_NUMBER_LOCALE';
-export const SET_DOCUMENT_LANGUAGE = 'SET_DOCUMENT_LANGUAGE';
-
-// ===== Device & Sensors step
-export const SET_DEVICES = 'SET_DEVICES';
-export const UPDATE_SENSOR_CONFIG = 'UPDATE_SENSOR_CONFIG';
-export const SET_CONFIRMED_DEVICE = 'SET_CONFIRMED_DEVICE';
-export const UPDATE_CONFIRMED_DEVICE = 'UPDATE_CONFIRMED_DEVICE';
-export const CLEAR_CONFIRMED_DEVICE = 'CLEAR_CONFIRMED_DEVICE';
-export const FETCH_SENSOR_CONFIGS = 'FETCH_SENSOR_CONFIGS';
-export const FETCH_SENSOR_CONFIGS_SUCCESS = 'FETCH_SENSOR_CONFIGS_SUCCESS';
-export const FETCH_SENSOR_CONFIGS_FAILURE = 'FETCH_SENSOR_CONFIGS_FAILURE';
-export const CREATE_SENSOR_CONFIG = 'CREATE_SENSOR_CONFIG';
-export const CREATE_SENSOR_CONFIG_SUCCESS = 'CREATE_SENSOR_CONFIG_SUCCESS';
-export const CREATE_SENSOR_CONFIG_FAILURE = 'CREATE_SENSOR_CONFIG_FAILURE';
-
-// ===== Map Columns step
-export const SET_COLUMN_MAPPINGS = 'SET_COLUMN_MAPPINGS';
-export const UPDATE_COLUMN_MAPPING = 'UPDATE_COLUMN_MAPPING';
-
-// ===== Validate step
-export const SET_VALIDATION_RESULT = 'SET_VALIDATION_RESULT';
-export const SET_SAMPLING_INTERVAL = 'SET_SAMPLING_INTERVAL';
-
-// ===== Context step
-export const SET_CONTEXT = 'SET_CONTEXT';
-
-// ===== Submission
-export const SUBMIT_OBSERVATIONS_IMPORT = 'SUBMIT_OBSERVATIONS_IMPORT';
-export const SUBMIT_OBSERVATIONS_IMPORT_SUCCESS =
-  'SUBMIT_OBSERVATIONS_IMPORT_SUCCESS';
-export const SUBMIT_OBSERVATIONS_IMPORT_FAILURE =
-  'SUBMIT_OBSERVATIONS_IMPORT_FAILURE';
+// The wizard submission thunks stay thunks (they own reducer-side status
+// tracking that the multi-step UI reads back), but the fetch layer moves to
+// apiGet/apiPost so we can share the auth-header, 401 shape and error
+// contract with the rest of the app. This tiny helper mirrors what the
+// QueryClient's global onError does for RQ paths — one place, one 401
+// behaviour, across both paradigms.
+const handleAuthError = (error, dispatch) => {
+  if (error?.status === 401) {
+    dispatch(postLogout());
+    return true;
+  }
+  return false;
+};
 
 // ===== Helpers
 
@@ -126,8 +119,7 @@ export const parseAndSetFile = (file, encoding) => async dispatch => {
 
 export const searchDevices =
   (query, { filter, sort = 'name:asc' } = {}) =>
-  (dispatch, getState) => {
-    const { authorizationHeader } = getState().login;
+  async dispatch => {
     const params = { sort };
     if (query) params.query = query;
     if (filter) {
@@ -135,32 +127,19 @@ export const searchDevices =
         params[`filter[${key}]`] = value;
       });
     }
-    const url = makeUrl(devicesSearchUrl, params);
-
-    const requestOptions = {
-      method: 'GET',
-      headers: authorizationHeader
-    };
-
-    return fetch(url, requestOptions)
-      .then(checkAuthStatus(dispatch))
-      .then(response => response.json())
-      .then(data => {
-        const devices = (data.results || []).map(normalizeSearchDevice);
-        dispatch({ type: SET_DEVICES, devices });
-        return devices;
-      })
-      .catch(error => {
-        if (error.isAuthError) return;
-        // Logging for debugging — the error is re-thrown for caller handling
-        console.error('Device search failed:', error.message);
-        throw error;
-      });
+    try {
+      const data = await apiGet(makeUrl(devicesSearchUrl, params));
+      const devices = (data.results || []).map(normalizeSearchDevice);
+      dispatch({ type: SET_DEVICES, devices });
+      return devices;
+    } catch (error) {
+      if (handleAuthError(error, dispatch)) return undefined;
+      console.error('Device search failed:', error.message);
+      throw error;
+    }
   };
 
-export const createDevice = deviceData => (dispatch, getState) => {
-  const { authorizationHeader } = getState().login;
-
+export const createDevice = deviceData => async dispatch => {
   const body = {
     name: deviceData.name,
     brandName: deviceData.brandName || undefined,
@@ -168,70 +147,47 @@ export const createDevice = deviceData => (dispatch, getState) => {
     productUrl: deviceData.productUrl || undefined,
     manufacturerUrl: deviceData.manufacturerUrl || undefined
   };
-
-  const requestOptions = {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      ...authorizationHeader,
-      'Content-Type': 'application/json'
-    }
-  };
-
-  return fetch(devicesUrl, requestOptions)
-    .then(checkAuthStatus(dispatch))
-    .then(response => response.json())
-    .then(data => normalizeDevice(data))
-    .catch(error => {
-      if (error.isAuthError) return;
-      console.error('Device creation failed:', error.message);
-      throw error;
-    });
+  try {
+    const data = await apiPost(devicesUrl, body);
+    return normalizeDevice(data);
+  } catch (error) {
+    if (handleAuthError(error, dispatch)) return undefined;
+    console.error('Device creation failed:', error.message);
+    throw error;
+  }
 };
 
-export const fetchSensorConfigs = deviceId => (dispatch, getState) => {
+export const fetchSensorConfigs = deviceId => async dispatch => {
   dispatch({ type: FETCH_SENSOR_CONFIGS });
-  const { authorizationHeader } = getState().login;
-
-  const requestOptions = {
-    method: 'GET',
-    headers: authorizationHeader
-  };
-
-  return fetch(getDeviceUrl(deviceId), requestOptions)
-    .then(checkAuthStatus(dispatch))
-    .then(response => response.json())
-    .then(data => {
-      const sensorConfigs = (data.configurations || []).map(
-        normalizeSensorConfig
-      );
-      dispatch({ type: FETCH_SENSOR_CONFIGS_SUCCESS, sensorConfigs });
-
-      // Return full device data so caller can update confirmed device if needed
-      return {
-        device: {
-          id: data.id,
-          name: data.name,
-          brandName: data.brandName || null,
-          serialNumber: data.serialNumber || null,
-          author: data.author || null
-        },
-        sensorConfigs
-      };
-    })
-    .catch(error => {
-      if (error.isAuthError) return;
-      dispatch({
-        type: FETCH_SENSOR_CONFIGS_FAILURE,
-        error: error.message
-      });
+  try {
+    const data = await apiGet(getDeviceUrl(deviceId));
+    const sensorConfigs = (data.configurations || []).map(
+      normalizeSensorConfig
+    );
+    dispatch({ type: FETCH_SENSOR_CONFIGS_SUCCESS, sensorConfigs });
+    // Return full device data so caller can update confirmed device if needed
+    return {
+      device: {
+        id: data.id,
+        name: data.name,
+        brandName: data.brandName || null,
+        serialNumber: data.serialNumber || null,
+        author: data.author || null
+      },
+      sensorConfigs
+    };
+  } catch (error) {
+    if (handleAuthError(error, dispatch)) return undefined;
+    dispatch({
+      type: FETCH_SENSOR_CONFIGS_FAILURE,
+      error: error.message
     });
+    return undefined;
+  }
 };
 
-export const createSensorConfig = configData => (dispatch, getState) => {
+export const createSensorConfig = configData => async dispatch => {
   dispatch({ type: CREATE_SENSOR_CONFIG });
-  const { authorizationHeader } = getState().login;
-
   const body = {
     label: configData.label || undefined,
     quantityKind: configData.quantityKindId,
@@ -245,115 +201,90 @@ export const createSensorConfig = configData => (dispatch, getState) => {
     detectionLimitMin: configData.detectionLimitMin ?? null,
     detectionLimitMax: configData.detectionLimitMax ?? null
   };
-
-  const requestOptions = {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      ...authorizationHeader,
-      'Content-Type': 'application/json'
-    }
-  };
-
-  return fetch(deviceConfigurationsUrl(configData.deviceId), requestOptions)
-    .then(checkAuthStatus(dispatch))
-    .then(response => response.json())
-    .then(data => {
-      const sensorConfig = normalizeSensorConfig(data);
-      dispatch({ type: CREATE_SENSOR_CONFIG_SUCCESS, sensorConfig });
-      return sensorConfig;
-    })
-    .catch(error => {
-      if (error.isAuthError) return;
-      dispatch({
-        type: CREATE_SENSOR_CONFIG_FAILURE,
-        error: error.message
-      });
-      throw error;
+  try {
+    const data = await apiPost(
+      deviceConfigurationsUrl(configData.deviceId),
+      body
+    );
+    const sensorConfig = normalizeSensorConfig(data);
+    dispatch({ type: CREATE_SENSOR_CONFIG_SUCCESS, sensorConfig });
+    return sensorConfig;
+  } catch (error) {
+    if (handleAuthError(error, dispatch)) return undefined;
+    dispatch({
+      type: CREATE_SENSOR_CONFIG_FAILURE,
+      error: error.message
     });
+    throw error;
+  }
 };
 
 export const submitObservationsImport =
-  (file, profileJson) => (dispatch, getState) => {
+  (file, profileJson) => async dispatch => {
     dispatch({ type: SUBMIT_OBSERVATIONS_IMPORT });
 
-    const { authorizationHeader } = getState().login;
-
+    // apiPostForm intentionally does NOT set Content-Type — the browser sets
+    // it to multipart/form-data with the correct boundary.
     const formData = new FormData();
     formData.append('file', file);
     formData.append('profile', JSON.stringify(profileJson));
 
-    // Do NOT set Content-Type — the browser sets it to multipart/form-data
-    // with the correct boundary when using FormData.
-    const requestOptions = {
-      method: 'POST',
-      body: formData,
-      headers: authorizationHeader
-    };
-
-    return fetch(observationsImportUrl, requestOptions)
-      .then(checkAuthStatus(dispatch))
-      .then(response => response.json())
-      .then(data => {
-        dispatch({
-          type: SUBMIT_OBSERVATIONS_IMPORT_SUCCESS,
-          documentId: data.documentId
-        });
-        return data;
-      })
-      .catch(error => {
-        if (error.isAuthError) return;
-        dispatch({
-          type: SUBMIT_OBSERVATIONS_IMPORT_FAILURE,
-          error: {
-            code: error.body?.code || null,
-            message: error.body?.message || error.message,
-            details: error.body?.metadata?.details || [],
-            status: error.status || null,
-            referenceId: error.body?.reference_id || null
-          }
-        });
+    try {
+      const data = await apiPostForm(observationsImportUrl, formData);
+      dispatch({
+        type: SUBMIT_OBSERVATIONS_IMPORT_SUCCESS,
+        documentId: data.documentId
       });
+      return data;
+    } catch (error) {
+      if (handleAuthError(error, dispatch)) return undefined;
+      dispatch({
+        type: SUBMIT_OBSERVATIONS_IMPORT_FAILURE,
+        error: {
+          code: error.body?.code || null,
+          message: error.body?.message || error.message,
+          details: error.body?.metadata?.details || [],
+          status: error.status || null,
+          referenceId: error.body?.reference_id || null
+        }
+      });
+      return undefined;
+    }
   };
 
-export const fetchCaveById =
-  (caveId, { signal } = {}) =>
-  (dispatch, getState) => {
-    const { authorizationHeader } = getState().login;
+// Both lookups piggy-back on the shared RQ cache (caveKeys.detail /
+// personKeys.detail) so a cave already loaded by useCave / a caver by usePerson
+// is reused here without an extra request. The thunk signature is preserved
+// (`dispatch(fetchCaveById(id))`) so wizard callers do not change.
+//
+// The optional `signal` argument is dropped: RQ handles in-flight
+// deduplication and cache reuse; the wizard's cancelled/AbortController flags
+// still gate the state updates on the caller side.
+export const fetchCaveById = caveId => async () => {
+  try {
+    return await queryClient.fetchQuery({
+      queryKey: caveKeys.detail(caveId),
+      queryFn: () => apiGet(`${getCaveUrl}${caveId}`),
+      staleTime: STALE.STANDARD
+    });
+  } catch (error) {
+    // 401s are dispatched to postLogout by the QueryClient's global onError,
+    // so this catch only sees non-auth errors — same graceful degradation as
+    // the legacy thunk (log and return undefined).
+    console.error(`Failed to fetch cave ${caveId}:`, error.message);
+    return undefined;
+  }
+};
 
-    const requestOptions = {
-      method: 'GET',
-      headers: authorizationHeader,
-      signal
-    };
-
-    return fetch(`${getCaveUrl}${caveId}`, requestOptions)
-      .then(checkAuthStatus(dispatch))
-      .then(response => response.json())
-      .catch(error => {
-        if (error.isAuthError) return undefined;
-        console.error(`Failed to fetch cave ${caveId}:`, error.message);
-        return undefined;
-      });
-  };
-
-export const fetchCaverById =
-  (caverId, { signal } = {}) =>
-  (dispatch, getState) => {
-    const { authorizationHeader } = getState().login;
-
-    const requestOptions = {
-      method: 'GET',
-      headers: authorizationHeader,
-      signal
-    };
-
-    return fetch(`${getCaverUrl}${caverId}`, requestOptions)
-      .then(checkAuthStatus(dispatch))
-      .then(response => response.json())
-      .catch(error => {
-        if (error.isAuthError) return undefined;
-        console.error(`Failed to fetch caver ${caverId}:`, error.message);
-        return undefined;
-      });
-  };
+export const fetchCaverById = caverId => async () => {
+  try {
+    return await queryClient.fetchQuery({
+      queryKey: personKeys.detail(caverId),
+      queryFn: () => apiGet(`${getCaverUrl}${caverId}`),
+      staleTime: STALE.STANDARD
+    });
+  } catch (error) {
+    console.error(`Failed to fetch caver ${caverId}:`, error.message);
+    return undefined;
+  }
+};

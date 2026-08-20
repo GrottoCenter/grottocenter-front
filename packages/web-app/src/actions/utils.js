@@ -8,12 +8,7 @@ import {
   defaultTo,
   equals
 } from 'ramda';
-// Static import is safe: Login.js does not import utils.js, so no circular dep.
-// (Was a lazy require() to guard against circularity; replaced with a static
-// import because Vitest's vi.mock hoisting cannot intercept runtime require().)
-import { postLogout } from './Login';
 
-// Remove the next line when other exports are created.
 export const makeUrl = (url, criterias) => {
   if (criterias) {
     return `${url}?${Object.keys(criterias)
@@ -54,13 +49,3 @@ export const getTotalCount = (defaultCount, contentRangeHeader) =>
   )(contentRangeHeader);
 
 export const convertKmIntoMiles = km => km * 0.621371;
-
-export const checkAuthStatus = dispatch => response => {
-  if (response.status === 401) {
-    dispatch(postLogout());
-    const err = new Error('Unauthorized');
-    err.isAuthError = true;
-    throw err;
-  }
-  return checkAndGetStatus(response);
-};

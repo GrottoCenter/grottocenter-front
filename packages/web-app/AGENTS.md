@@ -137,7 +137,7 @@ Use ICU message format for dynamic values:
 All server reads (GET) and writes (POST/PUT/PATCH/DELETE) live in **TanStack
 Query**. Redux is kept for genuine client/session state only —
 see the [🎯 Redux Patterns](#-redux-patterns) section below for the
-7 slices that remain. Rationale, tiers and offline contract are in
+6 slices that remain. Rationale, tiers and offline contract are in
 [docs/adr/0001-tanstack-query-server-state.md](../../docs/adr/0001-tanstack-query-server-state.md).
 
 ### Where to add a new endpoint
@@ -148,7 +148,8 @@ see the [🎯 Redux Patterns](#-redux-patterns) section below for the
   `countryKeys`, `regionKeys`, `snapshotKeys`, `notificationKeys`,
   `countKeys`, `subscriptionKeys`, `messageKeys`, `moderationKeys`,
   `importKeys`, `listKeys`, `statsKeys`, `advancedSearchKeys`,
-  `quicksearchKeys`, `duplicateKeys`). Every entity domain uses the same
+  `quicksearchKeys`, `duplicateKeys`, `accountKeys`, `substanceKeys`,
+  `massifPreviewKeys`). Every entity domain uses the same
   `detailKey(domain)` factory so `xxxKeys.all` is the prefix and
   `xxxKeys.detail(id)` extends it (`regionKeys.detail` composes on
   `(countryId, regionId)` because the API path is nested).
@@ -197,18 +198,16 @@ Redux keeps only genuine client/session state. **Do not add a new
 reducer for a server fetch** — server-state (`{ data, loading, error }`
 for an API response) belongs in React Query.
 
-Remaining slices (7):
+Remaining slices (6):
 
-- `account` — mirror of the current user's account object (name, email,
-  language, prefs). Reads live in Redux; writes go through `useUpdateAccount`
-  and re-fetch `fetchAccount` on success.
 - `login` — session/JWT, authorization header, login-dialog visibility,
   MFA transition flags. Load-bearing across the auth flows in
   `hooks/mutations/useAuthFlows.js` and `useMfa.js` — the mutations
   dispatch back into this slice on success.
 - `intl` — locale + loaded message catalogues. Locale changes are
   driven by `changeLocale`; account language sync writes back via
-  `useUpdateAccount`.
+  `useUpdateAccount` (which invalidates `accountKeys.current()` so
+  `useAccount` refetches).
 - `sideMenu` — open/closed state of the AppShell side menu.
 - `error` — global error banner state (rare, mostly used by legacy
   error boundaries).
@@ -220,7 +219,10 @@ Remaining slices (7):
   wizard has small server-state sub-fetches (`fetchSensorConfigs`,
   submission status) that also live here to keep the step transitions
   atomic — they are not new endpoints, so leaving them in Redux is not
-  a regression.
+  a regression. Action type constants live in a separate
+  `actions/Observations/importWizardTypes.js` so the reducer never
+  pulls the thunks (which import `queryClient`) — this breaks the store
+  cycle that would otherwise re-appear.
 
 Anything else that looks like "load, hold, invalidate" is a React Query
 job — see the section above.

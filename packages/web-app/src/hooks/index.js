@@ -5,6 +5,11 @@ export {
   DMS_CODE
 } from './useCoordinatePreference';
 export { default as useProjections } from './queries/useProjections';
+export {
+  useAccount,
+  useNotificationPreferences,
+  useUpdateNotificationPreferences
+} from './queries/useAccount';
 export { useDebounce } from './useDebounce';
 export { useBoolean } from './useBoolean';
 export { useAuthNavigate } from './useAuthNavigate';
@@ -181,6 +186,15 @@ export {
   useUnarchiveConversation,
   useSendMessage
 } from './mutations/useMessages';
+export {
+  useSubstanceSearch,
+  useCreateSubstance
+} from './queries/useSubstances';
+export { usePreviewSensitiveMassif } from './queries/usePreviewSensitiveMassif';
+export {
+  useLinkExploredEntrance,
+  useUnlinkExploredEntrance
+} from './mutations/useExploredEntrance';
 export { useDbExport } from './queries/useDbExport';
 export { useProcessDocuments } from './mutations/useProcessDocuments';
 export { useImportCsvSession } from './useImportCsvSession';

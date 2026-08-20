@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
@@ -8,8 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-import { useDebounce } from '../../../../hooks';
-import { searchSubstances } from '../../../../actions/Substance';
+import { useDebounce, useSubstanceSearch } from '../../../../hooks';
 import {
   AUTOCOMPLETE_DEBOUNCE_DELAY,
   AUTOCOMPLETE_MIN_CHARACTERS
@@ -17,38 +15,17 @@ import {
 
 const SubstanceAutocomplete = ({ value, onChange }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
 
   const [inputValue, setInputValue] = useState('');
-  const [options, setOptions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-
   const debouncedInput = useDebounce(inputValue, AUTOCOMPLETE_DEBOUNCE_DELAY);
+  const trimmed = (debouncedInput || '').trim();
 
-  useEffect(() => {
-    const query = debouncedInput ? debouncedInput.trim() : '';
-    if (query.length < AUTOCOMPLETE_MIN_CHARACTERS) {
-      setOptions([]);
-      setHasSearched(false);
-      return undefined;
-    }
-    let cancelled = false;
-    setLoading(true);
-    dispatch(searchSubstances(query))
-      .then(results => {
-        if (!cancelled) {
-          setOptions(results || []);
-          setHasSearched(true);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [debouncedInput, dispatch]);
+  // useSubstanceSearch guards `enabled` on trimmed.length >= 2 internally;
+  // isFetching is false when disabled, so we don't need our own gate.
+  const { data: options, isFetching, isSuccess } = useSubstanceSearch(trimmed);
+  const hasSearched =
+    isSuccess && trimmed.length >= AUTOCOMPLETE_MIN_CHARACTERS;
+  const loading = isFetching;
 
   const handleInputChange = useCallback((_e, newInput, reason) => {
     if (reason === 'reset') return;

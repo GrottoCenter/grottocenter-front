@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { useQueryClient } from '@tanstack/react-query';
-import { linkExploredEntrance } from '../actions/Entrance/LinkExploredEntrance';
-import { unlinkExploredEntrance } from '../actions/Entrance/UnlinkExploredEntrance';
-import { personKeys } from '../api/queryKeys';
+import {
+  useLinkExploredEntrance,
+  useUnlinkExploredEntrance
+} from './mutations/useExploredEntrance';
 import { usePerson } from './queries/usePerson';
 
 /**
@@ -16,11 +15,11 @@ import { usePerson } from './queries/usePerson';
  * @param {number|null} userId     - The current user ID, or null if not logged in.
  */
 const useExplored = ({ entranceId, userId }) => {
-  const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const [isExplored, setIsExplored] = useState(false);
   const [isExploredLoading, setIsExploredLoading] = useState(false);
   const { data: person } = usePerson(userId);
+  const linkMutation = useLinkExploredEntrance();
+  const unlinkMutation = useUnlinkExploredEntrance();
 
   useEffect(() => {
     if (!entranceId) return;
@@ -31,13 +30,11 @@ const useExplored = ({ entranceId, userId }) => {
     if (!userId || !entranceId) return;
     setIsExploredLoading(true);
     try {
-      if (isExplored) {
-        await dispatch(unlinkExploredEntrance(entranceId, userId));
-      } else {
-        await dispatch(linkExploredEntrance(entranceId, userId));
-      }
+      const mutation = isExplored ? unlinkMutation : linkMutation;
+      // Both mutations invalidate personKeys.detail(userId) in their
+      // onSuccess, so no manual invalidation is needed here.
+      await mutation.mutateAsync({ entranceId, caverId: userId });
       setIsExplored(prev => !prev);
-      queryClient.invalidateQueries({ queryKey: personKeys.detail(userId) });
     } catch (err) {
       console.error('Error toggling explored status:', err);
     } finally {

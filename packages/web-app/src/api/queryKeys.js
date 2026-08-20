@@ -185,6 +185,35 @@ export const quicksearchKeys = {
   results: criteria => ['quicksearch', 'results', criteria]
 };
 
+// Current user's own account payload — one entry app-wide, keyed only by
+// domain root. Any mutation that touches the caller's account fields
+// (useUpdateAccount, MFA verify, MFA reset, …) invalidates this key.
+export const accountKeys = {
+  all: ['account'],
+  current: () => ['account', 'current'],
+  notificationPreferences: () => ['account', 'notificationPreferences']
+};
+
+// Substance autocomplete backing the observation-import wizard's sensor
+// configuration form. Keyed on the (trimmed) search term so parallel typing
+// in different sensors keeps its own cache.
+export const substanceKeys = {
+  all: ['substance'],
+  search: term => ['substance', 'search', term]
+};
+
+// Preview of how many entrances would be affected by marking a massif as
+// sensitive. Read-only imperative check used before a moderator confirms the
+// action; keyed on the massif id so a re-open reuses the count.
+export const massifPreviewKeys = {
+  all: ['massifPreview'],
+  sensitive: massifId => ['massifPreview', 'sensitive', massifId]
+};
+
+// Short-lived SSO tokens for the BI dashboard. Not cached under a stable key
+// on purpose — every openBi() call needs a fresh token, and useOpenBi uses
+// the mutation form so no cache entry survives.
+
 // Homepage aggregate counters + per-entity statistics blocks. All are
 // long-cache-friendly aggregate reads.
 export const statsKeys = {

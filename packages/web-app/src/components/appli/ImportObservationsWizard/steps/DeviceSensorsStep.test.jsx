@@ -22,6 +22,17 @@ vi.mock('../../../../hooks', () => ({
     onError: vi.fn(),
     onWarning: vi.fn(),
     onInfo: vi.fn()
+  }),
+  // Substance hooks are consumed by descendants (SensorConfigForm /
+  // SubstanceAutocomplete). Return inert defaults so this test does not
+  // need to mount a QueryClient just to satisfy an unrelated hook call.
+  useCreateSubstance: () => ({
+    mutateAsync: vi.fn(() => Promise.resolve({ id: 1 }))
+  }),
+  useSubstanceSearch: () => ({
+    data: [],
+    isFetching: false,
+    isSuccess: false
   })
 }));
 
@@ -41,11 +52,6 @@ vi.mock('../../../../actions/Observations/importWizard', () => ({
   createSensorConfig: vi.fn(() => () => Promise.resolve()),
   SET_CONFIRMED_DEVICE: 'SET_CONFIRMED_DEVICE',
   CLEAR_CONFIRMED_DEVICE: 'CLEAR_CONFIRMED_DEVICE'
-}));
-
-vi.mock('../../../../actions/Substance', () => ({
-  searchSubstances: () => () => Promise.resolve([]),
-  createSubstance: () => () => Promise.resolve({ id: 1, name: 'Nitrate' })
 }));
 
 vi.mock('../components/SubstanceAutocomplete', () => {

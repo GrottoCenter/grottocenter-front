@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 
 import {
@@ -41,10 +41,11 @@ import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { styled } from '@mui/material/styles';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { fetchAccount } from '../../actions/Account/GetAccount';
-import { checkAuthStatus } from '../../actions/utils';
 import { postLogout } from '../../actions/Login';
 import {
+  useAccount,
+  useNotificationPreferences,
+  useUpdateNotificationPreferences,
   usePerson,
   useOnlineStatus,
   useUserProperties,
@@ -84,7 +85,6 @@ import {
   languageIdToLocale,
   localeToLanguageId
 } from '../../utils/languageMapping';
-import { notificationPreferencesUrl } from '../../conf/apiRoutes';
 import {
   clearOfflineData,
   getOfflineDataUsage,
@@ -224,7 +224,6 @@ EditActions.propTypes = {
 // ─── Personal info section ────────────────────────────────────────────────────
 
 const PersonalInfoSection = ({ account, onSaved }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -274,10 +273,9 @@ const PersonalInfoSection = ({ account, onSaved }) => {
         name: data.name,
         surname: data.surname
       });
-      // The Redux `account` slice stays (see anti-scope in the ADR) so the
-      // side panel / preferences card still reads from it — dispatch a
-      // fresh fetchAccount so the just-persisted fields are visible.
-      dispatch(fetchAccount());
+      // useUpdateAccount invalidates accountKeys.current() in its onSuccess,
+      // so every useAccount() consumer refetches automatically — no manual
+      // trigger needed here.
       setIsEditing(false);
       onSaved();
     } catch (error) {
@@ -395,7 +393,6 @@ PersonalInfoSection.propTypes = {
 // ─── Email & security section ─────────────────────────────────────────────────
 
 const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -451,7 +448,6 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
     setEmailError(null);
     try {
       await updateAccountMutation.mutateAsync({ email: data.email });
-      dispatch(fetchAccount());
       setIsEditingEmail(false);
       onSaved();
     } catch {
@@ -487,10 +483,6 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
         currentPassword: data.currentPassword,
         password: data.password
       });
-      // Password changes don't affect the mirrored account data, but keep
-      // parity with the email/personal-info paths so the Redux slice is
-      // never stale after a save.
-      dispatch(fetchAccount());
       setIsChangingPassword(false);
       resetPassword({
         currentPassword: '',
@@ -681,9 +673,8 @@ const MfaSection = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const mfaResetMutation = useMfaReset();
-  const isMfaEnabled = useSelector(
-    state => state.account.account?.mfaEnabled ?? false
-  );
+  const { data: mfaAccount } = useAccount();
+  const isMfaEnabled = mfaAccount?.mfaEnabled ?? false;
 
   const {
     control,
@@ -837,20 +828,26 @@ const NOTIF_DEFAULTS = {
 };
 
 const PreferencesSection = ({ account, onSaved }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const authHeader = useSelector(state => state.login.authorizationHeader);
   const updateAccountMutation = useUpdateAccount();
+  const {
+    data: notifPrefsData,
+    isPending: isNotifLoading,
+    isError: hasNotifError
+  } = useNotificationPreferences();
+  const updateNotifPrefsMutation = useUpdateNotificationPreferences();
+
+  const notifPrefs = {
+    alert_for_news: notifPrefsData?.alert_for_news ?? false,
+    send_notification_by_email:
+      notifPrefsData?.send_notification_by_email ?? false,
+    send_message_notification_by_email:
+      notifPrefsData?.send_message_notification_by_email ?? false
+  };
 
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
-
-  // Notification preferences from GET /account/notifications
-  const [notifPrefs, setNotifPrefs] = useState(NOTIF_DEFAULTS);
-  const [isNotifLoading, setIsNotifLoading] = useState(true);
-  const [notifError, setNotifError] = useState(null);
-  const hasFetched = useRef(false);
 
   const currentLocale = languageIdToLocale(account?.language) ?? '';
 
@@ -866,45 +863,9 @@ const PreferencesSection = ({ account, onSaved }) => {
     }
   });
 
-  // Fetch notification preferences on mount
-  useEffect(() => {
-    if (!authHeader || hasFetched.current) return;
-    hasFetched.current = true;
-
-    const loadPrefs = async () => {
-      setIsNotifLoading(true);
-      setNotifError(null);
-      try {
-        const response = await checkAuthStatus(dispatch)(
-          await fetch(notificationPreferencesUrl, {
-            method: 'GET',
-            headers: authHeader
-          })
-        );
-        const data = await response.json();
-        const prefs = {
-          alert_for_news: data.alert_for_news ?? false,
-          send_notification_by_email: data.send_notification_by_email ?? false,
-          send_message_notification_by_email:
-            data.send_message_notification_by_email ?? false
-        };
-        setNotifPrefs(prefs);
-        reset({
-          language: languageIdToLocale(account?.language) ?? '',
-          ...prefs
-        });
-      } catch (err) {
-        if (err.isAuthError) return;
-        setNotifError(true);
-      } finally {
-        setIsNotifLoading(false);
-      }
-    };
-
-    loadPrefs();
-  }, [authHeader, dispatch, account, reset]);
-
-  // Sync language and notification preferences when account or notifPrefs changes
+  // Sync language and notification preferences when account or notifPrefs changes.
+  // The RQ hook already runs the fetch on mount — we just mirror its data into
+  // the RHF form defaults whenever a fresh copy lands.
   useEffect(() => {
     if (account) {
       reset({
@@ -912,7 +873,10 @@ const PreferencesSection = ({ account, onSaved }) => {
         ...notifPrefs
       });
     }
-  }, [account, notifPrefs, reset]);
+    // notifPrefs is rebuilt on every render — depending on notifPrefsData
+    // instead avoids resetting the form on every parent re-render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account, notifPrefsData, reset]);
 
   const handleEdit = () => {
     setSaveError(null);
@@ -932,32 +896,23 @@ const PreferencesSection = ({ account, onSaved }) => {
     setIsLoading(true);
     setSaveError(null);
     try {
-      // Save language via the account endpoint
+      // Save language via the account endpoint — invalidates useAccount.
       await updateAccountMutation.mutateAsync({
         language: localeToLanguageId(data.language)
       });
 
-      // Save notification preferences via the dedicated endpoint
-      const prefs = {
+      // Save notification preferences via the dedicated endpoint —
+      // useUpdateNotificationPreferences invalidates the query on success.
+      await updateNotifPrefsMutation.mutateAsync({
         alert_for_news: data.alert_for_news,
         send_notification_by_email: data.send_notification_by_email,
         send_message_notification_by_email:
           data.send_message_notification_by_email
-      };
-      await checkAuthStatus(dispatch)(
-        await fetch(notificationPreferencesUrl, {
-          method: 'PATCH',
-          headers: { ...authHeader, 'Content-Type': 'application/json' },
-          body: JSON.stringify(prefs)
-        })
-      );
+      });
 
-      setNotifPrefs(prefs);
       setIsEditing(false);
-      dispatch(fetchAccount());
       onSaved();
-    } catch (err) {
-      if (err.isAuthError) return;
+    } catch {
       setSaveError(true);
     } finally {
       setIsLoading(false);
@@ -1000,7 +955,7 @@ const PreferencesSection = ({ account, onSaved }) => {
         <CircularProgress size={20} />
       </InfoRow>
     );
-  } else if (notifError) {
+  } else if (hasNotifError) {
     notificationRows = (
       <Alert
         severity="warning"
@@ -1280,16 +1235,15 @@ const OfflineDataSection = () => {
 
 const AccountPage = () => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
   const userProperties = useUserProperties();
   const userId = userProperties?.id ?? null;
   const { isAdmin, isLeader } = usePermissions();
 
   const {
-    account,
-    isLoading: isAccountLoading,
+    data: account,
+    isPending: isAccountLoading,
     error: accountError
-  } = useSelector(state => state.account);
+  } = useAccount();
   const { data: person, isFetching: isPersonFetching } = usePerson(userId);
   const queryClient = useQueryClient();
   const invalidatePerson = useCallback(
@@ -1307,10 +1261,6 @@ const AccountPage = () => {
   const [pendingLeaveOrg, setPendingLeaveOrg] = useState(null);
   const joinOrganizationMutation = useJoinOrganization();
   const leaveOrganizationMutation = useLeaveOrganization();
-
-  useEffect(() => {
-    dispatch(fetchAccount());
-  }, [dispatch, userId]);
 
   const handleSaved = useCallback(() => {}, []);
 

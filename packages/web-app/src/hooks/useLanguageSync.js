@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeLocale } from '../actions/Intl';
-import { fetchAccount } from '../actions/Account/GetAccount';
-import { usePermissions, useUpdateAccount } from '.';
+import { useAccount, useUpdateAccount, usePermissions } from '.';
 import {
   languageIdToLocale,
   localeToLanguageId
@@ -12,19 +11,15 @@ const useLanguageSync = () => {
   const dispatch = useDispatch();
   const { isAuth } = usePermissions();
   const { locale } = useSelector(state => state.intl);
-  const { account } = useSelector(state => state.account);
+  // useAccount is only enabled while isAuth is true — no explicit fetch trigger
+  // is needed here.
+  const { data: account } = useAccount();
   const updateAccountMutation = useUpdateAccount();
   const mountedRef = useRef(false);
-  // Set to true while effect 2 is programmatically changing locale to prevent
-  // effect 3 from dispatching a redundant PATCH before fetchAccount resolves.
+  // Set to true while effect 1 is programmatically changing locale to prevent
+  // effect 2 from dispatching a redundant PATCH before the invalidated
+  // account query resolves.
   const syncingFromAccountRef = useRef(false);
-
-  // On login: load account data. The language list is no longer pulled here —
-  // useLanguages fetches it where it is actually displayed, and React Query
-  // dedupes across those call sites.
-  useEffect(() => {
-    if (isAuth) dispatch(fetchAccount());
-  }, [dispatch, isAuth]);
 
   // account.language → UI locale (after login or after a PATCH)
   useEffect(() => {

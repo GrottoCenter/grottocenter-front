@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
   loginUrl,
@@ -7,6 +7,7 @@ import {
   mfaResetUrl
 } from '../../conf/apiRoutes';
 import store from '../../store';
+import { accountKeys } from '../../api/queryKeys';
 import {
   decodeJWT,
   fetchLoginSuccess,
@@ -43,8 +44,13 @@ const rawFetchJson = async (url, { method = 'POST', headers, body } = {}) => {
 // the login response). Returns { secret, otpauthUri } — the QR-code inputs
 // for the authenticator app. mutation.data survives across steps 2 and 3
 // of the wizard so the UI does not need a separate cache.
+// meta.skip401Logout: enrollment 401s mean the enrollment token itself is
+// invalid, not that a real session has expired. The UI reads mutation.error
+// and prompts a fresh login — the global handler must not race it by calling
+// postLogout() on the (nonexistent) session first.
 export const useMfaEnroll = () =>
   useMutation({
+    meta: { skip401Logout: true },
     mutationFn: async () => {
       const { enrollmentToken } = store.getState().login;
       const json = await rawFetchJson(mfaEnrollUrl, {
@@ -61,8 +67,16 @@ export const useMfaEnroll = () =>
 // server returns a real bearer JWT — dispatch it into login state and close
 // the dialog. On 401 with a non-TOTP status the enrollment token itself
 // expired; the UI reads that flag to prompt a fresh login.
-export const useMfaVerify = () =>
-  useMutation({
+// meta.skip401Logout: a 401 here can mean either a wrong TOTP code
+// (InvalidTotpCode / TotpAlreadyUsed) or an expired enrollment token —
+// neither justifies a global logout while enrollment is in progress. The
+// caller reads err.isEnrollmentTokenExpired to disambiguate.
+export const useMfaVerify = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    meta: { skip401Logout: true },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: accountKeys.current() }),
     mutationFn: async code => {
       const { enrollmentToken } = store.getState().login;
       try {
@@ -84,12 +98,17 @@ export const useMfaVerify = () =>
       }
     }
   });
+};
 
 // Login-side MFA: for admins with MFA already enabled, the login endpoint
 // wants { email, password, totpCode } in one shot (no separate enrollment
 // step). Same success side-effects as useMfaVerify.
+// meta.skip401Logout: MFA login runs unauthenticated; a 401 here means a
+// wrong password or a wrong TOTP, not a lost session. Global logout would
+// clear the login dialog state and make the retry impossible.
 export const useMfaLogin = () =>
   useMutation({
+    meta: { skip401Logout: true },
     mutationFn: async ({ email, password, code }) => {
       const json = await rawFetchJson(loginUrl, {
         headers: { 'Content-Type': 'application/json' },
@@ -105,8 +124,16 @@ export const useMfaLogin = () =>
 // logout (the account page holds the delay so the confirmation notice
 // stays visible). A 401 that is not a "Mismatch" means the session
 // itself is invalid — logout immediately.
-export const useMfaReset = () =>
-  useMutation({
+// meta.skip401Logout: password 'Mismatch' during self-service reset is a
+// form-validation error and must not sign the user out. Any other 401 IS a
+// real session loss — dispatched here explicitly so the global handler stays
+// disabled uniformly for MFA.
+export const useMfaReset = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    meta: { skip401Logout: true },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: accountKeys.current() }),
     mutationFn: async password => {
       const { authorizationHeader } = store.getState().login;
       try {
@@ -125,3 +152,4 @@ export const useMfaReset = () =>
       }
     }
   });
+};

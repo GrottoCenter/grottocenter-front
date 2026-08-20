@@ -29,9 +29,15 @@ vi.mock('../../../../actions/Observations/importWizard', async () => ({
 }));
 
 const mockCreateSubstance = vi.fn();
-vi.mock('../../../../actions/Substance', () => ({
-  searchSubstances: () => () => Promise.resolve([]),
-  createSubstance: (...args) => mockCreateSubstance(...args)
+vi.mock('../../../../hooks', async () => ({
+  ...(await vi.importActual('../../../../hooks')),
+  useCreateSubstance: () => ({ mutateAsync: mockCreateSubstance }),
+  useNotification: () => ({
+    onSuccess: vi.fn(),
+    onError: vi.fn(),
+    onWarning: vi.fn(),
+    onInfo: vi.fn()
+  })
 }));
 
 // ---- SubstanceAutocomplete mock ----

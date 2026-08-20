@@ -195,12 +195,14 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
       return undefined;
     }
 
-    const abortController = new AbortController();
+    // fetchCaveById now goes through queryClient.fetchQuery, which handles
+    // in-flight deduplication and cache reuse. We can no longer abort the
+    // network request from here — a `cancelled` flag guards the setState
+    // calls so a stale response for a superseded caveId is discarded.
+    let cancelled = false;
 
-    dispatch(
-      fetchCaveById(context.caveId, { signal: abortController.signal })
-    ).then(data => {
-      if (!data) return;
+    dispatch(fetchCaveById(context.caveId)).then(data => {
+      if (cancelled || !data) return;
       const name =
         data.name ||
         (data.entrances && data.entrances[0] && data.entrances[0].name) ||
@@ -235,7 +237,9 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
       }
     });
 
-    return () => abortController.abort();
+    return () => {
+      cancelled = true;
+    };
     // Excluding dispatch, selectedCave, context.latitude,
     // context.longitude — this fetches cave data only when caveId changes
     // (e.g. from profile import). Including selectedCave would skip the fetch.
@@ -251,24 +255,22 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     )
       return undefined;
 
-    const abortController = new AbortController();
+    // Same rationale as above: RQ handles the fetch and the `cancelled` flag
+    // discards a stale batch of authors if authorIds changes mid-flight.
     let cancelled = false;
 
-    Promise.all(
-      context.authorIds.map(id =>
-        dispatch(fetchCaverById(id, { signal: abortController.signal }))
-      )
-    ).then(results => {
-      if (cancelled) return;
-      const authors = results
-        .filter(Boolean)
-        .map(data => ({ id: data.id, nickname: data.nickname }));
-      if (authors.length > 0) setSelectedAuthors(authors);
-    });
+    Promise.all(context.authorIds.map(id => dispatch(fetchCaverById(id)))).then(
+      results => {
+        if (cancelled) return;
+        const authors = results
+          .filter(Boolean)
+          .map(data => ({ id: data.id, nickname: data.nickname }));
+        if (authors.length > 0) setSelectedAuthors(authors);
+      }
+    );
 
     return () => {
       cancelled = true;
-      abortController.abort();
     };
     // Excluding selectedAuthors — this restores authors
     // display only when authorIds changes (e.g. profile import) and no authors

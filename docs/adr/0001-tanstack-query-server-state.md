@@ -124,12 +124,14 @@ The endpoint-by-endpoint migration reached its stable end state.
 
 ### Final state
 
-- **GCReducer: 106 slices → 7.** Redux keeps only genuine client/session
-  state: `account`, `login`, `intl`, `sideMenu`, `error`, `map` (viewport
+- **GCReducer: 106 slices → 6.** Redux keeps only genuine client/session
+  state: `login`, `intl`, `sideMenu`, `error`, `map` (viewport
   carve-out), `importWizard` (multi-step wizard client state). Every
   other slice's server-state was replaced by a React Query hook in
   `src/hooks/queries/` or `src/hooks/mutations/`, re-exported from
-  `src/hooks/index.js`.
+  `src/hooks/index.js`. The `account` slice was dropped in a follow-up
+  cleanup (`useAccount` / `useNotificationPreferences` /
+  `useUpdateNotificationPreferences` replace it end-to-end).
 - **Scaffolds removed** (all in the same migration): the middleware
   bridge `queryInvalidationBridge`, the `queryClientRef` singleton, the
   `mapCacheInvalidationMiddleware`, and three hand-rolled hooks —
@@ -148,31 +150,35 @@ The endpoint-by-endpoint migration reached its stable end state.
   the cache would grow without bound. Kept as thunks, per the carve-out
   in the original Decision section above.
 - **`importWizard` slice.** Multi-step client state (file, encoding,
-  header row, column mappings, context, wizard step). A few sub-fetches
-  colocate with the wizard reducer to keep step transitions atomic —
-  they are not new endpoints, so leaving them in Redux is not a
-  regression.
+  header row, column mappings, context, wizard step). The submission
+  thunks (`searchDevices`, `createDevice`, `fetchSensorConfigs`,
+  `createSensorConfig`, `submitObservationsImport`) stay as thunks
+  because they dispatch reducer-side status the multi-step UI reads
+  back — but the fetch layer moved to `apiGet`/`apiPost`/`apiPostForm`,
+  and a small `handleAuthError` helper in that file mirrors the
+  QueryClient's global 401 → `postLogout()` behaviour.
 - **`useRefetchOnReconnect` hook.** Kept for three legitimate callers
   outside the RQ scope: the viewport map, the intl locale reload, and
   the map tile cache reload. React Query's `refetchOnReconnect` covers
   RQ queries only.
-- **`checkAuthStatus` helper.** Still used by the remaining thunks that
-  live in the anti-scope (Account fetches, importWizard step fetches,
-  the Substance/PreviewSensitiveMassif thunks). The QueryClient's
-  global `onError` handles 401 for RQ. Two paths for now — the
-  "handled twice" risk from the Risks section above collapses when the
-  last thunk migrates, which is scoped for a follow-up.
 
-### The 401 handling risk noted above
+### 401 handling — single-source
 
-The "handled twice" risk in the Risks section is largely mitigated but
-not fully eliminated. All RQ queries and mutations hit the single
-`onError` in `conf/queryClient.js` (dispatches `postLogout()` on 401).
-The remaining thunks (see above) still call `checkAuthStatus` directly;
-both paths converge on `postLogout()`, so a real 401 lands the user on
-the same login flow regardless of which layer fired the request. When
-the last of those thunks migrates, `checkAuthStatus` disappears
-entirely and this paragraph closes.
+`checkAuthStatus` is gone. Every 401 in the app now flows through one
+of two identical dispatch paths:
+
+- RQ queries and mutations → `QueryCache`/`MutationCache` `onError` in
+  `conf/queryClient.js` → `postLogout()`. `meta.skip401Logout: true`
+  opts out for MFA/enrollment flows where a 401 is a form-validation
+  error, not a lost session.
+- Wizard submission thunks (the only remaining non-RQ callers) →
+  `handleAuthError` at the top of
+  `actions/Observations/importWizard.js` → same `postLogout()`.
+
+The two-path risk from the Risks section above is closed: both routes
+call `dispatch(postLogout())` on exactly the shape produced by
+`checkAndGetStatus` in `actions/utils.js` (still shared as the base
+non-auth response parser).
 
 ### Notable in-flight design choices worth remembering
 

@@ -39,15 +39,21 @@ const translate = (id, fallback) => {
 };
 
 const notifyError = (error, meta) => {
-  // 401 anywhere means the session is gone; drop it once, centrally, instead of
-  // letting every caller discover it. Replaces the per-thunk checkAuthStatus.
+  // 401 anywhere either signs the user out (default) or is handled inline
+  // by the caller (MFA verify/enroll/login/reset — flagged via
+  // meta.skip401Logout). In both cases the toast is suppressed: a session
+  // loss redirects to the login flow, and MFA flows surface the error in
+  // the dialog itself.
   if (error?.status === 401) {
-    store.dispatch(postLogout());
+    if (!meta?.skip401Logout) {
+      store.dispatch(postLogout());
+    }
     return;
   }
-  const fallback =
-    meta?.errorMessage ??
-    translate('unexpected error', 'An unexpected error occurred');
+  const fallback = translate(
+    'unexpected error',
+    'An unexpected error occurred'
+  );
   const code = error?.body?.code;
   enqueueSnackbar(code ? translate(code, fallback) : fallback, {
     variant: 'error'
