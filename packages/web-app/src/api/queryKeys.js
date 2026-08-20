@@ -141,3 +141,17 @@ export const importKeys = {
   all: ['import'],
   batch: batchId => ['import', 'batch', batchId]
 };
+
+// Homepage / admin content lists — mostly one-shot GETs that back the
+// carousels, cards and admin queues. Grouped under a shared root so a global
+// "invalidate all admin lists" is a single call.
+export const listKeys = {
+  all: ['list'],
+  recentChanges: () => ['list', 'recentChanges'],
+  partnersCarousel: () => ['list', 'partnersCarousel'],
+  randomEntrance: () => ['list', 'randomEntrance'],
+  latestBlogNews: url => ['list', 'latestBlogNews', url],
+  bannedCavers: () => ['list', 'bannedCavers'],
+  invalidEmailCavers: () => ['list', 'invalidEmailCavers'],
+  groups: () => ['list', 'groups']
+};

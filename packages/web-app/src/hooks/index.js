@@ -144,6 +144,17 @@ export { useDbExport } from './queries/useDbExport';
 export { useProcessDocuments } from './mutations/useProcessDocuments';
 export { useImportCsvSession } from './useImportCsvSession';
 export {
+  useRandomEntrance,
+  useRecentChanges,
+  usePartnersCarousel,
+  useLatestBlogNews
+} from './queries/useHomepageLists';
+export {
+  useGroups,
+  useBannedCavers,
+  useInvalidEmailCavers
+} from './queries/useAdminLists';
+export {
   useCreateOrganization,
   useUpdateOrganization
 } from './mutations/useOrganizationForm';

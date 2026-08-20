@@ -2,7 +2,6 @@ import { combineReducers } from 'redux';
 import account from './AccountReducer';
 import advancedsearch from './AdvancedsearchReducer';
 import banCaver from './BanCaverReducer';
-import bannedCavers from './BannedCaversReducer';
 import changeEmail from './ChangeEmail';
 import changePassword from './ChangePassword';
 import countryEntrances from './CountryEntrancesDataQualityReducer';
@@ -15,20 +14,14 @@ import duplicatesImport from './DuplicatesImportReducer';
 import dynamicNumber from './DynamicNumberReducer';
 import error from './ErrorReducer';
 import forgotPassword from './ForgotPasswordReducer';
-import groups from './GroupsReducer';
 import importWizard from './ImportWizardReducer';
 import intl from './IntlReducer';
-import invalidEmailCavers from './InvalidEmailCaversReducer';
-import latestBlogNews from './LatestBlogNewsReducer';
 import login from './LoginReducer';
 import map from './Map';
 import massifEntrances from './MassifEntrancesDataQualityReducer';
 import mfa from './MfaReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
-import partnersCarousel from './PartnersCarouselReducer';
 import quicksearch from './QuicksearchReducer';
-import randomEntrance from './RandomEntranceReducer';
-import recentChange from './RecentChangeReducer';
 import region from './RegionReducer';
 import regionEntrances from './RegionEntrancesDataQualityReducer';
 import resendVerificationEmail from './ResendVerificationEmailReducer';
@@ -45,7 +38,6 @@ const GCReducer = combineReducers({
   account,
   advancedsearch,
   banCaver,
-  bannedCavers,
   changeEmail,
   changePassword,
   countryEntrances,
@@ -58,20 +50,14 @@ const GCReducer = combineReducers({
   dynamicNumber,
   error,
   forgotPassword,
-  groups,
   importWizard,
   intl,
-  invalidEmailCavers,
-  latestBlogNews,
   login,
   map,
   massifEntrances,
   mfa,
   moveEntranceToCave,
-  partnersCarousel,
   quicksearch,
-  randomEntrance,
-  recentChange,
   region,
   regionEntrances,
   resendVerificationEmail,

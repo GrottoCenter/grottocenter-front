@@ -114,7 +114,7 @@ NewsCard.propTypes = {
   title: PropTypes.string,
   text: PropTypes.string,
   linkMore: PropTypes.string,
-  init: PropTypes.func.isRequired,
+  init: PropTypes.func,
   refresh: PropTypes.func.isRequired
 };
 
