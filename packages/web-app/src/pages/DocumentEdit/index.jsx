@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import DocumentSubmission from '../../components/appli/EntitiesForm/Document';
-import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
 import { resetDocumentApiErrors } from '../../actions/Document/ResetApiErrors';
+import { useDocument } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 
 const DocumentEdit = ({
@@ -20,20 +20,15 @@ const DocumentEdit = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const { isLoading, details, error } = useSelector(
-    state => state.documentDetails
-  );
+  const {
+    data: details,
+    isPending,
+    error
+  } = useDocument(documentId, { requireUpdate });
 
   const { latestHttpCode, errorMessages } = useSelector(
     state => state.updateDocument
   );
-
-  useEffect(() => {
-    if (documentId) {
-      dispatch(fetchDocumentDetails(documentId, requireUpdate));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [documentId]);
 
   useEffect(() => {
     if (latestHttpCode === 200 && errorMessages.length === 0) {
@@ -47,7 +42,7 @@ const DocumentEdit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestHttpCode, errorMessages]);
 
-  return isLoading || error || !details?.id ? (
+  return isPending || error || !details?.id ? (
     <CircularProgress />
   ) : (
     <Layout

@@ -45,11 +45,11 @@ import DocumentChildrenList, {
   ChildrenSectionHeader,
   DocumentChildrenTiles
 } from './DocumentChildrenList';
-import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
 import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
-import { deleteDocument } from '../../actions/Document/DeleteDocument';
-import { restoreDocument } from '../../actions/Document/RestoreDocument';
 import {
+  useDocument,
+  useDeleteDocument,
+  useRestoreDocument,
   useLanguages,
   useLicenses,
   findLicenseByName,
@@ -127,6 +127,7 @@ const SideColumn = styled('div', {
 const Document = ({
   isLoading = true,
   error,
+  isPaused = false,
   onRetry = null,
   documentData,
   documentChildren,
@@ -136,7 +137,8 @@ const Document = ({
   const openLink = useOpenLink();
   const navigate = useNavigate();
   const permissions = usePermissions();
-  const dispatch = useDispatch();
+  const deleteMutation = useDeleteDocument();
+  const restoreMutation = useRestoreDocument();
   const { data: languages = [] } = useLanguages();
   const { locale } = useSelector(state => state.intl);
   const { data: licenses } = useLicenses();
@@ -193,12 +195,12 @@ const Document = ({
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    dispatch(deleteDocument({ id: documentData.id, entityId, isPermanent }));
+    deleteMutation.mutate({ id: documentData.id, entityId, isPermanent });
     if (isPermanent) navigate('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreDocument({ id: documentData.id }));
+    restoreMutation.mutate({ id: documentData.id });
   };
 
   const mainLanguage =
@@ -519,11 +521,12 @@ const Document = ({
             }
           />
         )}
-        {error && (
+        {(error || isPaused) && (
           <ScrollableContent
             content={
               <FetchErrorState
                 error={error}
+                isPaused={isPaused}
                 onRetry={onRetry}
                 messageId="Error, the document data you are looking for is not available."
               />
@@ -819,9 +822,13 @@ const DocumentDetails = ({ id, hideActions = false }) => {
   const permissions = usePermissions();
   const { documentId: documentIdFromRoute } = useParams();
   const documentId = parseInt(documentIdFromRoute ?? id, 10);
-  const { isLoading, details, error } = useSelector(
-    state => state.documentDetails
-  );
+  const {
+    data: details,
+    isPending: isDetailsPending,
+    isPaused: isDetailsPaused,
+    error: detailsError,
+    refetch: refetchDetails
+  } = useDocument(documentId);
   const {
     isLoading: isDocumentChildrenLoading,
     children,
@@ -832,18 +839,23 @@ const DocumentDetails = ({ id, hideActions = false }) => {
   // costs nothing: React Query dedupes the two into a single request.
   const { isPending: isLanguagesPending } = useLanguages();
 
-  const reloadDocument = useCallback(() => {
-    if (!documentId) return;
-    dispatch(fetchDocumentDetails(documentId));
-    dispatch(fetchDocumentChildren(documentId));
+  const reloadChildren = useCallback(() => {
+    if (documentId) dispatch(fetchDocumentChildren(documentId));
   }, [dispatch, documentId]);
 
   useEffect(() => {
-    reloadDocument();
-  }, [reloadDocument]);
+    reloadChildren();
+  }, [reloadChildren]);
 
-  const fetchError = error ?? childrenError;
-  useRefetchOnReconnect(reloadDocument, Boolean(fetchError));
+  // React Query refetches the detail on reconnect on its own; the manual hook
+  // only stays for the children fetch, which is still a thunk.
+  useRefetchOnReconnect(reloadChildren, Boolean(childrenError));
+
+  const fetchError = detailsError ?? childrenError;
+  const onRetry = useCallback(() => {
+    refetchDetails();
+    reloadChildren();
+  }, [refetchDetails, reloadChildren]);
 
   return details?.isDeleted && !permissions.isModerator ? (
     <Deleted entityType={DELETED_ENTITIES.document} entity={details} />
@@ -858,7 +870,7 @@ const DocumentDetails = ({ id, hideActions = false }) => {
       key={documentId}
       isLoading={
         !documentId ||
-        isLoading ||
+        isDetailsPending ||
         isDocumentChildrenLoading ||
         isLanguagesPending
       }
@@ -866,7 +878,8 @@ const DocumentDetails = ({ id, hideActions = false }) => {
       // successful detail fetch still renders the document content plus the
       // error card, as a degraded state rather than blanking the whole page.
       error={fetchError}
-      onRetry={reloadDocument}
+      isPaused={isDetailsPaused}
+      onRetry={onRetry}
       documentData={details}
       documentChildren={children}
       hideActions={hideActions}
@@ -879,6 +892,7 @@ export default DocumentDetails;
 Document.propTypes = {
   isLoading: PropTypes.bool,
   error: PropTypes.shape({}),
+  isPaused: PropTypes.bool,
   onRetry: PropTypes.func,
   documentData: DocumentPropTypes,
   documentChildren: PropTypes.arrayOf(DocumentChildPropTypes),

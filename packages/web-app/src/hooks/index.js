@@ -16,6 +16,10 @@ export { useDocumentTypes } from './queries/useDocumentTypes';
 export { useIdentifierTypes } from './queries/useIdentifierTypes';
 export { useSubjects } from './queries/useSubjects';
 export { useLanguages } from './queries/useLanguages';
+export { useDocument } from './queries/useDocument';
+// Server-state writes live in ./mutations, same convention.
+export { useDeleteDocument } from './mutations/useDeleteDocument';
+export { useRestoreDocument } from './mutations/useRestoreDocument';
 export { useNotification } from './useNotification';
 export { usePermissions } from './usePermissions';
 export { useSessionExpiry } from './useSessionExpiry';

@@ -26,7 +26,6 @@ import dbExport from './DBExportReducer';
 import deleteGuideline from './DeleteGuidelineReducer';
 import detachEntrance from './DetachEntranceReducer';
 import documentChildren from './DocumentChildrenReducer';
-import documentDetails from './DetailsDocumentReducer';
 import documents from './DocumentsReducer';
 import duplicatesCount from './DuplicatesCountReducer';
 import duplicatesImport from './DuplicatesImportReducer';
@@ -128,7 +127,6 @@ const GCReducer = combineReducers({
   deleteGuideline,
   detachEntrance,
   documentChildren,
-  documentDetails,
   documents,
   duplicatesCount,
   duplicatesImport,

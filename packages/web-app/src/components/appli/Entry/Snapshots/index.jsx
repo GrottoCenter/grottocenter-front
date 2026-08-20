@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button, Card, CardContent, Skeleton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import HistoryIcon from '@mui/icons-material/History';
@@ -13,10 +14,11 @@ import SectionStack from '../../../common/Layouts/SectionStack';
 import { fetchSnapshot } from '../../../../actions/Snapshot/GetSnapshots';
 import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
 import { fetchCave } from '../../../../actions/Cave/GetCave';
-import { fetchDocumentDetails } from '../../../../actions/Document/GetDocumentDetails';
 import { loadMassif } from '../../../../actions/Massif/GetMassif';
 import { fetchPerson } from '../../../../actions/Person/GetPerson';
 import { fetchOrganization } from '../../../../actions/Organization/GetOrganization';
+import { useDocument } from '../../../../hooks';
+import { documentKeys } from '../../../../api/queryKeys';
 import REDUCER_STATUS from '../../../../reducers/ReducerStatus';
 import SensitiveCaveWarning from '../SensitiveCaveWarning';
 import AccordionSnapshotList from './AccordionSnapshotList';
@@ -36,6 +38,7 @@ const SUB_ENTITY_TYPES = [
 
 const SnapshotPage = () => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const location = useLocation();
@@ -59,8 +62,11 @@ const SnapshotPage = () => {
   const { cave: currentCave, loading: isCaveLoading } = useSelector(
     s => s.cave
   );
-  const { details: currentDocument, isLoading: isDocumentLoading } =
-    useSelector(s => s.documentDetails);
+  // useDocument is gated on type so the query stays disabled — no wasted
+  // request — when this page renders any other entity.
+  const documentQuery = useDocument(type === 'documents' ? id : undefined);
+  const currentDocument = documentQuery.data ?? null;
+  const isDocumentLoading = documentQuery.isFetching;
   const { massif: currentMassif, isFetching: isMassifLoading } = useSelector(
     s => s.massif
   );
@@ -86,7 +92,8 @@ const SnapshotPage = () => {
     const fetchByType = {
       entrances: () => dispatch(fetchEntrance(id)),
       caves: () => dispatch(fetchCave(id)),
-      documents: () => dispatch(fetchDocumentDetails(id)),
+      documents: () =>
+        queryClient.invalidateQueries({ queryKey: documentKeys.detail(id) }),
       massifs: () => dispatch(loadMassif(id)),
       persons: () => dispatch(fetchPerson(id)),
       organizations: () => dispatch(fetchOrganization(id))
@@ -105,7 +112,7 @@ const SnapshotPage = () => {
     } else if (Object.hasOwn(fetchByType, type)) {
       fetchByType[type]();
     }
-  }, [id, type, parentId, parentType, isSubEntityType, dispatch]);
+  }, [id, type, parentId, parentType, isSubEntityType, dispatch, queryClient]);
 
   const parentDataByType = {
     entrances: currentEntrance,

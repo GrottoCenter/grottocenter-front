@@ -19,3 +19,20 @@ export const referenceKeys = {
   languages: () => [...referenceKeys.all, 'languages'],
   projections: () => [...referenceKeys.all, 'projections']
 };
+
+// Entity keys. Each `detail(id)` key is what a mutation invalidates to force a
+// refetch of the parent entity when it (or one of its children — descriptions,
+// riggings, locations, …) changes. Options are appended when the same detail
+// has to be cached under different shapes (documents with `requireUpdate` fetch
+// a snapshot the moderator can act on — different payload, different key).
+
+const detailKey = domain => (id, opts) => {
+  const key = [domain, 'detail', id];
+  if (opts !== undefined) key.push(opts);
+  return key;
+};
+
+export const documentKeys = {
+  all: ['document'],
+  detail: detailKey('document')
+};
