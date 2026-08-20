@@ -1,5 +1,4 @@
-import { useContext, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useContext, useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import {
   Fade,
@@ -14,8 +13,8 @@ import { useIntl } from 'react-intl';
 import Translate from '../../../../common/Translate';
 import { DocumentFormContext } from '../Provider';
 import StringInput from '../../../../common/Form/StringInput';
-import { loadIdentifierTypes } from '../../../../../actions/IdentifierType';
 import { DocumentTypes } from '../../../../../utils/documentTypeHelpers';
+import { useIdentifierTypes } from '../../../../../hooks';
 
 const InlineWrapper = styled('div')`
   display: flex;
@@ -34,17 +33,9 @@ const IdentifierTypeContainer = styled('div')`
 `;
 
 const IdentifierEditor = () => {
-  const dispatch = useDispatch();
-  const { identifierTypes: allIdentifierTypes } = useSelector(
-    state => state.identifierType
-  );
+  const { data: allIdentifierTypes = [] } = useIdentifierTypes();
   const { formatMessage } = useIntl();
   const { document, updateAttribute } = useContext(DocumentFormContext);
-
-  useEffect(() => {
-    dispatch(loadIdentifierTypes());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const identifierType = useMemo(() => {
     if (!document.identifierType) return null;

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import { DocumentFormContext } from '../Provider';
 
-import { useDebounce } from '../../../../../hooks';
+import { useDebounce, useLicenses } from '../../../../../hooks';
 import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
 import {
   fetchParentDocumentDetails,
@@ -14,7 +14,6 @@ import {
   fetchAuthorizationDocumentDetails,
   FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS
 } from '../../../../../actions/Document/GetAuthorizationDocumentDetails';
-import { fetchLicense } from '../../../../../actions/Licenses';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './AddFileForm/FileHelpers';
 
 const SearchBar = props => {
@@ -30,13 +29,7 @@ const SearchBar = props => {
   const debouncedInput = useDebounce(inputValue);
   const dispatch = useDispatch();
   const { languages } = useSelector(state => state.language);
-  const { data: licenses } = useSelector(state => state.licenses);
-
-  useEffect(() => {
-    if (!licenses || licenses.length === 0) {
-      dispatch(fetchLicense());
-    }
-  }, [dispatch, licenses]);
+  const { data: licenses } = useLicenses();
 
   const handleInputChange = newValue => {
     if (

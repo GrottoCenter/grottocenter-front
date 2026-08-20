@@ -2,6 +2,28 @@
 // Allows assertions like: expect(element).toHaveTextContent(/react/i)
 import '@testing-library/jest-dom';
 
+import { AVAILABLE_LANGUAGES } from './conf/config';
+
+// index.html defines window.intlBootstrap in an inline script, before the app
+// bundle runs — IntlReducer reads it at module scope to seed its initial state.
+// jsdom loads no such script, so anything that reaches GCReducer (the store, and
+// therefore every module that imports src/store.js) would throw a bare
+// ReferenceError on import.
+//
+// allLanguages is derived from AVAILABLE_LANGUAGES rather than copied: the two
+// lists must match or IntlReducer logs an error, and a hand-copied list here
+// would drift the first time a locale is added.
+if (typeof globalThis.intlBootstrap === 'undefined') {
+  globalThis.intlBootstrap = {
+    defaultLocale: 'en',
+    allLanguages: Object.keys(AVAILABLE_LANGUAGES),
+    initialLocale: 'en',
+    // A promise in the browser; null is enough here — `await null` resolves, and
+    // no test drives the initial locale fetch.
+    initialFetchP: null
+  };
+}
+
 // jsdom does not implement window.matchMedia, and MUI's useMediaQuery relies
 // on it. Without a polyfill every breakpoint check falls back to `false`, which
 // silently flips the whole app into mobile mode inside tests. Assume a very

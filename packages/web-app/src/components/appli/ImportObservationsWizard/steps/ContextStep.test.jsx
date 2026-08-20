@@ -13,9 +13,14 @@ vi.mock('react-redux', async () => ({
   useSelector: selector => selector(mockStoreState)
 }));
 
+// Licenses now come from React Query (useLicenses), not the store — the tests
+// drive the hook instead of seeding a `licenses` slice.
+let mockLicenses = { data: null, isLoading: false };
+
 // ---- useUserProperties mock ----
 vi.mock('../../../../hooks', () => ({
   useUserProperties: () => ({ id: 1, nickname: 'testuser' }),
+  useLicenses: () => mockLicenses,
   useDebounce: value => value,
   useEntitySearch: () => ({
     inputValue: '',
@@ -48,11 +53,6 @@ vi.mock('../../../common/AutoCompleteSearch/CaveAutoCompleteSearch', () => {
       )
   };
 });
-
-// ---- License action mock ----
-vi.mock('../../../../actions/Licenses', () => ({
-  fetchLicense: vi.fn(() => ({ type: 'FETCH_LICENSES_LOAD' }))
-}));
 
 // ---- Quicksearch action mock ----
 vi.mock('../../../../actions/Quicksearch', () => ({
@@ -186,11 +186,6 @@ const buildState = (overrides = {}) => ({
     authorizationHeader: { Authorization: 'Bearer fake-token' },
     authTokenDecoded: { id: 1, groups: ['User'], nickname: 'testuser' }
   },
-  licenses: {
-    data: null,
-    loading: false,
-    error: null
-  },
   quicksearch: {
     results: [],
     isLoading: false,
@@ -222,6 +217,7 @@ const renderComponent = (props = {}, stateOverrides = {}) => {
 beforeEach(() => {
   mockDispatch.mockClear();
   mockDispatch.mockImplementation(() => Promise.resolve());
+  mockLicenses = { data: null, isLoading: false };
 });
 
 describe('ContextStep', () => {
@@ -266,10 +262,8 @@ describe('ContextStep', () => {
     ];
 
     it('should not display Creative Commons licenses in the license dropdown', () => {
-      mockStoreState = {
-        ...buildState(),
-        licenses: { data: licensesWithCC, loading: false, error: null }
-      };
+      mockStoreState = buildState();
+      mockLicenses = { data: licensesWithCC, isLoading: false };
 
       render(
         <IntlProvider locale="en" messages={messages}>
@@ -308,10 +302,8 @@ describe('ContextStep', () => {
     });
 
     it('should only show the 3 allowed licenses (ODbL, ODC-BY, Licence Ouverte)', () => {
-      mockStoreState = {
-        ...buildState(),
-        licenses: { data: licensesWithCC, loading: false, error: null }
-      };
+      mockStoreState = buildState();
+      mockLicenses = { data: licensesWithCC, isLoading: false };
 
       render(
         <IntlProvider locale="en" messages={messages}>

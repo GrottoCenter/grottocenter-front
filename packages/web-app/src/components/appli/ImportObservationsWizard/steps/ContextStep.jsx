@@ -32,8 +32,7 @@ import {
   fetchCaveById,
   fetchCaverById
 } from '../../../../actions/Observations/importWizard';
-import { fetchLicense } from '../../../../actions/Licenses';
-import { useUserProperties } from '../../../../hooks';
+import { useUserProperties, useLicenses } from '../../../../hooks';
 import CaveAutoCompleteSearch from '../../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
 import AuthorsSelect from '../../../common/AuthorsSelect';
 import LanguageSelect from '../../../common/LanguageSelect';
@@ -62,10 +61,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     state => state.importWizard.samplingIntervalSeconds
   );
 
-  // Licenses from Redux
-  const { data: allLicenses, loading: licensesLoading } = useSelector(
-    state => state.licenses
-  );
+  const { data: allLicenses, isLoading: licensesLoading } = useLicenses();
 
   // Current user
   const currentUser = useUserProperties();
@@ -147,13 +143,6 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     // (e.g. profile import). Including form values would create a loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context.latitude, context.longitude]);
-
-  // Fetch licenses on mount
-  useEffect(() => {
-    if (!allLicenses && !licensesLoading) {
-      dispatch(fetchLicense());
-    }
-  }, [dispatch, allLicenses, licensesLoading]);
 
   // Pre-fill cave when locked
   useEffect(() => {

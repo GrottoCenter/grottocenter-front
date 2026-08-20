@@ -28,23 +28,19 @@ import detachEntrance from './DetachEntranceReducer';
 import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
 import documents from './DocumentsReducer';
-import documentType from './DocumentTypeReducer';
 import duplicatesCount from './DuplicatesCountReducer';
 import duplicatesImport from './DuplicatesImportReducer';
 import dynamicNumber from './DynamicNumberReducer';
 import entrance from './EntranceReducer';
 import error from './ErrorReducer';
-import fileFormats from './FileFormatsReducer';
 import forgotPassword from './ForgotPasswordReducer';
 import groups from './GroupsReducer';
-import identifierType from './IdentifierTypesReducer';
 import importCsv from './ImportCsvReducer';
 import importWizard from './ImportWizardReducer';
 import intl from './IntlReducer';
 import invalidEmailCavers from './InvalidEmailCaversReducer';
 import language from './LanguageReducer';
 import latestBlogNews from './LatestBlogNewsReducer';
-import licenses from './LicensesReducer';
 import linkDocumentToEntrance from './LinkDocumentToEntrance';
 import login from './LoginReducer';
 import map from './Map';
@@ -137,23 +133,19 @@ const GCReducer = combineReducers({
   documentChildren,
   documentDetails,
   documents,
-  documentType,
   duplicatesCount,
   duplicatesImport,
   dynamicNumber,
   entrance,
   error,
-  fileFormats,
   forgotPassword,
   groups,
-  identifierType,
   importCsv,
   importWizard,
   intl,
   invalidEmailCavers,
   language,
   latestBlogNews,
-  licenses,
   linkDocumentToEntrance,
   login,
   map,

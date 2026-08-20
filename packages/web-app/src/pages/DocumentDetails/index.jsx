@@ -12,7 +12,6 @@ import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ShareIcon from '@mui/icons-material/Share';
 import { NavigateNext } from '@mui/icons-material';
 import { LicenseBadge } from '@/components/common/LicenseTag';
-import { fetchLicense } from '@/actions/Licenses';
 import {
   DEFAULT_COLLECTION_SORT_ORDER,
   DOCUMENT_SORT_ORDERS,
@@ -52,6 +51,7 @@ import { deleteDocument } from '../../actions/Document/DeleteDocument';
 import { restoreDocument } from '../../actions/Document/RestoreDocument';
 import { loadLanguages } from '../../actions/Language';
 import {
+  useLicenses,
   usePermissions,
   useRefetchOnReconnect,
   useSharePage
@@ -138,9 +138,7 @@ const Document = ({
   const dispatch = useDispatch();
   const { languages } = useSelector(state => state.language);
   const { locale } = useSelector(state => state.intl);
-  const licenses = useSelector(state => state.licenses.data);
-  const licensesLoading = useSelector(state => state.licenses.loading);
-  const licensesError = useSelector(state => state.licenses.error);
+  const { data: licenses } = useLicenses();
   const [issuesSortOrder, setIssuesSortOrder] = useState(
     DEFAULT_COLLECTION_SORT_ORDER
   );
@@ -166,14 +164,6 @@ const Document = ({
   // The document detail only carries the license name; resolve the full license
   // object (for its deed URL) from the licenses list.
   //
-  // The error is part of the guard, not just the loading flag: the reducer
-  // resets `data` to null on failure, so without it a failed /licenses call
-  // satisfies the condition again on the very next render and the page refetches
-  // forever.
-  useEffect(() => {
-    if (!licenses && !licensesLoading && !licensesError)
-      dispatch(fetchLicense());
-  }, [dispatch, licenses, licensesLoading, licensesError]);
   // Stay `undefined` until the licenses list is loaded — otherwise the badge
   // renders once with the bare name string (no deed URL), then re-renders as
   // an object once the list arrives, causing a visible flicker where the

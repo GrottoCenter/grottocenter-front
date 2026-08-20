@@ -7,8 +7,8 @@ import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
-import { loadDocumentTypes } from '../../../actions/DocumentType';
 import { loadSubjects } from '../../../actions/Subject';
+import { useDocumentTypes } from '../../../hooks';
 import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON
@@ -118,11 +118,10 @@ const DocumentSearch = () => {
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
   const searchEntity = ADVANCED_SEARCH_TYPES.DOCUMENTS;
 
-  const documentTypes = useSelector(state => state.documentType.documentTypes);
+  const { data: documentTypes = [] } = useDocumentTypes();
   const subjects = useSelector(state => state.subject.subjects);
 
   useEffect(() => {
-    dispatch(loadDocumentTypes());
     dispatch(loadSubjects());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

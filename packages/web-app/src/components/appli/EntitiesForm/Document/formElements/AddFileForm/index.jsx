@@ -23,7 +23,11 @@ import LicenseTag from '@/components/common/LicenseTag';
 import AppLink from '@/components/common/AppLink';
 import InternationalizedLink from '@/components/common/InternationalizedLink';
 import { licenceLinks } from '@/conf/externalLinks';
-import { useUserProperties, useFileFormats } from '../../../../../../hooks';
+import {
+  useUserProperties,
+  useFileFormats,
+  useLicenses
+} from '../../../../../../hooks';
 import ErrorsList from './ErrorsList';
 import {
   IS_DELETED,
@@ -34,7 +38,6 @@ import {
   validateAndBuildFileEntries
 } from './FileHelpers';
 import FileSelectorInput from '../../../../../common/FileSelectorInput';
-import { fetchLicense } from '../../../../../../actions/Licenses';
 import { getDocuments } from '../../../../../../actions/Document/GetDocuments';
 import { DocumentFormContext } from '../../Provider';
 
@@ -103,16 +106,16 @@ const AddFileForm = ({
   showAuthorization = true
 }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
   const [errors, setErrors] = useState([]);
   const {
     mimeTypes,
     extensions: backendExtensions,
     loading
   } = useFileFormats();
-  const { data: licenses, loading: licensesLoading } = useSelector(
-    state => state.licenses
-  );
+  // Fetched only where the authorization block is shown; React Query keeps the
+  // call site unconditional and skips the request until then.
+  const { data: licenses, isLoading: licensesLoading } =
+    useLicenses(showAuthorization);
   const currentUser = useUserProperties();
   const { document, updateAttribute } = useContext(DocumentFormContext);
 
@@ -146,11 +149,6 @@ const AddFileForm = ({
     .join(',');
   const showAuthDocSelect = option === DOCUMENT_AUTHORIZE_TO_PUBLISH;
   const visibleFiles = files.filter(f => f.state !== IS_DELETED);
-
-  useEffect(() => {
-    if (showAuthorization && !licenses && !licensesLoading)
-      dispatch(fetchLicense());
-  }, [dispatch, showAuthorization, licenses, licensesLoading]);
 
   const documentLicenseName = document.license?.name;
   useEffect(() => {

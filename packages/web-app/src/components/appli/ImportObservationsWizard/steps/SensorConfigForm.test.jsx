@@ -22,7 +22,9 @@ vi.mock('notistack', () => ({
 
 // ---- Actions mock ----
 const mockCreateSensorConfig = vi.fn();
-vi.mock('../../../../actions/Observations/importWizard', () => ({
+// Spread, not replace — see the note in UploadStep.test.jsx.
+vi.mock('../../../../actions/Observations/importWizard', async () => ({
+  ...(await vi.importActual('../../../../actions/Observations/importWizard')),
   createSensorConfig: (...args) => mockCreateSensorConfig(...args)
 }));
 
