@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { Box, Breadcrumbs, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -45,16 +45,15 @@ import DocumentChildrenList, {
   ChildrenSectionHeader,
   DocumentChildrenTiles
 } from './DocumentChildrenList';
-import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
 import {
   useDocument,
+  useDocumentChildren,
   useDeleteDocument,
   useRestoreDocument,
   useLanguages,
   useLicenses,
   findLicenseByName,
   usePermissions,
-  useRefetchOnReconnect,
   useSharePage
 } from '../../hooks';
 import PageContainer from '../../components/common/Layouts/PageContainer';
@@ -818,7 +817,6 @@ const Document = ({
 };
 
 const DocumentDetails = ({ id, hideActions = false }) => {
-  const dispatch = useDispatch();
   const permissions = usePermissions();
   const { documentId: documentIdFromRoute } = useParams();
   const documentId = parseInt(documentIdFromRoute ?? id, 10);
@@ -830,32 +828,21 @@ const DocumentDetails = ({ id, hideActions = false }) => {
     refetch: refetchDetails
   } = useDocument(documentId);
   const {
-    isLoading: isDocumentChildrenLoading,
-    children,
-    childrenError
-  } = useSelector(state => state.documentChildren);
+    data: children = [],
+    isPending: isDocumentChildrenLoading,
+    error: childrenError,
+    refetch: refetchChildren
+  } = useDocumentChildren(documentId);
   // The document body renders its language by name, so it must not appear
   // before the list is known. Calling useLanguages here as well as in <Document>
   // costs nothing: React Query dedupes the two into a single request.
   const { isPending: isLanguagesPending } = useLanguages();
 
-  const reloadChildren = useCallback(() => {
-    if (documentId) dispatch(fetchDocumentChildren(documentId));
-  }, [dispatch, documentId]);
-
-  useEffect(() => {
-    reloadChildren();
-  }, [reloadChildren]);
-
-  // React Query refetches the detail on reconnect on its own; the manual hook
-  // only stays for the children fetch, which is still a thunk.
-  useRefetchOnReconnect(reloadChildren, Boolean(childrenError));
-
   const fetchError = detailsError ?? childrenError;
   const onRetry = useCallback(() => {
     refetchDetails();
-    reloadChildren();
-  }, [refetchDetails, reloadChildren]);
+    refetchChildren();
+  }, [refetchDetails, refetchChildren]);
 
   return details?.isDeleted && !permissions.isModerator ? (
     <Deleted entityType={DELETED_ENTITIES.document} entity={details} />

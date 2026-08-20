@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 
 import { DocumentFormContext } from '../Provider';
@@ -10,16 +10,25 @@ import {
   useLicenses,
   findLicenseByName
 } from '../../../../../hooks';
+import { getDocumentDetailsUrl } from '../../../../../conf/apiRoutes';
+import { apiGet } from '../../../../../api/client';
+import { documentKeys } from '../../../../../api/queryKeys';
+import { STALE } from '../../../../../conf/queryClient';
 import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
-import {
-  fetchParentDocumentDetails,
-  FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS
-} from '../../../../../actions/Document/GetParentDocumentDetails';
-import {
-  fetchAuthorizationDocumentDetails,
-  FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS
-} from '../../../../../actions/Document/GetAuthorizationDocumentDetails';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './AddFileForm/FileHelpers';
+
+// Fetch a document detail on demand while reusing the useDocument cache.
+// The old code used two dedicated slices (parentDocument, authorizationDocument)
+// hitting the same /documents/:id endpoint as useDocument, with three copies
+// of the same fetch machinery. fetchQuery reads from cache first, falls back
+// to network, and populates the same key — so a parent document already open
+// in DocumentDetails is served from memory here.
+const fetchDocumentDetailFromCache = (queryClient, id) =>
+  queryClient.fetchQuery({
+    queryKey: documentKeys.detail(id),
+    queryFn: () => apiGet(`${getDocumentDetailsUrl}${id}`),
+    staleTime: STALE.STANDARD
+  });
 
 const SearchBar = props => {
   const {
@@ -32,7 +41,7 @@ const SearchBar = props => {
   const { document, updateAttribute } = useContext(DocumentFormContext);
   const [inputValue, setInputValue] = React.useState(defaultInputValue);
   const debouncedInput = useDebounce(inputValue);
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { data: languages = [] } = useLanguages();
   const { data: licenses } = useLicenses();
 
@@ -67,59 +76,49 @@ const SearchBar = props => {
       updateAttribute(contextValueName, newValue);
       if (contextValueName === 'parent') {
         try {
-          const resultAction = await dispatch(
-            fetchParentDocumentDetails(newValue.id)
+          const documentDetails = await fetchDocumentDetailFromCache(
+            queryClient,
+            newValue.id
           );
 
-          if (resultAction.type === FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS) {
-            const documentDetails = resultAction.data;
-
-            if (
-              documentDetails.mainLanguage &&
-              typeof documentDetails.mainLanguage === 'string'
-            ) {
-              updateAttribute(
-                'mainLanguage',
-                documentDetails.mainLanguage || '000'
-              );
-              updateAttribute(
-                'mainLanguageName',
-                getLanguageRefName(documentDetails.mainLanguage)
-              );
-            }
-
-            if (documentDetails.license) {
-              let licenseObject = null;
-
-              if (typeof documentDetails.license === 'string') {
-                licenseObject = getLicenseByName(documentDetails.license);
-              }
-              updateAttribute('license', licenseObject);
-            }
-
-            updateAttribute('editor', documentDetails.editor ?? null);
-            updateAttribute('library', documentDetails.library ?? null);
+          if (
+            documentDetails.mainLanguage &&
+            typeof documentDetails.mainLanguage === 'string'
+          ) {
             updateAttribute(
-              'selectOptionAuthorizationDocument',
-              documentDetails.authorizationDocument
-                ? DOCUMENT_AUTHORIZE_TO_PUBLISH
-                : null
+              'mainLanguage',
+              documentDetails.mainLanguage || '000'
             );
+            updateAttribute(
+              'mainLanguageName',
+              getLanguageRefName(documentDetails.mainLanguage)
+            );
+          }
 
-            if (documentDetails.authorizationDocument) {
-              const authResponse = await dispatch(
-                fetchAuthorizationDocumentDetails(
-                  documentDetails.authorizationDocument.id
-                )
-              );
-              if (
-                authResponse.type ===
-                FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS
-              ) {
-                const authDocumentDetails = authResponse.data;
-                updateAttribute('authorizationDocument', authDocumentDetails);
-              }
+          if (documentDetails.license) {
+            let licenseObject = null;
+
+            if (typeof documentDetails.license === 'string') {
+              licenseObject = getLicenseByName(documentDetails.license);
             }
+            updateAttribute('license', licenseObject);
+          }
+
+          updateAttribute('editor', documentDetails.editor ?? null);
+          updateAttribute('library', documentDetails.library ?? null);
+          updateAttribute(
+            'selectOptionAuthorizationDocument',
+            documentDetails.authorizationDocument
+              ? DOCUMENT_AUTHORIZE_TO_PUBLISH
+              : null
+          );
+
+          if (documentDetails.authorizationDocument) {
+            const authDocumentDetails = await fetchDocumentDetailFromCache(
+              queryClient,
+              documentDetails.authorizationDocument.id
+            );
+            updateAttribute('authorizationDocument', authDocumentDetails);
           }
         } catch (error) {
           console.error('Error fetching parent document details:', error);

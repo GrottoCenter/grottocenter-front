@@ -1,7 +1,6 @@
 import { combineReducers } from 'redux';
 import account from './AccountReducer';
 import advancedsearch from './AdvancedsearchReducer';
-import authorizationDocument from './AuthorizationDocumentReducer';
 import banCaver from './BanCaverReducer';
 import bannedCavers from './BannedCaversReducer';
 import changeEmail from './ChangeEmail';
@@ -24,7 +23,6 @@ import cumulatedLength from './CumulatedLengthReducer';
 import dbExport from './DBExportReducer';
 import deleteGuideline from './DeleteGuidelineReducer';
 import detachEntrance from './DetachEntranceReducer';
-import documentChildren from './DocumentChildrenReducer';
 import documents from './DocumentsReducer';
 import duplicatesCount from './DuplicatesCountReducer';
 import duplicatesImport from './DuplicatesImportReducer';
@@ -46,7 +44,6 @@ import messaging from './MessagingReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import notifications from './NotificationsReducer';
 import organization from './OrganizationReducer';
-import parentDocument from './ParentDocumentReducer';
 import partnersCarousel from './PartnersCarouselReducer';
 import pendingDocumentsCount from './PendingDocumentsCountReducer';
 import person from './PersonReducer';
@@ -96,7 +93,6 @@ import verifyEmail from './VerifyEmailReducer';
 const GCReducer = combineReducers({
   account,
   advancedsearch,
-  authorizationDocument,
   banCaver,
   bannedCavers,
   changeEmail,
@@ -120,7 +116,6 @@ const GCReducer = combineReducers({
   dbExport,
   deleteGuideline,
   detachEntrance,
-  documentChildren,
   documents,
   duplicatesCount,
   duplicatesImport,
@@ -143,7 +138,6 @@ const GCReducer = combineReducers({
   moveEntranceToCave,
   notifications,
   organization,
-  parentDocument,
   partnersCarousel,
   pendingDocumentsCount,
   person,
