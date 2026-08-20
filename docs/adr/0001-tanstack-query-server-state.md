@@ -15,9 +15,11 @@ boilerplate is a recurring tax on every feature, not frozen legacy.
 
 Three consequences, all observed:
 
-- **Fetch bugs.** The `/api/convert` 429 loop: on failure the reducer reset
-  `loading:false` without recording the failure, and the consuming hook refetched
-  forever. No cache, no deduplication, no backoff.
+- **Fetch bugs.** The `/api/convert` 429 loop: the reducer *does* record the
+  failure, but `useProjections` guards its refetch on `(projections === null &&
+  !loading)` — never on `error`. So on failure, `projections` stays `null`,
+  `loading` drops back to `false`, and the effect fires again. No cache, no
+  deduplication, no backoff — a single failure feeds a tight retry storm.
 - **Redundant refetches.** Static reference data reloaded on every component mount.
 - **Boilerplate.** Three files per endpoint, mechanically copied.
 
