@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useDispatch } from 'react-redux';
 
 import {
   postGuidelineUrl,
@@ -9,40 +8,29 @@ import {
   rollbackGuidelineUrl
 } from '../../conf/apiRoutes';
 import { apiPost, apiPatch, apiDelete } from '../../api/client';
-import { countryKeys, massifKeys } from '../../api/queryKeys';
+import { countryKeys, massifKeys, regionKeys } from '../../api/queryKeys';
 
-// A guideline is many-to-many with country / region / massif. Country and
-// massif details now live in React Query; RegionDetailsReducer still listens
-// to the *_GUIDELINE_* actions to keep state.regionDetails.guidelines in
-// sync until B4. The dispatch drops out completely once Region is RQ.
-
+// A guideline is many-to-many with country / region / massif. The API
+// response doesn't tell us which specific parents to invalidate cheaply, so
+// we invalidate the three domain roots. RQ only refetches queries currently
+// mounted — at most one detail per open page, and usually zero.
 const invalidateGuidelineHosts = queryClient => {
   queryClient.invalidateQueries({ queryKey: countryKeys.all });
+  queryClient.invalidateQueries({ queryKey: regionKeys.all });
   queryClient.invalidateQueries({ queryKey: massifKeys.all });
 };
 
-const useGuidelineMutation = ({ mutationFn, dispatchType }) => {
+const useGuidelineMutation = mutationFn => {
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
   return useMutation({
     mutationFn,
-    onSuccess: data => {
-      invalidateGuidelineHosts(queryClient);
-      dispatch({ type: dispatchType, guideline: data });
-    }
+    onSuccess: () => invalidateGuidelineHosts(queryClient)
   });
 };
 
 export const usePostGuideline = () =>
-  useGuidelineMutation({
-    mutationFn: ({
-      countries,
-      regions,
-      massifs,
-      title,
-      description,
-      language
-    }) =>
+  useGuidelineMutation(
+    ({ countries, regions, massifs, title, description, language }) =>
       apiPost(postGuidelineUrl, {
         countries,
         regions,
@@ -50,47 +38,27 @@ export const usePostGuideline = () =>
         title,
         description,
         language
-      }),
-    dispatchType: 'POST_GUIDELINE_SUCCESS'
-  });
+      })
+  );
 
 export const usePatchGuideline = () =>
-  useGuidelineMutation({
-    mutationFn: ({ id, ...body }) => apiPatch(patchGuidelineUrl(id), body),
-    dispatchType: 'PATCH_GUIDELINE_SUCCESS'
-  });
+  useGuidelineMutation(({ id, ...body }) =>
+    apiPatch(patchGuidelineUrl(id), body)
+  );
 
-// Delete carries a small quirk: the API can respond 204 (no body) and the
-// caller expects `.id` to fall through so the reducers can drop the row.
 export const useDeleteGuideline = () => {
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
   return useMutation({
-    mutationFn: async ({ id, isPermanent }) => {
-      const data = await apiDelete(deleteGuidelineUrl(id, isPermanent));
-      return { ...(data || {}), id };
-    },
-    onSuccess: (data, { isPermanent }) => {
-      invalidateGuidelineHosts(queryClient);
-      dispatch({
-        type: isPermanent
-          ? 'DELETE_GUIDELINE_PERMANENT_SUCCESS'
-          : 'DELETE_GUIDELINE_SUCCESS',
-        guideline: data
-      });
-    }
+    mutationFn: ({ id, isPermanent }) =>
+      apiDelete(deleteGuidelineUrl(id, isPermanent)),
+    onSuccess: () => invalidateGuidelineHosts(queryClient)
   });
 };
 
 export const useRestoreGuideline = () =>
-  useGuidelineMutation({
-    mutationFn: ({ id }) => apiPost(restoreGuidelineUrl(id)),
-    dispatchType: 'RESTORE_GUIDELINE_SUCCESS'
-  });
+  useGuidelineMutation(({ id }) => apiPost(restoreGuidelineUrl(id)));
 
 export const useRollbackGuideline = () =>
-  useGuidelineMutation({
-    mutationFn: ({ id, snapshotId }) =>
-      apiPost(rollbackGuidelineUrl(id, snapshotId)),
-    dispatchType: 'ROLLBACK_GUIDELINE_SUCCESS'
-  });
+  useGuidelineMutation(({ id, snapshotId }) =>
+    apiPost(rollbackGuidelineUrl(id, snapshotId))
+  );

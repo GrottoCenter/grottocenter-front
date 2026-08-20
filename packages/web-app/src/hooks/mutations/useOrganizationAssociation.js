@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useDispatch } from 'react-redux';
 
 import {
   postOrganizationUrl,
@@ -11,9 +10,13 @@ import {
   deleteMassifOrganizationUrl
 } from '../../conf/apiRoutes';
 import { apiPost, apiPut, apiDelete } from '../../api/client';
-import { countryKeys, massifKeys, organizationKeys } from '../../api/queryKeys';
+import {
+  countryKeys,
+  massifKeys,
+  organizationKeys,
+  regionKeys
+} from '../../api/queryKeys';
 import { invalidateAll } from '../../utils/mapTileCache';
-import { fetchRegion } from '../../actions/Region/GetRegion';
 
 // The AssociationForm accepts either an existing organization (organizationId)
 // or a free-text organizationName. In the second case we first POST a new
@@ -36,9 +39,8 @@ const invalidateOrgKeys = queryClient => {
   invalidateAll('organizations');
 };
 
-// Region details are still a Redux slice (migrating in B4). Until then the
-// region set/remove hooks dispatch the legacy fetch action to refresh that
-// slice; country and massif both invalidate their RQ detail key directly.
+// Country, region and massif details all live in React Query — each hook
+// invalidates its parent detail key on success.
 export const useSetCountryOrganization = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -74,7 +76,6 @@ export const useRemoveCountryOrganization = () => {
 
 export const useSetRegionOrganization = () => {
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
   return useMutation({
     mutationFn: async ({
       countryId,
@@ -89,7 +90,9 @@ export const useSetRegionOrganization = () => {
       return apiPut(putRegionOrganizationUrl(countryId, regionId, finalOrgId));
     },
     onSuccess: (_data, { countryId, regionId }) => {
-      dispatch(fetchRegion(countryId, regionId));
+      queryClient.invalidateQueries({
+        queryKey: regionKeys.detail(countryId, regionId)
+      });
       invalidateOrgKeys(queryClient);
     }
   });
@@ -97,14 +100,15 @@ export const useSetRegionOrganization = () => {
 
 export const useRemoveRegionOrganization = () => {
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
   return useMutation({
     mutationFn: ({ countryId, regionId, organizationId }) =>
       apiDelete(
         deleteRegionOrganizationUrl(countryId, regionId, organizationId)
       ),
     onSuccess: (_data, { countryId, regionId }) => {
-      dispatch(fetchRegion(countryId, regionId));
+      queryClient.invalidateQueries({
+        queryKey: regionKeys.detail(countryId, regionId)
+      });
       invalidateOrgKeys(queryClient);
     }
   });

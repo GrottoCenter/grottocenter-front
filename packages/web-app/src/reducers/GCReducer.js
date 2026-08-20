@@ -41,7 +41,6 @@ import readAllNotifications from './ReadAllNotificationsReducer';
 import readNotification from './ReadNotificationReducer';
 import recentChange from './RecentChangeReducer';
 import region from './RegionReducer';
-import regionDetails from './RegionDetailsReducer';
 import regionEntrances from './RegionEntrancesDataQualityReducer';
 import resendVerificationEmail from './ResendVerificationEmailReducer';
 import sideMenu from './SideMenuReducer';
@@ -104,7 +103,6 @@ const GCReducer = combineReducers({
   readNotification,
   recentChange,
   region,
-  regionDetails,
   regionEntrances,
   resendVerificationEmail,
   sideMenu,

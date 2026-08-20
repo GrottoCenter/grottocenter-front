@@ -67,3 +67,11 @@ export const countryKeys = {
   all: ['country'],
   detail: detailKey('country')
 };
+
+// Region details are keyed on (countryId, regionId): the API path is
+// nested (/countries/:c/regions/:r), and two countries can host the same
+// short regionId. detailKey composes them into an array-form id.
+export const regionKeys = {
+  all: ['region'],
+  detail: (countryId, regionId) => ['region', 'detail', countryId, regionId]
+};

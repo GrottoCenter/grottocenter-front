@@ -25,7 +25,6 @@ import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import FetchErrorState from '../../common/FetchErrorState';
 import GuidelinePropTypes from '../../../types/guideline.type';
-import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
 import {
   usePermissions,
@@ -39,10 +38,11 @@ const Region = ({
   canSubscribe,
   region,
   error,
+  isPaused = false,
+  isFetching = false,
   onRetry = null,
   onSubscribe,
   onUnsubscribe,
-  status,
   countryId,
   regionId
 }) => {
@@ -50,7 +50,7 @@ const Region = ({
   const navigate = useNavigate();
   const componentRef = useRef();
   const permissions = usePermissions();
-  const isLoading = status === REDUCER_STATUS.LOADING;
+  const isLoading = isFetching && !region;
   const handleShare = useSharePage();
   const handlePrint = useReactToPrint({ contentRef: componentRef });
 
@@ -142,11 +142,12 @@ const Region = ({
             </Card>
           </SectionStack>
         )}
-        {error && (
+        {(error || isPaused) && (
           <SectionStack>
             <Card sx={{ p: 2 }}>
               <FetchErrorState
                 error={error}
+                isPaused={isPaused}
                 onRetry={onRetry}
                 messageId="Error, the region data you are looking for is not available."
               />
@@ -224,10 +225,11 @@ Region.propTypes = {
     organizations: PropTypes.arrayOf(PropTypes.shape({}))
   }),
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  isPaused: PropTypes.bool,
+  isFetching: PropTypes.bool,
   onRetry: PropTypes.func,
   onSubscribe: PropTypes.func,
   onUnsubscribe: PropTypes.func,
-  status: PropTypes.string,
   countryId: PropTypes.string,
   regionId: PropTypes.string
 };

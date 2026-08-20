@@ -143,9 +143,10 @@ contract are in [docs/adr/0001-tanstack-query-server-state.md](../../docs/adr/00
 
 - **Query key** — `src/api/queryKeys.js` (`referenceKeys` for the static
   lists, `documentKeys`/`caveKeys`/`massifKeys`/`entranceKeys`/`personKeys`/
-  `organizationKeys` for entities). Every new domain uses the same
-  `detailKey(domain)` factory, so `xxxKeys.all` is the prefix and
-  `xxxKeys.detail(id)` extends it.
+  `organizationKeys`/`countryKeys`/`regionKeys` for entities). Every new
+  domain uses the same `detailKey(domain)` factory, so `xxxKeys.all` is the
+  prefix and `xxxKeys.detail(id)` extends it. `regionKeys.detail` is a
+  composite key `(countryId, regionId)` because the API path is nested.
 - **Query hook** — `src/hooks/queries/useXxx.js`. Return the raw
   `useQuery` object. Callers destructure with `= []`/`= null` fallbacks —
   wrappers that hide `refetch`/`isFetching`/`isPending` are not worth it.
@@ -180,8 +181,8 @@ and `networkMode:'always'` — use it for anything that reads from RQ.
   `useDocumentTypes`, `useIdentifierTypes`, `useSubjects`, `useLanguages`,
   `useProjections`.
 - **Entity details**: `useDocument`, `useMassif`, `useCave`, `useEntrance`,
-  `usePerson`, `useOrganization` and their `useDelete*` / `useRestore*` /
-  `useLink*` mutations.
+  `usePerson`, `useOrganization`, `useCountry`, `useRegion` and their
+  `useDelete*` / `useRestore*` / `useLink*` mutations.
 - **Entity forms**: `useCaveForm`, `useEntranceForm`, `useMassifForm`,
   `usePerson` (create/update/groups), `useOrganizationForm`
   (create/update) — form-state (`isPending`/`error`/`data`) flows through
@@ -202,11 +203,11 @@ alongside the RQ invalidation.
 ### Redux still handles
 
 Auth/session, i18n, snackbar, side menu, global error, `map` (viewport
-carve-out), Country/Region details (migrating in B3/B4), Snapshots
-(migrating in C), and the remaining form-state slices scheduled for
-Phases D–H. Anything whose *value* comes from the server and whose
-*shape* is `{ data, loading, error }` belongs in React Query, not in a
-new slice.
+carve-out), Snapshots (migrating in C), regions-search results
+(`state.region`, moves with the other search lists in G), and the
+remaining form-state slices scheduled for Phases D–H. Anything whose
+*value* comes from the server and whose *shape* is `{ data, loading,
+error }` belongs in React Query, not in a new slice.
 
 ## 🎯 Redux Patterns (detailed)
 
