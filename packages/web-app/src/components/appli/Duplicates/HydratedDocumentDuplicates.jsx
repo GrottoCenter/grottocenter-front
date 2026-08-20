@@ -6,7 +6,7 @@ import { LinearProgress as MuiLinearProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
-import { updateDocumentWithNewEntities } from '../../../actions/Document/UpdateDocument';
+import { useUpdateDocumentWithNewEntities } from '../../../hooks';
 import DuplicatesHandler from '../../common/DuplicatesHandler';
 import {
   createNewEntityFromDuplicate,
@@ -28,9 +28,9 @@ const HydratedDocumentDuplicates = ({
   const { formatMessage } = useIntl();
   const [currentDuplicate, setCurrentDuplicate] = useState(0);
 
-  const { loading: docUpdateLoading, latestHttpCode } = useSelector(
-    state => state.updateDocument
-  );
+  const updateDocumentMutation = useUpdateDocumentWithNewEntities();
+  const docUpdateLoading = updateDocumentMutation.isPending;
+  const isDocUpdateSuccess = updateDocumentMutation.isSuccess;
 
   const {
     loading: loadingDuplicate,
@@ -44,13 +44,11 @@ const HydratedDocumentDuplicates = ({
   const currentDuplicateId = selectedDuplicates[currentDuplicate];
 
   const updateDocument = (data, newRelatedEntitiesObject) => {
-    dispatch(
-      updateDocumentWithNewEntities(
-        data,
-        newRelatedEntitiesObject.newAuthors,
-        newRelatedEntitiesObject.newDescriptions
-      )
-    );
+    updateDocumentMutation.mutate({
+      document: data,
+      newAuthors: newRelatedEntitiesObject.newAuthors,
+      newDescriptions: newRelatedEntitiesObject.newDescriptions
+    });
   };
 
   const createDocument = () => {
@@ -65,11 +63,15 @@ const HydratedDocumentDuplicates = ({
     }
   }, [currentDuplicate]);
 
+  // After a successful duplicate merge, delete the source duplicate row. The
+  // mutation invalidates documentKeys.detail already; this step removes it
+  // from the duplicates queue.
   useEffect(() => {
-    if ([200, 204].includes(latestHttpCode)) {
+    if (isDocUpdateSuccess) {
       dispatch(deleteDuplicate(currentDuplicateId, 'document'));
+      updateDocumentMutation.reset();
     }
-  }, [latestHttpCode]);
+  }, [isDocUpdateSuccess]);
 
   useEffect(() => {
     if ([200, 204].includes(latestHttpCodeOnDelete)) {

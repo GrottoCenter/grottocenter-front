@@ -1,14 +1,10 @@
 import { useState } from 'react';
 import { styled } from '@mui/material/styles';
-import { useDispatch } from 'react-redux';
-import { useQueryClient } from '@tanstack/react-query';
 import { useIntl } from 'react-intl';
 import { isMobileOnly } from 'react-device-detect';
 import { Typography } from '@mui/material';
 
 import { useDocuments } from '../../hooks';
-import { documentKeys } from '../../api/queryKeys';
-import { resetDocumentApiErrors } from '../../actions/Document/ResetApiErrors';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StandardDialog from '../../components/common/StandardDialog';
 import Actions from './Actions';
@@ -27,8 +23,6 @@ const Wrapper = styled('div')`
 
 const DocumentValidationPage = () => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const [selectedIds, setSelectedIds] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -56,10 +50,10 @@ const DocumentValidationPage = () => {
     closeDetailedView();
   };
 
+  // useUpdateDocument invalidates documentKeys.all on success — the queue
+  // refetches automatically. This page just closes the edit modal.
   const handleSuccessfulUpdate = () => {
-    dispatch(resetDocumentApiErrors());
     closeEditView();
-    queryClient.invalidateQueries({ queryKey: documentKeys.all });
   };
 
   const isUpdatedDocRequired = () => {

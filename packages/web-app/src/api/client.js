@@ -83,3 +83,24 @@ export const apiPatch = send('PATCH');
  * most do not.
  */
 export const apiDelete = send('DELETE');
+
+// Multipart FormData sends. The browser must set Content-Type itself so the
+// multipart boundary is included — never merge jsonHeaders() here.
+const sendFormData = method => async (url, formData) => {
+  const response = await fetch(url, {
+    method,
+    body: formData,
+    headers: authHeaders()
+  });
+  await checkAndGetStatus(response);
+  return parseJsonOr204(response);
+};
+
+/**
+ * POST a multipart FormData payload (file uploads, document submissions).
+ * Same error contract as apiPost — throws with body/status attached.
+ */
+export const apiPostForm = sendFormData('POST');
+
+/** PUT a multipart FormData payload. */
+export const apiPutForm = sendFormData('PUT');

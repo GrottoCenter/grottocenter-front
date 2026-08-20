@@ -3,7 +3,6 @@ import account from './AccountReducer';
 import banCaver from './BanCaverReducer';
 import changeEmail from './ChangeEmail';
 import changePassword from './ChangePassword';
-import createDocument from './CreateDocumentReducer';
 import detachEntrance from './DetachEntranceReducer';
 import duplicatesImport from './DuplicatesImportReducer';
 import error from './ErrorReducer';
@@ -19,7 +18,6 @@ import resendVerificationEmail from './ResendVerificationEmailReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
 import updateAccount from './UpdateAccountReducer';
-import updateDocument from './UpdateDocumentReducer';
 import verifyEmail from './VerifyEmailReducer';
 
 const GCReducer = combineReducers({
@@ -27,7 +25,6 @@ const GCReducer = combineReducers({
   banCaver,
   changeEmail,
   changePassword,
-  createDocument,
   detachEntrance,
   duplicatesImport,
   error,
@@ -43,7 +40,6 @@ const GCReducer = combineReducers({
   sideMenu,
   signUp,
   updateAccount,
-  updateDocument,
   verifyEmail
 });
 

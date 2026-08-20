@@ -17,18 +17,17 @@ import {
 import Alert from '@mui/material/Alert';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { useIntl } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
 import {
   useEntrance,
   useLinkDocumentToEntrance,
-  usePermissions
+  usePermissions,
+  useCreateDocument,
+  useUpdateDocument
 } from '../../../../hooks';
 import { documentTypeHelpers } from '../../../../utils/documentTypeHelpers';
-import { resetDocumentApiErrors } from '../../../../actions/Document/ResetApiErrors';
-import { postDocument } from '../../../../actions/Document/CreateDocument';
-import { updateDocument } from '../../../../actions/Document/UpdateDocument';
 import { displayLoginDialog } from '../../../../actions/Login';
 
 import DocumentFormProvider, { DocumentFormContext } from './Provider';
@@ -55,7 +54,7 @@ const Spacer = styled('div')`
 const DONT_LEAVE_MESSAGE =
   'If you leave now, some data would be lost. Are you sure you want to leave this page?';
 
-const DocumentSubmission = ({ onCancel }) => {
+const DocumentSubmission = ({ onCancel, onSuccess }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const permissions = usePermissions();
@@ -72,15 +71,14 @@ const DocumentSubmission = ({ onCancel }) => {
 
   const [isDocSubmittedWithSuccess, setDocSubmittedWithSuccess] =
     useState(false);
-  const [isDocSubmitted, setDocSubmitted] = useState(false);
   const [isMissingFileDialogOpen, setMissingFileDialogOpen] = useState(false);
   const hasLinked = useRef(false);
 
-  const createDocumentState = useSelector(state => state.createDocument);
-  const updateDocumentState = useSelector(state => state.updateDocument);
-  const documentState = isNewDocument
-    ? createDocumentState
-    : updateDocumentState;
+  const createMutation = useCreateDocument();
+  const updateMutation = useUpdateDocument();
+  const activeMutation = isNewDocument ? createMutation : updateMutation;
+  const isSubmitting = activeMutation.isPending;
+  const errorMessages = activeMutation.error?.errorMessages ?? [];
 
   const entranceIdParam = searchParams.get('entranceId')
     ? parseInt(searchParams.get('entranceId'), 10)
@@ -102,9 +100,8 @@ const DocumentSubmission = ({ onCancel }) => {
   }, [linkedEntranceData, entranceIdParam, linkedEntrance, setLinkedEntrance]);
 
   const submitDocument = () => {
-    if (isNewDocument) dispatch(postDocument(document));
-    else dispatch(updateDocument(document));
-    setDocSubmitted(true);
+    if (isNewDocument) createMutation.mutate(document);
+    else updateMutation.mutate(document);
   };
 
   const onFormSubmit = event => {
@@ -128,9 +125,9 @@ const DocumentSubmission = ({ onCancel }) => {
   };
 
   const resetSubmissionState = () => {
-    dispatch(resetDocumentApiErrors());
+    createMutation.reset();
+    updateMutation.reset();
     setDocSubmittedWithSuccess(false);
-    setDocSubmitted(false);
     hasLinked.current = false;
   };
 
@@ -150,30 +147,34 @@ const DocumentSubmission = ({ onCancel }) => {
     });
   };
 
+  const createdDocument = createMutation.data;
   useEffect(() => {
-    if (!isDocSubmitted) return;
-    if (documentState.latestHttpCode === 200) {
-      setDocSubmittedWithSuccess(true);
-      if (
-        isNewDocument &&
-        linkedEntrance &&
-        documentState.createdDocument &&
-        !hasLinked.current
-      ) {
-        hasLinked.current = true;
-        linkEntranceMutation.mutate({
-          entranceId: linkedEntrance.id,
-          document: documentState.createdDocument
-        });
-      }
+    if (!activeMutation.isSuccess) return;
+    setDocSubmittedWithSuccess(true);
+    if (
+      isNewDocument &&
+      linkedEntrance &&
+      createdDocument &&
+      !hasLinked.current
+    ) {
+      hasLinked.current = true;
+      linkEntranceMutation.mutate({
+        entranceId: linkedEntrance.id,
+        document: createdDocument
+      });
     }
+    // In the edit flow the parent (DocumentEdit or DocumentValidation modal)
+    // handles success — close the modal or navigate away — so the inline
+    // "another document" buttons never render. In the create flow onSuccess
+    // is undefined and DocumentSubmission owns the post-success UI itself.
+    if (!isNewDocument && onSuccess) onSuccess();
   }, [
-    isDocSubmitted,
-    documentState.latestHttpCode,
-    documentState.createdDocument,
+    activeMutation.isSuccess,
+    createdDocument,
     isNewDocument,
     linkedEntrance,
-    linkEntranceMutation
+    linkEntranceMutation,
+    onSuccess
   ]);
 
   usePrompt({
@@ -181,7 +182,7 @@ const DocumentSubmission = ({ onCancel }) => {
     when: ({ currentLocation, nextLocation }) =>
       permissions.isAuth &&
       !isDocSubmittedWithSuccess &&
-      documentState.isLoading &&
+      isSubmitting &&
       currentLocation.pathname !== nextLocation.pathname
   });
 
@@ -254,13 +255,13 @@ const DocumentSubmission = ({ onCancel }) => {
       {permissions.isAuth && !isDocSubmittedWithSuccess && (
         <>
           <DocumentSubmissionDialog
-            isLoading={documentState.isLoading}
+            isLoading={isSubmitting}
             isNewDocument={isNewDocument}
           />
           <form
             onSubmit={onFormSubmit}
-            style={documentState.isLoading ? { opacity: '0.6' } : undefined}>
-            <FromContent onCancel={onCancel} />
+            style={isSubmitting ? { opacity: '0.6' } : undefined}>
+            <FromContent onCancel={onCancel} isSubmitting={isSubmitting} />
           </form>
 
           <Dialog
@@ -289,10 +290,10 @@ const DocumentSubmission = ({ onCancel }) => {
             </DialogActions>
           </Dialog>
 
-          {documentState.errorMessages.length > 0 && (
+          {errorMessages.length > 0 && (
             <CenteredBlock>
-              {documentState.errorMessages.map(error => (
-                <Fade in={documentState.errorMessages.length > 0} key={error}>
+              {errorMessages.map(error => (
+                <Fade in={errorMessages.length > 0} key={error}>
                   <Alert severity="error" sx={{ mt: 0.5 }}>
                     {formatMessage({ id: error })}
                   </Alert>
@@ -307,21 +308,23 @@ const DocumentSubmission = ({ onCancel }) => {
 };
 
 DocumentSubmission.propTypes = {
-  onCancel: PropTypes.func
+  onCancel: PropTypes.func,
+  onSuccess: PropTypes.func
 };
 
 // Used from:
 // - The Application to add a new document (no initialValues)
 // - DocumentEdit to edit a existing document (with initialValues)
-const HydratedDocumentSubmission = ({ initialValues, onCancel }) => (
+const HydratedDocumentSubmission = ({ initialValues, onCancel, onSuccess }) => (
   <DocumentFormProvider initialValues={initialValues}>
-    <DocumentSubmission onCancel={onCancel} />
+    <DocumentSubmission onCancel={onCancel} onSuccess={onSuccess} />
   </DocumentFormProvider>
 );
 
 HydratedDocumentSubmission.propTypes = {
   initialValues: defaultDocumentValuesTypes,
-  onCancel: PropTypes.func
+  onCancel: PropTypes.func,
+  onSuccess: PropTypes.func
 };
 
 export default HydratedDocumentSubmission;

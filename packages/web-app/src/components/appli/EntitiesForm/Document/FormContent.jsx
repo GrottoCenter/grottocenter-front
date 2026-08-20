@@ -46,7 +46,7 @@ const PublicationDatePicker = React.lazy(
   () => import('./formElements/PublicationDatePicker')
 );
 
-const FormContent = ({ onCancel }) => {
+const FormContent = ({ onCancel, isSubmitting = false }) => {
   const {
     document,
     isFormValid,
@@ -69,7 +69,6 @@ const FormContent = ({ onCancel }) => {
 
   const locale = useSelector(state => state.intl.locale);
   const { data: languages = [] } = useLanguages();
-  const isSubmitting = useSelector(state => state.createDocument.isLoading);
   const userLanguageId = languages.find(l => l.part1 === locale)?.id ?? '000';
 
   useEffect(() => {
@@ -485,5 +484,6 @@ const FormContent = ({ onCancel }) => {
 export default FormContent;
 
 FormContent.propTypes = {
-  onCancel: PropTypes.func
+  onCancel: PropTypes.func,
+  isSubmitting: PropTypes.bool
 };

@@ -26,6 +26,11 @@ export {
   resetAdvancedSearch
 } from './queries/useAdvancedSearch';
 export { useQuickSearch } from './queries/useQuickSearch';
+export {
+  useCreateDocument,
+  useUpdateDocument,
+  useUpdateDocumentWithNewEntities
+} from './mutations/useDocumentForm';
 export { useMassif } from './queries/useMassif';
 export { useCave } from './queries/useCave';
 export { useEntrance } from './queries/useEntrance';
