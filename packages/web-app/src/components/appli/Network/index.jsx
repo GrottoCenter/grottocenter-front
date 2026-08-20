@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
 import { Box, Breadcrumbs, Card, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -15,7 +14,12 @@ import BiotechIcon from '@mui/icons-material/Biotech';
 import { useReactToPrint } from 'react-to-print';
 import AppLink from '../../common/AppLink';
 
-import { usePermissions, useSharePage } from '../../../hooks';
+import {
+  useDeleteCave,
+  useRestoreCave,
+  usePermissions,
+  useSharePage
+} from '../../../hooks';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
@@ -27,8 +31,6 @@ import GuidelinesGrouped from '../Guidelines/GuidelinesGrouped';
 import EntrancesMap from './EntrancesMap';
 import Properties from './Properties';
 import Science from '../Science';
-import { deleteCave } from '../../../actions/Cave/DeleteCave';
-import { restoreCave } from '../../../actions/Cave/RestoreCave';
 import { NetworkForm } from '../EntitiesForm';
 import StandardDialog from '../../common/StandardDialog';
 import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
@@ -54,12 +56,19 @@ const HalfSplitContainer = styled('div')`
   }
 `;
 
-export const Network = ({ isLoading, error, onRetry = null, cave }) => {
-  const dispatch = useDispatch();
+export const Network = ({
+  isLoading,
+  error,
+  isPaused = false,
+  onRetry = null,
+  cave
+}) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const { caveId } = useParams();
   const { isAuth, isAdmin, isModerator } = usePermissions();
+  const deleteMutation = useDeleteCave();
+  const restoreMutation = useRestoreCave();
   const componentRef = useRef();
   const [isEditing, setEditing] = useState(false);
   const [selectedEntrancesId, setSelectedEntrancesId] = useState([]);
@@ -88,12 +97,12 @@ export const Network = ({ isLoading, error, onRetry = null, cave }) => {
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    dispatch(deleteCave({ id: caveId, entityId, isPermanent }));
+    deleteMutation.mutate({ id: caveId, entityId, isPermanent });
     if (isPermanent) navigate('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreCave({ id: caveId }));
+    restoreMutation.mutate({ id: caveId });
   };
 
   const handleToggleSelection = id => {
@@ -226,11 +235,12 @@ export const Network = ({ isLoading, error, onRetry = null, cave }) => {
                 </Card>
               </SectionStack>
             )}
-            {error && (
+            {(error || isPaused) && (
               <SectionStack>
                 <Card sx={{ p: 2 }}>
                   <FetchErrorState
                     error={error}
+                    isPaused={isPaused}
                     onRetry={onRetry}
                     messageId="Error, the network data you are looking for is not available."
                   />
@@ -371,6 +381,7 @@ export const Network = ({ isLoading, error, onRetry = null, cave }) => {
 Network.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
+  isPaused: PropTypes.bool,
   onRetry: PropTypes.func,
   cave: CavePropTypes
 };

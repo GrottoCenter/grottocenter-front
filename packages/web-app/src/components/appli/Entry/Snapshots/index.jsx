@@ -13,11 +13,10 @@ import PageHeader from '../../../common/Layouts/PageHeader';
 import SectionStack from '../../../common/Layouts/SectionStack';
 import { fetchSnapshot } from '../../../../actions/Snapshot/GetSnapshots';
 import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
-import { fetchCave } from '../../../../actions/Cave/GetCave';
 import { fetchPerson } from '../../../../actions/Person/GetPerson';
 import { fetchOrganization } from '../../../../actions/Organization/GetOrganization';
-import { useDocument, useMassif } from '../../../../hooks';
-import { documentKeys, massifKeys } from '../../../../api/queryKeys';
+import { useCave, useDocument, useMassif } from '../../../../hooks';
+import { caveKeys, documentKeys, massifKeys } from '../../../../api/queryKeys';
 import REDUCER_STATUS from '../../../../reducers/ReducerStatus';
 import SensitiveCaveWarning from '../SensitiveCaveWarning';
 import AccordionSnapshotList from './AccordionSnapshotList';
@@ -58,12 +57,12 @@ const SnapshotPage = () => {
   const { data: currentEntrance, loading: isEntranceLoading } = useSelector(
     s => s.entrance
   );
-  const { cave: currentCave, loading: isCaveLoading } = useSelector(
-    s => s.cave
-  );
-  // useDocument/useMassif are gated on type so the query stays disabled — no
-  // wasted request — when this page renders any other entity. Same pattern
-  // applied to each entity as it migrates to React Query.
+  // useCave/useDocument/useMassif are gated on type so each query stays
+  // disabled — no wasted request — when this page renders any other entity.
+  // Same pattern applied to each entity as it migrates to React Query.
+  const caveQuery = useCave(type === 'caves' ? id : undefined);
+  const currentCave = caveQuery.data ?? null;
+  const isCaveLoading = caveQuery.isFetching;
   const documentQuery = useDocument(type === 'documents' ? id : undefined);
   const currentDocument = documentQuery.data ?? null;
   const isDocumentLoading = documentQuery.isFetching;
@@ -94,7 +93,8 @@ const SnapshotPage = () => {
   useEffect(() => {
     const fetchByType = {
       entrances: () => dispatch(fetchEntrance(id)),
-      caves: () => dispatch(fetchCave(id)),
+      caves: () =>
+        queryClient.invalidateQueries({ queryKey: caveKeys.detail(id) }),
       documents: () =>
         queryClient.invalidateQueries({ queryKey: documentKeys.detail(id) }),
       massifs: () =>

@@ -15,10 +15,8 @@ import {
 } from '../actions/Entrance/DeleteEntrance';
 import { POST_CAVE_SUCCESS } from '../actions/Cave/CreateCave';
 import { UPDATE_CAVE_SUCCESS } from '../actions/Cave/UpdateCave';
-import {
-  DELETE_CAVE_SUCCESS,
-  DELETE_CAVE_PERMANENT_SUCCESS
-} from '../actions/Cave/DeleteCave';
+// DeleteCave has migrated to useDeleteCave; the tile-cache invalidation now
+// lives in that hook's onSuccess where the effect actually belongs.
 import { POST_ORGANIZATION_SUCCESS } from '../actions/Organization/CreateOrganization';
 import { UPDATE_ORGANIZATION_SUCCESS } from '../actions/Organization/UpdateOrganization';
 import {
@@ -76,10 +74,6 @@ const mapCacheInvalidationMiddleware = () => next => action => {
     case DELETE_ENTRANCE_SUCCESS:
     case DELETE_ENTRANCE_PERMANENT_SUCCESS:
       invalidateAll('entrances');
-      invalidateAll('networks');
-      break;
-    case DELETE_CAVE_SUCCESS:
-    case DELETE_CAVE_PERMANENT_SUCCESS:
       invalidateAll('networks');
       break;
     case DELETE_ORGANIZATION_SUCCESS:

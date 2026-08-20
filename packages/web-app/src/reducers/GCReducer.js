@@ -4,7 +4,6 @@ import advancedsearch from './AdvancedsearchReducer';
 import authorizationDocument from './AuthorizationDocumentReducer';
 import banCaver from './BanCaverReducer';
 import bannedCavers from './BannedCaversReducer';
-import cave from './CaveReducer';
 import changeEmail from './ChangeEmail';
 import changePassword from './ChangePassword';
 import countUnreadNotifications from './CountUnreadNotificationsReducer';
@@ -103,7 +102,6 @@ const GCReducer = combineReducers({
   authorizationDocument,
   banCaver,
   bannedCavers,
-  cave,
   changeEmail,
   changePassword,
   countUnreadNotifications,

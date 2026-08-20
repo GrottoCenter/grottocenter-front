@@ -1,5 +1,5 @@
 import { getQueryClient } from '../api/queryClientRef';
-import { massifKeys } from '../api/queryKeys';
+import { caveKeys, massifKeys } from '../api/queryKeys';
 
 // Bridge from legacy thunks to React Query cache invalidation. Some mutations
 // still run as thunks (they carry their own form state, or they touch
@@ -14,15 +14,18 @@ import { massifKeys } from '../api/queryKeys';
 
 const asId = ref => (typeof ref === 'object' && ref !== null ? ref.id : ref);
 
-const invalidateMassif = id => {
-  if (id == null) return;
-  // getQueryClient() returns null during the store's own module init — the
-  // bridge only fires on dispatched actions, which happen well after
-  // conf/queryClient.js has run setQueryClient(). Guarding anyway so a
-  // reducer test that renders without a client does not crash.
+// getQueryClient() returns null during the store's own module init — the
+// bridge only fires on dispatched actions, which happen well after
+// conf/queryClient.js has run setQueryClient(). Guarding anyway so a
+// reducer test that renders without a client does not crash.
+const invalidate = queryKey => {
   const client = getQueryClient();
-  if (client) client.invalidateQueries({ queryKey: massifKeys.detail(id) });
+  if (client) client.invalidateQueries({ queryKey });
 };
+
+const invalidateMassif = id => id != null && invalidate(massifKeys.detail(id));
+
+const invalidateCave = id => id != null && invalidate(caveKeys.detail(id));
 
 // Actions carrying `action.massif` (payload updated the massif slice directly).
 // `_PERMANENT_SUCCESS` variants share the same payload shape as the plain
@@ -60,10 +63,13 @@ const queryInvalidationBridge = () => next => action => {
     invalidateMassif(action.massif?.id);
   } else if (DESCRIPTION_ACTIONS.has(action.type)) {
     invalidateMassif(asId(action.description?.massif));
+    invalidateCave(asId(action.description?.cave));
   } else if (action.type === 'MOVE_DESCRIPTION_RELEVANCE_SUCCESS') {
-    // MoveRelevance swaps two descriptions; either can carry the massif ref.
+    // MoveRelevance swaps two descriptions; either can carry the entity ref.
     invalidateMassif(asId(action.moved?.massif));
     invalidateMassif(asId(action.swapped?.massif));
+    invalidateCave(asId(action.moved?.cave));
+    invalidateCave(asId(action.swapped?.cave));
   } else if (GUIDELINE_ACTIONS.has(action.type)) {
     (action.guideline?.massifs ?? []).forEach(m => invalidateMassif(asId(m)));
   }

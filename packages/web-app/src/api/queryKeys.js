@@ -41,3 +41,8 @@ export const massifKeys = {
   all: ['massif'],
   detail: detailKey('massif')
 };
+
+export const caveKeys = {
+  all: ['cave'],
+  detail: detailKey('cave')
+};
