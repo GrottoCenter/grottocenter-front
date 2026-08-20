@@ -123,6 +123,14 @@ export {
   useReadAllNotifications
 } from './mutations/useNotifications';
 export {
+  useSubscribeToCountry,
+  useUnsubscribeFromCountry,
+  useSubscribeToRegion,
+  useUnsubscribeFromRegion,
+  useSubscribeToMassif,
+  useUnsubscribeFromMassif
+} from './mutations/useSubscriptions';
+export {
   useCreateOrganization,
   useUpdateOrganization
 } from './mutations/useOrganizationForm';

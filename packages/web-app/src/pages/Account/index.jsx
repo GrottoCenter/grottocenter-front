@@ -43,7 +43,6 @@ import { styled } from '@mui/material/styles';
 import fetch from 'isomorphic-fetch';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchAccount } from '../../actions/Account/GetAccount';
-import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
 import { updateAccount } from '../../actions/Account/UpdateAccount';
 import { checkAuthStatus } from '../../actions/utils';
 import { postMfaReset, clearMfaState } from '../../actions/Mfa';
@@ -55,7 +54,8 @@ import {
   usePermissions,
   useNotification,
   useJoinOrganization,
-  useLeaveOrganization
+  useLeaveOrganization,
+  useSubscriptions
 } from '../../hooks';
 import { personKeys } from '../../api/queryKeys';
 import Alert from '../../components/common/Alert';
@@ -63,7 +63,6 @@ import BoolIcon from '../../components/common/BoolIcon';
 
 import DocumentsList from '../../components/common/DocumentsList/DocumentsList';
 import SubscriptionsList from '../../components/common/Subscriptions/SubscriptionsList';
-import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import EntitiesList from '../../components/common/entitiesList/EntitiesList';
 import PageContainer from '../../components/common/Layouts/PageContainer';
 import PageHeader from '../../components/common/Layouts/PageHeader';
@@ -1287,9 +1286,9 @@ const AccountPage = () => {
       queryClient.invalidateQueries({ queryKey: personKeys.detail(userId) }),
     [queryClient, userId]
   );
-  const { subscriptions, status: subscriptionsStatus } = useSelector(
-    state => state.subscriptions
-  );
+  // useSubscriptions internally reads the current user's id and fires the
+  // query — no dispatch needed here.
+  const { subscriptions } = useSubscriptions();
 
   const [isOrgSearchVisible, setIsOrgSearchVisible] = useState(false);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
@@ -1299,8 +1298,7 @@ const AccountPage = () => {
 
   useEffect(() => {
     dispatch(fetchAccount());
-    if (userId && isLeader) dispatch(fetchSubscriptions(userId));
-  }, [dispatch, userId, isLeader]);
+  }, [dispatch, userId]);
 
   const handleSaved = useCallback(() => {}, []);
 
@@ -1545,9 +1543,7 @@ const AccountPage = () => {
                   <SubscriptionsList
                     canUnsubscribe
                     subscriptions={subscriptions}
-                    subscriptionsStatus={
-                      subscriptionsStatus ?? REDUCER_STATUS.IDLE
-                    }
+                    isLoading={!subscriptions}
                     userId={userId}
                   />
                 }

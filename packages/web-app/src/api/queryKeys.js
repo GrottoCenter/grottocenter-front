@@ -101,3 +101,11 @@ export const countKeys = {
   pendingDocuments: () => ['count', 'pendingDocuments'],
   duplicates: () => ['count', 'duplicates']
 };
+
+// Per-user country/region/massif subscriptions. Every subscribe/unsubscribe
+// mutation invalidates subscriptionKeys.all so the list refetches without
+// hand-written reducer patching.
+export const subscriptionKeys = {
+  all: ['subscription'],
+  list: caverId => ['subscription', 'list', caverId]
+};

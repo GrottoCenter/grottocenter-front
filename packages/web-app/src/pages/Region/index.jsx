@@ -1,20 +1,19 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { useQueryClient } from '@tanstack/react-query';
 
 import Region from '../../components/appli/Region';
-import { usePermissions, useRegion, useUserProperties } from '../../hooks';
+import {
+  usePermissions,
+  useRegion,
+  useSubscribeToRegion,
+  useUnsubscribeFromRegion
+} from '../../hooks';
 import { regionKeys } from '../../api/queryKeys';
-import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
-import { subscribeToRegion } from '../../actions/Subscriptions/SubscribeToRegion';
-import { unsubscribeFromRegion } from '../../actions/Subscriptions/UnsubscribeFromRegion';
 
 const RegionPage = () => {
   const { countryId, regionId } = useParams();
-  const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const userProperties = useUserProperties();
   const permissions = usePermissions();
   const {
     data: region,
@@ -22,9 +21,11 @@ const RegionPage = () => {
     isFetching,
     isPaused
   } = useRegion(countryId, regionId);
-  const onSubscribe = () => dispatch(subscribeToRegion(countryId, regionId));
+  const subscribeMutation = useSubscribeToRegion();
+  const unsubscribeMutation = useUnsubscribeFromRegion();
+  const onSubscribe = () => subscribeMutation.mutate({ countryId, regionId });
   const onUnsubscribe = () =>
-    dispatch(unsubscribeFromRegion(countryId, regionId));
+    unsubscribeMutation.mutate({ countryId, regionId });
   const canSubscribe = permissions.isLeader;
 
   const reloadRegion = useCallback(
@@ -34,13 +35,6 @@ const RegionPage = () => {
       }),
     [queryClient, countryId, regionId]
   );
-
-  useEffect(() => {
-    if (permissions.isAuth) {
-      dispatch(fetchSubscriptions(userProperties.id));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, regionId]);
 
   return (
     <Region

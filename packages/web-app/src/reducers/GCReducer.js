@@ -41,13 +41,6 @@ import signUp from './SignUpReducer';
 import statisticsCountry from './StatisticsCountryReducer';
 import statisticsMassif from './StatisticsMassifReducer';
 import statisticsRegion from './StatisticsRegionReducer';
-import subscribeToCountry from './SubscribeToCountryReducer';
-import subscribeToMassif from './SubscribeToMassifReducer';
-import subscribeToRegion from './SubscribeToRegionReducer';
-import subscriptions from './SubscriptionsReducer';
-import unsubscribeFromCountry from './UnsubscribeFromCountryReducer';
-import unsubscribeFromMassif from './UnsubscribeFromMassifReducer';
-import unsubscribeFromRegion from './UnsubscribeFromRegionReducer';
 import updateAccount from './UpdateAccountReducer';
 import updateDocument from './UpdateDocumentReducer';
 import verifyEmail from './VerifyEmailReducer';
@@ -95,13 +88,6 @@ const GCReducer = combineReducers({
   statisticsCountry,
   statisticsMassif,
   statisticsRegion,
-  subscribeToCountry,
-  subscribeToMassif,
-  subscribeToRegion,
-  subscriptions,
-  unsubscribeFromCountry,
-  unsubscribeFromMassif,
-  unsubscribeFromRegion,
   updateAccount,
   updateDocument,
   verifyEmail

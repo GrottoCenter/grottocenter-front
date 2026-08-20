@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
 import { Button, Card, CircularProgress, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
@@ -20,12 +20,12 @@ import {
   useDeleteMassif,
   useRestoreMassif,
   usePermissions,
-  useSubscriptions,
   useScrollToHashOnLoad,
-  useSharePage
+  useSharePage,
+  useSubscribeToMassif,
+  useSubscriptions,
+  useUnsubscribeFromMassif
 } from '../../../hooks';
-import { subscribeToMassif } from '../../../actions/Subscriptions/SubscribeToMassif';
-import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
@@ -57,7 +57,6 @@ const Massif = ({
   onRetry = null,
   massif
 }) => {
-  const dispatch = useDispatch();
   const { massifId } = useParams();
   const massifIdInt = parseInt(massifId, 10);
   const navigate = useNavigate();
@@ -66,6 +65,8 @@ const Massif = ({
   const componentRef = useRef();
   const deleteMutation = useDeleteMassif();
   const restoreMutation = useRestoreMassif();
+  const subscribeMutation = useSubscribeToMassif();
+  const unsubscribeMutation = useUnsubscribeFromMassif();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -113,9 +114,9 @@ const Massif = ({
 
   const handleChangeSubscribe = () => {
     if (!isSubscribed) {
-      dispatch(subscribeToMassif(massifId));
+      subscribeMutation.mutate({ massifId });
     } else {
-      dispatch(unsubscribeFromMassif(massifId));
+      unsubscribeMutation.mutate({ massifId });
     }
   };
 
