@@ -53,6 +53,12 @@ export {
   useForgotPassword,
   useResendVerificationEmail
 } from './mutations/useAuthFlows';
+export {
+  useMfaEnroll,
+  useMfaVerify,
+  useMfaLogin,
+  useMfaReset
+} from './mutations/useMfa';
 export { useMassif } from './queries/useMassif';
 export { useCave } from './queries/useCave';
 export { useEntrance } from './queries/useEntrance';

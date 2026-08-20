@@ -21,7 +21,6 @@ import {
   postForgotPassword,
   displayLoginDialog
 } from '../../actions/Login';
-import { postMfaLogin } from '../../actions/Mfa';
 
 import { isValidEmail } from '../../conf/config';
 import Translate from '../common/Translate';
@@ -30,6 +29,7 @@ import LoginForm from '../common/LoginForm';
 import MfaEnrollment from './MfaEnrollment';
 import OfflineDisabled from '../common/OfflineDisabled';
 import {
+  useMfaLogin,
   useNotification,
   useOnlineStatus,
   useResendVerificationEmail
@@ -40,7 +40,7 @@ const Login = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const authState = useSelector(state => state.login);
-  const mfaVerifyState = useSelector(state => state.mfa.verify);
+  const mfaLoginMutation = useMfaLogin();
   const resendVerificationMutation = useResendVerificationEmail();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -120,13 +120,11 @@ const Login = () => {
   };
 
   const onTotpSubmit = code => {
-    dispatch(
-      postMfaLogin(
-        lockedCredentials.current.email,
-        lockedCredentials.current.password,
-        code
-      )
-    );
+    mfaLoginMutation.mutate({
+      email: lockedCredentials.current.email,
+      password: lockedCredentials.current.password,
+      code
+    });
   };
 
   const onBackToLogin = () => {
@@ -253,9 +251,12 @@ const Login = () => {
           password={password}
           totpMode
           onTotpSubmit={onTotpSubmit}
-          totpError={mfaVerifyState.error}
-          totpIsEnrollmentTokenExpired={mfaVerifyState.isEnrollmentTokenExpired}
-          totpIsLoading={mfaVerifyState.isLoading}
+          totpError={
+            mfaLoginMutation.error?.body?.status ??
+            mfaLoginMutation.error?.message
+          }
+          totpIsEnrollmentTokenExpired={false}
+          totpIsLoading={mfaLoginMutation.isPending}
           onBackToLogin={onBackToLogin}
         />
       </StandardDialog>

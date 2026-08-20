@@ -44,7 +44,6 @@ import fetch from 'isomorphic-fetch';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchAccount } from '../../actions/Account/GetAccount';
 import { checkAuthStatus } from '../../actions/utils';
-import { postMfaReset, clearMfaState } from '../../actions/Mfa';
 import { postLogout } from '../../actions/Login';
 import {
   usePerson,
@@ -55,7 +54,8 @@ import {
   useJoinOrganization,
   useLeaveOrganization,
   useSubscriptions,
-  useUpdateAccount
+  useUpdateAccount,
+  useMfaReset
 } from '../../hooks';
 import { personKeys } from '../../api/queryKeys';
 import Alert from '../../components/common/Alert';
@@ -681,7 +681,7 @@ const MfaSection = () => {
   const { onSuccess } = useNotification();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const { reset: mfaReset } = useSelector(state => state.mfa);
+  const mfaResetMutation = useMfaReset();
   const isMfaEnabled = useSelector(
     state => state.account.account?.mfaEnabled ?? false
   );
@@ -694,27 +694,32 @@ const MfaSection = () => {
   } = useForm({ defaultValues: { password: '' }, mode: 'onChange' });
 
   const handleOpen = () => {
-    dispatch(clearMfaState());
+    mfaResetMutation.reset();
     setIsDialogOpen(true);
   };
 
   const handleClose = () => {
     resetForm({ password: '' });
     setIsDialogOpen(false);
-    dispatch(clearMfaState());
+    mfaResetMutation.reset();
   };
 
+  const isResetSuccess = mfaResetMutation.isSuccess;
   useEffect(() => {
-    if (!mfaReset.isSuccess) return undefined;
+    if (!isResetSuccess) return undefined;
     onSuccess(formatMessage({ id: 'mfaResetSuccess' }));
     const timer = setTimeout(() => dispatch(postLogout()), 1500);
     return () => clearTimeout(timer);
     // onSuccess, formatMessage, dispatch are stable — only isSuccess matters here
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mfaReset.isSuccess]);
+  }, [isResetSuccess]);
 
   const onSubmit = async data => {
-    await dispatch(postMfaReset(data.password));
+    try {
+      await mfaResetMutation.mutateAsync(data.password);
+    } catch {
+      /* error surfaced via mfaResetMutation.error below */
+    }
   };
 
   const viewContent = (
@@ -773,16 +778,16 @@ const MfaSection = () => {
             <Button
               onClick={handleClose}
               variant="text"
-              disabled={mfaReset.isLoading}>
+              disabled={mfaResetMutation.isPending}>
               {formatMessage({ id: 'Cancel' })}
             </Button>
             <Button
               onClick={handleSubmit(onSubmit)}
               color="error"
               variant="contained"
-              disabled={!isValid || mfaReset.isLoading}
+              disabled={!isValid || mfaResetMutation.isPending}
               startIcon={
-                mfaReset.isLoading ? (
+                mfaResetMutation.isPending ? (
                   <CircularProgress size={16} color="inherit" />
                 ) : null
               }>
@@ -807,12 +812,12 @@ const MfaSection = () => {
               autoComplete="current-password"
             />
           </form>
-          {mfaReset.error && (
+          {mfaResetMutation.error && (
             <Alert
               severity="error"
               content={formatMessage({
                 id:
-                  mfaReset.error === 'Mismatch'
+                  mfaResetMutation.error?.body?.status === 'Mismatch'
                     ? 'currentPasswordIncorrect'
                     : 'genericError'
               })}
