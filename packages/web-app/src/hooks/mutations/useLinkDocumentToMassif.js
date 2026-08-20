@@ -22,8 +22,14 @@ const linkDocuments = async (massifId, documents) => {
       apiPut(associateDocumentToMassifUrl(massifId, document.id))
     )
   );
-  const failure = results.find(result => result.status === 'rejected');
-  if (failure) throw failure.reason;
+  const rejections = results
+    .filter(result => result.status === 'rejected')
+    .map(result => result.reason);
+  if (rejections.length > 0) {
+    const error = rejections[0];
+    error.rejections = rejections;
+    throw error;
+  }
   return results.map(result => result.value);
 };
 

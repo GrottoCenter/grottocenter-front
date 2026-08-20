@@ -93,6 +93,7 @@ describe('document association mutations', () => {
     });
 
     expect(caughtError).toBe(failure);
+    expect(caughtError.rejections).toEqual([failure]);
     expect(apiPut).toHaveBeenCalledTimes(3);
     expect(invalidateQueries).toHaveBeenCalledWith({
       queryKey: entranceKeys.detail(42)
@@ -102,6 +103,33 @@ describe('document association mutations', () => {
         queryKey: documentKeys.detail(document.id)
       });
     });
+  });
+
+  it('exposes every rejection reason when several links fail', async () => {
+    const first = new Error('first failed');
+    const second = new Error('second failed');
+    apiPut
+      .mockRejectedValueOnce(first)
+      .mockResolvedValueOnce(null)
+      .mockRejectedValueOnce(second);
+    const { result } = renderHook(() => useLinkDocumentsToEntrance(), {
+      wrapper: makeWrapper(queryClient)
+    });
+    let caughtError;
+
+    await act(async () => {
+      try {
+        await result.current.mutateAsync({
+          entranceId: 42,
+          documents: [{ id: 1 }, { id: 2 }, { id: 3 }]
+        });
+      } catch (error) {
+        caughtError = error;
+      }
+    });
+
+    expect(caughtError).toBe(first);
+    expect(caughtError.rejections).toEqual([first, second]);
   });
 
   it('refreshes both sides after unlinking an entrance document', async () => {

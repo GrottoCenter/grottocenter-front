@@ -30,9 +30,10 @@ export const useProcessDocuments = () => {
         queryKey: countKeys.pendingDocuments()
       });
       queryClient.invalidateQueries({ queryKey: documentKeys.all });
-      // Validation applies pending author/organization/massif relations. Their
-      // detail payloads embed documents, and the API returns no relation diff,
-      // so each affected domain has to be invalidated by prefix.
+      // Validation applies pending relations across entrance, massif,
+      // organization and person (the "author" side). Their detail payloads
+      // embed documents, and the API returns no relation diff, so each
+      // affected domain has to be invalidated by prefix.
       queryClient.invalidateQueries({ queryKey: entranceKeys.all });
       queryClient.invalidateQueries({ queryKey: massifKeys.all });
       queryClient.invalidateQueries({ queryKey: organizationKeys.all });
