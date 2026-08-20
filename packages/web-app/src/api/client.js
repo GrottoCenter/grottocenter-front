@@ -3,15 +3,26 @@ import fetch from 'isomorphic-fetch';
 import store from '../store';
 import { checkAndGetStatus } from '../actions/utils';
 
-// Thin fetch wrapper for React Query's queryFn. Deliberately reuses the existing
-// conventions instead of inventing new ones: checkAndGetStatus attaches `body`
-// and `status` to the thrown error, which is what the global error handler in
-// conf/queryClient.js reads, and what the AGENTS.md error contract describes.
+// Thin fetch wrapper for React Query's queryFn/mutationFn. Deliberately reuses
+// the existing conventions instead of inventing new ones: checkAndGetStatus
+// attaches `body` and `status` to the thrown error, which is what the global
+// error handler in conf/queryClient.js reads, and what the AGENTS.md error
+// contract describes.
 //
 // The auth header is read from the store at call time, never captured at module
 // scope: a query mounted before login must still send the header once the
 // session exists.
 const authHeaders = () => store.getState().login.authorizationHeader ?? {};
+
+const jsonHeaders = () => ({
+  'Content-Type': 'application/json',
+  ...authHeaders()
+});
+
+const parseJsonOr204 = async response => {
+  if (response.status === 204) return null;
+  return response.json();
+};
 
 /**
  * GET a JSON resource.
@@ -25,28 +36,37 @@ const authHeaders = () => store.getState().login.authorizationHeader ?? {};
 export const apiGet = async url => {
   const response = await fetch(url, { headers: authHeaders() });
   await checkAndGetStatus(response);
-  if (response.status === 204) return null;
-  return response.json();
+  return parseJsonOr204(response);
 };
 
-// Write verbs (apiPost/apiPut/apiPatch/apiDelete) land with the mutation phase.
-// They are not added ahead of a caller: an untested wrapper nobody imports is
-// the kind of dead code this migration is meant to remove, not create.
-//
-// Expected shape when the first mutation lands — sketch, not code, to keep the
-// first caller aligned with apiGet's conventions:
-//
-//   export const apiPost = async (url, body) => {
-//     const response = await fetch(url, {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-//       body: JSON.stringify(body)
-//     });
-//     await checkAndGetStatus(response);
-//     if (response.status === 204) return null;
-//     return response.json();
-//   };
-//
-// Same auth header discipline as apiGet (read at call time, never captured),
-// same checkAndGetStatus so the QueryClient's global onError sees the same
-// `body`/`status` shape whether the failure came from a query or a mutation.
+const send = method => async (url, body) => {
+  const init = {
+    method,
+    headers: body != null ? jsonHeaders() : authHeaders()
+  };
+  if (body != null) init.body = JSON.stringify(body);
+  const response = await fetch(url, init);
+  await checkAndGetStatus(response);
+  return parseJsonOr204(response);
+};
+
+/**
+ * POST a JSON body and return the parsed response.
+ *
+ * Same conventions as apiGet: auth header read at call time, errors thrown
+ * with `body`/`status` attached so the QueryClient's onError sees the same
+ * shape whether the failure came from a query or a mutation.
+ */
+export const apiPost = send('POST');
+
+/** PUT a JSON body. */
+export const apiPut = send('PUT');
+
+/** PATCH a JSON body. */
+export const apiPatch = send('PATCH');
+
+/**
+ * DELETE a resource. Body is optional — some deletes carry a reason payload,
+ * most do not.
+ */
+export const apiDelete = send('DELETE');
