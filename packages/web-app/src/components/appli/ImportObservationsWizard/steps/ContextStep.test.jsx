@@ -62,12 +62,6 @@ vi.mock('../../../common/AutoCompleteSearch/CaveAutoCompleteSearch', () => {
   };
 });
 
-// ---- Quicksearch action mock ----
-vi.mock('../../../../actions/Quicksearch', () => ({
-  fetchQuicksearchResult: vi.fn(() => ({ type: 'FETCH_QUICKSEARCH' })),
-  resetQuicksearch: vi.fn(() => ({ type: 'RESET_QUICKSEARCH' }))
-}));
-
 // ---- Import wizard action mock ----
 vi.mock('../../../../actions/Observations/importWizard', () => ({
   SET_CONTEXT: 'SET_CONTEXT',
@@ -193,11 +187,6 @@ const buildState = (overrides = {}) => ({
   login: {
     authorizationHeader: { Authorization: 'Bearer fake-token' },
     authTokenDecoded: { id: 1, groups: ['User'], nickname: 'testuser' }
-  },
-  quicksearch: {
-    results: [],
-    isLoading: false,
-    error: null
   },
   createPerson: {
     isLoading: false,

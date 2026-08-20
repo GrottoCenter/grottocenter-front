@@ -14,7 +14,6 @@ import login from './LoginReducer';
 import map from './Map';
 import mfa from './MfaReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
-import quicksearch from './QuicksearchReducer';
 import region from './RegionReducer';
 import resendVerificationEmail from './ResendVerificationEmailReducer';
 import sideMenu from './SideMenuReducer';
@@ -39,7 +38,6 @@ const GCReducer = combineReducers({
   map,
   mfa,
   moveEntranceToCave,
-  quicksearch,
   region,
   resendVerificationEmail,
   sideMenu,

@@ -1,13 +1,9 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { InputAdornment } from '@mui/material';
 import { massifIcon } from '../../../../../assets/icons';
 
-import {
-  fetchQuicksearchResult,
-  resetQuicksearch
-} from '../../../../../actions/Quicksearch';
-
+import { useQuickSearch } from '../../../../../hooks';
 import { entityOptionForSelector } from '../../../../../helpers/Entity';
 
 import SearchBar from './SearchBar';
@@ -19,6 +15,8 @@ const resultEndAdornment = (
   </InputAdornment>
 );
 
+const MASSIF_ENTITIES = ['massifs'];
+
 const getMassifToString = massif => `#${massif.id} - ${massif.name}`;
 
 const MassifAutoComplete = ({
@@ -29,24 +27,16 @@ const MassifAutoComplete = ({
   required = false,
   searchLabelText
 }) => {
-  const dispatch = useDispatch();
+  const [searchQuery, setSearchQuery] = useState('');
   const {
+    data,
     error,
-    isLoading,
-    results: suggestions
-  } = useSelector(state => state.quicksearch);
+    isFetching: isLoading
+  } = useQuickSearch({ query: searchQuery, entities: MASSIF_ENTITIES });
+  const suggestions = data?.results ?? [];
 
-  const fetchSearchResults = debouncedInput => {
-    const criterias = {
-      query: debouncedInput.trim(),
-      entities: ['massifs']
-    };
-    dispatch(fetchQuicksearchResult(criterias));
-  };
-
-  const resetSearchResults = () => {
-    dispatch(resetQuicksearch());
-  };
+  const fetchSearchResults = debouncedInput => setSearchQuery(debouncedInput);
+  const resetSearchResults = () => setSearchQuery('');
 
   return (
     <DocumentFormAutoComplete

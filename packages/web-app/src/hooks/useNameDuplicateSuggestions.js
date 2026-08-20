@@ -1,12 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
-import { fetchQuickSearchRaw } from '../actions/Quicksearch';
-import {
-  AUTOCOMPLETE_DEBOUNCE_DELAY,
-  AUTOCOMPLETE_MIN_CHARACTERS
-} from '../conf/config';
+import { AUTOCOMPLETE_DEBOUNCE_DELAY } from '../conf/config';
 import { useDebounce } from './useDebounce';
+import { useQuickSearch } from './queries/useQuickSearch';
 
 const MAX_RESULTS = 10;
+const ENTITIES = ['entrances'];
 
 /**
  * Suggests existing entrances whose name matches the typed text, to help the
@@ -25,47 +22,15 @@ const MAX_RESULTS = 10;
 export const useNameDuplicateSuggestions = (name, enabled = true) => {
   const trimmed = (name ?? '').trim();
   const debouncedQuery = useDebounce(trimmed, AUTOCOMPLETE_DEBOUNCE_DELAY);
-  const [suggestions, setSuggestions] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  // Incremented on every change; lets us drop stale/out-of-order responses.
-  const requestIdRef = useRef(0);
-
-  useEffect(() => {
-    if (!enabled || debouncedQuery.length < AUTOCOMPLETE_MIN_CHARACTERS) {
-      requestIdRef.current += 1; // Cancel any in-flight response.
-      setSuggestions([]);
-      setIsLoading(false);
-      return undefined;
-    }
-
-    requestIdRef.current += 1;
-    const requestId = requestIdRef.current;
-    setIsLoading(true);
-
-    fetchQuickSearchRaw({
-      query: debouncedQuery,
-      entities: ['entrances'],
-      filter: {}
-    })
-      .then(data => {
-        if (requestId !== requestIdRef.current) return; // Stale.
-        setSuggestions((data?.results ?? []).slice(0, MAX_RESULTS));
-        setIsLoading(false);
-      })
-      .catch(() => {
-        if (requestId !== requestIdRef.current) return; // Stale.
-        setSuggestions([]);
-        setIsLoading(false);
-      });
-
-    // On unmount (or before the next run) bump the id so the in-flight response
-    // is treated as stale and never calls setState on an unmounted component.
-    return () => {
-      requestIdRef.current += 1;
-    };
-  }, [debouncedQuery, enabled]);
-
-  return { suggestions, isLoading };
+  const query = useQuickSearch({
+    query: debouncedQuery,
+    entities: ENTITIES,
+    enabled
+  });
+  return {
+    suggestions: (query.data?.results ?? []).slice(0, MAX_RESULTS),
+    isLoading: query.isFetching
+  };
 };
 
 export default useNameDuplicateSuggestions;

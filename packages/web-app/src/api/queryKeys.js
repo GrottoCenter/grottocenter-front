@@ -166,6 +166,15 @@ export const advancedSearchKeys = {
   results: params => ['advancedSearch', 'results', params]
 };
 
+// Autocomplete-style search backing the AppBar quick lookup and the entity
+// autocomplete inputs across the app. Each caller passes its own criteria
+// (query + entities + filter), so parallel autocompletes never clobber each
+// other — cached per criteria object.
+export const quicksearchKeys = {
+  all: ['quicksearch'],
+  results: criteria => ['quicksearch', 'results', criteria]
+};
+
 // Homepage aggregate counters + per-entity statistics blocks. All are
 // long-cache-friendly aggregate reads.
 export const statsKeys = {

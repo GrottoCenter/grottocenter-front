@@ -1,30 +1,28 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import AutoCompleteSearch from '../common/AutoCompleteSearch';
-import {
-  fetchQuicksearchResult,
-  resetQuicksearch
-} from '../../actions/Quicksearch';
-import { useDebounce, useOnlineStatus } from '../../hooks';
-import {
-  AUTOCOMPLETE_DEBOUNCE_DELAY,
-  AUTOCOMPLETE_MIN_CHARACTERS
-} from '../../conf/config';
+import { useDebounce, useOnlineStatus, useQuickSearch } from '../../hooks';
+import { AUTOCOMPLETE_DEBOUNCE_DELAY } from '../../conf/config';
+
+const QUICKSEARCH_ENTITIES = ['entrances', 'caves', 'organizations', 'massifs'];
 
 const QuickSearch = ({ hasFullWidthResults, autoFocus, onClose }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { results, errors, isLoading } = useSelector(
-    state => state.quicksearch
-  );
   const isOnline = useOnlineStatus();
   const [input, setInput] = useState('');
 
   const debouncedInput = useDebounce(input, AUTOCOMPLETE_DEBOUNCE_DELAY);
+  const { data, error, isFetching } = useQuickSearch({
+    query: debouncedInput,
+    entities: QUICKSEARCH_ENTITIES,
+    // Search runs on the API's index, which is never cached — offline every
+    // keystroke would fail and paint the field red, as if the user had typed
+    // something wrong. Skip the request and explain instead (see noOptionsText).
+    enabled: isOnline
+  });
 
   // A single-entrance cavity would appear twice (once as its cave, once as its
   // entrance). Keep only networks (caves with 2+ entrances) and all other entity
@@ -32,10 +30,10 @@ const QuickSearch = ({ hasFullWidthResults, autoFocus, onClose }) => {
   // redundant with its entrance.
   const filteredResults = useMemo(
     () =>
-      results.filter(
+      (data?.results ?? []).filter(
         ({ _type, nbEntrances }) => _type !== 'caves' || (nbEntrances ?? 0) > 1
       ),
-    [results]
+    [data]
   );
 
   const handleSelection = selection => {
@@ -59,28 +57,6 @@ const QuickSearch = ({ hasFullWidthResults, autoFocus, onClose }) => {
     }, 0);
   };
 
-  useEffect(() => {
-    if (debouncedInput.length < AUTOCOMPLETE_MIN_CHARACTERS) {
-      dispatch(resetQuicksearch());
-      return;
-    }
-    // Search runs on the API's index, which is never cached — offline every
-    // keystroke would fail and paint the field red, as if the user had typed
-    // something wrong. Skip the request and explain instead (see noOptionsText).
-    if (!isOnline) {
-      dispatch(resetQuicksearch());
-      return;
-    }
-    const criterias = {
-      query: debouncedInput.trim(),
-      entities: ['entrances', 'caves', 'organizations', 'massifs']
-    };
-
-    dispatch(fetchQuicksearchResult(criterias));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedInput, isOnline]);
-
   return (
     <AutoCompleteSearch
       onInputChange={setInput}
@@ -88,8 +64,8 @@ const QuickSearch = ({ hasFullWidthResults, autoFocus, onClose }) => {
       label={formatMessage({ id: 'Quick search' })}
       suggestions={filteredResults}
       onSelection={handleSelection}
-      hasError={!!errors}
-      isLoading={isLoading}
+      hasError={!!error}
+      isLoading={isFetching}
       hasFullWidthResults={hasFullWidthResults}
       autoFocus={autoFocus}
       noOptionsText={

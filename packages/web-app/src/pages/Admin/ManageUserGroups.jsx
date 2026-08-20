@@ -6,15 +6,11 @@ import { IconButton, Button, Typography } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 
 import {
-  fetchQuicksearchResult,
-  resetQuicksearch
-} from '../../actions/Quicksearch';
-
-import {
   usePerson,
   useUpdatePersonGroups,
   useDebounce,
-  useNotification
+  useNotification,
+  useQuickSearch
 } from '../../hooks';
 
 import AutoCompleteSearch from '../../components/common/AutoCompleteSearch';
@@ -67,10 +63,15 @@ const ManageUserGroups = () => {
     selectedUser?.id
   );
   const {
-    results,
+    data: quicksearchData,
     error: quickSearchError,
-    isLoading: searchIsLoading
-  } = useSelector(state => state.quicksearch);
+    isFetching: searchIsLoading
+  } = useQuickSearch({
+    query: debouncedInput,
+    entities: ['persons'],
+    filter: { type: 'CAVER' }
+  });
+  const results = quicksearchData?.results ?? [];
 
   const updatePersonGroupsMutation = useUpdatePersonGroups();
   const isUpdateLoading = updatePersonGroupsMutation.isPending;
@@ -90,21 +91,6 @@ const ManageUserGroups = () => {
     authTokenDecoded?.id &&
     person.id === authTokenDecoded.id
   );
-
-  useEffect(() => {
-    // Check search input value and launch / reset search
-    if (debouncedInput.length >= 2) {
-      const criteria = {
-        query: debouncedInput.trim(),
-        filter: { type: 'CAVER' },
-        entities: ['persons']
-      };
-      dispatch(fetchQuicksearchResult(criteria));
-    } else {
-      dispatch(resetQuicksearch());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedInput]);
 
   useEffect(() => {
     setDidSaveGroups(false);
