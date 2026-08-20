@@ -134,31 +134,35 @@ Use ICU message format for dynamic values:
 
 ## 🎯 Server state — React Query
 
-Server reads (GET) and writes (POST/PUT/PATCH/DELETE) live in **TanStack
-Query**. Redux is kept for genuine client/session state — auth, i18n, side
-menu, form-state slices, snackbar state. Rationale, tiers and offline
-contract are in [docs/adr/0001-tanstack-query-server-state.md](../../docs/adr/0001-tanstack-query-server-state.md).
+All server reads (GET) and writes (POST/PUT/PATCH/DELETE) live in **TanStack
+Query**. Redux is kept for genuine client/session state only —
+see the [🎯 Redux Patterns](#-redux-patterns) section below for the
+7 slices that remain. Rationale, tiers and offline contract are in
+[docs/adr/0001-tanstack-query-server-state.md](../../docs/adr/0001-tanstack-query-server-state.md).
 
 ### Where to add a new endpoint
 
-- **Query key** — `src/api/queryKeys.js` (`referenceKeys` for the static
-  lists, `documentKeys`/`caveKeys`/`massifKeys`/`entranceKeys`/`personKeys`/
-  `organizationKeys`/`countryKeys`/`regionKeys` for entities). Every new
-  domain uses the same `detailKey(domain)` factory, so `xxxKeys.all` is the
-  prefix and `xxxKeys.detail(id)` extends it. `regionKeys.detail` is a
-  composite key `(countryId, regionId)` because the API path is nested.
+- **Query key** — `src/api/queryKeys.js`. `referenceKeys` for static
+  reference lists; `xxxKeys` per entity domain (`documentKeys`, `caveKeys`,
+  `massifKeys`, `entranceKeys`, `personKeys`, `organizationKeys`,
+  `countryKeys`, `regionKeys`, `snapshotKeys`, `notificationKeys`,
+  `countKeys`, `subscriptionKeys`, `messageKeys`, `moderationKeys`,
+  `importKeys`, `listKeys`, `statsKeys`, `advancedSearchKeys`,
+  `quicksearchKeys`, `duplicateKeys`). Every entity domain uses the same
+  `detailKey(domain)` factory so `xxxKeys.all` is the prefix and
+  `xxxKeys.detail(id)` extends it (`regionKeys.detail` composes on
+  `(countryId, regionId)` because the API path is nested).
 - **Query hook** — `src/hooks/queries/useXxx.js`. Return the raw
   `useQuery` object. Callers destructure with `= []`/`= null` fallbacks —
   wrappers that hide `refetch`/`isFetching`/`isPending` are not worth it.
 - **Mutation hook** — `src/hooks/mutations/useYyyXxx.js`. `onSuccess`
   invalidates `xxxKeys.detail(id)` (or `removeQueries` on permanent
-  delete). Any side effect the legacy thunk owned (map tile cache
+  delete). Any side effect the endpoint owns (list badge refresh, map tile
   invalidation, session cleanup) belongs in the same `onSuccess`.
 - **Barrel** — re-export from `src/hooks/index.js` so consumers keep one
   import path.
 
-Conventions (frozen — the migration will replicate over the remaining
-endpoints):
+Conventions (frozen):
 
 - Options go in an object, not positional booleans:
   `useLicenses({ enabled: showAuthorization })`.
@@ -166,175 +170,60 @@ endpoints):
   identity is stable, on a copy so the cache array is never mutated.
 - Cross-caller lookups (`findLicenseByName`, and future siblings) are
   colocated with their hook and re-exported from `hooks/index.js`.
-- `apiGet/apiPost/apiPut/apiPatch/apiDelete` in `src/api/client.js` are
-  the only fetch entry points for RQ. They read the auth header at call
-  time and throw errors with `body`/`status` attached — the QueryClient's
-  global `onError` (dispatches `postLogout()` on 401) reads that shape.
+- `apiGet/apiPost/apiPut/apiPatch/apiDelete` (JSON) and
+  `apiGetWithRange`/`apiPostForm`/`apiPutForm` (paginated GETs, multipart
+  uploads) in `src/api/client.js` are the only fetch entry points for RQ.
+  They read the auth header at call time and throw errors with
+  `body`/`status` attached — the QueryClient's global `onError`
+  (dispatches `postLogout()` on 401) reads that shape.
 
 Test provider: `src/test/renderWithProviders.jsx` mounts
 `QueryClientProvider` on a fresh client per render with `retry:false`
 and `networkMode:'always'` — use it for anything that reads from RQ.
 
-### Migrated domains
+### Shared mutation state across components (module singleton)
 
-- **Reference lists**: `useFileFormats`, `useLicenses` (+ `findLicenseByName`),
-  `useDocumentTypes`, `useIdentifierTypes`, `useSubjects`, `useLanguages`,
-  `useProjections`.
-- **Entity details**: `useDocument`, `useMassif`, `useCave`, `useEntrance`,
-  `usePerson`, `useOrganization`, `useCountry`, `useRegion` and their
-  `useDelete*` / `useRestore*` / `useLink*` mutations.
-- **Entity forms**: `useCaveForm`, `useEntranceForm`, `useMassifForm`,
-  `usePerson` (create/update/groups), `useOrganizationForm`
-  (create/update) — form-state (`isPending`/`error`/`data`) flows through
-  the mutation object, not a Redux slice.
-- **Association mutations**: `useOrganizationAssociation` (set/remove
-  organizations on countries, regions, massifs — chained POST + PUT when a
-  free-text name is passed instead of an id).
-- **Child CRUD** (Description, Guideline, Location, History, Rigging,
-  Comment): create/update/delete/restore/moveRelevance hooks that
-  invalidate the parent entity's `detail(id)`.
+For flows where "current submitted state" is shared across a form + a
+results component (the advanced-search page's SearchResults reads what
+DocumentSearch/EntrancesSearch submitted), use a module-scope
+`useSyncExternalStore` singleton next to the query hook — see
+`src/hooks/queries/useAdvancedSearch.js`. One advanced search is active
+app-wide at any time, so a module singleton matches the semantics
+without threading a React context through the tree.
 
-The bridge middleware and `queryClientRef` singleton have been removed —
-every mutation now invalidates directly from its `onSuccess`. Map tile
-invalidation (previously handled by `mapCacheInvalidationMiddleware` for
-organizations) lives inside each Organization mutation's `onSuccess`
-alongside the RQ invalidation.
+## 🎯 Redux Patterns
 
-### Redux still handles
+Redux keeps only genuine client/session state. **Do not add a new
+reducer for a server fetch** — server-state (`{ data, loading, error }`
+for an API response) belongs in React Query.
 
-Auth/session, i18n, snackbar, side menu, global error, `map` (viewport
-carve-out), Snapshots (migrating in C), regions-search results
-(`state.region`, moves with the other search lists in G), and the
-remaining form-state slices scheduled for Phases D–H. Anything whose
-*value* comes from the server and whose *shape* is `{ data, loading,
-error }` belongs in React Query, not in a new slice.
+Remaining slices (7):
 
-## 🎯 Redux Patterns (detailed)
+- `account` — mirror of the current user's account object (name, email,
+  language, prefs). Reads live in Redux; writes go through `useUpdateAccount`
+  and re-fetch `fetchAccount` on success.
+- `login` — session/JWT, authorization header, login-dialog visibility,
+  MFA transition flags. Load-bearing across the auth flows in
+  `hooks/mutations/useAuthFlows.js` and `useMfa.js` — the mutations
+  dispatch back into this slice on success.
+- `intl` — locale + loaded message catalogues. Locale changes are
+  driven by `changeLocale`; account language sync writes back via
+  `useUpdateAccount`.
+- `sideMenu` — open/closed state of the AppShell side menu.
+- `error` — global error banner state (rare, mostly used by legacy
+  error boundaries).
+- `map` — viewport map: continuous-bounds fetches (`actions/Map.js`) are
+  a carve-out per the ADR (unbounded cache keys). The tile cache
+  (`utils/mapTileCache.js`) stays here.
+- `importWizard` — multi-step observation-import wizard. Client-state:
+  file/encoding/header row/column mappings/context/wizard step. The
+  wizard has small server-state sub-fetches (`fetchSensorConfigs`,
+  submission status) that also live here to keep the step transitions
+  atomic — they are not new endpoints, so leaving them in Redux is not
+  a regression.
 
-See also root `AGENTS.md` for the short reference.
-
-### Action Types Pattern
-
-```javascript
-// actions/UpdateEntrance.js — a form-state thunk (Redux stays here)
-export const UPDATE_ENTRANCE = 'UPDATE_ENTRANCE';
-export const UPDATE_ENTRANCE_SUCCESS = 'UPDATE_ENTRANCE_SUCCESS';
-export const UPDATE_ENTRANCE_ERROR = 'UPDATE_ENTRANCE_ERROR';
-
-export const updateEntrance = payload => async (dispatch, getState) => {
-  dispatch({ type: UPDATE_ENTRANCE });
-  try {
-    const response = await fetch(`/api/entrances/${payload.id}`, {
-      method: 'PUT',
-      headers: getState().login.authorizationHeader,
-      body: JSON.stringify(payload)
-    });
-    const data = await response.json();
-    dispatch({ type: UPDATE_ENTRANCE_SUCCESS, httpCode: response.status, data });
-  } catch (error) {
-    dispatch({
-      type: UPDATE_ENTRANCE_ERROR,
-      error: {
-        code: error.body?.code || null,
-        message: error.body?.message || error.message,
-        details: error.body?.metadata?.details || [],
-        status: error.status || null
-      }
-    });
-  }
-};
-```
-
-> ⚠️ Server-state fetches (`fetchCave`, `fetchDocument`, …) migrated to
-> React Query. Adding a new one as a Redux thunk is the anti-pattern this
-> section used to encourage — see the "Server state" section above.
-
-### Reducer Pattern
-
-The **NotificationsReducer** is the reference implementation — use its status pattern:
-
-```javascript
-// reducers/UpdateEntranceReducer.js
-import {
-  UPDATE_ENTRANCE,
-  UPDATE_ENTRANCE_SUCCESS,
-  UPDATE_ENTRANCE_ERROR
-} from '../actions/Entrance/UpdateEntrance';
-
-const initialState = {
-  loading: false,
-  error: null,
-  data: null,
-  latestHttpCode: null
-};
-
-const reducer = (state = initialState, action) => {
-  switch (action.type) {
-    case UPDATE_ENTRANCE:
-      return { ...state, loading: true, error: null, latestHttpCode: null };
-    case UPDATE_ENTRANCE_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        data: action.data,
-        latestHttpCode: action.httpCode
-      };
-    case UPDATE_ENTRANCE_ERROR:
-      return {
-        ...state,
-        loading: false,
-        error: action.error,
-        latestHttpCode: action.httpCode
-      };
-    default:
-      return state;
-  }
-};
-
-export default reducer;
-```
-
-### Registering a new reducer
-
-The root store is assembled in **`src/reducers/GCReducer.js`** via `combineReducers`. Adding a reducer requires two steps:
-
-**1. Create the file** in `src/reducers/` following the naming convention `<Feature>Reducer.js` (PascalCase):
-
-```javascript
-// src/reducers/MyFeatureReducer.js
-import { MY_FEATURE, MY_FEATURE_SUCCESS, MY_FEATURE_FAILURE } from '../actions/MyFeature';
-
-const initialState = { data: null, loading: false, error: null };
-
-const myFeatureReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case MY_FEATURE:
-      return { ...state, loading: true, error: null };
-    case MY_FEATURE_SUCCESS:
-      return { ...state, loading: false, data: action.payload };
-    case MY_FEATURE_FAILURE:
-      return { ...state, loading: false, error: action.error };
-    default:
-      return state;
-  }
-};
-
-export default myFeatureReducer;
-```
-
-**2. Register it in `src/reducers/GCReducer.js`** — add the import and the key in `combineReducers` (keep alphabetical order):
-
-```javascript
-import myFeature from './MyFeatureReducer'; // add import
-
-const GCReducer = combineReducers({
-  // ...
-  myFeature,   // add key — accessible as state.myFeature in useSelector
-  // ...
-});
-```
-
-The store is created in `src/store.js` via `configureStore({ reducer: GCReducer })` — you never need to touch that file when adding a reducer. It lives in its own module so code outside React (the `QueryClient` error handler) can dispatch; never call `createStore`, deprecated since Redux 4.2.
+Anything else that looks like "load, hold, invalidate" is a React Query
+job — see the section above.
 
 ---
 

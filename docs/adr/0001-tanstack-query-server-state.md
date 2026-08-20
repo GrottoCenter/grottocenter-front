@@ -1,6 +1,6 @@
 # ADR 0001 — TanStack Query as the server-state layer
 
-- **Status**: accepted
+- **Status**: accepted → **migration complete (2026-08-12)**
 - **Date**: 2026-08-11
 - **Scope**: `packages/web-app`
 - **Tracking issue**: [#1466](https://github.com/GrottoCenter/grottocenter-front/issues/1466)
@@ -117,3 +117,94 @@ in the same change — `refetchOnReconnect` is on by default and the two would d
   colocated with their hook and re-exported from `hooks/index.js`. A
   `licenses.find(l => l.name === x)` reinvented in three components is the
   duplication this migration is meant to remove, not accumulate.
+
+## Migration completed (2026-08-12)
+
+The endpoint-by-endpoint migration reached its stable end state.
+
+### Final state
+
+- **GCReducer: 106 slices → 7.** Redux keeps only genuine client/session
+  state: `account`, `login`, `intl`, `sideMenu`, `error`, `map` (viewport
+  carve-out), `importWizard` (multi-step wizard client state). Every
+  other slice's server-state was replaced by a React Query hook in
+  `src/hooks/queries/` or `src/hooks/mutations/`, re-exported from
+  `src/hooks/index.js`.
+- **Scaffolds removed** (all in the same migration): the middleware
+  bridge `queryInvalidationBridge`, the `queryClientRef` singleton, the
+  `mapCacheInvalidationMiddleware`, and three hand-rolled hooks —
+  `useReducerSuccessNotification`, `useJobPolling`,
+  `useLanguages`-style ref-list fetchers. Every mutation invalidates
+  directly from its own `onSuccess`.
+- **`isomorphic-fetch` dependency dropped.** Every remaining call site
+  uses the platform's global `fetch`. Vite bundles for the browser
+  (native fetch on all supported targets); the vitest jsdom env has
+  fetch on `globalThis`. See I3 in the roadmap.
+
+### What did NOT migrate (and why)
+
+- **Viewport map fetches** (`actions/Map.js`). Continuous-bounds queries
+  produce a different cache key on every pan — no reuse to gain, and
+  the cache would grow without bound. Kept as thunks, per the carve-out
+  in the original Decision section above.
+- **`importWizard` slice.** Multi-step client state (file, encoding,
+  header row, column mappings, context, wizard step). A few sub-fetches
+  colocate with the wizard reducer to keep step transitions atomic —
+  they are not new endpoints, so leaving them in Redux is not a
+  regression.
+- **`useRefetchOnReconnect` hook.** Kept for three legitimate callers
+  outside the RQ scope: the viewport map, the intl locale reload, and
+  the map tile cache reload. React Query's `refetchOnReconnect` covers
+  RQ queries only.
+- **`checkAuthStatus` helper.** Still used by the remaining thunks that
+  live in the anti-scope (Account fetches, importWizard step fetches,
+  the Substance/PreviewSensitiveMassif thunks). The QueryClient's
+  global `onError` handles 401 for RQ. Two paths for now — the
+  "handled twice" risk from the Risks section above collapses when the
+  last thunk migrates, which is scoped for a follow-up.
+
+### The 401 handling risk noted above
+
+The "handled twice" risk in the Risks section is largely mitigated but
+not fully eliminated. All RQ queries and mutations hit the single
+`onError` in `conf/queryClient.js` (dispatches `postLogout()` on 401).
+The remaining thunks (see above) still call `checkAuthStatus` directly;
+both paths converge on `postLogout()`, so a real 401 lands the user on
+the same login flow regardless of which layer fired the request. When
+the last of those thunks migrates, `checkAuthStatus` disappears
+entirely and this paragraph closes.
+
+### Notable in-flight design choices worth remembering
+
+- **Advanced search** uses a module-scope `useSyncExternalStore`
+  singleton (`hooks/queries/useAdvancedSearch.js`) to share the
+  currently submitted params between the form and the results
+  component. Only one advanced search is active app-wide at any time
+  — the singleton matches that semantic without a context provider.
+- **`isNewQuery` flag** on advanced-search: preserved as a coordination
+  signal for `DesktopEntityTable`/`MobileEntityList` to reset
+  pagination/sort/selection on a fresh submit. The flag flips back to
+  `false` from a `useEffect` once RQ finishes fetching, so a subsequent
+  submit re-fires the reset.
+- **FormData mutations** (`useCreateDocument`, `useUpdateDocument`) go
+  through `apiPostForm`/`apiPutForm` in `api/client.js`. They bypass
+  `jsonHeaders()` on purpose — the browser must set the multipart
+  Content-Type so the boundary is included.
+- **MFA hooks** (`hooks/mutations/useMfa.js`) use a small raw fetch
+  helper (not `apiPost`) because the enroll/verify calls carry the
+  enrollment token, not the standard authorization header. Login-slice
+  dispatches (`fetchLoginSuccess`, `hideLoginDialog`, `postLogout`) are
+  wired into `store.dispatch` from within the mutation so the
+  login flow stays single-sourced.
+
+### Metrics
+
+- **106 → 7** slices in `GCReducer.js`.
+- **~30** query/mutation hook files under `hooks/queries/` and
+  `hooks/mutations/`.
+- **1** dependency dropped (`isomorphic-fetch`, `-152.99 KiB` per
+  `yarn install`).
+- **0** additions to the middleware chain in `store.js` from this
+  migration (the two RQ-related middlewares were added and removed
+  during the migration; the store today is `configureStore` on a bare
+  combined reducer).
