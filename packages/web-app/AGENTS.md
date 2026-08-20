@@ -132,6 +132,73 @@ Use ICU message format for dynamic values:
 
 ---
 
+## 🎯 Server state — React Query
+
+Server reads (GET) and writes (POST/PUT/PATCH/DELETE) live in **TanStack
+Query**. Redux is kept for genuine client/session state — auth, i18n, side
+menu, form-state slices, snackbar state. Rationale, tiers and offline
+contract are in [docs/adr/0001-tanstack-query-server-state.md](../../docs/adr/0001-tanstack-query-server-state.md).
+
+### Where to add a new endpoint
+
+- **Query key** — `src/api/queryKeys.js` (`referenceKeys` for the static
+  lists, `documentKeys`/`caveKeys`/`massifKeys`/`entranceKeys` for
+  entities). Every new domain uses the same `detailKey(domain)` factory,
+  so `xxxKeys.all` is the prefix and `xxxKeys.detail(id)` extends it.
+- **Query hook** — `src/hooks/queries/useXxx.js`. Return the raw
+  `useQuery` object. Callers destructure with `= []`/`= null` fallbacks —
+  wrappers that hide `refetch`/`isFetching`/`isPending` are not worth it.
+- **Mutation hook** — `src/hooks/mutations/useYyyXxx.js`. `onSuccess`
+  invalidates `xxxKeys.detail(id)` (or `removeQueries` on permanent
+  delete). Any side effect the legacy thunk owned (map tile cache
+  invalidation, session cleanup) belongs in the same `onSuccess`.
+- **Barrel** — re-export from `src/hooks/index.js` so consumers keep one
+  import path.
+
+Conventions (frozen — the migration will replicate over the remaining
+endpoints):
+
+- Options go in an object, not positional booleans:
+  `useLicenses({ enabled: showAuthorization })`.
+- Sorts and shape transforms go in `select`, at module scope so the
+  identity is stable, on a copy so the cache array is never mutated.
+- Cross-caller lookups (`findLicenseByName`, and future siblings) are
+  colocated with their hook and re-exported from `hooks/index.js`.
+- `apiGet/apiPost/apiPut/apiPatch/apiDelete` in `src/api/client.js` are
+  the only fetch entry points for RQ. They read the auth header at call
+  time and throw errors with `body`/`status` attached — the QueryClient's
+  global `onError` (dispatches `postLogout()` on 401) reads that shape.
+
+Test provider: `src/test/renderWithProviders.jsx` mounts
+`QueryClientProvider` on a fresh client per render with `retry:false`
+and `networkMode:'always'` — use it for anything that reads from RQ.
+
+### Migrated domains
+
+- **Reference lists**: `useFileFormats`, `useLicenses` (+ `findLicenseByName`),
+  `useDocumentTypes`, `useIdentifierTypes`, `useSubjects`, `useLanguages`,
+  `useProjections`.
+- **Entity details**: `useDocument`, `useMassif`, `useCave`, `useEntrance`
+  and their `useDelete*` / `useRestore*` / `useLink*` mutations.
+
+### Transient bridge
+
+`src/middlewares/queryInvalidationBridge.js` watches the mutations that
+still run as thunks (form-state ones — `UpdateEntrance`, `MarkSensitive`,
+Description/Guideline/Location/History/Rigging/Comment CRUD and MOVE_*)
+and invalidates the migrated entity's `detail(id)` on their success.
+`api/queryClientRef.js` is the late-bound singleton reference the bridge
+uses — importing `conf/queryClient` from a middleware would close a store
+init cycle. The bridge shrinks as each remaining thunk becomes a
+`useMutation`, and disappears when the last one is converted.
+
+### Redux still handles
+
+Auth/session, i18n, snackbar, side menu, global error, and form-state
+slices (`updateEntrance`, `createDocument`, `updateDocument`, …). Anything
+whose *value* comes from the server and whose *shape* is `{ data, loading,
+error }` belongs in React Query, not in a new slice.
+
 ## 🎯 Redux Patterns (detailed)
 
 See also root `AGENTS.md` for the short reference.
@@ -139,20 +206,24 @@ See also root `AGENTS.md` for the short reference.
 ### Action Types Pattern
 
 ```javascript
-// actions/Cave.js
-export const FETCH_CAVE = 'FETCH_CAVE';
-export const FETCH_CAVE_SUCCESS = 'FETCH_CAVE_SUCCESS';
-export const FETCH_CAVE_FAILURE = 'FETCH_CAVE_FAILURE';
+// actions/UpdateEntrance.js — a form-state thunk (Redux stays here)
+export const UPDATE_ENTRANCE = 'UPDATE_ENTRANCE';
+export const UPDATE_ENTRANCE_SUCCESS = 'UPDATE_ENTRANCE_SUCCESS';
+export const UPDATE_ENTRANCE_ERROR = 'UPDATE_ENTRANCE_ERROR';
 
-export const fetchCave = id => async dispatch => {
-  dispatch({ type: FETCH_CAVE });
+export const updateEntrance = payload => async (dispatch, getState) => {
+  dispatch({ type: UPDATE_ENTRANCE });
   try {
-    const response = await fetch(`/api/caves/${id}`);
+    const response = await fetch(`/api/entrances/${payload.id}`, {
+      method: 'PUT',
+      headers: getState().login.authorizationHeader,
+      body: JSON.stringify(payload)
+    });
     const data = await response.json();
-    dispatch({ type: FETCH_CAVE_SUCCESS, payload: data });
+    dispatch({ type: UPDATE_ENTRANCE_SUCCESS, httpCode: response.status, data });
   } catch (error) {
     dispatch({
-      type: FETCH_CAVE_FAILURE,
+      type: UPDATE_ENTRANCE_ERROR,
       error: {
         code: error.body?.code || null,
         message: error.body?.message || error.message,
@@ -164,34 +235,53 @@ export const fetchCave = id => async dispatch => {
 };
 ```
 
+> ⚠️ Server-state fetches (`fetchCave`, `fetchDocument`, …) migrated to
+> React Query. Adding a new one as a Redux thunk is the anti-pattern this
+> section used to encourage — see the "Server state" section above.
+
 ### Reducer Pattern
 
 The **NotificationsReducer** is the reference implementation — use its status pattern:
 
 ```javascript
-// reducers/Cave.js
+// reducers/UpdateEntranceReducer.js
 import {
-  FETCH_CAVE,
-  FETCH_CAVE_SUCCESS,
-  FETCH_CAVE_FAILURE
-} from '../actions/Cave';
+  UPDATE_ENTRANCE,
+  UPDATE_ENTRANCE_SUCCESS,
+  UPDATE_ENTRANCE_ERROR
+} from '../actions/Entrance/UpdateEntrance';
 
-const initialState = { data: null, loading: false, error: null };
+const initialState = {
+  loading: false,
+  error: null,
+  data: null,
+  latestHttpCode: null
+};
 
-const caveReducer = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_CAVE:
-      return { ...state, loading: true, error: null };
-    case FETCH_CAVE_SUCCESS:
-      return { ...state, loading: false, data: action.payload };
-    case FETCH_CAVE_FAILURE:
-      return { ...state, loading: false, error: action.error };
+    case UPDATE_ENTRANCE:
+      return { ...state, loading: true, error: null, latestHttpCode: null };
+    case UPDATE_ENTRANCE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        data: action.data,
+        latestHttpCode: action.httpCode
+      };
+    case UPDATE_ENTRANCE_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+        latestHttpCode: action.httpCode
+      };
     default:
       return state;
   }
 };
 
-export default caveReducer;
+export default reducer;
 ```
 
 ### Registering a new reducer
@@ -241,21 +331,29 @@ The store is created in `src/store.js` via `configureStore({ reducer: GCReducer 
 ### Hooks vs HOC
 
 ```javascript
-// ✅ Preferred: hooks
+// ✅ Preferred: hooks — Redux for client-state
 import { useSelector, useDispatch } from 'react-redux';
 
-const CaveView = ({ id }) => {
+const AppShell = () => {
   const dispatch = useDispatch();
-  const cave = useSelector(state => state.cave.data);
-  const loading = useSelector(state => state.cave.loading);
-
-  useEffect(() => {
-    dispatch(fetchCave(id));
-  }, [dispatch, id]);
+  const { isOpen } = useSelector(state => state.sideMenu);
+  return <SideMenu open={isOpen} onToggle={() => dispatch(toggleSideMenu())} />;
 };
 
 // ❌ Deprecated: connect()
-export default connect(mapStateToProps, mapDispatchToProps)(CaveView);
+export default connect(mapStateToProps, mapDispatchToProps)(AppShell);
+```
+
+For server-state (a cave, a document, …), use the React Query hook —
+see the "Server state" section above:
+
+```javascript
+import { useCave } from '../hooks';
+
+const CaveView = ({ id }) => {
+  const { data: cave, isPending, error } = useCave(id);
+  // …
+};
 ```
 
 ---
