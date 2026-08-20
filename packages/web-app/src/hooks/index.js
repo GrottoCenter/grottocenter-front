@@ -110,6 +110,19 @@ export { useCountry } from './queries/useCountry';
 export { useRegion } from './queries/useRegion';
 export { useSnapshots } from './queries/useSnapshots';
 export {
+  useNotifications,
+  useMenuNotifications
+} from './queries/useNotifications';
+export {
+  useUnreadNotificationsCount,
+  usePendingDocumentsCount,
+  useDuplicatesCount
+} from './queries/useCounts';
+export {
+  useReadNotification,
+  useReadAllNotifications
+} from './mutations/useNotifications';
+export {
   useCreateOrganization,
   useUpdateOrganization
 } from './mutations/useOrganizationForm';

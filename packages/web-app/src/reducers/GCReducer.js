@@ -5,7 +5,6 @@ import banCaver from './BanCaverReducer';
 import bannedCavers from './BannedCaversReducer';
 import changeEmail from './ChangeEmail';
 import changePassword from './ChangePassword';
-import countUnreadNotifications from './CountUnreadNotificationsReducer';
 import countryEntrances from './CountryEntrancesDataQualityReducer';
 import countryRegions from './CountryRegionsReducer';
 import createDocument from './CreateDocumentReducer';
@@ -13,7 +12,6 @@ import cumulatedLength from './CumulatedLengthReducer';
 import dbExport from './DBExportReducer';
 import detachEntrance from './DetachEntranceReducer';
 import documents from './DocumentsReducer';
-import duplicatesCount from './DuplicatesCountReducer';
 import duplicatesImport from './DuplicatesImportReducer';
 import dynamicNumber from './DynamicNumberReducer';
 import error from './ErrorReducer';
@@ -28,17 +26,12 @@ import login from './LoginReducer';
 import map from './Map';
 import massifEntrances from './MassifEntrancesDataQualityReducer';
 import mfa from './MfaReducer';
-import menuNotifications from './MenuNotificationsReducer';
 import messaging from './MessagingReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
-import notifications from './NotificationsReducer';
 import partnersCarousel from './PartnersCarouselReducer';
-import pendingDocumentsCount from './PendingDocumentsCountReducer';
 import processDocuments from './ProcessDocumentsReducer';
 import quicksearch from './QuicksearchReducer';
 import randomEntrance from './RandomEntranceReducer';
-import readAllNotifications from './ReadAllNotificationsReducer';
-import readNotification from './ReadNotificationReducer';
 import recentChange from './RecentChangeReducer';
 import region from './RegionReducer';
 import regionEntrances from './RegionEntrancesDataQualityReducer';
@@ -66,7 +59,6 @@ const GCReducer = combineReducers({
   bannedCavers,
   changeEmail,
   changePassword,
-  countUnreadNotifications,
   countryEntrances,
   countryRegions,
   createDocument,
@@ -74,7 +66,6 @@ const GCReducer = combineReducers({
   dbExport,
   detachEntrance,
   documents,
-  duplicatesCount,
   duplicatesImport,
   dynamicNumber,
   error,
@@ -89,17 +80,12 @@ const GCReducer = combineReducers({
   map,
   massifEntrances,
   mfa,
-  menuNotifications,
   messaging,
   moveEntranceToCave,
-  notifications,
   partnersCarousel,
-  pendingDocumentsCount,
   processDocuments,
   quicksearch,
   randomEntrance,
-  readAllNotifications,
-  readNotification,
   recentChange,
   region,
   regionEntrances,

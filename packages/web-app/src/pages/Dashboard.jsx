@@ -23,7 +23,11 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import { styled } from '@mui/material/styles';
 
 import { fetchDBExportUrl } from '../actions/DBExport';
-import { usePermissions } from '../hooks';
+import {
+  useDuplicatesCount,
+  usePendingDocumentsCount,
+  usePermissions
+} from '../hooks';
 import REDUCER_STATUS from '../reducers/ReducerStatus';
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
 import ImpersonationLauncher from '../components/appli/ImpersonationLauncher';
@@ -53,11 +57,9 @@ const ToolGrid = styled(Box)(({ theme }) => ({
   }
 }));
 
-const badgeContent = (count, status) => {
-  if (status === REDUCER_STATUS.LOADING) {
-    return <CircularProgress size={10} color="inherit" />;
-  }
-  if (status === REDUCER_STATUS.FAILED) return '!';
+const badgeContent = (count, isLoading, isError) => {
+  if (isLoading) return <CircularProgress size={10} color="inherit" />;
+  if (isError) return '!';
   return count;
 };
 
@@ -67,17 +69,14 @@ const ToolCard = ({
   description,
   roleId,
   count,
-  status,
+  isLoading = false,
+  isError = false,
   onClick
 }) => {
   const { formatMessage } = useIntl();
   const roleLabel = formatMessage({ id: roleId });
   const hasCounter = typeof count === 'number';
-  const showBadge =
-    hasCounter &&
-    (status === REDUCER_STATUS.LOADING ||
-      status === REDUCER_STATUS.FAILED ||
-      count > 0);
+  const showBadge = hasCounter && (isLoading || isError || count > 0);
 
   const iconNode = (
     <Box
@@ -106,8 +105,8 @@ const ToolCard = ({
             {showBadge ? (
               <Badge
                 overlap="rectangular"
-                color={status === REDUCER_STATUS.FAILED ? 'error' : 'secondary'}
-                badgeContent={badgeContent(count, status)}
+                color={isError ? 'error' : 'secondary'}
+                badgeContent={badgeContent(count, isLoading, isError)}
                 max={99}>
                 {iconNode}
               </Badge>
@@ -133,7 +132,8 @@ ToolCard.propTypes = {
   description: PropTypes.string.isRequired,
   roleId: PropTypes.oneOf(['Administrator', 'Moderator', 'Leader']).isRequired,
   count: PropTypes.number,
-  status: PropTypes.oneOf(Object.values(REDUCER_STATUS)),
+  isLoading: PropTypes.bool,
+  isError: PropTypes.bool,
   onClick: PropTypes.func.isRequired
 };
 
@@ -218,10 +218,12 @@ const Dashboard = () => {
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const dbExport = useSelector(state => state.dbExport);
-  const pendingDocumentsCount = useSelector(
-    state => state.pendingDocumentsCount
-  );
-  const duplicatesCount = useSelector(state => state.duplicatesCount);
+  const pendingDocumentsQuery = usePendingDocumentsCount({
+    enabled: permissions.isModerator
+  });
+  const duplicatesQuery = useDuplicatesCount({
+    enabled: permissions.isModerator
+  });
 
   const goTo = url => navigate(url);
 
@@ -289,8 +291,9 @@ const Dashboard = () => {
                     id: 'Document validation description'
                   })}
                   roleId="Moderator"
-                  count={pendingDocumentsCount.value}
-                  status={pendingDocumentsCount.status}
+                  count={pendingDocumentsQuery.data ?? 0}
+                  isLoading={pendingDocumentsQuery.isPending}
+                  isError={pendingDocumentsQuery.isError}
                   onClick={() => goTo('/ui/documents/validation')}
                 />
                 <ToolCard
@@ -300,8 +303,9 @@ const Dashboard = () => {
                     id: 'Duplicates tool description'
                   })}
                   roleId="Moderator"
-                  count={duplicatesCount.value}
-                  status={duplicatesCount.status}
+                  count={duplicatesQuery.data ?? 0}
+                  isLoading={duplicatesQuery.isPending}
+                  isError={duplicatesQuery.isError}
                   onClick={() => goTo('/ui/duplicates')}
                 />
               </ToolGrid>

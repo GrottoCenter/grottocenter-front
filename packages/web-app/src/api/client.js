@@ -39,6 +39,19 @@ export const apiGet = async url => {
   return parseJsonOr204(response);
 };
 
+/**
+ * GET a JSON resource and return both body and the Content-Range header.
+ * Used by paginated lists whose total count lives in the response header
+ * (notifications, documents queue, …).
+ */
+export const apiGetWithRange = async url => {
+  const response = await fetch(url, { headers: authHeaders() });
+  await checkAndGetStatus(response);
+  const contentRange = response.headers.get('Content-Range');
+  const data = await parseJsonOr204(response);
+  return { data, contentRange };
+};
+
 const send = method => async (url, body) => {
   const init = {
     method,

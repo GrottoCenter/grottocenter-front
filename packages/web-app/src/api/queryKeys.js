@@ -82,3 +82,22 @@ export const snapshotKeys = {
   all: ['snapshot'],
   list: (typeId, typeName, opts) => ['snapshot', 'list', typeName, typeId, opts]
 };
+
+// Per-user notifications. The unread counter shares the domain so
+// invalidating notificationKeys.all after a read refreshes list + menu +
+// counter in one call.
+export const notificationKeys = {
+  all: ['notification'],
+  list: opts => ['notification', 'list', opts],
+  menu: opts => ['notification', 'menu', opts],
+  unreadCount: () => ['notification', 'unreadCount']
+};
+
+// Moderator queue counters. Two independent endpoints, one domain root so a
+// single invalidateQueries({ queryKey: countKeys.all }) refreshes both after
+// a moderator processes an item.
+export const countKeys = {
+  all: ['count'],
+  pendingDocuments: () => ['count', 'pendingDocuments'],
+  duplicates: () => ['count', 'duplicates']
+};
