@@ -1,37 +1,32 @@
 import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Skeleton } from '@mui/material';
 
-import { fetchPerson } from '../../actions/Person/GetPerson';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import PersonForm from '../../components/appli/EntitiesForm/Person';
 import Alert from '../../components/common/Alert';
-import { useUserProperties, usePermissions } from '../../hooks';
+import { usePerson, useUserProperties, usePermissions } from '../../hooks';
 
 const PersonEdit = () => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-  const { person, isFetching } = useSelector(state => state.person);
   const { personId } = useParams();
   const navigate = useNavigate();
   const { isAdmin, isModerator } = usePermissions();
 
   const userId = useUserProperties()?.id ?? null;
   const isOurAccount = userId?.toString() === personId.toString();
+  const { data: person, isFetching } = usePerson(
+    isOurAccount ? undefined : personId
+  );
   let isAllowed = isOurAccount || isAdmin;
   if (isModerator && person?.type === 'AUTHOR') isAllowed = true;
 
   useEffect(() => {
     if (isOurAccount) {
       navigate('/ui/account', { replace: true });
-      return;
     }
-    if (personId && isAllowed) {
-      dispatch(fetchPerson(personId));
-    }
-  }, [personId, isOurAccount, isAllowed, dispatch, navigate]);
+  }, [isOurAccount, navigate]);
 
   let title = isFetching ? <Skeleton /> : '';
   if (person) {

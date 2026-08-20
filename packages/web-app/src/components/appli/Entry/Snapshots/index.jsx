@@ -12,19 +12,20 @@ import PageContainer from '../../../common/Layouts/PageContainer';
 import PageHeader from '../../../common/Layouts/PageHeader';
 import SectionStack from '../../../common/Layouts/SectionStack';
 import { fetchSnapshot } from '../../../../actions/Snapshot/GetSnapshots';
-import { fetchPerson } from '../../../../actions/Person/GetPerson';
 import { fetchOrganization } from '../../../../actions/Organization/GetOrganization';
 import {
   useCave,
   useDocument,
   useEntrance,
-  useMassif
+  useMassif,
+  usePerson
 } from '../../../../hooks';
 import {
   caveKeys,
   documentKeys,
   entranceKeys,
-  massifKeys
+  massifKeys,
+  personKeys
 } from '../../../../api/queryKeys';
 import REDUCER_STATUS from '../../../../reducers/ReducerStatus';
 import SensitiveCaveWarning from '../SensitiveCaveWarning';
@@ -86,9 +87,9 @@ const SnapshotPage = () => {
   const massifQuery = useMassif(relevantMassifId);
   const currentMassif = massifQuery.data ?? null;
   const isMassifLoading = massifQuery.isFetching;
-  const { person: currentPerson, isFetching: isPersonLoading } = useSelector(
-    s => s.person
-  );
+  const personQuery = usePerson(type === 'persons' ? id : undefined);
+  const currentPerson = personQuery.data ?? null;
+  const isPersonLoading = personQuery.isFetching;
   const {
     organization: currentOrganization,
     isLoading: isOrganizationLoading
@@ -114,7 +115,8 @@ const SnapshotPage = () => {
         queryClient.invalidateQueries({ queryKey: documentKeys.detail(id) }),
       massifs: () =>
         queryClient.invalidateQueries({ queryKey: massifKeys.detail(id) }),
-      persons: () => dispatch(fetchPerson(id)),
+      persons: () =>
+        queryClient.invalidateQueries({ queryKey: personKeys.detail(id) }),
       organizations: () => dispatch(fetchOrganization(id))
     };
     const fetchParentByType = {

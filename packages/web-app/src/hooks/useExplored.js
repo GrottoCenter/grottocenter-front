@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPerson } from '../actions/Person/GetPerson';
+import { useDispatch } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 import { linkExploredEntrance } from '../actions/Entrance/LinkExploredEntrance';
 import { unlinkExploredEntrance } from '../actions/Entrance/UnlinkExploredEntrance';
+import { personKeys } from '../api/queryKeys';
+import { usePerson } from './queries/usePerson';
 
 /**
  * Manages the "explored" toggle state for an entrance.
@@ -15,24 +17,15 @@ import { unlinkExploredEntrance } from '../actions/Entrance/UnlinkExploredEntran
  */
 const useExplored = ({ entranceId, userId }) => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const [isExplored, setIsExplored] = useState(false);
   const [isExploredLoading, setIsExploredLoading] = useState(false);
-  const { person, error: personError } = useSelector(state => state.person);
-
-  // Guard against a stale person from another profile page sharing the reducer.
-  const isPersonCurrent = Boolean(userId) && person?.id === userId;
-
-  useEffect(() => {
-    if (userId && !isPersonCurrent && !personError) {
-      dispatch(fetchPerson(userId));
-    }
-  }, [userId, isPersonCurrent, personError, dispatch]);
+  const { data: person } = usePerson(userId);
 
   useEffect(() => {
     if (!entranceId) return;
-    if (userId && !isPersonCurrent) return; // wait for the current person's data
     setIsExplored(!!person?.exploredEntrances?.some(e => e?.id === entranceId));
-  }, [person, entranceId, userId, isPersonCurrent]);
+  }, [person, entranceId]);
 
   const handleToggleExplored = async () => {
     if (!userId || !entranceId) return;
@@ -44,7 +37,7 @@ const useExplored = ({ entranceId, userId }) => {
         await dispatch(linkExploredEntrance(entranceId, userId));
       }
       setIsExplored(prev => !prev);
-      dispatch(fetchPerson(userId));
+      queryClient.invalidateQueries({ queryKey: personKeys.detail(userId) });
     } catch (err) {
       console.error('Error toggling explored status:', err);
     } finally {

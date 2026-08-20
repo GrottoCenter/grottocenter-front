@@ -5,8 +5,7 @@ import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import AddIcon from '@mui/icons-material/Add';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { postPerson } from '../../../actions/Person/CreatePerson';
+import { useCreatePerson } from '../../../hooks';
 import ActionButton from '../ActionButton';
 
 const Wrapper = styled('div')`
@@ -22,12 +21,13 @@ const CreateCaverPanel = ({
   enabled,
   onCreateSuccess
 }) => {
-  const dispatch = useDispatch();
-  const { isLoading, caver } = useSelector(state => state.createPerson);
+  const createMutation = useCreatePerson();
   const { formatMessage } = useIntl();
   const inputRef = useRef(null);
   const [name, setName] = useState(defaultName);
   const [surname, setSurname] = useState(defaultSurname);
+  const isLoading = createMutation.isPending;
+  const caver = createMutation.data;
 
   const handleChangeName = event => {
     setName(event.target.value);
@@ -37,7 +37,7 @@ const CreateCaverPanel = ({
   };
 
   const handleSubmit = () => {
-    dispatch(postPerson({ name, surname }));
+    createMutation.mutate({ name, surname });
   };
 
   useEffect(() => {

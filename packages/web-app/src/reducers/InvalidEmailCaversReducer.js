@@ -2,7 +2,7 @@ import {
   FETCH_INVALID_EMAIL_CAVERS,
   FETCH_INVALID_EMAIL_CAVERS_FAILURE,
   FETCH_INVALID_EMAIL_CAVERS_SUCCESS
-} from '../actions/Person/GetPerson';
+} from '../actions/Person/adminLists';
 
 const initialState = {
   invalidEmailCavers: [],

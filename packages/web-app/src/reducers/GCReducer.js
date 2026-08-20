@@ -11,7 +11,6 @@ import countryEntrances from './CountryEntrancesDataQualityReducer';
 import countryRegions from './CountryRegionsReducer';
 import createDocument from './CreateDocumentReducer';
 import createOrganization from './CreateOrganization';
-import createPerson from './CreatePerson';
 import cumulatedLength from './CumulatedLengthReducer';
 import dbExport from './DBExportReducer';
 import detachEntrance from './DetachEntranceReducer';
@@ -38,7 +37,6 @@ import notifications from './NotificationsReducer';
 import organization from './OrganizationReducer';
 import partnersCarousel from './PartnersCarouselReducer';
 import pendingDocumentsCount from './PendingDocumentsCountReducer';
-import person from './PersonReducer';
 import processDocuments from './ProcessDocumentsReducer';
 import quicksearch from './QuicksearchReducer';
 import randomEntrance from './RandomEntranceReducer';
@@ -65,11 +63,9 @@ import unsubscribeFromRegion from './UnsubscribeFromRegionReducer';
 import updateAccount from './UpdateAccountReducer';
 import updateDocument from './UpdateDocumentReducer';
 import updateOrganization from './UpdateOrganization';
-import updatePerson from './UpdatePerson';
 import countryOrganization from './CountryOrganizationReducer';
 import massifOrganization from './MassifOrganizationReducer';
 import regionOrganization from './RegionOrganizationReducer';
-import updatePersonGroups from './UpdatePersonGroupesReducer';
 import verifyEmail from './VerifyEmailReducer';
 
 const GCReducer = combineReducers({
@@ -86,7 +82,6 @@ const GCReducer = combineReducers({
   countryRegions,
   createDocument,
   createOrganization,
-  createPerson,
   cumulatedLength,
   dbExport,
   detachEntrance,
@@ -114,7 +109,6 @@ const GCReducer = combineReducers({
   organization,
   partnersCarousel,
   pendingDocumentsCount,
-  person,
   processDocuments,
   quicksearch,
   randomEntrance,
@@ -142,8 +136,6 @@ const GCReducer = combineReducers({
   updateAccount,
   updateDocument,
   updateOrganization,
-  updatePerson,
-  updatePersonGroups,
   verifyEmail
 });
 

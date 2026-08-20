@@ -9,7 +9,7 @@ import {
   fetchGroups,
   fetchBannedCavers,
   fetchInvalidEmailCavers
-} from '../../actions/Person/GetPerson';
+} from '../../actions/Person/adminLists';
 
 import AuthChecker from '../../components/appli/AuthChecker';
 

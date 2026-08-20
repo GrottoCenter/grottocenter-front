@@ -4,7 +4,7 @@ import {
   FETCH_INVALID_EMAIL_CAVERS,
   FETCH_INVALID_EMAIL_CAVERS_SUCCESS,
   FETCH_INVALID_EMAIL_CAVERS_FAILURE
-} from '../actions/Person/GetPerson';
+} from '../actions/Person/adminLists';
 
 /**
  * Property 2: Reducer state transitions

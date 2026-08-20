@@ -10,7 +10,12 @@ import {
   resetQuicksearch
 } from '../../actions/Quicksearch';
 
-import { useDebounce, useNotification } from '../../hooks';
+import {
+  usePerson,
+  useUpdatePersonGroups,
+  useDebounce,
+  useNotification
+} from '../../hooks';
 
 import AutoCompleteSearch from '../../components/common/AutoCompleteSearch';
 import AppLink from '../../components/common/AppLink';
@@ -18,8 +23,6 @@ import AppLink from '../../components/common/AppLink';
 import PersonProperties from '../../components/common/Person/PersonProperties';
 import UserGroups from './UserGroups';
 
-import { postPersonGroups } from '../../actions/Person/UpdatePersonGroups';
-import { fetchPerson } from '../../actions/Person/GetPerson';
 import { postBanCaver, postUnbanCaver } from '../../actions/Person/BanCaver';
 
 const UserBlock = styled('div')`
@@ -60,8 +63,8 @@ const ManageUserGroups = () => {
   const { formatMessage } = useIntl();
   const { onSuccess, onError } = useNotification();
   const debouncedInput = useDebounce(inputValue);
-  const { person, isFetching: isPersonFetching } = useSelector(
-    state => state.person
+  const { data: person, isFetching: isPersonFetching } = usePerson(
+    selectedUser?.id
   );
   const {
     results,
@@ -69,11 +72,10 @@ const ManageUserGroups = () => {
     isLoading: searchIsLoading
   } = useSelector(state => state.quicksearch);
 
-  const {
-    isLoading: isUpdateLoading,
-    isSuccess: isUpdateSuccess,
-    error: updateError
-  } = useSelector(state => state.updatePersonGroups);
+  const updatePersonGroupsMutation = useUpdatePersonGroups();
+  const isUpdateLoading = updatePersonGroupsMutation.isPending;
+  const isUpdateSuccess = updatePersonGroupsMutation.isSuccess;
+  const updateError = updatePersonGroupsMutation.error;
 
   const {
     isLoading: isBanLoading,
@@ -109,12 +111,10 @@ const ManageUserGroups = () => {
     setDidSaveBan(false);
   }, [selectedUser]);
 
-  useEffect(() => {
-    if (selectedUser && (isUpdateSuccess || isBanSuccess)) {
-      dispatch(fetchPerson(selectedUser.id));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isUpdateSuccess, isBanSuccess]);
+  // usePerson refetches on demand via invalidation. The ban thunk still
+  // dispatches its own action; the update-groups path invalidates in its
+  // own onSuccess, so no explicit refetch needed here. When BanCaver
+  // migrates (Phase H), it will invalidate too.
 
   useEffect(() => {
     if (!didSaveGroups || isUpdateLoading) return;
@@ -148,7 +148,6 @@ const ManageUserGroups = () => {
           onSelection={selection => {
             if (selection !== null) {
               setSelectedUser(selection);
-              dispatch(fetchPerson(selection.id));
             }
             setInputValue('');
           }}
@@ -188,7 +187,10 @@ const ManageUserGroups = () => {
                   setDidSaveBan(b);
                 }}
                 onSaveGroups={groups =>
-                  dispatch(postPersonGroups(selectedUser.id, groups))
+                  updatePersonGroupsMutation.mutate({
+                    id: selectedUser.id,
+                    groups
+                  })
                 }
                 onSaveBan={banned => {
                   if (banned) {

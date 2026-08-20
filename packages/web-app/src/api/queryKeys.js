@@ -52,3 +52,8 @@ export const entranceKeys = {
   all: ['entrance'],
   detail: detailKey('entrance')
 };
+
+export const personKeys = {
+  all: ['person'],
+  detail: detailKey('person')
+};

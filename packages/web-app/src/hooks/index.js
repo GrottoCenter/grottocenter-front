@@ -98,6 +98,13 @@ export {
   useUnmarkMassifSensitive
 } from './mutations/useMassifForm';
 export { useUpdateName } from './mutations/useUpdateName';
+export { usePerson } from './queries/usePerson';
+export {
+  useCreatePerson,
+  useUpdatePerson,
+  useDeletePerson,
+  useUpdatePersonGroups
+} from './mutations/usePerson';
 export { useNotification } from './useNotification';
 export { usePermissions } from './usePermissions';
 export { useSessionExpiry } from './useSessionExpiry';

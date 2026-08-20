@@ -41,13 +41,21 @@ import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { styled } from '@mui/material/styles';
 
 import fetch from 'isomorphic-fetch';
+import { useQueryClient } from '@tanstack/react-query';
 import { fetchAccount } from '../../actions/Account/GetAccount';
 import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
 import { updateAccount } from '../../actions/Account/UpdateAccount';
 import { checkAuthStatus } from '../../actions/utils';
 import { postMfaReset, clearMfaState } from '../../actions/Mfa';
 import { postLogout } from '../../actions/Login';
-import { fetchPerson } from '../../actions/Person/GetPerson';
+import {
+  usePerson,
+  useOnlineStatus,
+  useUserProperties,
+  usePermissions,
+  useNotification
+} from '../../hooks';
+import { personKeys } from '../../api/queryKeys';
 import { joinOrganization } from '../../actions/Organization/JoinOrganization';
 import { leaveOrganization } from '../../actions/Organization/LeaveOrganization';
 import Alert from '../../components/common/Alert';
@@ -70,12 +78,6 @@ import { FormRow } from '../../components/appli/EntitiesForm/utils/FormContainer
 import PasswordRules from '../../components/common/Form/PasswordRules';
 import SearchOrganizationForm from '../../components/appli/Form/SearchOrganizationForm';
 import Translate from '../../components/common/Translate';
-import {
-  useOnlineStatus,
-  useUserProperties,
-  usePermissions,
-  useNotification
-} from '../../hooks';
 import AppLink from '../../components/common/AppLink';
 import OfflineDisabled from '../../components/common/OfflineDisabled';
 import SectionCreateButton from '../../components/common/SectionCreateButton';
@@ -1277,8 +1279,13 @@ const AccountPage = () => {
     isLoading: isAccountLoading,
     error: accountError
   } = useSelector(state => state.account);
-  const { person, isFetching: isPersonFetching } = useSelector(
-    state => state.person
+  const { data: person, isFetching: isPersonFetching } = usePerson(userId);
+  const queryClient = useQueryClient();
+  const invalidatePerson = useCallback(
+    () =>
+      userId &&
+      queryClient.invalidateQueries({ queryKey: personKeys.detail(userId) }),
+    [queryClient, userId]
   );
   const { subscriptions, status: subscriptionsStatus } = useSelector(
     state => state.subscriptions
@@ -1290,17 +1297,12 @@ const AccountPage = () => {
 
   useEffect(() => {
     dispatch(fetchAccount());
-    if (userId) {
-      dispatch(fetchPerson(userId));
-      if (isLeader) dispatch(fetchSubscriptions(userId));
-    }
+    if (userId && isLeader) dispatch(fetchSubscriptions(userId));
   }, [dispatch, userId, isLeader]);
 
   const handleSaved = useCallback(() => {}, []);
 
-  const handleRefreshPerson = useCallback(() => {
-    if (userId) dispatch(fetchPerson(userId));
-  }, [dispatch, userId]);
+  const handleRefreshPerson = invalidatePerson;
 
   const handleJoinOrganization = useCallback(
     async organizations => {
@@ -1309,13 +1311,13 @@ const AccountPage = () => {
         await Promise.all(
           organizations.map(org => dispatch(joinOrganization(userId, org.id)))
         );
-        dispatch(fetchPerson(userId));
+        invalidatePerson();
         setIsOrgSearchVisible(false);
       } catch {
         // join failed — leave the search form open so the user can retry
       }
     },
-    [dispatch, userId]
+    [dispatch, userId, invalidatePerson]
   );
 
   const requestLeaveOrganization = useCallback(
@@ -1334,11 +1336,11 @@ const AccountPage = () => {
     try {
       await dispatch(leaveOrganization(userId, id));
       setPendingLeaveOrg(null);
-      dispatch(fetchPerson(userId));
+      invalidatePerson();
     } catch {
       setPendingLeaveOrg(null);
     }
-  }, [dispatch, userId, pendingLeaveOrg]);
+  }, [dispatch, userId, pendingLeaveOrg, invalidatePerson]);
 
   const nbOrganizations = (person?.organizations ?? []).length;
   const nbEntrances = (person?.exploredEntrances ?? []).length;

@@ -17,8 +17,7 @@ import SendIcon from '@mui/icons-material/Send';
 import StandardDialog from '../../components/common/StandardDialog';
 import OfflineDisabled from '../../components/common/OfflineDisabled';
 import { sendMessage } from '../../actions/Messaging/SendMessage';
-import { fetchPerson } from '../../actions/Person/GetPerson';
-import { useEntitySearch, useOnlineStatus } from '../../hooks';
+import { usePerson, useEntitySearch, useOnlineStatus } from '../../hooks';
 import { AUTOCOMPLETE_MIN_CHARACTERS } from '../../conf/config';
 
 const PERSON_ENTITIES = ['persons'];
@@ -32,8 +31,8 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isOnline = useOnlineStatus();
 
-  const { person: fetchedPerson, isFetching: isPersonFetching } = useSelector(
-    state => state.person
+  const { data: fetchedPerson, isFetching: isPersonFetching } = usePerson(
+    open ? prefilledRecipientId : undefined
   );
   const myCaverId = useSelector(state => state.login.authTokenDecoded?.id);
 
@@ -55,12 +54,8 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
     skipQuery: recipient ? `${recipient.nickname} (${recipient.id})` : undefined
   });
 
-  // Load prefilled recipient if prefilledRecipientId changes
-  useEffect(() => {
-    if (open && prefilledRecipientId) {
-      dispatch(fetchPerson(prefilledRecipientId));
-    }
-  }, [open, prefilledRecipientId, dispatch]);
+  // usePerson above handles the fetch; when it resolves the next effect
+  // prefills the recipient.
 
   // Prefill the recipient when the fetched person matches the id we asked
   // for. `open` is deliberately NOT in the deps: it would re-trigger the

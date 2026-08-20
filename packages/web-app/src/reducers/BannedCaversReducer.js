@@ -2,7 +2,7 @@ import {
   FETCH_BANNED_CAVERS,
   FETCH_BANNED_CAVERS_FAILURE,
   FETCH_BANNED_CAVERS_SUCCESS
-} from '../actions/Person/GetPerson';
+} from '../actions/Person/adminLists';
 
 const initialState = {
   bannedCavers: [],

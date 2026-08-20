@@ -4,12 +4,19 @@ import { useIntl } from 'react-intl';
 import { Card, Chip, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector, useStore } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 import MailIcon from '@mui/icons-material/Mail';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
 
-import { useUserProperties, usePermissions, useSharePage } from '@/hooks';
+import {
+  useDeletePerson,
+  useUserProperties,
+  usePermissions,
+  useSharePage
+} from '@/hooks';
+import { personKeys } from '@/api/queryKeys';
 import { PersonPropTypes } from '@/types/person.type';
 import PageContainer from '@/components/common/Layouts/PageContainer';
 import PageHeader from '@/components/common/Layouts/PageHeader';
@@ -17,8 +24,6 @@ import SectionStack from '@/components/common/Layouts/SectionStack';
 import ResponsiveActions from '@/components/common/Layouts/ResponsiveActions';
 import CustomIcon from '@/components/common/CustomIcon';
 import FetchErrorState from '@/components/common/FetchErrorState';
-import { deletePerson } from '@/actions/Person/DeletePerson';
-import { fetchPerson } from '@/actions/Person/GetPerson';
 import { fetchConversations } from '@/actions/Messaging/GetConversations';
 
 import {
@@ -28,9 +33,17 @@ import {
 import AuthorBody from './AuthorBody';
 import CaverBody from './CaverBody';
 
-const Person = ({ isLoading, person, error, onRetry = null }) => {
+const Person = ({
+  isLoading,
+  person,
+  error,
+  isPaused = false,
+  onRetry = null
+}) => {
   const dispatch = useDispatch();
   const store = useStore();
+  const queryClient = useQueryClient();
+  const deleteMutation = useDeletePerson();
   const activeConversations = useSelector(
     state => state.messaging.activeConversations.items
   );
@@ -55,8 +68,9 @@ const Person = ({ isLoading, person, error, onRetry = null }) => {
     editPropertiesTarget = `/ui/persons/${person?.id}/edit`;
 
   const handleRefresh = useCallback(() => {
-    dispatch(fetchPerson(person.id));
-  }, [dispatch, person?.id]);
+    if (person?.id)
+      queryClient.invalidateQueries({ queryKey: personKeys.detail(person.id) });
+  }, [queryClient, person?.id]);
 
   const handleMessageClick = useCallback(async () => {
     if (!person?.id) return;
@@ -97,7 +111,7 @@ const Person = ({ isLoading, person, error, onRetry = null }) => {
     onDelete = () => setIsDeleteConfirmationOpen(true);
   }
   const onDeletePress = (entityId, isPermanent) => {
-    dispatch(deletePerson({ id: person?.id, entityId, isPermanent }));
+    deleteMutation.mutate({ id: person?.id, entityId });
     if (isPermanent) navigate('/', { replace: true });
   };
 
@@ -211,11 +225,12 @@ const Person = ({ isLoading, person, error, onRetry = null }) => {
           </Card>
         </SectionStack>
       )}
-      {!!error && (
+      {(!!error || isPaused) && (
         <SectionStack>
           <Card sx={{ p: 2 }}>
             <FetchErrorState
               error={error}
+              isPaused={isPaused}
               onRetry={onRetry}
               messageId="Error, the person you are looking for is not available."
             />
@@ -250,6 +265,7 @@ const Person = ({ isLoading, person, error, onRetry = null }) => {
 Person.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
+  isPaused: PropTypes.bool,
   onRetry: PropTypes.func,
   person: PersonPropTypes
 };

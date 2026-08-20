@@ -2,7 +2,7 @@ import {
   FETCH_GROUPS,
   FETCH_GROUPS_FAILURE,
   FETCH_GROUPS_SUCCESS
-} from '../actions/Person/GetPerson';
+} from '../actions/Person/adminLists';
 
 const initialState = {
   administrators: [],
