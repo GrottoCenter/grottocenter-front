@@ -26,7 +26,6 @@ import login from './LoginReducer';
 import map from './Map';
 import massifEntrances from './MassifEntrancesDataQualityReducer';
 import mfa from './MfaReducer';
-import messaging from './MessagingReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import partnersCarousel from './PartnersCarouselReducer';
 import processDocuments from './ProcessDocumentsReducer';
@@ -73,7 +72,6 @@ const GCReducer = combineReducers({
   map,
   massifEntrances,
   mfa,
-  messaging,
   moveEntranceToCave,
   partnersCarousel,
   processDocuments,

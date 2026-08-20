@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
 import { useIntl, FormattedDate } from 'react-intl';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
@@ -31,12 +30,13 @@ import PageContainer from '@/components/common/Layouts/PageContainer';
 import UserAvatar from '@/components/common/UserAvatar';
 import FetchErrorState from '@/components/common/FetchErrorState';
 import OfflineDisabled from '@/components/common/OfflineDisabled';
-import { useOnlineStatus, useRefetchOnReconnect } from '@/hooks';
+import {
+  useArchiveConversation,
+  useConversations,
+  useOnlineStatus,
+  useUnarchiveConversation
+} from '@/hooks';
 import AuthChecker from '../../components/appli/AuthChecker';
-import REDUCER_STATUS from '../../reducers/ReducerStatus';
-import { fetchConversations } from '../../actions/Messaging/GetConversations';
-import { archiveConversation } from '../../actions/Messaging/ArchiveConversation';
-import { unarchiveConversation } from '../../actions/Messaging/UnarchiveConversation';
 import ConversationDetail from './ConversationDetail';
 import ComposeDialog from './ComposeDialog';
 
@@ -106,7 +106,6 @@ const StyledCardContent = styled(CardContent)({
 
 const MessagesPage = () => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const isOnline = useOnlineStatus();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -132,34 +131,14 @@ const MessagesPage = () => {
   };
 
   const isArchived = tabValue === 1;
-  const listKey = isArchived ? 'archivedConversations' : 'activeConversations';
 
-  const {
-    items: conversations,
-    totalCount,
-    status,
-    error
-  } = useSelector(state => state.messaging[listKey]);
+  const { data, isFetching, isPending, isSuccess, error, refetch } =
+    useConversations({ isArchived, page, pageSize: PAGE_SIZE });
+  const conversations = data?.items ?? [];
+  const totalCount = data?.totalCount ?? 0;
 
-  const reloadConversations = useCallback(
-    () =>
-      dispatch(
-        fetchConversations(
-          { limit: PAGE_SIZE, skip: (page - 1) * PAGE_SIZE },
-          isArchived
-        )
-      ),
-    [dispatch, page, isArchived]
-  );
-
-  useEffect(() => {
-    reloadConversations();
-  }, [reloadConversations]);
-
-  // Only the current tab/page URL is ever cached, so switching to Archived or
-  // paging forward offline lands on an empty list. Refill it as soon as the
-  // connection is back, instead of leaving the user on a dead end.
-  useRefetchOnReconnect(reloadConversations, Boolean(error));
+  const archiveMutation = useArchiveConversation();
+  const unarchiveMutation = useUnarchiveConversation();
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -171,7 +150,7 @@ const MessagesPage = () => {
   };
 
   const renderContent = () => {
-    if (status === REDUCER_STATUS.LOADING && conversations.length === 0) {
+    if (isPending || (isFetching && conversations.length === 0)) {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
           <CircularProgress />
@@ -179,7 +158,7 @@ const MessagesPage = () => {
       );
     }
 
-    if (status === REDUCER_STATUS.FAILED) {
+    if (error) {
       // Deliberately NOT `error.message`: makeErrorMessage() is called as
       // makeErrorMessage(error.message, 'Fetching user conversations'), whose
       // signature is (type, message) — so `message` holds the untranslated
@@ -188,13 +167,13 @@ const MessagesPage = () => {
       return (
         <FetchErrorState
           error={error}
-          onRetry={reloadConversations}
+          onRetry={refetch}
           messageId="An error occurred while fetching conversations."
         />
       );
     }
 
-    if (conversations.length === 0) {
+    if (isSuccess && conversations.length === 0) {
       return (
         <EmptyStateContainer>
           <Typography variant="body1">
@@ -247,16 +226,12 @@ const MessagesPage = () => {
                       aria-label={isArchived ? 'unarchive' : 'archive'}
                       onClick={e => {
                         e.stopPropagation();
-                        if (isArchived) {
-                          dispatch(unarchiveConversation(conv.id));
-                          if (conversationId === String(conv.id)) {
-                            navigate('/ui/messages');
-                          }
-                        } else {
-                          dispatch(archiveConversation(conv.id));
-                          if (conversationId === String(conv.id)) {
-                            navigate('/ui/messages');
-                          }
+                        const mutation = isArchived
+                          ? unarchiveMutation
+                          : archiveMutation;
+                        mutation.mutate(conv.id);
+                        if (conversationId === String(conv.id)) {
+                          navigate('/ui/messages');
                         }
                       }}>
                       {isArchived ? <UnarchiveIcon /> : <ArchiveIcon />}

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useIntl, FormattedDate } from 'react-intl';
 import {
@@ -28,18 +29,18 @@ import linkifyOptions from '../../helpers/linkifyOptions';
 import UserAvatar from '../../components/common/UserAvatar';
 import AppLink from '../../components/common/AppLink';
 
-import { fetchConversationMessages } from '../../actions/Messaging/GetConversationMessages';
-import { sendMessage } from '../../actions/Messaging/SendMessage';
-import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import FetchErrorState from '../../components/common/FetchErrorState';
 import OfflineDisabled from '../../components/common/OfflineDisabled';
 import StandardDialog from '../../components/common/StandardDialog';
 import {
-  useNotification,
+  useConversationMessages,
+  useConversations,
   useLongPress,
+  useNotification,
   useOnlineStatus,
-  useRefetchOnReconnect
+  useSendMessage
 } from '../../hooks';
+import { messageKeys } from '../../api/queryKeys';
 
 const MESSAGES_PAGE_SIZE = 20;
 const GROUP_GAP_MS = 5 * 60 * 1000; // Consecutive messages within 5 min are grouped
@@ -164,9 +165,6 @@ const InputRow = styled(Box)(({ theme }) => ({
 }));
 
 const RoundInput = styled(TextField)(({ theme }) => ({
-  // The theme applies `padding: 4px 0` to every MuiFormControl for form
-  // spacing — we don't want that here, it breaks alignment with the send
-  // button.
   padding: 0,
   '& .MuiOutlinedInput-root': {
     borderRadius: '22px',
@@ -291,8 +289,6 @@ const MessageItem = ({ item, isMenuOpen, onOpenMenu }) => {
     [onOpenMenu, msg]
   );
 
-  // Long-press is the only way to open the menu on touch devices; the ⋮
-  // button is hidden by CSS there (see MessageBubble styles).
   const longPress = useLongPress(handleLongPress);
 
   return (
@@ -372,7 +368,7 @@ const BlankStateContainer = styled(Box)(({ theme }) => ({
 const ConversationDetail = () => {
   const { conversationId } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { formatMessage } = useIntl();
 
   // Virtual keyboards have no usable Shift+Enter, so Enter must insert a line
@@ -382,52 +378,101 @@ const ConversationDetail = () => {
   const hasVirtualKeyboard = useMediaQuery('(pointer: coarse)');
 
   const [replyText, setReplyText] = useState('');
-  const [isSending, setIsSending] = useState(false);
   const [selectedMessageToReport, setSelectedMessageToReport] = useState(null);
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const { onSuccess, onError } = useNotification();
   const isOnline = useOnlineStatus();
 
+  // Skip-based pagination: `skip` grows as the user scrolls up. Each skip
+  // maps to a distinct queryKey, so RQ caches every page independently and
+  // switching threads keeps their scroll history warm.
+  const [skip, setSkip] = useState(0);
+  const [accumulated, setAccumulated] = useState([]);
+
+  // Reset accumulation when navigating to a different conversation.
+  useEffect(() => {
+    setSkip(0);
+    setAccumulated([]);
+  }, [conversationId]);
+
   const {
-    items: messages,
-    totalCount,
-    status,
-    error
-  } = useSelector(state => state.messaging.activeConversationMessages);
+    data: pageData,
+    isFetching,
+    isPending,
+    isSuccess,
+    error,
+    refetch: refetchCurrentPage
+  } = useConversationMessages(conversationId, {
+    skip,
+    pageSize: MESSAGES_PAGE_SIZE
+  });
+
+  // Prepend older pages, replace on the initial page. Guarded on isSuccess
+  // to avoid flushing accumulated when the query is transitioning between
+  // pages and pageData briefly reads the previous shape.
+  useEffect(() => {
+    if (!isSuccess || !pageData) return;
+    setAccumulated(prev =>
+      skip === 0 ? pageData.items : [...pageData.items, ...prev]
+    );
+  }, [pageData, skip, isSuccess]);
+
+  // Opening a conversation marks its messages as read server-side; invalidate
+  // the unread-count and conversation lists so the badges catch up. Ran once
+  // per initial load per conversation (skip === 0 && isSuccess).
+  useEffect(() => {
+    if (skip === 0 && isSuccess) {
+      queryClient.invalidateQueries({ queryKey: messageKeys.unreadCount() });
+      queryClient.invalidateQueries({
+        queryKey: messageKeys.conversations({}),
+        exact: false
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, skip === 0 && isSuccess]);
+
+  const messages = accumulated;
+  const totalCount = pageData?.totalCount ?? 0;
+
+  const sendMessageMutation = useSendMessage();
+
+  // Read the active conversation from the paged lists' cached data — the
+  // otherParticipant lives on the conversation shape, not on individual
+  // messages, and we want the same nickname/link as the sidebar shows.
+  // getConversationsData combs both active and archived caches; the first
+  // match wins.
+  const { data: activeData } = useConversations({
+    isArchived: false,
+    page: 1,
+    pageSize: 20
+  });
+  const { data: archivedData } = useConversations({
+    isArchived: true,
+    page: 1,
+    pageSize: 20
+  });
+  const convIdNum = Number(conversationId);
+  const currentConversation =
+    activeData?.items?.find(c => c.id === convIdNum) ||
+    archivedData?.items?.find(c => c.id === convIdNum);
 
   const authState = useSelector(state => state.login);
   const myCaverId = authState?.authTokenDecoded?.id;
 
-  // The list is rendered inside a `flex-direction: column-reverse` container,
-  // so we feed it the items in reverse order (latest at the bottom). Reversing
-  // here keeps the useMemo useful — a per-render `[...items].reverse()` at the
-  // call site would defeat it.
   const renderedItems = useMemo(
     () => buildRenderedItems(messages, myCaverId).reverse(),
     [messages, myCaverId]
   );
 
-  // Single active menu across the whole conversation: opening the menu on
-  // one message replaces any previously open menu, avoiding stacked menus.
   const [actionsMenu, setActionsMenu] = useState(null);
   const handleOpenActionsMenu = useCallback((msg, { anchor, position }) => {
     setActionsMenu({ msg, anchor: anchor || null, position: position || null });
   }, []);
   const handleCloseActionsMenu = useCallback(() => setActionsMenu(null), []);
 
-  const convIdNum = Number(conversationId);
-  const activeConv = useSelector(state =>
-    state.messaging.activeConversations.items.find(c => c.id === convIdNum)
-  );
-  const archivedConv = useSelector(state =>
-    state.messaging.archivedConversations.items.find(c => c.id === convIdNum)
-  );
-  const currentConversation = activeConv || archivedConv;
-
-  // Do NOT fall back on `state.person.person` (fetchedPerson): it holds the
-  // last profile the user visited and has no guaranteed link to this
-  // conversation. Using it would render the wrong nickname and, worse, link
-  // the header to an unrelated user's profile (misattribution / data leak).
+  // Do NOT fall back on the last-visited profile: it holds no guaranteed link
+  // to this conversation. Using it would render the wrong nickname and link
+  // the header to an unrelated user (misattribution / data leak).
   const otherParticipant =
     currentConversation?.otherParticipant ||
     messages.find(m => m.caverSender?.id !== myCaverId)?.caverSender ||
@@ -441,44 +486,14 @@ const ConversationDetail = () => {
   const sentinelRef = useRef(null);
   const isFirstLoad = useRef(true);
 
-  // `hasMore` is derived from the two Redux slices. Between navigating to a
-  // new conversation and its first response landing, `items` has been reset
-  // to [] by the reducer but `totalCount` still holds the previous
-  // conversation's value — so a naive `messages.length < totalCount` reads
-  // `true`, the sentinel mounts, the IntersectionObserver fires, and
-  // `loadMore` dispatches a second `skip:0` fetch that races the initial one.
-  // Gate on the request status: no "more" until the first response for this
-  // conversation has succeeded.
-  const hasMore =
-    status === REDUCER_STATUS.SUCCEEDED && messages.length < totalCount;
+  // Gate hasMore on isSuccess: between conversations, accumulated resets to
+  // [] but totalCount briefly holds the previous value, so a naive check
+  // would spawn a duplicate skip=0 fetch that races the initial one.
+  const hasMore = isSuccess && messages.length < totalCount;
 
   useEffect(() => {
     isFirstLoad.current = true;
   }, [conversationId]);
-
-  // The single loader for this thread, shared by three callers: the mount/
-  // navigation effect below, the reconnect refetch, and FetchErrorState's Retry.
-  // Its identity is the navigation signal — switching threads changes
-  // conversationId, which changes the callback, which re-runs the effect and is
-  // picked up by useRefetchOnReconnect through its own ref sync.
-  const reloadMessages = useCallback(() => {
-    if (!conversationId) return;
-    dispatch(
-      fetchConversationMessages(conversationId, {
-        limit: MESSAGES_PAGE_SIZE,
-        skip: 0
-      })
-    );
-  }, [dispatch, conversationId]);
-
-  useEffect(() => {
-    reloadMessages();
-  }, [reloadMessages]);
-
-  // Reopening a conversation offline that was never read online leaves the
-  // thread empty — fill it back in on reconnection rather than waiting for a
-  // click on a Retry button that FetchErrorState deliberately hides offline.
-  useRefetchOnReconnect(reloadMessages, Boolean(error));
 
   useEffect(() => {
     if (messages.length > 0 && isFirstLoad.current) {
@@ -488,17 +503,12 @@ const ConversationDetail = () => {
   }, [messages]);
 
   const loadMore = useCallback(() => {
-    if (status === REDUCER_STATUS.LOADING || !hasMore) return;
-    dispatch(
-      fetchConversationMessages(conversationId, {
-        limit: MESSAGES_PAGE_SIZE,
-        skip: messages.length
-      })
-    );
-  }, [dispatch, conversationId, hasMore, messages.length, status]);
+    if (isFetching || !hasMore) return;
+    setSkip(messages.length);
+  }, [isFetching, hasMore, messages.length]);
 
   useEffect(() => {
-    if (!hasMore || status === REDUCER_STATUS.LOADING) return undefined;
+    if (!hasMore || isFetching) return undefined;
 
     const observer = new IntersectionObserver(
       entries => {
@@ -522,7 +532,7 @@ const ConversationDetail = () => {
         observer.unobserve(currentSentinel);
       }
     };
-  }, [hasMore, status, loadMore]);
+  }, [hasMore, isFetching, loadMore]);
 
   if (!conversationId) {
     return (
@@ -552,7 +562,7 @@ const ConversationDetail = () => {
     );
   }
 
-  if (status === REDUCER_STATUS.LOADING && messages.length === 0) {
+  if (isPending || (isFetching && messages.length === 0)) {
     return (
       <Box
         sx={{
@@ -566,15 +576,12 @@ const ConversationDetail = () => {
     );
   }
 
-  if (status === REDUCER_STATUS.FAILED) {
-    // `error.message` is NOT the failure here — makeErrorMessage() is called
-    // as (error.message, 'Fetching conversation messages'), so `message` holds
-    // the untranslated debug label. FetchErrorState reads the shape correctly.
+  if (error) {
     return (
       <Box sx={{ p: 2 }}>
         <FetchErrorState
           error={error}
-          onRetry={reloadMessages}
+          onRetry={refetchCurrentPage}
           messageId="An error occurred while fetching messages."
         />
       </Box>
@@ -583,15 +590,15 @@ const ConversationDetail = () => {
 
   const handleSend = async () => {
     if (!replyText.trim() || replyText.length > 5000) return;
-    setIsSending(true);
     try {
-      await dispatch(sendMessage({ conversationId, body: replyText.trim() }));
+      await sendMessageMutation.mutateAsync({
+        conversationId,
+        body: replyText.trim()
+      });
       setReplyText('');
     } catch (err) {
       console.error('Failed to send reply:', err);
       onError(formatMessage({ id: 'Failed to send message.' }));
-    } finally {
-      setIsSending(false);
     }
   };
 
@@ -644,6 +651,8 @@ Message Body: ${body}`;
 
     handleCloseReportDialog();
   };
+
+  const isSending = sendMessageMutation.isPending;
 
   return (
     <DetailContainer>
@@ -710,7 +719,7 @@ Message Body: ${body}`;
           <Box
             ref={sentinelRef}
             sx={{ display: 'flex', justifyContent: 'center', py: 0.5 }}>
-            {status === REDUCER_STATUS.LOADING ? (
+            {isFetching ? (
               <CircularProgress size={24} />
             ) : (
               <Button onClick={loadMore} size="small">
@@ -724,10 +733,6 @@ Message Body: ${body}`;
         )}
       </MessagesList>
       <InputArea>
-        {/* Sending is a POST. Disabling the input as well as the button is the
-            point: letting someone compose a long reply offline only to reject
-            it on send is the worst of both. fullWidth so the wrapper doesn't
-            collapse the row it replaces. */}
         <OfflineDisabled fullWidth>
           <InputRow>
             <RoundInput
@@ -756,8 +761,6 @@ Message Body: ${body}`;
             />
             <SendButton
               onClick={handleSend}
-              // Pressing a button moves focus to it, which closes the virtual
-              // keyboard. Suppressing the default keeps focus in the input.
               onMouseDown={e => e.preventDefault()}
               disabled={
                 !isOnline ||

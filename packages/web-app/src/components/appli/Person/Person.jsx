@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Card, Chip, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useQueryClient } from '@tanstack/react-query';
 import MailIcon from '@mui/icons-material/Mail';
 import CreateIcon from '@mui/icons-material/Create';
@@ -16,7 +15,7 @@ import {
   usePermissions,
   useSharePage
 } from '@/hooks';
-import { personKeys } from '@/api/queryKeys';
+import { messageKeys, personKeys } from '@/api/queryKeys';
 import { PersonPropTypes } from '@/types/person.type';
 import PageContainer from '@/components/common/Layouts/PageContainer';
 import PageHeader from '@/components/common/Layouts/PageHeader';
@@ -24,7 +23,9 @@ import SectionStack from '@/components/common/Layouts/SectionStack';
 import ResponsiveActions from '@/components/common/Layouts/ResponsiveActions';
 import CustomIcon from '@/components/common/CustomIcon';
 import FetchErrorState from '@/components/common/FetchErrorState';
-import { fetchConversations } from '@/actions/Messaging/GetConversations';
+import { apiGetWithRange } from '@/api/client';
+import { getConversationsUrl } from '@/conf/apiRoutes';
+import { makeUrl } from '@/actions/utils';
 
 import {
   DeleteConfirmationDialog,
@@ -40,13 +41,8 @@ const Person = ({
   isPaused = false,
   onRetry = null
 }) => {
-  const dispatch = useDispatch();
-  const store = useStore();
   const queryClient = useQueryClient();
   const deleteMutation = useDeletePerson();
-  const activeConversations = useSelector(
-    state => state.messaging.activeConversations.items
-  );
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -75,26 +71,21 @@ const Person = ({
   const handleMessageClick = useCallback(async () => {
     if (!person?.id) return;
     try {
-      // First, check if the conversation already exists in our currently loaded conversations
-      let existingConv = activeConversations.find(
+      // Reuse the cache if the Messages page has already loaded the first
+      // active conversations page; otherwise fetchQuery does exactly one
+      // request and hydrates the same cache entry the Messages page uses.
+      // TODO: replace with a dedicated /conversations?participant=id endpoint
+      // — if the target conversation is beyond the first 50, it won't be found.
+      const criteria = { isArchived: false, page: 1, pageSize: 50 };
+      const { data } = await queryClient.fetchQuery({
+        queryKey: messageKeys.conversations(criteria),
+        queryFn: () =>
+          apiGetWithRange(makeUrl(getConversationsUrl, { limit: 50, skip: 0 }))
+      });
+      const items = data?.conversations ?? [];
+      const existingConv = items.find(
         c => Number(c.otherParticipant?.id) === Number(person.id)
       );
-
-      if (!existingConv) {
-        // TODO: If the target conversation is beyond the first 50 conversations, it won't be found here.
-        // We should implement a dedicated backend endpoint to retrieve a conversation by participant ID.
-        // If not found, do a single fetch (first 50 conversations) to update the Redux store
-        await dispatch(fetchConversations({ limit: 50, skip: 0 }, false));
-
-        // Read updated conversations from the store to avoid UI flashing from multiple page loads
-        const state = store.getState();
-        const updatedConversations =
-          state.messaging?.activeConversations?.items || [];
-        existingConv = updatedConversations.find(
-          c => Number(c.otherParticipant?.id) === Number(person.id)
-        );
-      }
-
       if (existingConv) {
         navigate(`/ui/messages/${existingConv.id}`);
       } else {
@@ -104,7 +95,7 @@ const Person = ({
       console.error('Failed to check existing conversations:', err);
       navigate(`/ui/messages?composeTo=${person.id}`);
     }
-  }, [dispatch, person?.id, navigate, activeConversations, store]);
+  }, [queryClient, person?.id, navigate]);
 
   let onDelete = null;
   if (person && (permissions.isAdmin || permissions.isModerator)) {

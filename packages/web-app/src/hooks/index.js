@@ -131,6 +131,16 @@ export {
   useUnsubscribeFromMassif
 } from './mutations/useSubscriptions';
 export {
+  useConversations,
+  useConversationMessages,
+  useUnreadMessageCount
+} from './queries/useMessages';
+export {
+  useArchiveConversation,
+  useUnarchiveConversation,
+  useSendMessage
+} from './mutations/useMessages';
+export {
   useCreateOrganization,
   useUpdateOrganization
 } from './mutations/useOrganizationForm';

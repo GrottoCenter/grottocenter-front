@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -16,8 +16,12 @@ import {
 import SendIcon from '@mui/icons-material/Send';
 import StandardDialog from '../../components/common/StandardDialog';
 import OfflineDisabled from '../../components/common/OfflineDisabled';
-import { sendMessage } from '../../actions/Messaging/SendMessage';
-import { usePerson, useEntitySearch, useOnlineStatus } from '../../hooks';
+import {
+  useEntitySearch,
+  useOnlineStatus,
+  usePerson,
+  useSendMessage
+} from '../../hooks';
 import { AUTOCOMPLETE_MIN_CHARACTERS } from '../../conf/config';
 
 const PERSON_ENTITIES = ['persons'];
@@ -25,7 +29,6 @@ const CAVER_FILTER = { type: 'CAVER' };
 
 const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -35,11 +38,12 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
     open ? prefilledRecipientId : undefined
   );
   const myCaverId = useSelector(state => state.login.authTokenDecoded?.id);
+  const sendMessageMutation = useSendMessage();
 
   const [recipient, setRecipient] = useState(null);
   const [body, setBody] = useState('');
-  const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState(null);
+  const isSending = sendMessageMutation.isPending;
 
   const {
     inputValue: recipientInput,
@@ -95,18 +99,13 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
 
   const handleSend = async () => {
     if (!recipient || !body.trim()) return;
-    setIsSending(true);
     setSendError(null);
 
     try {
-      const message = await dispatch(
-        sendMessage({
-          recipientId: recipient.id,
-          body: body.trim(),
-          recipient: { id: recipient.id, nickname: recipient.nickname }
-        })
-      );
-      setIsSending(false);
+      const message = await sendMessageMutation.mutateAsync({
+        recipientId: recipient.id,
+        body: body.trim()
+      });
       if (message && message.conversation) {
         navigate(`/ui/messages/${message.conversation}`);
       } else {
@@ -114,7 +113,6 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
       }
       handleClose();
     } catch (err) {
-      setIsSending(false);
       setSendError(
         err.message || formatMessage({ id: 'Failed to send message.' })
       );

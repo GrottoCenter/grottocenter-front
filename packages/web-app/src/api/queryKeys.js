@@ -109,3 +109,19 @@ export const subscriptionKeys = {
   all: ['subscription'],
   list: caverId => ['subscription', 'list', caverId]
 };
+
+// Direct messages (private inbox). unreadCount is a sibling of the two lists
+// so a mutation that lands a message (send / open a conversation for reading)
+// can invalidateQueries({ queryKey: messageKeys.all }) and refresh everything
+// with one call.
+export const messageKeys = {
+  all: ['message'],
+  conversations: opts => ['message', 'conversations', opts],
+  messages: (conversationId, opts) => [
+    'message',
+    'messages',
+    conversationId,
+    opts
+  ],
+  unreadCount: () => ['message', 'unreadCount']
+};

@@ -1,46 +1,24 @@
-import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Badge, CircularProgress, IconButton } from '@mui/material';
 import MailIcon from '@mui/icons-material/Mail';
-import { useDispatch, useSelector } from 'react-redux';
-import { usePermissions } from '../../../hooks';
+import { usePermissions, useUnreadMessageCount } from '../../../hooks';
 import AppLink from '../AppLink';
-import REDUCER_STATUS from '../../../reducers/ReducerStatus';
-import { fetchUnreadMessageCount } from '../../../actions/Messaging/CountUnreadMessages';
 import { APP_BAR_ICON_SIZE } from './constants';
-
-const getBadgeContent = (nbMessages, status) => {
-  switch (status) {
-    case REDUCER_STATUS.LOADING:
-      return <CircularProgress size={10} />;
-    case REDUCER_STATUS.FAILED:
-      return '!';
-    case REDUCER_STATUS.SUCCEEDED:
-      return nbMessages > 0 ? nbMessages : undefined;
-    default:
-      return undefined;
-  }
-};
 
 const MessagesIcon = () => {
   const { formatMessage } = useIntl();
   const { isAuth } = usePermissions();
-  const dispatch = useDispatch();
-
-  const { active, archived, status } = useSelector(
-    state => state.messaging.unreadCounts
-  );
-
-  useEffect(() => {
-    if (isAuth) {
-      dispatch(fetchUnreadMessageCount());
-    }
-  }, [dispatch, isAuth]);
+  const { data, isPending, isError, isSuccess } = useUnreadMessageCount({
+    enabled: isAuth
+  });
 
   if (!isAuth) return null;
 
-  // The badge displays the sum of active and archived unread counts
-  const nbMessages = active + archived;
+  const nbMessages = (data?.active ?? 0) + (data?.archived ?? 0);
+  let badgeContent;
+  if (isPending) badgeContent = <CircularProgress size={10} />;
+  else if (isError) badgeContent = '!';
+  else if (isSuccess) badgeContent = nbMessages > 0 ? nbMessages : undefined;
 
   return (
     <IconButton
@@ -51,8 +29,8 @@ const MessagesIcon = () => {
       size="large">
       <Badge
         overlap="rectangular"
-        color={status === REDUCER_STATUS.FAILED ? 'error' : 'secondary'}
-        badgeContent={getBadgeContent(nbMessages, status)}>
+        color={isError ? 'error' : 'secondary'}
+        badgeContent={badgeContent}>
         <MailIcon sx={{ fontSize: APP_BAR_ICON_SIZE }} />
       </Badge>
     </IconButton>
