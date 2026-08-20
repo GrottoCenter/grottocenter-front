@@ -7,7 +7,6 @@ import intl from './IntlReducer';
 import login from './LoginReducer';
 import map from './Map';
 import mfa from './MfaReducer';
-import region from './RegionReducer';
 import sideMenu from './SideMenuReducer';
 
 const GCReducer = combineReducers({
@@ -19,7 +18,6 @@ const GCReducer = combineReducers({
   login,
   map,
   mfa,
-  region,
   sideMenu
 });
 

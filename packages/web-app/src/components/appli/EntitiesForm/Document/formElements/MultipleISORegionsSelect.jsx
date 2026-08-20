@@ -1,11 +1,8 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Translate from '../../../../common/Translate';
 import MultipleSelectComponent from './MultipleSelect';
-import {
-  loadRegionsSearch,
-  resetRegionsSearch
-} from '../../../../../actions/Region';
+import { useRegionsSearch } from '../../../../../hooks';
 
 const MultipleISORegionsSelect = ({
   computeHasError,
@@ -14,19 +11,12 @@ const MultipleISORegionsSelect = ({
   labelName,
   required = false
 }) => {
-  const dispatch = useDispatch();
+  const [searchQuery, setSearchQuery] = useState('');
   const {
-    error,
+    data: searchResults = [],
     isFetching,
-    results: searchResults
-  } = useSelector(state => state.region);
-
-  const loadSearchResults = inputValue => {
-    dispatch(loadRegionsSearch(inputValue));
-  };
-  const resetSearchResults = () => {
-    dispatch(resetRegionsSearch());
-  };
+    error
+  } = useRegionsSearch(searchQuery);
 
   return (
     <MultipleSelectComponent
@@ -39,13 +29,13 @@ const MultipleISORegionsSelect = ({
       helperText={helperText}
       isLoading={isFetching}
       labelName={labelName}
-      loadSearchResults={loadSearchResults}
+      loadSearchResults={setSearchQuery}
       nbCharactersNeededToLaunchSearch={1}
       noOptionsText={
         <Translate>No region matches you search criteria</Translate>
       }
       required={required}
-      resetSearchResults={resetSearchResults}
+      resetSearchResults={() => setSearchQuery('')}
       searchError={error?.message ?? null}
       searchResults={searchResults}
     />

@@ -26,6 +26,7 @@ export {
   resetAdvancedSearch
 } from './queries/useAdvancedSearch';
 export { useQuickSearch } from './queries/useQuickSearch';
+export { useRegionsSearch } from './queries/useRegionsSearch';
 export {
   useCreateDocument,
   useUpdateDocument,
