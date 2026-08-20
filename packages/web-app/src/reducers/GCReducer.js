@@ -6,7 +6,6 @@ import changeEmail from './ChangeEmail';
 import changePassword from './ChangePassword';
 import createDocument from './CreateDocumentReducer';
 import detachEntrance from './DetachEntranceReducer';
-import documents from './DocumentsReducer';
 import duplicatesImport from './DuplicatesImportReducer';
 import error from './ErrorReducer';
 import forgotPassword from './ForgotPasswordReducer';
@@ -33,7 +32,6 @@ const GCReducer = combineReducers({
   changePassword,
   createDocument,
   detachEntrance,
-  documents,
   duplicatesImport,
   error,
   forgotPassword,

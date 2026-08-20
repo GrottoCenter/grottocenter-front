@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty, remove } from 'ramda';
 import {
   Autocomplete,
@@ -27,6 +26,7 @@ import {
   useUserProperties,
   useFileFormats,
   useLicenses,
+  useDocuments,
   findLicenseByName
 } from '../../../../../../hooks';
 import ErrorsList from './ErrorsList';
@@ -39,26 +39,17 @@ import {
   validateAndBuildFileEntries
 } from './FileHelpers';
 import FileSelectorInput from '../../../../../common/FileSelectorInput';
-import { getDocuments } from '../../../../../../actions/Document/GetDocuments';
 import { DocumentFormContext } from '../../Provider';
 
 const DEFAULT_LICENSE = 'CC-BY-SA';
 
 const AuthDocSelect = ({ value, onChange, disabled = false }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-  const { data, isLoading } = useSelector(state => state.documents);
-  const authDocs = data.authorizationDocuments ?? [];
-
-  useEffect(() => {
-    if (authDocs.length > 0 || isLoading) return;
-    dispatch(
-      getDocuments({
-        isValidated: true,
-        documentType: 'Authorization To Publish'
-      })
-    );
-  }, [dispatch, authDocs.length, isLoading]);
+  const { data, isLoading } = useDocuments({
+    isValidated: true,
+    documentType: 'Authorization To Publish'
+  });
+  const authDocs = data?.documents ?? [];
 
   return (
     <Autocomplete

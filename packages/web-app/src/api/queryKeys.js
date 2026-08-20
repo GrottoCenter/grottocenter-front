@@ -35,7 +35,8 @@ const detailKey = domain => (id, opts) => {
 export const documentKeys = {
   all: ['document'],
   detail: detailKey('document'),
-  children: id => [...documentKeys.all, 'children', id]
+  children: id => [...documentKeys.all, 'children', id],
+  list: criteria => [...documentKeys.all, 'list', criteria]
 };
 
 export const massifKeys = {

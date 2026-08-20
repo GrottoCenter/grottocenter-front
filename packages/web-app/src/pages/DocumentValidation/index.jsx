@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 import { useIntl } from 'react-intl';
 import { isMobileOnly } from 'react-device-detect';
 import { Typography } from '@mui/material';
 
-import { getDocuments } from '../../actions/Document/GetDocuments';
+import { useDocuments } from '../../hooks';
+import { documentKeys } from '../../api/queryKeys';
 import { resetDocumentApiErrors } from '../../actions/Document/ResetApiErrors';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StandardDialog from '../../components/common/StandardDialog';
@@ -26,7 +28,7 @@ const Wrapper = styled('div')`
 const DocumentValidationPage = () => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
-  const { isLoading, data, totalCount } = useSelector(state => state.documents);
+  const queryClient = useQueryClient();
   const [selectedIds, setSelectedIds] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -34,45 +36,36 @@ const DocumentValidationPage = () => {
 
   const [detailedView, setDetailedView] = useState(null);
   const [editView, setEditView] = useState(null);
-  const [refreshPage, setRefreshPage] = useState(false);
 
   const closeDetailedView = () => setDetailedView(null);
   const closeEditView = () => setEditView(null);
 
-  const loadDocuments = useCallback(() => {
-    setRefreshPage(false);
+  const { isLoading, data } = useDocuments({
+    isValidated: false,
+    limit: rowsPerPage,
+    skip: page * rowsPerPage
+  });
+  const documents = data?.documents ?? [];
+  const totalCount = data?.totalCount ?? 0;
+
+  // useProcessDocuments already invalidates documentKeys.all, so the queue
+  // refetches on validate/decline. This callback only resets the UI selection
+  // and closes the details modal (side effects that stay local to this page).
+  const handleProcessed = () => {
     setSelectedIds([]);
     closeDetailedView();
-    const criteria = {
-      isValidated: false,
-      limit: rowsPerPage,
-      skip: page * rowsPerPage
-    };
-    dispatch(getDocuments(criteria));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowsPerPage, page]);
+  };
 
   const handleSuccessfulUpdate = () => {
     dispatch(resetDocumentApiErrors());
     closeEditView();
-    loadDocuments();
+    queryClient.invalidateQueries({ queryKey: documentKeys.all });
   };
 
   const isUpdatedDocRequired = () => {
-    // We fetch the updated doc only if the doc has been modified
-    if (!editView || data.documents.length === 0) return false;
-    return (
-      data.documents.find(doc => doc.id === editView).modifiedDocJson !== null
-    );
+    if (!editView || documents.length === 0) return false;
+    return documents.find(doc => doc.id === editView).modifiedDocJson !== null;
   };
-
-  useEffect(() => {
-    loadDocuments();
-  }, [loadDocuments]);
-
-  useEffect(() => {
-    if (refreshPage) loadDocuments();
-  }, [loadDocuments, refreshPage]);
 
   return (
     <>
@@ -88,7 +81,7 @@ const DocumentValidationPage = () => {
                 <EntityTable
                   entityType="documents"
                   isLoading={isLoading}
-                  pageRows={data.documents}
+                  pageRows={documents}
                   nbTotalRows={totalCount}
                   selectedIds={selectedIds}
                   onPageChange={(pageNum, pageSize) => {
@@ -106,7 +99,7 @@ const DocumentValidationPage = () => {
                 <Actions
                   selectedIds={selectedIds}
                   onEdit={setEditView}
-                  onProcessed={() => setRefreshPage(true)}
+                  onProcessed={handleProcessed}
                 />
               </Wrapper>
             }
