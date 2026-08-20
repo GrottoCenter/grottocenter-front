@@ -1,11 +1,12 @@
 import { Box } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { usePermissions } from '../../../../hooks';
-import { updateRiggings } from '../../../../actions/Riggings/UpdateRigging';
-import { deleteRiggings } from '../../../../actions/Riggings/DeleteRigging';
-import { restoreRiggings } from '../../../../actions/Riggings/RestoreRigging';
+import {
+  useUpdateRigging,
+  useDeleteRigging,
+  useRestoreRigging,
+  usePermissions
+} from '../../../../hooks';
 import ActionButtons from '../ActionButtons';
 import CreateRiggingsForm from '../../EntitiesForm/Riggings';
 import { RiggingPropTypes } from '../../../../types/entrance.type';
@@ -23,8 +24,10 @@ const Rigging = ({
   isFirst,
   isLast
 }) => {
-  const dispatch = useDispatch();
   const permissions = usePermissions();
+  const updateMutation = useUpdateRigging();
+  const deleteMutation = useDeleteRigging();
+  const restoreMutation = useRestoreRigging();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [isDiscardDialogOpen, setIsDiscardDialogOpen] = useState(false);
@@ -48,21 +51,16 @@ const Rigging = ({
     }
   };
   const onSubmitUpdateForm = data => {
-    dispatch(
-      updateRiggings({
-        ...data,
-        language: data.language
-      })
-    );
+    updateMutation.mutate({ ...data, language: data.language });
     closeForm();
   };
   const onDeletePress = isPermanent => {
     setWantedDeletedState(true);
-    dispatch(deleteRiggings({ id: rigging.id, isPermanent }));
+    deleteMutation.mutate({ id: rigging.id, isPermanent });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreRiggings({ id: rigging.id }));
+    restoreMutation.mutate({ id: rigging.id });
   };
 
   const isActionLoading = wantedDeletedState !== rigging.isDeleted;

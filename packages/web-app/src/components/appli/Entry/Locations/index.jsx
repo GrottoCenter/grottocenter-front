@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Divider, List } from '@mui/material';
 
@@ -9,9 +8,11 @@ import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { LocationPropTypes } from '../../../../types/entrance.type';
 import Location from './Location';
 import CreateLocationForm from '../../EntitiesForm/Location';
-import { postLocation } from '../../../../actions/Location/CreateLocation';
-import { moveLocationRelevance } from '../../../../actions/Location/MoveRelevance';
-import { usePermissions } from '../../../../hooks';
+import {
+  useCreateLocation,
+  useMoveLocationRelevance,
+  usePermissions
+} from '../../../../hooks';
 import { useMoveRelevanceWithUndo } from '../../../../hooks/useMoveRelevanceWithUndo';
 import { sortByRelevance } from '../../../../helpers/sortByRelevance';
 import Alert from '../../../common/Alert';
@@ -19,21 +20,18 @@ import Alert from '../../../common/Alert';
 const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
-  const dispatch = useDispatch();
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const { movingId, handleMove } = useMoveRelevanceWithUndo(
-    moveLocationRelevance
-  );
+  const createMutation = useCreateLocation();
+  const moveMutation = useMoveLocationRelevance();
+  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveMutation);
 
   const onSubmitForm = data => {
-    dispatch(
-      postLocation({
-        entrance: entranceId,
-        title: data.title,
-        body: data.body,
-        language: data.language
-      })
-    );
+    createMutation.mutate({
+      entrance: entranceId,
+      title: data.title,
+      body: data.body,
+      language: data.language
+    });
     setIsFormVisible(false);
   };
 

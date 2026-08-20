@@ -12,8 +12,6 @@ import countryRegions from './CountryRegionsReducer';
 import createCave from './CreateCaveReducer';
 import createDocument from './CreateDocumentReducer';
 import createEntrance from './CreateEntranceReducer';
-import createHistory from './CreateHistory';
-import createLocation from './CreateLocation';
 import createMassif from './CreateMassifReducer';
 import createOrganization from './CreateOrganization';
 import createPerson from './CreatePerson';
@@ -71,8 +69,6 @@ import updateAccount from './UpdateAccountReducer';
 import updateCave from './UpdateCaveReducer';
 import updateDocument from './UpdateDocumentReducer';
 import updateEntrance from './UpdateEntranceReducer';
-import updateHistory from './UpdateHistory';
-import updateLocation from './UpdateLocation';
 import updateMassif from './UpdateMassifReducer';
 import updateName from './UpdateNameReducer';
 import updateOrganization from './UpdateOrganization';
@@ -98,8 +94,6 @@ const GCReducer = combineReducers({
   createCave,
   createDocument,
   createEntrance,
-  createHistory,
-  createLocation,
   createMassif,
   createOrganization,
   createPerson,
@@ -159,8 +153,6 @@ const GCReducer = combineReducers({
   updateCave,
   updateDocument,
   updateEntrance,
-  updateHistory,
-  updateLocation,
   updateMassif,
   updateName,
   updateOrganization,

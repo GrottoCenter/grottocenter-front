@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Box, Divider, Paper } from '@mui/material';
 
@@ -9,9 +8,11 @@ import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { CommentPropTypes } from '../../../../types/entrance.type';
 import Comment from './Comment';
 import CreateCommentForm from '../../EntitiesForm/Comment';
-import { postComment } from '../../../../actions/Comment/CreateComment';
-import { moveCommentRelevance } from '../../../../actions/Comment/MoveRelevance';
-import { usePermissions } from '../../../../hooks';
+import {
+  useCreateComment,
+  useMoveCommentRelevance,
+  usePermissions
+} from '../../../../hooks';
 import { useMoveRelevanceWithUndo } from '../../../../hooks/useMoveRelevanceWithUndo';
 import { sortByRelevance } from '../../../../helpers/sortByRelevance';
 import Alert from '../../../common/Alert';
@@ -19,25 +20,23 @@ import Alert from '../../../common/Alert';
 const Comments = ({ entranceId, comments, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
-  const dispatch = useDispatch();
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const { movingId, handleMove } =
-    useMoveRelevanceWithUndo(moveCommentRelevance);
+  const createMutation = useCreateComment();
+  const moveMutation = useMoveCommentRelevance();
+  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveMutation);
 
   const onSubmitForm = data => {
-    dispatch(
-      postComment({
-        entrance: entranceId,
-        title: data.title,
-        body: data.body,
-        aestheticism: data.aestheticism,
-        caving: data.caving,
-        approach: data.approach,
-        eTTrail: data.eTTrail,
-        eTUnderground: data.eTUnderground,
-        language: data.language
-      })
-    );
+    createMutation.mutate({
+      entrance: entranceId,
+      title: data.title,
+      body: data.body,
+      aestheticism: data.aestheticism,
+      caving: data.caving,
+      approach: data.approach,
+      eTTrail: data.eTTrail,
+      eTUnderground: data.eTUnderground,
+      language: data.language
+    });
     setIsFormVisible(false);
   };
 

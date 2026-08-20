@@ -52,6 +52,34 @@ export {
   useRestoreGuideline,
   useRollbackGuideline
 } from './mutations/useGuideline';
+export {
+  useCreateLocation,
+  useUpdateLocation,
+  useDeleteLocation,
+  useRestoreLocation,
+  useMoveLocationRelevance
+} from './mutations/useLocation';
+export {
+  useCreateHistory,
+  useUpdateHistory,
+  useDeleteHistory,
+  useRestoreHistory,
+  useMoveHistoryRelevance
+} from './mutations/useHistory';
+export {
+  useCreateRigging,
+  useUpdateRigging,
+  useDeleteRigging,
+  useRestoreRigging,
+  useMoveRiggingRelevance
+} from './mutations/useRigging';
+export {
+  useCreateComment,
+  useUpdateComment,
+  useDeleteComment,
+  useRestoreComment,
+  useMoveCommentRelevance
+} from './mutations/useComment';
 export { useNotification } from './useNotification';
 export { usePermissions } from './usePermissions';
 export { useSessionExpiry } from './useSessionExpiry';

@@ -13,12 +13,12 @@ import {
 import RestorePageIcon from '@mui/icons-material/RestorePage';
 import { pathOr } from 'ramda';
 import { useIntl } from 'react-intl';
-import { updateHistory } from '../../../../../actions/History/UpdateHistory';
-import { updateRiggings } from '../../../../../actions/Riggings/UpdateRigging';
-import { updateLocation } from '../../../../../actions/Location/UpdateLocation';
-import { updateComment } from '../../../../../actions/Comment/UpdateComment';
 import {
   useUpdateDescription,
+  useUpdateHistory,
+  useUpdateLocation,
+  useUpdateRigging,
+  useUpdateComment,
   useRollbackGuideline,
   usePermissions,
   useUserProperties
@@ -35,6 +35,10 @@ function sleep(ms) {
 const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
   const dispatch = useDispatch();
   const updateDescriptionMutation = useUpdateDescription();
+  const updateHistoryMutation = useUpdateHistory();
+  const updateLocationMutation = useUpdateLocation();
+  const updateRiggingMutation = useUpdateRigging();
+  const updateCommentMutation = useUpdateComment();
   const rollbackGuidelineMutation = useRollbackGuideline();
   const userId = pathOr(null, ['id'], useUserProperties());
   const permissions = usePermissions();
@@ -59,14 +63,12 @@ const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
       switch (typeItem) {
         case 'comments':
           if (canEditComment) {
-            await dispatch(
-              updateComment({
-                ...content,
-                id: content.t_id,
-                eTTrail: durationStringToMinutes(content.eTTrail),
-                eTUnderground: durationStringToMinutes(content.eTUnderground)
-              })
-            );
+            await updateCommentMutation.mutateAsync({
+              ...content,
+              id: content.t_id,
+              eTTrail: durationStringToMinutes(content.eTTrail),
+              eTUnderground: durationStringToMinutes(content.eTUnderground)
+            });
           }
           break;
         case 'descriptions':
@@ -111,28 +113,22 @@ const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
           break;
         }
         case 'histories':
-          await dispatch(
-            updateHistory({
-              ...content,
-              id: content.t_id
-            })
-          );
+          await updateHistoryMutation.mutateAsync({
+            ...content,
+            id: content.t_id
+          });
           break;
         case 'locations':
-          await dispatch(
-            updateLocation({
-              ...content,
-              id: content.t_id
-            })
-          );
+          await updateLocationMutation.mutateAsync({
+            ...content,
+            id: content.t_id
+          });
           break;
         case 'riggings':
-          await dispatch(
-            updateRiggings({
-              ...content,
-              id: content.t_id
-            })
-          );
+          await updateRiggingMutation.mutateAsync({
+            ...content,
+            id: content.t_id
+          });
           break;
         case 'guidelines':
           await rollbackGuidelineMutation.mutateAsync({
