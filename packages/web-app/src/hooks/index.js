@@ -4,7 +4,7 @@ export {
   WGS84_DD,
   DMS_CODE
 } from './useCoordinatePreference';
-export { default as useProjections } from './useProjections';
+export { default as useProjections } from './queries/useProjections';
 export { useDebounce } from './useDebounce';
 export { useBoolean } from './useBoolean';
 export { useAuthNavigate } from './useAuthNavigate';

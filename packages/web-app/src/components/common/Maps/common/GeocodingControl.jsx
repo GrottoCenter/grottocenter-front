@@ -33,7 +33,7 @@ import {
   parseCoordinateString,
   formatWGS84
 } from '../../../../helpers/coordinateConvert';
-import useProjections from '../../../../hooks/useProjections';
+import { useProjections } from '../../../../hooks';
 import {
   CoordinatesMarker,
   EntrancePopup,

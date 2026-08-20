@@ -27,7 +27,6 @@ import {
   fetchMassifs,
   refetchMapViewport
 } from '../actions/Map';
-import { fetchProjections } from '../actions/Projections';
 import useGeolocation from '../hooks/useGeolocation';
 import useGeolocationPermission from '../hooks/useGeolocationPermission';
 import { useRefetchOnReconnect } from '../hooks';
@@ -205,7 +204,6 @@ const Map = () => {
   );
 
   const loadMapData = useCallback(() => {
-    dispatch(fetchProjections());
     dispatch(fetchAllEntrancesCoordinates());
     dispatch(fetchAllNetworksCoordinates());
     dispatch(fetchAllMassifsCoordinates());

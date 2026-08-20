@@ -56,7 +56,6 @@ import partnersCarousel from './PartnersCarouselReducer';
 import pendingDocumentsCount from './PendingDocumentsCountReducer';
 import person from './PersonReducer';
 import processDocuments from './ProcessDocumentsReducer';
-import projections from './Projections';
 import quicksearch from './QuicksearchReducer';
 import randomEntrance from './RandomEntranceReducer';
 import readAllNotifications from './ReadAllNotificationsReducer';
@@ -160,7 +159,6 @@ const GCReducer = combineReducers({
   pendingDocumentsCount,
   person,
   processDocuments,
-  projections,
   quicksearch,
   randomEntrance,
   readAllNotifications,

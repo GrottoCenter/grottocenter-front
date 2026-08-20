@@ -16,5 +16,6 @@ export const referenceKeys = {
   documentTypes: () => [...referenceKeys.all, 'documentTypes'],
   identifierTypes: () => [...referenceKeys.all, 'identifierTypes'],
   subjects: () => [...referenceKeys.all, 'subjects'],
-  languages: () => [...referenceKeys.all, 'languages']
+  languages: () => [...referenceKeys.all, 'languages'],
+  projections: () => [...referenceKeys.all, 'projections']
 };
