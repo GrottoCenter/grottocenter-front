@@ -4,7 +4,12 @@ import PropTypes from 'prop-types';
 
 import { DocumentFormContext } from '../Provider';
 
-import { useDebounce, useLanguages, useLicenses } from '../../../../../hooks';
+import {
+  useDebounce,
+  useLanguages,
+  useLicenses,
+  findLicenseByName
+} from '../../../../../hooks';
 import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
 import {
   fetchParentDocumentDetails,
@@ -51,10 +56,7 @@ const SearchBar = props => {
   );
 
   const getLicenseByName = useCallback(
-    licenseName => {
-      if (!licenses || !licenseName) return null;
-      return licenses.find(lic => lic.name === licenseName) || null;
-    },
+    licenseName => findLicenseByName(licenses, licenseName) ?? null,
     [licenses]
   );
 

@@ -26,7 +26,8 @@ import { licenceLinks } from '@/conf/externalLinks';
 import {
   useUserProperties,
   useFileFormats,
-  useLicenses
+  useLicenses,
+  findLicenseByName
 } from '../../../../../../hooks';
 import ErrorsList from './ErrorsList';
 import {
@@ -110,12 +111,13 @@ const AddFileForm = ({
   const {
     mimeTypes,
     extensions: backendExtensions,
-    loading
+    isLoading
   } = useFileFormats();
   // Fetched only where the authorization block is shown; React Query keeps the
   // call site unconditional and skips the request until then.
-  const { data: licenses, isLoading: licensesLoading } =
-    useLicenses(showAuthorization);
+  const { data: licenses, isLoading: licensesLoading } = useLicenses({
+    enabled: showAuthorization
+  });
   const currentUser = useUserProperties();
   const { document, updateAttribute } = useContext(DocumentFormContext);
 
@@ -154,7 +156,7 @@ const AddFileForm = ({
   useEffect(() => {
     if (!showAuthorization || !licenses) return;
     const licenseName = documentLicenseName ?? DEFAULT_LICENSE;
-    const selected = licenses.find(l => l.name === licenseName);
+    const selected = findLicenseByName(licenses, licenseName);
     if (selected) setLicense(selected);
     // setLicense is an inline arrow function prop — excluding it from deps is intentional
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -213,7 +215,7 @@ const AddFileForm = ({
         onFileRemove={removeFile}
         accept={accept}
         extensions={extensions}
-        disabled={loading}
+        disabled={isLoading}
       />
       {showAuthorization && visibleFiles.length > 0 && (
         <Box sx={{ mt: 1 }}>
@@ -305,24 +307,21 @@ const AddFileForm = ({
                   value={document.license?.name ?? ''}
                   renderValue={() => <LicenseTag license={document.license} />}
                   onChange={e =>
-                    setLicense(licenses?.find(l => l.name === e.target.value))
+                    setLicense(findLicenseByName(licenses, e.target.value))
                   }>
                   {licensesLoading && (
                     <MenuItem disabled>
                       <CircularProgress size={16} />
                     </MenuItem>
                   )}
-                  {(licenses ?? [])
-                    .slice()
-                    .sort((a, b) => (a.name > b.name ? 1 : -1))
-                    .map(l => (
-                      <MenuItem key={l.id} value={l.name}>
-                        <LicenseTag
-                          license={l}
-                          recommended={l.name === DEFAULT_LICENSE}
-                        />
-                      </MenuItem>
-                    ))}
+                  {(licenses ?? []).map(l => (
+                    <MenuItem key={l.id} value={l.name}>
+                      <LicenseTag
+                        license={l}
+                        recommended={l.name === DEFAULT_LICENSE}
+                      />
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
               {document.license?.url && (

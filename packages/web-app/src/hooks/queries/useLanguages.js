@@ -21,19 +21,16 @@ const byRefName = languages =>
 /**
  * The languages a document can be written in, sorted by display name.
  *
- * @param {boolean} [isPreferredLanguage=true] - restrict to the preferred set
+ * Always restricted to the preferred set: no caller has ever needed the full
+ * list, and threading a `false` through here — and through the query key —
+ * would be dead weight. Add a `useAllLanguages` hook the day it is needed.
  */
-export const useLanguages = (isPreferredLanguage = true) =>
+export const useLanguages = () =>
   useQuery({
-    queryKey: referenceKeys.languages(isPreferredLanguage),
+    queryKey: referenceKeys.languages(),
     queryFn: async () =>
-      (
-        await apiGet(
-          makeUrl(getLanguagesUrl, {
-            isPreferedLanguage: isPreferredLanguage
-          })
-        )
-      ).languages,
+      (await apiGet(makeUrl(getLanguagesUrl, { isPreferedLanguage: true })))
+        .languages,
     select: byRefName,
     ...REFERENCE_QUERY
   });

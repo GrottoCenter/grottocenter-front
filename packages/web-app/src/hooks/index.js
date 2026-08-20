@@ -11,7 +11,7 @@ export { useAuthNavigate } from './useAuthNavigate';
 // Server-state reads live in ./queries and are re-exported here so consumers
 // keep one import path — see docs/adr/0001-tanstack-query-server-state.md.
 export { useFileFormats } from './queries/useFileFormats';
-export { useLicenses } from './queries/useLicenses';
+export { useLicenses, findLicenseByName } from './queries/useLicenses';
 export { useDocumentTypes } from './queries/useDocumentTypes';
 export { useIdentifierTypes } from './queries/useIdentifierTypes';
 export { useSubjects } from './queries/useSubjects';

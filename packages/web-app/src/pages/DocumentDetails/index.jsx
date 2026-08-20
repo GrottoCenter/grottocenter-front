@@ -52,6 +52,7 @@ import { restoreDocument } from '../../actions/Document/RestoreDocument';
 import {
   useLanguages,
   useLicenses,
+  findLicenseByName,
   usePermissions,
   useRefetchOnReconnect,
   useSharePage
@@ -169,7 +170,7 @@ const Document = ({
   // an object once the list arrives, causing a visible flicker where the
   // link suddenly materialises.
   const licenseObject = licenses
-    ? (licenses.find(l => l.name === documentData?.license) ??
+    ? (findLicenseByName(licenses, documentData?.license) ??
         documentData?.license) ||
       undefined
     : undefined;

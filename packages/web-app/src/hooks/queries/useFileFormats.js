@@ -18,7 +18,11 @@ const toMimesAndExtensions = fileFormats => ({
 /**
  * Accepted upload formats, as the two lists the file pickers need.
  *
- * @returns {{mimeTypes: string[], extensions: string[], loading: boolean, error: ?Error}}
+ * Named top-level fields rather than raw `data`, because this hook is one of
+ * the exceptions to the list-hook convention (see ADR): it transforms the API
+ * shape into two derived arrays. `isLoading`/`error` keep the useQuery naming.
+ *
+ * @returns {{mimeTypes: string[], extensions: string[], isLoading: boolean, error: ?Error}}
  */
 export const useFileFormats = () => {
   const { data, isLoading, error } = useQuery({
@@ -31,7 +35,7 @@ export const useFileFormats = () => {
   return {
     mimeTypes: data?.mimeTypes ?? EMPTY,
     extensions: data?.extensions ?? EMPTY,
-    loading: isLoading,
+    isLoading,
     error
   };
 };

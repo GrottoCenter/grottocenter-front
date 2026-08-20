@@ -16,7 +16,5 @@ export const referenceKeys = {
   documentTypes: () => [...referenceKeys.all, 'documentTypes'],
   identifierTypes: () => [...referenceKeys.all, 'identifierTypes'],
   subjects: () => [...referenceKeys.all, 'subjects'],
-  // The endpoint takes a "preferred languages only" flag, so two different calls
-  // return two different lists — it has to be part of the key.
-  languages: isPreferred => [...referenceKeys.all, 'languages', isPreferred]
+  languages: () => [...referenceKeys.all, 'languages']
 };
