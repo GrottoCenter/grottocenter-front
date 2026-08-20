@@ -60,8 +60,14 @@ export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
     handleSubmit,
     reset,
     control,
-    formState: { errors, isSubmitting, isSubmitSuccessful }
+    formState: { errors, isSubmitting, isSubmitSuccessful, isValid }
   } = useForm({
+    // Validate on every change so `isValid` reflects the field-level `rules`
+    // (required, custom validators) in real time — the submit button below
+    // reads `isValid` directly. Subscribing to isValid also triggers an
+    // initial validation pass, so an empty create form has the button
+    // disabled from mount without an explicit trigger() call.
+    mode: 'onChange',
     defaultValues: {
       organization: organizationValues || defaultOrganizationValues
     }
@@ -134,6 +140,7 @@ export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
         <FormActionRow
           isNew={isNewOrganization}
           isSubmitting={isSubmitting}
+          disabled={!isValid}
           onCancel={onCancel}
         />
       </form>
