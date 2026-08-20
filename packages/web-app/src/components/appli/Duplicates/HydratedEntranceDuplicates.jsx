@@ -1,17 +1,17 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { LinearProgress as MuiLinearProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
 import {
-  createNewEntityFromDuplicate,
-  deleteDuplicate,
-  fetchDuplicate
-} from '../../../actions/DuplicatesImport';
+  useCreateEntityFromDuplicate,
+  useDeleteDuplicate,
+  useDuplicate,
+  useUpdateEntranceWithNewEntities
+} from '../../../hooks';
 import DuplicatesHandler from '../../common/DuplicatesHandler';
-import { useUpdateEntranceWithNewEntities } from '../../../hooks';
 
 const LinearProgress = styled(MuiLinearProgress)`
   visibility: ${({ $isLoading }) => ($isLoading ? 'visible' : 'hidden')};
@@ -23,52 +23,51 @@ const HydratedEntranceDuplicates = ({
   goBack,
   selectedDuplicates
 }) => {
-  const updateMutation = useUpdateEntranceWithNewEntities();
-  const {
-    loading: loadingDuplicate,
-    duplicate,
-    error,
-    latestHttpCodeOnDelete,
-    latestHttpCodeOnCreate
-  } = useSelector(state => state.duplicatesImport);
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const [currentDuplicate, setCurrentDuplicate] = useState(0);
-
-  const loading = updateMutation.isPending || loadingDuplicate;
   const currentDuplicateId = selectedDuplicates[currentDuplicate];
 
+  const updateMutation = useUpdateEntranceWithNewEntities();
+  const deleteDuplicateMutation = useDeleteDuplicate('entrance');
+  const createEntityMutation = useCreateEntityFromDuplicate('entrance');
+  const { data: duplicate, error } = useDuplicate(
+    'entrance',
+    currentDuplicateId
+  );
+  const loadingDuplicate = !duplicate && !error && !!currentDuplicateId;
+
+  const loading =
+    updateMutation.isPending ||
+    deleteDuplicateMutation.isPending ||
+    createEntityMutation.isPending ||
+    loadingDuplicate;
+
   useEffect(() => {
-    if (currentDuplicateId) {
-      dispatch(fetchDuplicate(currentDuplicateId, 'entrance'));
-    } else {
-      goBack();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!currentDuplicateId) goBack();
   }, [currentDuplicate]);
 
   useEffect(() => {
     if (updateMutation.isSuccess) {
-      dispatch(deleteDuplicate(currentDuplicateId, 'entrance'));
+      deleteDuplicateMutation.mutate(currentDuplicateId);
+      updateMutation.reset();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateMutation.isSuccess]);
 
   useEffect(() => {
-    if ([200, 204].includes(latestHttpCodeOnDelete)) {
+    if (deleteDuplicateMutation.isSuccess) {
       onSuccessSubmit();
       setCurrentDuplicate(currentDuplicate + 1);
+      deleteDuplicateMutation.reset();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [latestHttpCodeOnDelete]);
+  }, [deleteDuplicateMutation.isSuccess]);
 
   useEffect(() => {
-    if ([200, 204].includes(latestHttpCodeOnCreate)) {
+    if (createEntityMutation.isSuccess) {
       onSuccessNotDuplicateSubmit();
       setCurrentDuplicate(currentDuplicate + 1);
+      createEntityMutation.reset();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [latestHttpCodeOnCreate]);
+  }, [createEntityMutation.isSuccess]);
 
   const updateEntry = (entryObject, newRelatedEntitiesObject) => {
     updateMutation.mutate({
@@ -82,7 +81,7 @@ const HydratedEntranceDuplicates = ({
   };
 
   const createEntry = () => {
-    dispatch(createNewEntityFromDuplicate(currentDuplicateId, 'entrance'));
+    createEntityMutation.mutate(currentDuplicateId);
   };
 
   return (

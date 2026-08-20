@@ -1,13 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import {
-  deleteDuplicates,
-  fetchDuplicatesList
-} from '../../../actions/DuplicatesImport';
 import EntityTable from '../../common/EntityTable';
 
 import TableActions from './TableActions';
+import { useDeleteDuplicates, useDuplicatesList } from '../../../hooks';
 
 const DuplicatesList = ({
   duplicateType,
@@ -15,52 +11,39 @@ const DuplicatesList = ({
   setSelectedDuplicates,
   nextStep
 }) => {
-  const dispatch = useDispatch();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
-  const [pageRows, setPageRows] = useState([]);
+  const criteria = {
+    limit: rowsPerPage,
+    skip: page * rowsPerPage
+  };
+  const { data, isFetching: loading } = useDuplicatesList(
+    duplicateType,
+    criteria
+  );
+  const totalCount = data?.totalCount ?? 0;
 
-  const { loading, duplicatesList, totalCount, latestHttpCodeOnDelete } =
-    useSelector(state => state.duplicatesImport);
+  const deleteMutation = useDeleteDuplicates(duplicateType);
 
-  useEffect(() => {
-    if ([200, 204].includes(latestHttpCodeOnDelete)) {
-      const criteria = {
-        limit: rowsPerPage,
-        skip: page * rowsPerPage
-      };
-      dispatch(fetchDuplicatesList(duplicateType, criteria));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [latestHttpCodeOnDelete]);
-
-  useEffect(() => {
-    const criteria = {
-      limit: rowsPerPage,
-      skip: page * rowsPerPage
-    };
-    dispatch(fetchDuplicatesList(duplicateType, criteria));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowsPerPage, page, duplicateType]);
-
-  useEffect(() => {
-    let formated = [];
+  const pageRows = useMemo(() => {
+    const list = data?.duplicatesList ?? [];
     if (duplicateType === 'entrance') {
-      formated = duplicatesList.map(e => ({
+      return list.map(e => ({
         id: e.id,
         docId: e.entrance,
         name: e.content?.nameDescLoc?.name?.text
       }));
-    } else if (duplicateType === 'document') {
-      formated = duplicatesList.map(e => ({
+    }
+    if (duplicateType === 'document') {
+      return list.map(e => ({
         id: e.id,
         docId: e.document,
         name: e.content?.description?.title
       }));
     }
-    setPageRows(formated);
-  }, [duplicatesList, duplicateType]);
+    return [];
+  }, [data, duplicateType]);
 
   return (
     <>
@@ -81,9 +64,7 @@ const DuplicatesList = ({
       <TableActions
         isDisabled={selectedDuplicates.length === 0}
         onClickSelect={nextStep}
-        onClickDelete={() => {
-          dispatch(deleteDuplicates(selectedDuplicates, duplicateType));
-        }}
+        onClickDelete={() => deleteMutation.mutate(selectedDuplicates)}
       />
     </>
   );

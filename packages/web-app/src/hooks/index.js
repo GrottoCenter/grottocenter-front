@@ -28,6 +28,13 @@ export {
 export { useQuickSearch } from './queries/useQuickSearch';
 export { useRegionsSearch } from './queries/useRegionsSearch';
 export {
+  useDuplicatesList,
+  useDuplicate,
+  useDeleteDuplicates,
+  useDeleteDuplicate,
+  useCreateEntityFromDuplicate
+} from './queries/useDuplicates';
+export {
   useCreateDocument,
   useUpdateDocument,
   useUpdateDocumentWithNewEntities

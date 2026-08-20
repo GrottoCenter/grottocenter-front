@@ -143,6 +143,16 @@ export const importKeys = {
   batch: batchId => ['import', 'batch', batchId]
 };
 
+// Duplicate rows queued in the moderator import queue. Keyed by (type, id)
+// for detail and (type, criteria) for the paginated list so a delete
+// invalidates both — the list refetches with the row removed and any open
+// duplicate handler picks up the fresh state.
+export const duplicateKeys = {
+  all: ['duplicate'],
+  list: (type, criteria) => ['duplicate', 'list', type, criteria],
+  detail: (type, id) => ['duplicate', 'detail', type, id]
+};
+
 // Homepage / admin content lists — mostly one-shot GETs that back the
 // carousels, cards and admin queues. Grouped under a shared root so a global
 // "invalidate all admin lists" is a single call.

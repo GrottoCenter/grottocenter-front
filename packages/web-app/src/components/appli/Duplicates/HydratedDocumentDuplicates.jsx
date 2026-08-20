@@ -1,18 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { LinearProgress as MuiLinearProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
-import { useUpdateDocumentWithNewEntities } from '../../../hooks';
-import DuplicatesHandler from '../../common/DuplicatesHandler';
 import {
-  createNewEntityFromDuplicate,
-  deleteDuplicate,
-  fetchDuplicate
-} from '../../../actions/DuplicatesImport';
+  useCreateEntityFromDuplicate,
+  useDeleteDuplicate,
+  useDuplicate,
+  useUpdateDocumentWithNewEntities
+} from '../../../hooks';
+import DuplicatesHandler from '../../common/DuplicatesHandler';
 
 const LinearProgress = styled(MuiLinearProgress)`
   visibility: ${({ $isLoading }) => ($isLoading ? 'visible' : 'hidden')};
@@ -24,24 +23,25 @@ const HydratedDocumentDuplicates = ({
   goBack,
   selectedDuplicates
 }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const [currentDuplicate, setCurrentDuplicate] = useState(0);
 
-  const updateDocumentMutation = useUpdateDocumentWithNewEntities();
-  const docUpdateLoading = updateDocumentMutation.isPending;
-  const isDocUpdateSuccess = updateDocumentMutation.isSuccess;
-
-  const {
-    loading: loadingDuplicate,
-    duplicate,
-    error,
-    latestHttpCodeOnDelete,
-    latestHttpCodeOnCreate
-  } = useSelector(state => state.duplicatesImport);
-
-  const showLoading = docUpdateLoading || loadingDuplicate;
   const currentDuplicateId = selectedDuplicates[currentDuplicate];
+
+  const updateDocumentMutation = useUpdateDocumentWithNewEntities();
+  const deleteDuplicateMutation = useDeleteDuplicate('document');
+  const createEntityMutation = useCreateEntityFromDuplicate('document');
+  const { data: duplicate, error } = useDuplicate(
+    'document',
+    currentDuplicateId
+  );
+  const loadingDuplicate = !duplicate && !error && !!currentDuplicateId;
+
+  const showLoading =
+    updateDocumentMutation.isPending ||
+    deleteDuplicateMutation.isPending ||
+    createEntityMutation.isPending ||
+    loadingDuplicate;
 
   const updateDocument = (data, newRelatedEntitiesObject) => {
     updateDocumentMutation.mutate({
@@ -52,40 +52,35 @@ const HydratedDocumentDuplicates = ({
   };
 
   const createDocument = () => {
-    dispatch(createNewEntityFromDuplicate(currentDuplicateId, 'document'));
+    createEntityMutation.mutate(currentDuplicateId);
   };
 
   useEffect(() => {
-    if (currentDuplicateId) {
-      dispatch(fetchDuplicate(currentDuplicateId, 'document'));
-    } else {
-      goBack();
-    }
+    if (!currentDuplicateId) goBack();
   }, [currentDuplicate]);
 
-  // After a successful duplicate merge, delete the source duplicate row. The
-  // mutation invalidates documentKeys.detail already; this step removes it
-  // from the duplicates queue.
   useEffect(() => {
-    if (isDocUpdateSuccess) {
-      dispatch(deleteDuplicate(currentDuplicateId, 'document'));
+    if (updateDocumentMutation.isSuccess) {
+      deleteDuplicateMutation.mutate(currentDuplicateId);
       updateDocumentMutation.reset();
     }
-  }, [isDocUpdateSuccess]);
+  }, [updateDocumentMutation.isSuccess]);
 
   useEffect(() => {
-    if ([200, 204].includes(latestHttpCodeOnDelete)) {
+    if (deleteDuplicateMutation.isSuccess) {
       onSuccessSubmit();
       setCurrentDuplicate(currentDuplicate + 1);
+      deleteDuplicateMutation.reset();
     }
-  }, [latestHttpCodeOnDelete]);
+  }, [deleteDuplicateMutation.isSuccess]);
 
   useEffect(() => {
-    if ([200, 204].includes(latestHttpCodeOnCreate)) {
+    if (createEntityMutation.isSuccess) {
       onSuccessNotDuplicateSubmit();
       setCurrentDuplicate(currentDuplicate + 1);
+      createEntityMutation.reset();
     }
-  }, [latestHttpCodeOnCreate]);
+  }, [createEntityMutation.isSuccess]);
 
   return (
     <>
