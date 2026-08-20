@@ -14,6 +14,8 @@ export { useFileFormats } from './queries/useFileFormats';
 export { useLicenses } from './queries/useLicenses';
 export { useDocumentTypes } from './queries/useDocumentTypes';
 export { useIdentifierTypes } from './queries/useIdentifierTypes';
+export { useSubjects } from './queries/useSubjects';
+export { useLanguages } from './queries/useLanguages';
 export { useNotification } from './useNotification';
 export { usePermissions } from './usePermissions';
 export { useSessionExpiry } from './useSessionExpiry';

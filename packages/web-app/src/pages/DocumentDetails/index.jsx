@@ -49,8 +49,8 @@ import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails'
 import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
 import { deleteDocument } from '../../actions/Document/DeleteDocument';
 import { restoreDocument } from '../../actions/Document/RestoreDocument';
-import { loadLanguages } from '../../actions/Language';
 import {
+  useLanguages,
   useLicenses,
   usePermissions,
   useRefetchOnReconnect,
@@ -136,7 +136,7 @@ const Document = ({
   const navigate = useNavigate();
   const permissions = usePermissions();
   const dispatch = useDispatch();
-  const { languages } = useSelector(state => state.language);
+  const { data: languages = [] } = useLanguages();
   const { locale } = useSelector(state => state.intl);
   const { data: licenses } = useLicenses();
   const [issuesSortOrder, setIssuesSortOrder] = useState(
@@ -826,14 +826,10 @@ const DocumentDetails = ({ id, hideActions = false }) => {
     children,
     childrenError
   } = useSelector(state => state.documentChildren);
-
-  const { isLoaded: isLanguagesLoaded } = useSelector(state => state.language);
-
-  useEffect(() => {
-    if (!isLanguagesLoaded) {
-      dispatch(loadLanguages(true));
-    }
-  }, [dispatch, isLanguagesLoaded]);
+  // The document body renders its language by name, so it must not appear
+  // before the list is known. Calling useLanguages here as well as in <Document>
+  // costs nothing: React Query dedupes the two into a single request.
+  const { isPending: isLanguagesPending } = useLanguages();
 
   const reloadDocument = useCallback(() => {
     if (!documentId) return;
@@ -863,7 +859,7 @@ const DocumentDetails = ({ id, hideActions = false }) => {
         !documentId ||
         isLoading ||
         isDocumentChildrenLoading ||
-        !isLanguagesLoaded
+        isLanguagesPending
       }
       // Deliberately not exclusive: a children-fetch failure alongside a
       // successful detail fetch still renders the document content plus the

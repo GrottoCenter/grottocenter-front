@@ -13,14 +13,22 @@ vi.mock('react-redux', async () => ({
   useSelector: selector => selector(mockStoreState)
 }));
 
-// Licenses now come from React Query (useLicenses), not the store — the tests
-// drive the hook instead of seeding a `licenses` slice.
+// Licenses and the language list now come from React Query, not the store —
+// the tests drive the hooks instead of seeding `licenses` / `language` slices.
 let mockLicenses = { data: null, isLoading: false };
+const mockLanguages = {
+  data: [
+    { id: 'eng', refName: 'English' },
+    { id: 'fra', refName: 'French' }
+  ],
+  isSuccess: true
+};
 
 // ---- useUserProperties mock ----
 vi.mock('../../../../hooks', () => ({
   useUserProperties: () => ({ id: 1, nickname: 'testuser' }),
   useLicenses: () => mockLicenses,
+  useLanguages: () => mockLanguages,
   useDebounce: value => value,
   useEntitySearch: () => ({
     inputValue: '',
@@ -195,13 +203,6 @@ const buildState = (overrides = {}) => ({
     isLoading: false,
     caver: null,
     error: null
-  },
-  language: {
-    languages: [
-      { id: 'eng', refName: 'English' },
-      { id: 'fra', refName: 'French' }
-    ],
-    isLoaded: true
   }
 });
 

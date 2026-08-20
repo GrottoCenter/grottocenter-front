@@ -39,7 +39,6 @@ import importCsv from './ImportCsvReducer';
 import importWizard from './ImportWizardReducer';
 import intl from './IntlReducer';
 import invalidEmailCavers from './InvalidEmailCaversReducer';
-import language from './LanguageReducer';
 import latestBlogNews from './LatestBlogNewsReducer';
 import linkDocumentToEntrance from './LinkDocumentToEntrance';
 import login from './LoginReducer';
@@ -75,7 +74,6 @@ import snapshots from './SnapshotReducer';
 import statisticsCountry from './StatisticsCountryReducer';
 import statisticsMassif from './StatisticsMassifReducer';
 import statisticsRegion from './StatisticsRegionReducer';
-import subject from './SubjectReducer';
 import subscribeToCountry from './SubscribeToCountryReducer';
 import subscribeToMassif from './SubscribeToMassifReducer';
 import subscribeToRegion from './SubscribeToRegionReducer';
@@ -144,7 +142,6 @@ const GCReducer = combineReducers({
   importWizard,
   intl,
   invalidEmailCavers,
-  language,
   latestBlogNews,
   linkDocumentToEntrance,
   login,
@@ -182,7 +179,6 @@ const GCReducer = combineReducers({
   statisticsCountry,
   statisticsMassif,
   statisticsRegion,
-  subject,
   subscribeToCountry,
   subscribeToMassif,
   subscribeToRegion,

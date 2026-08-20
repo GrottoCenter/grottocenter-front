@@ -15,6 +15,8 @@ import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { useLanguages } from '../../../../hooks';
+
 import { DocumentFormContext } from './Provider';
 
 import DocumentTypeSelect from './formElements/DocumentTypeSelect';
@@ -66,7 +68,7 @@ const FormContent = ({ onCancel }) => {
   } = documentTypeHelpers;
 
   const locale = useSelector(state => state.intl.locale);
-  const { languages } = useSelector(state => state.language);
+  const { data: languages = [] } = useLanguages();
   const isSubmitting = useSelector(state => state.createDocument.isLoading);
   const userLanguageId = languages.find(l => l.part1 === locale)?.id ?? '000';
 

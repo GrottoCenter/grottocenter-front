@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
@@ -7,8 +7,7 @@ import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
-import { loadSubjects } from '../../../actions/Subject';
-import { useDocumentTypes } from '../../../hooks';
+import { useDocumentTypes, useSubjects } from '../../../hooks';
 import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON
@@ -119,12 +118,7 @@ const DocumentSearch = () => {
   const searchEntity = ADVANCED_SEARCH_TYPES.DOCUMENTS;
 
   const { data: documentTypes = [] } = useDocumentTypes();
-  const subjects = useSelector(state => state.subject.subjects);
-
-  useEffect(() => {
-    dispatch(loadSubjects());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { data: subjects = [] } = useSubjects();
 
   const startAdvancedsearch = (
     overrideQuery,

@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { DocumentFormContext } from '../Provider';
 
-import { useDebounce, useLicenses } from '../../../../../hooks';
+import { useDebounce, useLanguages, useLicenses } from '../../../../../hooks';
 import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
 import {
   fetchParentDocumentDetails,
@@ -28,7 +28,7 @@ const SearchBar = props => {
   const [inputValue, setInputValue] = React.useState(defaultInputValue);
   const debouncedInput = useDebounce(inputValue);
   const dispatch = useDispatch();
-  const { languages } = useSelector(state => state.language);
+  const { data: languages = [] } = useLanguages();
   const { data: licenses } = useLicenses();
 
   const handleInputChange = newValue => {
