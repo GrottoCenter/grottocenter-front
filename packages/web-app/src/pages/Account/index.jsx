@@ -43,7 +43,6 @@ import { styled } from '@mui/material/styles';
 import fetch from 'isomorphic-fetch';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchAccount } from '../../actions/Account/GetAccount';
-import { updateAccount } from '../../actions/Account/UpdateAccount';
 import { checkAuthStatus } from '../../actions/utils';
 import { postMfaReset, clearMfaState } from '../../actions/Mfa';
 import { postLogout } from '../../actions/Login';
@@ -55,7 +54,8 @@ import {
   useNotification,
   useJoinOrganization,
   useLeaveOrganization,
-  useSubscriptions
+  useSubscriptions,
+  useUpdateAccount
 } from '../../hooks';
 import { personKeys } from '../../api/queryKeys';
 import Alert from '../../components/common/Alert';
@@ -230,6 +230,7 @@ const PersonalInfoSection = ({ account, onSaved }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const updateAccountMutation = useUpdateAccount();
 
   const {
     control,
@@ -269,13 +270,15 @@ const PersonalInfoSection = ({ account, onSaved }) => {
     setIsLoading(true);
     setSaveError(null);
     try {
-      await dispatch(
-        updateAccount({
-          nickname: data.nickname,
-          name: data.name,
-          surname: data.surname
-        })
-      );
+      await updateAccountMutation.mutateAsync({
+        nickname: data.nickname,
+        name: data.name,
+        surname: data.surname
+      });
+      // The Redux `account` slice stays (see anti-scope in the ADR) so the
+      // side panel / preferences card still reads from it — dispatch a
+      // fresh fetchAccount so the just-persisted fields are visible.
+      dispatch(fetchAccount());
       setIsEditing(false);
       onSaved();
     } catch (error) {
@@ -399,6 +402,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+  const updateAccountMutation = useUpdateAccount();
   const [emailError, setEmailError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -447,7 +451,8 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
     setIsEmailLoading(true);
     setEmailError(null);
     try {
-      await dispatch(updateAccount({ email: data.email }));
+      await updateAccountMutation.mutateAsync({ email: data.email });
+      dispatch(fetchAccount());
       setIsEditingEmail(false);
       onSaved();
     } catch {
@@ -479,12 +484,14 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
     setIsPasswordLoading(true);
     setPasswordError(null);
     try {
-      await dispatch(
-        updateAccount({
-          currentPassword: data.currentPassword,
-          password: data.password
-        })
-      );
+      await updateAccountMutation.mutateAsync({
+        currentPassword: data.currentPassword,
+        password: data.password
+      });
+      // Password changes don't affect the mirrored account data, but keep
+      // parity with the email/personal-info paths so the Redux slice is
+      // never stale after a save.
+      dispatch(fetchAccount());
       setIsChangingPassword(false);
       resetPassword({
         currentPassword: '',
@@ -829,6 +836,7 @@ const PreferencesSection = ({ account, onSaved }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const authHeader = useSelector(state => state.login.authorizationHeader);
+  const updateAccountMutation = useUpdateAccount();
 
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -921,9 +929,9 @@ const PreferencesSection = ({ account, onSaved }) => {
     setSaveError(null);
     try {
       // Save language via the account endpoint
-      await dispatch(
-        updateAccount({ language: localeToLanguageId(data.language) })
-      );
+      await updateAccountMutation.mutateAsync({
+        language: localeToLanguageId(data.language)
+      });
 
       // Save notification preferences via the dedicated endpoint
       const prefs = {

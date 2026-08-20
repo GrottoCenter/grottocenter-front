@@ -1,32 +1,26 @@
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 
 import Alert from '../../common/Alert';
-import {
-  detachEntranceToNewCave,
-  resetDetachEntrance
-} from '../../../actions/Entrance/DetachEntrance';
+import { useDetachEntranceToNewCave } from '../../../hooks';
 import { useNotification } from '../../../hooks/useNotification';
 import { EntranceType } from './types';
 import OperationSummary from './OperationSummary';
 import FormActions from './FormActions';
 
 const DetachEntranceSection = ({ entrance }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const { onSuccess } = useNotification();
-  const { loading, error, success } = useSelector(
-    state => state.detachEntrance
-  );
+  const detachMutation = useDetachEntranceToNewCave();
+  const loading = detachMutation.isPending;
+  const { error } = detachMutation;
+  const success = detachMutation.isSuccess;
 
   const isSoleEntrance =
     !entrance.cave?.entrances || entrance.cave.entrances.length === 1;
-
-  useEffect(() => () => dispatch(resetDetachEntrance()), [dispatch]);
 
   useEffect(() => {
     if (success) {
@@ -35,7 +29,7 @@ const DetachEntranceSection = ({ entrance }) => {
     }
   }, [success, navigate, entrance.id, onSuccess, formatMessage]);
 
-  const handleDetach = () => dispatch(detachEntranceToNewCave(entrance));
+  const handleDetach = () => detachMutation.mutate(entrance);
 
   return (
     <Box>

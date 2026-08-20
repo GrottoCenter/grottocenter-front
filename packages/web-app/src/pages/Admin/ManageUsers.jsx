@@ -1,13 +1,9 @@
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Divider, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import { useBannedCavers, useGroups, useInvalidEmailCavers } from '../../hooks';
-import { listKeys } from '../../api/queryKeys';
 
 import AuthChecker from '../../components/appli/AuthChecker';
 
@@ -41,7 +37,6 @@ UserList.propTypes = {
 
 const ManageUsers = () => {
   const { formatMessage } = useIntl();
-  const queryClient = useQueryClient();
 
   const { data: groups, isPending: isLoading } = useGroups();
   const { administrators = [], moderators = [], leaders = [] } = groups ?? {};
@@ -52,27 +47,9 @@ const ManageUsers = () => {
   const { data: invalidEmailCavers = [], isPending: isInvalidEmailLoading } =
     useInvalidEmailCavers();
 
-  const { isLoading: isUpdateLoading, isSuccess: isUpdateSuccess } =
-    useSelector(state => state.updatePersonGroups);
-
-  const { isLoading: isBanLoading, isSuccess: isBanSuccess } = useSelector(
-    state => state.banCaver
-  );
-
-  useEffect(() => {
-    // Refresh the groups list after a successful role-update submission.
-    if (isUpdateSuccess && !isUpdateLoading) {
-      queryClient.invalidateQueries({ queryKey: listKeys.groups() });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isUpdateLoading, isUpdateSuccess]);
-
-  useEffect(() => {
-    if (isBanSuccess && !isBanLoading) {
-      queryClient.invalidateQueries({ queryKey: listKeys.bannedCavers() });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBanLoading, isBanSuccess]);
+  // useBanCaver / useUnbanCaver / useUpdatePersonGroups own their own
+  // onSuccess invalidations for listKeys.groups() / listKeys.bannedCavers(),
+  // so this page just displays the queries.
 
   return (
     <Layout

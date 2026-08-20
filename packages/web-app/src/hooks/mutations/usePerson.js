@@ -7,7 +7,7 @@ import {
   postPersonGroupsUrl
 } from '../../conf/apiRoutes';
 import { apiPost, apiPut, apiDelete } from '../../api/client';
-import { personKeys } from '../../api/queryKeys';
+import { listKeys, personKeys } from '../../api/queryKeys';
 
 const invalidatePersons = queryClient =>
   queryClient.invalidateQueries({ queryKey: personKeys.all });
@@ -41,13 +41,17 @@ export const useDeletePerson = () => {
   });
 };
 
-// Admin: rewrite the caver's group memberships in one shot.
+// Admin: rewrite the caver's group memberships in one shot. Invalidates the
+// group-lists board (ManageUsers) too so the newly-added moderator/leader
+// shows up without a refresh.
 export const useUpdatePersonGroups = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, groups }) =>
       apiPost(postPersonGroupsUrl(id), { groups }),
-    onSuccess: (_data, { id }) =>
-      queryClient.invalidateQueries({ queryKey: personKeys.detail(id) })
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: personKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: listKeys.groups() });
+    }
   });
 };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { IconButton, Button, Typography } from '@mui/material';
@@ -10,7 +10,9 @@ import {
   useUpdatePersonGroups,
   useDebounce,
   useNotification,
-  useQuickSearch
+  useQuickSearch,
+  useBanCaver,
+  useUnbanCaver
 } from '../../hooks';
 
 import AutoCompleteSearch from '../../components/common/AutoCompleteSearch';
@@ -18,8 +20,6 @@ import AppLink from '../../components/common/AppLink';
 
 import PersonProperties from '../../components/common/Person/PersonProperties';
 import UserGroups from './UserGroups';
-
-import { postBanCaver, postUnbanCaver } from '../../actions/Person/BanCaver';
 
 const UserBlock = styled('div')`
   display: flex;
@@ -55,7 +55,6 @@ const ManageUserGroups = () => {
   const [didSaveGroups, setDidSaveGroups] = useState(false);
   const [didSaveBan, setDidSaveBan] = useState(false);
 
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const { onSuccess, onError } = useNotification();
   const debouncedInput = useDebounce(inputValue);
@@ -78,11 +77,11 @@ const ManageUserGroups = () => {
   const isUpdateSuccess = updatePersonGroupsMutation.isSuccess;
   const updateError = updatePersonGroupsMutation.error;
 
-  const {
-    isLoading: isBanLoading,
-    isSuccess: isBanSuccess,
-    error: banError
-  } = useSelector(state => state.banCaver);
+  const banMutation = useBanCaver();
+  const unbanMutation = useUnbanCaver();
+  const isBanLoading = banMutation.isPending || unbanMutation.isPending;
+  const isBanSuccess = banMutation.isSuccess || unbanMutation.isSuccess;
+  const banError = banMutation.error || unbanMutation.error;
 
   const { authTokenDecoded } = useSelector(state => state.login);
 
@@ -179,11 +178,8 @@ const ManageUserGroups = () => {
                   })
                 }
                 onSaveBan={banned => {
-                  if (banned) {
-                    dispatch(postBanCaver(selectedUser.id));
-                  } else {
-                    dispatch(postUnbanCaver(selectedUser.id));
-                  }
+                  if (banned) banMutation.mutate(selectedUser.id);
+                  else unbanMutation.mutate(selectedUser.id);
                 }}
                 userGroups={person?.groups}
                 isBanned={person?.isBanned}

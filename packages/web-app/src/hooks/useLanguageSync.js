@@ -2,8 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeLocale } from '../actions/Intl';
 import { fetchAccount } from '../actions/Account/GetAccount';
-import { updateAccount } from '../actions/Account/UpdateAccount';
-import { usePermissions } from '.';
+import { usePermissions, useUpdateAccount } from '.';
 import {
   languageIdToLocale,
   localeToLanguageId
@@ -14,6 +13,7 @@ const useLanguageSync = () => {
   const { isAuth } = usePermissions();
   const { locale } = useSelector(state => state.intl);
   const { account } = useSelector(state => state.account);
+  const updateAccountMutation = useUpdateAccount();
   const mountedRef = useRef(false);
   // Set to true while effect 2 is programmatically changing locale to prevent
   // effect 3 from dispatching a redundant PATCH before fetchAccount resolves.
@@ -54,7 +54,7 @@ const useLanguageSync = () => {
     if (!isAuth) return;
     const languageId = localeToLanguageId(locale);
     if (languageId && languageId !== account?.language)
-      dispatch(updateAccount({ language: languageId }));
+      updateAccountMutation.mutate({ language: languageId });
     // Mirror of the effect above: only a locale change may trigger the PATCH.
     // `account?.language` is read as a guard, but listing it would re-run this
     // when the PATCH response lands and loop the two effects against each other.

@@ -20,26 +20,16 @@ vi.mock('../../../../hooks/useNotification', () => ({
   })
 }));
 
-// ---- Redux mock ----
-const mockDispatch = vi.fn();
-let mockStoreState = {};
-
-vi.mock('react-redux', async () => ({
-  ...(await vi.importActual('react-redux')),
-  useDispatch: () => mockDispatch,
-  useSelector: selector => selector(mockStoreState)
-}));
-
-// ---- Action mock ----
-const mockDetachEntranceToNewCave = vi.fn(() => ({
-  type: 'DETACH_ENTRANCE'
-}));
-const mockResetDetachEntrance = vi.fn(() => ({
-  type: 'DETACH_ENTRANCE_RESET'
-}));
-vi.mock('../../../../actions/Entrance/DetachEntrance', () => ({
-  detachEntranceToNewCave: (...args) => mockDetachEntranceToNewCave(...args),
-  resetDetachEntrance: (...args) => mockResetDetachEntrance(...args)
+// ---- Mutation mock ----
+const mockMutate = vi.fn();
+let mockMutationState = { isPending: false, error: null, isSuccess: false };
+vi.mock('../../../../hooks', () => ({
+  useDetachEntranceToNewCave: () => ({
+    mutate: mockMutate,
+    isPending: mockMutationState.isPending,
+    error: mockMutationState.error,
+    isSuccess: mockMutationState.isSuccess
+  })
 }));
 
 // The before → after preview is covered by its own suite; keep this one focused
@@ -82,14 +72,11 @@ const soleEntranceCave = {
   }
 };
 
-const defaultDetachState = {
-  loading: false,
-  error: undefined,
-  success: false
-};
-
-const renderComponent = (entrance, detachState = defaultDetachState) => {
-  mockStoreState = { detachEntrance: detachState };
+const renderComponent = (
+  entrance,
+  mutationState = { isPending: false, error: null, isSuccess: false }
+) => {
+  mockMutationState = mutationState;
   return render(
     <IntlProvider locale="en" messages={messages}>
       <DetachEntranceSection entrance={entrance} />
@@ -98,8 +85,7 @@ const renderComponent = (entrance, detachState = defaultDetachState) => {
 };
 
 beforeEach(() => {
-  mockDispatch.mockClear();
-  mockDetachEntranceToNewCave.mockClear();
+  mockMutate.mockClear();
   mockNavigate.mockClear();
   mockOnSuccess.mockClear();
 });
@@ -120,20 +106,20 @@ describe('DetachEntranceSection', () => {
     expect(button).toBeDisabled();
   });
 
-  it('clicking button dispatches detachEntranceToNewCave', () => {
+  it('clicking button calls useDetachEntranceToNewCave.mutate with the entrance', () => {
     renderComponent(multiEntranceCave);
 
     const button = screen.getByRole('button', { name: 'Detach entrance' });
     fireEvent.click(button);
 
-    expect(mockDetachEntranceToNewCave).toHaveBeenCalledWith(multiEntranceCave);
-    expect(mockDispatch).toHaveBeenCalled();
+    expect(mockMutate).toHaveBeenCalledWith(multiEntranceCave);
   });
 
-  it('shows loading spinner when loading is true', () => {
+  it('shows loading spinner when mutation is pending', () => {
     renderComponent(multiEntranceCave, {
-      ...defaultDetachState,
-      loading: true
+      isPending: true,
+      error: null,
+      isSuccess: false
     });
 
     const button = screen.getByRole('button', { name: 'Detach entrance' });
@@ -143,8 +129,9 @@ describe('DetachEntranceSection', () => {
 
   it('navigates to entrance page on success', () => {
     renderComponent(multiEntranceCave, {
-      ...defaultDetachState,
-      success: true
+      isPending: false,
+      error: null,
+      isSuccess: true
     });
 
     expect(mockNavigate).toHaveBeenCalledWith('/ui/entrances/1');
@@ -152,8 +139,9 @@ describe('DetachEntranceSection', () => {
 
   it('shows success toast notification on success', () => {
     renderComponent(multiEntranceCave, {
-      ...defaultDetachState,
-      success: true
+      isPending: false,
+      error: null,
+      isSuccess: true
     });
 
     expect(mockOnSuccess).toHaveBeenCalledWith(
@@ -161,23 +149,15 @@ describe('DetachEntranceSection', () => {
     );
   });
 
-  it('shows error alert when error is truthy', () => {
+  it('shows error alert when mutation.error is truthy', () => {
     renderComponent(multiEntranceCave, {
-      ...defaultDetachState,
-      error: 'Something went wrong'
+      isPending: false,
+      error: new Error('Something went wrong'),
+      isSuccess: false
     });
 
     expect(
       screen.getByText('An error occurred while detaching the entrance.')
     ).toBeInTheDocument();
-  });
-
-  it('dispatches resetDetachEntrance on unmount', () => {
-    const { unmount } = renderComponent(multiEntranceCave);
-    mockDispatch.mockClear();
-
-    unmount();
-
-    expect(mockResetDetachEntrance).toHaveBeenCalled();
   });
 });

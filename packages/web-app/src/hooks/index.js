@@ -31,6 +31,13 @@ export {
   useUpdateDocument,
   useUpdateDocumentWithNewEntities
 } from './mutations/useDocumentForm';
+export {
+  useBanCaver,
+  useUnbanCaver,
+  useUpdateAccount,
+  useMoveEntranceToCave,
+  useDetachEntranceToNewCave
+} from './mutations/useAdminActions';
 export { useMassif } from './queries/useMassif';
 export { useCave } from './queries/useCave';
 export { useEntrance } from './queries/useEntrance';
