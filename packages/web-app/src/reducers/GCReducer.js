@@ -45,7 +45,6 @@ import regionEntrances from './RegionEntrancesDataQualityReducer';
 import resendVerificationEmail from './ResendVerificationEmailReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
-import snapshots from './SnapshotReducer';
 import statisticsCountry from './StatisticsCountryReducer';
 import statisticsMassif from './StatisticsMassifReducer';
 import statisticsRegion from './StatisticsRegionReducer';
@@ -107,7 +106,6 @@ const GCReducer = combineReducers({
   resendVerificationEmail,
   sideMenu,
   signUp,
-  snapshots,
   statisticsCountry,
   statisticsMassif,
   statisticsRegion,

@@ -75,3 +75,10 @@ export const regionKeys = {
   all: ['region'],
   detail: (countryId, regionId) => ['region', 'detail', countryId, regionId]
 };
+
+// Revision history for any versioned entity. Keyed on the parent (typeId,
+// typeName) and the two options that switch the endpoint's shape.
+export const snapshotKeys = {
+  all: ['snapshot'],
+  list: (typeId, typeName, opts) => ['snapshot', 'list', typeName, typeId, opts]
+};

@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button, Card, CardContent, Skeleton } from '@mui/material';
@@ -11,14 +10,14 @@ import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import PageContainer from '../../../common/Layouts/PageContainer';
 import PageHeader from '../../../common/Layouts/PageHeader';
 import SectionStack from '../../../common/Layouts/SectionStack';
-import { fetchSnapshot } from '../../../../actions/Snapshot/GetSnapshots';
 import {
   useCave,
   useDocument,
   useEntrance,
   useMassif,
   useOrganization,
-  usePerson
+  usePerson,
+  useSnapshots
 } from '../../../../hooks';
 import {
   caveKeys,
@@ -28,7 +27,6 @@ import {
   organizationKeys,
   personKeys
 } from '../../../../api/queryKeys';
-import REDUCER_STATUS from '../../../../reducers/ReducerStatus';
 import SensitiveCaveWarning from '../SensitiveCaveWarning';
 import AccordionSnapshotList from './AccordionSnapshotList';
 import Alert403 from './error/403Alert';
@@ -46,7 +44,6 @@ const SUB_ENTITY_TYPES = [
 ];
 
 const SnapshotPage = () => {
-  const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
@@ -97,13 +94,13 @@ const SnapshotPage = () => {
   const currentOrganization = organizationQuery.data ?? null;
   const isOrganizationLoading = organizationQuery.isFetching;
 
-  const { data, status, latestHttpCode } = useSelector(
-    state => state.snapshots
-  );
-
-  useEffect(() => {
-    dispatch(fetchSnapshot(id, type, isNetwork, getAll));
-  }, [id, type, isNetwork, getAll, dispatch]);
+  const {
+    data: snapshotData = {},
+    isFetching: isSnapshotFetching,
+    isSuccess,
+    error: snapshotError
+  } = useSnapshots(id, type, { isNetwork, getAll });
+  const latestHttpCode = snapshotError?.status;
 
   const isSubEntityType = SUB_ENTITY_TYPES.includes(type);
 
@@ -138,7 +135,7 @@ const SnapshotPage = () => {
     } else if (Object.hasOwn(fetchByType, type)) {
       fetchByType[type]();
     }
-  }, [id, type, parentId, parentType, isSubEntityType, dispatch, queryClient]);
+  }, [id, type, parentId, parentType, isSubEntityType, queryClient]);
 
   const parentDataByType = {
     entrances: currentEntrance,
@@ -177,8 +174,9 @@ const SnapshotPage = () => {
     false
   ];
 
-  const isLoading = status === REDUCER_STATUS.LOADING;
-  const isSuccess = status === REDUCER_STATUS.SUCCEEDED;
+  // 404 is swallowed by useSnapshots (empty history is a legitimate success);
+  // is404 only fires if the API ever changes and 404 leaks out as an error.
+  const isLoading = isSnapshotFetching && !isSuccess;
   const is404 = !isSuccess && latestHttpCode === 404;
   const is403 = !isSuccess && latestHttpCode === 403;
   const isSensitive = currentTItem?.isSensitive ?? false;
@@ -267,7 +265,7 @@ const SnapshotPage = () => {
             {isSuccess &&
               (getAll ? (
                 <AccordionSnapshotListPage
-                  data={sortSnapshots(data)}
+                  data={sortSnapshots(snapshotData)}
                   type={type}
                   isNetwork={isNetwork}
                   currentTItem={currentTItem}
@@ -275,7 +273,7 @@ const SnapshotPage = () => {
                 />
               ) : (
                 <AccordionSnapshotList
-                  data={data}
+                  data={snapshotData}
                   type={type}
                   isNetwork={isNetwork}
                   currentItem={currentTItem}
