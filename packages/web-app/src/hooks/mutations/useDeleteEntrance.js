@@ -5,13 +5,8 @@ import { apiDelete } from '../../api/client';
 import { entranceKeys } from '../../api/queryKeys';
 import { invalidateAll } from '../../utils/mapTileCache';
 
-/**
- * Soft- or permanently delete an entrance.
- *
- * mapCacheInvalidationMiddleware used to fire the tile invalidation on
- * DELETE_ENTRANCE_*_SUCCESS; the middleware no longer sees the dispatch,
- * so the effect moves here alongside the RQ cache invalidation.
- */
+// Soft- or permanently delete an entrance. Both entrance and network tile
+// caches are invalidated: an entrance removal changes both projections.
 export const useDeleteEntrance = () => {
   const queryClient = useQueryClient();
   return useMutation({

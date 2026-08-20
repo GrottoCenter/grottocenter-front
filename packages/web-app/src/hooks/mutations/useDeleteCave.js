@@ -5,14 +5,9 @@ import { apiDelete } from '../../api/client';
 import { caveKeys } from '../../api/queryKeys';
 import { invalidateAll } from '../../utils/mapTileCache';
 
-/**
- * Soft- or permanently delete a cave.
- *
- * The map tile cache invalidation used to be triggered by
- * mapCacheInvalidationMiddleware on DELETE_CAVE_*_SUCCESS; the middleware
- * no longer sees a dispatch, so the invalidation lives here in the
- * mutation's onSuccess where the effect belongs.
- */
+// Soft- or permanently delete a cave. The `networks` tile cache is invalidated
+// alongside the RQ cache — the map projection is fed by /geoloc, not by the
+// cave endpoint, so RQ invalidation alone would leave the marker stale.
 export const useDeleteCave = () => {
   const queryClient = useQueryClient();
   return useMutation({

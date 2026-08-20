@@ -53,11 +53,11 @@ import {
   useOnlineStatus,
   useUserProperties,
   usePermissions,
-  useNotification
+  useNotification,
+  useJoinOrganization,
+  useLeaveOrganization
 } from '../../hooks';
 import { personKeys } from '../../api/queryKeys';
-import { joinOrganization } from '../../actions/Organization/JoinOrganization';
-import { leaveOrganization } from '../../actions/Organization/LeaveOrganization';
 import Alert from '../../components/common/Alert';
 import BoolIcon from '../../components/common/BoolIcon';
 
@@ -1294,6 +1294,8 @@ const AccountPage = () => {
   const [isOrgSearchVisible, setIsOrgSearchVisible] = useState(false);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
   const [pendingLeaveOrg, setPendingLeaveOrg] = useState(null);
+  const joinOrganizationMutation = useJoinOrganization();
+  const leaveOrganizationMutation = useLeaveOrganization();
 
   useEffect(() => {
     dispatch(fetchAccount());
@@ -1309,15 +1311,19 @@ const AccountPage = () => {
       if (!userId || organizations.length === 0) return;
       try {
         await Promise.all(
-          organizations.map(org => dispatch(joinOrganization(userId, org.id)))
+          organizations.map(org =>
+            joinOrganizationMutation.mutateAsync({
+              caverId: userId,
+              organizationId: org.id
+            })
+          )
         );
-        invalidatePerson();
         setIsOrgSearchVisible(false);
       } catch {
         // join failed — leave the search form open so the user can retry
       }
     },
-    [dispatch, userId, invalidatePerson]
+    [userId, joinOrganizationMutation]
   );
 
   const requestLeaveOrganization = useCallback(
@@ -1334,13 +1340,14 @@ const AccountPage = () => {
     if (!pendingLeaveOrg || !userId) return;
     const { id } = pendingLeaveOrg;
     try {
-      await dispatch(leaveOrganization(userId, id));
-      setPendingLeaveOrg(null);
-      invalidatePerson();
-    } catch {
+      await leaveOrganizationMutation.mutateAsync({
+        caverId: userId,
+        organizationId: id
+      });
+    } finally {
       setPendingLeaveOrg(null);
     }
-  }, [dispatch, userId, pendingLeaveOrg, invalidatePerson]);
+  }, [userId, pendingLeaveOrg, leaveOrganizationMutation]);
 
   const nbOrganizations = (person?.organizations ?? []).length;
   const nbEntrances = (person?.exploredEntrances ?? []).length;

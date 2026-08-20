@@ -10,7 +10,6 @@ import country from './CountryReducer';
 import countryEntrances from './CountryEntrancesDataQualityReducer';
 import countryRegions from './CountryRegionsReducer';
 import createDocument from './CreateDocumentReducer';
-import createOrganization from './CreateOrganization';
 import cumulatedLength from './CumulatedLengthReducer';
 import dbExport from './DBExportReducer';
 import detachEntrance from './DetachEntranceReducer';
@@ -34,7 +33,6 @@ import menuNotifications from './MenuNotificationsReducer';
 import messaging from './MessagingReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import notifications from './NotificationsReducer';
-import organization from './OrganizationReducer';
 import partnersCarousel from './PartnersCarouselReducer';
 import pendingDocumentsCount from './PendingDocumentsCountReducer';
 import processDocuments from './ProcessDocumentsReducer';
@@ -62,10 +60,6 @@ import unsubscribeFromMassif from './UnsubscribeFromMassifReducer';
 import unsubscribeFromRegion from './UnsubscribeFromRegionReducer';
 import updateAccount from './UpdateAccountReducer';
 import updateDocument from './UpdateDocumentReducer';
-import updateOrganization from './UpdateOrganization';
-import countryOrganization from './CountryOrganizationReducer';
-import massifOrganization from './MassifOrganizationReducer';
-import regionOrganization from './RegionOrganizationReducer';
 import verifyEmail from './VerifyEmailReducer';
 
 const GCReducer = combineReducers({
@@ -78,10 +72,8 @@ const GCReducer = combineReducers({
   countUnreadNotifications,
   country,
   countryEntrances,
-  countryOrganization,
   countryRegions,
   createDocument,
-  createOrganization,
   cumulatedLength,
   dbExport,
   detachEntrance,
@@ -100,13 +92,11 @@ const GCReducer = combineReducers({
   login,
   map,
   massifEntrances,
-  massifOrganization,
   mfa,
   menuNotifications,
   messaging,
   moveEntranceToCave,
   notifications,
-  organization,
   partnersCarousel,
   pendingDocumentsCount,
   processDocuments,
@@ -118,7 +108,6 @@ const GCReducer = combineReducers({
   region,
   regionDetails,
   regionEntrances,
-  regionOrganization,
   resendVerificationEmail,
   sideMenu,
   signUp,
@@ -135,7 +124,6 @@ const GCReducer = combineReducers({
   unsubscribeFromRegion,
   updateAccount,
   updateDocument,
-  updateOrganization,
   verifyEmail
 });
 

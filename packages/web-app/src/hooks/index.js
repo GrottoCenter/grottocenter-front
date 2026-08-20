@@ -105,6 +105,27 @@ export {
   useDeletePerson,
   useUpdatePersonGroups
 } from './mutations/usePerson';
+export { useOrganization } from './queries/useOrganization';
+export {
+  useCreateOrganization,
+  useUpdateOrganization
+} from './mutations/useOrganizationForm';
+export {
+  useDeleteOrganization,
+  useRestoreOrganization,
+  useJoinOrganization,
+  useLeaveOrganization,
+  useLinkCaveToOrganization,
+  useUnlinkCaveFromOrganization
+} from './mutations/useOrganization';
+export {
+  useSetCountryOrganization,
+  useRemoveCountryOrganization,
+  useSetRegionOrganization,
+  useRemoveRegionOrganization,
+  useSetMassifOrganization,
+  useRemoveMassifOrganization
+} from './mutations/useOrganizationAssociation';
 export { useNotification } from './useNotification';
 export { usePermissions } from './usePermissions';
 export { useSessionExpiry } from './useSessionExpiry';

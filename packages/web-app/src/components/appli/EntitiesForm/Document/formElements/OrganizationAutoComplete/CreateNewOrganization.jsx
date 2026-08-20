@@ -5,9 +5,8 @@ import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import AddIcon from '@mui/icons-material/Add';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
 
-import { postOrganization } from '../../../../../../actions/Organization/CreateOrganization';
+import { useCreateOrganization } from '../../../../../../hooks';
 import ActionButton from '../../../../../common/ActionButton';
 import { DocumentFormContext } from '../../Provider';
 
@@ -24,12 +23,12 @@ const CreateNewOrganization = ({
   onCreateSuccess,
   contextValueName = null
 }) => {
-  const dispatch = useDispatch();
   const {
-    isLoading,
+    isPending: isLoading,
     error,
-    data: organization
-  } = useSelector(state => state.createOrganization);
+    data: organization,
+    mutate
+  } = useCreateOrganization();
   const { updateAttribute } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const inputRef = useRef(null);
@@ -39,12 +38,7 @@ const CreateNewOrganization = ({
   };
 
   const handleSubmit = () => {
-    const organizationToPost = {
-      name: {
-        text: organizationName
-      }
-    };
-    dispatch(postOrganization(organizationToPost));
+    mutate({ name: { text: organizationName } });
   };
 
   useEffect(() => {

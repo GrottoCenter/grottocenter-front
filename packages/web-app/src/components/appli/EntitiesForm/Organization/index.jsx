@@ -1,10 +1,12 @@
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { useUpdateName } from '../../../../hooks';
-import { postOrganization } from '../../../../actions/Organization/CreateOrganization';
-import { updateOrganization } from '../../../../actions/Organization/UpdateOrganization';
+import { useSelector } from 'react-redux';
+import {
+  useCreateOrganization,
+  useUpdateOrganization,
+  useUpdateName
+} from '../../../../hooks';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import { normelizeCoordinate } from '../utils/InputCoordinate';
 import OrganizationFields from './OrganizationFields';
@@ -37,21 +39,22 @@ const defaultOrganizationValues = {
 
 export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
   const isNewOrganization = !organizationValues;
+  const createOrganizationMutation = useCreateOrganization();
+  const updateOrganizationMutation = useUpdateOrganization();
+  const organizationMutation = isNewOrganization
+    ? createOrganizationMutation
+    : updateOrganizationMutation;
   const {
     error: organizationError,
-    isLoading: organizationLoading,
+    isPending: organizationLoading,
     data: organizationData
-  } = useSelector(state =>
-    isNewOrganization ? state.createOrganization : state.updateOrganization
-  );
+  } = organizationMutation;
   const updateNameMutation = useUpdateName();
   const nameError = updateNameMutation.error;
   const nameLoading = updateNameMutation.isPending;
 
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
   defaultOrganizationValues.language = AVAILABLE_LANGUAGES[locale].id;
-
-  const dispatch = useDispatch();
 
   const {
     handleSubmit,
@@ -82,7 +85,7 @@ export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
 
     if (isNewOrganization) {
       const organizationToPost = makePostOrganizationData(data);
-      dispatch(postOrganization(organizationToPost));
+      createOrganizationMutation.mutate(organizationToPost);
     } else {
       if (data.organization.name !== organizationValues) {
         updateNameMutation.mutate({
@@ -95,7 +98,7 @@ export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
         data,
         organizationValues
       );
-      dispatch(updateOrganization(organizationToUpdate));
+      updateOrganizationMutation.mutate(organizationToUpdate);
     }
   };
 

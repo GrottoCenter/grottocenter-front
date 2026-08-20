@@ -11,8 +11,10 @@ import StandardDialog from '../StandardDialog';
 import { NetworkPropTypes } from '../../../types/grotto.type';
 import { EntranceSimplePropTypes } from '../../../types/entrance.type';
 import SearchCaveForm from '../../appli/Form/SearchCaveForm';
-import { linkCave } from '../../../actions/Cave/LinkCave';
-import { unlinkCave } from '../../../actions/Cave/UnlinkCave';
+import {
+  useLinkCaveToOrganization,
+  useUnlinkCaveFromOrganization
+} from '../../../hooks';
 import { linkExploredEntrance } from '../../../actions/Entrance/LinkExploredEntrance';
 import { unlinkExploredEntrance } from '../../../actions/Entrance/UnlinkExploredEntrance';
 import { getEntranceUrl } from '../../../conf/apiRoutes';
@@ -33,6 +35,8 @@ const RelatedCaves = ({
 }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
+  const linkCaveMutation = useLinkCaveToOrganization();
+  const unlinkCaveMutation = useUnlinkCaveFromOrganization();
   const [isAdding, setIsAdding] = useState(false);
   const [pendingRemove, setPendingRemove] = useState(null);
 
@@ -46,13 +50,16 @@ const RelatedCaves = ({
   const handleUnlinkCave = useCallback(
     async caveId => {
       try {
-        await dispatch(unlinkCave(caveId, entityId));
+        await unlinkCaveMutation.mutateAsync({
+          caveId,
+          organizationId: entityId
+        });
         onRefresh();
       } catch (error) {
         console.error('Error unlinking cave:', error);
       }
     },
-    [dispatch, entityId, onRefresh]
+    [unlinkCaveMutation, entityId, onRefresh]
   );
 
   const handleUnlinkOrganizationEntrance = useCallback(
@@ -129,7 +136,11 @@ const RelatedCaves = ({
           try {
             if (isOrganization) {
               const caveId = await fetchCaveIdFromEntrance(entranceId);
-              if (caveId) await dispatch(linkCave(caveId, entityId));
+              if (caveId)
+                await linkCaveMutation.mutateAsync({
+                  caveId,
+                  organizationId: entityId
+                });
             } else {
               await dispatch(linkExploredEntrance(entranceId, entityId));
             }
@@ -153,6 +164,7 @@ const RelatedCaves = ({
     },
     [
       dispatch,
+      linkCaveMutation,
       entityId,
       isOrganization,
       fetchCaveIdFromEntrance,

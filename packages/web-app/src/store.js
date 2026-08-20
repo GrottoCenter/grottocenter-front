@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import GCReducer from './reducers/GCReducer';
-import mapCacheInvalidationMiddleware from './middlewares/mapCacheInvalidationMiddleware';
 
 // The store lives here rather than inside ApplicationShell so that code running
 // outside React can reach it — the QueryClient's global error handler is created
@@ -22,7 +21,7 @@ const store = configureStore({
       // keeps the guard where it is cheap and useful.
       immutableCheck: { ignoredPaths: ['map'] },
       serializableCheck: { ignoredPaths: ['map'] }
-    }).concat(mapCacheInvalidationMiddleware)
+    })
 });
 
 export default store;

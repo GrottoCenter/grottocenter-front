@@ -57,3 +57,8 @@ export const personKeys = {
   all: ['person'],
   detail: detailKey('person')
 };
+
+export const organizationKeys = {
+  all: ['organization'],
+  detail: detailKey('organization')
+};

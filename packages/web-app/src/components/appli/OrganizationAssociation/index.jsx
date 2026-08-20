@@ -1,12 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
-import { useQueryClient } from '@tanstack/react-query';
 import { Skeleton, Box, Button, Typography } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
-import { usePermissions, useNotification } from '../../../hooks';
+import {
+  usePermissions,
+  useNotification,
+  useSetCountryOrganization,
+  useRemoveCountryOrganization,
+  useSetRegionOrganization,
+  useRemoveRegionOrganization,
+  useSetMassifOrganization,
+  useRemoveMassifOrganization
+} from '../../../hooks';
 
 import AssociationForm from './AssociationForm';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
@@ -15,31 +22,63 @@ import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import SectionCreateButton from '../../common/SectionCreateButton';
 import StandardDialog from '../../common/StandardDialog';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
-import {
-  setCountryOrganization,
-  removeCountryOrganization,
-  resetCountryOrganization
-} from '../../../actions/Country/CountryOrganization';
-import {
-  setRegionOrganization,
-  removeRegionOrganization,
-  resetRegionOrganization
-} from '../../../actions/Region/RegionOrganization';
-import {
-  setMassifOrganization,
-  removeMassifOrganization,
-  resetMassifOrganization
-} from '../../../actions/Massif/MassifOrganization';
-import { fetchCountry } from '../../../actions/Country/GetCountry';
-import { fetchRegion } from '../../../actions/Region/GetRegion';
-import { massifKeys } from '../../../api/queryKeys';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 
-// Maps an entityType to its Redux reducer key registered in GCReducer.
-const ORGANIZATION_REDUCER_KEYS = {
-  country: 'countryOrganization',
-  region: 'regionOrganization',
-  massif: 'massifOrganization'
+// Both set/remove hooks are read for a given entity type; the effective pair
+// is chosen at call time so the same component covers country/region/massif.
+const useAssociationMutations = (entityType, parentEntityId, entityId) => {
+  const setCountry = useSetCountryOrganization();
+  const removeCountry = useRemoveCountryOrganization();
+  const setRegion = useSetRegionOrganization();
+  const removeRegion = useRemoveRegionOrganization();
+  const setMassif = useSetMassifOrganization();
+  const removeMassif = useRemoveMassifOrganization();
+
+  if (entityType === 'country') {
+    return {
+      setMutation: setCountry,
+      removeMutation: removeCountry,
+      makeSetArgs: orgData => ({
+        countryId: entityId,
+        organizationId: orgData.id,
+        organizationName: orgData.name
+      }),
+      makeRemoveArgs: orgId => ({
+        countryId: entityId,
+        organizationId: orgId
+      })
+    };
+  }
+  if (entityType === 'region') {
+    return {
+      setMutation: setRegion,
+      removeMutation: removeRegion,
+      makeSetArgs: orgData => ({
+        countryId: parentEntityId,
+        regionId: entityId,
+        organizationId: orgData.id,
+        organizationName: orgData.name
+      }),
+      makeRemoveArgs: orgId => ({
+        countryId: parentEntityId,
+        regionId: entityId,
+        organizationId: orgId
+      })
+    };
+  }
+  return {
+    setMutation: setMassif,
+    removeMutation: removeMassif,
+    makeSetArgs: orgData => ({
+      massifId: entityId,
+      organizationId: orgData.id,
+      organizationName: orgData.name
+    }),
+    makeRemoveArgs: orgId => ({
+      massifId: entityId,
+      organizationId: orgId
+    })
+  };
 };
 
 const AssociationSection = ({
@@ -50,114 +89,50 @@ const AssociationSection = ({
   isLoading = false
 }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const { onError } = useNotification();
 
   const { isAuth } = usePermissions();
   const canManageAssociations = isAuth;
 
-  const reducerKey = ORGANIZATION_REDUCER_KEYS[entityType];
-  const reducerState = useSelector(state => state[reducerKey]);
-  const status = reducerState?.status;
-  const error = reducerState?.error;
+  const { setMutation, removeMutation, makeSetArgs, makeRemoveArgs } =
+    useAssociationMutations(entityType, parentEntityId, entityId);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [orgToRemove, setOrgToRemove] = useState(null);
-  // Both track an in-flight set/remove operation, but serve different purposes:
-  // - isPending is React state, driving re-renders to disable buttons / show progress.
-  // - pendingOperationRef is a ref read inside the status effect to tell "our" status
-  //   transitions apart from unrelated ones (e.g. another instance) without re-triggering it.
-  const [isPending, setIsPending] = useState(false);
-  const pendingOperationRef = useRef(false);
 
-  // Refresh entity data when association is updated successfully
-  useEffect(() => {
-    if (pendingOperationRef.current && status === REDUCER_STATUS.SUCCEEDED) {
-      if (entityType === 'country') {
-        dispatch(fetchCountry(entityId));
-        dispatch(resetCountryOrganization());
-      } else if (entityType === 'region') {
-        dispatch(fetchRegion(parentEntityId, entityId));
-        dispatch(resetRegionOrganization());
-      } else if (entityType === 'massif') {
-        queryClient.invalidateQueries({
-          queryKey: massifKeys.detail(entityId)
-        });
-        dispatch(resetMassifOrganization());
-      }
-
-      setOrgToRemove(null);
-      setIsPending(false);
-      pendingOperationRef.current = false;
-    } else if (
-      pendingOperationRef.current &&
-      status === REDUCER_STATUS.FAILED
-    ) {
-      // Surface the failure: without this, a rejected set/remove just silently
-      // re-enables the buttons (the in-form Alert is masked once isPending
-      // clears below), so the user gets no feedback. Covers both flows.
-      onError(
-        error?.message ||
-          formatMessage({ id: 'An error occurred while saving.' })
-      );
-      setIsPending(false);
-      pendingOperationRef.current = false;
-    }
-  }, [
-    status,
-    error,
-    dispatch,
-    queryClient,
-    entityType,
-    entityId,
-    parentEntityId,
-    onError,
-    formatMessage
-  ]);
-
-  useEffect(
-    () => () => {
-      // Clean up reducer state on unmount to prevent stale status affecting other instances
-      if (entityType === 'country') dispatch(resetCountryOrganization());
-      else if (entityType === 'region') dispatch(resetRegionOrganization());
-      else if (entityType === 'massif') dispatch(resetMassifOrganization());
-    },
-    [dispatch, entityType]
-  );
+  const isPending = setMutation.isPending || removeMutation.isPending;
+  // The AssociationForm expects the legacy REDUCER_STATUS enum. Bridging here
+  // (rather than reshaping the form) keeps the change local.
+  const status = (() => {
+    if (setMutation.isPending) return REDUCER_STATUS.LOADING;
+    if (setMutation.isError) return REDUCER_STATUS.FAILED;
+    if (setMutation.isSuccess) return REDUCER_STATUS.SUCCEEDED;
+    return undefined;
+  })();
+  const error = setMutation.error ?? removeMutation.error;
 
   const handleSet = orgData => {
-    setIsPending(true);
-    pendingOperationRef.current = true;
-    if (entityType === 'country') {
-      dispatch(setCountryOrganization(entityId, orgData.id, orgData.name));
-    } else if (entityType === 'region') {
-      dispatch(
-        setRegionOrganization(
-          parentEntityId,
-          entityId,
-          orgData.id,
-          orgData.name
+    setMutation.mutate(makeSetArgs(orgData), {
+      onError: err =>
+        onError(
+          err?.body?.message ||
+            err?.message ||
+            formatMessage({ id: 'An error occurred while saving.' })
         )
-      );
-    } else if (entityType === 'massif') {
-      dispatch(setMassifOrganization(entityId, orgData.id, orgData.name));
-    }
+    });
   };
 
   const handleRemove = () => {
     if (!orgToRemove) return;
-    setIsPending(true);
-    pendingOperationRef.current = true;
-    if (entityType === 'country') {
-      dispatch(removeCountryOrganization(entityId, orgToRemove.id));
-    } else if (entityType === 'region') {
-      dispatch(
-        removeRegionOrganization(parentEntityId, entityId, orgToRemove.id)
-      );
-    } else if (entityType === 'massif') {
-      dispatch(removeMassifOrganization(entityId, orgToRemove.id));
-    }
+    removeMutation.mutate(makeRemoveArgs(orgToRemove.id), {
+      onSuccess: () => setOrgToRemove(null),
+      onError: err =>
+        onError(
+          err?.body?.message ||
+            err?.message ||
+            formatMessage({ id: 'An error occurred while saving.' })
+        )
+    });
   };
 
   const isEmpty = !organizations || organizations.length === 0;
@@ -197,7 +172,7 @@ const AssociationSection = ({
               <AssociationForm
                 onClose={() => setIsFormOpen(false)}
                 onSubmit={handleSet}
-                status={isPending ? status : undefined}
+                status={status}
                 error={error}
               />
             )}
@@ -234,7 +209,7 @@ const AssociationSection = ({
                   <Button
                     variant="outlined"
                     onClick={() => setOrgToRemove(null)}
-                    disabled={isPending && status === REDUCER_STATUS.LOADING}>
+                    disabled={isPending}>
                     {formatMessage({ id: 'Cancel' })}
                   </Button>
                   <Button
@@ -242,7 +217,7 @@ const AssociationSection = ({
                     variant="contained"
                     startIcon={<LinkOffIcon />}
                     onClick={handleRemove}
-                    disabled={isPending && status === REDUCER_STATUS.LOADING}>
+                    disabled={isPending}>
                     {formatMessage({ id: 'Remove' })}
                   </Button>
                 </>
