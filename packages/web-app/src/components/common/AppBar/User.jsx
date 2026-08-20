@@ -13,7 +13,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import BuildIcon from '@mui/icons-material/Build';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, forwardRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
@@ -29,6 +29,15 @@ import Translate from '../Translate';
 
 // Constants
 const MENU_MIN_WIDTH = 250;
+
+// Non-interactive Menu child: muiSkipListHighlight must be carried by the
+// component type, not by its props — otherwise React tries to forward it to
+// the DOM and logs a warning.
+const NonMenuItem = forwardRef((props, ref) => (
+  <Box ref={ref} component="li" role="presentation" {...props} />
+));
+NonMenuItem.displayName = 'NonMenuItem';
+NonMenuItem.muiSkipListHighlight = true;
 
 const UserMenu = ({
   authTokenExpirationDate,
@@ -159,10 +168,7 @@ const UserMenu = ({
           }
         }}>
         {/* Primary content: User info */}
-        <Box
-          component="li"
-          role="presentation"
-          muiSkipListHighlight
+        <NonMenuItem
           sx={{
             px: 1,
             py: 1,
@@ -193,7 +199,7 @@ const UserMenu = ({
               }
             )}
           </Typography>
-        </Box>
+        </NonMenuItem>
 
         {/* Primary actions */}
         <MenuItem disabled={!userId} onClick={handleMyAccountClick}>
@@ -232,17 +238,13 @@ const UserMenu = ({
 
         {/* Session expired warning */}
         {isSessionExpired && (
-          <Box
-            component="li"
-            role="presentation"
-            muiSkipListHighlight
-            sx={{ px: 1, py: '12px' }}>
+          <NonMenuItem sx={{ px: 1, py: '12px' }}>
             <Alert severity="error">
               {formatMessage({
                 id: 'Your session has expired: please log in again.'
               })}
             </Alert>
-          </Box>
+          </NonMenuItem>
         )}
 
         {/* Secondary actions */}
