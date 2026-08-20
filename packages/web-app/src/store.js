@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-import createDebounce from 'redux-debounced';
 
 import GCReducer from './reducers/GCReducer';
 import mapCacheInvalidationMiddleware from './middlewares/mapCacheInvalidationMiddleware';
@@ -23,11 +22,7 @@ const store = configureStore({
       // keeps the guard where it is cheap and useful.
       immutableCheck: { ignoredPaths: ['map'] },
       serializableCheck: { ignoredPaths: ['map'] }
-    })
-      // Before thunk, as in the applyMiddleware call this replaces: the debounce
-      // middleware must see an action before the thunk middleware unwraps it.
-      .prepend(createDebounce())
-      .concat(mapCacheInvalidationMiddleware)
+    }).concat(mapCacheInvalidationMiddleware)
 });
 
 export default store;

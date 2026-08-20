@@ -39,6 +39,9 @@ const MapClusters = React.lazy(
 );
 
 const MAP_POSITION_KEY = 'grottocenter_map_position';
+// Delay before the massif-polygon fetch leaves, in milliseconds. Carried over
+// from the `redux-debounced` metadata this replaces — see massifsDebounceRef.
+const MASSIFS_DEBOUNCE_MS = 500;
 
 function getSavedPosition() {
   try {
@@ -139,6 +142,12 @@ const Map = () => {
   // avoiding lagging due to URL updates.
   // Leaflet always handles the visual movement immediately on its own.
   const urlDebounceRef = useRef(null);
+  // massifsDebounceRef: the other three viewport fetches below go through the
+  // tile cache, which bounds their rate on its own; massifs don't, so this is
+  // what stops them firing on every moveend at polygon zoom. Same 500 ms the
+  // `redux-debounced` middleware applied before it was removed — this is the
+  // only site that dispatches fetchMassifs, so debouncing here is equivalent.
+  const massifsDebounceRef = useRef(null);
 
   const handleUpdate = useCallback(
     ({ markers, showMassifPolygons, zoom: newZoom, center, bounds }) => {
@@ -158,8 +167,14 @@ const Map = () => {
       if (includes('entrances', markers)) {
         dispatch(fetchEntrances(criteria));
       }
+      // Cleared unconditionally so toggling the layer off also drops a fetch
+      // that was still pending for the previous viewport.
+      if (massifsDebounceRef.current) clearTimeout(massifsDebounceRef.current);
       if (showMassifPolygons) {
-        dispatch(fetchMassifs(criteria));
+        massifsDebounceRef.current = setTimeout(() => {
+          massifsDebounceRef.current = null;
+          dispatch(fetchMassifs(criteria));
+        }, MASSIFS_DEBOUNCE_MS);
       }
 
       if (center.lat !== defaultCoord.lat || center.lng !== defaultCoord.lng) {
@@ -184,6 +199,7 @@ const Map = () => {
   useEffect(
     () => () => {
       if (urlDebounceRef.current) clearTimeout(urlDebounceRef.current);
+      if (massifsDebounceRef.current) clearTimeout(massifsDebounceRef.current);
     },
     []
   );

@@ -2261,7 +2261,6 @@ __metadata:
     react-socks: "npm:^2.2.0"
     react-to-print: "npm:^3.3.0"
     redux: "npm:^5.0.1"
-    redux-debounced: "npm:^0.5.0"
     redux-thunk: "npm:^3.1.0"
     rollup-plugin-visualizer: "npm:^7.0.1"
     sharp: "npm:^0.35.2"
@@ -12062,13 +12061,6 @@ __metadata:
     indent-string: "npm:^4.0.0"
     strip-indent: "npm:^3.0.0"
   checksum: 10/fa1ef20404a2d399235e83cc80bd55a956642e37dd197b4b612ba7327bf87fa32745aeb4a1634b2bab25467164ab4ed9c15be2c307923dd08b0fe7c52431ae6b
-  languageName: node
-  linkType: hard
-
-"redux-debounced@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "redux-debounced@npm:0.5.0"
-  checksum: 10/8d99b17902d0e3580136a94b26ccc5ed3e8cb526d86aff61447e7a9de039f80ccae1dfcbecd0a931cb684238616301149bbd19949603194a472e98f66382253f
   languageName: node
   linkType: hard
 
