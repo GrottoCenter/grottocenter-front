@@ -234,7 +234,7 @@ const GCReducer = combineReducers({
 });
 ```
 
-The store is created in `src/pages/ApplicationShell.jsx` via `createStore(GCReducer, ...)` — you never need to touch that file when adding a reducer.
+The store is created in `src/store.js` via `configureStore({ reducer: GCReducer })` — you never need to touch that file when adding a reducer. It lives in its own module so code outside React (the `QueryClient` error handler) can dispatch; never call `createStore`, deprecated since Redux 4.2.
 
 ---
 

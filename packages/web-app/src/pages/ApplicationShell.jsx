@@ -2,16 +2,12 @@ import { useCallback, useRef, useEffect, Suspense } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
-import createDebounce from 'redux-debounced';
 import { SnackbarContent, SnackbarProvider } from 'notistack';
-import { createStore, applyMiddleware, compose } from 'redux';
-import { thunk } from 'redux-thunk';
 import PropTypes from 'prop-types';
 import { styled, useTheme } from '@mui/material/styles';
 import { Alert, Box, CircularProgress, useMediaQuery } from '@mui/material';
 
-import GCReducer from '../reducers/GCReducer';
-import mapCacheInvalidationMiddleware from '../middlewares/mapCacheInvalidationMiddleware';
+import store from '../store';
 import {
   bootstrapIntl,
   changeLocale,
@@ -50,14 +46,6 @@ async function transitionToReact() {
     loaderEl.remove();
   }, 410);
 }
-
-const middlewares = applyMiddleware(
-  createDebounce(),
-  thunk,
-  mapCacheInvalidationMiddleware
-);
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const gcStore = createStore(GCReducer, composeEnhancers(middlewares));
 
 const customOnIntlError = err => {
   // Custom handler for missing translation.
@@ -251,7 +239,7 @@ const ApplicationShell = () => {
           dedupe compares by identity, and a snackbar whose message is a React
           node (the notifiers all pass <FormattedMessage>) never matches itself,
           so it would opt out of deduplication silently. */}
-      <Provider store={gcStore}>
+      <Provider store={store}>
         <HydratedIntlProvider onError={customOnIntlError}>
           <SnackbarProvider
             maxSnack={4}
