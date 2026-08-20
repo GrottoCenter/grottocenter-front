@@ -4,15 +4,6 @@ import { useIsMutating } from '@tanstack/react-query';
 import { useUserProperties } from './useUserProperties';
 import { useSubscriptionsList } from './queries/useSubscriptionsList';
 
-// Any concurrent (subscribe|unsubscribe) mutation targeting one of the six
-// endpoints registers under mutationKey xxx-subscription so useIsMutating
-// can report a per-domain loading flag without threading each mutation
-// object into every caller. Kept module-scoped so the identity is stable.
-const isMutatingBy =
-  key =>
-  ({ mutation }) =>
-    mutation.options.mutationKey?.[0] === key;
-
 /**
  * Consumer-facing subscription helper.
  *
@@ -54,10 +45,9 @@ export const useSubscriptions = () => {
     isPending,
     isError,
     isCountryLoading:
-      useIsMutating({ predicate: isMutatingBy('country-subscription') }) > 0,
+      useIsMutating({ mutationKey: ['country-subscription'] }) > 0,
     isRegionLoading:
-      useIsMutating({ predicate: isMutatingBy('region-subscription') }) > 0,
-    isMassifLoading:
-      useIsMutating({ predicate: isMutatingBy('massif-subscription') }) > 0
+      useIsMutating({ mutationKey: ['region-subscription'] }) > 0,
+    isMassifLoading: useIsMutating({ mutationKey: ['massif-subscription'] }) > 0
   };
 };
