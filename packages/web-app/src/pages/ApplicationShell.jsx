@@ -28,6 +28,7 @@ import UpdatePrompt from '../components/appli/UpdatePrompt';
 import SideMenu from '../components/common/SideMenu';
 
 import AppBar from '../components/common/AppBar';
+import ImpersonationIndicator from '../components/common/ImpersonationIndicator';
 import LoginDialog from '../components/appli/Login';
 
 async function transitionToReact() {
@@ -188,6 +189,12 @@ const ApplicationLayout = () => {
           `useSideMenuOffset()` hands out exactly that number. */}
       <AppBar />
       <SideMenu />
+      {/* Fixed pill centred at the top of the viewport; renders null unless
+          a real admin is currently previewing another role, so it has zero
+          layout footprint for everyone else. Sibling of AppBar rather than
+          inside MainWrapper: the side-menu margin doesn't apply — the pill
+          is anchored to the viewport, not the content column. */}
+      <ImpersonationIndicator />
       <MainWrapper $offset={sideMenuOffset} $transition={transition}>
         <LoginDialog />
 

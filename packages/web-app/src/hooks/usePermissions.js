@@ -14,12 +14,33 @@ const isTokenExpired = authState => {
 
 export function usePermissions() {
   const authState = useSelector(state => state.login);
+  const isRealAdmin = hasRole(authState, 'Administrator', {
+    ignoreImpersonation: true
+  });
+  const impersonatedRole = isRealAdmin
+    ? (authState.impersonatedRole ?? null)
+    : null;
+  // "Anonymous" impersonation is our synthetic role for "not logged in": the
+  // UI must behave as if no session existed — login button in the AppBar,
+  // PrivateRoutes blocked, private queries disabled. Every other impersonated
+  // role keeps isAuth true so the app still has a session to hang requests
+  // off. We use a name distinct from the Visitor group in GroupHelper to
+  // avoid conflating "user with the Visitor role" and "not logged in".
+  const isAnonymousMode = impersonatedRole === 'Anonymous';
+  const hasLiveSession =
+    authState.authTokenDecoded !== null && !isTokenExpired(authState);
   return {
     isAdmin: hasRole(authState, 'Administrator'),
-    isAuth: authState.authTokenDecoded !== null && !isTokenExpired(authState),
+    isAuth: hasLiveSession && !isAnonymousMode,
     isLeader: hasRole(authState, 'Leader'),
     isModerator: hasRole(authState, 'Moderator'),
     isTokenExpired: isTokenExpired(authState),
-    isUser: hasRole(authState, 'User')
+    isUser: hasRole(authState, 'User'),
+    // Ignore-impersonation flag so the ImpersonationIndicator and its
+    // launcher stay visible when a real admin is currently masquerading as a
+    // lower role.
+    isRealAdmin,
+    isImpersonating: Boolean(impersonatedRole),
+    impersonatedRole
   };
 }

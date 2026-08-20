@@ -10,12 +10,45 @@ import {
   DISPLAY_LOGIN_DIALOG,
   HIDE_LOGIN_DIALOG,
   LOGOUT,
+  SET_IMPERSONATED_ROLE,
+  CLEAR_IMPERSONATION,
   decodeJWT
 } from '../actions/Login';
 import { authTokenName } from '../conf/config';
+import {
+  IMPERSONATED_ROLE_KEY,
+  isImpersonatableRole
+} from '../utils/impersonation';
+
+// Per-tab so a forgotten impersonation cannot leak across tabs or persist after
+// the browser is closed. See ImpersonationIndicator for the UI.
 
 const removeTokenFromLocalStorage = () => {
   window.localStorage.removeItem(authTokenName);
+};
+
+const readImpersonatedRole = () => {
+  try {
+    const roleName =
+      window.sessionStorage.getItem(IMPERSONATED_ROLE_KEY) || null;
+    if (isImpersonatableRole(roleName)) return roleName;
+    window.sessionStorage.removeItem(IMPERSONATED_ROLE_KEY);
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+const writeImpersonatedRole = roleName => {
+  try {
+    if (roleName) {
+      window.sessionStorage.setItem(IMPERSONATED_ROLE_KEY, roleName);
+    } else {
+      window.sessionStorage.removeItem(IMPERSONATED_ROLE_KEY);
+    }
+  } catch {
+    /* sessionStorage disabled — impersonation just won't survive a refresh */
+  }
 };
 
 const getRawTokenIfNotExpired = () => {
@@ -39,6 +72,7 @@ const initialState = {
   },
   enrollmentToken: null,
   error: null,
+  impersonatedRole: readImpersonatedRole(),
   isFetching: false,
   isLoginDialogDisplayed: false,
   isMfaRequiredDisplayed: false,
@@ -66,6 +100,7 @@ const reducer = (state = initialState, action) => {
       };
     case FETCH_LOGIN_SUCCESS:
       window.localStorage.setItem(authTokenName, action.token);
+      writeImpersonatedRole(null);
       return {
         ...state,
         authToken: action.token,
@@ -75,7 +110,8 @@ const reducer = (state = initialState, action) => {
         isFetching: false,
         isMfaRequiredDisplayed: false,
         isMfaEnrollmentRequiredDisplayed: false,
-        authTokenDecoded: action.tokenDecoded
+        authTokenDecoded: action.tokenDecoded,
+        impersonatedRole: null
       };
     case FETCH_LOGIN_MUST_RESET:
       return {
@@ -143,11 +179,26 @@ const reducer = (state = initialState, action) => {
       };
     case LOGOUT:
       removeTokenFromLocalStorage();
+      writeImpersonatedRole(null);
       return {
         ...state,
         authToken: undefined,
         authorizationHeader: undefined,
-        authTokenDecoded: null
+        authTokenDecoded: null,
+        impersonatedRole: null
+      };
+    case SET_IMPERSONATED_ROLE:
+      if (!isImpersonatableRole(action.roleName)) return state;
+      writeImpersonatedRole(action.roleName);
+      return {
+        ...state,
+        impersonatedRole: action.roleName
+      };
+    case CLEAR_IMPERSONATION:
+      writeImpersonatedRole(null);
+      return {
+        ...state,
+        impersonatedRole: null
       };
     default:
       return state;
