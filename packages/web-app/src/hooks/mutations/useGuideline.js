@@ -9,17 +9,17 @@ import {
   rollbackGuidelineUrl
 } from '../../conf/apiRoutes';
 import { apiPost, apiPatch, apiDelete } from '../../api/client';
-import { massifKeys } from '../../api/queryKeys';
+import { countryKeys, massifKeys } from '../../api/queryKeys';
 
-// A guideline is many-to-many with country / region / massif. Massif details
-// live in React Query; country and region details still live in Redux
-// (CountryReducer, RegionDetailsReducer listen to the *_GUIDELINE_* actions
-// to keep state.country.guidelines / state.regionDetails.guidelines in sync).
-//
-// Hybrid until Phase B migrates those two slices: each mutation invalidates
-// the massif key AND dispatches the legacy Redux action so both worlds see
-// the update. The dispatch drops out once Country/Region are RQ; the whole
-// GUIDELINE_ACTIONS block leaves the bridge middleware at the same moment.
+// A guideline is many-to-many with country / region / massif. Country and
+// massif details now live in React Query; RegionDetailsReducer still listens
+// to the *_GUIDELINE_* actions to keep state.regionDetails.guidelines in
+// sync until B4. The dispatch drops out completely once Region is RQ.
+
+const invalidateGuidelineHosts = queryClient => {
+  queryClient.invalidateQueries({ queryKey: countryKeys.all });
+  queryClient.invalidateQueries({ queryKey: massifKeys.all });
+};
 
 const useGuidelineMutation = ({ mutationFn, dispatchType }) => {
   const queryClient = useQueryClient();
@@ -27,7 +27,7 @@ const useGuidelineMutation = ({ mutationFn, dispatchType }) => {
   return useMutation({
     mutationFn,
     onSuccess: data => {
-      queryClient.invalidateQueries({ queryKey: massifKeys.all });
+      invalidateGuidelineHosts(queryClient);
       dispatch({ type: dispatchType, guideline: data });
     }
   });
@@ -71,7 +71,7 @@ export const useDeleteGuideline = () => {
       return { ...(data || {}), id };
     },
     onSuccess: (data, { isPermanent }) => {
-      queryClient.invalidateQueries({ queryKey: massifKeys.all });
+      invalidateGuidelineHosts(queryClient);
       dispatch({
         type: isPermanent
           ? 'DELETE_GUIDELINE_PERMANENT_SUCCESS'

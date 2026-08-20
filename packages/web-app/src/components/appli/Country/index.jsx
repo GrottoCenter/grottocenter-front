@@ -21,7 +21,6 @@ import PageHeader from '../../common/Layouts/PageHeader';
 import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import FetchErrorState from '../../common/FetchErrorState';
-import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
 import CountryPropTypes from './propTypes';
 import { usePermissions, useSubscriptions, useSharePage } from '../../../hooks';
@@ -35,15 +34,16 @@ const Country = ({
   canSubscribe,
   country,
   error,
+  isPaused = false,
+  isFetching = false,
   onRetry = null,
   onSubscribe,
-  onUnsubscribe,
-  status
+  onUnsubscribe
 }) => {
   const { formatMessage, locale } = useIntl();
   const navigate = useNavigate();
   const componentRef = useRef();
-  const isLoading = status === REDUCER_STATUS.LOADING;
+  const isLoading = isFetching && !country;
   const permissions = usePermissions();
   const handleShare = useSharePage();
   const handlePrint = useReactToPrint({ contentRef: componentRef });
@@ -68,7 +68,7 @@ const Country = ({
 
   let title = '';
   if (isLoading) title = undefined;
-  if (status === REDUCER_STATUS.SUCCEEDED) {
+  if (country) {
     title = getLocalizedCountryName(country.id, locale, country.nativeName);
   }
 
@@ -138,11 +138,12 @@ const Country = ({
             </Card>
           </SectionStack>
         )}
-        {error && (
+        {(error || isPaused) && (
           <SectionStack>
             <Card sx={{ p: 2 }}>
               <FetchErrorState
                 error={error}
+                isPaused={isPaused}
                 onRetry={onRetry}
                 messageId="Error, the country data you are looking for is not available."
               />

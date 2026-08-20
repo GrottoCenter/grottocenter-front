@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchRegion } from '../../actions/Region/GetRegion';
 import Region from '../../components/appli/Region';
 import {
+  useCountry,
   usePermissions,
   useRefetchOnReconnect,
   useUserProperties
@@ -19,7 +20,7 @@ const RegionPage = () => {
   const userProperties = useUserProperties();
   const permissions = usePermissions();
   const { region, error, status } = useSelector(state => state.regionDetails);
-  const { country } = useSelector(state => state.country);
+  const { data: country } = useCountry(countryId);
   const onSubscribe = () => dispatch(subscribeToRegion(countryId, regionId));
   const onUnsubscribe = () =>
     dispatch(unsubscribeFromRegion(countryId, regionId));

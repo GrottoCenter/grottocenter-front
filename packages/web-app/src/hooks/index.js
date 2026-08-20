@@ -106,6 +106,7 @@ export {
   useUpdatePersonGroups
 } from './mutations/usePerson';
 export { useOrganization } from './queries/useOrganization';
+export { useCountry } from './queries/useCountry';
 export {
   useCreateOrganization,
   useUpdateOrganization

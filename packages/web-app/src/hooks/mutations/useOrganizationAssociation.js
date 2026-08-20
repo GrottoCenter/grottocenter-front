@@ -11,9 +11,8 @@ import {
   deleteMassifOrganizationUrl
 } from '../../conf/apiRoutes';
 import { apiPost, apiPut, apiDelete } from '../../api/client';
-import { massifKeys, organizationKeys } from '../../api/queryKeys';
+import { countryKeys, massifKeys, organizationKeys } from '../../api/queryKeys';
 import { invalidateAll } from '../../utils/mapTileCache';
-import { fetchCountry } from '../../actions/Country/GetCountry';
 import { fetchRegion } from '../../actions/Region/GetRegion';
 
 // The AssociationForm accepts either an existing organization (organizationId)
@@ -37,12 +36,11 @@ const invalidateOrgKeys = queryClient => {
   invalidateAll('organizations');
 };
 
-// Country / Region details are still Redux slices (migrating in B3/B4). Until
-// then, dispatching the legacy fetch action is the only way to refresh the
-// parent entity view after an association changes.
+// Region details are still a Redux slice (migrating in B4). Until then the
+// region set/remove hooks dispatch the legacy fetch action to refresh that
+// slice; country and massif both invalidate their RQ detail key directly.
 export const useSetCountryOrganization = () => {
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
   return useMutation({
     mutationFn: async ({ countryId, organizationId, organizationName }) => {
       const finalOrgId = await resolveOrganizationId({
@@ -52,7 +50,9 @@ export const useSetCountryOrganization = () => {
       return apiPut(putCountryOrganizationUrl(countryId, finalOrgId));
     },
     onSuccess: (_data, { countryId }) => {
-      dispatch(fetchCountry(countryId));
+      queryClient.invalidateQueries({
+        queryKey: countryKeys.detail(countryId)
+      });
       invalidateOrgKeys(queryClient);
     }
   });
@@ -60,12 +60,13 @@ export const useSetCountryOrganization = () => {
 
 export const useRemoveCountryOrganization = () => {
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
   return useMutation({
     mutationFn: ({ countryId, organizationId }) =>
       apiDelete(deleteCountryOrganizationUrl(countryId, organizationId)),
     onSuccess: (_data, { countryId }) => {
-      dispatch(fetchCountry(countryId));
+      queryClient.invalidateQueries({
+        queryKey: countryKeys.detail(countryId)
+      });
       invalidateOrgKeys(queryClient);
     }
   });

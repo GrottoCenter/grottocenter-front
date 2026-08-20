@@ -3,9 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
-import { fetchCountry } from '../../actions/Country/GetCountry';
 import { fetchRegion } from '../../actions/Region/GetRegion';
-import { useMassif } from '../../hooks';
+import { useCountry, useMassif } from '../../hooks';
 import getLocalizedCountryName from '../../helpers/countryName';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import EntitySearchPage from '../../components/appli/AdvancedSearch/EntitySearchPage';
@@ -25,16 +24,13 @@ const EntrancesListPage = () => {
   const dispatch = useDispatch();
   const { formatMessage, locale } = useIntl();
 
-  const { country, status: countryStatus } = useSelector(
-    state => state.country
-  );
+  const { data: country } = useCountry(countryId);
   const { region, status: regionStatus } = useSelector(
     state => state.regionDetails
   );
   const { data: massif, isPending: massifFetching } = useMassif(massifId);
 
   useEffect(() => {
-    if (countryId) dispatch(fetchCountry(countryId));
     if (regionId && countryId) dispatch(fetchRegion(countryId, regionId));
   }, [countryId, regionId, dispatch]);
 
@@ -57,7 +53,7 @@ const EntrancesListPage = () => {
     );
   }
 
-  const countryReady = countryStatus === REDUCER_STATUS.SUCCEEDED && country;
+  const countryReady = Boolean(country);
   if (countryReady) {
     const flag = getFlagEmoji(country.id);
     const localizedCountry = getLocalizedCountryName(

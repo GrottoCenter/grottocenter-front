@@ -6,7 +6,6 @@ import bannedCavers from './BannedCaversReducer';
 import changeEmail from './ChangeEmail';
 import changePassword from './ChangePassword';
 import countUnreadNotifications from './CountUnreadNotificationsReducer';
-import country from './CountryReducer';
 import countryEntrances from './CountryEntrancesDataQualityReducer';
 import countryRegions from './CountryRegionsReducer';
 import createDocument from './CreateDocumentReducer';
@@ -70,7 +69,6 @@ const GCReducer = combineReducers({
   changeEmail,
   changePassword,
   countUnreadNotifications,
-  country,
   countryEntrances,
   countryRegions,
   createDocument,
