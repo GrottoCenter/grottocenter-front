@@ -7,8 +7,8 @@
 
 ## Context
 
-The app manages server state by hand in Redux: 107 slices in `GCReducer`, most of
-them `{ data, loading, error }` triplets caching an API response. 187 `dispatch(fetchX)`
+The app manages server state by hand in Redux: 106 slices in `GCReducer` when this
+was written, most of them `{ data, loading, error }` triplets caching an API response. 187 `dispatch(fetchX)`
 call sites each repeat the same manual "don't refetch if already loaded or in flight"
 guard. 28 new reducers were created in the 12 months preceding this decision — the
 boilerplate is a recurring tax on every feature, not frozen legacy.
