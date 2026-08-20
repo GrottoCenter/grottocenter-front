@@ -27,9 +27,6 @@ const DocumentValidationPage = () => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const { isLoading, data, totalCount } = useSelector(state => state.documents);
-  const { success: isActionSuccess } = useSelector(
-    state => state.processDocuments
-  );
   const [selectedIds, setSelectedIds] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -77,10 +74,6 @@ const DocumentValidationPage = () => {
     if (refreshPage) loadDocuments();
   }, [loadDocuments, refreshPage]);
 
-  useEffect(() => {
-    if (isActionSuccess) setRefreshPage(true);
-  }, [isActionSuccess]);
-
   return (
     <>
       <Layout
@@ -110,7 +103,11 @@ const DocumentValidationPage = () => {
                     setSelectedIds(ids);
                   }}
                 />
-                <Actions selectedIds={selectedIds} onEdit={setEditView} />
+                <Actions
+                  selectedIds={selectedIds}
+                  onEdit={setEditView}
+                  onProcessed={() => setRefreshPage(true)}
+                />
               </Wrapper>
             }
           />

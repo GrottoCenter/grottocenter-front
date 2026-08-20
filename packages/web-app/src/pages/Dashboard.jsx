@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -22,13 +21,12 @@ import PublishIcon from '@mui/icons-material/Publish';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import { styled } from '@mui/material/styles';
 
-import { fetchDBExportUrl } from '../actions/DBExport';
 import {
+  useDbExport,
   useDuplicatesCount,
   usePendingDocumentsCount,
   usePermissions
 } from '../hooks';
-import REDUCER_STATUS from '../reducers/ReducerStatus';
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
 import ImpersonationLauncher from '../components/appli/ImpersonationLauncher';
 
@@ -137,15 +135,15 @@ ToolCard.propTypes = {
   onClick: PropTypes.func.isRequired
 };
 
-const DBExportCard = ({ dbExport }) => {
+const DBExportCard = ({ dbExport, isLoading }) => {
   const { formatMessage } = useIntl();
-  const isLoading = dbExport.status === REDUCER_STATUS.LOADING;
-  const lastUpdate = dbExport.lastUpdate
+  const lastUpdate = dbExport?.lastUpdate
     ? dbExport.lastUpdate.split('T')[0]
     : null;
-  const sizeMo = dbExport.size
+  const sizeMo = dbExport?.size
     ? Math.round((dbExport.size * 10) / (1024 * 1024)) / 10
     : null;
+  const url = dbExport?.url;
 
   return (
     <Card variant="outlined">
@@ -177,7 +175,7 @@ const DBExportCard = ({ dbExport }) => {
             </Typography>
           </Box>
         )}
-        {!isLoading && dbExport.url && (
+        {!isLoading && url && (
           <Box sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary">
               {formatMessage({ id: 'Last update' })} : {lastUpdate}
@@ -192,8 +190,8 @@ const DBExportCard = ({ dbExport }) => {
         <Button
           variant="outlined"
           size="small"
-          disabled={!dbExport.url}
-          onClick={() => window.open(dbExport.url, '_blank')}
+          disabled={!url}
+          onClick={() => window.open(url, '_blank')}
           startIcon={<ArchiveIcon />}>
           {formatMessage({ id: 'Download' })} —{' '}
           {formatMessage({ id: 'License: CC-BY-SA' })}
@@ -207,17 +205,23 @@ DBExportCard.propTypes = {
   dbExport: PropTypes.shape({
     url: PropTypes.string,
     lastUpdate: PropTypes.string,
-    size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    status: PropTypes.string
-  }).isRequired
+    size: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  }),
+  isLoading: PropTypes.bool
+};
+
+DBExportCard.defaultProps = {
+  dbExport: null,
+  isLoading: false
 };
 
 const Dashboard = () => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const permissions = usePermissions();
-  const dispatch = useDispatch();
-  const dbExport = useSelector(state => state.dbExport);
+  const { data: dbExport, isPending: isDbExportLoading } = useDbExport({
+    enabled: permissions.isLeader
+  });
   const pendingDocumentsQuery = usePendingDocumentsCount({
     enabled: permissions.isModerator
   });
@@ -238,12 +242,6 @@ const Dashboard = () => {
       navigate('/');
     }
   }, [permissions, navigate]);
-
-  useEffect(() => {
-    if (permissions.isLeader) {
-      dispatch(fetchDBExportUrl());
-    }
-  }, [dispatch, permissions.isLeader]);
 
   const showDataSection = permissions.isModerator || permissions.isLeader;
 
@@ -328,7 +326,12 @@ const Dashboard = () => {
                     onClick={() => goTo('/ui/import-csv')}
                   />
                 )}
-                {permissions.isLeader && <DBExportCard dbExport={dbExport} />}
+                {permissions.isLeader && (
+                  <DBExportCard
+                    dbExport={dbExport}
+                    isLoading={isDbExportLoading}
+                  />
+                )}
               </ToolGrid>
             </Section>
           )}

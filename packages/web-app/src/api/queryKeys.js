@@ -125,3 +125,11 @@ export const messageKeys = {
   ],
   unreadCount: () => ['message', 'unreadCount']
 };
+
+// Moderator DB export + document validation. Everything under this root
+// invalidates together — validating documents refreshes the pending count
+// and the validation queue in a single call.
+export const moderationKeys = {
+  all: ['moderation'],
+  dbExport: () => ['moderation', 'dbExport']
+};

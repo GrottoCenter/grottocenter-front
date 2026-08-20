@@ -2,7 +2,6 @@ import { isNil, anyPass, isEmpty, head } from 'ramda';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import { useSelector } from 'react-redux';
 import EditIcon from '@mui/icons-material/Edit';
 import ActionButton from '../../components/common/ActionButton';
 
@@ -27,7 +26,6 @@ const isNilOrEmpty = anyPass([isNil, isEmpty]);
 
 const Actions = ({ selected, onEdit }) => {
   const { formatMessage } = useIntl();
-  const { isLoading } = useSelector(state => state.processDocuments);
 
   const handleEdit = () => {
     if (!isEmpty(selected)) {
@@ -39,7 +37,7 @@ const Actions = ({ selected, onEdit }) => {
     <Wrapper>
       <ActionButton
         label={formatMessage({ id: ActionTypes.edit.name })}
-        disabled={isNilOrEmpty(selected) || isLoading || selected.length > 1}
+        disabled={isNilOrEmpty(selected) || selected.length > 1}
         onClick={handleEdit}
         icon={<EditIcon />}
       />

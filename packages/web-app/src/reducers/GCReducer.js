@@ -9,7 +9,6 @@ import countryEntrances from './CountryEntrancesDataQualityReducer';
 import countryRegions from './CountryRegionsReducer';
 import createDocument from './CreateDocumentReducer';
 import cumulatedLength from './CumulatedLengthReducer';
-import dbExport from './DBExportReducer';
 import detachEntrance from './DetachEntranceReducer';
 import documents from './DocumentsReducer';
 import duplicatesImport from './DuplicatesImportReducer';
@@ -28,7 +27,6 @@ import massifEntrances from './MassifEntrancesDataQualityReducer';
 import mfa from './MfaReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import partnersCarousel from './PartnersCarouselReducer';
-import processDocuments from './ProcessDocumentsReducer';
 import quicksearch from './QuicksearchReducer';
 import randomEntrance from './RandomEntranceReducer';
 import recentChange from './RecentChangeReducer';
@@ -55,7 +53,6 @@ const GCReducer = combineReducers({
   countryRegions,
   createDocument,
   cumulatedLength,
-  dbExport,
   detachEntrance,
   documents,
   duplicatesImport,
@@ -74,7 +71,6 @@ const GCReducer = combineReducers({
   mfa,
   moveEntranceToCave,
   partnersCarousel,
-  processDocuments,
   quicksearch,
   randomEntrance,
   recentChange,

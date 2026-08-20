@@ -140,6 +140,8 @@ export {
   useUnarchiveConversation,
   useSendMessage
 } from './mutations/useMessages';
+export { useDbExport } from './queries/useDbExport';
+export { useProcessDocuments } from './mutations/useProcessDocuments';
 export {
   useCreateOrganization,
   useUpdateOrganization
