@@ -1,32 +1,15 @@
-import { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import Entry from '../../components/appli/Entry';
-import { fetchEntrance } from '../../actions/Entrance/GetEntrance';
-import { useCave, usePermissions, useRefetchOnReconnect } from '../../hooks';
+import { useCave, useEntrance, usePermissions } from '../../hooks';
 import {
   Deleted,
   DELETED_ENTITIES
 } from '../../components/common/card/Deleted';
 
 const EntryPage = () => {
-  const dispatch = useDispatch();
   const { entranceId } = useParams();
   const permissions = usePermissions();
-  const { loading, data, error } = useSelector(state => state.entrance);
-
-  const reloadEntrance = useCallback(
-    () => dispatch(fetchEntrance(entranceId)),
-    [dispatch, entranceId]
-  );
-
-  useEffect(() => {
-    reloadEntrance();
-  }, [reloadEntrance]);
-
-  // Repair the page on its own when the connection returns, so a caver who
-  // lost signal mid-read finds the content rather than an error.
-  useRefetchOnReconnect(reloadEntrance, Boolean(error));
+  const { data, isPending, isPaused, error, refetch } = useEntrance(entranceId);
 
   // When the entrance belongs to a network cave with siblings, we display the
   // count of descriptions attached to the parent cave — helps the reader know
@@ -41,9 +24,10 @@ const EntryPage = () => {
     <Deleted entityType={DELETED_ENTITIES.entrance} entity={data} />
   ) : (
     <Entry
-      isLoading={loading}
+      isLoading={isPending}
       error={error}
-      onRetry={reloadEntrance}
+      isPaused={isPaused}
+      onRetry={refetch}
       entrance={data}
       networkDescriptionsCount={networkDescriptionsCount}
     />

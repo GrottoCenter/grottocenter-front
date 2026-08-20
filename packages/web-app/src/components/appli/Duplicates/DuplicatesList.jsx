@@ -9,7 +9,6 @@ import EntityTable from '../../common/EntityTable';
 
 import TableActions from './TableActions';
 import { resetDocumentApiErrors } from '../../../actions/Document/ResetApiErrors';
-import { resetEntranceState } from '../../../actions/Entrance/ResetEntrance';
 
 const DuplicatesList = ({
   duplicateType,
@@ -26,18 +25,17 @@ const DuplicatesList = ({
   const { loading, duplicatesList, totalCount, latestHttpCodeOnDelete } =
     useSelector(state => state.duplicatesImport);
 
-  const { latestHttpCode: httpCodeEntry } = useSelector(
-    state => state.entrance
-  );
   const { latestHttpCode: httpCodeDocument } = useSelector(
     state => state.createDocument
   );
 
   useEffect(() => {
-    dispatch(resetEntranceState());
+    // Document form errors are still tracked in state.createDocument; entrance
+    // form errors used to be tracked in state.entrance but that slice moved
+    // to React Query and its mutations own their error surface now.
     dispatch(resetDocumentApiErrors());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpCodeEntry, httpCodeDocument]);
+  }, [httpCodeDocument]);
 
   useEffect(() => {
     if ([200, 204].includes(latestHttpCodeOnDelete)) {

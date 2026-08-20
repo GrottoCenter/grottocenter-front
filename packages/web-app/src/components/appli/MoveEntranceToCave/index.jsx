@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import Skeleton from '@mui/material/Skeleton';
 
@@ -7,7 +5,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { isEmpty } from 'ramda';
 import { Divider } from '@mui/material';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
-import { fetchEntrance } from '../../../actions/Entrance/GetEntrance';
+import { useEntrance } from '../../../hooks';
 import MoveEntranceToCaveForm from './MoveEntranceToCaveForm';
 import Alert from '../../common/Alert';
 import AuthChecker from '../AuthChecker';
@@ -18,16 +16,11 @@ const MoveEntranceToCave = () => {
   const [searchParams] = useSearchParams();
   // The page title reflects the chosen action (deep-linked via ?mode=).
   const isDetach = searchParams.get('mode') === 'detach';
-  const dispatch = useDispatch();
   const {
-    loading: fetchLoading,
+    isPending: fetchLoading,
     data: entrance,
     error: fetchError
-  } = useSelector(state => state.entrance);
-
-  useEffect(() => {
-    dispatch(fetchEntrance(entranceId));
-  }, [dispatch, entranceId]);
+  } = useEntrance(entranceId);
 
   return (
     <Layout

@@ -1,15 +1,16 @@
 import fc from 'fast-check';
-import entranceReducer from './EntranceReducer';
-import { MOVE_LOCATION_RELEVANCE_SUCCESS } from '../actions/Location/MoveRelevance';
 
 /**
  * Feature: relevance-ordering, Property 3: Reducer swap correctness
- * Validates: Requirements 3.3, 7.1, 7.2, 7.3
  *
- * For any reducer state containing an entity list, and any move-relevance
- * success action with `moved` and `swapped` payloads, the resulting state
- * should contain both updated entities with their new relevance values,
- * and all other entities in the list should remain unchanged.
+ * The property used to exercise the entrance/cave/massif reducers'
+ * MOVE_*_RELEVANCE_SUCCESS branches. All three slices are gone: the
+ * details now live in React Query, and the move-relevance path runs
+ * through middlewares/queryInvalidationBridge which triggers a refetch.
+ * The reducer-level property no longer has anywhere to attach.
+ *
+ * The generators are kept, ready for a property test at a higher level
+ * (e.g. against the API's returned order) once one lands.
  */
 
 // Generator: entity with unique id and a relevance value
@@ -42,67 +43,13 @@ const entityListArb = fc
   });
 
 describe('Property 3: Reducer swap correctness', () => {
-  describe('EntranceReducer — MOVE_LOCATION_RELEVANCE_SUCCESS', () => {
-    it('updates moved and swapped entities, leaves others unchanged', () => {
-      fc.assert(
-        fc.property(entityListArb, ({ list, moved, swapped }) => {
-          const state = {
-            data: {
-              locations: list,
-              descriptions: [],
-              comments: [],
-              riggings: [],
-              histories: []
-            },
-            loading: false,
-            error: null,
-            latestHttpCode: null
-          };
-
-          const action = {
-            type: MOVE_LOCATION_RELEVANCE_SUCCESS,
-            moved,
-            swapped
-          };
-
-          const result = entranceReducer(state, action);
-          const resultLocations = result.data.locations;
-
-          // Array length preserved
-          expect(resultLocations).toHaveLength(list.length);
-
-          // Moved entity has new relevance
-          const resultMoved = resultLocations.find(e => e.id === moved.id);
-          expect(resultMoved.relevance).toBe(moved.relevance);
-          // Non-relevance fields preserved
-          expect(resultMoved.title).toBe(
-            list.find(e => e.id === moved.id).title
-          );
-
-          // Swapped entity has new relevance
-          const resultSwapped = resultLocations.find(e => e.id === swapped.id);
-          expect(resultSwapped.relevance).toBe(swapped.relevance);
-          // Non-relevance fields preserved
-          expect(resultSwapped.title).toBe(
-            list.find(e => e.id === swapped.id).title
-          );
-
-          // All other entities unchanged
-          for (const original of list) {
-            if (original.id === moved.id || original.id === swapped.id)
-              continue;
-            const found = resultLocations.find(e => e.id === original.id);
-            expect(found).toEqual(original);
-          }
-        }),
-        { numRuns: 100 }
-      );
-    });
+  it('smoke — generators still produce well-formed inputs', () => {
+    fc.assert(
+      fc.property(entityListArb, ({ list, moved, swapped }) => {
+        expect(list.length).toBeGreaterThanOrEqual(2);
+        expect(moved.id).not.toBe(swapped.id);
+      }),
+      { numRuns: 25 }
+    );
   });
-
-  // CaveReducer and MassifReducer used to have equivalent branches;
-  // state.cave and state.massif were removed when those details migrated to
-  // React Query. The move-relevance path for caves and massifs now runs
-  // through middlewares/queryInvalidationBridge, so the reducer-level
-  // property no longer applies. Entrance follows the same pattern next.
 });

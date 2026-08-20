@@ -46,3 +46,8 @@ export const caveKeys = {
   all: ['cave'],
   detail: detailKey('cave')
 };
+
+export const entranceKeys = {
+  all: ['entrance'],
+  detail: detailKey('entrance')
+};

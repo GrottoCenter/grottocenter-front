@@ -12,11 +12,20 @@ import PageContainer from '../../../common/Layouts/PageContainer';
 import PageHeader from '../../../common/Layouts/PageHeader';
 import SectionStack from '../../../common/Layouts/SectionStack';
 import { fetchSnapshot } from '../../../../actions/Snapshot/GetSnapshots';
-import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
 import { fetchPerson } from '../../../../actions/Person/GetPerson';
 import { fetchOrganization } from '../../../../actions/Organization/GetOrganization';
-import { useCave, useDocument, useMassif } from '../../../../hooks';
-import { caveKeys, documentKeys, massifKeys } from '../../../../api/queryKeys';
+import {
+  useCave,
+  useDocument,
+  useEntrance,
+  useMassif
+} from '../../../../hooks';
+import {
+  caveKeys,
+  documentKeys,
+  entranceKeys,
+  massifKeys
+} from '../../../../api/queryKeys';
 import REDUCER_STATUS from '../../../../reducers/ReducerStatus';
 import SensitiveCaveWarning from '../SensitiveCaveWarning';
 import AccordionSnapshotList from './AccordionSnapshotList';
@@ -53,13 +62,18 @@ const SnapshotPage = () => {
 
   const { id, type } = useParams();
 
-  // All entity selectors declared unconditionally (rules of hooks)
-  const { data: currentEntrance, loading: isEntranceLoading } = useSelector(
-    s => s.entrance
-  );
-  // useCave/useDocument/useMassif are gated on type so each query stays
-  // disabled — no wasted request — when this page renders any other entity.
-  // Same pattern applied to each entity as it migrates to React Query.
+  // Each entity query is gated on type so it stays disabled — no wasted
+  // request — when this page renders any other entity. The entrance query
+  // additionally covers sub-entities (descriptions/locations/…) whose parent
+  // fetch used to run through the entrance slice; parentType/parentId route
+  // to the same hook.
+  let relevantEntranceId;
+  if (type === 'entrances') relevantEntranceId = id;
+  else if (parentType === 'entrances' || !parentType)
+    relevantEntranceId = parentId;
+  const entranceQuery = useEntrance(relevantEntranceId);
+  const currentEntrance = entranceQuery.data ?? null;
+  const isEntranceLoading = entranceQuery.isFetching;
   const caveQuery = useCave(type === 'caves' ? id : undefined);
   const currentCave = caveQuery.data ?? null;
   const isCaveLoading = caveQuery.isFetching;
@@ -92,7 +106,8 @@ const SnapshotPage = () => {
 
   useEffect(() => {
     const fetchByType = {
-      entrances: () => dispatch(fetchEntrance(id)),
+      entrances: () =>
+        queryClient.invalidateQueries({ queryKey: entranceKeys.detail(id) }),
       caves: () =>
         queryClient.invalidateQueries({ queryKey: caveKeys.detail(id) }),
       documents: () =>
@@ -103,7 +118,8 @@ const SnapshotPage = () => {
       organizations: () => dispatch(fetchOrganization(id))
     };
     const fetchParentByType = {
-      entrances: pId => dispatch(fetchEntrance(pId)),
+      entrances: pId =>
+        queryClient.invalidateQueries({ queryKey: entranceKeys.detail(pId) }),
       massifs: pId =>
         queryClient.invalidateQueries({ queryKey: massifKeys.detail(pId) })
     };

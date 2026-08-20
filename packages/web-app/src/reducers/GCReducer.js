@@ -29,7 +29,6 @@ import documents from './DocumentsReducer';
 import duplicatesCount from './DuplicatesCountReducer';
 import duplicatesImport from './DuplicatesImportReducer';
 import dynamicNumber from './DynamicNumberReducer';
-import entrance from './EntranceReducer';
 import error from './ErrorReducer';
 import forgotPassword from './ForgotPasswordReducer';
 import groups from './GroupsReducer';
@@ -38,7 +37,6 @@ import importWizard from './ImportWizardReducer';
 import intl from './IntlReducer';
 import invalidEmailCavers from './InvalidEmailCaversReducer';
 import latestBlogNews from './LatestBlogNewsReducer';
-import linkDocumentToEntrance from './LinkDocumentToEntrance';
 import login from './LoginReducer';
 import map from './Map';
 import massifEntrances from './MassifEntrancesDataQualityReducer';
@@ -74,7 +72,6 @@ import subscribeToCountry from './SubscribeToCountryReducer';
 import subscribeToMassif from './SubscribeToMassifReducer';
 import subscribeToRegion from './SubscribeToRegionReducer';
 import subscriptions from './SubscriptionsReducer';
-import unlinkDocumentToEntrance from './UnlinkDocumentToEntrance';
 import unsubscribeFromCountry from './UnsubscribeFromCountryReducer';
 import unsubscribeFromMassif from './UnsubscribeFromMassifReducer';
 import unsubscribeFromRegion from './UnsubscribeFromRegionReducer';
@@ -128,7 +125,6 @@ const GCReducer = combineReducers({
   duplicatesCount,
   duplicatesImport,
   dynamicNumber,
-  entrance,
   error,
   forgotPassword,
   groups,
@@ -137,7 +133,6 @@ const GCReducer = combineReducers({
   intl,
   invalidEmailCavers,
   latestBlogNews,
-  linkDocumentToEntrance,
   login,
   map,
   massifEntrances,
@@ -175,7 +170,6 @@ const GCReducer = combineReducers({
   subscribeToMassif,
   subscribeToRegion,
   subscriptions,
-  unlinkDocumentToEntrance,
   unsubscribeFromCountry,
   unsubscribeFromMassif,
   unsubscribeFromRegion,

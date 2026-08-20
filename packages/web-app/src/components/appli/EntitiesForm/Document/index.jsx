@@ -20,14 +20,16 @@ import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
-import { usePermissions } from '../../../../hooks';
+import {
+  useEntrance,
+  useLinkDocumentToEntrance,
+  usePermissions
+} from '../../../../hooks';
 import { documentTypeHelpers } from '../../../../utils/documentTypeHelpers';
 import { resetDocumentApiErrors } from '../../../../actions/Document/ResetApiErrors';
 import { postDocument } from '../../../../actions/Document/CreateDocument';
 import { updateDocument } from '../../../../actions/Document/UpdateDocument';
 import { displayLoginDialog } from '../../../../actions/Login';
-import { linkDocumentToEntrance } from '../../../../actions/LinkDocumentToEntrance';
-import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
 
 import DocumentFormProvider, { DocumentFormContext } from './Provider';
 import { defaultDocumentValuesTypes } from './types';
@@ -79,31 +81,25 @@ const DocumentSubmission = ({ onCancel }) => {
   const documentState = isNewDocument
     ? createDocumentState
     : updateDocumentState;
-  const entranceState = useSelector(state => state.entrance);
 
   const entranceIdParam = searchParams.get('entranceId')
     ? parseInt(searchParams.get('entranceId'), 10)
     : null;
-
-  useEffect(() => {
-    if (!entranceIdParam) return;
-    if (entranceState.data?.id !== entranceIdParam) {
-      dispatch(fetchEntrance(entranceIdParam));
-    }
-    // entranceIdParam is derived from stable URL params; entranceState.data is intentionally
-    // read only at mount to avoid re-triggering the fetch when data arrives
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entranceIdParam]);
+  const { data: linkedEntranceData } = useEntrance(entranceIdParam);
+  const linkEntranceMutation = useLinkDocumentToEntrance();
 
   useEffect(() => {
     if (
       entranceIdParam &&
-      entranceState.data?.id === entranceIdParam &&
+      linkedEntranceData?.id === entranceIdParam &&
       !linkedEntrance
     ) {
-      setLinkedEntrance({ id: entranceIdParam, name: entranceState.data.name });
+      setLinkedEntrance({
+        id: entranceIdParam,
+        name: linkedEntranceData.name
+      });
     }
-  }, [entranceState.data, entranceIdParam, linkedEntrance, setLinkedEntrance]);
+  }, [linkedEntranceData, entranceIdParam, linkedEntrance, setLinkedEntrance]);
 
   const submitDocument = () => {
     if (isNewDocument) dispatch(postDocument(document));
@@ -165,12 +161,10 @@ const DocumentSubmission = ({ onCancel }) => {
         !hasLinked.current
       ) {
         hasLinked.current = true;
-        dispatch(
-          linkDocumentToEntrance({
-            entranceId: linkedEntrance.id,
-            document: documentState.createdDocument
-          })
-        );
+        linkEntranceMutation.mutate({
+          entranceId: linkedEntrance.id,
+          document: documentState.createdDocument
+        });
       }
     }
   }, [
@@ -179,7 +173,7 @@ const DocumentSubmission = ({ onCancel }) => {
     documentState.createdDocument,
     isNewDocument,
     linkedEntrance,
-    dispatch
+    linkEntranceMutation
   ]);
 
   usePrompt({

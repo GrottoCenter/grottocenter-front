@@ -1,12 +1,12 @@
 import { getQueryClient } from '../api/queryClientRef';
-import { caveKeys, massifKeys } from '../api/queryKeys';
+import { caveKeys, entranceKeys, massifKeys } from '../api/queryKeys';
 
 // Bridge from legacy thunks to React Query cache invalidation. Some mutations
-// still run as thunks (they carry their own form state, or they touch
-// entities that have not all been migrated yet — Description and Guideline
-// are shared across cave/entrance/massif). Their success action passes
-// through here and invalidates the migrated entity's detail query so the
-// consuming page refetches without needing its own subscription.
+// still run as thunks (they carry their own form state, or their action type
+// is dispatched by several shared child domains — Description, Location,
+// Rigging, Comment, History, Guideline). Their success action passes through
+// here and invalidates the migrated entity's detail query so the consuming
+// page refetches without needing its own subscription.
 //
 // A thunk that becomes a `useMutation` invalidates in its own `onSuccess`
 // and drops out of this file. The bridge shrinks as the migration completes,
@@ -36,7 +36,8 @@ const MASSIF_PAYLOAD_ACTIONS = new Set([
   'UNMARK_MASSIF_SENSITIVE_SUCCESS'
 ]);
 
-// Actions carrying `action.description` whose payload references a massif.
+// Actions carrying `action.description` whose payload references a massif,
+// cave or entrance.
 const DESCRIPTION_ACTIONS = new Set([
   'POST_DESCRIPTION_SUCCESS',
   'UPDATE_DESCRIPTION_SUCCESS',
@@ -56,6 +57,41 @@ const GUIDELINE_ACTIONS = new Set([
   'ROLLBACK_GUIDELINE_SUCCESS'
 ]);
 
+// Entrance-only shared children: their payloads always concern the current
+// entrance, but the shape of the payload varies (`action.location`,
+// `action.rigging`, `action.comment`, …). Rather than plucking the entrance
+// id out of every shape, invalidate `entranceKeys.all` — only the currently
+// rendered entrance is in cache anyway, so the extra cost is one refetch.
+const ENTRANCE_CHILD_ACTIONS = new Set([
+  'POST_LOCATION_SUCCESS',
+  'UPDATE_LOCATION_SUCCESS',
+  'DELETE_LOCATION_SUCCESS',
+  'DELETE_LOCATION_PERMANENT_SUCCESS',
+  'RESTORE_LOCATION_SUCCESS',
+  'POST_HISTORY_SUCCESS',
+  'UPDATE_HISTORY_SUCCESS',
+  'DELETE_HISTORY_SUCCESS',
+  'DELETE_HISTORY_PERMANENT_SUCCESS',
+  'RESTORE_HISTORY_SUCCESS',
+  'POST_RIGGINGS_SUCCESS',
+  'UPDATE_RIGGINGS_SUCCESS',
+  'DELETE_RIGGINGS_SUCCESS',
+  'DELETE_RIGGINGS_PERMANENT_SUCCESS',
+  'RESTORE_RIGGINGS_SUCCESS',
+  'POST_COMMENT_SUCCESS',
+  'UPDATE_COMMENT_SUCCESS',
+  'DELETE_COMMENT_SUCCESS',
+  'DELETE_COMMENT_PERMANENT_SUCCESS',
+  'RESTORE_COMMENT_SUCCESS',
+  'MOVE_LOCATION_RELEVANCE_SUCCESS',
+  'MOVE_HISTORY_RELEVANCE_SUCCESS',
+  'MOVE_RIGGING_RELEVANCE_SUCCESS',
+  'MOVE_COMMENT_RELEVANCE_SUCCESS',
+  // The Entrance-shape mutations that still live as thunks (form-state).
+  'UPDATE_ENTRANCE_SUCCESS',
+  'CREATE_ENTRANCE_SUCCESS'
+]);
+
 const queryInvalidationBridge = () => next => action => {
   const result = next(action);
 
@@ -64,14 +100,18 @@ const queryInvalidationBridge = () => next => action => {
   } else if (DESCRIPTION_ACTIONS.has(action.type)) {
     invalidateMassif(asId(action.description?.massif));
     invalidateCave(asId(action.description?.cave));
+    invalidate(entranceKeys.all);
   } else if (action.type === 'MOVE_DESCRIPTION_RELEVANCE_SUCCESS') {
     // MoveRelevance swaps two descriptions; either can carry the entity ref.
     invalidateMassif(asId(action.moved?.massif));
     invalidateMassif(asId(action.swapped?.massif));
     invalidateCave(asId(action.moved?.cave));
     invalidateCave(asId(action.swapped?.cave));
+    invalidate(entranceKeys.all);
   } else if (GUIDELINE_ACTIONS.has(action.type)) {
     (action.guideline?.massifs ?? []).forEach(m => invalidateMassif(asId(m)));
+  } else if (ENTRANCE_CHILD_ACTIONS.has(action.type)) {
+    invalidate(entranceKeys.all);
   }
 
   return result;

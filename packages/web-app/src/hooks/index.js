@@ -19,6 +19,7 @@ export { useLanguages } from './queries/useLanguages';
 export { useDocument } from './queries/useDocument';
 export { useMassif } from './queries/useMassif';
 export { useCave } from './queries/useCave';
+export { useEntrance } from './queries/useEntrance';
 // Server-state writes live in ./mutations, same convention.
 export { useDeleteDocument } from './mutations/useDeleteDocument';
 export { useRestoreDocument } from './mutations/useRestoreDocument';
@@ -30,6 +31,12 @@ export {
 } from './mutations/useLinkDocumentToMassif';
 export { useDeleteCave } from './mutations/useDeleteCave';
 export { useRestoreCave } from './mutations/useRestoreCave';
+export { useDeleteEntrance } from './mutations/useDeleteEntrance';
+export { useRestoreEntrance } from './mutations/useRestoreEntrance';
+export {
+  useLinkDocumentToEntrance,
+  useUnlinkDocumentToEntrance
+} from './mutations/useLinkDocumentToEntrance';
 export { useNotification } from './useNotification';
 export { usePermissions } from './usePermissions';
 export { useSessionExpiry } from './useSessionExpiry';
