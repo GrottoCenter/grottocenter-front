@@ -27,6 +27,11 @@ const mockLanguages = {
 // ---- useUserProperties mock ----
 vi.mock('../../../../hooks', () => ({
   useUserProperties: () => ({ id: 1, nickname: 'testuser' }),
+  useCreatePerson: () => ({
+    data: null,
+    isPending: false,
+    mutate: vi.fn()
+  }),
   useLicenses: () => mockLicenses,
   useLanguages: () => mockLanguages,
   useDebounce: value => value,

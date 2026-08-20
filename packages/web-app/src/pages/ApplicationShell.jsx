@@ -2,11 +2,11 @@ import { useCallback, useRef, useEffect, Suspense, lazy } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
-import { SnackbarContent, SnackbarProvider } from 'notistack';
+import { SnackbarProvider } from 'notistack';
 import { QueryClientProvider } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import { styled, useTheme } from '@mui/material/styles';
-import { Alert, Box, CircularProgress, useMediaQuery } from '@mui/material';
+import { Box, CircularProgress, useMediaQuery } from '@mui/material';
 
 import store from '../store';
 import queryClient from '../conf/queryClient';
@@ -24,6 +24,7 @@ import SessionExpiryNotifier from '../components/common/SessionExpiryNotifier';
 import ErrorBoundary from '../components/appli/PageErrorBounary';
 import UpdatePrompt from '../components/appli/UpdatePrompt';
 import SideMenu from '../components/common/SideMenu';
+import AppSnackbar from '../components/common/AppSnackbar';
 
 import AppBar from '../components/common/AppBar';
 import ImpersonationIndicator from '../components/common/ImpersonationIndicator';
@@ -101,52 +102,6 @@ const HydratedIntlProvider = ({ children }) => {
 
 HydratedIntlProvider.propTypes = {
   children: PropTypes.node
-};
-
-// Custom notistack snackbar with standard MUI typography (body1 = 1rem).
-// `action` is pulled out of the rest props and handed to the Alert rather than
-// the SnackbarContent wrapper: it is what renders the close button a persistent
-// snackbar needs to be dismissible (see NetworkStatusNotifier).
-//
-// notistack hands custom components the raw `action` option, unresolved — its
-// own MaterialDesignContent calls `action(id)` when it is a function, and a
-// custom component has to do the same or a function action would be rendered
-// as a React child and throw.
-// `icon` is destructured out for the same reason as `action`: notistack
-// forwards unknown enqueueSnackbar options to the custom component, and letting
-// it fall into `rest` would spread a React element onto SnackbarContent's div.
-// Pulling it out is also what lets a caller override the severity icon
-// (UpdatePrompt uses SystemUpdateAltIcon); `undefined` keeps Alert's default.
-const AppSnackbar = ({ id, message, variant, action, icon, ref, ...rest }) => {
-  const severity = variant === 'default' ? 'info' : variant;
-  const resolvedAction = typeof action === 'function' ? action(id) : action;
-  return (
-    <SnackbarContent ref={ref} {...rest}>
-      <Alert
-        severity={severity}
-        action={resolvedAction}
-        icon={icon}
-        sx={{
-          width: '100%',
-          alignItems: 'center',
-          typography: 'body1',
-          // Alert's action slot is top-aligned and padded by default, which
-          // reads as off-centre as soon as the message wraps to two lines.
-          '& .MuiAlert-action': { alignItems: 'center', pt: 0 }
-        }}>
-        {message}
-      </Alert>
-    </SnackbarContent>
-  );
-};
-AppSnackbar.displayName = 'AppSnackbar';
-AppSnackbar.propTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  message: PropTypes.node,
-  variant: PropTypes.string,
-  action: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  icon: PropTypes.node,
-  ref: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 };
 
 const SNACKBAR_COMPONENTS = {
