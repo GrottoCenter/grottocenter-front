@@ -4,7 +4,6 @@ import advancedsearch from './AdvancedsearchReducer';
 import banCaver from './BanCaverReducer';
 import changeEmail from './ChangeEmail';
 import changePassword from './ChangePassword';
-import countryRegions from './CountryRegionsReducer';
 import createDocument from './CreateDocumentReducer';
 import detachEntrance from './DetachEntranceReducer';
 import documents from './DocumentsReducer';
@@ -32,7 +31,6 @@ const GCReducer = combineReducers({
   banCaver,
   changeEmail,
   changePassword,
-  countryRegions,
   createDocument,
   detachEntrance,
   documents,
