@@ -1,5 +1,5 @@
 import { getQueryClient } from '../api/queryClientRef';
-import { caveKeys, entranceKeys, massifKeys } from '../api/queryKeys';
+import { entranceKeys, massifKeys } from '../api/queryKeys';
 
 // Bridge from legacy thunks to React Query cache invalidation. Some mutations
 // still run as thunks (they carry their own form state, or their action type
@@ -25,8 +25,6 @@ const invalidate = queryKey => {
 
 const invalidateMassif = id => id != null && invalidate(massifKeys.detail(id));
 
-const invalidateCave = id => id != null && invalidate(caveKeys.detail(id));
-
 // Actions carrying `action.massif` (payload updated the massif slice directly).
 // `_PERMANENT_SUCCESS` variants share the same payload shape as the plain
 // `_SUCCESS`, hence the same handling.
@@ -34,16 +32,6 @@ const MASSIF_PAYLOAD_ACTIONS = new Set([
   'UPDATE_MASSIF_SUCCESS',
   'MARK_MASSIF_SENSITIVE_SUCCESS',
   'UNMARK_MASSIF_SENSITIVE_SUCCESS'
-]);
-
-// Actions carrying `action.description` whose payload references a massif,
-// cave or entrance.
-const DESCRIPTION_ACTIONS = new Set([
-  'POST_DESCRIPTION_SUCCESS',
-  'UPDATE_DESCRIPTION_SUCCESS',
-  'DELETE_DESCRIPTION_SUCCESS',
-  'DELETE_DESCRIPTION_PERMANENT_SUCCESS',
-  'RESTORE_DESCRIPTION_SUCCESS'
 ]);
 
 // Actions carrying `action.guideline` — guideline has a many-to-many
@@ -97,17 +85,6 @@ const queryInvalidationBridge = () => next => action => {
 
   if (MASSIF_PAYLOAD_ACTIONS.has(action.type)) {
     invalidateMassif(action.massif?.id);
-  } else if (DESCRIPTION_ACTIONS.has(action.type)) {
-    invalidateMassif(asId(action.description?.massif));
-    invalidateCave(asId(action.description?.cave));
-    invalidate(entranceKeys.all);
-  } else if (action.type === 'MOVE_DESCRIPTION_RELEVANCE_SUCCESS') {
-    // MoveRelevance swaps two descriptions; either can carry the entity ref.
-    invalidateMassif(asId(action.moved?.massif));
-    invalidateMassif(asId(action.swapped?.massif));
-    invalidateCave(asId(action.moved?.cave));
-    invalidateCave(asId(action.swapped?.cave));
-    invalidate(entranceKeys.all);
   } else if (GUIDELINE_ACTIONS.has(action.type)) {
     (action.guideline?.massifs ?? []).forEach(m => invalidateMassif(asId(m)));
   } else if (ENTRANCE_CHILD_ACTIONS.has(action.type)) {

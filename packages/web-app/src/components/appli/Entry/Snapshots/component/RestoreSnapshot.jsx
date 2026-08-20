@@ -13,13 +13,16 @@ import {
 import RestorePageIcon from '@mui/icons-material/RestorePage';
 import { pathOr } from 'ramda';
 import { useIntl } from 'react-intl';
-import { updateDescription } from '../../../../../actions/Description/UpdateDescription';
 import { updateHistory } from '../../../../../actions/History/UpdateHistory';
 import { updateRiggings } from '../../../../../actions/Riggings/UpdateRigging';
 import { updateLocation } from '../../../../../actions/Location/UpdateLocation';
 import { updateComment } from '../../../../../actions/Comment/UpdateComment';
 import { rollbackGuideline } from '../../../../../actions/Guideline/RollbackGuideline';
-import { usePermissions, useUserProperties } from '../../../../../hooks';
+import {
+  useUpdateDescription,
+  usePermissions,
+  useUserProperties
+} from '../../../../../hooks';
 import { updateEntrance } from '../../../../../actions/Entrance/UpdateEntrance';
 import { updateCaveAndEntrance } from '../../../../../actions/CaveAndEntrance';
 import Translate from '../../../../common/Translate';
@@ -31,6 +34,7 @@ function sleep(ms) {
 }
 const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
   const dispatch = useDispatch();
+  const updateDescriptionMutation = useUpdateDescription();
   const userId = pathOr(null, ['id'], useUserProperties());
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
@@ -65,12 +69,10 @@ const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
           }
           break;
         case 'descriptions':
-          await dispatch(
-            updateDescription({
-              ...content,
-              id: content.t_id
-            })
-          );
+          await updateDescriptionMutation.mutateAsync({
+            ...content,
+            id: content.t_id
+          });
           break;
         case 'entrances': {
           const updatedEntrance = {

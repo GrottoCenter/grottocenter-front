@@ -38,6 +38,13 @@ export {
   useLinkDocumentToEntrance,
   useUnlinkDocumentToEntrance
 } from './mutations/useLinkDocumentToEntrance';
+export {
+  useCreateDescription,
+  useUpdateDescription,
+  useDeleteDescription,
+  useRestoreDescription,
+  useMoveDescriptionRelevance
+} from './mutations/useDescription';
 export { useNotification } from './useNotification';
 export { usePermissions } from './usePermissions';
 export { useSessionExpiry } from './useSessionExpiry';

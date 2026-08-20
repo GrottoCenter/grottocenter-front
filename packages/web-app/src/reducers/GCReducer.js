@@ -10,7 +10,6 @@ import country from './CountryReducer';
 import countryEntrances from './CountryEntrancesDataQualityReducer';
 import countryRegions from './CountryRegionsReducer';
 import createCave from './CreateCaveReducer';
-import createDescription from './CreateDescription';
 import createDocument from './CreateDocumentReducer';
 import createEntrance from './CreateEntranceReducer';
 import createGuideline from './CreateGuidelineReducer';
@@ -74,7 +73,6 @@ import unsubscribeFromMassif from './UnsubscribeFromMassifReducer';
 import unsubscribeFromRegion from './UnsubscribeFromRegionReducer';
 import updateAccount from './UpdateAccountReducer';
 import updateCave from './UpdateCaveReducer';
-import updateDescription from './UpdateDescription';
 import updateDocument from './UpdateDocumentReducer';
 import updateEntrance from './UpdateEntranceReducer';
 import updateGuideline from './UpdateGuidelineReducer';
@@ -103,7 +101,6 @@ const GCReducer = combineReducers({
   countryOrganization,
   countryRegions,
   createCave,
-  createDescription,
   createDocument,
   createEntrance,
   createGuideline,
@@ -169,7 +166,6 @@ const GCReducer = combineReducers({
   unsubscribeFromRegion,
   updateAccount,
   updateCave,
-  updateDescription,
   updateDocument,
   updateEntrance,
   updateGuideline,
