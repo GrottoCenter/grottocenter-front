@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import {
   Box,
@@ -26,7 +25,7 @@ import {
   documentTypeHelpers
 } from '../../../../../utils/documentTypeHelpers';
 import { DocumentFormContext } from '../Provider';
-import { loadDocumentTypes } from '../../../../../actions/DocumentType';
+import { useDocumentTypes } from '../../../../../hooks';
 
 const { isArticle, isIssue } = documentTypeHelpers;
 
@@ -164,15 +163,10 @@ SecondaryCard.propTypes = {
 const DocumentTypeSelect = () => {
   const { document, updateAttribute } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { isLoaded, documentTypes } = useSelector(state => state.documentType);
+  const { data: documentTypes = [], isPending } = useDocumentTypes();
   const [othersOpen, setOthersOpen] = useState(false);
-
-  useEffect(() => {
-    if (!isLoaded) dispatch(loadDocumentTypes());
-  }, [dispatch, isLoaded]);
 
   // Open others section if selected type is not featured
   useEffect(() => {
@@ -196,7 +190,7 @@ const DocumentTypeSelect = () => {
     ? (DOCUMENT_TYPE_ICONS[selectedOther.name] ?? DOCUMENT_TYPE_FALLBACK_ICON)
     : null;
 
-  if (!isLoaded) {
+  if (isPending) {
     return (
       <Box sx={{ mt: 1 }}>
         <Grid container spacing={1}>

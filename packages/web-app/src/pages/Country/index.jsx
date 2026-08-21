@@ -1,42 +1,34 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { fetchCountry } from '../../actions/Country/GetCountry';
 import Country from '../../components/appli/Country';
 import {
+  useCountry,
   usePermissions,
-  useRefetchOnReconnect,
-  useUserProperties
+  useSubscribeToCountry,
+  useUnsubscribeFromCountry
 } from '../../hooks';
-import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
-import { subscribeToCountry } from '../../actions/Subscriptions/SubscribeToCountry';
-import { unsubscribeFromCountry } from '../../actions/Subscriptions/UnsubscribeFromCountry';
+import { countryKeys } from '../../api/queryKeys';
 
 const CountryPage = () => {
   const { id: countryId } = useParams();
-  const dispatch = useDispatch();
-  const userProperties = useUserProperties();
+  const queryClient = useQueryClient();
   const permissions = usePermissions();
-  const { country, error, status } = useSelector(state => state.country);
-  const onSubscribe = () => dispatch(subscribeToCountry(countryId));
-  const onUnsubscribe = () => dispatch(unsubscribeFromCountry(countryId));
+  const { data: country, error, isFetching, isPaused } = useCountry(countryId);
+  const subscribeMutation = useSubscribeToCountry();
+  const unsubscribeMutation = useUnsubscribeFromCountry();
+  const onSubscribe = () => subscribeMutation.mutate({ countryId });
+  const onUnsubscribe = () => unsubscribeMutation.mutate({ countryId });
   const canSubscribe = permissions.isLeader;
 
   const reloadCountry = useCallback(
-    () => dispatch(fetchCountry(countryId)),
-    [dispatch, countryId]
+    () =>
+      queryClient.invalidateQueries({
+        queryKey: countryKeys.detail(countryId)
+      }),
+    [queryClient, countryId]
   );
-
-  useEffect(() => {
-    reloadCountry();
-    if (permissions.isAuth) {
-      dispatch(fetchSubscriptions(userProperties.id));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId]);
-
-  useRefetchOnReconnect(reloadCountry, Boolean(error));
 
   return (
     <Country
@@ -44,10 +36,11 @@ const CountryPage = () => {
       canSubscribe={canSubscribe}
       country={country}
       error={error}
+      isPaused={isPaused}
+      isFetching={isFetching}
       onRetry={reloadCountry}
       onSubscribe={onSubscribe}
       onUnsubscribe={onUnsubscribe}
-      status={status}
     />
   );
 };

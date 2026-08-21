@@ -1,19 +1,18 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import { isValidEmail } from '../../conf/config';
 import {
-  postForgotPassword,
-  resetForgotPassword
-} from '../../actions/ForgotPassword';
-import { useBoolean, useNotification, usePermissions } from '../../hooks';
+  useBoolean,
+  useForgotPassword,
+  useNotification,
+  usePermissions
+} from '../../hooks';
 import ForgotPasswordPage from '../../pages/ForgotPassword';
 
 const ForgotPassword = () => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const forgotPasswordState = useSelector(state => state.forgotPassword);
+  const forgotPasswordMutation = useForgotPassword();
   const {
     isTrue: isRequestSucceeded,
     true: requestSucceeded,
@@ -28,10 +27,7 @@ const ForgotPassword = () => {
     if (permissions.isAuth) {
       navigate(``);
     }
-    return () => {
-      dispatch(resetForgotPassword());
-    };
-  }, [dispatch, navigate, permissions.isAuth]);
+  }, [navigate, permissions.isAuth]);
 
   const checkIfValuesAreValid = () => {
     const errors = [];
@@ -49,26 +45,20 @@ const ForgotPassword = () => {
   const onForgotPassword = event => {
     event.preventDefault();
     if (checkIfValuesAreValid()) {
-      dispatch(
-        postForgotPassword({
-          email
-        })
-      );
+      forgotPasswordMutation.mutate({ email });
     }
   };
 
+  const isForgotSuccess = forgotPasswordMutation.isSuccess;
   useEffect(() => {
-    if (forgotPasswordState.success) {
-      requestSucceeded();
-    } else {
-      requestFailed();
-    }
+    if (isForgotSuccess) requestSucceeded();
+    else requestFailed();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [forgotPasswordState.success]);
+  }, [isForgotSuccess]);
 
   return (
     <ForgotPasswordPage
-      loading={forgotPasswordState.isFetching}
+      loading={forgotPasswordMutation.isPending}
       email={email}
       onEmailChange={setEmail}
       onForgotPassword={onForgotPassword}

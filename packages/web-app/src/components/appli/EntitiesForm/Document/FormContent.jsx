@@ -15,6 +15,8 @@ import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { useLanguages } from '../../../../hooks';
+
 import { DocumentFormContext } from './Provider';
 
 import DocumentTypeSelect from './formElements/DocumentTypeSelect';
@@ -44,7 +46,7 @@ const PublicationDatePicker = React.lazy(
   () => import('./formElements/PublicationDatePicker')
 );
 
-const FormContent = ({ onCancel }) => {
+const FormContent = ({ onCancel, isSubmitting = false }) => {
   const {
     document,
     isFormValid,
@@ -66,8 +68,7 @@ const FormContent = ({ onCancel }) => {
   } = documentTypeHelpers;
 
   const locale = useSelector(state => state.intl.locale);
-  const { languages } = useSelector(state => state.language);
-  const isSubmitting = useSelector(state => state.createDocument.isLoading);
+  const { data: languages = [] } = useLanguages();
   const userLanguageId = languages.find(l => l.part1 === locale)?.id ?? '000';
 
   useEffect(() => {
@@ -483,5 +484,6 @@ const FormContent = ({ onCancel }) => {
 export default FormContent;
 
 FormContent.propTypes = {
-  onCancel: PropTypes.func
+  onCancel: PropTypes.func,
+  isSubmitting: PropTypes.bool
 };

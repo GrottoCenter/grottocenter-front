@@ -4,7 +4,6 @@ import { Divider, LinearProgress as MuiLinearProgress } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { styled } from '@mui/material/styles';
 import PublishIcon from '@mui/icons-material/Publish';
-import { useSelector } from 'react-redux';
 import ImportTabs from './ImportTabs';
 import Stepper from '../../common/Form/Stepper';
 import Provider, { ImportPageContentContext } from './Provider';
@@ -43,15 +42,15 @@ const ImportContainer = () => {
     true: enableNextStep,
     false: disableNextStep
   } = useBoolean(true);
-  const { isLoading } = useSelector(state => state.importCsv);
-
   const {
     currentStep: currentFormStep,
     validatedSteps,
     updateCurrentStep,
     selectedType,
-    importAttributes: { formSteps }
+    importAttributes: { formSteps },
+    importSession
   } = useContext(ImportPageContentContext);
+  const { isLoading } = importSession;
 
   const handleStepNext = useCallback(() => {
     updateCurrentStep(prevFormStep => prevFormStep + 1);

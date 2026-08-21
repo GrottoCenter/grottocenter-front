@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Box, ListItem, ListItemText } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { HistoryPropTypes } from '../../../../types/entrance.type';
 import CreateHistoryForm from '../../EntitiesForm/History';
-import { updateHistory } from '../../../../actions/History/UpdateHistory';
-import { deleteHistory } from '../../../../actions/History/DeleteHistory';
-import { restoreHistory } from '../../../../actions/History/RestoreHistory';
 import ActionButtons from '../ActionButtons';
-import { usePermissions } from '../../../../hooks';
+import {
+  useUpdateHistory,
+  useDeleteHistory,
+  useRestoreHistory,
+  usePermissions
+} from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
 
 const ListItemStyled = styled(ListItem)`
@@ -31,8 +32,10 @@ const History = ({
   isFirst,
   isLast
 }) => {
-  const dispatch = useDispatch();
   const permissions = usePermissions();
+  const updateMutation = useUpdateHistory();
+  const deleteMutation = useDeleteHistory();
+  const restoreMutation = useRestoreHistory();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
 
@@ -41,23 +44,21 @@ const History = ({
   }, [history.isDeleted]);
 
   const onSubmitForm = data => {
-    dispatch(
-      updateHistory({
-        id: data.id,
-        body: data.body,
-        language: data.language
-      })
-    );
+    updateMutation.mutate({
+      id: data.id,
+      body: data.body,
+      language: data.language
+    });
     setIsUpdateFormVisible(false);
   };
 
   const onDeletePress = isPermanent => {
     setWantedDeletedState(true);
-    dispatch(deleteHistory({ id: history.id, isPermanent }));
+    deleteMutation.mutate({ id: history.id, isPermanent });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreHistory({ id: history.id }));
+    restoreMutation.mutate({ id: history.id });
   };
 
   const isActionLoading = wantedDeletedState !== history.isDeleted;

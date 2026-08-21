@@ -13,9 +13,27 @@ vi.mock('react-redux', async () => ({
   useSelector: selector => selector(mockStoreState)
 }));
 
+// Licenses and the language list now come from React Query, not the store —
+// the tests drive the hooks instead of seeding `licenses` / `language` slices.
+let mockLicenses = { data: null, isLoading: false };
+const mockLanguages = {
+  data: [
+    { id: 'eng', refName: 'English' },
+    { id: 'fra', refName: 'French' }
+  ],
+  isSuccess: true
+};
+
 // ---- useUserProperties mock ----
 vi.mock('../../../../hooks', () => ({
   useUserProperties: () => ({ id: 1, nickname: 'testuser' }),
+  useCreatePerson: () => ({
+    data: null,
+    isPending: false,
+    mutate: vi.fn()
+  }),
+  useLicenses: () => mockLicenses,
+  useLanguages: () => mockLanguages,
   useDebounce: value => value,
   useEntitySearch: () => ({
     inputValue: '',
@@ -48,17 +66,6 @@ vi.mock('../../../common/AutoCompleteSearch/CaveAutoCompleteSearch', () => {
       )
   };
 });
-
-// ---- License action mock ----
-vi.mock('../../../../actions/Licenses', () => ({
-  fetchLicense: vi.fn(() => ({ type: 'FETCH_LICENSES_LOAD' }))
-}));
-
-// ---- Quicksearch action mock ----
-vi.mock('../../../../actions/Quicksearch', () => ({
-  fetchQuicksearchResult: vi.fn(() => ({ type: 'FETCH_QUICKSEARCH' })),
-  resetQuicksearch: vi.fn(() => ({ type: 'RESET_QUICKSEARCH' }))
-}));
 
 // ---- Import wizard action mock ----
 vi.mock('../../../../actions/Observations/importWizard', () => ({
@@ -186,27 +193,10 @@ const buildState = (overrides = {}) => ({
     authorizationHeader: { Authorization: 'Bearer fake-token' },
     authTokenDecoded: { id: 1, groups: ['User'], nickname: 'testuser' }
   },
-  licenses: {
-    data: null,
-    loading: false,
-    error: null
-  },
-  quicksearch: {
-    results: [],
-    isLoading: false,
-    error: null
-  },
   createPerson: {
     isLoading: false,
     caver: null,
     error: null
-  },
-  language: {
-    languages: [
-      { id: 'eng', refName: 'English' },
-      { id: 'fra', refName: 'French' }
-    ],
-    isLoaded: true
   }
 });
 
@@ -222,6 +212,7 @@ const renderComponent = (props = {}, stateOverrides = {}) => {
 beforeEach(() => {
   mockDispatch.mockClear();
   mockDispatch.mockImplementation(() => Promise.resolve());
+  mockLicenses = { data: null, isLoading: false };
 });
 
 describe('ContextStep', () => {
@@ -266,10 +257,8 @@ describe('ContextStep', () => {
     ];
 
     it('should not display Creative Commons licenses in the license dropdown', () => {
-      mockStoreState = {
-        ...buildState(),
-        licenses: { data: licensesWithCC, loading: false, error: null }
-      };
+      mockStoreState = buildState();
+      mockLicenses = { data: licensesWithCC, isLoading: false };
 
       render(
         <IntlProvider locale="en" messages={messages}>
@@ -308,10 +297,8 @@ describe('ContextStep', () => {
     });
 
     it('should only show the 3 allowed licenses (ODbL, ODC-BY, Licence Ouverte)', () => {
-      mockStoreState = {
-        ...buildState(),
-        licenses: { data: licensesWithCC, loading: false, error: null }
-      };
+      mockStoreState = buildState();
+      mockLicenses = { data: licensesWithCC, isLoading: false };
 
       render(
         <IntlProvider locale="en" messages={messages}>

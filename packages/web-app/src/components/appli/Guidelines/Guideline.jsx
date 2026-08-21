@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Box, ListItem, ListItemText } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import GuidelinePropTypes from '../../../types/guideline.type';
 import GuidelineForm from '../EntitiesForm/Guideline/index';
-import { patchGuideline } from '../../../actions/Guideline/UpdateGuideline';
-import { deleteGuideline } from '../../../actions/Guideline/DeleteGuideline';
-import { restoreGuideline } from '../../../actions/Guideline/RestoreGuideline';
 import ActionButtons from '../Entry/ActionButtons';
 import SectionTitle from '../Entry/SectionTitle';
-import { usePermissions, useNotification } from '../../../hooks';
+import {
+  usePatchGuideline,
+  useDeleteGuideline,
+  useRestoreGuideline,
+  usePermissions,
+  useNotification
+} from '../../../hooks';
 import Contribution from '../../common/Contribution/Contribution';
 
 const ListItemStyled = styled(ListItem)`
@@ -22,10 +24,12 @@ const ListItemStyled = styled(ListItem)`
 `;
 
 const Guideline = ({ guideline, isEditAllowed }) => {
-  const dispatch = useDispatch();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
   const { onError } = useNotification();
+  const patchMutation = usePatchGuideline();
+  const deleteMutation = useDeleteGuideline();
+  const restoreMutation = useRestoreGuideline();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(
     guideline.isDeleted
@@ -36,26 +40,24 @@ const Guideline = ({ guideline, isEditAllowed }) => {
   }, [guideline.isDeleted]);
 
   const onSubmitForm = async data => {
-    const result = await dispatch(
-      patchGuideline({
+    try {
+      await patchMutation.mutateAsync({
         id: guideline.id,
         title: data.title,
         description: data.description,
         language: data.language
-      })
-    );
-    if (result) setIsUpdateFormVisible(false);
+      });
+      setIsUpdateFormVisible(false);
+    } catch {
+      /* toast handled globally */
+    }
   };
 
   const onDeletePress = async isPermanent => {
     setWantedDeletedState(true);
-    // On success the reducer removes/updates the guideline in place. On failure
-    // the request errored (e.g. a non-2xx response): surface it instead of
-    // leaving the view silently stale, and revert the optimistic loading state.
-    const ok = await dispatch(
-      deleteGuideline({ id: guideline.id, isPermanent })
-    );
-    if (!ok) {
+    try {
+      await deleteMutation.mutateAsync({ id: guideline.id, isPermanent });
+    } catch {
       setWantedDeletedState(guideline.isDeleted);
       onError(
         formatMessage({
@@ -67,8 +69,9 @@ const Guideline = ({ guideline, isEditAllowed }) => {
   };
   const onRestorePress = async () => {
     setWantedDeletedState(false);
-    const ok = await dispatch(restoreGuideline({ id: guideline.id }));
-    if (!ok) {
+    try {
+      await restoreMutation.mutateAsync({ id: guideline.id });
+    } catch {
       setWantedDeletedState(guideline.isDeleted);
       onError(
         formatMessage({

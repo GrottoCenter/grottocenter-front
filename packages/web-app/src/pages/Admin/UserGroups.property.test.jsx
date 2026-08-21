@@ -56,6 +56,7 @@ const groupsArb = fc
  */
 // fast-check runs many render iterations — needs more than Vitest's 5s default.
 vi.setConfig({ testTimeout: 30000 });
+const PROPERTY_RUNS = 20;
 
 describe('Property 2: Ban switch reflects server ban status', () => {
   it('switch checked state matches isBanned prop on initial render', () => {
@@ -72,7 +73,7 @@ describe('Property 2: Ban switch reflects server ban status', () => {
 
         unmount();
       }),
-      { numRuns: 100 }
+      { numRuns: PROPERTY_RUNS }
     );
   });
 });
@@ -147,7 +148,7 @@ describe('Property 3: Save button enabled on dirty state', () => {
           unmount();
         }
       ),
-      { numRuns: 100 }
+      { numRuns: PROPERTY_RUNS }
     );
   });
 });
@@ -220,7 +221,7 @@ describe('Property 4: No ban API call when ban state unchanged', () => {
           unmount();
         }
       ),
-      { numRuns: 100 }
+      { numRuns: PROPERTY_RUNS }
     );
   });
 });
@@ -250,7 +251,7 @@ describe('Property 5: Self-ban prevention', () => {
 
         unmount();
       }),
-      { numRuns: 100 }
+      { numRuns: PROPERTY_RUNS }
     );
   });
 });

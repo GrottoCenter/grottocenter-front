@@ -1,17 +1,15 @@
-import { useCallback, useRef, useEffect, Suspense } from 'react';
+import { useCallback, useRef, useEffect, Suspense, lazy } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
-import createDebounce from 'redux-debounced';
-import { SnackbarContent, SnackbarProvider } from 'notistack';
-import { createStore, applyMiddleware, compose } from 'redux';
-import { thunk } from 'redux-thunk';
+import { SnackbarProvider } from 'notistack';
+import { QueryClientProvider } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import { styled, useTheme } from '@mui/material/styles';
-import { Alert, Box, CircularProgress, useMediaQuery } from '@mui/material';
+import { Box, CircularProgress, useMediaQuery } from '@mui/material';
 
-import GCReducer from '../reducers/GCReducer';
-import mapCacheInvalidationMiddleware from '../middlewares/mapCacheInvalidationMiddleware';
+import store from '../store';
+import queryClient from '../conf/queryClient';
 import {
   bootstrapIntl,
   changeLocale,
@@ -26,6 +24,7 @@ import SessionExpiryNotifier from '../components/common/SessionExpiryNotifier';
 import ErrorBoundary from '../components/appli/PageErrorBounary';
 import UpdatePrompt from '../components/appli/UpdatePrompt';
 import SideMenu from '../components/common/SideMenu';
+import AppSnackbar from '../components/common/AppSnackbar';
 
 import AppBar from '../components/common/AppBar';
 import ImpersonationIndicator from '../components/common/ImpersonationIndicator';
@@ -51,13 +50,17 @@ async function transitionToReact() {
   }, 410);
 }
 
-const middlewares = applyMiddleware(
-  createDebounce(),
-  thunk,
-  mapCacheInvalidationMiddleware
-);
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const gcStore = createStore(GCReducer, composeEnhancers(middlewares));
+// import.meta.env.DEV is statically replaced at build time, so the ternary folds
+// to null in production and the dynamic import becomes unreachable — the
+// devtools bundle is never emitted. Keep the guard inline for that reason; a
+// runtime check would ship the chunk.
+const ReactQueryDevtools = import.meta.env.DEV
+  ? lazy(() =>
+      import('@tanstack/react-query-devtools').then(m => ({
+        default: m.ReactQueryDevtools
+      }))
+    )
+  : null;
 
 const customOnIntlError = err => {
   // Custom handler for missing translation.
@@ -99,52 +102,6 @@ const HydratedIntlProvider = ({ children }) => {
 
 HydratedIntlProvider.propTypes = {
   children: PropTypes.node
-};
-
-// Custom notistack snackbar with standard MUI typography (body1 = 1rem).
-// `action` is pulled out of the rest props and handed to the Alert rather than
-// the SnackbarContent wrapper: it is what renders the close button a persistent
-// snackbar needs to be dismissible (see NetworkStatusNotifier).
-//
-// notistack hands custom components the raw `action` option, unresolved — its
-// own MaterialDesignContent calls `action(id)` when it is a function, and a
-// custom component has to do the same or a function action would be rendered
-// as a React child and throw.
-// `icon` is destructured out for the same reason as `action`: notistack
-// forwards unknown enqueueSnackbar options to the custom component, and letting
-// it fall into `rest` would spread a React element onto SnackbarContent's div.
-// Pulling it out is also what lets a caller override the severity icon
-// (UpdatePrompt uses SystemUpdateAltIcon); `undefined` keeps Alert's default.
-const AppSnackbar = ({ id, message, variant, action, icon, ref, ...rest }) => {
-  const severity = variant === 'default' ? 'info' : variant;
-  const resolvedAction = typeof action === 'function' ? action(id) : action;
-  return (
-    <SnackbarContent ref={ref} {...rest}>
-      <Alert
-        severity={severity}
-        action={resolvedAction}
-        icon={icon}
-        sx={{
-          width: '100%',
-          alignItems: 'center',
-          typography: 'body1',
-          // Alert's action slot is top-aligned and padded by default, which
-          // reads as off-centre as soon as the message wraps to two lines.
-          '& .MuiAlert-action': { alignItems: 'center', pt: 0 }
-        }}>
-        {message}
-      </Alert>
-    </SnackbarContent>
-  );
-};
-AppSnackbar.displayName = 'AppSnackbar';
-AppSnackbar.propTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  message: PropTypes.node,
-  variant: PropTypes.string,
-  action: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  icon: PropTypes.node,
-  ref: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 };
 
 const SNACKBAR_COMPONENTS = {
@@ -251,24 +208,33 @@ const ApplicationShell = () => {
           dedupe compares by identity, and a snackbar whose message is a React
           node (the notifiers all pass <FormattedMessage>) never matches itself,
           so it would opt out of deduplication silently. */}
-      <Provider store={gcStore}>
-        <HydratedIntlProvider onError={customOnIntlError}>
-          <SnackbarProvider
-            maxSnack={4}
-            dense={isCompact}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            Components={SNACKBAR_COMPONENTS}>
-            <ErrorHandler />
-            {/* Outside the boundary on purpose: when a stale build crashes the
-                app, offering the update is exactly what fixes it. */}
-            <UpdatePrompt />
-            <NetworkStatusNotifier />
-            <SessionExpiryNotifier />
-            <ErrorBoundary>
-              <ApplicationLayout />
-            </ErrorBoundary>
-          </SnackbarProvider>
-        </HydratedIntlProvider>
+      <Provider store={store}>
+        {/* Inside Provider: the QueryClient's global error handler dispatches to
+            the store, and its toasts are rendered by the SnackbarProvider below. */}
+        <QueryClientProvider client={queryClient}>
+          <HydratedIntlProvider onError={customOnIntlError}>
+            <SnackbarProvider
+              maxSnack={4}
+              dense={isCompact}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+              Components={SNACKBAR_COMPONENTS}>
+              <ErrorHandler />
+              {/* Outside the boundary on purpose: when a stale build crashes the
+                  app, offering the update is exactly what fixes it. */}
+              <UpdatePrompt />
+              <NetworkStatusNotifier />
+              <SessionExpiryNotifier />
+              <ErrorBoundary>
+                <ApplicationLayout />
+              </ErrorBoundary>
+            </SnackbarProvider>
+          </HydratedIntlProvider>
+          {ReactQueryDevtools && (
+            <Suspense fallback={null}>
+              <ReactQueryDevtools initialIsOpen={false} />
+            </Suspense>
+          )}
+        </QueryClientProvider>
       </Provider>
     </div>
   );

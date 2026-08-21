@@ -3,13 +3,19 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Card, Chip, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector, useStore } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 import MailIcon from '@mui/icons-material/Mail';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
 
-import { useUserProperties, usePermissions, useSharePage } from '@/hooks';
+import {
+  useDeletePerson,
+  useUserProperties,
+  usePermissions,
+  useSharePage
+} from '@/hooks';
+import { messageKeys, personKeys } from '@/api/queryKeys';
 import { PersonPropTypes } from '@/types/person.type';
 import PageContainer from '@/components/common/Layouts/PageContainer';
 import PageHeader from '@/components/common/Layouts/PageHeader';
@@ -17,9 +23,9 @@ import SectionStack from '@/components/common/Layouts/SectionStack';
 import ResponsiveActions from '@/components/common/Layouts/ResponsiveActions';
 import CustomIcon from '@/components/common/CustomIcon';
 import FetchErrorState from '@/components/common/FetchErrorState';
-import { deletePerson } from '@/actions/Person/DeletePerson';
-import { fetchPerson } from '@/actions/Person/GetPerson';
-import { fetchConversations } from '@/actions/Messaging/GetConversations';
+import { apiGetWithRange } from '@/api/client';
+import { getConversationsUrl } from '@/conf/apiRoutes';
+import { makeUrl } from '@/actions/utils';
 
 import {
   DeleteConfirmationDialog,
@@ -28,12 +34,15 @@ import {
 import AuthorBody from './AuthorBody';
 import CaverBody from './CaverBody';
 
-const Person = ({ isLoading, person, error, onRetry = null }) => {
-  const dispatch = useDispatch();
-  const store = useStore();
-  const activeConversations = useSelector(
-    state => state.messaging.activeConversations.items
-  );
+const Person = ({
+  isLoading,
+  person,
+  error,
+  isPaused = false,
+  onRetry = null
+}) => {
+  const queryClient = useQueryClient();
+  const deleteMutation = useDeletePerson();
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -55,32 +64,31 @@ const Person = ({ isLoading, person, error, onRetry = null }) => {
     editPropertiesTarget = `/ui/persons/${person?.id}/edit`;
 
   const handleRefresh = useCallback(() => {
-    dispatch(fetchPerson(person.id));
-  }, [dispatch, person?.id]);
+    if (person?.id)
+      queryClient.invalidateQueries({ queryKey: personKeys.detail(person.id) });
+  }, [queryClient, person?.id]);
 
   const handleMessageClick = useCallback(async () => {
     if (!person?.id) return;
     try {
-      // First, check if the conversation already exists in our currently loaded conversations
-      let existingConv = activeConversations.find(
+      // Reuse the cache if the Messages page has already loaded the first
+      // active conversations page; otherwise fetchQuery does exactly one
+      // request and hydrates the same cache entry the Messages page uses.
+      // Keep pageSize in sync with pages/Messages/index.jsx (PAGE_SIZE = 20)
+      // — RQ hashes the key structurally, so a mismatched pageSize keys a
+      // separate cache entry and defeats the intended reuse.
+      // TODO: replace with a dedicated /conversations?participant=id endpoint
+      // — if the target conversation is beyond the first page, it won't be found.
+      const criteria = { isArchived: false, page: 1, pageSize: 20 };
+      const { data } = await queryClient.fetchQuery({
+        queryKey: messageKeys.conversations(criteria),
+        queryFn: () =>
+          apiGetWithRange(makeUrl(getConversationsUrl, { limit: 20, skip: 0 }))
+      });
+      const items = data?.conversations ?? [];
+      const existingConv = items.find(
         c => Number(c.otherParticipant?.id) === Number(person.id)
       );
-
-      if (!existingConv) {
-        // TODO: If the target conversation is beyond the first 50 conversations, it won't be found here.
-        // We should implement a dedicated backend endpoint to retrieve a conversation by participant ID.
-        // If not found, do a single fetch (first 50 conversations) to update the Redux store
-        await dispatch(fetchConversations({ limit: 50, skip: 0 }, false));
-
-        // Read updated conversations from the store to avoid UI flashing from multiple page loads
-        const state = store.getState();
-        const updatedConversations =
-          state.messaging?.activeConversations?.items || [];
-        existingConv = updatedConversations.find(
-          c => Number(c.otherParticipant?.id) === Number(person.id)
-        );
-      }
-
       if (existingConv) {
         navigate(`/ui/messages/${existingConv.id}`);
       } else {
@@ -90,14 +98,14 @@ const Person = ({ isLoading, person, error, onRetry = null }) => {
       console.error('Failed to check existing conversations:', err);
       navigate(`/ui/messages?composeTo=${person.id}`);
     }
-  }, [dispatch, person?.id, navigate, activeConversations, store]);
+  }, [queryClient, person?.id, navigate]);
 
   let onDelete = null;
   if (person && (permissions.isAdmin || permissions.isModerator)) {
     onDelete = () => setIsDeleteConfirmationOpen(true);
   }
   const onDeletePress = (entityId, isPermanent) => {
-    dispatch(deletePerson({ id: person?.id, entityId, isPermanent }));
+    deleteMutation.mutate({ id: person?.id, entityId });
     if (isPermanent) navigate('/', { replace: true });
   };
 
@@ -211,11 +219,12 @@ const Person = ({ isLoading, person, error, onRetry = null }) => {
           </Card>
         </SectionStack>
       )}
-      {!!error && (
+      {(!!error || isPaused) && (
         <SectionStack>
           <Card sx={{ p: 2 }}>
             <FetchErrorState
               error={error}
+              isPaused={isPaused}
               onRetry={onRetry}
               messageId="Error, the person you are looking for is not available."
             />
@@ -250,6 +259,7 @@ const Person = ({ isLoading, person, error, onRetry = null }) => {
 Person.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
+  isPaused: PropTypes.bool,
   onRetry: PropTypes.func,
   person: PersonPropTypes
 };

@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
@@ -44,9 +43,9 @@ import Comments from './Comments/index';
 import Documents from './Documents';
 import Histories from './Histories';
 import Science from '../Science';
-import { deleteEntrance } from '../../../actions/Entrance/DeleteEntrance';
-import { restoreEntrance } from '../../../actions/Entrance/RestoreEntrance';
 import {
+  useDeleteEntrance,
+  useRestoreEntrance,
   usePermissions,
   useUserProperties,
   useExplored,
@@ -80,11 +79,11 @@ const HalfSplitContainer = styled('div')`
 export const Entry = ({
   isLoading,
   error,
+  isPaused = false,
   onRetry = null,
   entrance,
   networkDescriptionsCount = 0
 }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const openLink = useOpenLink();
@@ -92,6 +91,8 @@ export const Entry = ({
   const { isAuth, isAdmin, isModerator } = usePermissions();
   const componentRef = useRef();
   const handleShare = useSharePage();
+  const deleteMutation = useDeleteEntrance();
+  const restoreMutation = useRestoreEntrance();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -120,13 +121,13 @@ export const Entry = ({
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    dispatch(deleteEntrance({ id: entranceId, entityId, isPermanent }));
+    deleteMutation.mutate({ id: entranceId, entityId, isPermanent });
     if (isPermanent) navigate('/', { replace: true });
   };
 
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreEntrance({ id: entranceId }));
+    restoreMutation.mutate({ id: entranceId });
   };
 
   const handlePrint = useReactToPrint({ contentRef: componentRef });
@@ -329,11 +330,12 @@ export const Entry = ({
                 </Card>
               </SectionStack>
             )}
-            {error && (
+            {(error || isPaused) && (
               <SectionStack>
                 <Card sx={{ p: 2 }}>
                   <FetchErrorState
                     error={error}
+                    isPaused={isPaused}
                     onRetry={onRetry}
                     messageId="Error, the entrance data you are looking for is not available."
                   />
@@ -529,6 +531,7 @@ export const Entry = ({
 Entry.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
+  isPaused: PropTypes.bool,
   onRetry: PropTypes.func,
   entrance: EntrancePropTypes,
   networkDescriptionsCount: PropTypes.number

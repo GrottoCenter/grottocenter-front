@@ -27,28 +27,16 @@ vi.mock('../../../../hooks/useNotification', () => ({
   })
 }));
 
-// ---- Redux mock ----
-const mockDispatch = vi.fn(() => Promise.resolve());
-let mockStoreState = {};
-
-vi.mock('react-redux', async () => ({
-  ...(await vi.importActual('react-redux')),
-  useDispatch: () => mockDispatch,
-  useSelector: selector => selector(mockStoreState)
-}));
-
-// ---- Action mocks ----
-vi.mock('../../../../actions/MoveEntranceToCave', () => ({
-  moveEntranceToCave: (entranceId, caveId) => ({
-    type: 'MOVE_ENTRANCE_TO_CAVE',
-    entranceId,
-    caveId
+// ---- Mutation mock ----
+const mockMutate = vi.fn();
+let mockMutationState = { isPending: false, error: null, isSuccess: false };
+vi.mock('../../../../hooks', () => ({
+  useMoveEntranceToCave: () => ({
+    mutate: mockMutate,
+    isPending: mockMutationState.isPending,
+    error: mockMutationState.error,
+    isSuccess: mockMutationState.isSuccess
   })
-}));
-
-vi.mock('../../../../actions/Entrance/DetachEntrance', () => ({
-  detachEntranceToNewCave: vi.fn(() => ({ type: 'DETACH_ENTRANCE' })),
-  resetDetachEntrance: vi.fn(() => ({ type: 'DETACH_ENTRANCE_RESET' }))
 }));
 
 // ---- Mock child components not relevant to this test ----
@@ -117,13 +105,9 @@ const entrance = {
 };
 
 const renderComponent = (
-  moveState = { loading: false, error: undefined },
-  detachState = { loading: false, error: undefined, success: false }
+  mutationState = { isPending: false, error: null, isSuccess: false }
 ) => {
-  mockStoreState = {
-    moveEntranceToCave: moveState,
-    detachEntrance: detachState
-  };
+  mockMutationState = mutationState;
   return render(
     <IntlProvider locale="en" messages={messages}>
       <MoveEntranceToCaveForm entrance={entrance} />
@@ -141,33 +125,30 @@ const selectAndValidate = async () => {
 };
 
 beforeEach(() => {
-  mockDispatch.mockClear();
+  mockMutate.mockClear();
   mockNavigate.mockClear();
   mockOnSuccess.mockClear();
 });
 
 describe('MoveEntranceToCaveForm - navigation and toast on success', () => {
-  it('dispatches the move when validating', async () => {
+  it('calls useMoveEntranceToCave.mutate when validating', async () => {
     renderComponent();
     await selectAndValidate();
-    expect(mockDispatch).toHaveBeenCalledWith({
-      type: 'MOVE_ENTRANCE_TO_CAVE',
+    expect(mockMutate).toHaveBeenCalledWith({
       entranceId: 123,
       caveId: 42
     });
   });
 
   it('navigates to entrance page after successful move', async () => {
-    renderComponent();
-    await selectAndValidate();
+    renderComponent({ isPending: false, error: null, isSuccess: true });
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/ui/entrances/123');
     });
   });
 
   it('shows success toast after successful move', async () => {
-    renderComponent();
-    await selectAndValidate();
+    renderComponent({ isPending: false, error: null, isSuccess: true });
     await waitFor(() => {
       expect(mockOnSuccess).toHaveBeenCalledWith(
         'Entrance successfully moved.'

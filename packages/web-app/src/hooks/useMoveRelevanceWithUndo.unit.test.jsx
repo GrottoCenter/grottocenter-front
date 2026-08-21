@@ -1,12 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useMoveRelevanceWithUndo } from './useMoveRelevanceWithUndo';
 
-// Mock dependencies
-const mockDispatch = vi.fn();
-vi.mock('react-redux', () => ({
-  useDispatch: () => mockDispatch
-}));
-
 const mockEnqueueSnackbar = vi.fn();
 const mockCloseSnackbar = vi.fn();
 vi.mock('notistack', () => ({
@@ -30,28 +24,12 @@ vi.mock('@mui/material', () => ({
   )
 }));
 
-const successResult = {
-  moved: { id: 1, relevance: 2 },
-  swapped: { id: 2, relevance: 1 }
-};
-
-const failureResult = {
-  error: { type: 400, message: 'Cannot move further' }
-};
-
-const createMockThunk = (result = successResult) => {
-  const thunk = vi.fn(() => () => Promise.resolve(result));
-  return thunk;
-};
+const createMockMutation = () => ({
+  mutateAsync: vi.fn().mockResolvedValue({})
+});
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockDispatch.mockImplementation(thunkFn => {
-    if (typeof thunkFn === 'function') {
-      return thunkFn();
-    }
-    return Promise.resolve(thunkFn);
-  });
 });
 
 /**
@@ -60,8 +38,8 @@ beforeEach(() => {
  */
 describe('useMoveRelevanceWithUndo', () => {
   it('shows success snackbar after successful move', async () => {
-    const mockThunk = createMockThunk();
-    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
+    const mutation = createMockMutation();
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mutation));
 
     await act(async () => {
       result.current.handleMove(1, -1);
@@ -74,8 +52,8 @@ describe('useMoveRelevanceWithUndo', () => {
   });
 
   it('snackbar contains an Undo action button', async () => {
-    const mockThunk = createMockThunk();
-    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
+    const mutation = createMockMutation();
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mutation));
 
     await act(async () => {
       result.current.handleMove(1, -1);
@@ -92,8 +70,8 @@ describe('useMoveRelevanceWithUndo', () => {
   });
 
   it('snackbar auto-dismiss is configured to 6000ms', async () => {
-    const mockThunk = createMockThunk();
-    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
+    const mutation = createMockMutation();
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mutation));
 
     await act(async () => {
       result.current.handleMove(1, -1);
@@ -106,8 +84,8 @@ describe('useMoveRelevanceWithUndo', () => {
   });
 
   it('clicking Undo dispatches move with opposite direction', async () => {
-    const mockThunk = createMockThunk();
-    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
+    const mutation = createMockMutation();
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mutation));
 
     await act(async () => {
       result.current.handleMove(1, -1);
@@ -117,27 +95,23 @@ describe('useMoveRelevanceWithUndo', () => {
     const actionFn = mockEnqueueSnackbar.mock.calls[0][1].action;
     const actionElement = actionFn('snackbar-1');
 
-    mockThunk.mockClear();
-    mockDispatch.mockClear();
-    mockDispatch.mockImplementation(thunkFn => {
-      if (typeof thunkFn === 'function') {
-        return thunkFn();
-      }
-      return Promise.resolve(thunkFn);
-    });
+    mutation.mutateAsync.mockClear();
 
     await act(async () => {
       actionElement.props.onClick();
     });
 
     // Original direction was -1, undo should be 1 (opposite)
-    expect(mockThunk).toHaveBeenCalledWith(1, 1);
+    expect(mutation.mutateAsync).toHaveBeenCalledWith({
+      id: 1,
+      direction: 1
+    });
     expect(mockCloseSnackbar).toHaveBeenCalledWith('snackbar-1');
   });
 
   it('undo success shows confirmation snackbar', async () => {
-    const mockThunk = createMockThunk();
-    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
+    const mutation = createMockMutation();
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mutation));
 
     await act(async () => {
       result.current.handleMove(1, 1);
@@ -147,13 +121,6 @@ describe('useMoveRelevanceWithUndo', () => {
     const actionElement = actionFn('snackbar-1');
 
     mockEnqueueSnackbar.mockClear();
-    mockDispatch.mockImplementation(thunkFn => {
-      if (typeof thunkFn === 'function') {
-        return thunkFn();
-      }
-      return Promise.resolve(thunkFn);
-    });
-
     await act(async () => {
       actionElement.props.onClick();
     });
@@ -168,8 +135,9 @@ describe('useMoveRelevanceWithUndo', () => {
   });
 
   it('shows error snackbar and no success snackbar when move fails', async () => {
-    const mockThunk = createMockThunk(failureResult);
-    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
+    const mutation = createMockMutation();
+    mutation.mutateAsync.mockRejectedValue(new Error('Cannot move further'));
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mutation));
 
     await act(async () => {
       result.current.handleMove(1, -1);
@@ -177,14 +145,14 @@ describe('useMoveRelevanceWithUndo', () => {
 
     expect(mockEnqueueSnackbar).toHaveBeenCalledTimes(1);
     expect(mockEnqueueSnackbar).toHaveBeenCalledWith(
-      expect.any(String),
+      'Cannot move further',
       expect.objectContaining({ variant: 'error' })
     );
   });
 
   it('shows error snackbar and no undo-success snackbar when undo fails', async () => {
-    const mockThunk = createMockThunk();
-    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
+    const mutation = createMockMutation();
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mutation));
 
     await act(async () => {
       result.current.handleMove(1, 1);
@@ -194,7 +162,7 @@ describe('useMoveRelevanceWithUndo', () => {
     const actionElement = actionFn('snackbar-1');
 
     mockEnqueueSnackbar.mockClear();
-    mockDispatch.mockImplementation(() => Promise.resolve(failureResult));
+    mutation.mutateAsync.mockRejectedValueOnce(new Error('Undo failed'));
 
     await act(async () => {
       actionElement.props.onClick();

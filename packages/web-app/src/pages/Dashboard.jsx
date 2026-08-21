@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -22,9 +21,12 @@ import PublishIcon from '@mui/icons-material/Publish';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import { styled } from '@mui/material/styles';
 
-import { fetchDBExportUrl } from '../actions/DBExport';
-import { usePermissions } from '../hooks';
-import REDUCER_STATUS from '../reducers/ReducerStatus';
+import {
+  useDbExport,
+  useDuplicatesCount,
+  usePendingDocumentsCount,
+  usePermissions
+} from '../hooks';
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
 import ImpersonationLauncher from '../components/appli/ImpersonationLauncher';
 
@@ -53,11 +55,9 @@ const ToolGrid = styled(Box)(({ theme }) => ({
   }
 }));
 
-const badgeContent = (count, status) => {
-  if (status === REDUCER_STATUS.LOADING) {
-    return <CircularProgress size={10} color="inherit" />;
-  }
-  if (status === REDUCER_STATUS.FAILED) return '!';
+const badgeContent = (count, isLoading, isError) => {
+  if (isLoading) return <CircularProgress size={10} color="inherit" />;
+  if (isError) return '!';
   return count;
 };
 
@@ -67,17 +67,14 @@ const ToolCard = ({
   description,
   roleId,
   count,
-  status,
+  isLoading = false,
+  isError = false,
   onClick
 }) => {
   const { formatMessage } = useIntl();
   const roleLabel = formatMessage({ id: roleId });
   const hasCounter = typeof count === 'number';
-  const showBadge =
-    hasCounter &&
-    (status === REDUCER_STATUS.LOADING ||
-      status === REDUCER_STATUS.FAILED ||
-      count > 0);
+  const showBadge = hasCounter && (isLoading || isError || count > 0);
 
   const iconNode = (
     <Box
@@ -106,8 +103,8 @@ const ToolCard = ({
             {showBadge ? (
               <Badge
                 overlap="rectangular"
-                color={status === REDUCER_STATUS.FAILED ? 'error' : 'secondary'}
-                badgeContent={badgeContent(count, status)}
+                color={isError ? 'error' : 'secondary'}
+                badgeContent={badgeContent(count, isLoading, isError)}
                 max={99}>
                 {iconNode}
               </Badge>
@@ -133,19 +130,20 @@ ToolCard.propTypes = {
   description: PropTypes.string.isRequired,
   roleId: PropTypes.oneOf(['Administrator', 'Moderator', 'Leader']).isRequired,
   count: PropTypes.number,
-  status: PropTypes.oneOf(Object.values(REDUCER_STATUS)),
+  isLoading: PropTypes.bool,
+  isError: PropTypes.bool,
   onClick: PropTypes.func.isRequired
 };
 
-const DBExportCard = ({ dbExport }) => {
+const DBExportCard = ({ dbExport, isLoading }) => {
   const { formatMessage } = useIntl();
-  const isLoading = dbExport.status === REDUCER_STATUS.LOADING;
-  const lastUpdate = dbExport.lastUpdate
+  const lastUpdate = dbExport?.lastUpdate
     ? dbExport.lastUpdate.split('T')[0]
     : null;
-  const sizeMo = dbExport.size
+  const sizeMo = dbExport?.size
     ? Math.round((dbExport.size * 10) / (1024 * 1024)) / 10
     : null;
+  const url = dbExport?.url;
 
   return (
     <Card variant="outlined">
@@ -177,7 +175,7 @@ const DBExportCard = ({ dbExport }) => {
             </Typography>
           </Box>
         )}
-        {!isLoading && dbExport.url && (
+        {!isLoading && url && (
           <Box sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary">
               {formatMessage({ id: 'Last update' })} : {lastUpdate}
@@ -192,8 +190,8 @@ const DBExportCard = ({ dbExport }) => {
         <Button
           variant="outlined"
           size="small"
-          disabled={!dbExport.url}
-          onClick={() => window.open(dbExport.url, '_blank')}
+          disabled={!url}
+          onClick={() => window.open(url, '_blank')}
           startIcon={<ArchiveIcon />}>
           {formatMessage({ id: 'Download' })} —{' '}
           {formatMessage({ id: 'License: CC-BY-SA' })}
@@ -207,21 +205,29 @@ DBExportCard.propTypes = {
   dbExport: PropTypes.shape({
     url: PropTypes.string,
     lastUpdate: PropTypes.string,
-    size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    status: PropTypes.string
-  }).isRequired
+    size: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  }),
+  isLoading: PropTypes.bool
+};
+
+DBExportCard.defaultProps = {
+  dbExport: null,
+  isLoading: false
 };
 
 const Dashboard = () => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const permissions = usePermissions();
-  const dispatch = useDispatch();
-  const dbExport = useSelector(state => state.dbExport);
-  const pendingDocumentsCount = useSelector(
-    state => state.pendingDocumentsCount
-  );
-  const duplicatesCount = useSelector(state => state.duplicatesCount);
+  const { data: dbExport, isPending: isDbExportLoading } = useDbExport({
+    enabled: permissions.isLeader
+  });
+  const pendingDocumentsQuery = usePendingDocumentsCount({
+    enabled: permissions.isModerator
+  });
+  const duplicatesQuery = useDuplicatesCount({
+    enabled: permissions.isModerator
+  });
 
   const goTo = url => navigate(url);
 
@@ -236,12 +242,6 @@ const Dashboard = () => {
       navigate('/');
     }
   }, [permissions, navigate]);
-
-  useEffect(() => {
-    if (permissions.isLeader) {
-      dispatch(fetchDBExportUrl());
-    }
-  }, [dispatch, permissions.isLeader]);
 
   const showDataSection = permissions.isModerator || permissions.isLeader;
 
@@ -289,8 +289,9 @@ const Dashboard = () => {
                     id: 'Document validation description'
                   })}
                   roleId="Moderator"
-                  count={pendingDocumentsCount.value}
-                  status={pendingDocumentsCount.status}
+                  count={pendingDocumentsQuery.data ?? 0}
+                  isLoading={pendingDocumentsQuery.isPending}
+                  isError={pendingDocumentsQuery.isError}
                   onClick={() => goTo('/ui/documents/validation')}
                 />
                 <ToolCard
@@ -300,8 +301,9 @@ const Dashboard = () => {
                     id: 'Duplicates tool description'
                   })}
                   roleId="Moderator"
-                  count={duplicatesCount.value}
-                  status={duplicatesCount.status}
+                  count={duplicatesQuery.data ?? 0}
+                  isLoading={duplicatesQuery.isPending}
+                  isError={duplicatesQuery.isError}
                   onClick={() => goTo('/ui/duplicates')}
                 />
               </ToolGrid>
@@ -324,7 +326,12 @@ const Dashboard = () => {
                     onClick={() => goTo('/ui/import-csv')}
                   />
                 )}
-                {permissions.isLeader && <DBExportCard dbExport={dbExport} />}
+                {permissions.isLeader && (
+                  <DBExportCard
+                    dbExport={dbExport}
+                    isLoading={isDbExportLoading}
+                  />
+                )}
               </ToolGrid>
             </Section>
           )}

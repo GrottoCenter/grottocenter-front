@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
@@ -28,10 +29,14 @@ import Alert from '../../common/Alert';
 import FetchErrorState from '../../common/FetchErrorState';
 import SectionCreateButton from '../../common/SectionCreateButton';
 import {
+  useDeleteOrganization,
+  useJoinOrganization,
+  useLeaveOrganization,
   usePermissions,
-  useRefetchOnReconnect,
+  useRestoreOrganization,
   useSharePage
 } from '../../../hooks';
+import { organizationKeys } from '../../../api/queryKeys';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
@@ -40,19 +45,18 @@ import {
   DeleteConfirmationDialog,
   DELETED_ENTITIES
 } from '../../common/card/Deleted';
-import { deleteOrganization } from '../../../actions/Organization/DeleteOrganization';
-import { restoreOrganization } from '../../../actions/Organization/RestoreOrganization';
-import { joinOrganization } from '../../../actions/Organization/JoinOrganization';
-import { leaveOrganization } from '../../../actions/Organization/LeaveOrganization';
-import { fetchOrganization } from '../../../actions/Organization/GetOrganization';
 
-const Organization = ({ error, isLoading, organization }) => {
+const Organization = ({ error, isPaused = false, isLoading, organization }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const { isAuth, isAdmin, isModerator } = usePermissions();
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { organizationId } = useParams();
   const authState = useSelector(state => state.login);
+  const deleteOrganizationMutation = useDeleteOrganization();
+  const restoreOrganizationMutation = useRestoreOrganization();
+  const joinOrganizationMutation = useJoinOrganization();
+  const leaveOrganizationMutation = useLeaveOrganization();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -93,19 +97,23 @@ const Organization = ({ error, isLoading, organization }) => {
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    dispatch(deleteOrganization({ id: organizationId, entityId, isPermanent }));
+    deleteOrganizationMutation.mutate({
+      id: organizationId,
+      entityId,
+      isPermanent
+    });
     if (isPermanent) navigate('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreOrganization({ id: organizationId }));
+    restoreOrganizationMutation.mutate({ id: organizationId });
   };
 
   const handleRefresh = useCallback(() => {
-    dispatch(fetchOrganization(organizationId));
-  }, [dispatch, organizationId]);
-
-  useRefetchOnReconnect(handleRefresh, Boolean(error));
+    queryClient.invalidateQueries({
+      queryKey: organizationKeys.detail(organizationId)
+    });
+  }, [queryClient, organizationId]);
 
   const handleJoinLeave = useCallback(async () => {
     if (!currentUserId) return;
@@ -113,18 +121,29 @@ const Organization = ({ error, isLoading, organization }) => {
     setJoinLeaveError(null);
     try {
       if (isMember) {
-        await dispatch(leaveOrganization(currentUserId, organizationId));
+        await leaveOrganizationMutation.mutateAsync({
+          caverId: currentUserId,
+          organizationId
+        });
       } else {
-        await dispatch(joinOrganization(currentUserId, organizationId));
+        await joinOrganizationMutation.mutateAsync({
+          caverId: currentUserId,
+          organizationId
+        });
       }
-      dispatch(fetchOrganization(organizationId));
     } catch (err) {
       console.error('Error joining/leaving organization:', err);
       setJoinLeaveError(err.message || 'An error occurred');
     } finally {
       setIsJoining(false);
     }
-  }, [dispatch, isMember, currentUserId, organizationId]);
+  }, [
+    isMember,
+    currentUserId,
+    organizationId,
+    joinOrganizationMutation,
+    leaveOrganizationMutation
+  ]);
 
   const requestRemoveMember = useCallback(
     userId => {
@@ -140,13 +159,15 @@ const Organization = ({ error, isLoading, organization }) => {
     setPendingRemoveMember(null);
     setJoinLeaveError(null);
     try {
-      await dispatch(leaveOrganization(id, organizationId));
-      dispatch(fetchOrganization(organizationId));
+      await leaveOrganizationMutation.mutateAsync({
+        caverId: id,
+        organizationId
+      });
     } catch (err) {
       console.error('Error removing member:', err);
       setJoinLeaveError(err.message || 'An error occurred');
     }
-  }, [dispatch, pendingRemoveMember, organizationId]);
+  }, [pendingRemoveMember, organizationId, leaveOrganizationMutation]);
 
   const isActionLoading = wantedDeletedState !== organization?.isDeleted;
 
@@ -243,11 +264,12 @@ const Organization = ({ error, isLoading, organization }) => {
           </Card>
         </SectionStack>
       )}
-      {error && (
+      {(error || isPaused) && (
         <SectionStack>
           <Card sx={{ p: 2 }}>
             <FetchErrorState
               error={error}
+              isPaused={isPaused}
               onRetry={handleRefresh}
               messageId="Error, the organization data you are looking for is not available."
             />
@@ -444,6 +466,7 @@ const Organization = ({ error, isLoading, organization }) => {
 
 Organization.propTypes = {
   error: PropTypes.shape({}),
+  isPaused: PropTypes.bool,
   isLoading: PropTypes.bool.isRequired,
   organization: GrottoFullPropTypes
 };

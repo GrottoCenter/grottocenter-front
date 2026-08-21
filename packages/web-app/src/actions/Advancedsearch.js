@@ -1,57 +1,10 @@
-import fetch from 'isomorphic-fetch';
-import { advancedSearchUrl, advancedSearchExportUrl } from '../conf/apiRoutes';
+import { advancedSearchExportUrl } from '../conf/apiRoutes';
 import { VALID_EXPORT_FORMATS } from '../conf/exportFormats';
 import { checkAndGetStatus } from './utils';
 
-export const FETCH_ADVANCEDSEARCH = 'FETCH_ADVANCEDSEARCH';
-export const FETCH_ADVANCEDSEARCH_SUCCESS = 'FETCH_ADVANCEDSEARCH_SUCCESS';
-export const FETCH_ADVANCEDSEARCH_FAILURE = 'FETCH_ADVANCEDSEARCH_FAILURE';
-export const RESET_ADVANCEDSEARCH_RESULTS = 'RESET_ADVANCEDSEARCH_RESULTS';
-
-const fetchAdvancedsearchStarted = (queryParams, isNewQuery) => ({
-  type: FETCH_ADVANCEDSEARCH,
-  queryParams,
-  isNewQuery
-});
-
-const fetchAdvancedsearchSuccess = d => ({
-  type: FETCH_ADVANCEDSEARCH_SUCCESS,
-  totalResults: d.totalResults,
-  results: d.results
-});
-
-const fetchAdvancedsearchFailure = error => ({
-  type: FETCH_ADVANCEDSEARCH_FAILURE,
-  error
-});
-
-export const resetAdvancedSearchResults = () => ({
-  type: RESET_ADVANCEDSEARCH_RESULTS
-});
-
-export const fetchAdvancedSearchResults =
-  (
-    { query, entity, sort, filter, matchAllFields = true, page = 0, size = 20 },
-    isNewQuery = true
-  ) =>
-  dispatch => {
-    const data = { query, entity, sort, filter, matchAllFields, page, size };
-    dispatch(fetchAdvancedsearchStarted(data, isNewQuery));
-
-    const requestOptions = {
-      method: 'POST',
-      body: JSON.stringify(data)
-    };
-
-    return fetch(advancedSearchUrl, requestOptions)
-      .then(checkAndGetStatus)
-      .then(response => response.json())
-      .then(d => dispatch(fetchAdvancedsearchSuccess(d)))
-      .catch(errorMessage => {
-        dispatch(fetchAdvancedsearchFailure(errorMessage));
-      });
-  };
-
+// Advanced-search results migrated to React Query — see hooks/queries/useAdvancedSearch.js.
+// This file kept only the CSV/GeoJSON/GPX/KML export because it downloads a
+// Blob, not JSON, so it doesn't fit apiPost's parseJsonOr204 contract.
 export const downloadAdvancedSearchResults = async ({
   query,
   entity,

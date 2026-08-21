@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Divider, Link as MuiLink, List, Typography } from '@mui/material';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
@@ -10,9 +9,11 @@ import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { DescriptionPropTypes } from '../../../types/description.type';
 import Description from './Description';
 import CreateDescriptionForm from '../EntitiesForm/Description';
-import { postDescription } from '../../../actions/Description/CreateDescription';
-import { moveDescriptionRelevance } from '../../../actions/Description/MoveRelevance';
-import { usePermissions } from '../../../hooks';
+import {
+  useCreateDescription,
+  useMoveDescriptionRelevance,
+  usePermissions
+} from '../../../hooks';
 import { useMoveRelevanceWithUndo } from '../../../hooks/useMoveRelevanceWithUndo';
 import { sortByRelevance } from '../../../helpers/sortByRelevance';
 import Alert from '../../common/Alert';
@@ -32,21 +33,18 @@ const Descriptions = ({
   const permissions = usePermissions();
   const hasNetworkDescriptions =
     !!networkId && !!networkName && networkDescriptionsCount > 0;
-  const dispatch = useDispatch();
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const { movingId, handleMove } = useMoveRelevanceWithUndo(
-    moveDescriptionRelevance
-  );
+  const createMutation = useCreateDescription();
+  const moveMutation = useMoveDescriptionRelevance();
+  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveMutation);
 
   const onSubmitForm = data => {
-    dispatch(
-      postDescription({
-        [entityType]: entityId,
-        title: data.title,
-        body: data.body,
-        language: data.language
-      })
-    );
+    createMutation.mutate({
+      [entityType]: entityId,
+      title: data.title,
+      body: data.body,
+      language: data.language
+    });
     setIsFormVisible(false);
   };
 

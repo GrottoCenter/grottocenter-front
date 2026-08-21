@@ -16,9 +16,8 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import { useNotification } from '../../../../hooks';
+import { useCreateSubstance, useNotification } from '../../../../hooks';
 import { createSensorConfig } from '../../../../actions/Observations/importWizard';
-import { createSubstance } from '../../../../actions/Substance';
 import { QUANTITY_KINDS } from '../constants/quantityKinds';
 import { UNITS } from '../constants/units';
 import { QUANTITY_KIND_UNITS_MAP } from '../constants/quantityKindUnitsMap';
@@ -41,6 +40,7 @@ const SensorConfigForm = ({ deviceId }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const { onSuccess } = useNotification();
+  const createSubstance = useCreateSubstance();
 
   const sortedQuantityKinds = useMemo(
     () =>
@@ -155,15 +155,13 @@ const SensorConfigForm = ({ deviceId }) => {
       if (substanceRequired && form.selectedSubstance) {
         if (form.selectedSubstance.id === null) {
           // PubChem result — persist first
-          const persisted = await dispatch(
-            createSubstance({
-              name: form.selectedSubstance.name,
-              formula: form.selectedSubstance.formula || undefined,
-              casNumber: form.selectedSubstance.casNumber || undefined,
-              externalId: form.selectedSubstance.externalId || undefined,
-              externalSource: form.selectedSubstance.externalSource || undefined
-            })
-          );
+          const persisted = await createSubstance.mutateAsync({
+            name: form.selectedSubstance.name,
+            formula: form.selectedSubstance.formula || undefined,
+            casNumber: form.selectedSubstance.casNumber || undefined,
+            externalId: form.selectedSubstance.externalId || undefined,
+            externalSource: form.selectedSubstance.externalSource || undefined
+          });
           idSubstance = persisted.id;
         } else {
           idSubstance = form.selectedSubstance.id;
@@ -213,6 +211,7 @@ const SensorConfigForm = ({ deviceId }) => {
     substanceRequired,
     validate,
     dispatch,
+    createSubstance,
     deviceId,
     formatMessage,
     onSuccess

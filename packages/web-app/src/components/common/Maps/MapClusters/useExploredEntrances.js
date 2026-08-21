@@ -1,6 +1,5 @@
-import { useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPerson } from '../../../../actions/Person/GetPerson';
+import { useMemo } from 'react';
+import { usePerson } from '../../../../hooks';
 
 /**
  * Resolves a user's explored entrances into map-ready points.
@@ -19,22 +18,11 @@ import { fetchPerson } from '../../../../actions/Person/GetPerson';
  * @returns {{ points: Array, hasExploredData: boolean|null }}
  */
 const useExploredEntrances = ({ userId, enabled = true }) => {
-  const dispatch = useDispatch();
-  const { person, isFetching, error } = useSelector(state => state.person);
-
-  // Guard against stale person from another profile page sharing the same reducer.
-  const isPersonCurrent = Boolean(userId) && person?.id === userId;
-
-  // Fetch person when the overlay is activated and person isn't already loaded.
-  useEffect(() => {
-    if (enabled && userId && !isPersonCurrent && !isFetching && !error) {
-      dispatch(fetchPerson(userId));
-    }
-  }, [enabled, userId, isPersonCurrent, isFetching, error, dispatch]);
+  const { data: person } = usePerson(enabled ? userId : undefined);
+  const isReady = Boolean(person) && person?.id === userId;
 
   const points = useMemo(() => {
-    if (!isPersonCurrent) return [];
-
+    if (!isReady) return [];
     return (person.exploredEntrances ?? [])
       .filter(e => Number.isFinite(e.latitude) && Number.isFinite(e.longitude))
       .map(e => ({
@@ -44,9 +32,9 @@ const useExploredEntrances = ({ userId, enabled = true }) => {
         name: e.name,
         url: `/ui/entrances/${e.id}`
       }));
-  }, [isPersonCurrent, person]);
+  }, [isReady, person]);
 
-  const hasExploredData = isPersonCurrent
+  const hasExploredData = isReady
     ? (person.exploredEntrances?.length ?? 0) > 0
     : null;
 

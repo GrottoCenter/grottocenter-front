@@ -1,12 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { styled } from '@mui/material/styles';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { isMobileOnly } from 'react-device-detect';
 import { Typography } from '@mui/material';
 
-import { getDocuments } from '../../actions/Document/GetDocuments';
-import { resetDocumentApiErrors } from '../../actions/Document/ResetApiErrors';
+import { useDocuments } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StandardDialog from '../../components/common/StandardDialog';
 import Actions from './Actions';
@@ -25,11 +23,6 @@ const Wrapper = styled('div')`
 
 const DocumentValidationPage = () => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-  const { isLoading, data, totalCount } = useSelector(state => state.documents);
-  const { success: isActionSuccess } = useSelector(
-    state => state.processDocuments
-  );
   const [selectedIds, setSelectedIds] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -37,49 +30,37 @@ const DocumentValidationPage = () => {
 
   const [detailedView, setDetailedView] = useState(null);
   const [editView, setEditView] = useState(null);
-  const [refreshPage, setRefreshPage] = useState(false);
 
   const closeDetailedView = () => setDetailedView(null);
   const closeEditView = () => setEditView(null);
 
-  const loadDocuments = useCallback(() => {
-    setRefreshPage(false);
+  const { isFetching, data } = useDocuments({
+    isValidated: false,
+    limit: rowsPerPage,
+    skip: page * rowsPerPage
+  });
+  const documents = data?.documents ?? [];
+  const totalCount = data?.totalCount ?? 0;
+
+  // useProcessDocuments already invalidates documentKeys.all, so the queue
+  // refetches on validate/decline. This callback only resets the UI selection
+  // and closes the details modal (side effects that stay local to this page).
+  // Memoized so Actions' onProcessed effect doesn't re-fire on every render.
+  const handleProcessed = useCallback(() => {
     setSelectedIds([]);
     closeDetailedView();
-    const criteria = {
-      isValidated: false,
-      limit: rowsPerPage,
-      skip: page * rowsPerPage
-    };
-    dispatch(getDocuments(criteria));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowsPerPage, page]);
+  }, []);
 
+  // useUpdateDocument invalidates documentKeys.all on success — the queue
+  // refetches automatically. This page just closes the edit modal.
   const handleSuccessfulUpdate = () => {
-    dispatch(resetDocumentApiErrors());
     closeEditView();
-    loadDocuments();
   };
 
   const isUpdatedDocRequired = () => {
-    // We fetch the updated doc only if the doc has been modified
-    if (!editView || data.documents.length === 0) return false;
-    return (
-      data.documents.find(doc => doc.id === editView).modifiedDocJson !== null
-    );
+    if (!editView || documents.length === 0) return false;
+    return documents.find(doc => doc.id === editView).modifiedDocJson !== null;
   };
-
-  useEffect(() => {
-    loadDocuments();
-  }, [loadDocuments]);
-
-  useEffect(() => {
-    if (refreshPage) loadDocuments();
-  }, [loadDocuments, refreshPage]);
-
-  useEffect(() => {
-    if (isActionSuccess) setRefreshPage(true);
-  }, [isActionSuccess]);
 
   return (
     <>
@@ -94,8 +75,8 @@ const DocumentValidationPage = () => {
                 </Typography>
                 <EntityTable
                   entityType="documents"
-                  isLoading={isLoading}
-                  pageRows={data.documents}
+                  isLoading={isFetching}
+                  pageRows={documents}
                   nbTotalRows={totalCount}
                   selectedIds={selectedIds}
                   onPageChange={(pageNum, pageSize) => {
@@ -110,7 +91,11 @@ const DocumentValidationPage = () => {
                     setSelectedIds(ids);
                   }}
                 />
-                <Actions selectedIds={selectedIds} onEdit={setEditView} />
+                <Actions
+                  selectedIds={selectedIds}
+                  onEdit={setEditView}
+                  onProcessed={handleProcessed}
+                />
               </Wrapper>
             }
           />

@@ -2,14 +2,15 @@ import PropTypes from 'prop-types';
 import { Chip, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import { useDispatch } from 'react-redux';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
+import {
+  useUnsubscribeFromCountry,
+  useUnsubscribeFromMassif,
+  useUnsubscribeFromRegion
+} from '../../../hooks';
 import { MassifSimpleTypes } from '../../../types/massif.type';
 import countryType from '../../../types/country.type';
 import regionType from '../../../types/region.type';
-import { unsubscribeFromCountry } from '../../../actions/Subscriptions/UnsubscribeFromCountry';
-import { unsubscribeFromRegion } from '../../../actions/Subscriptions/UnsubscribeFromRegion';
 
 // A region id encodes its country: "US-AL" is Alabama in the United States.
 const subscriptionUrl = (type, id) => {
@@ -22,18 +23,20 @@ const subscriptionUrl = (type, id) => {
 const SubscriptionItem = ({ canUnsubscribe, subscription, type, userId }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const url = subscriptionUrl(type, subscription.id);
+  const unsubscribeCountry = useUnsubscribeFromCountry();
+  const unsubscribeMassif = useUnsubscribeFromMassif();
+  const unsubscribeRegion = useUnsubscribeFromRegion();
 
   const handleUnsubscribe = () => {
     if (type === 'MASSIF')
-      dispatch(unsubscribeFromMassif(subscription.id, userId));
+      unsubscribeMassif.mutate({ massifId: subscription.id, userId });
     if (type === 'COUNTRY')
-      dispatch(unsubscribeFromCountry(subscription.id, userId));
+      unsubscribeCountry.mutate({ countryId: subscription.id, userId });
     if (type === 'REGION') {
       // Parse region ID to extract country and region parts (format: "US-AL")
       const [countryId, regionId] = subscription.id.split('-');
-      dispatch(unsubscribeFromRegion(countryId, regionId, userId));
+      unsubscribeRegion.mutate({ countryId, regionId, userId });
     }
   };
 

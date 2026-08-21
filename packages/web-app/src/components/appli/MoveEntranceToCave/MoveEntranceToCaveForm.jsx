@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Box, Link } from '@mui/material';
 import { useIntl } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import Alert from '../../common/Alert';
 import CaveAutoCompleteSearch from '../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
 import Header from './Header';
-import { moveEntranceToCave } from '../../../actions/MoveEntranceToCave';
+import { useMoveEntranceToCave } from '../../../hooks';
 import { EntranceType } from './types';
 import OperationSummary from './OperationSummary';
 import FormActions from './FormActions';
@@ -27,33 +26,20 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
     searchParams.get('mode') === MODE_DETACH ? MODE_DETACH : MODE_MOVE;
 
   const [newCave, setNewCave] = useState(null);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const { onSuccess } = useNotification();
-  const { loading, error: apiError } = useSelector(
-    state => state.moveEntranceToCave
-  );
+  const moveMutation = useMoveEntranceToCave();
+  const loading = moveMutation.isPending;
+  const apiError = moveMutation.error;
+  const isMoveSuccess = moveMutation.isSuccess;
 
   useEffect(() => {
-    if (hasSubmitted && !loading && !apiError) {
-      // Consume the submission so a later upstream error-clear can't retrigger
-      // the success navigation without a fresh submit.
-      setHasSubmitted(false);
-      onSuccess(formatMessage({ id: 'Entrance successfully moved.' }));
-      navigate(`/ui/entrances/${entrance?.id}`);
-    }
-  }, [
-    hasSubmitted,
-    loading,
-    apiError,
-    navigate,
-    entrance?.id,
-    onSuccess,
-    formatMessage
-  ]);
+    if (!isMoveSuccess) return;
+    onSuccess(formatMessage({ id: 'Entrance successfully moved.' }));
+    navigate(`/ui/entrances/${entrance?.id}`);
+  }, [isMoveSuccess, navigate, entrance?.id, onSuccess, formatMessage]);
 
   if (!entrance) return null;
 
@@ -79,8 +65,7 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
 
   const handleValidate = () => {
     if (!newCave || isSameCave) return;
-    setHasSubmitted(true);
-    dispatch(moveEntranceToCave(entrance.id, newCave.id));
+    moveMutation.mutate({ entranceId: entrance.id, caveId: newCave.id });
   };
 
   return (

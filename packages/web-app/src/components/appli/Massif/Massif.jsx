@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
 import { Button, Card, CircularProgress, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
@@ -17,15 +16,16 @@ import { useReactToPrint } from 'react-to-print';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import {
+  useDeleteMassif,
+  useRestoreMassif,
   usePermissions,
-  useSubscriptions,
   useScrollToHashOnLoad,
-  useSharePage
+  useSharePage,
+  useStatisticsMassif,
+  useSubscribeToMassif,
+  useSubscriptions,
+  useUnsubscribeFromMassif
 } from '../../../hooks';
-import { subscribeToMassif } from '../../../actions/Subscriptions/SubscribeToMassif';
-import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
-import { deleteMassif } from '../../../actions/Massif/DeleteMassif';
-import { restoreMassif } from '../../../actions/Massif/RestoreMassif';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
@@ -50,14 +50,23 @@ import {
 import { MassifTypes } from '../../../types/massif.type';
 import AssociationSection from '../OrganizationAssociation';
 
-const Massif = ({ isLoading, error, onRetry = null, massif }) => {
-  const dispatch = useDispatch();
+const Massif = ({
+  isLoading,
+  error,
+  isPaused = false,
+  onRetry = null,
+  massif
+}) => {
   const { massifId } = useParams();
   const massifIdInt = parseInt(massifId, 10);
   const navigate = useNavigate();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
   const componentRef = useRef();
+  const deleteMutation = useDeleteMassif();
+  const restoreMutation = useRestoreMassif();
+  const subscribeMutation = useSubscribeToMassif();
+  const unsubscribeMutation = useUnsubscribeFromMassif();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -70,7 +79,7 @@ const Massif = ({ isLoading, error, onRetry = null, massif }) => {
     if (massif) setWantedDeletedState(massif.isDeleted);
   }, [massif]);
 
-  const { dataMassif } = useSelector(state => state.statisticsMassif);
+  const { data: dataMassif } = useStatisticsMassif(massifIdInt);
   useScrollToHashOnLoad(dataMassif);
 
   let onEdit = null;
@@ -89,12 +98,12 @@ const Massif = ({ isLoading, error, onRetry = null, massif }) => {
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    dispatch(deleteMassif({ id: massifId, entityId, isPermanent }));
+    deleteMutation.mutate({ id: massifId, entityId, isPermanent });
     if (isPermanent) navigate('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreMassif({ id: massifId }));
+    restoreMutation.mutate({ id: massifId });
   };
 
   const {
@@ -105,9 +114,9 @@ const Massif = ({ isLoading, error, onRetry = null, massif }) => {
 
   const handleChangeSubscribe = () => {
     if (!isSubscribed) {
-      dispatch(subscribeToMassif(massifId));
+      subscribeMutation.mutate({ massifId });
     } else {
-      dispatch(unsubscribeFromMassif(massifId));
+      unsubscribeMutation.mutate({ massifId });
     }
   };
 
@@ -205,11 +214,12 @@ const Massif = ({ isLoading, error, onRetry = null, massif }) => {
                 </Card>
               </SectionStack>
             )}
-            {error && (
+            {(error || isPaused) && (
               <SectionStack>
                 <Card sx={{ p: 2 }}>
                   <FetchErrorState
                     error={error}
+                    isPaused={isPaused}
                     onRetry={onRetry}
                     messageId="Error, the massif data you are looking for is not available."
                   />
@@ -386,6 +396,7 @@ const Massif = ({ isLoading, error, onRetry = null, massif }) => {
 Massif.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
+  isPaused: PropTypes.bool,
   onRetry: PropTypes.func,
   massif: MassifTypes
 };

@@ -1,29 +1,22 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 
-import {
-  fetchAdvancedSearchResults,
-  resetAdvancedSearchResults
-} from '../../../actions/Advancedsearch';
+import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
 import { SearchForm, SearchActionButtons } from './SearchElements';
 import { getStoredRowsPerPage } from '../../common/EntityTable';
 import SearchInput from '../../common/SearchInput';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 
 const MassifsSearch = () => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const [query, setQuery] = useState('');
 
   const startAdvancedsearch = overrideQuery =>
-    dispatch(
-      fetchAdvancedSearchResults({
-        entity: ADVANCED_SEARCH_TYPES.MASSIFS,
-        query: overrideQuery !== undefined ? overrideQuery : query,
-        size: getStoredRowsPerPage()
-      })
-    );
+    startAdvancedSearch({
+      entity: ADVANCED_SEARCH_TYPES.MASSIFS,
+      query: overrideQuery !== undefined ? overrideQuery : query,
+      size: getStoredRowsPerPage()
+    });
 
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>
@@ -37,7 +30,7 @@ const MassifsSearch = () => {
         showReset={query !== ''}
         onReset={() => {
           setQuery('');
-          dispatch(resetAdvancedSearchResults());
+          resetAdvancedSearch();
           startAdvancedsearch('');
         }}
       />

@@ -7,8 +7,13 @@ const mockAuthState = {
   login: { authorizationHeader: { Authorization: 'Bearer test-token' } }
 };
 vi.mock('react-redux', () => ({
-  useDispatch: () => mockDispatch,
-  useSelector: selector => selector(mockAuthState)
+  useDispatch: () => mockDispatch
+}));
+
+// api/client reads the auth header from the store at call time; the mock
+// store just needs a getState() shim that returns login.authorizationHeader.
+vi.mock('../store', () => ({
+  default: { getState: () => mockAuthState }
 }));
 
 vi.mock('react-intl', () => ({
@@ -26,22 +31,8 @@ vi.mock('./usePermissions', () => ({
 }));
 
 vi.mock('../actions/Login', () => ({
-  displayLoginDialog: () => ({ type: 'DISPLAY_LOGIN_DIALOG' })
-}));
-
-// Use the real checkAuthStatus, but it lazy-requires ./Login on a 401 only.
-vi.mock('../actions/utils', () => ({
-  checkAuthStatus: () => response => {
-    if (response.status === 401) {
-      const err = new Error('Unauthorized');
-      err.isAuthError = true;
-      throw err;
-    }
-    if (!response.ok) {
-      throw new Error(`status ${response.status}`);
-    }
-    return response;
-  }
+  displayLoginDialog: () => ({ type: 'DISPLAY_LOGIN_DIALOG' }),
+  postLogout: () => ({ type: 'POST_LOGOUT' })
 }));
 
 const mockWindow = { name: 'gcBiTab', close: vi.fn() };
@@ -78,6 +69,7 @@ describe('useOpenBi', () => {
   it('requests an SSO token and submits the form when logged in', async () => {
     global.fetch.mockResolvedValue({
       ok: true,
+      status: 200,
       json: async () => ({ token: 'sso-jwt' })
     });
     const { result } = renderHook(() => useOpenBi());
@@ -100,6 +92,7 @@ describe('useOpenBi', () => {
     mockIsAuth = false;
     global.fetch.mockResolvedValue({
       ok: true,
+      status: 200,
       json: async () => ({ token: 'sso-jwt' })
     });
 
@@ -140,7 +133,7 @@ describe('useOpenBi', () => {
     );
   });
 
-  it('skips the error toast on a 401 (auth error triggers logout)', async () => {
+  it('dispatches postLogout on a 401 and skips the toast', async () => {
     global.fetch.mockResolvedValue({
       ok: false,
       status: 401,
@@ -155,5 +148,6 @@ describe('useOpenBi', () => {
     expect(submitSpy).not.toHaveBeenCalled();
     expect(mockWindow.close).toHaveBeenCalled();
     expect(mockOnError).not.toHaveBeenCalled();
+    expect(mockDispatch).toHaveBeenCalledWith({ type: 'POST_LOGOUT' });
   });
 });

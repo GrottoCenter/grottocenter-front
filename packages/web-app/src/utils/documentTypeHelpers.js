@@ -69,6 +69,17 @@ export const DOCUMENT_TYPE_ICONS = {
 
 export const DOCUMENT_TYPE_FALLBACK_ICON = InsertDriveFileIcon;
 
+export const hasSameDocumentId = (firstId, secondId) =>
+  firstId != null && secondId != null && String(firstId) === String(secondId);
+
+export const isDocumentSelfParent = document =>
+  hasSameDocumentId(document?.id, document?.parent?.id);
+
+export const filterParentDocumentResults = (documents, currentDocumentId) =>
+  documents.filter(
+    document => !hasSameDocumentId(document.id, currentDocumentId)
+  );
+
 // Per-type file restrictions. null = unrestricted (backend-provided list applies).
 export const DOCUMENT_TYPE_ACCEPT = {
   [DocumentTypes.IMAGE]: {

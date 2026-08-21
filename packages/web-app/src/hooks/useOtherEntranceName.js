@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import fetch from 'isomorphic-fetch';
 import { useSelector } from 'react-redux';
 
 import { getCaveUrl } from '../conf/apiRoutes';

@@ -1,19 +1,17 @@
-import { useContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { InputAdornment } from '@mui/material';
 import { bibliographyIcon } from '../../../../../assets/icons';
 
 import { DocumentFormContext } from '../Provider';
 
-import {
-  fetchQuicksearchResult,
-  resetQuicksearch
-} from '../../../../../actions/Quicksearch';
-
+import { useQuickSearch } from '../../../../../hooks';
 import { entityOptionForSelector } from '../../../../../helpers/Entity';
 
-import { documentTypeHelpers } from '../../../../../utils/documentTypeHelpers';
+import {
+  documentTypeHelpers,
+  filterParentDocumentResults
+} from '../../../../../utils/documentTypeHelpers';
 import SearchBar from './SearchBar';
 
 import FormAutoCompleteComponent from '../../../../common/Form/FormAutoComplete';
@@ -24,6 +22,8 @@ const resultEndAdornment = (
   </InputAdornment>
 );
 
+const DOC_ENTITIES = ['documents'];
+
 const DocumentAutoComplete = ({
   contextValueName,
   helperContent,
@@ -31,71 +31,38 @@ const DocumentAutoComplete = ({
   required = false,
   searchLabelText
 }) => {
-  const dispatch = useDispatch();
-  const {
-    error,
-    isLoading,
-    results: quicksearchResult
-  } = useSelector(state => state.quicksearch);
   const { isArticle, isIssue } = documentTypeHelpers;
-
   const { document } = useContext(DocumentFormContext);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // The user must not search all the documents everytime:
   //   - if he creates an article, he's searching for an issue
   //   - if he creates an issue, he's searching for a collection
   //   - else he's searching for any document.
+  const searchFilter = useMemo(() => {
+    if (isArticle(document.type)) return { type: 'Issue' };
+    if (isIssue(document.type)) return { type: 'Collection' };
+    return {};
+  }, [document.type, isArticle, isIssue]);
 
-  // /**
-  //  * Recursive function to build the complete name of a "part" element
-  //  * from all its parents and children.
-  //  * @param part : element to build the name
-  //  * @param childPart : previously child part name computed
-  //  *
-  //  * Ex:
-  //  * If myArticle is from a Spelunca issue,
-  //  * getPartOfName(myArticle, '') will return:
-  //  * Spelunca [COLLECTION] > Spelunca n°142 > "the title of myArticle"
-  //  */
-  // const getPartOfName = (part, childPart = '') => {
-  //   const conditionalChildPart = childPart === '' ? '' : `> ${childPart}`;
-
-  //   // If the item is a Collection without child, display [COLLECTION] indicator
-  //   const conditionalNamePart =
-  //     isCollection(part.documentType) && childPart === ''
-  //       ? `${part.name} [${formatMessage({ id: 'COLLECTION' })}]`
-  //       : part.name;
-
-  //   if (!part.partOf) {
-  //     return `${conditionalNamePart} ${
-  //       part.issue ? part.issue : ''
-  //     } ${conditionalChildPart}`;
-  //   }
-  //   return getPartOfName(
-  //     part.partOf,
-  //     `${conditionalNamePart} ${part.issue} ${conditionalChildPart}`
-  //   );
-  // };
+  const {
+    data,
+    error,
+    isFetching: isLoading
+  } = useQuickSearch({
+    query: searchQuery,
+    entities: DOC_ENTITIES,
+    filter: searchFilter
+  });
+  const quicksearchResult = filterParentDocumentResults(
+    data?.results ?? [],
+    document.id
+  );
 
   const getDocumentName = doc => `[${doc.type}] ${doc.title}`;
 
-  const searchFilter = {};
-  if (isArticle(document.type)) {
-    searchFilter.type = 'Issue';
-  } else if (isIssue(document.type)) {
-    searchFilter.type = 'Collection';
-  }
-
-  const fetchSearchResults = debouncedInput =>
-    dispatch(
-      fetchQuicksearchResult({
-        query: debouncedInput.trim(),
-        entities: ['documents'],
-        filter: searchFilter
-      })
-    );
-
-  const resetSearchResults = () => dispatch(resetQuicksearch());
+  const fetchSearchResults = debouncedInput => setSearchQuery(debouncedInput);
+  const resetSearchResults = () => setSearchQuery('');
 
   return (
     <FormAutoCompleteComponent

@@ -1,19 +1,20 @@
 import { useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { useIntl } from 'react-intl';
-import { updateEntrance } from '../../../../actions/Entrance/UpdateEntrance';
-import { postEntrance } from '../../../../actions/Entrance/CreateEntrance';
-import {
-  postCaveAndEntrance,
-  updateCaveAndEntrance
-} from '../../../../actions/CaveAndEntrance';
 
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import { normelizeCoordinate } from '../utils/InputCoordinate';
-import { usePermissions, useNotification } from '../../../../hooks';
+import {
+  useCreateEntrance,
+  useUpdateEntrance,
+  useCreateCaveAndEntrance,
+  useUpdateCaveAndEntrance,
+  usePermissions,
+  useNotification
+} from '../../../../hooks';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import LicenseBox from '../utils/LicenseBox';
 import EditTypeSelection from './EditTypeSelection';
@@ -75,17 +76,16 @@ export const EntranceForm = ({
 
   defaultCaveValues.language = AVAILABLE_LANGUAGES[locale].id;
   defaultEntranceValues.language = AVAILABLE_LANGUAGES[locale].id;
-  const {
-    error: entranceError,
-    loading: entranceLoading,
-    data: entranceData
-  } = useSelector(state =>
-    isNewEntrance ? state.createEntrance : state.updateEntrance
-  );
-  const { error: caveError, loading: caveLoading } = useSelector(state =>
-    isNewEntrance ? state.createCave : state.updateCave
-  );
-  const dispatch = useDispatch();
+
+  // Four mutations wired at once — the form picks which pair to fire based
+  // on isNewEntrance and entityType (see onSubmit). The read side used to
+  // pull four Redux slices (create/update × cave/entrance); with hooks we
+  // pick the active mutation object and read isPending/error from it.
+  const createEntranceMutation = useCreateEntrance();
+  const updateEntranceMutation = useUpdateEntrance();
+  const createCaveAndEntranceMutation = useCreateCaveAndEntrance();
+  const updateCaveAndEntranceMutation = useUpdateCaveAndEntrance();
+
   const { formatMessage } = useIntl();
   const { onInfo } = useNotification();
   const entityTypeInitialValue = useMemo(
@@ -188,9 +188,12 @@ export const EntranceForm = ({
 
     if (isNewEntrance) {
       if (entityType === ENTRANCE_AND_CAVE) {
-        dispatch(postCaveAndEntrance(caveData, entranceDataFmt));
+        createCaveAndEntranceMutation.mutate({
+          caveData,
+          entranceData: entranceDataFmt
+        });
       } else {
-        dispatch(postEntrance(entranceDataFmt));
+        createEntranceMutation.mutate(entranceDataFmt);
       }
     } else {
       const caveUnchanged =
@@ -207,29 +210,45 @@ export const EntranceForm = ({
         return;
       }
       if (entityType === ENTRANCE_AND_CAVE && !caveUnchanged) {
-        dispatch(updateCaveAndEntrance(caveData, entranceDataFmt));
+        updateCaveAndEntranceMutation.mutate({
+          caveData,
+          entranceData: entranceDataFmt
+        });
       } else {
-        dispatch(updateEntrance(entranceDataFmt));
+        updateEntranceMutation.mutate(entranceDataFmt);
       }
     }
   };
 
+  const activeMutation = (() => {
+    if (isNewEntrance)
+      return entityType === ENTRANCE_AND_CAVE
+        ? createCaveAndEntranceMutation
+        : createEntranceMutation;
+    return entityType === ENTRANCE_AND_CAVE
+      ? updateCaveAndEntranceMutation
+      : updateEntranceMutation;
+  })();
+
   if (isSubmitSuccessful) {
+    // For the combined create flow, data is `{cave, entrance}`; for the
+    // single-entrance create, it's the entrance itself.
+    const createdEntranceId = isNewEntrance
+      ? (activeMutation.data?.entrance?.id ?? activeMutation.data?.id)
+      : entranceValues?.id;
     return (
       <FormProgressInfo
         isLoading={
-          caveLoading || entranceLoading || (isNewEntrance && !entranceData)
+          activeMutation.isPending || (isNewEntrance && !createdEntranceId)
         }
-        isError={!!(entranceError || caveError)}
+        isError={activeMutation.isError}
         labelLoading={
           isNewEntrance ? 'Creating entrance...' : 'Updating entrance...'
         }
         labelError="A server error occurred"
         resetFn={handleReset}
         getRedirectFn={() =>
-          isNewEntrance
-            ? `/ui/entrances/${entranceData.id}`
-            : `/ui/entrances/${entranceValues.id}`
+          createdEntranceId ? `/ui/entrances/${createdEntranceId}` : ''
         }
       />
     );

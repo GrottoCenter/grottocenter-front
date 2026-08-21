@@ -1,10 +1,7 @@
-import { useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ExploreOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { loadRandomEntrance } from '../../actions/RandomEntrance';
 import RandomEntryCardContainer from '../../containers/RandomEntryCardContainer';
 
 const Section = styled('section')(({ theme }) => ({
@@ -24,12 +21,7 @@ const TitleRow = styled(Box)({
 });
 
 const RandomEntry = () => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-
-  const handleRefresh = useCallback(() => {
-    dispatch(loadRandomEntrance());
-  }, [dispatch]);
 
   return (
     <Section aria-labelledby="random-entry-title">
@@ -45,7 +37,7 @@ const RandomEntry = () => {
         </Typography>
       </TitleRow>
       <Box sx={{ maxWidth: 720, width: '100%', mx: 'auto' }}>
-        <RandomEntryCardContainer onRefresh={handleRefresh} />
+        <RandomEntryCardContainer />
       </Box>
     </Section>
   );

@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import {
   changeLocale,
   hasLoadedMessages,
@@ -6,9 +5,9 @@ import {
   CHANGE_LOCALE_LOAD_SUCCESS
 } from './Intl';
 
-// The action imports fetch as a default export, so the factory has to return
-// `{ default: ... }` — a bare function would leave the import undefined.
-vi.mock('isomorphic-fetch', () => ({ default: vi.fn() }));
+// The action calls the global `fetch` directly. Stub it in each test with
+// `vi.stubGlobal('fetch', mockFn)` where a response is expected; the outer
+// describe blocks below carry their own local stubs where they need one.
 
 const makeStore = messages => ({
   dispatch: vi.fn(),
@@ -37,23 +36,32 @@ describe('hasLoadedMessages', () => {
 });
 
 describe('changeLocale', () => {
-  beforeEach(() => fetch.mockReset());
+  const mockFetch = vi.fn();
+
+  beforeEach(() => {
+    mockFetch.mockReset();
+    vi.stubGlobal('fetch', mockFetch);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it('does not refetch a locale that is already loaded', async () => {
     const { dispatch, getState } = makeStore({ fr: { Hello: 'Bonjour' } });
 
     await changeLocale('fr')(dispatch, getState);
 
-    expect(fetch).not.toHaveBeenCalled();
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 
   it('retries a locale whose previous load left it empty', async () => {
     const { dispatch, getState } = makeStore({ fr: {} });
-    fetch.mockReturnValue(okResponse({ Hello: 'Bonjour' }));
+    mockFetch.mockReturnValue(okResponse({ Hello: 'Bonjour' }));
 
     await changeLocale('fr')(dispatch, getState);
 
-    expect(fetch).toHaveBeenCalledWith('/lang/fr.json');
+    expect(mockFetch).toHaveBeenCalledWith('/lang/fr.json');
     expect(dispatch).toHaveBeenCalledWith({ type: CHANGE_LOCALE });
     expect(dispatch).toHaveBeenCalledWith({
       type: CHANGE_LOCALE_LOAD_SUCCESS,

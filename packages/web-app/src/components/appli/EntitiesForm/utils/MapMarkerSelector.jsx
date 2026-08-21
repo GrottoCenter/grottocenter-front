@@ -18,6 +18,7 @@ import LayersControl from '../../../common/Maps/common/LayersControl';
 import LocateMeControl from '../../../common/Maps/common/LocateMeControl';
 import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
 import FullscreenControl from '../../../common/Maps/common/FullscreenControl';
+import TileReloader from '../../../common/Maps/common/TileReloader';
 import { defaultCoord, defaultZoom, focusZoom } from '../../../../conf/config';
 
 const StyledMapContainer = styled(MapContainer)`
@@ -282,6 +283,7 @@ const MapMarkerSelector = ({
         <FullscreenControl forceSeparateButton="true" />
         <ScaleControl position="bottomright" />
         <LayersControl position="topright" />
+        <TileReloader />
 
         <MapBind
           center={currentPosition}

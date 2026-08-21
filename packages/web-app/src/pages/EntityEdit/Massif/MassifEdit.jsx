@@ -1,23 +1,15 @@
-import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { loadMassif } from '../../../actions/Massif/GetMassif';
+import { useMassif } from '../../../hooks';
 import MassifEditContainer from './MassifEditContainer';
 
 const MassifEdit = () => {
   const { massifId } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const { massif, isFetching } = useSelector(state => state.massif);
-
-  useEffect(() => {
-    dispatch(loadMassif(massifId));
-  }, [massifId, dispatch]);
+  const { data: massif, isPending } = useMassif(massifId);
 
   return (
     <MassifEditContainer
-      isFetching={isFetching}
+      isFetching={isPending}
       massif={massif}
       onCancel={() => navigate(`/ui/massifs/${massifId}`)}
     />

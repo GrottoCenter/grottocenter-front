@@ -3,23 +3,11 @@ import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
 import Locations from './index';
 
-// Mock react-redux with a controllable dispatch
-const mockDispatch = vi.fn(() => Promise.resolve());
-vi.mock('react-redux', async () => ({
-  ...(await vi.importActual('react-redux')),
-  useDispatch: () => mockDispatch,
-  useSelector: () => ({})
-}));
-
-// Mock the moveLocationRelevance action creator
-const mockMoveLocationRelevance = vi.fn((id, direction) => ({
-  type: 'MOVE_LOCATION_RELEVANCE',
-  id,
-  direction
-}));
-vi.mock('../../../../actions/Location/MoveRelevance', () => ({
-  moveLocationRelevance: (...args) => mockMoveLocationRelevance(...args)
-}));
+// The reorder mutation used to be a Redux thunk; now it's a React Query
+// mutation hook. Mock it as a mutation-shaped object so the component
+// (and the useMoveRelevanceWithUndo consumer) sees the right surface.
+const mockMutateAsync = vi.fn(() => Promise.resolve());
+const mockCreateMutate = vi.fn();
 
 // Mock usePermissions hook
 const mockPermissions = {
@@ -30,19 +18,32 @@ const mockPermissions = {
   isUser: false,
   isTokenExpired: false
 };
-vi.mock('../../../../hooks', () => ({
-  usePermissions: () => mockPermissions,
-  useAnchorScroll: () => {},
-  // ActionButtons disables itself offline; assume a connection here so the
-  // reorder buttons stay clickable.
-  useOnlineStatus: () => true,
-  // SectionCreateButton reads the viewport to pick its icon-only mobile shape.
-  useIsDesktopLayout: () => true
-}));
-
-vi.mock('../../../../actions/Location/CreateLocation', () => ({
-  postLocation: vi.fn(() => ({ type: 'POST_LOCATION' }))
-}));
+vi.mock('../../../../hooks', () => {
+  // vi.mock is hoisted to the top of the file, so top-level module scope is
+  // not yet initialised when this factory runs — hence the inline stub rather
+  // than a shared `noop` const.
+  const stubMutation = () => ({ mutate: vi.fn(), mutateAsync: vi.fn() });
+  return {
+    usePermissions: () => mockPermissions,
+    useAnchorScroll: () => {},
+    // ActionButtons disables itself offline; assume a connection here so the
+    // reorder buttons stay clickable.
+    useOnlineStatus: () => true,
+    // SectionCreateButton reads the viewport to pick its icon-only mobile shape.
+    useIsDesktopLayout: () => true,
+    useMoveLocationRelevance: () => ({
+      mutate: vi.fn(),
+      mutateAsync: mockMutateAsync
+    }),
+    useCreateLocation: () => ({ mutate: mockCreateMutate }),
+    // Location.jsx mounts these; the reorder test doesn't drive them, so
+    // stubs suffice — but they must exist on the mock or vi throws on any
+    // import miss.
+    useUpdateLocation: stubMutation,
+    useDeleteLocation: stubMutation,
+    useRestoreLocation: stubMutation
+  };
+});
 
 vi.mock('../../../common/Contribution/Contribution', () => {
   const MockContribution = () => <span>contribution</span>;
@@ -57,6 +58,7 @@ vi.mock('../Snapshots/UtilityFunction', () => ({
 const messages = {
   'Move up': 'Move up',
   'Move down': 'Move down',
+  Access: 'Access',
   Location: 'Location',
   'Cancel adding a new location': 'Cancel adding a new location',
   'Add a new location': 'Add a new location',
@@ -129,9 +131,9 @@ const renderLocations = (props = {}) =>
   );
 
 beforeEach(() => {
-  mockDispatch.mockClear();
-  mockDispatch.mockReturnValue(Promise.resolve());
-  mockMoveLocationRelevance.mockClear();
+  mockMutateAsync.mockClear();
+  mockMutateAsync.mockReturnValue(Promise.resolve());
+  mockCreateMutate.mockClear();
   mockPermissions.isAuth = true;
   mockPermissions.isModerator = true;
 });
@@ -172,7 +174,7 @@ describe('Locations reorder integration', () => {
     expect(screen.queryByLabelText('Move down')).toBeNull();
   });
 
-  it('dispatches moveLocationRelevance with direction -1 on up click', async () => {
+  it('calls the move mutation with direction -1 on up click', async () => {
     renderLocations();
 
     const moveUpButtons = screen.getAllByLabelText('Move up');
@@ -181,10 +183,10 @@ describe('Locations reorder integration', () => {
       fireEvent.click(moveUpButtons[0]);
     });
 
-    expect(mockMoveLocationRelevance).toHaveBeenCalledWith(2, -1);
+    expect(mockMutateAsync).toHaveBeenCalledWith({ id: 2, direction: -1 });
   });
 
-  it('dispatches moveLocationRelevance with direction 1 on down click', async () => {
+  it('calls the move mutation with direction 1 on down click', async () => {
     renderLocations();
 
     const moveDownButtons = screen.getAllByLabelText('Move down');
@@ -193,6 +195,6 @@ describe('Locations reorder integration', () => {
       fireEvent.click(moveDownButtons[0]);
     });
 
-    expect(mockMoveLocationRelevance).toHaveBeenCalledWith(1, 1);
+    expect(mockMutateAsync).toHaveBeenCalledWith({ id: 1, direction: 1 });
   });
 });

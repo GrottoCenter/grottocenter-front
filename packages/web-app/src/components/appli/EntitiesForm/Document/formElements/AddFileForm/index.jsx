@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty, remove } from 'ramda';
 import {
   Autocomplete,
@@ -23,7 +22,13 @@ import LicenseTag from '@/components/common/LicenseTag';
 import AppLink from '@/components/common/AppLink';
 import InternationalizedLink from '@/components/common/InternationalizedLink';
 import { licenceLinks } from '@/conf/externalLinks';
-import { useUserProperties, useFileFormats } from '../../../../../../hooks';
+import {
+  useUserProperties,
+  useFileFormats,
+  useLicenses,
+  useDocuments,
+  findLicenseByName
+} from '../../../../../../hooks';
 import ErrorsList from './ErrorsList';
 import {
   IS_DELETED,
@@ -34,27 +39,17 @@ import {
   validateAndBuildFileEntries
 } from './FileHelpers';
 import FileSelectorInput from '../../../../../common/FileSelectorInput';
-import { fetchLicense } from '../../../../../../actions/Licenses';
-import { getDocuments } from '../../../../../../actions/Document/GetDocuments';
 import { DocumentFormContext } from '../../Provider';
 
 const DEFAULT_LICENSE = 'CC-BY-SA';
 
 const AuthDocSelect = ({ value, onChange, disabled = false }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-  const { data, isLoading } = useSelector(state => state.documents);
-  const authDocs = data.authorizationDocuments ?? [];
-
-  useEffect(() => {
-    if (authDocs.length > 0 || isLoading) return;
-    dispatch(
-      getDocuments({
-        isValidated: true,
-        documentType: 'Authorization To Publish'
-      })
-    );
-  }, [dispatch, authDocs.length, isLoading]);
+  const { data, isLoading } = useDocuments({
+    isValidated: true,
+    documentType: 'Authorization To Publish'
+  });
+  const authDocs = data?.documents ?? [];
 
   return (
     <Autocomplete
@@ -103,16 +98,17 @@ const AddFileForm = ({
   showAuthorization = true
 }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
   const [errors, setErrors] = useState([]);
   const {
     mimeTypes,
     extensions: backendExtensions,
-    loading
+    isLoading
   } = useFileFormats();
-  const { data: licenses, loading: licensesLoading } = useSelector(
-    state => state.licenses
-  );
+  // Fetched only where the authorization block is shown; React Query keeps the
+  // call site unconditional and skips the request until then.
+  const { data: licenses, isLoading: licensesLoading } = useLicenses({
+    enabled: showAuthorization
+  });
   const currentUser = useUserProperties();
   const { document, updateAttribute } = useContext(DocumentFormContext);
 
@@ -147,16 +143,11 @@ const AddFileForm = ({
   const showAuthDocSelect = option === DOCUMENT_AUTHORIZE_TO_PUBLISH;
   const visibleFiles = files.filter(f => f.state !== IS_DELETED);
 
-  useEffect(() => {
-    if (showAuthorization && !licenses && !licensesLoading)
-      dispatch(fetchLicense());
-  }, [dispatch, showAuthorization, licenses, licensesLoading]);
-
   const documentLicenseName = document.license?.name;
   useEffect(() => {
     if (!showAuthorization || !licenses) return;
     const licenseName = documentLicenseName ?? DEFAULT_LICENSE;
-    const selected = licenses.find(l => l.name === licenseName);
+    const selected = findLicenseByName(licenses, licenseName);
     if (selected) setLicense(selected);
     // setLicense is an inline arrow function prop — excluding it from deps is intentional
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -215,7 +206,7 @@ const AddFileForm = ({
         onFileRemove={removeFile}
         accept={accept}
         extensions={extensions}
-        disabled={loading}
+        disabled={isLoading}
       />
       {showAuthorization && visibleFiles.length > 0 && (
         <Box sx={{ mt: 1 }}>
@@ -307,24 +298,21 @@ const AddFileForm = ({
                   value={document.license?.name ?? ''}
                   renderValue={() => <LicenseTag license={document.license} />}
                   onChange={e =>
-                    setLicense(licenses?.find(l => l.name === e.target.value))
+                    setLicense(findLicenseByName(licenses, e.target.value))
                   }>
                   {licensesLoading && (
                     <MenuItem disabled>
                       <CircularProgress size={16} />
                     </MenuItem>
                   )}
-                  {(licenses ?? [])
-                    .slice()
-                    .sort((a, b) => (a.name > b.name ? 1 : -1))
-                    .map(l => (
-                      <MenuItem key={l.id} value={l.name}>
-                        <LicenseTag
-                          license={l}
-                          recommended={l.name === DEFAULT_LICENSE}
-                        />
-                      </MenuItem>
-                    ))}
+                  {(licenses ?? []).map(l => (
+                    <MenuItem key={l.id} value={l.name}>
+                      <LicenseTag
+                        license={l}
+                        recommended={l.name === DEFAULT_LICENSE}
+                      />
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
               {document.license?.url && (

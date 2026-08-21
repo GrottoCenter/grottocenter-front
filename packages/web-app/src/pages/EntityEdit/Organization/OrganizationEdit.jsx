@@ -1,29 +1,20 @@
-import { useEffect } from 'react';
-import { useIntl } from 'react-intl';
 import { isNil } from 'ramda';
-import PropTypes from 'prop-types';
+import { useIntl } from 'react-intl';
 import { CircularProgress } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import OrganizationForm from '../../../components/appli/EntitiesForm/Organization';
 import { makeOrganizationValueData } from '../../../components/appli/EntitiesForm/Organization/transformers';
 import Layout from '../../../components/common/Layouts/Fixed/FixedContent';
 import Translate from '../../../components/common/Translate';
-import { fetchOrganization } from '../../../actions/Organization/GetOrganization';
+import { useOrganization } from '../../../hooks';
 
 const OrganizationEdit = () => {
   const { organizationId } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
 
-  const { organization, isFetching, error } = useSelector(
-    state => state.organization
-  );
+  const { data: organization, error } = useOrganization(organizationId);
 
-  useEffect(() => {
-    dispatch(fetchOrganization(organizationId));
-  }, [organizationId, dispatch]);
   if (!isNil(error)) {
     return (
       <Translate>
@@ -39,24 +30,17 @@ const OrganizationEdit = () => {
         formatMessage({ id: 'Loading the organization data...' })
       }
       content={
-        !isFetching && !organization ? (
-          <CircularProgress />
-        ) : (
+        organization ? (
           <OrganizationForm
             organizationValues={makeOrganizationValueData(organization)}
             onCancel={() => navigate(`/ui/organizations/${organizationId}`)}
           />
+        ) : (
+          <CircularProgress />
         )
       }
     />
   );
-};
-
-OrganizationEdit.propTypes = {
-  organization: PropTypes.shape({
-    name: PropTypes.shape({ message: PropTypes.string })
-  }),
-  error: PropTypes.shape({})
 };
 
 export default OrganizationEdit;

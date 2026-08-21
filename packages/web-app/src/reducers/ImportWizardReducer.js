@@ -27,7 +27,7 @@ import {
   SUBMIT_OBSERVATIONS_IMPORT,
   SUBMIT_OBSERVATIONS_IMPORT_SUCCESS,
   SUBMIT_OBSERVATIONS_IMPORT_FAILURE
-} from '../actions/Observations/importWizard';
+} from '../actions/Observations/importWizardTypes';
 import { DEFAULT_DOCUMENT_LANGUAGE } from '../components/appli/ImportObservationsWizard/constants/defaults';
 
 export const initialState = {

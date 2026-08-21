@@ -1,40 +1,27 @@
-import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Badge, CircularProgress, IconButton } from '@mui/material';
 import MuiNotificationsIcon from '@mui/icons-material/Notifications';
-import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { APP_BAR_ICON_SIZE } from '@/components/common/AppBar/constants';
-import { usePermissions } from '../../../hooks';
-import { countUnreadNotifications } from '../../../actions/Notifications/CountUnreadNotifications';
-import REDUCER_STATUS from '../../../reducers/ReducerStatus';
-
-const getBadgeContent = (nbNotifications, status) => {
-  switch (status) {
-    case REDUCER_STATUS.LOADING:
-      return <CircularProgress size={10} />;
-    case REDUCER_STATUS.FAILED:
-      return '!';
-    case REDUCER_STATUS.SUCCEEDED:
-      return nbNotifications;
-    default:
-      return undefined;
-  }
-};
+import { usePermissions, useUnreadNotificationsCount } from '../../../hooks';
 
 const NotificationsIcon = ({ onClick }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
   const { isAuth } = usePermissions();
-  const { count: nbNotifications, status } = useSelector(
-    state => state.countUnreadNotifications
-  );
-
-  useEffect(() => {
-    dispatch(countUnreadNotifications());
-  }, [dispatch]);
+  const {
+    data: nbNotifications,
+    isPending,
+    isError,
+    isSuccess
+  } = useUnreadNotificationsCount({ enabled: isAuth });
 
   if (!isAuth) return '';
+
+  let badgeContent;
+  if (isPending) badgeContent = <CircularProgress size={10} />;
+  else if (isError) badgeContent = '!';
+  else if (isSuccess) badgeContent = nbNotifications;
+
   return (
     <IconButton
       aria-label={formatMessage({ id: 'notifications of current user' })}
@@ -43,8 +30,8 @@ const NotificationsIcon = ({ onClick }) => {
       size="large">
       <Badge
         overlap="rectangular"
-        color={status === REDUCER_STATUS.FAILED ? 'error' : 'secondary'}
-        badgeContent={getBadgeContent(nbNotifications, status)}>
+        color={isError ? 'error' : 'secondary'}
+        badgeContent={badgeContent}>
         <MuiNotificationsIcon sx={{ fontSize: APP_BAR_ICON_SIZE }} />
       </Badge>
     </IconButton>

@@ -1,14 +1,16 @@
 import { ListItem, Box, ListItemText, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { timeToGoIcon, undergroundTimeIcon } from '../../../../assets/icons';
-import { usePermissions, useUserProperties } from '../../../../hooks';
-import { updateComment } from '../../../../actions/Comment/UpdateComment';
-import { deleteComment } from '../../../../actions/Comment/DeleteComment';
-import { restoreComment } from '../../../../actions/Comment/RestoreComment';
+import {
+  useUpdateComment,
+  useDeleteComment,
+  useRestoreComment,
+  usePermissions,
+  useUserProperties
+} from '../../../../hooks';
 import ActionButtons from '../ActionButtons';
 import SectionTitle from '../SectionTitle';
 import CreateCommentForm from '../../EntitiesForm/Comment';
@@ -41,9 +43,11 @@ const Comment = ({
   isFirst,
   isLast
 }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
+  const updateMutation = useUpdateComment();
+  const deleteMutation = useDeleteComment();
+  const restoreMutation = useRestoreComment();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
 
@@ -53,29 +57,27 @@ const Comment = ({
   }, []);
 
   const onSubmitForm = data => {
-    dispatch(
-      updateComment({
-        id: data.id,
-        title: data.title,
-        body: data.body,
-        aestheticism: data.aestheticism,
-        caving: data.caving,
-        approach: data.approach,
-        eTTrail: data.eTTrail,
-        eTUnderground: data.eTUnderground,
-        language: data.language
-      })
-    );
+    updateMutation.mutate({
+      id: data.id,
+      title: data.title,
+      body: data.body,
+      aestheticism: data.aestheticism,
+      caving: data.caving,
+      approach: data.approach,
+      eTTrail: data.eTTrail,
+      eTUnderground: data.eTUnderground,
+      language: data.language
+    });
     setIsUpdateFormVisible(false);
   };
 
   const onDeletePress = isPermanent => {
     setWantedDeletedState(true);
-    dispatch(deleteComment({ id: comment.id, isPermanent }));
+    deleteMutation.mutate({ id: comment.id, isPermanent });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreComment({ id: comment.id }));
+    restoreMutation.mutate({ id: comment.id });
   };
 
   const isActionLoading = wantedDeletedState !== comment.isDeleted;

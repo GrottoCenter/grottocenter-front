@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Box, ListItem, ListItemText } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 import { DescriptionPropTypes } from '../../../types/description.type';
 import CreateDescriptionForm from '../EntitiesForm/Description/index';
-import { updateDescription } from '../../../actions/Description/UpdateDescription';
-import { deleteDescription } from '../../../actions/Description/DeleteDescription';
-import { restoreDescription } from '../../../actions/Description/RestoreDescription';
+import {
+  useUpdateDescription,
+  useDeleteDescription,
+  useRestoreDescription,
+  usePermissions
+} from '../../../hooks';
 import ActionButtons from '../Entry/ActionButtons';
 import SectionTitle from '../Entry/SectionTitle';
-import { usePermissions } from '../../../hooks';
 import Contribution from '../../common/Contribution/Contribution';
 
 const ListItemStyled = styled(ListItem)`
@@ -30,8 +31,10 @@ const Description = ({
   parentId,
   parentType
 }) => {
-  const dispatch = useDispatch();
   const permissions = usePermissions();
+  const updateMutation = useUpdateDescription();
+  const deleteMutation = useDeleteDescription();
+  const restoreMutation = useRestoreDescription();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
 
@@ -41,24 +44,22 @@ const Description = ({
   }, []);
 
   const onSubmitForm = data => {
-    dispatch(
-      updateDescription({
-        id: description.id,
-        title: data.title,
-        body: data.body,
-        language: data.language
-      })
-    );
+    updateMutation.mutate({
+      id: description.id,
+      title: data.title,
+      body: data.body,
+      language: data.language
+    });
     setIsUpdateFormVisible(false);
   };
 
   const onDeletePress = isPermanent => {
     setWantedDeletedState(true);
-    dispatch(deleteDescription({ id: description.id, isPermanent }));
+    deleteMutation.mutate({ id: description.id, isPermanent });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreDescription({ id: description.id }));
+    restoreMutation.mutate({ id: description.id });
   };
 
   const isActionLoading = wantedDeletedState !== description.isDeleted;

@@ -132,130 +132,129 @@ Use ICU message format for dynamic values:
 
 ---
 
-## 🎯 Redux Patterns (detailed)
+## 🎯 Server state — React Query
 
-See also root `AGENTS.md` for the short reference.
+All server reads (GET) and writes (POST/PUT/PATCH/DELETE) live in **TanStack
+Query**. Redux is kept for genuine client/session state only —
+see the [🎯 Redux Patterns](#-redux-patterns) section below for the
+6 slices that remain. Rationale, tiers and offline contract are in
+[docs/adr/0001-tanstack-query-server-state.md](../../docs/adr/0001-tanstack-query-server-state.md).
 
-### Action Types Pattern
+### Where to add a new endpoint
 
-```javascript
-// actions/Cave.js
-export const FETCH_CAVE = 'FETCH_CAVE';
-export const FETCH_CAVE_SUCCESS = 'FETCH_CAVE_SUCCESS';
-export const FETCH_CAVE_FAILURE = 'FETCH_CAVE_FAILURE';
+- **Query key** — `src/api/queryKeys.js`. `referenceKeys` for static
+  reference lists; `xxxKeys` per entity domain (`documentKeys`, `caveKeys`,
+  `massifKeys`, `entranceKeys`, `personKeys`, `organizationKeys`,
+  `countryKeys`, `regionKeys`, `snapshotKeys`, `notificationKeys`,
+  `countKeys`, `subscriptionKeys`, `messageKeys`, `moderationKeys`,
+  `importKeys`, `listKeys`, `statsKeys`, `advancedSearchKeys`,
+  `quicksearchKeys`, `duplicateKeys`, `accountKeys`, `substanceKeys`,
+  `massifPreviewKeys`). Every entity domain uses the same
+  `detailKey(domain)` factory so `xxxKeys.all` is the prefix and
+  `xxxKeys.detail(id)` extends it (`regionKeys.detail` composes on
+  `(countryId, regionId)` because the API path is nested).
+- **Query hook** — `src/hooks/queries/useXxx.js`. Return the raw
+  `useQuery` object. Callers destructure with `= []`/`= null` fallbacks —
+  wrappers that hide `refetch`/`isFetching`/`isPending` are not worth it.
+- **Mutation hook** — `src/hooks/mutations/useYyyXxx.js`. `onSuccess`
+  invalidates `xxxKeys.detail(id)` (or `removeQueries` on permanent
+  delete). Any side effect the endpoint owns (list badge refresh, map tile
+  invalidation, session cleanup) belongs in the same `onSuccess`.
+- **Barrel** — re-export from `src/hooks/index.js` so consumers keep one
+  import path.
 
-export const fetchCave = id => async dispatch => {
-  dispatch({ type: FETCH_CAVE });
-  try {
-    const response = await fetch(`/api/caves/${id}`);
-    const data = await response.json();
-    dispatch({ type: FETCH_CAVE_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({
-      type: FETCH_CAVE_FAILURE,
-      error: {
-        code: error.body?.code || null,
-        message: error.body?.message || error.message,
-        details: error.body?.metadata?.details || [],
-        status: error.status || null
-      }
-    });
-  }
-};
-```
+Conventions (frozen):
 
-### Reducer Pattern
+- Options go in an object, not positional booleans:
+  `useLicenses({ enabled: showAuthorization })`.
+- Sorts and shape transforms go in `select`, at module scope so the
+  identity is stable, on a copy so the cache array is never mutated.
+- Cross-caller lookups (`findLicenseByName`, and future siblings) are
+  colocated with their hook and re-exported from `hooks/index.js`.
+- `apiGet/apiPost/apiPut/apiPatch/apiDelete` (JSON) and
+  `apiGetWithRange`/`apiPostForm`/`apiPutForm` (paginated GETs, multipart
+  uploads) in `src/api/client.js` are the only fetch entry points for RQ.
+  They read the auth header at call time and throw errors with
+  `body`/`status` attached — the QueryClient's global `onError`
+  (dispatches `postLogout()` on 401) reads that shape.
 
-The **NotificationsReducer** is the reference implementation — use its status pattern:
+Test provider: `src/test/renderWithProviders.jsx` mounts
+`QueryClientProvider` on a fresh client per render with `retry:false`
+and `networkMode:'always'` — use it for anything that reads from RQ.
 
-```javascript
-// reducers/Cave.js
-import {
-  FETCH_CAVE,
-  FETCH_CAVE_SUCCESS,
-  FETCH_CAVE_FAILURE
-} from '../actions/Cave';
+### Shared mutation state across components (module singleton)
 
-const initialState = { data: null, loading: false, error: null };
+For flows where "current submitted state" is shared across a form + a
+results component (the advanced-search page's SearchResults reads what
+DocumentSearch/EntrancesSearch submitted), use a module-scope
+`useSyncExternalStore` singleton next to the query hook — see
+`src/hooks/queries/useAdvancedSearch.js`. One advanced search is active
+app-wide at any time, so a module singleton matches the semantics
+without threading a React context through the tree.
 
-const caveReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case FETCH_CAVE:
-      return { ...state, loading: true, error: null };
-    case FETCH_CAVE_SUCCESS:
-      return { ...state, loading: false, data: action.payload };
-    case FETCH_CAVE_FAILURE:
-      return { ...state, loading: false, error: action.error };
-    default:
-      return state;
-  }
-};
+## 🎯 Redux Patterns
 
-export default caveReducer;
-```
+Redux keeps only genuine client/session state. **Do not add a new
+reducer for a server fetch** — server-state (`{ data, loading, error }`
+for an API response) belongs in React Query.
 
-### Registering a new reducer
+Remaining slices (6):
 
-The root store is assembled in **`src/reducers/GCReducer.js`** via `combineReducers`. Adding a reducer requires two steps:
+- `login` — session/JWT, authorization header, login-dialog visibility,
+  MFA transition flags. Load-bearing across the auth flows in
+  `hooks/mutations/useAuthFlows.js` and `useMfa.js` — the mutations
+  dispatch back into this slice on success.
+- `intl` — locale + loaded message catalogues. Locale changes are
+  driven by `changeLocale`; account language sync writes back via
+  `useUpdateAccount` (which invalidates `accountKeys.current()` so
+  `useAccount` refetches).
+- `sideMenu` — open/closed state of the AppShell side menu.
+- `error` — global error banner state (rare, mostly used by legacy
+  error boundaries).
+- `map` — viewport map: continuous-bounds fetches (`actions/Map.js`) are
+  a carve-out per the ADR (unbounded cache keys). The tile cache
+  (`utils/mapTileCache.js`) stays here.
+- `importWizard` — multi-step observation-import wizard. Client-state:
+  file/encoding/header row/column mappings/context/wizard step. The
+  wizard has small server-state sub-fetches (`fetchSensorConfigs`,
+  submission status) that also live here to keep the step transitions
+  atomic — they are not new endpoints, so leaving them in Redux is not
+  a regression. Action type constants live in a separate
+  `actions/Observations/importWizardTypes.js` so the reducer never
+  pulls the thunks (which import `queryClient`) — this breaks the store
+  cycle that would otherwise re-appear.
 
-**1. Create the file** in `src/reducers/` following the naming convention `<Feature>Reducer.js` (PascalCase):
-
-```javascript
-// src/reducers/MyFeatureReducer.js
-import { MY_FEATURE, MY_FEATURE_SUCCESS, MY_FEATURE_FAILURE } from '../actions/MyFeature';
-
-const initialState = { data: null, loading: false, error: null };
-
-const myFeatureReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case MY_FEATURE:
-      return { ...state, loading: true, error: null };
-    case MY_FEATURE_SUCCESS:
-      return { ...state, loading: false, data: action.payload };
-    case MY_FEATURE_FAILURE:
-      return { ...state, loading: false, error: action.error };
-    default:
-      return state;
-  }
-};
-
-export default myFeatureReducer;
-```
-
-**2. Register it in `src/reducers/GCReducer.js`** — add the import and the key in `combineReducers` (keep alphabetical order):
-
-```javascript
-import myFeature from './MyFeatureReducer'; // add import
-
-const GCReducer = combineReducers({
-  // ...
-  myFeature,   // add key — accessible as state.myFeature in useSelector
-  // ...
-});
-```
-
-The store is created in `src/pages/ApplicationShell.jsx` via `createStore(GCReducer, ...)` — you never need to touch that file when adding a reducer.
+Anything else that looks like "load, hold, invalidate" is a React Query
+job — see the section above.
 
 ---
 
 ### Hooks vs HOC
 
 ```javascript
-// ✅ Preferred: hooks
+// ✅ Preferred: hooks — Redux for client-state
 import { useSelector, useDispatch } from 'react-redux';
 
-const CaveView = ({ id }) => {
+const AppShell = () => {
   const dispatch = useDispatch();
-  const cave = useSelector(state => state.cave.data);
-  const loading = useSelector(state => state.cave.loading);
-
-  useEffect(() => {
-    dispatch(fetchCave(id));
-  }, [dispatch, id]);
+  const { isOpen } = useSelector(state => state.sideMenu);
+  return <SideMenu open={isOpen} onToggle={() => dispatch(toggleSideMenu())} />;
 };
 
 // ❌ Deprecated: connect()
-export default connect(mapStateToProps, mapDispatchToProps)(CaveView);
+export default connect(mapStateToProps, mapDispatchToProps)(AppShell);
+```
+
+For server-state (a cave, a document, …), use the React Query hook —
+see the "Server state" section above:
+
+```javascript
+import { useCave } from '../hooks';
+
+const CaveView = ({ id }) => {
+  const { data: cave, isPending, error } = useCave(id);
+  // …
+};
 ```
 
 ---

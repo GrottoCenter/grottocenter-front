@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Box, ListItem, ListItemText } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { updateLocation } from '../../../../actions/Location/UpdateLocation';
-import { deleteLocation } from '../../../../actions/Location/DeleteLocation';
-import { restoreLocation } from '../../../../actions/Location/RestoreLocation';
 import ActionButtons from '../ActionButtons';
 import SectionTitle from '../SectionTitle';
 import { LocationPropTypes } from '../../../../types/entrance.type';
 import CreateLocationForm from '../../EntitiesForm/Location';
-import { usePermissions } from '../../../../hooks';
+import {
+  useUpdateLocation,
+  useDeleteLocation,
+  useRestoreLocation,
+  usePermissions
+} from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
 
 const ListItemStyled = styled(ListItem)`
@@ -29,8 +30,10 @@ const Location = ({
   isFirst,
   isLast
 }) => {
-  const dispatch = useDispatch();
   const permissions = usePermissions();
+  const updateMutation = useUpdateLocation();
+  const deleteMutation = useDeleteLocation();
+  const restoreMutation = useRestoreLocation();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
 
@@ -40,24 +43,22 @@ const Location = ({
   }, []);
 
   const onSubmitForm = data => {
-    dispatch(
-      updateLocation({
-        id: data.id,
-        title: data.title,
-        body: data.body,
-        language: data.language
-      })
-    );
+    updateMutation.mutate({
+      id: data.id,
+      title: data.title,
+      body: data.body,
+      language: data.language
+    });
     setIsUpdateFormVisible(false);
   };
 
   const onDeletePress = isPermanent => {
     setWantedDeletedState(true);
-    dispatch(deleteLocation({ id: location.id, isPermanent }));
+    deleteMutation.mutate({ id: location.id, isPermanent });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreLocation({ id: location.id }));
+    restoreMutation.mutate({ id: location.id });
   };
 
   const isActionLoading = wantedDeletedState !== location.isDeleted;

@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { Box, Breadcrumbs, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,7 +12,6 @@ import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ShareIcon from '@mui/icons-material/Share';
 import { NavigateNext } from '@mui/icons-material';
 import { LicenseBadge } from '@/components/common/LicenseTag';
-import { fetchLicense } from '@/actions/Licenses';
 import {
   DEFAULT_COLLECTION_SORT_ORDER,
   DOCUMENT_SORT_ORDERS,
@@ -46,14 +45,15 @@ import DocumentChildrenList, {
   ChildrenSectionHeader,
   DocumentChildrenTiles
 } from './DocumentChildrenList';
-import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
-import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
-import { deleteDocument } from '../../actions/Document/DeleteDocument';
-import { restoreDocument } from '../../actions/Document/RestoreDocument';
-import { loadLanguages } from '../../actions/Language';
 import {
+  useDocument,
+  useDocumentChildren,
+  useDeleteDocument,
+  useRestoreDocument,
+  useLanguages,
+  useLicenses,
+  findLicenseByName,
   usePermissions,
-  useRefetchOnReconnect,
   useSharePage
 } from '../../hooks';
 import PageContainer from '../../components/common/Layouts/PageContainer';
@@ -126,6 +126,7 @@ const SideColumn = styled('div', {
 const Document = ({
   isLoading = true,
   error,
+  isPaused = false,
   onRetry = null,
   documentData,
   documentChildren,
@@ -135,12 +136,11 @@ const Document = ({
   const openLink = useOpenLink();
   const navigate = useNavigate();
   const permissions = usePermissions();
-  const dispatch = useDispatch();
-  const { languages } = useSelector(state => state.language);
+  const deleteMutation = useDeleteDocument();
+  const restoreMutation = useRestoreDocument();
+  const { data: languages = [] } = useLanguages();
   const { locale } = useSelector(state => state.intl);
-  const licenses = useSelector(state => state.licenses.data);
-  const licensesLoading = useSelector(state => state.licenses.loading);
-  const licensesError = useSelector(state => state.licenses.error);
+  const { data: licenses } = useLicenses();
   const [issuesSortOrder, setIssuesSortOrder] = useState(
     DEFAULT_COLLECTION_SORT_ORDER
   );
@@ -166,20 +166,12 @@ const Document = ({
   // The document detail only carries the license name; resolve the full license
   // object (for its deed URL) from the licenses list.
   //
-  // The error is part of the guard, not just the loading flag: the reducer
-  // resets `data` to null on failure, so without it a failed /licenses call
-  // satisfies the condition again on the very next render and the page refetches
-  // forever.
-  useEffect(() => {
-    if (!licenses && !licensesLoading && !licensesError)
-      dispatch(fetchLicense());
-  }, [dispatch, licenses, licensesLoading, licensesError]);
   // Stay `undefined` until the licenses list is loaded — otherwise the badge
   // renders once with the bare name string (no deed URL), then re-renders as
   // an object once the list arrives, causing a visible flicker where the
   // link suddenly materialises.
   const licenseObject = licenses
-    ? (licenses.find(l => l.name === documentData?.license) ??
+    ? (findLicenseByName(licenses, documentData?.license) ??
         documentData?.license) ||
       undefined
     : undefined;
@@ -202,12 +194,12 @@ const Document = ({
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    dispatch(deleteDocument({ id: documentData.id, entityId, isPermanent }));
+    deleteMutation.mutate({ id: documentData.id, entityId, isPermanent });
     if (isPermanent) navigate('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
-    dispatch(restoreDocument({ id: documentData.id }));
+    restoreMutation.mutate({ id: documentData.id });
   };
 
   const mainLanguage =
@@ -528,11 +520,12 @@ const Document = ({
             }
           />
         )}
-        {error && (
+        {(error || isPaused) && (
           <ScrollableContent
             content={
               <FetchErrorState
                 error={error}
+                isPaused={isPaused}
                 onRetry={onRetry}
                 messageId="Error, the document data you are looking for is not available."
               />
@@ -824,39 +817,32 @@ const Document = ({
 };
 
 const DocumentDetails = ({ id, hideActions = false }) => {
-  const dispatch = useDispatch();
   const permissions = usePermissions();
   const { documentId: documentIdFromRoute } = useParams();
   const documentId = parseInt(documentIdFromRoute ?? id, 10);
-  const { isLoading, details, error } = useSelector(
-    state => state.documentDetails
-  );
   const {
-    isLoading: isDocumentChildrenLoading,
-    children,
-    childrenError
-  } = useSelector(state => state.documentChildren);
+    data: details,
+    isPending: isDetailsPending,
+    isPaused: isDetailsPaused,
+    error: detailsError,
+    refetch: refetchDetails
+  } = useDocument(documentId);
+  const {
+    data: children = [],
+    isPending: isDocumentChildrenLoading,
+    error: childrenError,
+    refetch: refetchChildren
+  } = useDocumentChildren(documentId);
+  // The document body renders its language by name, so it must not appear
+  // before the list is known. Calling useLanguages here as well as in <Document>
+  // costs nothing: React Query dedupes the two into a single request.
+  const { isPending: isLanguagesPending } = useLanguages();
 
-  const { isLoaded: isLanguagesLoaded } = useSelector(state => state.language);
-
-  useEffect(() => {
-    if (!isLanguagesLoaded) {
-      dispatch(loadLanguages(true));
-    }
-  }, [dispatch, isLanguagesLoaded]);
-
-  const reloadDocument = useCallback(() => {
-    if (!documentId) return;
-    dispatch(fetchDocumentDetails(documentId));
-    dispatch(fetchDocumentChildren(documentId));
-  }, [dispatch, documentId]);
-
-  useEffect(() => {
-    reloadDocument();
-  }, [reloadDocument]);
-
-  const fetchError = error ?? childrenError;
-  useRefetchOnReconnect(reloadDocument, Boolean(fetchError));
+  const fetchError = detailsError ?? childrenError;
+  const onRetry = useCallback(() => {
+    refetchDetails();
+    refetchChildren();
+  }, [refetchDetails, refetchChildren]);
 
   return details?.isDeleted && !permissions.isModerator ? (
     <Deleted entityType={DELETED_ENTITIES.document} entity={details} />
@@ -871,15 +857,16 @@ const DocumentDetails = ({ id, hideActions = false }) => {
       key={documentId}
       isLoading={
         !documentId ||
-        isLoading ||
+        isDetailsPending ||
         isDocumentChildrenLoading ||
-        !isLanguagesLoaded
+        isLanguagesPending
       }
       // Deliberately not exclusive: a children-fetch failure alongside a
       // successful detail fetch still renders the document content plus the
       // error card, as a degraded state rather than blanking the whole page.
       error={fetchError}
-      onRetry={reloadDocument}
+      isPaused={isDetailsPaused}
+      onRetry={onRetry}
       documentData={details}
       documentChildren={children}
       hideActions={hideActions}
@@ -892,6 +879,7 @@ export default DocumentDetails;
 Document.propTypes = {
   isLoading: PropTypes.bool,
   error: PropTypes.shape({}),
+  isPaused: PropTypes.bool,
   onRetry: PropTypes.func,
   documentData: DocumentPropTypes,
   documentChildren: PropTypes.arrayOf(DocumentChildPropTypes),

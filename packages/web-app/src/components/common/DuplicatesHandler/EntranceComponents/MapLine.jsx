@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useIntl } from 'react-intl';
+import TileReloader from '../../Maps/common/TileReloader';
 
 const paddingVertical = '20px';
 
@@ -45,6 +46,7 @@ const MapComponent = ({ position, updatePosition }) => (
       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       referrerPolicy="strict-origin-when-cross-origin"
     />
+    <TileReloader />
 
     {isNil(updatePosition) ? (
       <Marker position={position} />

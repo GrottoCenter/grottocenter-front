@@ -1,21 +1,14 @@
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
-import { useSelector, useDispatch } from 'react-redux';
 
-import { updatePerson } from '../../../../actions/Person/UpdatePerson';
+import { useUpdatePerson } from '../../../../hooks';
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
 import InputText from '../utils/InputText';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import { PersonPropTypes } from '../../../../types/person.type';
 
 export const PersonForm = ({ personValues, onCancel }) => {
-  const {
-    error: personError,
-    isLoading: personIsLoading,
-    person: personData
-  } = useSelector(state => state.updatePerson);
-
-  const dispatch = useDispatch();
+  const updateMutation = useUpdatePerson();
   const {
     handleSubmit,
     reset,
@@ -32,26 +25,27 @@ export const PersonForm = ({ personValues, onCancel }) => {
   });
 
   const onSubmit = ({ person }) => {
-    dispatch(
-      updatePerson(personValues.id, {
+    updateMutation.mutate({
+      id: personValues.id,
+      body: {
         name: person.name,
         surname: person.surname,
         nickname: person.nickname
-      })
-    );
+      }
+    });
   };
 
   if (isSubmitSuccessful) {
     return (
       <FormProgressInfo
-        isLoading={personIsLoading || !personData}
-        isError={!!personError}
+        isLoading={updateMutation.isPending || !updateMutation.data}
+        isError={updateMutation.isError}
         labelLoading="Updating person..."
         labelError="'An error occurred when updating'"
         resetFn={() =>
           reset(undefined, { keepValues: true, keepErrors: false })
         }
-        getRedirectFn={() => `/ui/persons/${personData.id}`}
+        getRedirectFn={() => `/ui/persons/${updateMutation.data?.id}`}
       />
     );
   }

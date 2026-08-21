@@ -1,6 +1,5 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
 import {
   Button,
   Dialog,
@@ -13,15 +12,18 @@ import {
 import RestorePageIcon from '@mui/icons-material/RestorePage';
 import { pathOr } from 'ramda';
 import { useIntl } from 'react-intl';
-import { updateDescription } from '../../../../../actions/Description/UpdateDescription';
-import { updateHistory } from '../../../../../actions/History/UpdateHistory';
-import { updateRiggings } from '../../../../../actions/Riggings/UpdateRigging';
-import { updateLocation } from '../../../../../actions/Location/UpdateLocation';
-import { updateComment } from '../../../../../actions/Comment/UpdateComment';
-import { rollbackGuideline } from '../../../../../actions/Guideline/RollbackGuideline';
-import { usePermissions, useUserProperties } from '../../../../../hooks';
-import { updateEntrance } from '../../../../../actions/Entrance/UpdateEntrance';
-import { updateCaveAndEntrance } from '../../../../../actions/CaveAndEntrance';
+import {
+  useUpdateDescription,
+  useUpdateHistory,
+  useUpdateLocation,
+  useUpdateRigging,
+  useUpdateComment,
+  useRollbackGuideline,
+  useUpdateEntrance,
+  useUpdateCaveAndEntrance,
+  usePermissions,
+  useUserProperties
+} from '../../../../../hooks';
 import Translate from '../../../../common/Translate';
 import { durationStringToMinutes } from '../../../../../utils/dateTimeDuration';
 
@@ -30,7 +32,14 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
-  const dispatch = useDispatch();
+  const updateDescriptionMutation = useUpdateDescription();
+  const updateHistoryMutation = useUpdateHistory();
+  const updateLocationMutation = useUpdateLocation();
+  const updateRiggingMutation = useUpdateRigging();
+  const updateCommentMutation = useUpdateComment();
+  const rollbackGuidelineMutation = useRollbackGuideline();
+  const updateEntranceMutation = useUpdateEntrance();
+  const updateCaveAndEntranceMutation = useUpdateCaveAndEntrance();
   const userId = pathOr(null, ['id'], useUserProperties());
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
@@ -54,23 +63,19 @@ const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
       switch (typeItem) {
         case 'comments':
           if (canEditComment) {
-            await dispatch(
-              updateComment({
-                ...content,
-                id: content.t_id,
-                eTTrail: durationStringToMinutes(content.eTTrail),
-                eTUnderground: durationStringToMinutes(content.eTUnderground)
-              })
-            );
+            await updateCommentMutation.mutateAsync({
+              ...content,
+              id: content.t_id,
+              eTTrail: durationStringToMinutes(content.eTTrail),
+              eTUnderground: durationStringToMinutes(content.eTUnderground)
+            });
           }
           break;
         case 'descriptions':
-          await dispatch(
-            updateDescription({
-              ...content,
-              id: content.t_id
-            })
-          );
+          await updateDescriptionMutation.mutateAsync({
+            ...content,
+            id: content.t_id
+          });
           break;
         case 'entrances': {
           const updatedEntrance = {
@@ -88,7 +93,7 @@ const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
             id: content.t_id
           };
           if (isNetwork) {
-            await dispatch(updateEntrance(updatedEntrance));
+            await updateEntranceMutation.mutateAsync(updatedEntrance);
           } else {
             const updatedCave = {
               name: {
@@ -103,41 +108,36 @@ const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
               temperature: Number(content.cave.temperature),
               id: content.cave?.id
             };
-            await dispatch(updateCaveAndEntrance(updatedCave, updatedEntrance));
+            await updateCaveAndEntranceMutation.mutateAsync({
+              caveData: updatedCave,
+              entranceData: updatedEntrance
+            });
           }
           break;
         }
         case 'histories':
-          await dispatch(
-            updateHistory({
-              ...content,
-              id: content.t_id
-            })
-          );
+          await updateHistoryMutation.mutateAsync({
+            ...content,
+            id: content.t_id
+          });
           break;
         case 'locations':
-          await dispatch(
-            updateLocation({
-              ...content,
-              id: content.t_id
-            })
-          );
+          await updateLocationMutation.mutateAsync({
+            ...content,
+            id: content.t_id
+          });
           break;
         case 'riggings':
-          await dispatch(
-            updateRiggings({
-              ...content,
-              id: content.t_id
-            })
-          );
+          await updateRiggingMutation.mutateAsync({
+            ...content,
+            id: content.t_id
+          });
           break;
         case 'guidelines':
-          await dispatch(
-            rollbackGuideline({
-              id: content.t_id,
-              snapshotId: content.id
-            })
-          );
+          await rollbackGuidelineMutation.mutateAsync({
+            id: content.t_id,
+            snapshotId: content.id
+          });
           break;
         default:
           break;

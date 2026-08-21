@@ -27,19 +27,12 @@ vi.mock('react-redux', async () => ({
 // ---- Action mocks ----
 const mockParseAndSetFile = vi.fn(() => ({ type: 'PARSE_AND_SET_FILE' }));
 
-vi.mock('../../../../actions/Observations/importWizard', () => ({
-  parseAndSetFile: (...args) => mockParseAndSetFile(...args),
-  SET_COLUMN_MAPPINGS: 'SET_COLUMN_MAPPINGS',
-  SET_CONFIRMED_DEVICE: 'SET_CONFIRMED_DEVICE',
-  SET_CONTEXT: 'SET_CONTEXT',
-  SET_DEVICES: 'SET_DEVICES',
-  SET_DOCUMENT_LANGUAGE: 'SET_DOCUMENT_LANGUAGE',
-  SET_ENCODING: 'SET_ENCODING',
-  SET_HEADER_ROW: 'SET_HEADER_ROW',
-  SET_NUMBER_LOCALE: 'SET_NUMBER_LOCALE',
-  SET_SKIP_FIRST_ROWS: 'SET_SKIP_FIRST_ROWS',
-  SET_SKIP_LAST_ROWS: 'SET_SKIP_LAST_ROWS',
-  CREATE_SENSOR_CONFIG_SUCCESS: 'CREATE_SENSOR_CONFIG_SUCCESS'
+// Spreads the real module rather than re-listing its action types: the hooks
+// barrel now reaches the store, so ImportWizardReducer is built for every test
+// here and a hand-kept list silently goes stale the next time one is added.
+vi.mock('../../../../actions/Observations/importWizard', async () => ({
+  ...(await vi.importActual('../../../../actions/Observations/importWizard')),
+  parseAndSetFile: (...args) => mockParseAndSetFile(...args)
 }));
 
 // ---- Profile manager mock ----

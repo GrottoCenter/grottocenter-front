@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import { getMapEntrancesUrl } from '../conf/apiRoutes';
 import { checkAndGetStatus, makeUrl } from './utils';
 

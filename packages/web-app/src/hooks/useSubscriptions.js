@@ -1,119 +1,53 @@
-import { useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import REDUCER_STATUS from '../reducers/ReducerStatus';
-import { fetchSubscriptions } from '../actions/Subscriptions/GetSubscriptions';
+import { useCallback } from 'react';
+import { useIsMutating } from '@tanstack/react-query';
+
 import { useUserProperties } from './useUserProperties';
-import { useReducerSuccessNotification } from './useReducerSuccessNotification';
+import { useSubscriptionsList } from './queries/useSubscriptionsList';
 
-const subscribeSucceeded = reducerStatus =>
-  reducerStatus === REDUCER_STATUS.SUCCEEDED;
-
+/**
+ * Consumer-facing subscription helper.
+ *
+ * Returns the raw list plus an isSubscribed(id) test that treats any of
+ * country/region/massif membership as a match — the callers just need to
+ * know whether the entity is on the user's watch list, not by which type.
+ *
+ * The is*Loading flags aggregate all in-flight mutations targeting the
+ * corresponding domain, so the button's disabled state doesn't need to
+ * know which specific mutation it triggered.
+ */
 export const useSubscriptions = () => {
-  const dispatch = useDispatch();
   const userProperties = useUserProperties();
-  const { status: massifSubscribeStatus } = useSelector(
-    state => state.subscribeToMassif
-  );
-  const { status: massifUnsubscribeStatus } = useSelector(
-    state => state.unsubscribeFromMassif
-  );
-  const { status: countrySubscribeStatus } = useSelector(
-    state => state.subscribeToCountry
-  );
-  const { status: countryUnsubscribeStatus } = useSelector(
-    state => state.unsubscribeFromCountry
-  );
-  const { status: regionSubscribeStatus } = useSelector(
-    state => state.subscribeToRegion
-  );
-  const { status: regionUnsubscribeStatus } = useSelector(
-    state => state.unsubscribeFromRegion
-  );
-  const { subscriptions } = useSelector(state => state.subscriptions);
+  const caverId = userProperties?.id;
+  const {
+    data: subscriptions,
+    isPending,
+    isError
+  } = useSubscriptionsList(caverId);
 
   const isSubscribed = useCallback(
     id => {
-      let isSubscribedToCountry = false;
-      let isSubscribedToMassif = false;
-      let isSubscribedToRegion = false;
-      if (subscriptions && subscriptions.countries) {
-        isSubscribedToCountry = subscriptions.countries.some(c => c.id === id);
-      }
-      if (subscriptions && subscriptions.massifs) {
-        isSubscribedToMassif = subscriptions.massifs.some(m => m.id === id);
-      }
-      if (subscriptions && subscriptions.regions) {
-        isSubscribedToRegion = subscriptions.regions.some(r => r.id === id);
-      }
+      if (!subscriptions) return false;
       return (
-        isSubscribedToCountry || isSubscribedToMassif || isSubscribedToRegion
+        subscriptions.countries?.some(c => c.id === id) ||
+        subscriptions.regions?.some(r => r.id === id) ||
+        subscriptions.massifs?.some(m => m.id === id)
       );
     },
     [subscriptions]
   );
 
-  // Refetch subscriptions when (un)suscribing is successful
-  useEffect(() => {
-    if (
-      userProperties &&
-      userProperties.id &&
-      (subscribeSucceeded(massifSubscribeStatus) ||
-        subscribeSucceeded(massifUnsubscribeStatus) ||
-        subscribeSucceeded(countrySubscribeStatus) ||
-        subscribeSucceeded(countryUnsubscribeStatus) ||
-        subscribeSucceeded(regionSubscribeStatus) ||
-        subscribeSucceeded(regionUnsubscribeStatus))
-    ) {
-      dispatch(fetchSubscriptions(userProperties.id));
-    }
-  }, [
-    countrySubscribeStatus,
-    countryUnsubscribeStatus,
-    dispatch,
-    massifSubscribeStatus,
-    massifUnsubscribeStatus,
-    regionSubscribeStatus,
-    regionUnsubscribeStatus,
-    userProperties
-  ]);
-
-  // Display a snackbar on success
-  useReducerSuccessNotification(
-    massifSubscribeStatus,
-    'You are subscribed to the massif.'
-  );
-  useReducerSuccessNotification(
-    massifUnsubscribeStatus,
-    'You are unsubscribed from the massif.'
-  );
-  useReducerSuccessNotification(
-    countrySubscribeStatus,
-    'You are subscribed to the country.'
-  );
-  useReducerSuccessNotification(
-    countryUnsubscribeStatus,
-    'You are unsubscribed from the country.'
-  );
-  useReducerSuccessNotification(
-    regionSubscribeStatus,
-    'You are subscribed to the region.'
-  );
-  useReducerSuccessNotification(
-    regionUnsubscribeStatus,
-    'You are unsubscribed from the region.'
-  );
-
   return {
     subscriptions,
     isSubscribed,
+    // Exposed so callers can differentiate "still fetching" from "fetch
+    // failed" — `!subscriptions` collapses both into a permanent spinner
+    // and hides SubscriptionsList's error branch from users.
+    isPending,
+    isError,
     isCountryLoading:
-      countrySubscribeStatus === REDUCER_STATUS.LOADING ||
-      countryUnsubscribeStatus === REDUCER_STATUS.LOADING,
-    isMassifLoading:
-      massifSubscribeStatus === REDUCER_STATUS.LOADING ||
-      massifUnsubscribeStatus === REDUCER_STATUS.LOADING,
+      useIsMutating({ mutationKey: ['country-subscription'] }) > 0,
     isRegionLoading:
-      regionSubscribeStatus === REDUCER_STATUS.LOADING ||
-      regionUnsubscribeStatus === REDUCER_STATUS.LOADING
+      useIsMutating({ mutationKey: ['region-subscription'] }) > 0,
+    isMassifLoading: useIsMutating({ mutationKey: ['massif-subscription'] }) > 0
   };
 };

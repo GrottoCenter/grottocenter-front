@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
-import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import subscriptionsType from '../../../types/subscriptions.type';
 import SubscriptionListItem from './SubscriptionItem';
 import Alert from '../Alert';
@@ -10,19 +9,16 @@ import getLocalizedCountryName from '../../../helpers/countryName';
 const SubscriptionsList = ({
   canUnsubscribe,
   subscriptions = { countries: [], massifs: [], regions: [] },
-  subscriptionsStatus,
+  isLoading = false,
+  isError = false,
   userId
 }) => {
   const { formatMessage, locale } = useIntl();
   const { countries, massifs, regions } = subscriptions ?? {};
 
-  if (
-    subscriptionsStatus === REDUCER_STATUS.IDLE ||
-    subscriptionsStatus === REDUCER_STATUS.LOADING
-  )
-    return <CircularProgress />;
+  if (isLoading) return <CircularProgress />;
 
-  if (subscriptionsStatus !== REDUCER_STATUS.SUCCEEDED)
+  if (isError)
     return (
       <Alert
         severity="error"
@@ -89,7 +85,8 @@ const SubscriptionsList = ({
 SubscriptionsList.propTypes = {
   canUnsubscribe: PropTypes.bool,
   subscriptions: subscriptionsType,
-  subscriptionsStatus: PropTypes.oneOf(Object.values(REDUCER_STATUS)),
+  isLoading: PropTypes.bool,
+  isError: PropTypes.bool,
   userId: PropTypes.number
 };
 

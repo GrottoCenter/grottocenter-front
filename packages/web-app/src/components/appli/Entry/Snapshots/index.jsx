@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button, Card, CardContent, Skeleton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import HistoryIcon from '@mui/icons-material/History';
@@ -10,14 +10,23 @@ import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import PageContainer from '../../../common/Layouts/PageContainer';
 import PageHeader from '../../../common/Layouts/PageHeader';
 import SectionStack from '../../../common/Layouts/SectionStack';
-import { fetchSnapshot } from '../../../../actions/Snapshot/GetSnapshots';
-import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
-import { fetchCave } from '../../../../actions/Cave/GetCave';
-import { fetchDocumentDetails } from '../../../../actions/Document/GetDocumentDetails';
-import { loadMassif } from '../../../../actions/Massif/GetMassif';
-import { fetchPerson } from '../../../../actions/Person/GetPerson';
-import { fetchOrganization } from '../../../../actions/Organization/GetOrganization';
-import REDUCER_STATUS from '../../../../reducers/ReducerStatus';
+import {
+  useCave,
+  useDocument,
+  useEntrance,
+  useMassif,
+  useOrganization,
+  usePerson,
+  useSnapshots
+} from '../../../../hooks';
+import {
+  caveKeys,
+  documentKeys,
+  entranceKeys,
+  massifKeys,
+  organizationKeys,
+  personKeys
+} from '../../../../api/queryKeys';
 import SensitiveCaveWarning from '../SensitiveCaveWarning';
 import AccordionSnapshotList from './AccordionSnapshotList';
 import Alert403 from './error/403Alert';
@@ -35,7 +44,7 @@ const SUB_ENTITY_TYPES = [
 ];
 
 const SnapshotPage = () => {
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const location = useLocation();
@@ -52,48 +61,69 @@ const SnapshotPage = () => {
 
   const { id, type } = useParams();
 
-  // All entity selectors declared unconditionally (rules of hooks)
-  const { data: currentEntrance, loading: isEntranceLoading } = useSelector(
-    s => s.entrance
+  // Each entity query is gated on type so it stays disabled — no wasted
+  // request — when this page renders any other entity. The entrance query
+  // additionally covers sub-entities (descriptions/locations/…) whose parent
+  // fetch used to run through the entrance slice; parentType/parentId route
+  // to the same hook.
+  let relevantEntranceId;
+  if (type === 'entrances') relevantEntranceId = id;
+  else if (parentType === 'entrances' || !parentType)
+    relevantEntranceId = parentId;
+  const entranceQuery = useEntrance(relevantEntranceId);
+  const currentEntrance = entranceQuery.data ?? null;
+  const isEntranceLoading = entranceQuery.isFetching;
+  const caveQuery = useCave(type === 'caves' ? id : undefined);
+  const currentCave = caveQuery.data ?? null;
+  const isCaveLoading = caveQuery.isFetching;
+  const documentQuery = useDocument(type === 'documents' ? id : undefined);
+  const currentDocument = documentQuery.data ?? null;
+  const isDocumentLoading = documentQuery.isFetching;
+  let relevantMassifId;
+  if (type === 'massifs') relevantMassifId = id;
+  else if (parentType === 'massifs') relevantMassifId = parentId;
+  const massifQuery = useMassif(relevantMassifId);
+  const currentMassif = massifQuery.data ?? null;
+  const isMassifLoading = massifQuery.isFetching;
+  const personQuery = usePerson(type === 'persons' ? id : undefined);
+  const currentPerson = personQuery.data ?? null;
+  const isPersonLoading = personQuery.isFetching;
+  const organizationQuery = useOrganization(
+    type === 'organizations' ? id : undefined
   );
-  const { cave: currentCave, loading: isCaveLoading } = useSelector(
-    s => s.cave
-  );
-  const { details: currentDocument, isLoading: isDocumentLoading } =
-    useSelector(s => s.documentDetails);
-  const { massif: currentMassif, isFetching: isMassifLoading } = useSelector(
-    s => s.massif
-  );
-  const { person: currentPerson, isFetching: isPersonLoading } = useSelector(
-    s => s.person
-  );
+  const currentOrganization = organizationQuery.data ?? null;
+  const isOrganizationLoading = organizationQuery.isFetching;
+
   const {
-    organization: currentOrganization,
-    isLoading: isOrganizationLoading
-  } = useSelector(s => s.organization);
-
-  const { data, status, latestHttpCode } = useSelector(
-    state => state.snapshots
-  );
-
-  useEffect(() => {
-    dispatch(fetchSnapshot(id, type, isNetwork, getAll));
-  }, [id, type, isNetwork, getAll, dispatch]);
+    data: snapshotData = {},
+    isFetching: isSnapshotFetching,
+    isSuccess,
+    error: snapshotError
+  } = useSnapshots(id, type, { isNetwork, getAll });
+  const latestHttpCode = snapshotError?.status;
 
   const isSubEntityType = SUB_ENTITY_TYPES.includes(type);
 
   useEffect(() => {
     const fetchByType = {
-      entrances: () => dispatch(fetchEntrance(id)),
-      caves: () => dispatch(fetchCave(id)),
-      documents: () => dispatch(fetchDocumentDetails(id)),
-      massifs: () => dispatch(loadMassif(id)),
-      persons: () => dispatch(fetchPerson(id)),
-      organizations: () => dispatch(fetchOrganization(id))
+      entrances: () =>
+        queryClient.invalidateQueries({ queryKey: entranceKeys.detail(id) }),
+      caves: () =>
+        queryClient.invalidateQueries({ queryKey: caveKeys.detail(id) }),
+      documents: () =>
+        queryClient.invalidateQueries({ queryKey: documentKeys.detail(id) }),
+      massifs: () =>
+        queryClient.invalidateQueries({ queryKey: massifKeys.detail(id) }),
+      persons: () =>
+        queryClient.invalidateQueries({ queryKey: personKeys.detail(id) }),
+      organizations: () =>
+        queryClient.invalidateQueries({ queryKey: organizationKeys.detail(id) })
     };
     const fetchParentByType = {
-      entrances: pId => dispatch(fetchEntrance(pId)),
-      massifs: pId => dispatch(loadMassif(pId))
+      entrances: pId =>
+        queryClient.invalidateQueries({ queryKey: entranceKeys.detail(pId) }),
+      massifs: pId =>
+        queryClient.invalidateQueries({ queryKey: massifKeys.detail(pId) })
     };
     if (isSubEntityType) {
       if (parentId) {
@@ -105,7 +135,7 @@ const SnapshotPage = () => {
     } else if (Object.hasOwn(fetchByType, type)) {
       fetchByType[type]();
     }
-  }, [id, type, parentId, parentType, isSubEntityType, dispatch]);
+  }, [id, type, parentId, parentType, isSubEntityType, queryClient]);
 
   const parentDataByType = {
     entrances: currentEntrance,
@@ -144,8 +174,9 @@ const SnapshotPage = () => {
     false
   ];
 
-  const isLoading = status === REDUCER_STATUS.LOADING;
-  const isSuccess = status === REDUCER_STATUS.SUCCEEDED;
+  // 404 is swallowed by useSnapshots (empty history is a legitimate success);
+  // is404 only fires if the API ever changes and 404 leaks out as an error.
+  const isLoading = isSnapshotFetching && !isSuccess;
   const is404 = !isSuccess && latestHttpCode === 404;
   const is403 = !isSuccess && latestHttpCode === 403;
   const isSensitive = currentTItem?.isSensitive ?? false;
@@ -234,7 +265,7 @@ const SnapshotPage = () => {
             {isSuccess &&
               (getAll ? (
                 <AccordionSnapshotListPage
-                  data={sortSnapshots(data)}
+                  data={sortSnapshots(snapshotData)}
                   type={type}
                   isNetwork={isNetwork}
                   currentTItem={currentTItem}
@@ -242,7 +273,7 @@ const SnapshotPage = () => {
                 />
               ) : (
                 <AccordionSnapshotList
-                  data={data}
+                  data={snapshotData}
                   type={type}
                   isNetwork={isNetwork}
                   currentItem={currentTItem}

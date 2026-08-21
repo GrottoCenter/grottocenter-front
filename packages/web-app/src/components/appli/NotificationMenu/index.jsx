@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import {
@@ -12,18 +12,18 @@ import {
   Typography,
   Skeleton
 } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import { usePermissions } from '../../../hooks';
+import {
+  useMenuNotifications,
+  usePermissions,
+  useReadAllNotifications,
+  useReadNotification,
+  useUnreadNotificationsCount
+} from '../../../hooks';
 import NotificationsIcon from './NotificationsIcon';
-import { fetchMenuNotifications } from '../../../actions/Notifications/GetMenuNotifications';
-import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import NotificationsMenuItem from './NotificationMenuItem';
-import { readNotification } from '../../../actions/Notifications/ReadNotification';
-import { readAllNotifications } from '../../../actions/Notifications/ReadAllNotifications';
-import { countUnreadNotifications } from '../../../actions/Notifications/CountUnreadNotifications';
 
 const NOTIFICATION_WIDTH = 320;
 const NUMBER_OF_NOTIFICATIONS = 10;
@@ -45,32 +45,19 @@ const createSkeletons = n =>
   ));
 
 const NotificationMenu = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const { isAuth } = usePermissions();
-  const { notifications, status } = useSelector(
-    state => state.menuNotifications
-  );
-  const { count: nbNotifications } = useSelector(
-    state => state.countUnreadNotifications
-  );
-  const { status: readAllStatus } = useSelector(
-    state => state.readAllNotifications
-  );
-
-  const prevReadAllStatus = useRef(readAllStatus);
-
-  useEffect(() => {
-    if (
-      readAllStatus === REDUCER_STATUS.SUCCEEDED &&
-      prevReadAllStatus.current !== REDUCER_STATUS.SUCCEEDED
-    ) {
-      dispatch(fetchMenuNotifications({ size: NUMBER_OF_NOTIFICATIONS }));
-      dispatch(countUnreadNotifications());
-    }
-    prevReadAllStatus.current = readAllStatus;
-  }, [dispatch, readAllStatus]);
+  const { data: menuData, isPending } = useMenuNotifications({
+    size: NUMBER_OF_NOTIFICATIONS,
+    enabled: isAuth
+  });
+  const notifications = menuData?.notifications;
+  const { data: nbNotifications = 0 } = useUnreadNotificationsCount({
+    enabled: isAuth
+  });
+  const readNotificationMutation = useReadNotification();
+  const readAllMutation = useReadAllNotifications();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -79,23 +66,18 @@ const NotificationMenu = () => {
     setAnchorEl(null);
   }, []);
 
-  const handleOpen = useCallback(
-    event => {
-      dispatch(fetchMenuNotifications({ size: NUMBER_OF_NOTIFICATIONS }));
-      dispatch(countUnreadNotifications());
-      setAnchorEl(event.currentTarget);
-    },
-    [dispatch]
-  );
+  const handleOpen = useCallback(event => {
+    setAnchorEl(event.currentTarget);
+  }, []);
 
   const handleNotificationClick = useCallback(
     notification => {
       if (!notification.dateReadAt) {
-        dispatch(readNotification(notification.id));
+        readNotificationMutation.mutate(notification.id);
       }
       handleClose();
     },
-    [dispatch, handleClose]
+    [readNotificationMutation, handleClose]
   );
 
   const handleSeeAllClick = useCallback(() => {
@@ -104,8 +86,8 @@ const NotificationMenu = () => {
   }, [handleClose, navigate]);
 
   const handleReadAll = useCallback(() => {
-    dispatch(readAllNotifications());
-  }, [dispatch]);
+    readAllMutation.mutate();
+  }, [readAllMutation]);
 
   if (!isAuth) return '';
   return (
@@ -181,7 +163,7 @@ const NotificationMenu = () => {
 
         {/* Scrollable notifications list */}
         <Box sx={{ overflowY: 'auto', maxHeight: 400 }}>
-          {status === REDUCER_STATUS.LOADING &&
+          {isPending &&
             !notifications &&
             createSkeletons(Math.min(nbNotifications, 100) || 3)}
           {notifications &&

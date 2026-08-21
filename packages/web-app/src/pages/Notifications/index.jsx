@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Box, Button, Tooltip } from '@mui/material';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
@@ -7,41 +6,31 @@ import DoneAllIcon from '@mui/icons-material/DoneAll';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import EntityTable from '../../components/common/EntityTable';
 import AuthChecker from '../../components/appli/AuthChecker';
-import { fetchNotifications } from '../../actions/Notifications/GetNotifications';
-import { readNotification } from '../../actions/Notifications/ReadNotification';
-import { readAllNotifications } from '../../actions/Notifications/ReadAllNotifications';
-import { countUnreadNotifications } from '../../actions/Notifications/CountUnreadNotifications';
-import { useNotification } from '../../hooks';
-import REDUCER_STATUS from '../../reducers/ReducerStatus';
+import {
+  useNotification,
+  useNotifications,
+  useReadAllNotifications,
+  useReadNotification,
+  useUnreadNotificationsCount
+} from '../../hooks';
 import makeNotifications from './transformers';
 
 const NotificationsPage = () => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
   const { onError } = useNotification();
+  const [pagination, setPagination] = useState({ limit: 50, skip: 0 });
 
-  const {
-    notifications: notificationsRaw,
-    totalCount: totalCountRaw,
-    isLoading
-  } = useSelector(state => state.notifications);
+  const { data: listData, isFetching: isLoading } =
+    useNotifications(pagination);
+  const notificationsRaw = listData?.notifications;
+  const totalCountRaw = listData?.totalCount;
 
-  const { count: unreadCount } = useSelector(
-    state => state.countUnreadNotifications
-  );
-
-  const { status: readAllStatus, error: readAllError } = useSelector(
-    state => state.readAllNotifications
-  );
+  const { data: unreadCount = 0 } = useUnreadNotificationsCount();
+  const readNotificationMutation = useReadNotification();
+  const readAllMutation = useReadAllNotifications();
 
   const [notifications, setNotifications] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
-  const prevReadAllStatus = useRef(readAllStatus);
-
-  useEffect(() => {
-    dispatch(fetchNotifications({ limit: 50, skip: 0 }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (notificationsRaw) setNotifications(makeNotifications(notificationsRaw));
@@ -51,30 +40,20 @@ const NotificationsPage = () => {
     if (totalCountRaw) setTotalCount(totalCountRaw);
   }, [totalCountRaw]);
 
+  const prevReadAllError = useRef(readAllMutation.error);
   useEffect(() => {
-    if (
-      readAllStatus === REDUCER_STATUS.SUCCEEDED &&
-      prevReadAllStatus.current !== REDUCER_STATUS.SUCCEEDED
-    ) {
-      dispatch(fetchNotifications({ limit: 50, skip: 0 }));
-      dispatch(countUnreadNotifications());
-    }
-    prevReadAllStatus.current = readAllStatus;
-  }, [dispatch, readAllStatus]);
-
-  const prevReadAllError = useRef(readAllError);
-  useEffect(() => {
-    if (readAllError && readAllError !== prevReadAllError.current) {
+    const err = readAllMutation.error;
+    if (err && err !== prevReadAllError.current) {
       onError(
         formatMessage({
           id: 'An error occurred while marking all notifications as read'
         })
       );
     }
-    prevReadAllError.current = readAllError;
-  }, [readAllError, formatMessage, onError]);
+    prevReadAllError.current = err;
+  }, [readAllMutation.error, formatMessage, onError]);
 
-  const isReadAllLoading = readAllStatus === REDUCER_STATUS.LOADING;
+  const isReadAllLoading = readAllMutation.isPending;
   const hasUnread = unreadCount > 0;
 
   const markAllButton = (
@@ -86,7 +65,7 @@ const NotificationsPage = () => {
           variant="outlined"
           startIcon={<DoneAllIcon />}
           disabled={!hasUnread || isReadAllLoading}
-          onClick={() => dispatch(readAllNotifications())}>
+          onClick={() => readAllMutation.mutate()}>
           <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
             {formatMessage({ id: 'Mark all as read' })}
           </Box>
@@ -110,16 +89,14 @@ const NotificationsPage = () => {
               nbTotalRows={totalCount}
               onRowClick={doc => {
                 if (doc.isRead) return true;
-                dispatch(readNotification(doc.id));
+                readNotificationMutation.mutate(doc.id);
                 return true;
               }}
               onPageChange={(pageNum, pageSize) => {
-                dispatch(
-                  fetchNotifications({
-                    limit: pageSize,
-                    skip: pageNum * pageSize
-                  })
-                );
+                setPagination({
+                  limit: pageSize,
+                  skip: pageNum * pageSize
+                });
               }}
             />
           }

@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
-import { postMassif } from '../../../../actions/Massif/CreateMassif';
-import { updateMassif } from '../../../../actions/Massif/UpdateMassif';
-import { updateName } from '../../../../actions/Name';
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import LicenseBox from '../utils/LicenseBox';
 import { MassifTypes } from '../../../../types/massif.type';
 import FormProgressInfo from '../utils/FormProgressInfo';
-import { useNotification } from '../../../../hooks';
+import {
+  useCreateMassif,
+  useUpdateMassif,
+  useUpdateName,
+  useNotification
+} from '../../../../hooks';
 
 import MassifFields from './MassifFields';
 import MassifSensitivityControl from './MassifSensitivityControl';
@@ -44,21 +46,20 @@ export const MassifForm = ({ massifValues, onCancel }) => {
 
   const [polygonErrors, setPolygonErrors] = useState(false);
 
-  const {
-    error: massifError,
-    loading: massifLoading,
-    data: massifData
-  } = useSelector(state =>
-    isNewMassif ? state.createMassif : state.updateMassif
-  );
-  const { error: nameError, loading: nameLoading } = useSelector(
-    state => state.updateName
-  );
+  const createMassifMutation = useCreateMassif();
+  const updateMassifMutation = useUpdateMassif();
+  const updateNameMutation = useUpdateName();
+  const activeMassifMutation = isNewMassif
+    ? createMassifMutation
+    : updateMassifMutation;
+  const massifError = activeMassifMutation.error;
+  const massifLoading = activeMassifMutation.isPending;
+  const massifData = activeMassifMutation.data;
+  const nameError = updateNameMutation.error;
+  const nameLoading = updateNameMutation.isPending;
 
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
   defaultMassifValues.language = AVAILABLE_LANGUAGES[locale].id;
-
-  const dispatch = useDispatch();
 
   const geoJson = useMemo(
     () => JSON.parse(massifValues?.geogPolygon ?? null),
@@ -112,28 +113,24 @@ export const MassifForm = ({ massifValues, onCancel }) => {
     }
 
     if (isNewMassif) {
-      dispatch(
-        postMassif({
-          name: data.massif.name,
-          descriptionAndNameLanguage: { id: data.massif.language },
-          geogPolygon: data.massif.geogPolygon
-        })
-      );
+      createMassifMutation.mutate({
+        name: data.massif.name,
+        descriptionAndNameLanguage: { id: data.massif.language },
+        geogPolygon: data.massif.geogPolygon
+      });
     } else {
       if (data.massif.name !== massifValues.name) {
-        dispatch(
-          updateName({
-            id: data.massif.nameId,
-            name: data.massif.name
-          })
-        );
+        updateNameMutation.mutate({
+          id: data.massif.nameId,
+          name: data.massif.name
+        });
       }
 
       const body = { id: massifValues.id };
       if (JSON.stringify(data.massif.geogPolygon) !== JSON.stringify(geoJson)) {
         body.geogPolygon = data.massif.geogPolygon;
       }
-      dispatch(updateMassif(body));
+      updateMassifMutation.mutate(body);
     }
   };
 

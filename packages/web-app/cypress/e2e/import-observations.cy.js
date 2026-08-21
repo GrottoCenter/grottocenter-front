@@ -81,7 +81,7 @@ describe('Import Observations Wizard', () => {
       // Select a quantity kind (Temperature)
       cy.get('[data-testid="sensor-config-quantity-kind"]').click();
       cy.get('[data-testid="sensor-config-quantity-kind-menu"]').within(() => {
-        cy.get('[role="option"]').first().click();
+        cy.get('[role="option"][data-value="1"]').click();
       });
 
       // Unit is auto-selected; submit the sensor config

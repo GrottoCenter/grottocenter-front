@@ -1,23 +1,18 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import { isPasswordValid, isValidEmail } from '../../conf/config';
 import { localeToLanguageId } from '../../utils/languageMapping';
-import { postSignUp } from '../../actions/SignUp';
-import { useNotification, usePermissions } from '../../hooks';
+import { useNotification, usePermissions, useSignUp } from '../../hooks';
 import SignUpForm from '../../pages/SignUpForm';
 
 const captchaSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
 const SignUp = () => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const signUpState = useSelector(state => state.signUp);
+  const signUpMutation = useSignUp();
   const { locale } = useSelector(state => state.intl);
-  const [signUpRequestSent, setSignUpRequestSent] = React.useState(false);
-  const [signUpRequestSucceeded, setSignUpRequestSucceeded] =
-    React.useState(false);
   const [email, setEmail] = React.useState('');
   const [name, setName] = React.useState('');
   const [nickname, setNickname] = React.useState('');
@@ -62,37 +57,23 @@ const SignUp = () => {
   const onSignUp = event => {
     event.preventDefault();
     if (checkIfValuesAreValid()) {
-      dispatch(
-        postSignUp({
-          email,
-          language: localeToLanguageId(locale),
-          name,
-          nickname,
-          password,
-          surname,
-          website: honeypot,
-          ...(captchaSiteKey ? { captchaToken } : {})
-        })
-      );
-      setSignUpRequestSent(true);
+      signUpMutation.mutate({
+        email,
+        language: localeToLanguageId(locale),
+        name,
+        nickname,
+        password,
+        surname,
+        website: honeypot,
+        ...(captchaSiteKey ? { captchaToken } : {})
+      });
     }
   };
 
+  const signUpError = signUpMutation.error;
   useEffect(() => {
-    if (
-      signUpState.error === null &&
-      !signUpState.isFetching &&
-      signUpRequestSent
-    ) {
-      setSignUpRequestSucceeded(true);
-    } else {
-      setSignUpRequestSucceeded(false);
-    }
-  }, [signUpState, signUpRequestSent]);
-
-  useEffect(() => {
-    if (!signUpState.error) return;
-    const { code, message } = signUpState.error;
+    if (!signUpError) return;
+    const { code, message } = signUpError;
     const toastMessage = code
       ? formatMessage({
           id: code,
@@ -102,13 +83,13 @@ const SignUp = () => {
     onError(toastMessage);
     // Turnstile tokens are single-use — reset so the widget issues a fresh one.
     setCaptchaToken('');
-  }, [signUpState.error, formatMessage, onError]);
+  }, [signUpError, formatMessage, onError]);
 
   const isSubmitDisabled = Boolean(captchaSiteKey) && !captchaToken;
 
   return (
     <SignUpForm
-      loading={signUpState.isFetching}
+      loading={signUpMutation.isPending}
       email={email}
       name={name}
       nickname={nickname}
@@ -127,7 +108,7 @@ const SignUp = () => {
       onHoneypotChange={setHoneypot}
       onCaptchaTokenChange={setCaptchaToken}
       onSignUp={onSignUp}
-      signUpRequestSucceeded={signUpRequestSucceeded}
+      signUpRequestSucceeded={signUpMutation.isSuccess}
     />
   );
 };

@@ -67,6 +67,15 @@ export default [
       }
     }
   },
+  {
+    // Test-only helpers that are not themselves tests, so they match none of the
+    // airbnb devDependencies globs above. They ship to no bundle and legitimately
+    // import from devDependencies (@testing-library, …).
+    files: ['packages/web-app/src/test/**/*.{js,jsx}'],
+    rules: {
+      'import/no-extraneous-dependencies': ['error', { devDependencies: true }]
+    }
+  },
 
   // --- Node-side files: build scripts, tool configs, Storybook setup --------
   // None of these ship to the browser, and they all legitimately reach for

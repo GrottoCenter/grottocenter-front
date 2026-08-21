@@ -1,15 +1,9 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Divider, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-import {
-  fetchGroups,
-  fetchBannedCavers,
-  fetchInvalidEmailCavers
-} from '../../actions/Person/GetPerson';
+import { useBannedCavers, useGroups, useInvalidEmailCavers } from '../../hooks';
 
 import AuthChecker from '../../components/appli/AuthChecker';
 
@@ -43,48 +37,19 @@ UserList.propTypes = {
 
 const ManageUsers = () => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
 
-  const { administrators, moderators, leaders, isLoading } = useSelector(
-    state => state.groups
-  );
+  const { data: groups, isPending: isLoading } = useGroups();
+  const { administrators = [], moderators = [], leaders = [] } = groups ?? {};
 
-  const { bannedCavers, isLoading: isBannedLoading } = useSelector(
-    state => state.bannedCavers
-  );
+  const { data: bannedCavers = [], isPending: isBannedLoading } =
+    useBannedCavers();
 
-  const { invalidEmailCavers, isLoading: isInvalidEmailLoading } = useSelector(
-    state => state.invalidEmailCavers
-  );
+  const { data: invalidEmailCavers = [], isPending: isInvalidEmailLoading } =
+    useInvalidEmailCavers();
 
-  const { isLoading: isUpdateLoading, isSuccess: isUpdateSuccess } =
-    useSelector(state => state.updatePersonGroups);
-
-  const { isLoading: isBanLoading, isSuccess: isBanSuccess } = useSelector(
-    state => state.banCaver
-  );
-
-  useEffect(() => {
-    // Check if submission is ok
-    if (isUpdateSuccess && !isUpdateLoading) {
-      dispatch(fetchGroups());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isUpdateLoading, isUpdateSuccess]);
-
-  useEffect(() => {
-    if (isBanSuccess && !isBanLoading) {
-      dispatch(fetchBannedCavers());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBanLoading, isBanSuccess]);
-
-  useEffect(() => {
-    dispatch(fetchGroups());
-    dispatch(fetchBannedCavers());
-    dispatch(fetchInvalidEmailCavers());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useBanCaver / useUnbanCaver / useUpdatePersonGroups own their own
+  // onSuccess invalidations for listKeys.groups() / listKeys.bannedCavers(),
+  // so this page just displays the queries.
 
   return (
     <Layout

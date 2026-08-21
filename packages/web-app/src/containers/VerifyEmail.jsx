@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
-import { getVerifyEmail } from '../actions/VerifyEmail';
+import { useVerifyEmail } from '../hooks';
 import { displayLoginDialog } from '../actions/Login';
 import VerifyEmailPage from '../pages/VerifyEmail';
 
@@ -11,21 +10,13 @@ const VerifyEmail = () => {
   const token = searchParams.get('token');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const verifyEmailState = useSelector(state => state.verifyEmail);
-  const hasRequested = React.useRef(false);
+  const { isFetching, data, error } = useVerifyEmail(token);
 
-  useEffect(() => {
-    if (token && !hasRequested.current) {
-      hasRequested.current = true;
-      dispatch(getVerifyEmail(token));
-    }
-  }, [dispatch, token]);
-
-  const invalidToken = !token && !verifyEmailState.isFetching;
+  const invalidToken = !token && !isFetching;
+  const success = !!data;
+  const message = typeof data?.message === 'string' ? data.message : null;
   const alreadyVerified =
-    verifyEmailState.success &&
-    typeof verifyEmailState.message === 'string' &&
-    verifyEmailState.message.toLowerCase().includes('already');
+    success && message !== null && message.toLowerCase().includes('already');
 
   const handleGoToLogin = () => {
     navigate('/');
@@ -34,11 +25,11 @@ const VerifyEmail = () => {
 
   return (
     <VerifyEmailPage
-      loading={verifyEmailState.isFetching}
-      success={verifyEmailState.success}
+      loading={isFetching}
+      success={success}
       alreadyVerified={alreadyVerified}
       invalidToken={invalidToken}
-      error={verifyEmailState.error ? verifyEmailState.error.message : null}
+      error={error ? (error.body?.message ?? error.message) : null}
       onGoToLogin={handleGoToLogin}
     />
   );

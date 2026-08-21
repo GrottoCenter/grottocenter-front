@@ -1,44 +1,40 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { fetchRegion } from '../../actions/Region/GetRegion';
 import Region from '../../components/appli/Region';
 import {
   usePermissions,
-  useRefetchOnReconnect,
-  useUserProperties
+  useRegion,
+  useSubscribeToRegion,
+  useUnsubscribeFromRegion
 } from '../../hooks';
-import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
-import { subscribeToRegion } from '../../actions/Subscriptions/SubscribeToRegion';
-import { unsubscribeFromRegion } from '../../actions/Subscriptions/UnsubscribeFromRegion';
+import { regionKeys } from '../../api/queryKeys';
 
 const RegionPage = () => {
   const { countryId, regionId } = useParams();
-  const dispatch = useDispatch();
-  const userProperties = useUserProperties();
+  const queryClient = useQueryClient();
   const permissions = usePermissions();
-  const { region, error, status } = useSelector(state => state.regionDetails);
-  const { country } = useSelector(state => state.country);
-  const onSubscribe = () => dispatch(subscribeToRegion(countryId, regionId));
+  const {
+    data: region,
+    error,
+    isFetching,
+    isPaused
+  } = useRegion(countryId, regionId);
+  const subscribeMutation = useSubscribeToRegion();
+  const unsubscribeMutation = useUnsubscribeFromRegion();
+  const onSubscribe = () => subscribeMutation.mutate({ countryId, regionId });
   const onUnsubscribe = () =>
-    dispatch(unsubscribeFromRegion(countryId, regionId));
+    unsubscribeMutation.mutate({ countryId, regionId });
   const canSubscribe = permissions.isLeader;
 
   const reloadRegion = useCallback(
-    () => dispatch(fetchRegion(countryId, regionId)),
-    [dispatch, countryId, regionId]
+    () =>
+      queryClient.invalidateQueries({
+        queryKey: regionKeys.detail(countryId, regionId)
+      }),
+    [queryClient, countryId, regionId]
   );
-
-  useEffect(() => {
-    reloadRegion();
-    if (permissions.isAuth) {
-      dispatch(fetchSubscriptions(userProperties.id));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, regionId]);
-
-  useRefetchOnReconnect(reloadRegion, Boolean(error));
 
   return (
     <Region
@@ -46,13 +42,13 @@ const RegionPage = () => {
       canSubscribe={canSubscribe}
       region={region}
       error={error}
+      isPaused={isPaused}
+      isFetching={isFetching}
       onRetry={reloadRegion}
       onSubscribe={onSubscribe}
       onUnsubscribe={onUnsubscribe}
-      status={status}
       countryId={countryId}
       regionId={regionId}
-      country={country}
     />
   );
 };

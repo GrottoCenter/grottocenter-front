@@ -2,11 +2,10 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import { useDispatch, useSelector } from 'react-redux';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import DeclineIcon from '@mui/icons-material/NotInterested';
 import EditIcon from '@mui/icons-material/Edit';
-import { postProcessDocuments } from '../../actions/ProcessDocuments';
+import { useProcessDocuments } from '../../hooks';
 import ActionButton from '../../components/common/ActionButton';
 import StandardDialog from '../../components/common/StandardDialog';
 import StringInput from '../../components/common/Form/StringInput';
@@ -40,10 +39,10 @@ const Wrapper = styled('div')`
   }
 `;
 
-const Actions = ({ selectedIds, onEdit }) => {
+const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-  const { isLoading, success } = useSelector(state => state.processDocuments);
+  const processMutation = useProcessDocuments();
+  const { isPending: isLoading, isSuccess: success, reset } = processMutation;
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false);
   const [actionType, setActionType] = useState(null);
@@ -56,12 +55,17 @@ const Actions = ({ selectedIds, onEdit }) => {
     setIsConfirmationDialogOpen(true);
   };
 
+  // Reset the mutation so `success` doesn't stay sticky across renders — if it
+  // did, an unmemoized `onProcessed` from the parent would re-fire this effect
+  // and re-invoke setSelectedIds([]) → infinite update loop.
   useEffect(() => {
     if (success) {
       setIsConfirmationDialogOpen(false);
       setComment('');
+      if (onProcessed) onProcessed();
+      reset();
     }
-  }, [success]);
+  }, [success, onProcessed, reset]);
 
   return (
     <>
@@ -106,13 +110,11 @@ const Actions = ({ selectedIds, onEdit }) => {
             })} ${selectedIds.length} ${formatMessage({ id: 'document(s)' })}`}
             color={actionType === ActionTypes.validate ? 'success' : 'error'}
             onClick={() => {
-              dispatch(
-                postProcessDocuments(
-                  selectedIds,
-                  actionType === ActionTypes.validate,
-                  comment
-                )
-              );
+              processMutation.mutate({
+                ids: selectedIds,
+                isValidated: actionType === ActionTypes.validate,
+                comment
+              });
             }}
             icon={
               actionType === ActionTypes.validate ? (
@@ -148,5 +150,6 @@ export default Actions;
 
 Actions.propTypes = {
   selectedIds: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
-  onEdit: PropTypes.func.isRequired
+  onEdit: PropTypes.func.isRequired,
+  onProcessed: PropTypes.func
 };

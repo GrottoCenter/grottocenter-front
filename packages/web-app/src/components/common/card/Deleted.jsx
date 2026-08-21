@@ -1,8 +1,7 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   Button,
   Box,
@@ -25,12 +24,8 @@ import Layout from '../Layouts/Fixed/FixedContent';
 import { Property } from '../Properties';
 
 import { nomelizeSearchEntity, EntityIcon } from '../../../helpers/Entity';
-import { useDebounce } from '../../../hooks';
+import { useDebounce, useQuickSearch } from '../../../hooks';
 import AutoCompleteSearch from '../AutoCompleteSearch';
-import {
-  fetchQuicksearchResult,
-  resetQuicksearch
-} from '../../../actions/Quicksearch';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 
 export const DELETED_ENTITIES = {
@@ -203,42 +198,26 @@ export const DeleteConfirmationDialog = ({
   isSearchMandatory = false
 }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState('');
   const [selectedEntity, setSelectedEntity] = useState(null);
   const debouncedInput = useDebounce(inputValue);
   const {
-    isLoading: isQuickSearchLoading,
-    results: suggestions,
-    error
-  } = useSelector(state => state.quicksearch);
+    data,
+    error,
+    isFetching: isQuickSearchLoading
+  } = useQuickSearch({
+    query: debouncedInput,
+    entities: [entityType.searchType],
+    // Preserve the legacy `debouncedInput.length > 2` threshold — the hook
+    // defaults to AUTOCOMPLETE_MIN_CHARACTERS (2), which would fire one
+    // character earlier than the pre-migration behavior of this dialog.
+    minChars: 3
+  });
+  const suggestions = data?.results ?? [];
 
   useEffect(() => {
     if (!isOpen) setSelectedEntity(null);
   }, [isOpen, setSelectedEntity]);
-
-  const fetchSearchResults = useCallback(
-    query => {
-      const criteria = {
-        query: query.trim(),
-        entities: [entityType.searchType]
-      };
-      dispatch(fetchQuicksearchResult(criteria));
-    },
-    [dispatch, entityType]
-  );
-
-  const resetSearchResults = useCallback(() => {
-    dispatch(resetQuicksearch());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (debouncedInput.length > 2) {
-      fetchSearchResults(debouncedInput);
-    } else {
-      resetSearchResults();
-    }
-  }, [debouncedInput, fetchSearchResults, resetSearchResults]);
 
   const handleSelection = selection => {
     if (selection) {

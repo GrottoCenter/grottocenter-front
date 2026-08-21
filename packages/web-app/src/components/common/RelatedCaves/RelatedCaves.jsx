@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useDispatch } from 'react-redux';
 import { Box, Button, Typography } from '@mui/material';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 
@@ -11,10 +10,12 @@ import StandardDialog from '../StandardDialog';
 import { NetworkPropTypes } from '../../../types/grotto.type';
 import { EntranceSimplePropTypes } from '../../../types/entrance.type';
 import SearchCaveForm from '../../appli/Form/SearchCaveForm';
-import { linkCave } from '../../../actions/Cave/LinkCave';
-import { unlinkCave } from '../../../actions/Cave/UnlinkCave';
-import { linkExploredEntrance } from '../../../actions/Entrance/LinkExploredEntrance';
-import { unlinkExploredEntrance } from '../../../actions/Entrance/UnlinkExploredEntrance';
+import {
+  useLinkCaveToOrganization,
+  useUnlinkCaveFromOrganization,
+  useLinkExploredEntrance,
+  useUnlinkExploredEntrance
+} from '../../../hooks';
 import { getEntranceUrl } from '../../../conf/apiRoutes';
 import ExploredEntrancesMap from '../Maps/MapClusters/ExploredEntrancesMap';
 
@@ -32,7 +33,10 @@ const RelatedCaves = ({
   userId = null
 }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
+  const linkCaveMutation = useLinkCaveToOrganization();
+  const unlinkCaveMutation = useUnlinkCaveFromOrganization();
+  const linkExploredMutation = useLinkExploredEntrance();
+  const unlinkExploredMutation = useUnlinkExploredEntrance();
   const [isAdding, setIsAdding] = useState(false);
   const [pendingRemove, setPendingRemove] = useState(null);
 
@@ -46,13 +50,16 @@ const RelatedCaves = ({
   const handleUnlinkCave = useCallback(
     async caveId => {
       try {
-        await dispatch(unlinkCave(caveId, entityId));
+        await unlinkCaveMutation.mutateAsync({
+          caveId,
+          organizationId: entityId
+        });
         onRefresh();
       } catch (error) {
         console.error('Error unlinking cave:', error);
       }
     },
-    [dispatch, entityId, onRefresh]
+    [unlinkCaveMutation, entityId, onRefresh]
   );
 
   const handleUnlinkOrganizationEntrance = useCallback(
@@ -72,13 +79,16 @@ const RelatedCaves = ({
   const handleUnlinkExploredEntrance = useCallback(
     async entranceId => {
       try {
-        await dispatch(unlinkExploredEntrance(entranceId, entityId));
+        await unlinkExploredMutation.mutateAsync({
+          entranceId,
+          caverId: entityId
+        });
         onRefresh();
       } catch (error) {
         console.error('Error unlinking entrance:', error);
       }
     },
-    [dispatch, entityId, onRefresh]
+    [unlinkExploredMutation, entityId, onRefresh]
   );
 
   const requestUnlink = useCallback(
@@ -129,9 +139,16 @@ const RelatedCaves = ({
           try {
             if (isOrganization) {
               const caveId = await fetchCaveIdFromEntrance(entranceId);
-              if (caveId) await dispatch(linkCave(caveId, entityId));
+              if (caveId)
+                await linkCaveMutation.mutateAsync({
+                  caveId,
+                  organizationId: entityId
+                });
             } else {
-              await dispatch(linkExploredEntrance(entranceId, entityId));
+              await linkExploredMutation.mutateAsync({
+                entranceId,
+                caverId: entityId
+              });
             }
           } catch (error) {
             if (error.body?.message?.includes('already')) {
@@ -152,7 +169,8 @@ const RelatedCaves = ({
       }
     },
     [
-      dispatch,
+      linkExploredMutation,
+      linkCaveMutation,
       entityId,
       isOrganization,
       fetchCaveIdFromEntrance,

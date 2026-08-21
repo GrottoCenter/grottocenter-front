@@ -1,13 +1,8 @@
-import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
-import { fetchCountry } from '../../actions/Country/GetCountry';
-import { fetchRegion } from '../../actions/Region/GetRegion';
-import { loadMassif } from '../../actions/Massif/GetMassif';
+import { useCountry, useMassif, useRegion } from '../../hooks';
 import getLocalizedCountryName from '../../helpers/countryName';
-import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import EntitySearchPage from '../../components/appli/AdvancedSearch/EntitySearchPage';
 import EntrancesSearch from '../../components/appli/AdvancedSearch/EntrancesSearch';
 import CustomIcon from '../../components/common/CustomIcon';
@@ -22,27 +17,11 @@ const getFlagEmoji = iso =>
 
 const EntrancesListPage = () => {
   const { countryId, regionId, massifId } = useParams();
-  const dispatch = useDispatch();
   const { formatMessage, locale } = useIntl();
 
-  const { country, status: countryStatus } = useSelector(
-    state => state.country
-  );
-  const { region, status: regionStatus } = useSelector(
-    state => state.regionDetails
-  );
-  const { massif, isFetching: massifFetching } = useSelector(
-    state => state.massif
-  );
-
-  useEffect(() => {
-    if (countryId) dispatch(fetchCountry(countryId));
-    if (regionId && countryId) dispatch(fetchRegion(countryId, regionId));
-  }, [countryId, regionId, dispatch]);
-
-  useEffect(() => {
-    if (massifId) dispatch(loadMassif(massifId));
-  }, [massifId, dispatch]);
+  const { data: country } = useCountry(countryId);
+  const { data: region } = useRegion(countryId, regionId);
+  const { data: massif, isPending: massifFetching } = useMassif(massifId);
 
   let initialFilter = {};
   let lockedFilter = [];
@@ -63,7 +42,7 @@ const EntrancesListPage = () => {
     );
   }
 
-  const countryReady = countryStatus === REDUCER_STATUS.SUCCEEDED && country;
+  const countryReady = Boolean(country);
   if (countryReady) {
     const flag = getFlagEmoji(country.id);
     const localizedCountry = getLocalizedCountryName(
@@ -75,7 +54,7 @@ const EntrancesListPage = () => {
     // Using only nativeName would not match the facet value exactly.
     const countryTypesenseValue = `${country.id} - ${country.nativeName}`;
 
-    if (regionId && regionStatus === REDUCER_STATUS.SUCCEEDED && region) {
+    if (regionId && region) {
       // region.id is the ISO 3166-2 code built by the API as "${countryId}-${regionId}"
       // (e.g. "FR-01" for Ain, "MX-YUC" for Yucatán). This matches the `iso3166` Typesense
       // field populated by Nominatim reverse-geocoding, regardless of the country's admin level.

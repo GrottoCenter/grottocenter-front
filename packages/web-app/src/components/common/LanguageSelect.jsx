@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { loadLanguages } from '../../actions/Language';
 import Translate from './Translate';
+import { useLanguages } from '../../hooks';
 
 const LanguageSelect = ({
   value,
@@ -13,12 +11,7 @@ const LanguageSelect = ({
   disabled = false,
   error = false
 }) => {
-  const dispatch = useDispatch();
-  const { languages, isLoaded } = useSelector(state => state.language);
-
-  useEffect(() => {
-    if (!isLoaded) dispatch(loadLanguages(true));
-  }, [dispatch, isLoaded]);
+  const { data: languages = [], isSuccess: isLoaded } = useLanguages();
 
   return (
     <FormControl variant="standard" fullWidth required={required} error={error}>

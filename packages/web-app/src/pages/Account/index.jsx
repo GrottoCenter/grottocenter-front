@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 
 import {
@@ -40,22 +40,29 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { styled } from '@mui/material/styles';
 
-import fetch from 'isomorphic-fetch';
-import { fetchAccount } from '../../actions/Account/GetAccount';
-import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
-import { updateAccount } from '../../actions/Account/UpdateAccount';
-import { checkAuthStatus } from '../../actions/utils';
-import { postMfaReset, clearMfaState } from '../../actions/Mfa';
+import { useQueryClient } from '@tanstack/react-query';
 import { postLogout } from '../../actions/Login';
-import { fetchPerson } from '../../actions/Person/GetPerson';
-import { joinOrganization } from '../../actions/Organization/JoinOrganization';
-import { leaveOrganization } from '../../actions/Organization/LeaveOrganization';
+import {
+  useAccount,
+  useNotificationPreferences,
+  useUpdateNotificationPreferences,
+  usePerson,
+  useOnlineStatus,
+  useUserProperties,
+  usePermissions,
+  useNotification,
+  useJoinOrganization,
+  useLeaveOrganization,
+  useSubscriptions,
+  useUpdateAccount,
+  useMfaReset
+} from '../../hooks';
+import { personKeys } from '../../api/queryKeys';
 import Alert from '../../components/common/Alert';
 import BoolIcon from '../../components/common/BoolIcon';
 
 import DocumentsList from '../../components/common/DocumentsList/DocumentsList';
 import SubscriptionsList from '../../components/common/Subscriptions/SubscriptionsList';
-import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import EntitiesList from '../../components/common/entitiesList/EntitiesList';
 import PageContainer from '../../components/common/Layouts/PageContainer';
 import PageHeader from '../../components/common/Layouts/PageHeader';
@@ -70,12 +77,6 @@ import { FormRow } from '../../components/appli/EntitiesForm/utils/FormContainer
 import PasswordRules from '../../components/common/Form/PasswordRules';
 import SearchOrganizationForm from '../../components/appli/Form/SearchOrganizationForm';
 import Translate from '../../components/common/Translate';
-import {
-  useOnlineStatus,
-  useUserProperties,
-  usePermissions,
-  useNotification
-} from '../../hooks';
 import AppLink from '../../components/common/AppLink';
 import OfflineDisabled from '../../components/common/OfflineDisabled';
 import SectionCreateButton from '../../components/common/SectionCreateButton';
@@ -84,7 +85,6 @@ import {
   languageIdToLocale,
   localeToLanguageId
 } from '../../utils/languageMapping';
-import { notificationPreferencesUrl } from '../../conf/apiRoutes';
 import {
   clearOfflineData,
   getOfflineDataUsage,
@@ -224,11 +224,11 @@ EditActions.propTypes = {
 // ─── Personal info section ────────────────────────────────────────────────────
 
 const PersonalInfoSection = ({ account, onSaved }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const updateAccountMutation = useUpdateAccount();
 
   const {
     control,
@@ -268,13 +268,14 @@ const PersonalInfoSection = ({ account, onSaved }) => {
     setIsLoading(true);
     setSaveError(null);
     try {
-      await dispatch(
-        updateAccount({
-          nickname: data.nickname,
-          name: data.name,
-          surname: data.surname
-        })
-      );
+      await updateAccountMutation.mutateAsync({
+        nickname: data.nickname,
+        name: data.name,
+        surname: data.surname
+      });
+      // useUpdateAccount invalidates accountKeys.current() in its onSuccess,
+      // so every useAccount() consumer refetches automatically — no manual
+      // trigger needed here.
       setIsEditing(false);
       onSaved();
     } catch (error) {
@@ -392,12 +393,12 @@ PersonalInfoSection.propTypes = {
 // ─── Email & security section ─────────────────────────────────────────────────
 
 const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+  const updateAccountMutation = useUpdateAccount();
   const [emailError, setEmailError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -446,7 +447,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
     setIsEmailLoading(true);
     setEmailError(null);
     try {
-      await dispatch(updateAccount({ email: data.email }));
+      await updateAccountMutation.mutateAsync({ email: data.email });
       setIsEditingEmail(false);
       onSaved();
     } catch {
@@ -478,12 +479,10 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
     setIsPasswordLoading(true);
     setPasswordError(null);
     try {
-      await dispatch(
-        updateAccount({
-          currentPassword: data.currentPassword,
-          password: data.password
-        })
-      );
+      await updateAccountMutation.mutateAsync({
+        currentPassword: data.currentPassword,
+        password: data.password
+      });
       setIsChangingPassword(false);
       resetPassword({
         currentPassword: '',
@@ -673,10 +672,9 @@ const MfaSection = () => {
   const { onSuccess } = useNotification();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const { reset: mfaReset } = useSelector(state => state.mfa);
-  const isMfaEnabled = useSelector(
-    state => state.account.account?.mfaEnabled ?? false
-  );
+  const mfaResetMutation = useMfaReset();
+  const { data: mfaAccount } = useAccount();
+  const isMfaEnabled = mfaAccount?.mfaEnabled ?? false;
 
   const {
     control,
@@ -686,27 +684,32 @@ const MfaSection = () => {
   } = useForm({ defaultValues: { password: '' }, mode: 'onChange' });
 
   const handleOpen = () => {
-    dispatch(clearMfaState());
+    mfaResetMutation.reset();
     setIsDialogOpen(true);
   };
 
   const handleClose = () => {
     resetForm({ password: '' });
     setIsDialogOpen(false);
-    dispatch(clearMfaState());
+    mfaResetMutation.reset();
   };
 
+  const isResetSuccess = mfaResetMutation.isSuccess;
   useEffect(() => {
-    if (!mfaReset.isSuccess) return undefined;
+    if (!isResetSuccess) return undefined;
     onSuccess(formatMessage({ id: 'mfaResetSuccess' }));
     const timer = setTimeout(() => dispatch(postLogout()), 1500);
     return () => clearTimeout(timer);
     // onSuccess, formatMessage, dispatch are stable — only isSuccess matters here
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mfaReset.isSuccess]);
+  }, [isResetSuccess]);
 
   const onSubmit = async data => {
-    await dispatch(postMfaReset(data.password));
+    try {
+      await mfaResetMutation.mutateAsync(data.password);
+    } catch {
+      /* error surfaced via mfaResetMutation.error below */
+    }
   };
 
   const viewContent = (
@@ -765,16 +768,16 @@ const MfaSection = () => {
             <Button
               onClick={handleClose}
               variant="text"
-              disabled={mfaReset.isLoading}>
+              disabled={mfaResetMutation.isPending}>
               {formatMessage({ id: 'Cancel' })}
             </Button>
             <Button
               onClick={handleSubmit(onSubmit)}
               color="error"
               variant="contained"
-              disabled={!isValid || mfaReset.isLoading}
+              disabled={!isValid || mfaResetMutation.isPending}
               startIcon={
-                mfaReset.isLoading ? (
+                mfaResetMutation.isPending ? (
                   <CircularProgress size={16} color="inherit" />
                 ) : null
               }>
@@ -799,12 +802,12 @@ const MfaSection = () => {
               autoComplete="current-password"
             />
           </form>
-          {mfaReset.error && (
+          {mfaResetMutation.error && (
             <Alert
               severity="error"
               content={formatMessage({
                 id:
-                  mfaReset.error === 'Mismatch'
+                  mfaResetMutation.error?.body?.status === 'Mismatch'
                     ? 'currentPasswordIncorrect'
                     : 'genericError'
               })}
@@ -825,19 +828,26 @@ const NOTIF_DEFAULTS = {
 };
 
 const PreferencesSection = ({ account, onSaved }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const authHeader = useSelector(state => state.login.authorizationHeader);
+  const updateAccountMutation = useUpdateAccount();
+  const {
+    data: notifPrefsData,
+    isPending: isNotifLoading,
+    isError: hasNotifError
+  } = useNotificationPreferences();
+  const updateNotifPrefsMutation = useUpdateNotificationPreferences();
+
+  const notifPrefs = {
+    alert_for_news: notifPrefsData?.alert_for_news ?? false,
+    send_notification_by_email:
+      notifPrefsData?.send_notification_by_email ?? false,
+    send_message_notification_by_email:
+      notifPrefsData?.send_message_notification_by_email ?? false
+  };
 
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
-
-  // Notification preferences from GET /account/notifications
-  const [notifPrefs, setNotifPrefs] = useState(NOTIF_DEFAULTS);
-  const [isNotifLoading, setIsNotifLoading] = useState(true);
-  const [notifError, setNotifError] = useState(null);
-  const hasFetched = useRef(false);
 
   const currentLocale = languageIdToLocale(account?.language) ?? '';
 
@@ -853,45 +863,9 @@ const PreferencesSection = ({ account, onSaved }) => {
     }
   });
 
-  // Fetch notification preferences on mount
-  useEffect(() => {
-    if (!authHeader || hasFetched.current) return;
-    hasFetched.current = true;
-
-    const loadPrefs = async () => {
-      setIsNotifLoading(true);
-      setNotifError(null);
-      try {
-        const response = await checkAuthStatus(dispatch)(
-          await fetch(notificationPreferencesUrl, {
-            method: 'GET',
-            headers: authHeader
-          })
-        );
-        const data = await response.json();
-        const prefs = {
-          alert_for_news: data.alert_for_news ?? false,
-          send_notification_by_email: data.send_notification_by_email ?? false,
-          send_message_notification_by_email:
-            data.send_message_notification_by_email ?? false
-        };
-        setNotifPrefs(prefs);
-        reset({
-          language: languageIdToLocale(account?.language) ?? '',
-          ...prefs
-        });
-      } catch (err) {
-        if (err.isAuthError) return;
-        setNotifError(true);
-      } finally {
-        setIsNotifLoading(false);
-      }
-    };
-
-    loadPrefs();
-  }, [authHeader, dispatch, account, reset]);
-
-  // Sync language and notification preferences when account or notifPrefs changes
+  // Sync language and notification preferences when account or notifPrefs changes.
+  // The RQ hook already runs the fetch on mount — we just mirror its data into
+  // the RHF form defaults whenever a fresh copy lands.
   useEffect(() => {
     if (account) {
       reset({
@@ -899,7 +873,10 @@ const PreferencesSection = ({ account, onSaved }) => {
         ...notifPrefs
       });
     }
-  }, [account, notifPrefs, reset]);
+    // notifPrefs is rebuilt on every render — depending on notifPrefsData
+    // instead avoids resetting the form on every parent re-render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account, notifPrefsData, reset]);
 
   const handleEdit = () => {
     setSaveError(null);
@@ -919,32 +896,23 @@ const PreferencesSection = ({ account, onSaved }) => {
     setIsLoading(true);
     setSaveError(null);
     try {
-      // Save language via the account endpoint
-      await dispatch(
-        updateAccount({ language: localeToLanguageId(data.language) })
-      );
+      // Save language via the account endpoint — invalidates useAccount.
+      await updateAccountMutation.mutateAsync({
+        language: localeToLanguageId(data.language)
+      });
 
-      // Save notification preferences via the dedicated endpoint
-      const prefs = {
+      // Save notification preferences via the dedicated endpoint —
+      // useUpdateNotificationPreferences invalidates the query on success.
+      await updateNotifPrefsMutation.mutateAsync({
         alert_for_news: data.alert_for_news,
         send_notification_by_email: data.send_notification_by_email,
         send_message_notification_by_email:
           data.send_message_notification_by_email
-      };
-      await checkAuthStatus(dispatch)(
-        await fetch(notificationPreferencesUrl, {
-          method: 'PATCH',
-          headers: { ...authHeader, 'Content-Type': 'application/json' },
-          body: JSON.stringify(prefs)
-        })
-      );
+      });
 
-      setNotifPrefs(prefs);
       setIsEditing(false);
-      dispatch(fetchAccount());
       onSaved();
-    } catch (err) {
-      if (err.isAuthError) return;
+    } catch {
       setSaveError(true);
     } finally {
       setIsLoading(false);
@@ -987,7 +955,7 @@ const PreferencesSection = ({ account, onSaved }) => {
         <CircularProgress size={20} />
       </InfoRow>
     );
-  } else if (notifError) {
+  } else if (hasNotifError) {
     notificationRows = (
       <Alert
         severity="warning"
@@ -1267,55 +1235,59 @@ const OfflineDataSection = () => {
 
 const AccountPage = () => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
   const userProperties = useUserProperties();
   const userId = userProperties?.id ?? null;
   const { isAdmin, isLeader } = usePermissions();
 
   const {
-    account,
-    isLoading: isAccountLoading,
+    data: account,
+    isPending: isAccountLoading,
     error: accountError
-  } = useSelector(state => state.account);
-  const { person, isFetching: isPersonFetching } = useSelector(
-    state => state.person
+  } = useAccount();
+  const { data: person, isFetching: isPersonFetching } = usePerson(userId);
+  const queryClient = useQueryClient();
+  const invalidatePerson = useCallback(
+    () =>
+      userId &&
+      queryClient.invalidateQueries({ queryKey: personKeys.detail(userId) }),
+    [queryClient, userId]
   );
-  const { subscriptions, status: subscriptionsStatus } = useSelector(
-    state => state.subscriptions
-  );
+  // useSubscriptions internally reads the current user's id and fires the
+  // query — no dispatch needed here.
+  const {
+    subscriptions,
+    isPending: isSubscriptionsPending,
+    isError: isSubscriptionsError
+  } = useSubscriptions();
 
   const [isOrgSearchVisible, setIsOrgSearchVisible] = useState(false);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
   const [pendingLeaveOrg, setPendingLeaveOrg] = useState(null);
-
-  useEffect(() => {
-    dispatch(fetchAccount());
-    if (userId) {
-      dispatch(fetchPerson(userId));
-      if (isLeader) dispatch(fetchSubscriptions(userId));
-    }
-  }, [dispatch, userId, isLeader]);
+  const joinOrganizationMutation = useJoinOrganization();
+  const leaveOrganizationMutation = useLeaveOrganization();
 
   const handleSaved = useCallback(() => {}, []);
 
-  const handleRefreshPerson = useCallback(() => {
-    if (userId) dispatch(fetchPerson(userId));
-  }, [dispatch, userId]);
+  const handleRefreshPerson = invalidatePerson;
 
   const handleJoinOrganization = useCallback(
     async organizations => {
       if (!userId || organizations.length === 0) return;
       try {
         await Promise.all(
-          organizations.map(org => dispatch(joinOrganization(userId, org.id)))
+          organizations.map(org =>
+            joinOrganizationMutation.mutateAsync({
+              caverId: userId,
+              organizationId: org.id
+            })
+          )
         );
-        dispatch(fetchPerson(userId));
         setIsOrgSearchVisible(false);
       } catch {
         // join failed — leave the search form open so the user can retry
       }
     },
-    [dispatch, userId]
+    [userId, joinOrganizationMutation]
   );
 
   const requestLeaveOrganization = useCallback(
@@ -1332,13 +1304,18 @@ const AccountPage = () => {
     if (!pendingLeaveOrg || !userId) return;
     const { id } = pendingLeaveOrg;
     try {
-      await dispatch(leaveOrganization(userId, id));
-      setPendingLeaveOrg(null);
-      dispatch(fetchPerson(userId));
+      await leaveOrganizationMutation.mutateAsync({
+        caverId: userId,
+        organizationId: id
+      });
     } catch {
+      // Toast is emitted globally by mutationCache.onError — the button
+      // handler is fire-and-forget so an escaping rejection would surface
+      // as an unhandled promise rejection.
+    } finally {
       setPendingLeaveOrg(null);
     }
-  }, [dispatch, userId, pendingLeaveOrg]);
+  }, [userId, pendingLeaveOrg, leaveOrganizationMutation]);
 
   const nbOrganizations = (person?.organizations ?? []).length;
   const nbEntrances = (person?.exploredEntrances ?? []).length;
@@ -1536,9 +1513,8 @@ const AccountPage = () => {
                   <SubscriptionsList
                     canUnsubscribe
                     subscriptions={subscriptions}
-                    subscriptionsStatus={
-                      subscriptionsStatus ?? REDUCER_STATUS.IDLE
-                    }
+                    isLoading={isSubscriptionsPending}
+                    isError={isSubscriptionsError}
                     userId={userId}
                   />
                 }

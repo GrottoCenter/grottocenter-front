@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import {
   Box,
@@ -20,12 +19,7 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Alert from '../../common/Alert';
-import { useNotification } from '../../../hooks';
-import {
-  postMfaEnroll,
-  postMfaVerify,
-  clearMfaState
-} from '../../../actions/Mfa';
+import { useMfaEnroll, useMfaVerify, useNotification } from '../../../hooks';
 import { normalizeOtp } from '../../../utils/otpHelpers';
 
 // ─── Step 1: Install authenticator ───────────────────────────────────────────
@@ -265,21 +259,14 @@ StepVerify.propTypes = {
 // ─── Wizard root ──────────────────────────────────────────────────────────────
 
 const MfaEnrollment = ({ onBack }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const { enroll, verify } = useSelector(state => state.mfa);
+  const enrollMutation = useMfaEnroll();
+  const verifyMutation = useMfaVerify();
   const [activeStep, setActiveStep] = React.useState(0);
 
-  useEffect(
-    () => () => {
-      dispatch(clearMfaState());
-    },
-    [dispatch]
-  );
-
   const handleInstallContinue = () => {
-    dispatch(postMfaEnroll()).then(success => {
-      if (success) setActiveStep(1);
+    enrollMutation.mutate(undefined, {
+      onSuccess: () => setActiveStep(1)
     });
   };
 
@@ -292,8 +279,11 @@ const MfaEnrollment = ({ onBack }) => {
   };
 
   const handleVerifySubmit = code => {
-    dispatch(postMfaVerify(code));
+    verifyMutation.mutate(code);
   };
+
+  const enrollData = enrollMutation.data;
+  const verifyError = verifyMutation.error;
 
   const steps = [
     formatMessage({ id: 'mfaEnrollmentStep1Title' }),
@@ -305,22 +295,22 @@ const MfaEnrollment = ({ onBack }) => {
     <StepInstall
       key="install"
       onContinue={handleInstallContinue}
-      isLoading={enroll.isLoading}
-      error={enroll.error}
+      isLoading={enrollMutation.isPending}
+      error={enrollMutation.error?.status ?? enrollMutation.error?.message}
     />,
     <StepScanQr
       key="scan"
-      otpauthUri={enroll.otpauthUri ?? ''}
-      secret={enroll.secret ?? ''}
+      otpauthUri={enrollData?.otpauthUri ?? ''}
+      secret={enrollData?.secret ?? ''}
       onContinue={handleScanContinue}
       onBack={handleStepBack}
     />,
     <StepVerify
       key="verify"
       onSubmit={handleVerifySubmit}
-      isLoading={verify.isLoading}
-      error={verify.error}
-      isEnrollmentTokenExpired={verify.isEnrollmentTokenExpired}
+      isLoading={verifyMutation.isPending}
+      error={verifyError?.body?.status ?? verifyError?.message}
+      isEnrollmentTokenExpired={verifyError?.isEnrollmentTokenExpired ?? false}
       onBack={handleStepBack}
       onBackToLogin={onBack}
     />

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { usePermissions } from './usePermissions';
 import { useNotification } from './useNotification';
-import { displayLoginDialog } from '../actions/Login';
-import { checkAuthStatus } from '../actions/utils';
+import { displayLoginDialog, postLogout } from '../actions/Login';
+import { apiPost } from '../api/client';
 import { ssoAuthTokenUrl } from '../conf/apiRoutes';
 import { biLinks } from '../conf/externalLinks';
 
@@ -28,9 +28,6 @@ export const useOpenBi = () => {
   const { formatMessage } = useIntl();
   const { onError } = useNotification();
   const { isAuth } = usePermissions();
-  const authorizationHeader = useSelector(
-    state => state.login.authorizationHeader
-  );
   const [isOpening, setIsOpening] = useState(false);
   const waitingForAuth = useRef(false);
 
@@ -66,25 +63,22 @@ export const useOpenBi = () => {
 
     setIsOpening(true);
     try {
-      const response = await fetch(ssoAuthTokenUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...authorizationHeader
-        },
-        body: JSON.stringify({ product: SSO_PRODUCT })
+      // apiPost reads the auth header from the store at call time and throws
+      // with { status, body } attached on failure — the queryClient's global
+      // onError does NOT fire (this call bypasses RQ), so 401 must be handled
+      // explicitly here.
+      const { token } = await apiPost(ssoAuthTokenUrl, {
+        product: SSO_PRODUCT
       });
-
-      // checkAuthStatus triggers the global logout/redirect flow on a 401
-      // (expired token) and throws for any other non-2xx response.
-      await checkAuthStatus(dispatch)(response);
-
-      const { token } = await response.json();
       submitSsoForm(token, biTab);
     } catch (error) {
       biTab?.close();
-      // On a 401 the user is being logged out and redirected; no toast needed.
-      if (error.isAuthError) return;
+      if (error?.status === 401) {
+        // Session lost — dispatch the same logout path RQ takes, so the UX
+        // stays uniform regardless of which layer fired the request.
+        dispatch(postLogout());
+        return;
+      }
       console.error('BI SSO failed:', error);
       onError(
         formatMessage({
@@ -94,14 +88,7 @@ export const useOpenBi = () => {
     } finally {
       setIsOpening(false);
     }
-  }, [
-    isAuth,
-    authorizationHeader,
-    dispatch,
-    onError,
-    formatMessage,
-    submitSsoForm
-  ]);
+  }, [isAuth, dispatch, onError, formatMessage, submitSsoForm]);
 
   // Resume the action once the user has logged in.
   useEffect(() => {

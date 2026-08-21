@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Divider, List } from '@mui/material';
 
@@ -9,9 +8,11 @@ import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { HistoryPropTypes } from '../../../../types/entrance.type';
 import History from './History';
 import CreateHistoryForm from '../../EntitiesForm/History';
-import { postHistory } from '../../../../actions/History/CreateHistory';
-import { moveHistoryRelevance } from '../../../../actions/History/MoveRelevance';
-import { usePermissions } from '../../../../hooks';
+import {
+  useCreateHistory,
+  useMoveHistoryRelevance,
+  usePermissions
+} from '../../../../hooks';
 import { useMoveRelevanceWithUndo } from '../../../../hooks/useMoveRelevanceWithUndo';
 import { sortByRelevance } from '../../../../helpers/sortByRelevance';
 import Alert from '../../../common/Alert';
@@ -19,19 +20,18 @@ import Alert from '../../../common/Alert';
 const Histories = ({ entranceId, histories, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
-  const dispatch = useDispatch();
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const { movingId, handleMove } =
-    useMoveRelevanceWithUndo(moveHistoryRelevance);
+  const createMutation = useCreateHistory();
+  const moveMutation = useMoveHistoryRelevance();
+  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveMutation);
 
   const onSubmitForm = data => {
-    dispatch(
-      postHistory({
-        entrance: entranceId,
-        body: data.body,
-        language: data.language
-      })
-    );
+    createMutation.mutate({
+      entrance: entranceId,
+      title: data.title ?? undefined,
+      body: data.body,
+      language: data.language
+    });
     setIsFormVisible(false);
   };
 

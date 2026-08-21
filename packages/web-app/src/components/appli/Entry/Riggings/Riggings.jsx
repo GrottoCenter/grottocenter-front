@@ -1,12 +1,13 @@
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Divider } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import React, { useState } from 'react';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
-import { usePermissions } from '../../../../hooks';
-import { postRiggings } from '../../../../actions/Riggings/CreateRigging';
-import { moveRiggingRelevance } from '../../../../actions/Riggings/MoveRelevance';
+import {
+  useCreateRigging,
+  useMoveRiggingRelevance,
+  usePermissions
+} from '../../../../hooks';
 import { useMoveRelevanceWithUndo } from '../../../../hooks/useMoveRelevanceWithUndo';
 import CreateRiggingsForm from '../../EntitiesForm/Riggings';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
@@ -18,13 +19,13 @@ import DiscardChangesDialog from '../../../common/DiscardChangesDialog';
 
 const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [isDiscardDialogOpen, setIsDiscardDialogOpen] = useState(false);
-  const { movingId, handleMove } =
-    useMoveRelevanceWithUndo(moveRiggingRelevance);
+  const createMutation = useCreateRigging();
+  const moveMutation = useMoveRiggingRelevance();
+  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveMutation);
 
   const closeForm = () => {
     setIsFormVisible(false);
@@ -40,14 +41,12 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
     else setIsFormVisible(true);
   };
   const handleSubmitForm = data => {
-    dispatch(
-      postRiggings({
-        entrance: entranceId,
-        title: data.title,
-        obstacles: data.obstacles,
-        language: data.language
-      })
-    );
+    createMutation.mutate({
+      entrance: entranceId,
+      title: data.title,
+      obstacles: data.obstacles,
+      language: data.language
+    });
     closeForm();
   };
 

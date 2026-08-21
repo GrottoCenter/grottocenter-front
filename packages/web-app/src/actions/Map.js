@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import {
   getMapCavesUrl,
   getMapCavesCoordinatesUrl,
@@ -266,43 +265,40 @@ export const fetchAllMassifsCoordinates = () => dispatch => {
 };
 
 // Unlike the tile-cached thunks above, massif polygons aren't tile-cached
-// (registerEntity/fetchForBounds isn't used here), so the request rate isn't
-// bounded by the tile grid and `redux-debounced` is intentionally kept to
-// avoid firing on every moveend at polygon zoom.
-export const fetchMassifs = criteria => {
-  const thunkToDebounce = function (dispatch) {
-    dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.MASSIFS });
-    const completedUrl = makeUrl(getMapMassifsUrl, criteria);
-    return fetch(completedUrl)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.text();
-      })
-      .then(text => {
-        dispatch({ type: FETCH_MAP_MASSIFS_SUCCESS, data: JSON.parse(text) });
-      })
-      .catch(error => {
-        dispatch({
-          type: FETCH_MAP_MASSIFS_FAILURE,
-          error: makeErrorMessage(error.message, `Fetching massifs`)
-        });
-      })
-      .finally(() => {
-        dispatch({
-          type: FETCH_MAP_END_LOADING,
-          key: LOADINGS.MASSIFS
-        });
+// (registerEntity/fetchForBounds isn't used here), so nothing bounds the request
+// rate: unthrottled, this fires on every moveend at polygon zoom. The 500 ms
+// debounce that used to ride on this thunk as `redux-debounced` metadata now
+// lives at its single dispatch site — see MASSIFS_DEBOUNCE_MS in pages/Map.jsx.
+//
+// Not tile-cached on purpose, and not an oversight: the API selects massifs with
+// ST_Intersects and returns each polygon whole, so a polygon comes back in full
+// from every tile it overlaps. Caching per tile would store the same geometry
+// once per tile — measured at ~15x for one Alpine viewport (11 massifs, 105 kB
+// of payload becoming ~1.6 MB of cache), because a polygon spans many tiles
+// where a point belongs to exactly one.
+export const fetchMassifs = criteria => dispatch => {
+  dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.MASSIFS });
+  const completedUrl = makeUrl(getMapMassifsUrl, criteria);
+  return fetch(completedUrl)
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response.text();
+    })
+    .then(text => {
+      dispatch({ type: FETCH_MAP_MASSIFS_SUCCESS, data: JSON.parse(text) });
+    })
+    .catch(error => {
+      dispatch({
+        type: FETCH_MAP_MASSIFS_FAILURE,
+        error: makeErrorMessage(error.message, `Fetching massifs`)
       });
-  };
-
-  thunkToDebounce.meta = {
-    debounce: {
-      time: 500,
-      key: 'FETCH_MAP_MASSIFS'
-    }
-  };
-
-  return thunkToDebounce;
+    })
+    .finally(() => {
+      dispatch({
+        type: FETCH_MAP_END_LOADING,
+        key: LOADINGS.MASSIFS
+      });
+    });
 };

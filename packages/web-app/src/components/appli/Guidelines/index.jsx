@@ -13,14 +13,16 @@ import TextField from '@mui/material/TextField';
 import LinkIcon from '@mui/icons-material/Link';
 import CreateIcon from '@mui/icons-material/Create';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useDispatch } from 'react-redux';
 import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
-import { usePermissions, useNotification } from '../../../hooks';
+import {
+  usePostGuideline,
+  usePatchGuideline,
+  usePermissions,
+  useNotification
+} from '../../../hooks';
 import GuidelinePropTypes from '../../../types/guideline.type';
 import GuidelineForm from '../EntitiesForm/Guideline/index';
 import Guideline from './Guideline';
-import { postGuideline } from '../../../actions/Guideline/CreateGuideline';
-import { patchGuideline } from '../../../actions/Guideline/UpdateGuideline';
 import { getGuidelinesUrl } from '../../../conf/apiRoutes';
 import { checkAndGetStatus } from '../../../actions/utils';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
@@ -38,8 +40,9 @@ const ENTITY_LABEL_IDS = { countries: 'country', regions: 'region' };
 const Guidelines = ({ entityType, entityId, guidelines }) => {
   const permissions = usePermissions();
   const { onError } = useNotification();
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
+  const postMutation = usePostGuideline();
+  const patchMutation = usePatchGuideline();
   const [mode, setMode] = useState(MODE_NONE);
 
   const [allGuidelines, setAllGuidelines] = useState([]);
@@ -100,15 +103,17 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
     else if (entityType === 'regions') entities.regions = [entityId];
     else if (entityType === 'massifs') entities.massifs = [entityId];
 
-    const result = await dispatch(
-      postGuideline({
+    try {
+      await postMutation.mutateAsync({
         ...entities,
         title: data.title,
         description: data.description,
         language: data.language
-      })
-    );
-    if (result) closeForm();
+      });
+      closeForm();
+    } catch {
+      /* toast handled globally */
+    }
   };
 
   const handleAttachGuideline = async e => {
@@ -128,16 +133,19 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
     }
 
     setIsSubmitting(true);
-    const result = await dispatch(
-      patchGuideline({
+    try {
+      await patchMutation.mutateAsync({
         id: selectedGuideline.id,
         countries,
         regions,
         massifs
-      })
-    );
-    setIsSubmitting(false);
-    if (result) closeForm();
+      });
+      closeForm();
+    } catch {
+      /* toast handled globally */
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const availableGuidelines = allGuidelines.filter(g => {

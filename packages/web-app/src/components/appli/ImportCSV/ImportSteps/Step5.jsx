@@ -8,11 +8,8 @@ import {
 import ReplayIcon from '@mui/icons-material/Replay';
 import HomeIcon from '@mui/icons-material/Home';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
-import { useDispatch, useSelector } from 'react-redux';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { ImportPageContentContext } from '../Provider';
-import { resetImportState } from '../../../../actions/ImportCsv';
-import { useJobPolling } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import AppLink from '../../../common/AppLink';
 import { ENTRANCE, FAILURE_IMPORT, SUCCESS_IMPORT } from '../constants';
@@ -20,23 +17,20 @@ import Alert from '../../../common/Alert';
 import DownloadButton from '../DownloadButton';
 import ImportResultRecap from '../ImportResultRecap';
 
-// Step 5 — Import: runs the async job polling, shows live progress, then the
-// terminal result (success/failure recaps + report links). This step is
-// terminal in the wizard (no Back/Next); "New import" resets everything and
-// returns to step 1.
+// Step 5 — Import: shows live job progress (polled by useImportCsvSession's
+// internal useQuery + refetchInterval), then the terminal result
+// (success/failure recaps + report links). Terminal in the wizard (no
+// Back/Next); "New import" resets everything and returns to step 1.
 const Step5 = () => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const importCsv = useSelector(state => state.importCsv);
-  const { selectedType, resetContext } = useContext(ImportPageContentContext);
+  const { selectedType, resetContext, importSession } = useContext(
+    ImportPageContentContext
+  );
 
-  const { batchId, isPolling, progress, resultImport, status } = importCsv;
+  const { isPolling, progress, resultImport, status, error } = importSession;
   const isEntranceImport = selectedType === ENTRANCE;
 
-  useJobPolling(batchId, isPolling);
-
   const handleNewImport = () => {
-    dispatch(resetImportState());
     resetContext();
   };
 
@@ -53,11 +47,11 @@ const Step5 = () => {
 
   // "Done" once we have a result (either flow) or a terminal failure — used to
   // reveal the "New import" reset.
-  const isDone = !!resultImport || status === 'failed' || !!importCsv.error;
+  const isDone = !!resultImport || status === 'failed' || !!error;
 
-  // Async job recap: rendered on any terminal state that carries job `progress`,
-  // except the synchronous result shape (`resultImport.total` — documents and
-  // legacy entrance imports) which keeps its own alerts below.
+  // Async job recap: rendered on any terminal state that carries job
+  // `progress`, except the synchronous result shape (`resultImport.total` —
+  // documents and legacy entrance imports) which keeps its own alerts below.
   const showRecap =
     isTerminal && progress && !(resultImport && resultImport.total);
 
@@ -140,24 +134,26 @@ const Step5 = () => {
         />
       )}
 
-      {/* Poll failure or any error without the detailed recap above. Grottocenter
-          uses the English string itself as the translation key, so formatMessage
-          localizes known messages / keys and falls back to the raw text. */}
-      {importCsv.error && !(status === 'failed' && progress) && (
+      {/* Poll failure or any error without the detailed recap above.
+          Grottocenter uses the English string itself as the translation key,
+          so formatMessage localizes known messages / keys and falls back to
+          the raw text. */}
+      {error && !(status === 'failed' && progress) && (
         <Alert
           data-testid="csv-import-error-alert"
           severity="error"
           title={formatMessage({
-            id: importCsv.error,
-            defaultMessage: importCsv.error
+            id: error,
+            defaultMessage: error
           })}
         />
       )}
 
-      {/* Synchronous result shape (`total.*`, successfulImport, ...): documents,
-          and — until the async job API ships — legacy entrance imports too. The
-          shape (presence of `total`), not the entity type, drives the rendering,
-          so both flows work during the transition. In-memory CSV downloads. */}
+      {/* Synchronous result shape (`total.*`, successfulImport, ...): documents
+          and — until the async job API ships — legacy entrance imports too.
+          The shape (presence of `total`), not the entity type, drives the
+          rendering, so both flows work during the transition. In-memory CSV
+          downloads. */}
       {resultImport &&
         resultImport.total &&
         resultImport.total.successfulImportAsDuplicates > 0 && (

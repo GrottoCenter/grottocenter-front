@@ -1,19 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { isEmpty, isNil } from 'ramda';
 import { InputAdornment } from '@mui/material';
 import AddCircle from '@mui/icons-material/AddCircle';
 import { organizationIcon } from '../../../../../../assets/icons';
 
-import {
-  fetchQuicksearchResult,
-  resetQuicksearch
-} from '../../../../../../actions/Quicksearch';
-
 import SearchBar from '../SearchBar';
 import DocumentFormAutoComplete from '../DocumentFormAutoComplete';
-import { useBoolean } from '../../../../../../hooks';
+import { useBoolean, useQuickSearch } from '../../../../../../hooks';
 import CreateNewOrganization from './CreateNewOrganization';
 
 const resultEndAdornment = (
@@ -29,6 +23,8 @@ const resultEndAdornment = (
 const getOrganizationToString = organization =>
   `#${organization.id} - ${organization.name}`;
 
+const ORG_ENTITIES = ['organizations'];
+
 const OrganizationAutoComplete = ({
   contextValueName,
   helperContent,
@@ -40,28 +36,23 @@ const OrganizationAutoComplete = ({
   const [defaultSearchValue, setDefaultSearchValue] = useState('');
   const [defaultNewOrganizationValue, setDefaultNewOrganizationValue] =
     useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const { isTrue: actionEnabled, true: enableAction } = useBoolean();
   const { isOpen: isCreateOrganizationOpen, toggle: toggleCreateOrganization } =
     useBoolean();
-  const dispatch = useDispatch();
   const {
+    data,
     error,
-    isLoading,
-    results: suggestions
-  } = useSelector(state => state.quicksearch);
+    isFetching: isLoading
+  } = useQuickSearch({ query: searchQuery, entities: ORG_ENTITIES });
+  const suggestions = data?.results ?? [];
 
   const fetchSearchResults = debouncedInput => {
-    const criteria = {
-      query: debouncedInput.trim(),
-      entities: ['organizations']
-    };
     setDefaultNewOrganizationValue(debouncedInput);
-    dispatch(fetchQuicksearchResult(criteria));
+    setSearchQuery(debouncedInput);
   };
 
-  const resetSearchResults = () => {
-    dispatch(resetQuicksearch());
-  };
+  const resetSearchResults = () => setSearchQuery('');
 
   useEffect(() => {
     if (isLoading && !isEmpty(defaultNewOrganizationValue)) {

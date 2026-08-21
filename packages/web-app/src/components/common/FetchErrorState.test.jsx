@@ -72,6 +72,28 @@ describe('FetchErrorState', () => {
     });
   });
 
+  // React Query pauses a retry instead of failing when the browser goes offline
+  // (networkMode: 'offlineFirst'), so the query carries no error at all. Without
+  // this branch the page would sit on a spinner forever.
+  describe('when a react query retry is paused', () => {
+    it('shows the offline wording with no error to inspect', () => {
+      setOnLine(false);
+      renderState({ isPaused: true });
+
+      expect(screen.getByText('Unavailable offline')).toBeInTheDocument();
+      expect(screen.getByTestId('fetch-error-state')).toHaveClass(
+        'MuiAlert-standardInfo'
+      );
+    });
+
+    it('hides Retry, which react query will replay on reconnection', () => {
+      setOnLine(false);
+      renderState({ isPaused: true, onRetry: vi.fn() });
+
+      expect(screen.queryByText('Retry')).not.toBeInTheDocument();
+    });
+  });
+
   describe('when the server answered with an error', () => {
     const serverError = { status: 500, message: 'Server error' };
 

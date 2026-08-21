@@ -1,29 +1,29 @@
 import { useState, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Link } from '@mui/material';
 import { useNotification } from './useNotification';
 
-export const useMoveRelevanceWithUndo = moveThunk => {
-  const dispatch = useDispatch();
+/**
+ * Drives a move-relevance mutation with an inline "Undo" affordance.
+ *
+ * Takes the mutation returned by `useMoveXxxRelevance()` — its `mutateAsync`
+ * is what this hook chains. The pattern accommodates a follow-up dispatch
+ * (the undo) that must know when the initial move actually landed, hence
+ * awaiting `mutateAsync` rather than using `mutate`.
+ *
+ * @param {ReturnType<typeof useMutation>} mutation - result of e.g. useMoveDescriptionRelevance()
+ */
+export const useMoveRelevanceWithUndo = mutation => {
   const { onError, onSuccess, onClose } = useNotification();
   const { formatMessage } = useIntl();
   const [movingId, setMovingId] = useState(null);
+  const { mutateAsync } = mutation;
 
   const handleMove = useCallback(
     (entityId, direction) => {
       setMovingId(entityId);
-      dispatch(moveThunk(entityId, direction))
-        .then(result => {
-          if (result?.error) {
-            onError(
-              typeof result.error === 'string'
-                ? result.error
-                : formatMessage({ id: 'genericError' }),
-              { autoHideDuration: 6000 }
-            );
-            return;
-          }
+      mutateAsync({ id: entityId, direction })
+        .then(() => {
           onSuccess(formatMessage({ id: 'Order updated' }), {
             autoHideDuration: 6000,
             action: snackbarId => (
@@ -35,16 +35,15 @@ export const useMoveRelevanceWithUndo = moveThunk => {
                 onClick={() => {
                   onClose(snackbarId);
                   setMovingId(entityId);
-                  dispatch(moveThunk(entityId, direction * -1))
-                    .then(undoResult => {
-                      if (undoResult?.error) {
-                        onError(formatMessage({ id: 'genericError' }), {
-                          autoHideDuration: 6000
-                        });
-                        return;
-                      }
+                  mutateAsync({ id: entityId, direction: direction * -1 })
+                    .then(() => {
                       onSuccess(formatMessage({ id: 'Undo successful' }), {
                         autoHideDuration: 3000
+                      });
+                    })
+                    .catch(() => {
+                      onError(formatMessage({ id: 'genericError' }), {
+                        autoHideDuration: 6000
                       });
                     })
                     .finally(() => setMovingId(null));
@@ -54,9 +53,17 @@ export const useMoveRelevanceWithUndo = moveThunk => {
             )
           });
         })
+        .catch(error => {
+          onError(
+            typeof error?.message === 'string'
+              ? error.message
+              : formatMessage({ id: 'genericError' }),
+            { autoHideDuration: 6000 }
+          );
+        })
         .finally(() => setMovingId(null));
     },
-    [dispatch, moveThunk, onError, onSuccess, onClose, formatMessage]
+    [mutateAsync, onError, onSuccess, onClose, formatMessage]
   );
 
   return { movingId, handleMove };

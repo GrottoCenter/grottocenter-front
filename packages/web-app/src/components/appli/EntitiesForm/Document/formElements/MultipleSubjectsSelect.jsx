@@ -1,11 +1,9 @@
-import { useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 
 import Translate from '../../../../common/Translate';
-import { loadSubjects } from '../../../../../actions/Subject';
 import {
   SUBJECT_DEPTH_STYLES,
   getSubjectCode,
@@ -13,6 +11,7 @@ import {
 } from '../../../../../utils/subjectHelpers';
 
 import MultipleSelectWithOptionsComponent from './MultipleSelectWithOptions';
+import { useSubjects } from '../../../../../hooks';
 
 const MultipleSubjectsSelect = ({
   computeHasError,
@@ -21,16 +20,10 @@ const MultipleSubjectsSelect = ({
   labelName,
   required = false
 }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const { isFetching, subjects } = useSelector(state => state.subject);
+  const { data: subjects = [], isFetching } = useSubjects();
 
   const sortedSubjects = useMemo(() => sortSubjects(subjects), [subjects]);
-
-  useEffect(() => {
-    dispatch(loadSubjects());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const getSubjectLabel = option => {
     const code = getSubjectCode(option);

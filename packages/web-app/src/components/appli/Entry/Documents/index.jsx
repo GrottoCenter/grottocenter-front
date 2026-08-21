@@ -4,16 +4,17 @@ import { useIntl } from 'react-intl';
 import { Box, Divider } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import { styled } from '@mui/material/styles';
-import { useDispatch } from 'react-redux';
 import NewEntityButton from '@/components/common/NewEntityButton';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
-import { linkDocumentToEntrance } from '../../../../actions/LinkDocumentToEntrance';
-import { unlinkDocumentToEntrance } from '../../../../actions/UnlinkDocumentToEntrance';
 import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../../SearchDocumentForm';
 import Alert from '../../../common/Alert';
-import { usePermissions } from '../../../../hooks';
+import {
+  useLinkDocumentsToEntrance,
+  useUnlinkDocumentToEntrance,
+  usePermissions
+} from '../../../../hooks';
 import DocumentsList from '../../../common/DocumentsList/DocumentsList';
 
 const DividerStyled = styled(Divider)`
@@ -23,18 +24,11 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
-  const dispatch = useDispatch();
+  const linkMutation = useLinkDocumentsToEntrance();
+  const unlinkMutation = useUnlinkDocumentToEntrance();
 
-  const onSubmitForm = newDocuments => {
-    newDocuments.forEach(d => {
-      dispatch(
-        linkDocumentToEntrance({
-          entranceId,
-          document: d
-        })
-      );
-    });
-    setIsDocumentSearchVisible(false);
+  const onSubmitForm = async newDocuments => {
+    await linkMutation.mutateAsync({ entranceId, documents: newDocuments });
   };
 
   return (
@@ -76,7 +70,10 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
         <>
           {isDocumentSearchVisible && (
             <>
-              <SearchDocumentForm onSubmit={onSubmitForm} />
+              <SearchDocumentForm
+                onSubmit={onSubmitForm}
+                onSuccess={() => setIsDocumentSearchVisible(false)}
+              />
               <DividerStyled />
             </>
           )}
@@ -93,14 +90,11 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
             }
             onUnlink={
               permissions.isModerator && isEditAllowed
-                ? async document => {
-                    dispatch(
-                      unlinkDocumentToEntrance({
-                        entranceId,
-                        documentId: document.id
-                      })
-                    );
-                  }
+                ? document =>
+                    unlinkMutation.mutate({
+                      entranceId,
+                      documentId: document.id
+                    })
                 : null
             }
           />

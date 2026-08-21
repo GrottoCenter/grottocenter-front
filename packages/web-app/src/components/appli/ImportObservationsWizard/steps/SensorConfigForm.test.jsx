@@ -22,14 +22,22 @@ vi.mock('notistack', () => ({
 
 // ---- Actions mock ----
 const mockCreateSensorConfig = vi.fn();
-vi.mock('../../../../actions/Observations/importWizard', () => ({
+// Spread, not replace — see the note in UploadStep.test.jsx.
+vi.mock('../../../../actions/Observations/importWizard', async () => ({
+  ...(await vi.importActual('../../../../actions/Observations/importWizard')),
   createSensorConfig: (...args) => mockCreateSensorConfig(...args)
 }));
 
 const mockCreateSubstance = vi.fn();
-vi.mock('../../../../actions/Substance', () => ({
-  searchSubstances: () => () => Promise.resolve([]),
-  createSubstance: (...args) => mockCreateSubstance(...args)
+vi.mock('../../../../hooks', async () => ({
+  ...(await vi.importActual('../../../../hooks')),
+  useCreateSubstance: () => ({ mutateAsync: mockCreateSubstance }),
+  useNotification: () => ({
+    onSuccess: vi.fn(),
+    onError: vi.fn(),
+    onWarning: vi.fn(),
+    onInfo: vi.fn()
+  })
 }));
 
 // ---- SubstanceAutocomplete mock ----

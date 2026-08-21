@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPerson } from '../actions/Person/GetPerson';
-import { linkExploredEntrance } from '../actions/Entrance/LinkExploredEntrance';
-import { unlinkExploredEntrance } from '../actions/Entrance/UnlinkExploredEntrance';
+import {
+  useLinkExploredEntrance,
+  useUnlinkExploredEntrance
+} from './mutations/useExploredEntrance';
+import { usePerson } from './queries/usePerson';
 
 /**
  * Manages the "explored" toggle state for an entrance.
@@ -14,37 +15,26 @@ import { unlinkExploredEntrance } from '../actions/Entrance/UnlinkExploredEntran
  * @param {number|null} userId     - The current user ID, or null if not logged in.
  */
 const useExplored = ({ entranceId, userId }) => {
-  const dispatch = useDispatch();
   const [isExplored, setIsExplored] = useState(false);
   const [isExploredLoading, setIsExploredLoading] = useState(false);
-  const { person, error: personError } = useSelector(state => state.person);
-
-  // Guard against a stale person from another profile page sharing the reducer.
-  const isPersonCurrent = Boolean(userId) && person?.id === userId;
-
-  useEffect(() => {
-    if (userId && !isPersonCurrent && !personError) {
-      dispatch(fetchPerson(userId));
-    }
-  }, [userId, isPersonCurrent, personError, dispatch]);
+  const { data: person } = usePerson(userId);
+  const linkMutation = useLinkExploredEntrance();
+  const unlinkMutation = useUnlinkExploredEntrance();
 
   useEffect(() => {
     if (!entranceId) return;
-    if (userId && !isPersonCurrent) return; // wait for the current person's data
     setIsExplored(!!person?.exploredEntrances?.some(e => e?.id === entranceId));
-  }, [person, entranceId, userId, isPersonCurrent]);
+  }, [person, entranceId]);
 
   const handleToggleExplored = async () => {
     if (!userId || !entranceId) return;
     setIsExploredLoading(true);
     try {
-      if (isExplored) {
-        await dispatch(unlinkExploredEntrance(entranceId, userId));
-      } else {
-        await dispatch(linkExploredEntrance(entranceId, userId));
-      }
+      const mutation = isExplored ? unlinkMutation : linkMutation;
+      // Both mutations invalidate personKeys.detail(userId) in their
+      // onSuccess, so no manual invalidation is needed here.
+      await mutation.mutateAsync({ entranceId, caverId: userId });
       setIsExplored(prev => !prev);
-      dispatch(fetchPerson(userId));
     } catch (err) {
       console.error('Error toggling explored status:', err);
     } finally {

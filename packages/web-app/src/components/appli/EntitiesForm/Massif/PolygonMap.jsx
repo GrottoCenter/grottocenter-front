@@ -23,6 +23,7 @@ import useGeolocationPermission from '../../../../hooks/useGeolocationPermission
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
 import FullscreenControl from '../../../common/Maps/common/FullscreenControl';
+import TileReloader from '../../../common/Maps/common/TileReloader';
 import ShapefileImport from './ShapefileImport';
 import PolygonLayersList from './PolygonLayersList';
 import { isNeedlePolygon } from '../../../../helpers/polygonUtils';
@@ -734,6 +735,7 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
             <FullscreenControl forceSeparateButton="true" />
             <ScaleControl position="bottomright" />
             <LayersControl position="topright" />
+            <TileReloader />
 
             <KinkPane />
             {allKinkPoints.map(point => (
