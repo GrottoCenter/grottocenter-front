@@ -428,14 +428,16 @@ const UploadStep = () => {
           data-testid="profile-input"
           onChange={handleProfileFileChange}
         />
-        <FileSelectorInput
-          files={file ? [{ fileName: file.name }] : []}
-          multiple={false}
-          accept={ACCEPTED_FILE_TYPES}
-          onFilesAdd={handleFilesAdd}
-          onFileRemove={handleFileRemove}
-          onFileRejections={handleFileRejections}
-        />
+        <Box data-testid="observation-file-selector">
+          <FileSelectorInput
+            files={file ? [{ fileName: file.name }] : []}
+            multiple={false}
+            accept={ACCEPTED_FILE_TYPES}
+            onFilesAdd={handleFilesAdd}
+            onFileRemove={handleFileRemove}
+            onFileRejections={handleFileRejections}
+          />
+        </Box>
         {file && (
           <Typography
             variant="body2"
