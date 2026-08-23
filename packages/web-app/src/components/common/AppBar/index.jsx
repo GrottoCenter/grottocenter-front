@@ -83,7 +83,7 @@ const ToolsGroup = styled('div')(({ theme }) => ({
 // pressable at a glance — the same treatment the reference designs give their
 // rail toggle. The burger needs none of this: it is already a solid mark.
 const RailToggleButton = styled(IconButton)(({ theme }) => ({
-  border: `1px solid ${alpha(theme.palette.primary.contrastText, 0.5)}`,
+  border: '1px solid currentColor',
   '&:hover': {
     borderColor: theme.palette.primary.contrastText,
     backgroundColor: alpha(theme.palette.primary.contrastText, 0.14)
