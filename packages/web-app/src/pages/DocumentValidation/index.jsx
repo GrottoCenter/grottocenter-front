@@ -1,10 +1,8 @@
 import { useCallback, useState } from 'react';
-import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import { isMobileOnly } from 'react-device-detect';
-import { Typography } from '@mui/material';
 
-import { useDocuments } from '../../hooks';
+import { useDocuments, usePermissions } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StandardDialog from '../../components/common/StandardDialog';
 import Actions from './Actions';
@@ -13,16 +11,10 @@ import DocumentEdit from '../DocumentEdit';
 import AuthChecker from '../../components/appli/AuthChecker';
 
 import EntityTable from '../../components/common/EntityTable';
-import Translate from '../../components/common/Translate';
-
-const Wrapper = styled('div')`
-  display: flex;
-  flex-direction: column;
-  padding: ${({ theme }) => theme.spacing(1)};
-`;
 
 const DocumentValidationPage = () => {
   const { formatMessage } = useIntl();
+  const permissions = usePermissions();
   const [selectedIds, setSelectedIds] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -66,37 +58,36 @@ const DocumentValidationPage = () => {
     <>
       <Layout
         title={formatMessage({ id: 'Documents awaiting validation' })}
+        action={
+          permissions.isAuth ? (
+            <Actions
+              selectedIds={selectedIds}
+              onEdit={setEditView}
+              onProcessed={handleProcessed}
+            />
+          ) : null
+        }
         content={
           <AuthChecker
             componentToDisplay={
-              <Wrapper>
-                <Typography variant="h3" component="h2" gutterBottom>
-                  <Translate>Documents</Translate>
-                </Typography>
-                <EntityTable
-                  entityType="documents"
-                  isLoading={isFetching}
-                  pageRows={documents}
-                  nbTotalRows={totalCount}
-                  selectedIds={selectedIds}
-                  onPageChange={(pageNum, pageSize) => {
-                    setPage(pageNum);
-                    setRowsPerPage(pageSize);
-                  }}
-                  onRowClick={doc => {
-                    setDetailedView(doc.id);
-                    return false;
-                  }}
-                  onSelected={ids => {
-                    setSelectedIds(ids);
-                  }}
-                />
-                <Actions
-                  selectedIds={selectedIds}
-                  onEdit={setEditView}
-                  onProcessed={handleProcessed}
-                />
-              </Wrapper>
+              <EntityTable
+                entityType="documents"
+                isLoading={isFetching}
+                pageRows={documents}
+                nbTotalRows={totalCount}
+                selectedIds={selectedIds}
+                onPageChange={(pageNum, pageSize) => {
+                  setPage(pageNum);
+                  setRowsPerPage(pageSize);
+                }}
+                onRowClick={doc => {
+                  setDetailedView(doc.id);
+                  return false;
+                }}
+                onSelected={ids => {
+                  setSelectedIds(ids);
+                }}
+              />
             }
           />
         }
