@@ -5,7 +5,7 @@ import { IconButton, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CheckIcon from '@mui/icons-material/Check';
 import LinkIcon from '@mui/icons-material/Link';
-import copyToClipboard from '../../helpers/clipboard';
+import copyToClipboard from '@/utils/clipboard';
 
 export const AnchorHeadingWrapper = styled('span')`
   & .anchor-link {

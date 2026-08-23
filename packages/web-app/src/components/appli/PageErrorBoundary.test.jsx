@@ -1,8 +1,8 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
+import copyToClipboard from '@/utils/clipboard';
 import renderWithProviders from '../../test/renderWithProviders';
-import copyToClipboard from '../../helpers/clipboard';
 import PageErrorBoundary, { PageError } from './PageErrorBoundary';
 
 const mockNavigate = vi.fn();
@@ -15,7 +15,7 @@ vi.mock('react-router-dom', async importOriginal => {
   };
 });
 
-vi.mock('../../helpers/clipboard', () => ({ default: vi.fn() }));
+vi.mock('@/utils/clipboard', () => ({ default: vi.fn() }));
 
 const renderPage = () =>
   renderWithProviders(

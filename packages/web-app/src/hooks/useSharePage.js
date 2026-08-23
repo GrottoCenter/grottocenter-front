@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { isMobile } from 'react-device-detect';
-import copyToClipboard from '../helpers/clipboard';
+import copyToClipboard from '../utils/clipboard';
 import { useNotification } from './useNotification';
 
 const useSharePage = () => {

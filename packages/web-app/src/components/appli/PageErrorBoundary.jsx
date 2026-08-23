@@ -16,6 +16,7 @@ import {
   Typography
 } from '@mui/material';
 
+import copyToClipboard from '@/utils/clipboard';
 import {
   createGitHubIssueForClientLinks,
   contactLinks
@@ -24,7 +25,6 @@ import AppLink from '../common/AppLink';
 import InternationalizedLink from '../common/InternationalizedLink';
 import PageContainer from '../common/Layouts/PageContainer';
 import Translate from '../common/Translate';
-import copyToClipboard from '../../helpers/clipboard';
 
 const appVersion = import.meta.env.VITE_APP_VERSION || '—';
 const COPY_STATUS_MESSAGES = {
@@ -50,6 +50,9 @@ export const PageError = ({ error = null }) => {
   const titleRef = useRef(null);
   const [copyStatus, setCopyStatus] = useState(null);
 
+  // Keep the timestamp tied to the error screen's first render. Route-key
+  // changes reset the boundary; same-key hash changes intentionally preserve
+  // the original report rather than rewriting its occurrence time.
   const technicalReport = useMemo(
     () =>
       [

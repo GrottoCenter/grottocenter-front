@@ -1,11 +1,6 @@
 import { useContext, useEffect, useCallback, useMemo } from 'react';
 import { includes } from 'ramda';
-import {
-  Box,
-  Button,
-  Divider,
-  LinearProgress as MuiLinearProgress
-} from '@mui/material';
+import { Box, Button, Divider, LinearProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PublishIcon from '@mui/icons-material/Publish';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
@@ -27,7 +22,7 @@ import {
   STEP_IMPORT
 } from './constants';
 
-const LinearProgress = styled(MuiLinearProgress, {
+const StyledLinearProgress = styled(LinearProgress, {
   shouldForwardProp: prop => !prop.startsWith('$')
 })(({ $isLoading }) => ({
   visibility: $isLoading ? 'visible' : 'hidden'
@@ -114,7 +109,7 @@ const ImportContainer = () => {
       content={
         <>
           <ImportTabs />
-          <LinearProgress $isLoading={isLoading} />
+          <StyledLinearProgress $isLoading={isLoading} />
           <div style={isLoading ? { opacity: '0.6' } : {}}>
             <WizardProgress activeStep={activeStep} steps={progressSteps} />
             {(showBackButton || showNextButton) && (

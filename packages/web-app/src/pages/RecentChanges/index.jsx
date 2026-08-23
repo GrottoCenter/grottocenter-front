@@ -19,7 +19,7 @@ const RecentChangesPage = () => {
     refetch
   } = useRecentChangesFeed({ limit: PAGE_SIZE });
   const changes = data?.changes ?? [];
-  const retry = changes.length > 0 ? fetchNextPage : refetch;
+  const handleRetry = changes.length > 0 ? fetchNextPage : refetch;
 
   return (
     <Layout
@@ -42,7 +42,7 @@ const RecentChangesPage = () => {
             changes={changes}
             isLoading={isPending}
             error={error}
-            onRetry={retry}
+            onRetry={handleRetry}
           />
           {changes.length > 0 && hasNextPage && !error && (
             <Box sx={{ display: 'flex', justifyContent: 'center', pt: 2 }}>

@@ -11,19 +11,19 @@ const HOMEPAGE_CHANGES_LIMIT = 10;
 
 const Section = styled('section')(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
-  padding: '32px 24px',
+  padding: theme.spacing(4, 3),
   [theme.breakpoints.down('sm')]: {
-    padding: '24px 16px'
+    padding: theme.spacing(3, 2)
   }
 }));
 
-const TitleRow = styled(Box)({
+const TitleRow = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: 8,
-  marginBottom: 20
-});
+  gap: theme.spacing(1),
+  marginBottom: theme.spacing(2.5)
+}));
 
 const Inner = styled(Box)({
   maxWidth: 720,
