@@ -18,6 +18,7 @@ import { hasNativePdfViewer } from '@/utils/pdfViewerSupport';
 import AppLink from '../AppLink';
 
 const FRAME_HEIGHTS = { xs: 320, sm: 480, md: 600 };
+const PDFJS_ASSET_BASE_URL = `${import.meta.env.BASE_URL}assets/pdfjs`;
 
 // Zoom is a multiple of "fit to container width", so 1 always means the page
 // spans the frame whatever the screen. Below that there is nothing to gain —
@@ -125,7 +126,13 @@ const PdfJsViewer = ({ src }) => {
         // spawned by getDocument, not by this assignment.
         pdfjs.GlobalWorkerOptions.workerSrc = PDF_WORKER_URL;
         if (isCancelled) return;
-        loadingTask = pdfjs.getDocument({ url: src });
+        // PDF.js 6 decodes formats such as JBIG2 and JPEG 2000 through assets
+        // loaded by fixed filename from this directory. Without it, rendering
+        // succeeds with the undecodable images silently missing.
+        loadingTask = pdfjs.getDocument({
+          url: src,
+          wasmUrl: `${PDFJS_ASSET_BASE_URL}/${pdfjs.version}/wasm/`
+        });
         if (isCancelled) {
           loadingTask.destroy();
           return;
