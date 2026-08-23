@@ -62,7 +62,9 @@ const Scroller = styled('div')({
   overflow: 'auto',
   touchAction: 'pan-x pan-y',
   display: 'flex',
-  justifyContent: 'center',
+  // `center` creates unreachable negative overflow when the canvas is wider
+  // than the frame. Auto margins center it only while it still fits.
+  justifyContent: 'flex-start',
   alignItems: 'flex-start'
 });
 
@@ -239,7 +241,10 @@ const PdfJsViewer = ({ src }) => {
               { id: 'Page {current} of {total}' },
               { current: pageNumber, total: pageCount }
             )}
-            sx={{ display: pdf ? 'block' : 'none' }}
+            sx={{
+              display: pdf ? 'block' : 'none',
+              marginInline: 'auto'
+            }}
           />
         </Scroller>
         {!pdf && (
