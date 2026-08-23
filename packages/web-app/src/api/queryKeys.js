@@ -163,7 +163,7 @@ export const duplicateKeys = {
 // "invalidate all admin lists" is a single call.
 export const listKeys = {
   all: ['list'],
-  recentChanges: () => ['list', 'recentChanges'],
+  recentChanges: options => ['list', 'recentChanges', options],
   partnersCarousel: () => ['list', 'partnersCarousel'],
   randomEntrance: () => ['list', 'randomEntrance'],
   latestBlogNews: url => ['list', 'latestBlogNews', url],

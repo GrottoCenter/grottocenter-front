@@ -1,13 +1,16 @@
-import { useEffect } from 'react';
-import { useIntl, FormattedRelativeTime } from 'react-intl';
+import { FormattedRelativeTime, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import AppLink from '../AppLink';
-import CustomIcon from '../CustomIcon';
 
-function getRelativeTimeProps(dateStr) {
+import { getRecentChangeKey } from '@/utils/recentChanges';
+import AppLink from './AppLink';
+import CustomIcon from './CustomIcon';
+import FetchErrorState from './FetchErrorState';
+
+const getRelativeTimeProps = dateStr => {
   const diffMs = new Date(dateStr) - Date.now();
   const absSec = Math.abs(diffMs) / 1000;
   if (absSec < 3600)
@@ -19,17 +22,17 @@ function getRelativeTimeProps(dateStr) {
   if (absSec < 31536000)
     return { value: Math.round(diffMs / 2592000000), unit: 'month' };
   return { value: Math.round(diffMs / 31536000000), unit: 'year' };
-}
+};
 
-function actionFmt(action, formatMessage) {
+const actionFmt = (action, formatMessage) => {
   if (action === 'create') return formatMessage({ id: 'created' });
   if (action === 'update') return formatMessage({ id: 'updated' });
   if (action === 'delete') return formatMessage({ id: 'deleted' });
   if (action === 'restore') return formatMessage({ id: 'restored' });
   return formatMessage({ id: 'changed' });
-}
+};
 
-function entityFmt(entity, formatMessage) {
+const entityFmt = (entity, formatMessage) => {
   if (entity === 'location') return formatMessage({ id: 'a location' });
   if (entity === 'description') return formatMessage({ id: 'a description' });
   if (entity === 'rigging') return formatMessage({ id: 'a rigging' });
@@ -40,43 +43,45 @@ function entityFmt(entity, formatMessage) {
   if (entity === 'massif') return formatMessage({ id: 'the massif' });
   if (entity === 'document') return formatMessage({ id: 'the document' });
   if (entity === 'grotto') return formatMessage({ id: 'the organization' });
+  if (entity === 'guideline') return formatMessage({ id: 'the guideline' });
   return formatMessage({ id: 'unknown' });
-}
+};
 
-function subEntitygroupFmt(entities, formatMessage) {
+const subEntityGroupFmt = (entities, formatMessage) => {
   if (entities.length === 0) return '';
   if (entities.length === 1) return entityFmt(entities[0], formatMessage);
 
   const lastEntity = entityFmt(entities[entities.length - 1], formatMessage);
   const otherEntities = entities
     .slice(0, -1)
-    .map(e => entityFmt(e, formatMessage))
+    .map(entity => entityFmt(entity, formatMessage))
     .join(' ');
   return `${otherEntities} ${formatMessage({ id: 'and' })} ${lastEntity}`;
-}
+};
 
-function getEntityLinkUrl(type, id) {
+const getEntityLinkUrl = (type, id) => {
   if (type === 'grotto') return `/ui/organizations/${id}`;
   if (type === 'entrance') return `/ui/entrances/${id}`;
   if (type === 'cave') return `/ui/caves/${id}`;
   if (type === 'document') return `/ui/documents/${id}`;
   if (type === 'massif') return `/ui/massifs/${id}`;
-  return `/`;
-}
+  return null;
+};
 
-function getEntityIcon(type) {
+const getEntityIcon = type => {
   if (type === 'cave' || type === 'entrance') return 'entrance';
   if (type === 'massif') return 'massif';
   if (type === 'document') return 'bibliography';
   if (type === 'grotto') return 'organization';
+  if (type === 'guideline') return 'guidelines';
   return null;
-}
+};
 
 const TimelineItem = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: 12,
-  padding: '6px 0',
+  gap: theme.spacing(1.5),
+  padding: theme.spacing(0.75, 0),
   '&:not(:last-child)': {
     borderBottom: `1px solid ${theme.palette.divider}`
   }
@@ -94,6 +99,12 @@ const IconBubble = styled(Box)(({ theme }) => ({
   '& > span': { margin: 0 }
 }));
 
+const StrongText = ({ children }) => (
+  <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
+    {children}
+  </Typography>
+);
+
 const ChangeItem = ({ changeInfo }) => {
   const { formatMessage } = useIntl();
   const iconType = getEntityIcon(changeInfo.mainEntityType);
@@ -102,31 +113,43 @@ const ChangeItem = ({ changeInfo }) => {
     changeInfo.mainAction ?? changeInfo.subAction,
     formatMessage
   );
-
-  const authorEl = (
-    <AppLink
-      to={`/ui/persons/${changeInfo.authorId}`}
-      color="secondary"
-      underline="hover"
-      sx={{ fontWeight: 600 }}>
-      {changeInfo.author}
-    </AppLink>
+  const authorName = changeInfo.author || formatMessage({ id: 'unknown' });
+  const entityName = changeInfo.name || formatMessage({ id: 'unknown' });
+  const entityUrl = getEntityLinkUrl(
+    changeInfo.mainEntityType,
+    changeInfo.mainEntityId
   );
 
-  const entityEl = (
-    <AppLink
-      to={getEntityLinkUrl(changeInfo.mainEntityType, changeInfo.mainEntityId)}
-      underline="hover"
-      sx={{ fontWeight: 600 }}>
-      {changeInfo.name}
-    </AppLink>
-  );
+  const authorEl =
+    changeInfo.authorId != null && changeInfo.author ? (
+      <AppLink
+        to={`/ui/persons/${changeInfo.authorId}`}
+        color="secondary"
+        underline="hover"
+        sx={{ fontWeight: 600 }}>
+        {authorName}
+      </AppLink>
+    ) : (
+      <StrongText>{authorName}</StrongText>
+    );
+
+  const entityEl =
+    entityUrl && changeInfo.mainAction !== 'delete' ? (
+      <AppLink to={entityUrl} underline="hover" sx={{ fontWeight: 600 }}>
+        {entityName}
+      </AppLink>
+    ) : (
+      <StrongText>{entityName}</StrongText>
+    );
 
   let sentence;
   if (changeInfo.mainAction != null) {
     const subText =
       changeInfo.subAction != null
-        ? ` ${formatMessage({ id: 'with' })} ${subEntitygroupFmt(changeInfo.subEntityTypes, formatMessage)}`
+        ? ` ${formatMessage({ id: 'with' })} ${subEntityGroupFmt(
+            changeInfo.subEntityTypes,
+            formatMessage
+          )}`
         : '';
     sentence = (
       <>
@@ -144,7 +167,7 @@ const ChangeItem = ({ changeInfo }) => {
       <>
         {authorEl} {changeType}{' '}
         <Typography variant="body2" component="span" color="text.secondary">
-          {subEntitygroupFmt(changeInfo.subEntityTypes, formatMessage)}{' '}
+          {subEntityGroupFmt(changeInfo.subEntityTypes, formatMessage)}{' '}
           {formatMessage({ id: 'on' })}{' '}
         </Typography>
         {entityFmt(changeInfo.mainEntityType, formatMessage)} {entityEl}
@@ -176,7 +199,7 @@ const ChangeItem = ({ changeInfo }) => {
           <Typography
             variant="caption"
             color="text.secondary"
-            sx={{ flexShrink: 0, mt: '2px' }}>
+            sx={{ flexShrink: 0, mt: 0.25 }}>
             <FormattedRelativeTime
               value={relTime.value}
               unit={relTime.unit}
@@ -189,51 +212,73 @@ const ChangeItem = ({ changeInfo }) => {
   );
 };
 
-const RecentChangesCard = ({ changes, isFetching, fetch }) => {
-  useEffect(() => {
-    fetch();
-  }, [fetch]);
+const LoadingState = () => (
+  <Box>
+    {/* Fixed-length skeleton placeholders: position is their only identity. */}
+    {/* eslint-disable react/no-array-index-key */}
+    {[...Array(5)].map((_, index) => (
+      <TimelineItem key={index}>
+        <Skeleton
+          variant="circular"
+          width={36}
+          height={36}
+          sx={{ flexShrink: 0 }}
+        />
+        <Box sx={{ flex: 1 }}>
+          <Skeleton variant="text" width="75%" />
+          <Skeleton variant="text" width="35%" />
+        </Box>
+      </TimelineItem>
+    ))}
+    {/* eslint-enable react/no-array-index-key */}
+  </Box>
+);
 
-  if (isFetching || !changes) {
+const RecentChangesList = ({
+  changes = [],
+  isLoading = false,
+  error = null,
+  onRetry = null
+}) => {
+  const { formatMessage } = useIntl();
+
+  if (isLoading && changes.length === 0) return <LoadingState />;
+
+  if (error && changes.length === 0) {
     return (
-      <Box>
-        {/* Fixed-length skeleton placeholders: position is the only identity
-            they have, and the list never reorders. */}
-        {/* eslint-disable react/no-array-index-key */}
-        {[...Array(5)].map((_, i) => (
-          <Box
-            key={i}
-            sx={{
-              display: 'flex',
-              gap: '12px',
-              py: '10px',
-              borderBottom: '1px solid rgba(0,0,0,0.08)'
-            }}>
-            <Skeleton
-              variant="circular"
-              width={36}
-              height={36}
-              sx={{ flexShrink: 0 }}
-            />
-            <Box sx={{ flex: 1 }}>
-              <Skeleton variant="text" width="75%" />
-              <Skeleton variant="text" width="35%" />
-            </Box>
-          </Box>
-        ))}
-        {/* eslint-enable react/no-array-index-key */}
+      <FetchErrorState
+        error={error}
+        messageId="Unable to load recent changes"
+        onRetry={onRetry}
+      />
+    );
+  }
+
+  if (changes.length === 0) {
+    return (
+      <Box sx={{ py: 4, textAlign: 'center', color: 'text.disabled' }}>
+        <HistoryOutlinedIcon sx={{ fontSize: 48, mb: 0.5 }} />
+        <Typography variant="body2" color="text.secondary">
+          {formatMessage({ id: 'No recent changes' })}
+        </Typography>
       </Box>
     );
   }
 
   return (
     <Box>
-      {changes.map(e => (
-        <ChangeItem
-          changeInfo={e}
-          key={`${e.date}-${e.mainEntityType}-${e.mainEntityId}`}
-        />
+      {changes.map(change => (
+        <ChangeItem changeInfo={change} key={getRecentChangeKey(change)} />
       ))}
+      {error && (
+        <Box sx={{ mt: 1 }}>
+          <FetchErrorState
+            error={error}
+            messageId="Unable to load recent changes"
+            onRetry={onRetry}
+          />
+        </Box>
+      )}
     </Box>
   );
 };
@@ -250,11 +295,17 @@ const changeInfoShape = PropTypes.shape({
   name: PropTypes.string
 });
 
-ChangeItem.propTypes = { changeInfo: changeInfoShape };
-RecentChangesCard.propTypes = {
-  isFetching: PropTypes.bool,
+StrongText.propTypes = { children: PropTypes.node.isRequired };
+ChangeItem.propTypes = { changeInfo: changeInfoShape.isRequired };
+RecentChangesList.propTypes = {
   changes: PropTypes.arrayOf(changeInfoShape),
-  fetch: PropTypes.func.isRequired
+  isLoading: PropTypes.bool,
+  error: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string,
+    PropTypes.instanceOf(Error)
+  ]),
+  onRetry: PropTypes.func
 };
 
-export default RecentChangesCard;
+export default RecentChangesList;

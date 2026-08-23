@@ -37,6 +37,7 @@ const SignUp = lazy(() => import('./components/appli/SignUp'));
 const ForgotPassword = lazy(() => import('./components/appli/ForgotPassword'));
 const AccountPage = lazy(() => import('./pages/Account'));
 const ContributionsPage = lazy(() => import('./pages/Contributions'));
+const RecentChangesPage = lazy(() => import('./pages/RecentChanges'));
 const DocumentValidation = lazy(() => import('./pages/DocumentValidation'));
 const DocumentEdit = lazy(() => import('./pages/DocumentEdit'));
 const EntityCreation = lazy(() => import('./pages/EntityCreation'));
@@ -116,6 +117,7 @@ const router = createBrowserRouter(
       <Route path="/ui/faq" element={<Faq />} />
       <Route path="/ui/map/:target?" element={<Map />} />
       <Route path="/ui/contributions" element={<ContributionsPage />} />
+      <Route path="/ui/changes/recent" element={<RecentChangesPage />} />
       <Route path="/ui/notifications" element={<NotificationsPage />} />
       <Route path="/ui/messages" element={<MessagesPage />} />
       <Route path="/ui/messages/:conversationId" element={<MessagesPage />} />
