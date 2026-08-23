@@ -1,7 +1,6 @@
 ---
 name: github-workflow
 description: Grottocenter GitHub conventions — conventional commits with scope, branch from upstream develop, open a PR using the project template.
-argument-hint: '[issue-id]'
 ---
 
 ## Prerequisites
@@ -49,6 +48,10 @@ Examples: `fix/entrance-decimal-validation`, `feat/cave-export`, `chore/upgrade-
 ## Pull Request
 
 **1. Write the body** — read `.github/pull_request_template.md`, fill it out, save to `pr_body.md`.
+
+In the `## 🧪 Testing` section, write every test or verification as a GitHub
+checklist item. Use `- [x]` only for checks that were actually run and passed,
+and `- [ ]` for checks that are pending or were not run.
 
 **2. Show and confirm** — display the title and the **actual content of `pr_body.md`** to the user and **wait for explicit approval before proceeding**. Do not push or create the PR until the user confirms. The file must already exist on disk before asking for confirmation.
 
