@@ -2,7 +2,9 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { Box, Button, Step, StepLabel, Stepper } from '@mui/material';
+import { Box, Button } from '@mui/material';
+
+import WizardProgress from '@/components/common/Form/WizardProgress';
 
 import {
   SET_WIZARD_STEP,
@@ -160,13 +162,33 @@ const ImportObservationsWizard = ({ initialCaveId, caveIdLocked }) => {
   const wizardState = useSelector(state => state.importWizard);
   const { currentStep } = wizardState;
 
-  const stepLabels = [
-    formatMessage({ id: 'ImportObservationsWizard.step.upload' }),
-    formatMessage({ id: 'ImportObservationsWizard.step.deviceSensors' }),
-    formatMessage({ id: 'ImportObservationsWizard.step.mapColumns' }),
-    formatMessage({ id: 'ImportObservationsWizard.step.validate' }),
-    formatMessage({ id: 'ImportObservationsWizard.step.context' }),
-    formatMessage({ id: 'ImportObservationsWizard.step.submit' })
+  const steps = [
+    {
+      id: 'upload',
+      label: formatMessage({ id: 'ImportObservationsWizard.step.upload' })
+    },
+    {
+      id: 'device-sensors',
+      label: formatMessage({
+        id: 'ImportObservationsWizard.step.deviceSensors'
+      })
+    },
+    {
+      id: 'map-columns',
+      label: formatMessage({ id: 'ImportObservationsWizard.step.mapColumns' })
+    },
+    {
+      id: 'validate',
+      label: formatMessage({ id: 'ImportObservationsWizard.step.validate' })
+    },
+    {
+      id: 'context',
+      label: formatMessage({ id: 'ImportObservationsWizard.step.context' })
+    },
+    {
+      id: 'submit',
+      label: formatMessage({ id: 'ImportObservationsWizard.step.submit' })
+    }
   ];
 
   const handleBack = () => {
@@ -190,19 +212,17 @@ const ImportObservationsWizard = ({ initialCaveId, caveIdLocked }) => {
       icon={<EntityIcon iconType="scientific_observation" />}
       content={
         <>
-          <Stepper activeStep={currentStep} sx={{ mb: 3 }}>
-            {stepLabels.map(label => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+          <WizardProgress
+            activeStep={currentStep}
+            steps={steps}
+            sx={{ mb: 3 }}
+          />
 
           <Box sx={{ mb: 3 }}>
             {renderStep(currentStep, initialCaveId, caveIdLocked)}
           </Box>
 
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             <Button
               data-testid="back-button"
               disabled={isBackDisabled}

@@ -1,11 +1,19 @@
-import { useContext, useEffect, useCallback } from 'react';
+import { useContext, useEffect, useCallback, useMemo } from 'react';
 import { includes } from 'ramda';
-import { Divider, LinearProgress as MuiLinearProgress } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import {
+  Box,
+  Button,
+  Divider,
+  LinearProgress as MuiLinearProgress
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PublishIcon from '@mui/icons-material/Publish';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+
+import WizardProgress from '@/components/common/Form/WizardProgress';
+
 import ImportTabs from './ImportTabs';
-import Stepper from '../../common/Form/Stepper';
 import Provider, { ImportPageContentContext } from './Provider';
 import ImportPageContent from './ImportPageContent';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
@@ -19,12 +27,6 @@ import {
   STEP_IMPORT
 } from './constants';
 
-const useStyles = makeStyles({
-  stepper: {
-    margin: '0 0 0.625rem 0'
-  }
-});
-
 const LinearProgress = styled(MuiLinearProgress, {
   shouldForwardProp: prop => !prop.startsWith('$')
 })(({ $isLoading }) => ({
@@ -36,7 +38,6 @@ const StyledDivider = styled(Divider)`
 `;
 
 const ImportContainer = () => {
-  const classes = useStyles();
   const {
     isTrue: isNextStepDisabled,
     true: enableNextStep,
@@ -96,6 +97,15 @@ const ImportContainer = () => {
   const showNextButton = currentFormStep < STEP_CONFIRM;
   const showBackButton =
     currentFormStep !== STEP_GENERAL && currentFormStep !== STEP_IMPORT;
+  const progressSteps = useMemo(
+    () =>
+      formSteps.map(step => ({
+        id: step.id,
+        label: <Translate>{step.name}</Translate>
+      })),
+    [formSteps]
+  );
+  const activeStep = formSteps.findIndex(step => step.id === currentFormStep);
 
   return (
     <FixedContent
@@ -106,16 +116,40 @@ const ImportContainer = () => {
           <ImportTabs />
           <LinearProgress $isLoading={isLoading} />
           <div style={isLoading ? { opacity: '0.6' } : {}}>
-            <Stepper
-              className={classes.stepper}
-              currentFormStepId={currentFormStep}
-              formSteps={formSteps}
-              isNextStepButtonDisabled={isNextStepDisabled}
-              handleStepBack={handleStepBack}
-              handleStepNext={handleStepNext}
-              showBackButton={showBackButton}
-              showNextButton={showNextButton}
-            />
+            <WizardProgress activeStep={activeStep} steps={progressSteps} />
+            {(showBackButton || showNextButton) && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: 1,
+                  mt: 1,
+                  width: '100%'
+                }}>
+                {showBackButton && (
+                  <Button
+                    disabled={currentFormStep === STEP_GENERAL}
+                    onClick={handleStepBack}
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<NavigateBeforeIcon />}>
+                    <Translate>Back</Translate>
+                  </Button>
+                )}
+                {showNextButton && (
+                  <Button
+                    disabled={isNextStepDisabled}
+                    onClick={handleStepNext}
+                    variant="contained"
+                    color="primary"
+                    endIcon={<NavigateNextIcon />}
+                    sx={{ ml: 'auto' }}>
+                    <Translate>Next</Translate>
+                  </Button>
+                )}
+              </Box>
+            )}
             <StyledDivider />
             <ImportPageContent currentFormStepId={currentFormStep} />
           </div>
