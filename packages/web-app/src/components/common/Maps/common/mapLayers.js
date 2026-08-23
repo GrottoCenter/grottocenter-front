@@ -19,7 +19,7 @@ const layers = [
     pane: PANES.BASEMAP,
     attribution:
       '« © <a target="_blank" href="https://www.openstreetmap.org/copyright">OpenStreetMap </a> contributors » under ODbL licence',
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     referrerPolicy: 'strict-origin-when-cross-origin',
     maxZoom: 19,
     maxNativeZoom: 19,

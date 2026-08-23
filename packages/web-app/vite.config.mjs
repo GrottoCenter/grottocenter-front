@@ -1,11 +1,12 @@
 import { defineConfig, loadEnv } from 'vite';
-import { fileURLToPath, URL } from 'node:url';
+import { fileURLToPath, URL as NodeURL } from 'node:url';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import { compression } from 'vite-plugin-compression2';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA } from 'vite-plugin-pwa';
 import pdfJsWasmAssets from './vite/pdfJsWasmAssets.mjs';
+import serviceWorkerBuildGuard from './vite/serviceWorkerBuildGuard.mjs';
 
 const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -13,7 +14,9 @@ export default defineConfig(({ mode }) => {
   // Pull VITE_API_URL out of the env file so the SW's runtimeCaching pattern
   // matches whichever backend this build targets (prod, staging, local).
   const env = loadEnv(mode, process.cwd(), '');
-  const apiOrigin = env.VITE_API_URL ? new URL(env.VITE_API_URL).origin : null;
+  const apiOrigin = env.VITE_API_URL
+    ? new NodeURL(env.VITE_API_URL).origin
+    : null;
   // Build a RegExp for the runtimeCaching urlPattern. A closure over apiOrigin
   // would NOT work: vite-plugin-pwa serialises the function via .toString(),
   // so the free variable becomes `undefined` in the SW runtime and the rule
@@ -329,13 +332,11 @@ export default defineConfig(({ mode }) => {
           runtimeCaching: [
             {
               // OpenStreetMap basemap tiles (default Leaflet layer).
-              // Leaflet rotates between a/b/c.tile.openstreetmap.org for parallel
-              // downloads → without normalization, the same (z,x,y) tile ends up
-              // cached up to 3 times under 3 different hostnames. The
-              // cacheKeyWillBeUsed hook strips the subdomain so all three hit
-              // the same cache entry.
+              // OSM requires this exact canonical hostname. Using it also gives
+              // each (z,x,y) tile one stable cache key without a serialised URL
+              // normalisation callback.
               urlPattern: ({ url }) =>
-                /tile\.openstreetmap\.org/.test(url.href),
+                url.hostname === 'tile.openstreetmap.org',
               handler: 'CacheFirst',
               options: {
                 cacheName: 'osm-tiles',
@@ -346,14 +347,6 @@ export default defineConfig(({ mode }) => {
                 cacheableResponse: { statuses: [0, 200] },
                 plugins: [
                   {
-                    cacheKeyWillBeUsed: async ({ request }) => {
-                      const url = new URL(request.url);
-                      url.hostname = url.hostname.replace(
-                        /^[a-z]\.tile\.openstreetmap\.org$/,
-                        'tile.openstreetmap.org'
-                      );
-                      return url.toString();
-                    },
                     // Offline over an area never visited online: nothing cached,
                     // nothing reachable. CacheFirst then rejects with
                     // `no-response`, which surfaces as an uncaught promise per
@@ -369,7 +362,7 @@ export default defineConfig(({ mode }) => {
                     // function with toString(), so a closure variable would not
                     // survive into the generated service worker.
                     handlerDidError: async () =>
-                      new Response(
+                      new globalThis.Response(
                         '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">' +
                           '<rect width="256" height="256" fill="#f5f5f5"/>' +
                           '<path d="M0 128h256M128 0v256" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4 6"/>' +
@@ -397,7 +390,7 @@ export default defineConfig(({ mode }) => {
                 plugins: [
                   {
                     cacheKeyWillBeUsed: async ({ request }) => {
-                      const url = new URL(request.url);
+                      const url = new globalThis.URL(request.url);
                       url.hostname = url.hostname.replace(
                         /^[a-z]\.tile\.opentopomap\.org$/,
                         'tile.opentopomap.org'
@@ -408,7 +401,7 @@ export default defineConfig(({ mode }) => {
                     // for tiles missing offline, with the same placeholder
                     // (see comment above).
                     handlerDidError: async () =>
-                      new Response(
+                      new globalThis.Response(
                         '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">' +
                           '<rect width="256" height="256" fill="#f5f5f5"/>' +
                           '<path d="M0 128h256M128 0v256" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4 6"/>' +
@@ -551,7 +544,7 @@ export default defineConfig(({ mode }) => {
                           // ne_lat/ne_lng + massifId). Dropping it from the CACHE
                           // KEY — rather than from the request — keeps one entry
                           // per tile instead of one per tile×zoom pair, without
-                          // touching the map code. Same idiom as the OSM
+                          // touching the map code. Same idiom as the OpenTopoMap
                           // subdomain normalization above.
                           //
                           // The coupling with mapTileCache is one-directional:
@@ -559,7 +552,7 @@ export default defineConfig(({ mode }) => {
                           // nothing and the key is already the canonical one —
                           // the hook degrades to a no-op instead of breaking.
                           cacheKeyWillBeUsed: async ({ request }) => {
-                            const url = new URL(request.url);
+                            const url = new globalThis.URL(request.url);
                             url.searchParams.delete('zoom');
                             return url.toString();
                           }
@@ -626,11 +619,14 @@ export default defineConfig(({ mode }) => {
                             )
                               return response;
                             if (response.status !== 206) return null;
-                            return new Response(await response.clone().blob(), {
-                              status: 200,
-                              statusText: 'OK',
-                              headers: response.headers
-                            });
+                            return new globalThis.Response(
+                              await response.clone().blob(),
+                              {
+                                status: 200,
+                                statusText: 'OK',
+                                headers: response.headers
+                              }
+                            );
                           }
                         }
                       ]
@@ -720,13 +716,14 @@ export default defineConfig(({ mode }) => {
         },
         // No SW in dev — avoids confusing cache behaviour while developing.
         devOptions: { enabled: false }
-      })
+      }),
+      serviceWorkerBuildGuard()
     ],
     resolve: {
       alias: [
         {
           find: '@',
-          replacement: fileURLToPath(new URL('./src', import.meta.url))
+          replacement: fileURLToPath(new NodeURL('./src', import.meta.url))
         },
         // leaflet-draw is a side-effect-only CJS plugin with no default export;
         // the shim runs the side effect and provides a default for consumers
@@ -735,7 +732,7 @@ export default defineConfig(({ mode }) => {
         {
           find: /^leaflet-draw$/,
           replacement: fileURLToPath(
-            new URL('./src/shims/leaflet-draw.js', import.meta.url)
+            new NodeURL('./src/shims/leaflet-draw.js', import.meta.url)
           )
         }
       ]
