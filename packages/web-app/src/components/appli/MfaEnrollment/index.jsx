@@ -10,14 +10,14 @@ import {
   FormControl,
   IconButton,
   InputLabel,
-  Step,
-  StepLabel,
-  Stepper,
   Tooltip,
   Typography
 } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+
+import WizardProgress from '@/components/common/Form/WizardProgress';
+
 import Alert from '../../common/Alert';
 import { useMfaEnroll, useMfaVerify, useNotification } from '../../../hooks';
 import { normalizeOtp } from '../../../utils/otpHelpers';
@@ -286,9 +286,18 @@ const MfaEnrollment = ({ onBack }) => {
   const verifyError = verifyMutation.error;
 
   const steps = [
-    formatMessage({ id: 'mfaEnrollmentStep1Title' }),
-    formatMessage({ id: 'mfaEnrollmentStep2Title' }),
-    formatMessage({ id: 'mfaEnrollmentStep3Title' })
+    {
+      id: 'install',
+      label: formatMessage({ id: 'mfaEnrollmentStep1Title' })
+    },
+    {
+      id: 'scan',
+      label: formatMessage({ id: 'mfaEnrollmentStep2Title' })
+    },
+    {
+      id: 'verify',
+      label: formatMessage({ id: 'mfaEnrollmentStep3Title' })
+    }
   ];
 
   const stepContent = [
@@ -318,13 +327,7 @@ const MfaEnrollment = ({ onBack }) => {
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>
-      <Stepper activeStep={activeStep} alternativeLabel>
-        {steps.map(label => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
+      <WizardProgress activeStep={activeStep} steps={steps} />
       {stepContent[activeStep]}
     </Box>
   );
