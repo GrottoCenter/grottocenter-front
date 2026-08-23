@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import DeclineIcon from '@mui/icons-material/NotInterested';
 import EditIcon from '@mui/icons-material/Edit';
-import { useProcessDocuments } from '../../hooks';
+import { useNotification, useProcessDocuments } from '../../hooks';
 import ActionButton from '../../components/common/ActionButton';
 import StandardDialog from '../../components/common/StandardDialog';
 import StringInput from '../../components/common/Form/StringInput';
@@ -20,13 +20,28 @@ const ActionTypes = {
     confirmationText: 'Confirmation of document refusal',
     helperText:
       'Indicate to the contributor(s) why you decline the document(s) he / she / they submitted.',
-    name: 'Decline'
+    name: 'Decline',
+    successKey: 'documentsDeclinedSuccess'
   },
   validate: {
     confirmationText: 'Confirmation of document approval',
     helperText:
       'Indicate to the contributor(s) why you validate the document(s) he / she / they submitted.',
-    name: 'Validate'
+    name: 'Validate',
+    successKey: 'documentsValidatedSuccess'
+  }
+};
+
+// The endpoint does not return an error `code`, so we map on `status`. Falls
+// back to the generic key rather than leaking the back's English `message`.
+const getProcessErrorMessage = (error, formatMessage) => {
+  switch (error?.status) {
+    case 400:
+      return formatMessage({ id: 'processDocumentsBadRequest' });
+    case 403:
+      return formatMessage({ id: 'processDocumentsForbidden' });
+    default:
+      return formatMessage({ id: 'processDocumentsGenericError' });
   }
 };
 
@@ -42,7 +57,13 @@ const Wrapper = styled('div')`
 const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
   const { formatMessage } = useIntl();
   const processMutation = useProcessDocuments();
-  const { isPending: isLoading, isSuccess: success, reset } = processMutation;
+  const { onSuccess, onError } = useNotification();
+  const {
+    error,
+    isPending: isLoading,
+    isSuccess: success,
+    reset
+  } = processMutation;
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false);
   const [actionType, setActionType] = useState(null);
@@ -59,13 +80,32 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
   // did, an unmemoized `onProcessed` from the parent would re-fire this effect
   // and re-invoke setSelectedIds([]) → infinite update loop.
   useEffect(() => {
-    if (success) {
-      setIsConfirmationDialogOpen(false);
-      setComment('');
-      if (onProcessed) onProcessed();
-      reset();
-    }
-  }, [success, onProcessed, reset]);
+    if (!success || !actionType) return;
+    setIsConfirmationDialogOpen(false);
+    onSuccess(
+      formatMessage(
+        { id: actionType.successKey },
+        { count: selectedIds.length }
+      )
+    );
+    setComment('');
+    if (onProcessed) onProcessed();
+    reset();
+  }, [
+    actionType,
+    formatMessage,
+    onProcessed,
+    onSuccess,
+    reset,
+    selectedIds.length,
+    success
+  ]);
+
+  useEffect(() => {
+    if (!error) return;
+    setIsConfirmationDialogOpen(false);
+    onError(getProcessErrorMessage(error, formatMessage));
+  }, [error, formatMessage, onError]);
 
   return (
     <>
