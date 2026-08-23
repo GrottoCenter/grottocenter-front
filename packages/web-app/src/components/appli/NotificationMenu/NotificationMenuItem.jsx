@@ -50,7 +50,7 @@ const buildRowContent = (formatted, formatMessage) => {
   };
 };
 
-const NotificationsMenuItem = ({ notification, onClick }) => {
+const NotificationsMenuItem = ({ notification, onClick, divider = false }) => {
   const { formatDate, formatMessage, formatTime } = useIntl();
   const formatted = formatNotification(notification);
   const { dateInscription, isRead, link, notifier } = formatted;
@@ -66,6 +66,7 @@ const NotificationsMenuItem = ({ notification, onClick }) => {
       $isRead={isRead}
       component={AppLink}
       to={link}
+      divider={divider}
       onClick={handleOnClick}>
       {icon && (
         <ListItemIcon style={{ minWidth: `calc(${ICON_WIDTH} + 4px)` }}>
@@ -108,7 +109,8 @@ NotificationsMenuItem.propTypes = {
   notification: PropTypes.shape({
     id: PropTypes.number.isRequired
   }).isRequired,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  divider: PropTypes.bool
 };
 
 export default NotificationsMenuItem;

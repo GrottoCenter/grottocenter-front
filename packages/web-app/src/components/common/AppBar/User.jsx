@@ -14,11 +14,11 @@ import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import BuildIcon from '@mui/icons-material/Build';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import { useState, useCallback, forwardRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
 
+import AppLink from '@/components/common/AppLink';
 import UserAvatar from '@/components/common/UserAvatar';
 import {
   useDuplicatesCount,
@@ -49,7 +49,6 @@ const UserMenu = ({
 }) => {
   const { formatDate, formatMessage, formatTime } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
-  const navigate = useNavigate();
   const userProperties = useUserProperties();
   const permissions = usePermissions();
   // Only moderators consume these counters (see showPendingDot below), so
@@ -88,21 +87,6 @@ const UserMenu = ({
     handleClose();
     onLogoutClick();
   }, [handleClose, onLogoutClick]);
-
-  const handleMyAccountClick = useCallback(() => {
-    handleClose();
-    navigate('/ui/account');
-  }, [handleClose, navigate]);
-
-  const handleMyContributionsClick = useCallback(() => {
-    handleClose();
-    navigate('/ui/contributions');
-  }, [handleClose, navigate]);
-
-  const handleDashboardClick = useCallback(() => {
-    handleClose();
-    navigate('/ui/dashboard');
-  }, [handleClose, navigate]);
 
   return !isAuth ? (
     <Button color="inherit" onClick={onLoginClick} variant="outlined">
@@ -194,14 +178,20 @@ const UserMenu = ({
         </NonMenuItem>
 
         {/* Primary actions */}
-        <MenuItem disabled={!userId} onClick={handleMyAccountClick}>
+        <MenuItem
+          component={AppLink}
+          to="/ui/account"
+          disabled={!userId}
+          onClick={handleClose}>
           <ListItemIcon>
             <AccountBoxIcon />
           </ListItemIcon>
           <Translate>My Account</Translate>
         </MenuItem>
         <MenuItem
-          onClick={handleMyContributionsClick}
+          component={AppLink}
+          to="/ui/contributions"
+          onClick={handleClose}
           divider={!isSessionExpired}>
           <ListItemIcon>
             <ListAltIcon />
@@ -209,7 +199,11 @@ const UserMenu = ({
           <Translate>My contributions</Translate>
         </MenuItem>
         {hasDashboardAccess && (
-          <MenuItem onClick={handleDashboardClick} divider={!isSessionExpired}>
+          <MenuItem
+            component={AppLink}
+            to="/ui/dashboard"
+            onClick={handleClose}
+            divider={!isSessionExpired}>
             <ListItemIcon>
               <BuildIcon />
             </ListItemIcon>

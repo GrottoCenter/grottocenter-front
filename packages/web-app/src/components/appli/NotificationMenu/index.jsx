@@ -4,7 +4,6 @@ import DoneAllIcon from '@mui/icons-material/DoneAll';
 import {
   Box,
   Chip,
-  Divider,
   IconButton,
   Menu,
   MenuItem,
@@ -53,6 +52,8 @@ const NotificationMenu = () => {
     enabled: isAuth
   });
   const notifications = menuData?.notifications;
+  const displayedNotifications =
+    notifications?.slice(0, NUMBER_OF_NOTIFICATIONS) ?? [];
   const { data: nbNotifications = 0 } = useUnreadNotificationsCount({
     enabled: isAuth
   });
@@ -131,7 +132,9 @@ const NotificationMenu = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            flexShrink: 0
+            flexShrink: 0,
+            borderBottom: 1,
+            borderColor: 'divider'
           }}>
           <Typography variant="body2" color="text.primary">
             {formatMessage({ id: 'Notifications' })}
@@ -159,26 +162,19 @@ const NotificationMenu = () => {
           </Box>
         </Box>
 
-        <Divider sx={{ flexShrink: 0 }} />
-
         {/* Scrollable notifications list */}
         <Box sx={{ overflowY: 'auto', maxHeight: 400 }}>
           {isPending &&
             !notifications &&
             createSkeletons(Math.min(nbNotifications, 100) || 3)}
-          {notifications &&
-            notifications.length > 0 &&
-            notifications
-              .slice(0, NUMBER_OF_NOTIFICATIONS)
-              .map((notification, idx) => (
-                <div key={notification.id}>
-                  <NotificationsMenuItem
-                    notification={notification}
-                    onClick={handleNotificationClick}
-                  />
-                  {idx !== notifications.length - 1 && <Divider />}
-                </div>
-              ))}
+          {displayedNotifications.map((notification, idx) => (
+            <NotificationsMenuItem
+              key={notification.id}
+              notification={notification}
+              onClick={handleNotificationClick}
+              divider={idx < displayedNotifications.length - 1}
+            />
+          ))}
 
           {/* Empty state */}
           {notifications && notifications.length === 0 && (
@@ -201,8 +197,9 @@ const NotificationMenu = () => {
         </Box>
 
         {/* Sticky footer */}
-        <Divider sx={{ flexShrink: 0 }} />
-        <SeeAllMenuItem onClick={handleSeeAllClick}>
+        <SeeAllMenuItem
+          onClick={handleSeeAllClick}
+          sx={{ borderTop: 1, borderColor: 'divider', flexShrink: 0 }}>
           {formatMessage({ id: 'See all notifications' })}
         </SeeAllMenuItem>
       </Menu>
