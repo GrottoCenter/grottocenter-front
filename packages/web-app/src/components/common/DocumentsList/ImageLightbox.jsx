@@ -1,14 +1,22 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useId, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Box, ButtonBase, Dialog, IconButton, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import {
-  NavigateBefore,
-  NavigateNext,
-  Close,
-  Download,
-  FitScreen
-} from '@mui/icons-material';
+  Box,
+  ButtonBase,
+  Chip,
+  Dialog,
+  IconButton,
+  Tooltip,
+  Typography
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import Close from '@mui/icons-material/Close';
+import Download from '@mui/icons-material/Download';
+import FitScreen from '@mui/icons-material/FitScreen';
+import Info from '@mui/icons-material/Info';
+import InfoOutlined from '@mui/icons-material/InfoOutlined';
+import NavigateBefore from '@mui/icons-material/NavigateBefore';
+import NavigateNext from '@mui/icons-material/NavigateNext';
 import { useIntl } from 'react-intl';
 import {
   decodeFileName,
@@ -40,6 +48,8 @@ const OverlayButton = styled(IconButton)`
   color: white;
   background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
+  width: ${({ theme }) => theme.spacing(6)};
+  height: ${({ theme }) => theme.spacing(6)};
 
   &:hover,
   &:focus-visible {
@@ -138,6 +148,19 @@ const BottomBar = styled(Box)`
   }
 `;
 
+const ImageCounter = styled(Chip)(({ theme }) => ({
+  position: 'absolute',
+  bottom: theme.spacing(1.5),
+  left: '50%',
+  transform: 'translateX(-50%)',
+  zIndex: 2,
+  color: 'rgba(255,255,255,0.85)',
+  backgroundColor: 'rgba(0, 0, 0, 0.55)',
+  backdropFilter: 'blur(4px)',
+  pointerEvents: 'none',
+  textShadow: '0 1px 3px rgba(0, 0, 0, 0.9)'
+}));
+
 const LightboxImage = styled('img')`
   width: 100%;
   height: 100%;
@@ -159,6 +182,8 @@ const ImageLightbox = ({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchPanning, setIsTouchPanning] = useState(false);
+  const [isCaptionVisible, setIsCaptionVisible] = useState(true);
+  const captionId = useId();
 
   // Only a zoomed-in image can be panned, so only it gets a grab cursor.
   let panCursor = 'default';
@@ -173,6 +198,10 @@ const ImageLightbox = ({
   useEffect(() => {
     if (open) setCurrentIndex(initialIndex);
   }, [open, initialIndex]);
+
+  useEffect(() => {
+    if (open) setIsCaptionVisible(true);
+  }, [open]);
 
   useEffect(() => {
     setZoom(MIN_ZOOM);
@@ -326,6 +355,16 @@ const ImageLightbox = ({
 
   if (!currentImage) return null;
 
+  const captionToggleLabel = formatMessage({
+    id: isCaptionVisible ? 'Hide image caption' : 'Show image caption'
+  });
+  const imageCounterLabel = hasMultipleImages
+    ? formatMessage(
+        { id: 'Image {current} of {total}' },
+        { current: currentIndex + 1, total: images.length }
+      )
+    : null;
+
   return (
     <LightboxDialog
       open={open}
@@ -382,6 +421,15 @@ const ImageLightbox = ({
         )}
 
         <TopBar>
+          <Tooltip title={captionToggleLabel}>
+            <OverlayButton
+              onClick={() => setIsCaptionVisible(visible => !visible)}
+              aria-label={captionToggleLabel}
+              aria-expanded={isCaptionVisible}
+              aria-controls={captionId}>
+              {isCaptionVisible ? <Info /> : <InfoOutlined />}
+            </OverlayButton>
+          </Tooltip>
           <OverlayButton
             onClick={() =>
               downloadFile(
@@ -418,7 +466,19 @@ const ImageLightbox = ({
           </>
         )}
 
-        <BottomBar>
+        <BottomBar
+          id={captionId}
+          aria-hidden={!isCaptionVisible}
+          sx={{
+            opacity: isCaptionVisible ? 1 : 0,
+            transition: theme =>
+              theme.transitions.create('opacity', {
+                duration: theme.transitions.duration.shorter
+              }),
+            '@media (prefers-reduced-motion: reduce)': {
+              transition: 'none'
+            }
+          }}>
           <Typography
             variant="caption"
             sx={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
@@ -437,13 +497,13 @@ const ImageLightbox = ({
             <Typography
               variant="caption"
               sx={{ color: 'rgba(255,255,255,0.75)' }}>
-              {formatMessage(
-                { id: 'Image {current} of {total}' },
-                { current: currentIndex + 1, total: images.length }
-              )}
+              {imageCounterLabel}
             </Typography>
           )}
         </BottomBar>
+        {!isCaptionVisible && hasMultipleImages && (
+          <ImageCounter size="small" label={imageCounterLabel} />
+        )}
       </Box>
     </LightboxDialog>
   );
