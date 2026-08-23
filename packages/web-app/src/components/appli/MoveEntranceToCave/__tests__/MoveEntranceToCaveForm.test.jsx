@@ -91,6 +91,8 @@ const soloEntranceWarning =
   'This entrance is the only one in its cave. Attaching it to another entrance or network will permanently delete its depth, development, temperature and diving possibility. All data specific to the entrance will be preserved.';
 
 const messages = {
+  'Attach the entrance': 'Attach the entrance',
+  'Entrance or network to attach to': 'Entrance or network to attach to',
   'Entrance successfully moved.': 'Entrance successfully moved.',
   'Link to an existing entrance or network': 'Link to an entrance or network',
   [soloEntranceWarning]: soloEntranceWarning,

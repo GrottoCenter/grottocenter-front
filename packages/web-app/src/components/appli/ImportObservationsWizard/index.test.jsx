@@ -44,7 +44,8 @@ const messages = {
   'ImportObservationsWizard.step.submit': 'Submit',
   'ImportObservationsWizard.back': 'Back',
   'ImportObservationsWizard.startOver': 'Start over',
-  'ImportObservationsWizard.next': 'Next'
+  'ImportObservationsWizard.next': 'Next',
+  'Step {current} of {total}': 'Step {current} of {total}'
 };
 
 const defaultWizardState = {
