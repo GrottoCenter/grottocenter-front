@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { styled } from '@mui/material/styles';
+import { Box } from '@mui/material';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import DeclineIcon from '@mui/icons-material/NotInterested';
 import EditIcon from '@mui/icons-material/Edit';
@@ -44,15 +44,6 @@ const getProcessErrorMessage = (error, formatMessage) => {
       return formatMessage({ id: 'processDocumentsGenericError' });
   }
 };
-
-const Wrapper = styled('div')`
-  display: flex;
-  flex-direction: row;
-  margin-top: ${({ theme }) => theme.spacing(2)};
-  & > button {
-    margin-right: ${({ theme }) => theme.spacing(1)};
-  }
-`;
 
 const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
   const { formatMessage } = useIntl();
@@ -109,13 +100,14 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
 
   return (
     <>
-      <Wrapper>
+      <Box display="flex" gap={0.5}>
         <ActionButton
           label={formatMessage({ id: ActionTypes.validate.name })}
           color="success"
           disabled={hasNoSelectedIds || isLoading}
           onClick={handleActionConfirmation(ActionTypes.validate)}
           icon={<VerifiedIcon />}
+          shouldHideLabelOnMobile
         />
         <ActionButton
           label={formatMessage({ id: ActionTypes.edit.name })}
@@ -126,6 +118,7 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
             if (selectedIds[0]) onEdit(selectedIds[0]);
           }}
           icon={<EditIcon />}
+          shouldHideLabelOnMobile
         />
         <ActionButton
           label={formatMessage({ id: ActionTypes.decline.name })}
@@ -133,8 +126,9 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
           disabled={hasNoSelectedIds || isLoading}
           onClick={handleActionConfirmation(ActionTypes.decline)}
           icon={<DeclineIcon />}
+          shouldHideLabelOnMobile
         />
-      </Wrapper>
+      </Box>
       <StandardDialog
         maxWidth="xs"
         fullWidth
