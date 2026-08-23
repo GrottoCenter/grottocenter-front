@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
+import PublishIcon from '@mui/icons-material/Publish';
 import AppLink from '../../common/AppLink';
 import formatNotification from '../../../utils/formatNotification';
 
@@ -21,18 +22,39 @@ const StyledMenuItem = styled(MenuItem, {
   borderRadius: 0
 }));
 
+// Pick the icon + title + action-text triplet for the row from the notification
+// type. Entity events go through the standard "iconPath + entityName +
+// (entityType) verb" path; IMPORT_COMPLETE bypasses that entity-shaped triplet
+// because it has no entity — the util leaves entityName/entityType/iconPath
+// empty on purpose, so trying to render them generically would look broken.
+const buildRowContent = (formatted, formatMessage) => {
+  if (formatted.notificationType === 'IMPORT_COMPLETE') {
+    return {
+      icon: <PublishIcon />,
+      title: formatMessage({ id: 'CSV Import' }),
+      actionText: `${formatMessage({ id: formatted.verb, defaultMessage: formatted.verb })}.`
+    };
+  }
+
+  const { entityName, entityType, iconPath, verb } = formatted;
+  const typePart = entityType
+    ? `(${formatMessage({ id: entityType, defaultMessage: entityType })}) `
+    : '';
+  const verbPart = verb
+    ? formatMessage({ id: verb, defaultMessage: verb })
+    : '';
+  return {
+    icon: iconPath ? <Icon src={iconPath} /> : null,
+    title: entityName,
+    actionText: `${typePart}${verbPart}.`
+  };
+};
+
 const NotificationsMenuItem = ({ notification, onClick }) => {
   const { formatDate, formatMessage, formatTime } = useIntl();
-  const {
-    dateInscription,
-    entityName,
-    entityType,
-    iconPath,
-    isRead,
-    link,
-    notifier,
-    verb
-  } = formatNotification(notification);
+  const formatted = formatNotification(notification);
+  const { dateInscription, isRead, link, notifier } = formatted;
+  const { icon, title, actionText } = buildRowContent(formatted, formatMessage);
 
   const handleOnClick = () => {
     onClick(notification);
@@ -45,34 +67,16 @@ const NotificationsMenuItem = ({ notification, onClick }) => {
       component={AppLink}
       to={link}
       onClick={handleOnClick}>
-      {iconPath && (
+      {icon && (
         <ListItemIcon style={{ minWidth: `calc(${ICON_WIDTH} + 4px)` }}>
-          <Icon src={iconPath} />
+          {icon}
         </ListItemIcon>
       )}
       <Box>
         <Typography>
-          <b>{entityName}</b>
+          <b>{title}</b>
           &nbsp;
-          <span style={{ fontSize: '85%' }}>
-            {formatMessage(
-              {
-                id: 'entity.action',
-                defaultMessage: '{entity} {verb}'
-              },
-              {
-                // Guard: entityType is always truthy from formatNotification today,
-                // but we keep the check as defense against future regressions.
-                entity: entityType
-                  ? `(${formatMessage({ id: entityType, defaultMessage: entityType })})`
-                  : '',
-                verb: verb
-                  ? formatMessage({ id: verb, defaultMessage: verb })
-                  : ''
-              }
-            )}
-            .
-          </span>
+          <span style={{ fontSize: '85%' }}>{actionText}</span>
         </Typography>
         <Typography
           onMouseDown={e => e.stopPropagation()}

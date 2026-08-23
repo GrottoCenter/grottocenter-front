@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
+import PublishIcon from '@mui/icons-material/Publish';
 import { useIntl } from 'react-intl';
 import AppLink from '../AppLink';
 import Translate from '../Translate';
@@ -47,14 +48,32 @@ const cellsRender = {
     ) : (
       <UnreadNotificationIcon color="secondary" fontSize="small" />
     ),
+  // Non-entity notifications (IMPORT_COMPLETE) don't carry an entity-shaped
+  // "Type" (there is no cave/document/…), so the util leaves entityType/
+  // iconPath empty. The presenter picks its own MUI icon + type label to keep
+  // the column visually consistent with entity rows on either side.
   notificationEntityType: (value, doc) => (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <img src={doc.iconPath} alt="icon" style={{ width: '24px' }} />
+      {doc.notificationType === 'IMPORT_COMPLETE' ? (
+        <PublishIcon fontSize="small" />
+      ) : (
+        <img src={doc.iconPath} alt="icon" style={{ width: '24px' }} />
+      )}
       <span>
-        <Translate>{value}</Translate>
+        <Translate>
+          {doc.notificationType === 'IMPORT_COMPLETE' ? 'import' : value}
+        </Translate>
       </span>
     </Box>
   ),
+  // Non-entity notifications carry no entity name — surface a translated
+  // label so the "Name" column still reads at a glance.
+  notificationEntityName: (value, doc) =>
+    doc.notificationType === 'IMPORT_COMPLETE' ? (
+      <Translate>CSV Import</Translate>
+    ) : (
+      value
+    ),
   person: value => {
     if (!value) return false;
     if (value.id && value.nickname) {
@@ -95,7 +114,8 @@ const notifications = {
       field: 'entityName',
       label: 'Name',
       sortable: false,
-      isTitle: true
+      isTitle: true,
+      render: cellsRender.notificationEntityName
     },
     {
       visible: true,
