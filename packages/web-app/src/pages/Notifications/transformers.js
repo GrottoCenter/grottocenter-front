@@ -10,6 +10,7 @@ const makeNotifications = notifications => {
       iconPath,
       isRead,
       link,
+      notificationType,
       notifier,
       verb
     } = formatNotification(n);
@@ -21,6 +22,7 @@ const makeNotifications = notifications => {
       entityType,
       action: verb,
       iconPath,
+      notificationType,
       notifier,
       isRead,
       link

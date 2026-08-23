@@ -100,10 +100,9 @@ const formatNotification = notification => {
   const isRead = !!dateReadAt;
 
   // IMPORT_COMPLETE carries no entity (only a jobBatch FK) — it isn't a CRUD
-  // event on a cave/document/entrance/etc., so it can't go through the
-  // entity-detection loop below. Reuse the "unknown entity" link contract
-  // (link: '#') but keep entityName/entityType empty instead of 'unknown' for
-  // a cleaner render (see NotificationMenuItem's entityType guard).
+  // event on a cave/document/entrance/etc., so the shared entity fields stay
+  // empty. Consumers branch on `notificationType` to render the import-specific
+  // layout (icon + translated label + verb).
   if (notificationType.name === 'IMPORT_COMPLETE') {
     return {
       dateInscription,
@@ -112,8 +111,9 @@ const formatNotification = notification => {
       iconPath: undefined,
       isRead,
       link: '#',
+      notificationType: 'IMPORT_COMPLETE',
       notifier,
-      verb: 'import_complete'
+      verb: 'completed'
     };
   }
 
@@ -180,6 +180,7 @@ const formatNotification = notification => {
       iconPath: undefined,
       isRead,
       link: '#',
+      notificationType: notificationType.name,
       notifier,
       verb
     };
@@ -204,6 +205,7 @@ const formatNotification = notification => {
     iconPath,
     isRead,
     link,
+    notificationType: notificationType.name,
     notifier,
     verb
   };
