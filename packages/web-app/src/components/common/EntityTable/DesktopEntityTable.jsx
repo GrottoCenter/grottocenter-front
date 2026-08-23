@@ -60,7 +60,9 @@ const INLINE_PAGINATION_SX = {
   [`& .${tablePaginationClasses.toolbar}`]: { minHeight: 0, pl: 0 },
   [`& .${tablePaginationClasses.spacer}`]: { display: 'none' },
   [`& .${tablePaginationClasses.displayedRows}`]: { display: 'none' },
-  [`& .${tablePaginationClasses.actions}`]: { ml: 0 }
+  [`& .${tablePaginationClasses.toolbar} .${tablePaginationClasses.actions}`]: {
+    ml: 0
+  }
 };
 
 // MUI ships this as `visuallyHidden`, but only from @mui/utils, which is a
@@ -511,16 +513,11 @@ const DesktopEntityTable = ({
             sx={{
               display: 'flex',
               alignItems: 'center',
-              // Wider than the 8px used inside each group, so the three
-              // clusters (count, pagination, actions) read as separate.
-              gap: 2,
               minHeight: 48,
-              // Last resort if a locale still overflows at its narrowest
-              // labels: wrapping keeps every control reachable, where clipping
-              // would silently swallow the rightmost button. The sticky table
-              // header follows along, since useMeasuredHeight tracks the height.
-              flexWrap: 'wrap',
-              rowGap: 0.5
+              // Override the theme's app-bar-specific fixed Toolbar height.
+              height: 'auto',
+              flexWrap: 'nowrap',
+              gap: { xs: 1, sm: 2 }
             }}>
             {nbTotalRows != null && (
               // Stays mounted while loading. Unmounting it slid the whole
@@ -532,6 +529,7 @@ const DesktopEntityTable = ({
                 aria-live="polite"
                 sx={{
                   minWidth: 0,
+                  flex: '1 1 0',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
