@@ -22,6 +22,7 @@ import LicenseTag from '@/components/common/LicenseTag';
 import AppLink from '@/components/common/AppLink';
 import InternationalizedLink from '@/components/common/InternationalizedLink';
 import { licenceLinks } from '@/conf/externalLinks';
+import { MAX_SIZE_OF_UPLOADED_FILES } from '@/conf/config';
 import {
   useUserProperties,
   useFileFormats,
@@ -38,7 +39,9 @@ import {
   DOCUMENT_AUTHORIZE_TO_PUBLISH,
   validateAndBuildFileEntries
 } from './FileHelpers';
-import FileSelectorInput from '../../../../../common/FileSelectorInput';
+import FileSelectorInput, {
+  REJECTION_REASONS
+} from '../../../../../common/FileSelectorInput';
 import { DocumentFormContext } from '../../Provider';
 
 const DEFAULT_LICENSE = 'CC-BY-SA';
@@ -184,6 +187,41 @@ const AddFileForm = ({
     setFiles([...files, ...entries]);
   };
 
+  const handleRejections = rejections => {
+    const messages = rejections.map(({ fileName, reasons }) => {
+      if (reasons.includes(REJECTION_REASONS.TOO_LARGE)) {
+        return formatMessage(
+          {
+            id: 'error on file size',
+            defaultMessage:
+              'The following file is too big: {file}. Max accepted size: {maxSize}'
+          },
+          {
+            file: fileName,
+            maxSize: `${MAX_SIZE_OF_UPLOADED_FILES / 1000000} Mo`
+          }
+        );
+      }
+      if (reasons.includes(REJECTION_REASONS.TYPE_NOT_ACCEPTED)) {
+        return formatMessage(
+          {
+            id: 'error on file type',
+            defaultMessage: 'The file type is not accepted: {file}.'
+          },
+          { file: fileName }
+        );
+      }
+      return formatMessage(
+        {
+          id: 'error on file name',
+          defaultMessage: 'The following file name is invalid : {file}.'
+        },
+        { file: fileName }
+      );
+    });
+    setErrors(messages);
+  };
+
   const removeFile = fileName => {
     const index = files.findIndex(f => f.fileName === fileName);
     if (index === -1) return;
@@ -204,8 +242,10 @@ const AddFileForm = ({
         files={visibleFiles}
         onFilesAdd={updateFiles}
         onFileRemove={removeFile}
+        onFileRejections={handleRejections}
         accept={accept}
         extensions={extensions}
+        maxSize={MAX_SIZE_OF_UPLOADED_FILES}
         disabled={isLoading}
       />
       {showAuthorization && visibleFiles.length > 0 && (

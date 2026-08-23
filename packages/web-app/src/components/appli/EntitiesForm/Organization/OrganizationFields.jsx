@@ -11,7 +11,6 @@ import InputCountry from '../utils/InputCountry';
 import InputLanguage from '../utils/InputLanguage';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormRow, FormSectionLabel } from '../utils/FormContainers';
-// import OrganizationLogo from './OrganizationLogo';
 
 const OrganizationFields = ({ control, errors, isNewOrganization }) => {
   const { formatMessage } = useIntl();
@@ -151,8 +150,6 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
         latitudeError={errors?.organization?.latitude?.message}
         longitudeError={errors?.organization?.longitude?.message}
       />
-
-      {/* <OrganizationLogo control={control} errors={errors} /> To uncomment when api will be ready to store logo */}
     </>
   );
 };
