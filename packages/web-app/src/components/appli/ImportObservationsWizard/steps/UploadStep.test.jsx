@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
 import UploadStep from './UploadStep';
@@ -44,7 +44,6 @@ vi.mock('../utils/profileManager', () => ({
 const messages = {
   'ImportObservationsWizard.UploadStep.fileLabel':
     'Upload CSV / TSV / TXT file',
-  'ImportObservationsWizard.UploadStep.chooseFile': 'Choose file',
   'ImportObservationsWizard.UploadStep.dataRowCount':
     '{count, plural, one {# data row} other {# data rows}}',
   'ImportObservationsWizard.UploadStep.encodingLabel': 'Character encoding',
@@ -66,8 +65,26 @@ const messages = {
   'ImportObservationsWizard.UploadStep.profileImportError':
     'Failed to import profile: {error}',
   'ImportObservationsWizard.UploadStep.profileImportSuccess':
-    'Profile imported successfully'
+    'Profile imported successfully',
+  'Drop a file here or click to select': 'Drop a file here or click to select',
+  'Drag and drop a file here': 'Drag and drop a file here',
+  'Upload a file': 'Upload a file',
+  'Choose a file': 'Choose a file',
+  'This file was rejected.': 'This file was rejected.',
+  or: 'or'
 };
+
+const createDataTransfer = files => ({
+  dataTransfer: {
+    files,
+    items: files.map(file => ({
+      kind: 'file',
+      type: file.type,
+      getAsFile: () => file
+    })),
+    types: ['Files']
+  }
+});
 
 const defaultState = {
   importWizard: {
@@ -119,8 +136,79 @@ describe('UploadStep', () => {
   // Requirements: 2.9
   it('should accept only .csv, .tsv, .txt file extensions', () => {
     renderComponent();
-    const fileInput = screen.getByTestId('file-input');
-    expect(fileInput).toHaveAttribute('accept', '.csv,.tsv,.txt');
+    const dropzone = screen.getByRole('button', {
+      name: 'Drop a file here or click to select'
+    });
+    const fileInput = dropzone.querySelector('input[type="file"]');
+    const acceptedTypes = fileInput.getAttribute('accept').split(',');
+
+    expect(acceptedTypes).toEqual(
+      expect.arrayContaining(['.csv', '.tsv', '.txt'])
+    );
+  });
+
+  it('should parse an accepted file dropped in the dropzone', async () => {
+    renderComponent();
+    const dropzone = screen.getByRole('button', {
+      name: 'Drop a file here or click to select'
+    });
+    const file = new File(['col1,col2\n1,2'], 'data.csv', {
+      type: 'text/csv'
+    });
+
+    fireEvent.drop(dropzone, createDataTransfer([file]));
+
+    await waitFor(() => {
+      expect(mockParseAndSetFile).toHaveBeenCalledWith(file, null);
+    });
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: 'SET_RAW_ROWS',
+      rawRows: []
+    });
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: 'SET_COLUMN_MAPPINGS',
+      columnMappings: []
+    });
+  });
+
+  it('should report a rejected file', async () => {
+    renderComponent();
+    const dropzone = screen.getByRole('button', {
+      name: 'Drop a file here or click to select'
+    });
+    const file = new File(['PDF'], 'document.pdf', {
+      type: 'application/pdf'
+    });
+
+    fireEvent.drop(dropzone, createDataTransfer([file]));
+
+    await waitFor(() => {
+      expect(mockOnError).toHaveBeenCalledWith('This file was rejected.');
+    });
+    expect(mockParseAndSetFile).not.toHaveBeenCalled();
+  });
+
+  it('should clear file-derived data when the selected file is removed', () => {
+    renderComponent(stateWithFile);
+
+    fireEvent.click(screen.getByTestId('CancelIcon'));
+
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: 'SET_FILE',
+      file: null
+    });
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: 'SET_RAW_ROWS',
+      rawRows: []
+    });
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: 'SET_VALIDATION_RESULT',
+      validationResult: null
+    });
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: 'SET_SAMPLING_INTERVAL',
+      samplingIntervalSeconds: null
+    });
   });
 
   // Requirements: 2.8
