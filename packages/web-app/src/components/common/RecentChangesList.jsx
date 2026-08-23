@@ -181,7 +181,7 @@ const ChangeItem = ({ changeInfo }) => {
         {iconType ? (
           <CustomIcon type={iconType} size={20} />
         ) : (
-          <QuestionMarkIcon sx={{ fontSize: 20 }} color="primary" />
+          <QuestionMarkIcon fontSize="small" color="primary" />
         )}
       </IconBubble>
       <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -257,7 +257,9 @@ const RecentChangesList = ({
   if (changes.length === 0) {
     return (
       <Box sx={{ py: 4, textAlign: 'center', color: 'text.disabled' }}>
-        <HistoryOutlinedIcon sx={{ fontSize: 48, mb: 0.5 }} />
+        <HistoryOutlinedIcon
+          sx={{ fontSize: theme => theme.spacing(6), mb: 0.5 }}
+        />
         <Typography variant="body2" color="text.secondary">
           {formatMessage({ id: 'No recent changes' })}
         </Typography>

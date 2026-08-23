@@ -27,6 +27,9 @@ export const useRandomEntrance = () =>
   });
 
 const fetchRecentChangesPage = async ({ offset, limit }) => {
+  // Request one extra row as the next-page probe, then expose only `limit`.
+  // The API caps this feed at 500 rows; a shorter response therefore closes
+  // pagination even when the cap, rather than the dataset end, caused it.
   const data = await apiGet(
     makeUrl(getRecentChanges, { offset, limit: limit + 1 })
   );

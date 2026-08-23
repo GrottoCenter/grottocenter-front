@@ -88,7 +88,7 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
     onProcessed,
     onSuccess,
     reset,
-    selectedIds.length,
+    selectedIds,
     success
   ]);
 

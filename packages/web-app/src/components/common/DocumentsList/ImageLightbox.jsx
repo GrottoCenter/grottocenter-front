@@ -99,7 +99,7 @@ const ZoomResetButton = styled(ButtonBase)`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: ${({ theme }) => theme.spacing(0.5)};
   font-size: 0.875rem;
   font-weight: 500;
   user-select: none;
@@ -116,8 +116,8 @@ const TopBar = styled(Box)`
   top: 0;
   right: 0;
   display: flex;
-  gap: 8px;
-  padding: 12px;
+  gap: ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(1.5)};
   z-index: 3;
 `;
 
@@ -129,8 +129,8 @@ const BottomBar = styled(Box)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 16px 12px;
-  gap: 2px;
+  padding: ${({ theme }) => theme.spacing(3, 2, 1.5)};
+  gap: ${({ theme }) => theme.spacing(0.25)};
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.85) 0%,

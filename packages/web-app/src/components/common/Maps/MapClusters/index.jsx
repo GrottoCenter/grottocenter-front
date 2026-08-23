@@ -20,6 +20,7 @@ import {
 import { ContentCopy, LocationOn, Tune } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
+import copyToClipboard from '@/utils/clipboard';
 import GeocodingControl from '../common/GeocodingControl';
 import MapTour from './MapTour';
 import DataControl, { layerTypes } from './DataControl';
@@ -27,7 +28,6 @@ import {
   formatCoordinatesForCopy,
   formatWGS84
 } from '../../../../helpers/coordinateConvert';
-import copyToClipboard from '../../../../helpers/clipboard';
 import {
   useNotification,
   useCoordinatePreference,

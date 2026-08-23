@@ -21,11 +21,11 @@ import {
   TravelExplore,
   Tune
 } from '@mui/icons-material';
+import copyToClipboard from '@/utils/clipboard';
 import {
   formatCoordinatesForCopy,
   formatWGS84
 } from '../../../helpers/coordinateConvert';
-import copyToClipboard from '../../../helpers/clipboard';
 import CRSMenu from '../CRSMenu';
 import AppLink from '../AppLink';
 
