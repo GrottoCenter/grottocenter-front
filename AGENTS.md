@@ -135,6 +135,14 @@ A person can have 0, 1 or more roles (`t_group` table):
 
 ## 📝 Code Conventions
 
+### Reuse before duplication
+
+Before adding a component, hook, utility, style, constant, configuration, or
+workflow, search the codebase for an existing equivalent. Reuse it or extract a
+shared abstraction when the concepts and behavior are genuinely the same.
+Duplicate code only when sharing would couple distinct concepts or make the
+result less clear; document the reason when it is not obvious.
+
 ### Component Definition
 
 ```javascript
@@ -221,12 +229,15 @@ Key custom rules:
 - `console.warn` / `console.error` OK — `console.log` is a warning
 - A leading `_` marks a binding as deliberately unused (arguments, caught errors)
 
-`yarn lint` must end with **0 errors**. Warnings are the tracked design debt
-listed with `TODO` next to each rule in `packages/eslint-config/index.mjs`
-(currently `react/jsx-filename-extension`, `react/no-unstable-nested-components`,
-`react/jsx-props-no-spreading`, plus `no-console` for stray `console.log`). Do
-not add new ones — fix them as you touch the files, and clear a TODO by turning
-its rule to `error` once all the sites are gone.
+For routine changes and commits, run ESLint only on the modified lintable files.
+Run the full `yarn lint` command only when explicitly requested or when
+preparing a pull request. When run, `yarn lint` must end with **0 errors**.
+Warnings are the tracked design debt listed with `TODO` next to each rule in
+`packages/eslint-config/index.mjs` (currently `react/jsx-filename-extension`,
+`react/no-unstable-nested-components`, `react/jsx-props-no-spreading`, plus
+`no-console` for stray `console.log`). Do not add new ones — fix them as you
+touch the files, and clear a TODO by turning its rule to `error` once all the
+sites are gone.
 
 Everything else is enforced at `error`. In particular, the airbnb defaults for
 `react/prop-types`, `no-nested-ternary` and `consistent-return` are inherited
@@ -374,7 +385,7 @@ yarn outdated                           # Check outdated dependencies
 
 Before submitting any change:
 
-- [ ] `yarn lint` passes
+- [ ] ESLint passes on the modified lintable files (`yarn lint` before a PR)
 - [ ] PropTypes defined for all new components
 - [ ] i18n keys added to all lang files and sorted (see `packages/web-app/AGENTS.md`)
 - [ ] Redux state never mutated directly
