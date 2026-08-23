@@ -63,7 +63,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
           {isFormVisible && (
             <>
               <CreateCommentForm isNewComment onSubmit={onSubmitForm} />
-              <Divider />
+              <Divider sx={{ my: 2 }} />
             </>
           )}
 
