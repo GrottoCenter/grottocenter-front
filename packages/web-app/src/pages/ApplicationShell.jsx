@@ -21,7 +21,7 @@ import { useRefetchOnReconnect, useSideMenuOffset } from '../hooks';
 import ErrorHandler from '../components/appli/ErrorHandler';
 import NetworkStatusNotifier from '../components/common/NetworkStatusNotifier';
 import SessionExpiryNotifier from '../components/common/SessionExpiryNotifier';
-import ErrorBoundary from '../components/appli/PageErrorBounary';
+import ErrorBoundary from '../components/appli/PageErrorBoundary';
 import UpdatePrompt from '../components/appli/UpdatePrompt';
 import SideMenu from '../components/common/SideMenu';
 import AppSnackbar from '../components/common/AppSnackbar';
