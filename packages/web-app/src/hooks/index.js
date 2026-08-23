@@ -203,6 +203,7 @@ export { useImportCsvSession } from './useImportCsvSession';
 export {
   useRandomEntrance,
   useRecentChanges,
+  useRecentChangesFeed,
   usePartnersCarousel,
   useLatestBlogNews
 } from './queries/useHomepageLists';

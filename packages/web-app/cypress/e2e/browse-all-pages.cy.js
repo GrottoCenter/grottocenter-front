@@ -4,6 +4,11 @@ describe('Simple pages loader to check all major pages load correctly', () => {
     cy.checkPageLoaded();
   });
 
+  it('recent changes page', () => {
+    cy.visit('/changes/recent');
+    cy.checkPageLoaded();
+  });
+
   it('entrances list page', () => {
     cy.visit('/entrances');
     cy.checkPageLoaded();

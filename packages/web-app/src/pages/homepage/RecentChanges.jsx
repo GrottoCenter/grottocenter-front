@@ -1,8 +1,13 @@
 import { Box, Typography } from '@mui/material';
-import { HistoryOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 import { useIntl } from 'react-intl';
-import RecentChangesContainer from '../../containers/RecentChangesContainer';
+
+import AppLink from '@/components/common/AppLink';
+import RecentChangesList from '@/components/common/RecentChangesList';
+import { useRecentChanges } from '@/hooks';
+
+const HOMEPAGE_CHANGES_LIMIT = 10;
 
 const Section = styled('section')(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -27,10 +32,17 @@ const Inner = styled(Box)({
 
 const RecentChanges = () => {
   const { formatMessage } = useIntl();
+  const {
+    data: changes = [],
+    error,
+    isPending,
+    refetch
+  } = useRecentChanges({ limit: HOMEPAGE_CHANGES_LIMIT });
+
   return (
     <Section aria-labelledby="recent-changes-title">
       <TitleRow>
-        <HistoryOutlined color="primary" sx={{ fontSize: 28 }} />
+        <HistoryOutlinedIcon color="primary" sx={{ fontSize: 28 }} />
         <Typography
           id="recent-changes-title"
           variant="h3"
@@ -41,7 +53,26 @@ const RecentChanges = () => {
         </Typography>
       </TitleRow>
       <Inner>
-        <RecentChangesContainer />
+        <RecentChangesList
+          changes={changes}
+          isLoading={isPending}
+          error={error}
+          onRetry={refetch}
+        />
+        <Box sx={{ textAlign: 'center', mt: 2 }}>
+          <AppLink to="/ui/changes/recent">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                textDecoration: 'underline',
+                cursor: 'pointer',
+                '&:hover': { color: 'text.primary' }
+              }}>
+              {formatMessage({ id: 'See all recent changes' })}
+            </Typography>
+          </AppLink>
+        </Box>
       </Inner>
     </Section>
   );
