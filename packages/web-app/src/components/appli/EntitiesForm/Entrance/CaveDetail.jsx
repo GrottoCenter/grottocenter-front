@@ -13,6 +13,7 @@ const CaveDetail = ({
   errors,
   isReadonly = false,
   isShared = false,
+  showEntranceFields = true,
   caveId,
   caveName
 }) => {
@@ -98,18 +99,18 @@ const CaveDetail = ({
           helperText={errors.cave?.temperature?.message}
           rules={{ valueAsNumber: true, validate: validateTemperature }}
         />
-        <NumberField
-          name="entrance.yearDiscovery"
-          control={control}
-          label="Year of discovery"
-          icon="discovery_date"
-          isError={!!errors.entrance?.yearDiscovery}
-          inputProps={{ max: new Date().getFullYear() }}
-        />
+        {showEntranceFields && (
+          <NumberField
+            name="entrance.yearDiscovery"
+            control={control}
+            label="Year of discovery"
+            icon="discovery_date"
+            isError={!!errors.entrance?.yearDiscovery}
+            inputProps={{ max: new Date().getFullYear() }}
+          />
+        )}
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
-        {/* Diving belongs to the cave (locked when shared); touristic site is
-            an entrance-level attribute (always editable). */}
         <BoolToggleChip
           name="cave.isDiving"
           label="Diving cave"
@@ -117,12 +118,14 @@ const CaveDetail = ({
           control={control}
           disabled={isReadonly}
         />
-        <BoolToggleChip
-          name="entrance.isTouristic"
-          label="Touristic site"
-          icon="touristic"
-          control={control}
-        />
+        {showEntranceFields && (
+          <BoolToggleChip
+            name="entrance.isTouristic"
+            label="Touristic site"
+            icon="touristic"
+            control={control}
+          />
+        )}
       </Box>
     </FormSection>
   );
@@ -142,6 +145,7 @@ CaveDetail.propTypes = {
   control: PropTypes.shape({}),
   isReadonly: PropTypes.bool,
   isShared: PropTypes.bool,
+  showEntranceFields: PropTypes.bool,
   caveId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   caveName: PropTypes.string
 };

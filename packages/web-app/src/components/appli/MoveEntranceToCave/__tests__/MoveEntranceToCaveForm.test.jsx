@@ -46,7 +46,9 @@ vi.mock('../../../common/AutoCompleteSearch/CaveAutoCompleteSearch', () => ({
       <button
         type="button"
         data-testid="mock-cave-search"
-        onClick={() => onSelection({ id: '42', name: 'Destination Cave' })}>
+        onClick={() =>
+          onSelection({ id: '42', name: 'Destination Cave', nbEntrances: 1 })
+        }>
         Select Cave
       </button>
     );
@@ -85,9 +87,13 @@ vi.mock('../FormActions', () => ({
   }
 }));
 
+const soloEntranceWarning =
+  'This entrance is the only one in its cave. Attaching it to another entrance or network will permanently delete its depth, development, temperature and diving possibility. All data specific to the entrance will be preserved.';
+
 const messages = {
   'Entrance successfully moved.': 'Entrance successfully moved.',
   'Link to an existing entrance or network': 'Link to an entrance or network',
+  [soloEntranceWarning]: soloEntranceWarning,
   Validate: 'Validate',
   Cancel: 'Cancel',
   'Rather detach the entrance?': 'Rather detach the entrance?'
@@ -105,12 +111,13 @@ const entrance = {
 };
 
 const renderComponent = (
-  mutationState = { isPending: false, error: null, isSuccess: false }
+  mutationState = { isPending: false, error: null, isSuccess: false },
+  entranceValue = entrance
 ) => {
   mockMutationState = mutationState;
   return render(
     <IntlProvider locale="en" messages={messages}>
-      <MoveEntranceToCaveForm entrance={entrance} />
+      <MoveEntranceToCaveForm entrance={entranceValue} />
     </IntlProvider>
   );
 };
@@ -131,6 +138,20 @@ beforeEach(() => {
 });
 
 describe('MoveEntranceToCaveForm - navigation and toast on success', () => {
+  it('warns which cave characteristics are deleted for a solo entrance', async () => {
+    const soloEntrance = {
+      ...entrance,
+      cave: { ...entrance.cave, entrances: [{ id: entrance.id }] }
+    };
+    renderComponent(undefined, soloEntrance);
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('mock-cave-search'));
+    });
+
+    expect(screen.getByText(soloEntranceWarning)).toBeInTheDocument();
+  });
+
   it('calls useMoveEntranceToCave.mutate when validating', async () => {
     renderComponent();
     await selectAndValidate();
