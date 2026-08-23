@@ -7,7 +7,7 @@ import {
   restoreLocationUrl,
   moveLocationRelevanceUrl
 } from '../../conf/apiRoutes';
-import { apiPost, apiPatch, apiDelete } from '../../api/client';
+import { apiPost, apiPut, apiPatch, apiDelete } from '../../api/client';
 import { entranceKeys } from '../../api/queryKeys';
 
 // Locations are Entrance-only. Invalidating entranceKeys.all is the cheapest
@@ -28,7 +28,7 @@ export const useCreateLocation = () =>
 
 export const useUpdateLocation = () =>
   useLocationMutation(({ id, title, body, language }) =>
-    apiPatch(putLocationUrl(id), { title, body, language })
+    apiPut(putLocationUrl(id), { title, body, language })
   );
 
 export const useDeleteLocation = () =>
