@@ -11,11 +11,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Fade,
-  Typography
+  Fade
 } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import ReplayIcon from '@mui/icons-material/Replay';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
@@ -34,6 +32,7 @@ import DocumentFormProvider, { DocumentFormContext } from './Provider';
 import { defaultDocumentValuesTypes } from './types';
 import FromContent from './FormContent';
 import DocumentSubmissionDialog from './DocumentSubmissionDialog';
+import DocumentSubmissionSuccess from './DocumentSubmissionSuccess';
 import { IS_DELETED } from './formElements/AddFileForm/FileHelpers';
 import Translate from '../../../common/Translate';
 
@@ -189,49 +188,13 @@ const DocumentSubmission = ({ onCancel, onSuccess }) => {
   return (
     <div>
       {isDocSubmittedWithSuccess && (
-        <CenteredBlock>
-          <Alert severity="success" variant="outlined">
-            {isNewDocument
-              ? `${formatMessage({
-                  id: 'Your document has been successfully submitted, thank you!'
-                })} ${formatMessage({
-                  id: 'It will be verified by one of ours moderators.'
-                })}`
-              : `${formatMessage({
-                  id: 'Document successfully updated.'
-                })}`}
-          </Alert>
-          <Spacer />
-          {isArticle(document.type) && (
-            <>
-              <SpacedButton
-                color="primary"
-                onClick={onSubmitAnotherArticle}
-                startIcon={<ReplayIcon />}
-                variant="contained">
-                <Translate>Submit another article</Translate>
-              </SpacedButton>
-              <Typography variant="body1">
-                {formatMessage({
-                  id: 'By clicking this button, you will be able to submit another article without re-typing some values (publication date, parent document etc.).'
-                })}
-              </Typography>
-              <br />
-            </>
-          )}
-          {isNewDocument && (
-            <>
-              <SpacedButton
-                onClick={onSubmitAnotherDocument}
-                variant="outlined">
-                <Translate>Submit another document</Translate>
-              </SpacedButton>
-              <SpacedButton onClick={() => navigate(-1)} variant="contained">
-                <Translate>Go back</Translate>
-              </SpacedButton>
-            </>
-          )}
-        </CenteredBlock>
+        <DocumentSubmissionSuccess
+          isArticle={isArticle(document.type)}
+          isNewDocument={isNewDocument}
+          onSubmitAnotherArticle={onSubmitAnotherArticle}
+          onSubmitAnotherDocument={onSubmitAnotherDocument}
+          onFinish={() => navigate(-1)}
+        />
       )}
       {!permissions.isAuth && (
         <CenteredBlock>
