@@ -77,6 +77,13 @@ describe('FileSelectorInput', () => {
     const clickSpy = vi.spyOn(input, 'click');
     await userEvent.click(dropzone);
     fireEvent.keyDown(dropzone, { key: 'Enter' });
+    fireEvent.drop(
+      dropzone,
+      createDataTransfer([makeFile('ignored.txt', { type: 'text/plain' })])
+    );
+    await new Promise(resolve => {
+      setTimeout(resolve, 0);
+    });
     expect(clickSpy).not.toHaveBeenCalled();
     expect(onFilesAdd).not.toHaveBeenCalled();
   });
@@ -173,6 +180,13 @@ describe('FileSelectorInput', () => {
     });
     expect(onFilesAdd).not.toHaveBeenCalled();
     expect(onFileRejections).toHaveBeenCalled();
+    const rejections = onFileRejections.mock.calls[0][0];
+    expect(rejections).toHaveLength(2);
+    expect(
+      rejections.every(({ reasons }) =>
+        reasons.includes(REJECTION_REASONS.TOO_MANY_FILES)
+      )
+    ).toBe(true);
   });
 
   test('renders one chip per file and calls onFileRemove when a chip is deleted', async () => {

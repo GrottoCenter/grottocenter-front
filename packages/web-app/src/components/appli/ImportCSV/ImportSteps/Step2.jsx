@@ -62,6 +62,7 @@ const Step2 = () => {
     parseGenerationRef.current = parseGeneration;
     setRejectionError(null);
     setRowErrors([]);
+    resetCurrentImport();
     const text = await file.text();
     if (parseGeneration !== parseGenerationRef.current) return;
     readString(text, {
@@ -112,6 +113,7 @@ const Step2 = () => {
       <FileSelectorInput
         files={files}
         multiple={false}
+        maxFiles={1}
         accept={ACCEPT}
         extensions={EXTENSIONS}
         onFilesAdd={([file]) => file && parseFile(file)}

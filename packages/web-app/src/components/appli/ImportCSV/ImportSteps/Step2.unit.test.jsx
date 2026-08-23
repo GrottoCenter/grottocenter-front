@@ -205,4 +205,24 @@ describe('Step2 (CSV import)', () => {
     expect(ctx.updateAttribute).toHaveBeenCalledWith('fileImported', false);
     expect(ctx.importSession.reset).toHaveBeenCalledOnce();
   });
+
+  test('returning to the step resets the previous import session', async () => {
+    const ctx = makeCtx();
+    const firstRender = renderStep(ctx);
+
+    await waitFor(() => {
+      expect(ctx.updateAttribute).toHaveBeenCalledWith('fileImported', false);
+    });
+
+    firstRender.unmount();
+    ctx.updateAttribute.mockClear();
+    mockDispatch.mockClear();
+    renderStep(ctx);
+
+    await waitFor(() => {
+      expect(ctx.updateAttribute).toHaveBeenCalledWith('importData', undefined);
+      expect(ctx.updateAttribute).toHaveBeenCalledWith('fileImported', false);
+    });
+    expect(mockDispatch).toHaveBeenCalledWith({ type: 'RESET_IMPORT_STATE' });
+  });
 });

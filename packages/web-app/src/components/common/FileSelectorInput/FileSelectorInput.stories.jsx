@@ -11,9 +11,13 @@ const meta = {
 };
 export default meta;
 
-const StatefulSelector = ({ initialFiles, ...props }) => {
+const StatefulSelector = ({
+  initialFiles,
+  initialRejections = [],
+  ...props
+}) => {
   const [files, setFiles] = useState(initialFiles ?? []);
-  const [rejections, setRejections] = useState([]);
+  const [rejections, setRejections] = useState(initialRejections);
 
   const onFilesAdd = filesToAdd => {
     setRejections([]);
@@ -56,7 +60,8 @@ const StatefulSelector = ({ initialFiles, ...props }) => {
 StatefulSelector.propTypes = {
   initialFiles: PropTypes.arrayOf(
     PropTypes.shape({ fileName: PropTypes.string.isRequired })
-  )
+  ),
+  initialRejections: PropTypes.arrayOf(PropTypes.string)
 };
 
 export const Empty = {
@@ -87,6 +92,7 @@ export const RejectionByType = {
     <StatefulSelector
       accept={{ 'application/pdf': ['.pdf'] }}
       extensions={['pdf']}
+      initialRejections={['malware.exe: file type not accepted']}
     />
   )
 };

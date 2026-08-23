@@ -353,6 +353,14 @@ const ShapefileImport = ({ onImport }) => {
     setTolerance(INITIAL_TOLERANCE);
   };
 
+  const handleFileRejections = () => {
+    setParseError(
+      formatMessage({
+        id: 'Please select a GeoJSON (.geojson) or Shapefile ZIP (.zip) file'
+      })
+    );
+  };
+
   const handleImport = () => {
     if (simplifiedData) {
       const data = simplifiedData;
@@ -406,11 +414,13 @@ const ShapefileImport = ({ onImport }) => {
 
             <FileSelectorInput
               multiple={false}
+              maxFiles={1}
               accept={ACCEPTED_MIME}
               extensions={ACCEPTED_EXTENSIONS}
               files={fileName ? [{ fileName }] : []}
               onFilesAdd={handleFilesAdd}
               onFileRemove={handleFileRemove}
+              onFileRejections={handleFileRejections}
               disabled={analyzing}
             />
 
