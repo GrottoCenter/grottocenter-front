@@ -1,31 +1,52 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import AppSnackbar from './AppSnackbar';
 
 describe('AppSnackbar', () => {
-  it('does not forward notistack options to the DOM element', () => {
-    const { container } = render(
+  it('keeps notistack control props off the DOM', () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    try {
+      render(
+        <AppSnackbar
+          id="offline"
+          message="You are offline."
+          variant="warning"
+          persist
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          autoHideDuration={5000}
+          hideIconVariant={false}
+          iconVariant={{}}
+        />
+      );
+
+      const content = screen.getByRole('alert').parentElement;
+      expect(content).not.toHaveAttribute('persist');
+      expect(content).not.toHaveAttribute('anchorOrigin');
+      expect(content).not.toHaveAttribute('autoHideDuration');
+      expect(content).not.toHaveAttribute('hideIconVariant');
+      expect(content).not.toHaveAttribute('iconVariant');
+      expect(consoleError).not.toHaveBeenCalled();
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
+
+  it('retains the presentation props required by notistack', () => {
+    render(
       <AppSnackbar
-        id="snackbar-1"
+        id="success"
         message="Saved"
         variant="success"
-        persist
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        autoHideDuration={6000}
-        hideIconVariant={false}
-        iconVariant={{}}
         className="custom-snackbar"
-        style={{ marginTop: 8 }}
+        style={{ marginTop: 4 }}
       />
     );
 
-    const snackbar = container.firstChild;
-    expect(snackbar).toHaveClass('custom-snackbar');
-    expect(snackbar).toHaveStyle({ marginTop: '8px' });
-    expect(snackbar).not.toHaveAttribute('persist');
-    expect(snackbar).not.toHaveAttribute('anchorOrigin');
-    expect(snackbar).not.toHaveAttribute('autoHideDuration');
-    expect(snackbar).not.toHaveAttribute('hideIconVariant');
-    expect(snackbar).not.toHaveAttribute('iconVariant');
+    const content = screen.getByRole('alert').parentElement;
+    expect(content).toHaveClass('custom-snackbar');
+    expect(content).toHaveStyle({ marginTop: '4px' });
   });
 });
