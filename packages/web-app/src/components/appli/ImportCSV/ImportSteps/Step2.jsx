@@ -8,20 +8,10 @@ import FileSelectorInput, {
 } from '../../../common/FileSelectorInput';
 import { ImportPageContentContext } from '../Provider';
 import checkData from '../checkData';
+import formatBytes from '../../../../utils/formatBytes';
 
 const ACCEPT = { 'text/csv': ['.csv'] };
 const EXTENSIONS = ['.csv'];
-
-const formatBytes = bytes => {
-  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
-  const units = ['B', 'KB', 'MB', 'GB'];
-  const exponent = Math.min(
-    units.length - 1,
-    Math.floor(Math.log(bytes) / Math.log(1024))
-  );
-  const value = bytes / 1024 ** exponent;
-  return `${value.toFixed(exponent === 0 ? 0 : 1)} ${units[exponent]}`;
-};
 
 const Step2 = () => {
   const { updateAttribute, selectedType, importSession } = useContext(

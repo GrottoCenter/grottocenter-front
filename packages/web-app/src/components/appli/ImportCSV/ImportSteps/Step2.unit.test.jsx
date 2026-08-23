@@ -11,10 +11,27 @@ import { ThemeProvider } from '@mui/material/styles';
 import { vi } from 'vitest';
 
 import grottoTheme from '../../../../conf/grottoTheme';
-import messages from '../../../../../public/lang/en.json';
 import Step2 from './Step2';
 import { ImportPageContentContext } from '../Provider';
 import { ENTRANCE } from '../constants';
+
+// Only the keys Step2 (and its FileSelectorInput child) actually render. A
+// typo'd formatMessage id will fall through to its defaultMessage — surfacing
+// the bug — instead of silently resolving against the whole en.json.
+const messages = {
+  'Only CSV files are accepted.': 'Only CSV files are accepted.',
+  'This file was rejected.': 'This file was rejected.',
+  Row: 'Row',
+  'csvImport.missingColumn':
+    'The following column is missing a value: {column}.',
+  'csvImport.incorrectTypeColumn':
+    "The 'type' column is incorrect, expecting {rowType}.",
+  'Drop a file here or click to select': 'Drop a file here or click to select',
+  'Drag and drop a file here': 'Drag and drop a file here',
+  'Choose a file': 'Choose a file',
+  'Upload a file': 'Upload a file',
+  or: 'or'
+};
 
 const makeCtx = overrides => ({
   updateAttribute: vi.fn(),
@@ -25,12 +42,7 @@ const makeCtx = overrides => ({
 
 const renderStep = ctx =>
   render(
-    <IntlProvider
-      locale="en"
-      messages={messages}
-      onError={err => {
-        if (err.code !== 'MISSING_TRANSLATION') throw err;
-      }}>
+    <IntlProvider locale="en" messages={messages}>
       <ThemeProvider theme={grottoTheme}>
         <ImportPageContentContext.Provider value={ctx}>
           <Step2 />

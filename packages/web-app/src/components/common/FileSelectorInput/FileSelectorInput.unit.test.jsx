@@ -5,17 +5,26 @@ import { ThemeProvider } from '@mui/material/styles';
 import { vi } from 'vitest';
 
 import grottoTheme from '../../../conf/grottoTheme';
-import messages from '../../../../public/lang/en.json';
 import FileSelectorInput, { REJECTION_REASONS } from './index';
+
+// Only the keys FileSelectorInput actually renders. Declaring them explicitly
+// (instead of pulling in the full en.json) makes a typo in a formatMessage id
+// fail loudly instead of silently missing.
+const messages = {
+  'Drop files here or click to select': 'Drop files here or click to select',
+  'Drop a file here or click to select': 'Drop a file here or click to select',
+  'Drag and drop files here': 'Drag and drop files here',
+  'Drag and drop a file here': 'Drag and drop a file here',
+  'Upload files': 'Upload files',
+  'Upload a file': 'Upload a file',
+  'Choose files': 'Choose files',
+  'Choose a file': 'Choose a file',
+  or: 'or'
+};
 
 const renderIn = ui =>
   render(
-    <IntlProvider
-      locale="en"
-      messages={messages}
-      onError={err => {
-        if (err.code !== 'MISSING_TRANSLATION') throw err;
-      }}>
+    <IntlProvider locale="en" messages={messages}>
       <ThemeProvider theme={grottoTheme}>{ui}</ThemeProvider>
     </IntlProvider>
   );

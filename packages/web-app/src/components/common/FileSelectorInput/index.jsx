@@ -70,6 +70,20 @@ const normalizeRejections = fileRejections =>
     )
   }));
 
+// Pull `.ext` tokens out of a normalized accept object so the hint label stays
+// truthful when the caller doesn't hand-roll an `extensions` prop.
+const deriveExtensionsFromAccept = acceptObject => {
+  if (!acceptObject || typeof acceptObject !== 'object') return [];
+  const seen = new Set();
+  for (const values of Object.values(acceptObject)) {
+    if (!Array.isArray(values)) continue;
+    for (const entry of values) {
+      if (typeof entry === 'string' && entry.startsWith('.')) seen.add(entry);
+    }
+  }
+  return [...seen];
+};
+
 const DropZone = styled(Box, {
   shouldForwardProp: p =>
     p !== '$isDragging' && p !== '$isDragAccept' && p !== '$isDragReject'
@@ -121,6 +135,16 @@ const FileSelectorInput = ({
     formatMessage({ id: multiple ? pluralId : singularId });
 
   const acceptObject = useMemo(() => normalizeAccept(accept), [accept]);
+  // Prefer the caller's explicit `extensions` (it may include display-only
+  // entries that don't map to a single accept key); fall back to what the
+  // normalized accept object actually filters on so the hint can't drift.
+  const displayedExtensions = useMemo(
+    () =>
+      extensions && extensions.length > 0
+        ? extensions
+        : deriveExtensionsFromAccept(acceptObject),
+    [extensions, acceptObject]
+  );
   // When `multiple` is false, cap at a single file. Otherwise honour the
   // caller's explicit maxFiles, or leave it unbounded (react-dropzone reads
   // `0` as "no limit").
@@ -149,13 +173,13 @@ const FileSelectorInput = ({
     }
   });
 
-  const extensionsLabel = extensions?.length > 0 && (
+  const extensionsLabel = displayedExtensions.length > 0 && (
     <Typography
       variant="caption"
       color="text.disabled"
       display="block"
       onClick={e => e.stopPropagation()}>
-      {[...extensions].sort().join(', ')}
+      {[...displayedExtensions].sort().join(', ')}
     </Typography>
   );
 

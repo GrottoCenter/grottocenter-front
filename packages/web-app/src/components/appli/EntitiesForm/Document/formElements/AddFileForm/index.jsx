@@ -177,7 +177,21 @@ const AddFileForm = ({
     }
   };
 
+  // react-dropzone dispatches accepted and rejected files through two separate
+  // callbacks within a single onDrop event. React 18 batches the two setErrors
+  // calls, so a naive setErrors(newValue) in each would let the later call
+  // silently drop the earlier one — losing domain errors (duplicate names,
+  // missing extensions) whenever a mixed drop also has rejections. The ref
+  // below records that updateFiles ran in the current event so handleRejections
+  // knows whether to reset (rejections-only drop) or append (mixed drop). A
+  // microtask clears it after the synchronous batch completes.
+  const acceptedInThisDropRef = useRef(false);
+
   const updateFiles = newFiles => {
+    acceptedInThisDropRef.current = true;
+    queueMicrotask(() => {
+      acceptedInThisDropRef.current = false;
+    });
     const { entries, errors: errorsList } = validateAndBuildFileEntries(
       newFiles,
       files,
@@ -216,7 +230,9 @@ const AddFileForm = ({
         defaultMessage: 'This file was rejected.'
       });
     });
-    setErrors(messages);
+    setErrors(prev =>
+      acceptedInThisDropRef.current ? [...prev, ...messages] : messages
+    );
   };
 
   const removeFile = fileName => {
