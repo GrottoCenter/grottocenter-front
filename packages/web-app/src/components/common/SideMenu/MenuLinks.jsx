@@ -70,7 +70,7 @@ export const menuItemIconSx = isExpanded => ({
   minWidth: isExpanded ? 42 : 0,
   ...(!isExpanded && {
     justifyContent: 'center',
-    '& > *': { marginRight: 0 }
+    '& > span': { marginRight: 0 }
   })
 });
 
