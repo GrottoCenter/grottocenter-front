@@ -38,6 +38,10 @@ vi.mock('@/utils/pdfViewerSupport', () => ({
   hasNativePdfViewer: () => false
 }));
 
+const messages = {
+  'Page {current} of {total}': 'Page {current} of {total}'
+};
+
 describe('PdfPreview', () => {
   beforeEach(() => {
     mockDestroy.mockReset();
@@ -51,7 +55,7 @@ describe('PdfPreview', () => {
 
   it('provides the versioned image-decoder directory to PDF.js', async () => {
     const { unmount } = render(
-      <IntlProvider locale="en">
+      <IntlProvider locale="en" messages={messages}>
         <PdfPreview src="https://example.org/document.pdf" />
       </IntlProvider>
     );
@@ -72,7 +76,7 @@ describe('PdfPreview', () => {
 
   it('keeps the left edge reachable when a zoomed canvas overflows', () => {
     render(
-      <IntlProvider locale="en">
+      <IntlProvider locale="en" messages={messages}>
         <PdfPreview src="https://example.org/document.pdf" />
       </IntlProvider>
     );
