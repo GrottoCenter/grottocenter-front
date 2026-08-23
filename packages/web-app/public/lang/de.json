@@ -1942,6 +1942,7 @@
   "One of my caving buddies told me I should NOT post anything at all on Grottocenter. That sometimes makes it hard to contribute!": "Einer meiner Höhlenkunden sagte mir, ich sollte NICHTS auf Grottocenter posten. Das macht das Beitragen manchmal schwer!",
   "One or more polygons have self-intersecting edges. Fix them before saving.": "Ein oder mehrere Polygone haben sich selbst kreuzende Kanten. Beheben Sie dies vor dem Speichern.",
   "One or more polygons have too few points. Add more vertices before saving.": "Ein oder mehrere Polygone haben zu wenige Punkte. Fügen Sie vor dem Speichern weitere Eckpunkte hinzu.",
+  "Only .csv, .tsv, or .txt files are accepted.": "Es werden nur .csv-, .tsv- oder .txt-Dateien akzeptiert.",
   "Only administrators can modify massif sensitivity.": "Nur Administratoren können die Massiv-Sensibilität ändern.",
   "Only CSV files are accepted.": "Es werden nur CSV-Dateien akzeptiert.",
   "Opacity": "Deckkraft",

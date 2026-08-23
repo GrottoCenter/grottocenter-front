@@ -1942,6 +1942,7 @@
   "One of my caving buddies told me I should NOT post anything at all on Grottocenter. That sometimes makes it hard to contribute!": "Един от приятелите ми спелеолози ми каза, че НЕ трябва да публикувам нищо в Grottocenter. Понякога това затруднява приноса!",
   "One or more polygons have self-intersecting edges. Fix them before saving.": "Един или повече полигони имат самопресичащи се ръбове. Поправете ги преди запазване.",
   "One or more polygons have too few points. Add more vertices before saving.": "Един или повече полигони имат твърде малко точки. Добавете повече върхове преди запазване.",
+  "Only .csv, .tsv, or .txt files are accepted.": "Приемат се само файлове .csv, .tsv или .txt.",
   "Only administrators can modify massif sensitivity.": "Само администратори могат да променят чувствителността на масива.",
   "Only CSV files are accepted.": "Приемат се само CSV файлове.",
   "Opacity": "Непрозрачност",

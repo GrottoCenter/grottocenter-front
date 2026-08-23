@@ -253,7 +253,7 @@ const UploadStep = () => {
   const handleFileRejections = () => {
     onError(
       formatMessage({
-        id: 'This file was rejected.'
+        id: 'Only .csv, .tsv, or .txt files are accepted.'
       })
     );
   };

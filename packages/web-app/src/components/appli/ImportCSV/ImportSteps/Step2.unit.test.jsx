@@ -3,6 +3,7 @@ import {
   render,
   screen,
   fireEvent,
+  within,
   waitFor
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -209,8 +210,8 @@ describe('Step2 (CSV import)', () => {
     ctx.updateAttribute.mockClear();
     ctx.importSession.reset.mockClear();
 
-    const chip = screen.getByText('good.csv').closest('.MuiChip-root');
-    const removeIcon = chip.querySelector('svg[data-testid="CancelIcon"]');
+    const chip = screen.getByTestId('selected-file-good.csv');
+    const removeIcon = within(chip).getByTestId('CancelIcon');
     await userEvent.click(removeIcon);
 
     expect(ctx.updateAttribute).toHaveBeenCalledWith('importData', undefined);

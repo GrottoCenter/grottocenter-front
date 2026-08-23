@@ -1942,6 +1942,7 @@
   "One of my caving buddies told me I should NOT post anything at all on Grottocenter. That sometimes makes it hard to contribute!": "Salah satu teman spelunking saya mengatakan saya sebaiknya TIDAK memposting apa pun di Grottocenter. Kadang itu membuat kontribusi menjadi sulit!",
   "One or more polygons have self-intersecting edges. Fix them before saving.": "Satu atau lebih poligon memiliki sisi yang berpotongan sendiri. Perbaiki sebelum menyimpan.",
   "One or more polygons have too few points. Add more vertices before saving.": "Satu atau lebih poligon memiliki terlalu sedikit titik. Tambahkan lebih banyak titik sudut sebelum menyimpan.",
+  "Only .csv, .tsv, or .txt files are accepted.": "Hanya file .csv, .tsv, atau .txt yang diterima.",
   "Only administrators can modify massif sensitivity.": "Hanya administrator yang dapat mengubah sensitivitas massif.",
   "Only CSV files are accepted.": "Hanya berkas CSV yang diterima.",
   "Opacity": "Opasitas",

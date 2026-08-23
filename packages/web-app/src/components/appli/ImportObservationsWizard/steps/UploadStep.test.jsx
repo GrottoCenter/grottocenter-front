@@ -70,7 +70,8 @@ const messages = {
   'Drag and drop a file here': 'Drag and drop a file here',
   'Upload a file': 'Upload a file',
   'Choose a file': 'Choose a file',
-  'This file was rejected.': 'This file was rejected.',
+  'Only .csv, .tsv, or .txt files are accepted.':
+    'Only .csv, .tsv, or .txt files are accepted.',
   or: 'or'
 };
 
@@ -183,7 +184,9 @@ describe('UploadStep', () => {
     fireEvent.drop(dropzone, createDataTransfer([file]));
 
     await waitFor(() => {
-      expect(mockOnError).toHaveBeenCalledWith('This file was rejected.');
+      expect(mockOnError).toHaveBeenCalledWith(
+        'Only .csv, .tsv, or .txt files are accepted.'
+      );
     });
     expect(mockParseAndSetFile).not.toHaveBeenCalled();
   });

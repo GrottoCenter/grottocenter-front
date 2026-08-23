@@ -193,6 +193,7 @@ const FileSelectorInput = ({
       {files.map(f => (
         <Chip
           key={f.fileName}
+          data-testid={`selected-file-${f.fileName}`}
           label={f.fileName}
           size="small"
           color="primary"

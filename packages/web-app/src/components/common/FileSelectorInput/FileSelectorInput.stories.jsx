@@ -65,13 +65,13 @@ StatefulSelector.propTypes = {
 };
 
 export const Empty = {
-  render: () => <StatefulSelector extensions={['pdf', 'txt']} />
+  render: () => <StatefulSelector extensions={['.pdf', '.txt']} />
 };
 
 export const WithSelectedFiles = {
   render: () => (
     <StatefulSelector
-      extensions={['pdf', 'txt']}
+      extensions={['.pdf', '.txt']}
       initialFiles={[{ fileName: 'photo.jpg' }, { fileName: 'notes.pdf' }]}
     />
   )
@@ -81,7 +81,7 @@ export const Disabled = {
   render: () => (
     <StatefulSelector
       disabled
-      extensions={['pdf', 'txt']}
+      extensions={['.pdf', '.txt']}
       initialFiles={[{ fileName: 'read-only.pdf' }]}
     />
   )
@@ -91,16 +91,16 @@ export const RejectionByType = {
   render: () => (
     <StatefulSelector
       accept={{ 'application/pdf': ['.pdf'] }}
-      extensions={['pdf']}
+      extensions={['.pdf']}
       initialRejections={['malware.exe: file type not accepted']}
     />
   )
 };
 
 export const RejectionBySize = {
-  render: () => <StatefulSelector maxSize={1024} extensions={['txt']} />
+  render: () => <StatefulSelector maxSize={1024} extensions={['.txt']} />
 };
 
 export const SingleFile = {
-  render: () => <StatefulSelector multiple={false} extensions={['csv']} />
+  render: () => <StatefulSelector multiple={false} extensions={['.csv']} />
 };
