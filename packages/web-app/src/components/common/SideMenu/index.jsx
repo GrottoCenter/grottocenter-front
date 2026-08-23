@@ -116,6 +116,13 @@ const ContributeButton = styled(Button, {
       })
 }));
 
+// Tooltip must listen on an enabled element: disabled buttons do not emit the
+// pointer events it needs and MUI warns when one is its direct child.
+const ContributeTooltipTarget = styled('span')({
+  display: 'flex',
+  width: '100%'
+});
+
 // The whole menu body, shared by both drawers.
 //
 // Memoised because opening the mobile overlay is a Redux update: without it,
@@ -170,24 +177,26 @@ const SideMenuContent = memo(({ isExpanded, onNavigate }) => {
             disableHoverListener={isExpanded || !isOnline}
             disableFocusListener={isExpanded || !isOnline}
             disableTouchListener={isExpanded || !isOnline}>
-            <ContributeButton
-              $isExpanded={isExpanded}
-              variant="outlined"
-              color="secondary"
-              disabled={!isOnline}
-              aria-label={contributeLabel}
-              // Collapsed, the icon is the whole button, so it goes in as a
-              // child at the nav icons' size — `startIcon` would render it at
-              // MUI's 20px and drop it out of their weight, on top of adding a
-              // right margin that pushes it off-centre.
-              startIcon={isExpanded ? <AddCircleIcon /> : undefined}
-              onClick={handleContributeClick}>
-              {isExpanded ? (
-                <Translate>Contribute</Translate>
-              ) : (
-                <AddCircleIcon sx={{ fontSize: MENU_ICON_SIZE }} />
-              )}
-            </ContributeButton>
+            <ContributeTooltipTarget>
+              <ContributeButton
+                $isExpanded={isExpanded}
+                variant="outlined"
+                color="secondary"
+                disabled={!isOnline}
+                aria-label={contributeLabel}
+                // Collapsed, the icon is the whole button, so it goes in as a
+                // child at the nav icons' size — `startIcon` would render it at
+                // MUI's 20px and drop it out of their weight, on top of adding a
+                // right margin that pushes it off-centre.
+                startIcon={isExpanded ? <AddCircleIcon /> : undefined}
+                onClick={handleContributeClick}>
+                {isExpanded ? (
+                  <Translate>Contribute</Translate>
+                ) : (
+                  <AddCircleIcon sx={{ fontSize: MENU_ICON_SIZE }} />
+                )}
+              </ContributeButton>
+            </ContributeTooltipTarget>
           </Tooltip>
         </OfflineDisabled>
         <Footer>
