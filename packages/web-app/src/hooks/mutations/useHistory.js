@@ -7,7 +7,7 @@ import {
   restoreHistoryUrl,
   moveHistoryRelevanceUrl
 } from '../../conf/apiRoutes';
-import { apiPost, apiPatch, apiDelete } from '../../api/client';
+import { apiPost, apiPut, apiPatch, apiDelete } from '../../api/client';
 import { entranceKeys } from '../../api/queryKeys';
 
 const useHistoryMutation = mutationFn => {
@@ -26,7 +26,7 @@ export const useCreateHistory = () =>
 
 export const useUpdateHistory = () =>
   useHistoryMutation(({ id, title, body, language }) =>
-    apiPatch(putHistoryUrl(id), { title, body, language })
+    apiPut(putHistoryUrl(id), { title, body, language })
   );
 
 export const useDeleteHistory = () =>
