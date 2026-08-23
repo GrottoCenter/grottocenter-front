@@ -121,7 +121,7 @@ const Document = ({
                       }>
                       <Button
                         onClick={() => setUnlinkDialogOpen(true)}
-                        color="primary"
+                        color="error"
                         disabled={!isOnline}
                         aria-label={formatMessage({ id: 'unlink' })}>
                         <LinkOffIcon />
