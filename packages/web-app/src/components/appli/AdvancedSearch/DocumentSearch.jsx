@@ -185,6 +185,20 @@ const DocumentSearch = () => {
     [subjects]
   );
 
+  const hasClearableFilters =
+    query !== '' || countActiveFilters(filterState) > 0;
+
+  const handleClearAll = () => {
+    setQuery('');
+    setMatchAllFields(true);
+    resetFilter();
+    setAdvancedExpanded(false);
+    resetAdvancedSearch();
+    // Override params are required: React state updates from the calls above are async,
+    // so filterState/query/matchAllFields still hold stale values at this point.
+    startAdvancedsearch('', initialFilterState, true);
+  };
+
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>
       <Box
@@ -377,28 +391,17 @@ const DocumentSearch = () => {
           onChange={e => setMatchAllFields(e)}
         />
       </SearchFilterAccordion>
-      <SearchActionButtons
-        showReset={query !== '' || countActiveFilters(filterState) > 0}
-        onReset={() => {
-          setQuery('');
-          setMatchAllFields(true);
-          resetFilter();
-          setAdvancedExpanded(false);
-          resetAdvancedSearch();
-          // Override params are required: React state updates from the calls above are async,
-          // so filterState/query/matchAllFields still hold stale values at this point.
-          startAdvancedsearch('', initialFilterState, true);
-        }}
-      />
       <ActiveFilterChips
         filterState={filterState}
         query={query}
         queryLabel="Document"
         onRemoveFilter={handleRemoveFilter}
         onClearQuery={() => setQuery('')}
+        onClearAll={hasClearableFilters ? handleClearAll : undefined}
         labelMap={FILTER_LABELS}
         translatableValueFields={TRANSLATABLE_VALUE_FIELDS}
       />
+      <SearchActionButtons />
     </SearchForm>
   );
 };

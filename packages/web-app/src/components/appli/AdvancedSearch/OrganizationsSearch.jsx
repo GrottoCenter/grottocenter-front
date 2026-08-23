@@ -57,6 +57,18 @@ const OrganizationsSearch = () => {
     });
 
   const advancedFilterCount = countActiveFilters(filterState);
+  const hasClearableFilters = query !== '' || advancedFilterCount > 0;
+
+  const handleClearAll = () => {
+    setQuery('');
+    setMatchAllFields(true);
+    resetFilter();
+    setAdvancedExpanded(false);
+    resetAdvancedSearch();
+    // Override params are required: React state updates from the calls above are async,
+    // so filterState/query/matchAllFields still hold stale values at this point.
+    startAdvancedsearch('', initialFilterState, true);
+  };
 
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>
@@ -119,28 +131,16 @@ const OrganizationsSearch = () => {
         />
       </SearchFilterAccordion>
 
-      <SearchActionButtons
-        showReset={query !== '' || advancedFilterCount > 0}
-        onReset={() => {
-          setQuery('');
-          setMatchAllFields(true);
-          resetFilter();
-          setAdvancedExpanded(false);
-          resetAdvancedSearch();
-          // Override params are required: React state updates from the calls above are async,
-          // so filterState/query/matchAllFields still hold stale values at this point.
-          startAdvancedsearch('', initialFilterState, true);
-        }}
-      />
-
       <ActiveFilterChips
         filterState={filterState}
         query={query}
         queryLabel="Organization name"
         onRemoveFilter={handleRemoveFilter}
         onClearQuery={() => setQuery('')}
+        onClearAll={hasClearableFilters ? handleClearAll : undefined}
         labelMap={FILTER_LABELS}
       />
+      <SearchActionButtons />
     </SearchForm>
   );
 };

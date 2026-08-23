@@ -141,6 +141,18 @@ const EntrancesSearch = ({
   ].filter(k => !lockedFilter.includes(k));
 
   const advancedFilterCount = countActiveFilters(filterState, filterableKeys);
+  const hasClearableFilters = query !== '' || advancedFilterCount > 0;
+
+  const handleClearAll = () => {
+    setQuery('');
+    setMatchAllFields(true);
+    resetFilter();
+    setAdvancedExpanded(false);
+    resetAdvancedSearch();
+    // Override params are required: React state updates from the calls above are async,
+    // so filterState/query/matchAllFields still hold stale values at this point.
+    startAdvancedsearch('', mergedInitialState, true);
+  };
 
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>
@@ -299,24 +311,13 @@ const EntrancesSearch = ({
         queryLabel="Entrance name"
         onRemoveFilter={handleRemoveFilter}
         onClearQuery={() => setQuery('')}
+        onClearAll={hasClearableFilters ? handleClearAll : undefined}
         labelMap={FILTER_LABELS}
         lockedKeys={lockedFilter}
         valueLabels={valueLabels}
       />
 
-      <SearchActionButtons
-        showReset={query !== '' || advancedFilterCount > 0}
-        onReset={() => {
-          setQuery('');
-          setMatchAllFields(true);
-          resetFilter();
-          setAdvancedExpanded(false);
-          resetAdvancedSearch();
-          // Override params are required: React state updates from the calls above are async,
-          // so filterState/query/matchAllFields still hold stale values at this point.
-          startAdvancedsearch('', mergedInitialState, true);
-        }}
-      />
+      <SearchActionButtons />
     </SearchForm>
   );
 };

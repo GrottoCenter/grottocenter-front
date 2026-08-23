@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
-import { SearchForm, SearchActionButtons } from './SearchElements';
+import {
+  ActiveFilterChips,
+  SearchActionButtons,
+  SearchForm
+} from './SearchElements';
 import { getStoredRowsPerPage } from '../../common/EntityTable';
 import SearchInput from '../../common/SearchInput';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
@@ -18,6 +22,12 @@ const MassifsSearch = () => {
       size: getStoredRowsPerPage()
     });
 
+  const handleClearAll = () => {
+    setQuery('');
+    resetAdvancedSearch();
+    startAdvancedsearch('');
+  };
+
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>
       <SearchInput
@@ -26,14 +36,13 @@ const MassifsSearch = () => {
         placeholder={formatMessage({ id: 'Massif name' })}
       />
 
-      <SearchActionButtons
-        showReset={query !== ''}
-        onReset={() => {
-          setQuery('');
-          resetAdvancedSearch();
-          startAdvancedsearch('');
-        }}
+      <ActiveFilterChips
+        query={query}
+        queryLabel="Massif name"
+        onClearQuery={() => setQuery('')}
+        onClearAll={query !== '' ? handleClearAll : undefined}
       />
+      <SearchActionButtons />
     </SearchForm>
   );
 };

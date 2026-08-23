@@ -665,13 +665,32 @@ const formatRangeValue = (key, value) => {
   return `${fmt(value[0])} – ${fmt(value[1])}${unit}`;
 };
 
+const ClearAllButton = ({ onClick, sx = {} }) => (
+  <Button
+    type="button"
+    variant="text"
+    size="medium"
+    color="inherit"
+    startIcon={<ClearIcon />}
+    onClick={onClick}
+    sx={{ color: 'text.secondary', ...sx }}>
+    <Translate>Clear all</Translate>
+  </Button>
+);
+
+ClearAllButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  sx: sxPropType
+};
+
 export const ActiveFilterChips = ({
-  filterState,
+  filterState = {},
   query,
   queryLabel,
-  onRemoveFilter,
+  onRemoveFilter = null,
   onClearQuery,
-  labelMap,
+  onClearAll = null,
+  labelMap = {},
   translatableValueFields,
   lockedKeys = [],
   valueLabels = {}
@@ -709,37 +728,71 @@ export const ActiveFilterChips = ({
     chips.push({
       key,
       label: `${translatedLabel}: ${formattedValue}`,
-      onDelete: isLocked ? undefined : () => onRemoveFilter(key),
+      onDelete:
+        isLocked || !onRemoveFilter ? undefined : () => onRemoveFilter(key),
       isLocked
     });
   });
 
-  if (chips.length === 0) return null;
+  if (chips.length === 0 && !onClearAll) return null;
 
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5, mb: 0.5 }}>
-      {chips.map(chip => (
-        <Chip
-          key={chip.key}
-          icon={chip.isLocked ? <LockIcon fontSize="small" /> : undefined}
-          label={chip.label}
-          onDelete={chip.onDelete}
-          size="small"
-          color="primary"
-          variant="outlined"
+    <Box
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+        columnGap: 1,
+        width: '100%',
+        mt: 0.5,
+        mb: 0.5
+      }}>
+      {chips.length > 0 && (
+        <Box
+          sx={{
+            display: 'flex',
+            flex: '1 1 160px',
+            flexWrap: 'wrap',
+            alignContent: 'center',
+            gap: 0.5,
+            minWidth: 0,
+            minHeight: { xs: 48, sm: 0 }
+          }}>
+          {chips.map(chip => (
+            <Chip
+              key={chip.key}
+              icon={chip.isLocked ? <LockIcon fontSize="small" /> : undefined}
+              label={chip.label}
+              onDelete={chip.onDelete}
+              size="small"
+              color="primary"
+              variant="outlined"
+            />
+          ))}
+        </Box>
+      )}
+      {onClearAll && (
+        <ClearAllButton
+          onClick={onClearAll}
+          sx={{
+            flexShrink: 0,
+            minHeight: { xs: 48, sm: 0 },
+            ml: 'auto'
+          }}
         />
-      ))}
+      )}
     </Box>
   );
 };
 
 ActiveFilterChips.propTypes = {
-  filterState: PropTypes.shape({}).isRequired,
+  filterState: PropTypes.shape({}),
   query: PropTypes.string.isRequired,
   queryLabel: PropTypes.string,
-  onRemoveFilter: PropTypes.func.isRequired,
+  onRemoveFilter: PropTypes.func,
   onClearQuery: PropTypes.func.isRequired,
-  labelMap: PropTypes.shape({}).isRequired,
+  onClearAll: PropTypes.func,
+  labelMap: PropTypes.shape({}),
   translatableValueFields: PropTypes.instanceOf(Set),
   lockedKeys: PropTypes.arrayOf(PropTypes.string),
   valueLabels: PropTypes.shape({})
@@ -791,44 +844,39 @@ SearchFilterAccordion.propTypes = {
   children: PropTypes.node.isRequired
 };
 
-export const SearchActionButtons = ({ onReset, showReset = true }) => {
-  // Reset stays available offline (it only clears local form state); searching
-  // hits the API's index, which is never cached.
+export const SearchActionButtons = () => {
+  // Searching hits the API's index, which is never cached.
   const isOnline = useOnlineStatus();
 
   return (
     <CardActions
-      sx={{ padding: 0.25, justifyContent: 'flex-end', width: '100%' }}>
-      {showReset && (
-        <Button
-          type="button"
-          variant="text"
-          size="medium"
-          color="inherit"
-          startIcon={<ClearIcon />}
-          onClick={() => onReset()}
-          sx={{ color: 'text.secondary' }}>
-          <Translate>Reset</Translate>
-        </Button>
-      )}
-
-      <OfflineDisabled>
-        <Button
-          type="submit"
-          variant="contained"
-          size="medium"
-          disabled={!isOnline}
-          startIcon={<SearchIcon />}>
-          <Translate>Search</Translate>
-        </Button>
-      </OfflineDisabled>
+      sx={{
+        padding: 0.25,
+        justifyContent: 'flex-end',
+        width: '100%'
+      }}>
+      <Box
+        sx={{
+          width: { xs: '100%', sm: 'auto' },
+          '& > span': { width: { xs: '100%', sm: 'auto' } }
+        }}>
+        <OfflineDisabled>
+          <Button
+            type="submit"
+            variant="contained"
+            size="medium"
+            disabled={!isOnline}
+            startIcon={<SearchIcon />}
+            sx={{
+              width: { xs: '100%', sm: 'auto' },
+              minHeight: { xs: 48, sm: 0 }
+            }}>
+            <Translate>Search</Translate>
+          </Button>
+        </OfflineDisabled>
+      </Box>
     </CardActions>
   );
-};
-
-SearchActionButtons.propTypes = {
-  onReset: PropTypes.func.isRequired,
-  showReset: PropTypes.bool
 };
 
 SearchMatchAllFieldsToogle.propTypes = {

@@ -5,6 +5,7 @@ import CheckIcon from '@mui/icons-material/Check';
 
 import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
 import {
+  ActiveFilterChips,
   SearchForm,
   SearchActionButtons,
   SearchFieldset
@@ -41,6 +42,16 @@ const PersonSearch = () => {
     startAdvancedsearch(undefined, value);
   };
 
+  const hasClearableFilters =
+    query !== '' || personType !== DEFAULT_PERSON_TYPE;
+
+  const handleClearAll = () => {
+    setQuery('');
+    setPersonType(DEFAULT_PERSON_TYPE);
+    resetAdvancedSearch();
+    startAdvancedsearch('', DEFAULT_PERSON_TYPE);
+  };
+
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>
       <SearchInput
@@ -64,15 +75,13 @@ const PersonSearch = () => {
           ))}
         </Box>
       </SearchFieldset>
-      <SearchActionButtons
-        showReset={query !== '' || personType !== DEFAULT_PERSON_TYPE}
-        onReset={() => {
-          setQuery('');
-          setPersonType(DEFAULT_PERSON_TYPE);
-          resetAdvancedSearch();
-          startAdvancedsearch('', DEFAULT_PERSON_TYPE);
-        }}
+      <ActiveFilterChips
+        query={query}
+        queryLabel="Person"
+        onClearQuery={() => setQuery('')}
+        onClearAll={hasClearableFilters ? handleClearAll : undefined}
       />
+      <SearchActionButtons />
     </SearchForm>
   );
 };
