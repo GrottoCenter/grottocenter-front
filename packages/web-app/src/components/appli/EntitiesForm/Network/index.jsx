@@ -80,7 +80,11 @@ export const NetworkForm = ({ networkValues, onCancel }) => {
           />
         </FormRow>
 
-        <CaveDetail control={control} errors={errors} />
+        <CaveDetail
+          control={control}
+          errors={errors}
+          showEntranceFields={false}
+        />
 
         <FormActionRow
           isNew={false}

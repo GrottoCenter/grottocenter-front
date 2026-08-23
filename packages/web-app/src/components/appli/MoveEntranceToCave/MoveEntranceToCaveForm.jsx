@@ -116,7 +116,7 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
             <Alert
               severity="warning"
               content={formatMessage({
-                id: 'The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!'
+                id: 'This entrance is the only one in its cave. Attaching it to another entrance or network will permanently delete its depth, development, temperature and diving possibility. All data specific to the entrance will be preserved.'
               })}
             />
           )}
