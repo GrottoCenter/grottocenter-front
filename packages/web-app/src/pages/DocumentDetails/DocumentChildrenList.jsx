@@ -411,13 +411,9 @@ const RowTypeIcon = styled('span')(({ theme }) => ({
   color: theme.palette.text.disabled
 }));
 
-// The title has to win over the abstract under it — it was only one step above
-// (16px medium against 14px regular), which at two lines each read as a single
-// block of text. A larger, heavier line plus a small gap separates the two.
+// The title uses the app's item-heading token so it stays below the section
+// heading while remaining distinct from the abstract underneath.
 const ChildTitle = styled(Typography)(({ theme }) => ({
-  fontSize: '1.6rem',
-  fontWeight: 600,
-  lineHeight: 1.3,
   marginBottom: theme.spacing(0.25),
   overflowWrap: 'anywhere'
 }));
@@ -444,7 +440,7 @@ const DocumentChildRow = React.memo(({ doc }) => {
         <TypeIcon fontSize="small" />
       </RowTypeIcon>
       <Box sx={{ minWidth: 0, flex: 1 }}>
-        <ChildTitle component="div">
+        <ChildTitle variant="h4" component="h3">
           <AppLink to={`/ui/documents/${doc.id}`} underline="hover">
             {doc.title}
           </AppLink>
