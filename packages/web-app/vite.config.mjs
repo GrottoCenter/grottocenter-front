@@ -5,6 +5,7 @@ import svgr from 'vite-plugin-svgr';
 import { compression } from 'vite-plugin-compression2';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA } from 'vite-plugin-pwa';
+import pdfJsWasmAssets from './vite/pdfJsWasmAssets.mjs';
 
 const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -89,6 +90,7 @@ export default defineConfig(({ mode }) => {
       // SVG imported with `?react` becomes a React component; a bare `.svg`
       // import stays a URL (keeps src/assets/icons/index.js working untouched).
       svgr(),
+      pdfJsWasmAssets(),
       compression({ algorithm: 'gzip' }),
       compression({ algorithm: 'brotliCompress', deleteOriginalAssets: false }),
       visualizer({
