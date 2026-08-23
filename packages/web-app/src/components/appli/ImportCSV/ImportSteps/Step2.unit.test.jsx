@@ -216,13 +216,13 @@ describe('Step2 (CSV import)', () => {
 
     firstRender.unmount();
     ctx.updateAttribute.mockClear();
-    mockDispatch.mockClear();
+    ctx.importSession.reset.mockClear();
     renderStep(ctx);
 
     await waitFor(() => {
       expect(ctx.updateAttribute).toHaveBeenCalledWith('importData', undefined);
       expect(ctx.updateAttribute).toHaveBeenCalledWith('fileImported', false);
     });
-    expect(mockDispatch).toHaveBeenCalledWith({ type: 'RESET_IMPORT_STATE' });
+    expect(ctx.importSession.reset).toHaveBeenCalledOnce();
   });
 });

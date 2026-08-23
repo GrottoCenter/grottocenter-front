@@ -14,9 +14,8 @@ import {
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
-// Internal, stable rejection reasons. The values are picked to be
-// self-descriptive so callers can render them or map them to i18n keys without
-// leaking react-dropzone's own code enums into feature code.
+// Internal, stable rejection reasons. These values intentionally differ from
+// react-dropzone's code enum; DROPZONE_REJECTION_MAP owns that boundary.
 export const REJECTION_REASONS = Object.freeze({
   TOO_LARGE: 'file-too-large',
   TOO_SMALL: 'file-too-small',
@@ -185,6 +184,7 @@ const FileSelectorInput = ({
   const inputEl = <input {...getInputProps()} />;
 
   if (isMobile) {
+    // The touch layout is picker-only, so it intentionally omits drop handlers.
     return (
       <Stack>
         {inputEl}

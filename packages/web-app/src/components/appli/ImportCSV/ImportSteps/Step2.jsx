@@ -48,6 +48,8 @@ const Step2 = () => {
     updateAttribute('importData', undefined);
     updateAttribute('fileImported', false);
     resetImportSession();
+    // Both callbacks have stable identities, so this remains a mount-only
+    // reset without suppressing the exhaustive-deps check.
   }, [updateAttribute, resetImportSession]);
 
   const clearImportedFile = () => {
@@ -79,6 +81,8 @@ const Step2 = () => {
           ...checkData(results.data, selectedType, formatMessage)
         ];
         const isValid = errors.length === 0;
+        // Commit the visible file and its parsed data under the same guard
+        // above.
         setSelectedFile(file);
         setRowErrors(errors);
         updateAttribute('importData', isValid ? results.data : undefined);

@@ -26,7 +26,11 @@ const WARN_VERTICES = 1000;
 const INFO_VERTICES = 500;
 
 const ACCEPTED_EXTENSIONS = ['.geojson', '.json', '.zip'];
-const ACCEPTED_MIME = '.geojson,.json,.zip';
+const ACCEPTED_MIME = {
+  'application/geo+json': ['.geojson', '.json'],
+  'application/zip': ['.zip'],
+  'application/x-zip-compressed': ['.zip']
+};
 
 // Simplify polygon using simplify-js library
 const simplifyPolygon = (multiPolygon, toleranceValue) => ({

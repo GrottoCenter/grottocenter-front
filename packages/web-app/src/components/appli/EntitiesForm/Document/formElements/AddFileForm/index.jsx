@@ -211,13 +211,10 @@ const AddFileForm = ({
           { file: fileName }
         );
       }
-      return formatMessage(
-        {
-          id: 'error on file name',
-          defaultMessage: 'The following file name is invalid : {file}.'
-        },
-        { file: fileName }
-      );
+      return formatMessage({
+        id: 'This file was rejected.',
+        defaultMessage: 'This file was rejected.'
+      });
     });
     setErrors(messages);
   };
