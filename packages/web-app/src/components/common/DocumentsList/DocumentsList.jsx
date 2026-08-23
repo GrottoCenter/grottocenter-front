@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -10,7 +10,7 @@ import {
   Paper,
   Skeleton
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import DocumentSortSelect from '../DocumentSortSelect';
 import {
   canSortDocuments,
@@ -21,6 +21,10 @@ import { DocumentChildPropTypes } from '../../../types/document.type';
 import Document from './Document';
 import ImageLightbox from './ImageLightbox';
 import { isImageFile } from './utils/imageUtils';
+import {
+  calculateMasonryRowSpan,
+  MASONRY_ROW_HEIGHT
+} from './utils/masonryUtils';
 import { GALLERY_MIN_IMAGES } from './ImageThumbnail';
 
 // Documents are wildly uneven: a bare article needn't eat a whole desktop row
@@ -31,19 +35,82 @@ import { GALLERY_MIN_IMAGES } from './ImageThumbnail';
 const DocumentsGrid = styled(List)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))',
-  // Lets a short card backfill the hole a full-width gallery leaves behind.
+  // One-pixel implicit rows let each card span its measured height instead of
+  // inheriting the height of the tallest card beside it. The vertical spacing
+  // is included in that span; the negative margin removes it after the final
+  // card, where a regular grid gap would not render either.
+  gridAutoRows: `${MASONRY_ROW_HEIGHT}px`,
   gridAutoFlow: 'row dense',
   alignItems: 'start',
-  gap: theme.spacing(1),
+  columnGap: theme.spacing(1),
+  rowGap: 0,
+  marginBottom: theme.spacing(-1),
   // The grid owns its spacing: without this the rhythm would come from the
   // dense padding of a ListItem two components away, in another file.
   '& .MuiListItem-root': { paddingTop: 0, paddingBottom: 0 },
-  // `gap` stops applying once the grid falls back to block flow.
+  // Grid placement stops applying once the grid falls back to block flow.
   '@media print': {
     display: 'block',
+    marginBottom: 0,
     '& > *': { marginBottom: theme.spacing(1) }
   }
 }));
+
+const DocumentsGridItem = ({ children, isVisible = true, isWide = false }) => {
+  const theme = useTheme();
+  const contentRef = useRef(null);
+  const [contentHeight, setContentHeight] = useState(0);
+  const verticalGap = Number.parseFloat(theme.spacing(1)) || 0;
+
+  // Measure before paint so cards never flash in one-pixel rows. Observing the
+  // content wrapper also catches lazy images, wrapping titles, locale changes
+  // and container resizes without coupling the card to the grid.
+  useLayoutEffect(() => {
+    const content = contentRef.current;
+    if (!content || !isVisible) return undefined;
+
+    const updateHeight = height => {
+      const nextHeight = Math.ceil(height);
+      setContentHeight(currentHeight =>
+        currentHeight === nextHeight ? currentHeight : nextHeight
+      );
+    };
+
+    updateHeight(content.getBoundingClientRect().height);
+
+    if (typeof ResizeObserver === 'undefined') return undefined;
+
+    const observer = new ResizeObserver(([entry]) => {
+      updateHeight(entry.contentRect.height);
+    });
+    observer.observe(content);
+
+    return () => observer.disconnect();
+  }, [isVisible]);
+
+  return (
+    <Box
+      sx={{
+        display: isVisible ? 'block' : 'none',
+        // `1 / -1` rather than `span 2`: a no-op in a single column, instead
+        // of forcing an implicit second one.
+        gridColumn: isWide ? '1 / -1' : 'auto',
+        gridRowEnd: `span ${calculateMasonryRowSpan(
+          contentHeight,
+          verticalGap
+        )}`,
+        '@media print': { display: 'block' }
+      }}>
+      <Box ref={contentRef}>{children}</Box>
+    </Box>
+  );
+};
+
+DocumentsGridItem.propTypes = {
+  children: PropTypes.node.isRequired,
+  isVisible: PropTypes.bool,
+  isWide: PropTypes.bool
+};
 
 const DocumentSkeleton = () => (
   <ListItem
@@ -142,7 +209,9 @@ const DocumentsList = ({
     return (
       <DocumentsGrid dense disablePadding>
         {[0, 1, 2].map(i => (
-          <DocumentSkeleton key={i} />
+          <DocumentsGridItem key={i}>
+            <DocumentSkeleton />
+          </DocumentsGridItem>
         ))}
       </DocumentsGrid>
     );
@@ -187,15 +256,10 @@ const DocumentsList = ({
         {sortedDocuments.map((document, i) => {
           const isOnPage = i >= startIndex && i < endIndex;
           return (
-            <Box
+            <DocumentsGridItem
               key={document.id}
-              sx={{
-                display: isOnPage ? 'block' : 'none',
-                // `1 / -1` rather than `span 2`: a no-op in a single column,
-                // instead of forcing an implicit second one.
-                gridColumn: isWide[i] ? '1 / -1' : 'auto',
-                '@media print': { display: 'block' }
-              }}>
+              isVisible={isOnPage}
+              isWide={isWide[i]}>
               <Document
                 document={document}
                 hasSnapshotButton={hasSnapshotButton}
@@ -203,7 +267,7 @@ const DocumentsList = ({
                 onImageClick={isOnPage ? handleImageClick : undefined}
                 imageIndexOffset={imageOffsets[i]}
               />
-            </Box>
+            </DocumentsGridItem>
           );
         })}
       </DocumentsGrid>
