@@ -22,6 +22,7 @@ import LicenseTag from '@/components/common/LicenseTag';
 import AppLink from '@/components/common/AppLink';
 import InternationalizedLink from '@/components/common/InternationalizedLink';
 import { licenceLinks } from '@/conf/externalLinks';
+import { MAX_SIZE_OF_UPLOADED_FILES } from '@/conf/config';
 import {
   useUserProperties,
   useFileFormats,
@@ -38,7 +39,9 @@ import {
   DOCUMENT_AUTHORIZE_TO_PUBLISH,
   validateAndBuildFileEntries
 } from './FileHelpers';
-import FileSelectorInput from '../../../../../common/FileSelectorInput';
+import FileSelectorInput, {
+  REJECTION_REASONS
+} from '../../../../../common/FileSelectorInput';
 import { DocumentFormContext } from '../../Provider';
 
 const DEFAULT_LICENSE = 'CC-BY-SA';
@@ -174,7 +177,21 @@ const AddFileForm = ({
     }
   };
 
+  // react-dropzone dispatches accepted and rejected files through two separate
+  // callbacks within a single onDrop event. React 18 batches the two setErrors
+  // calls, so a naive setErrors(newValue) in each would let the later call
+  // silently drop the earlier one — losing domain errors (duplicate names,
+  // missing extensions) whenever a mixed drop also has rejections. The ref
+  // below records that updateFiles ran in the current event so handleRejections
+  // knows whether to reset (rejections-only drop) or append (mixed drop). A
+  // microtask clears it after the synchronous batch completes.
+  const acceptedInThisDropRef = useRef(false);
+
   const updateFiles = newFiles => {
+    acceptedInThisDropRef.current = true;
+    queueMicrotask(() => {
+      acceptedInThisDropRef.current = false;
+    });
     const { entries, errors: errorsList } = validateAndBuildFileEntries(
       newFiles,
       files,
@@ -182,6 +199,40 @@ const AddFileForm = ({
     );
     setErrors(isEmpty(errorsList) ? [] : errorsList);
     setFiles([...files, ...entries]);
+  };
+
+  const handleRejections = rejections => {
+    const messages = rejections.map(({ fileName, reasons }) => {
+      if (reasons.includes(REJECTION_REASONS.TOO_LARGE)) {
+        return formatMessage(
+          {
+            id: 'error on file size',
+            defaultMessage:
+              'The following file is too big: {file}. Max accepted size: {maxSize}'
+          },
+          {
+            file: fileName,
+            maxSize: `${MAX_SIZE_OF_UPLOADED_FILES / 1000000} Mo`
+          }
+        );
+      }
+      if (reasons.includes(REJECTION_REASONS.TYPE_NOT_ACCEPTED)) {
+        return formatMessage(
+          {
+            id: 'error on file type',
+            defaultMessage: 'The file type is not accepted: {file}.'
+          },
+          { file: fileName }
+        );
+      }
+      return formatMessage({
+        id: 'This file was rejected.',
+        defaultMessage: 'This file was rejected.'
+      });
+    });
+    setErrors(prev =>
+      acceptedInThisDropRef.current ? [...prev, ...messages] : messages
+    );
   };
 
   const removeFile = fileName => {
@@ -204,8 +255,10 @@ const AddFileForm = ({
         files={visibleFiles}
         onFilesAdd={updateFiles}
         onFileRemove={removeFile}
+        onFileRejections={handleRejections}
         accept={accept}
         extensions={extensions}
+        maxSize={MAX_SIZE_OF_UPLOADED_FILES}
         disabled={isLoading}
       />
       {showAuthorization && visibleFiles.length > 0 && (

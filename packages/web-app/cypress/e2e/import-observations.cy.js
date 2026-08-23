@@ -14,6 +14,13 @@ import {
 } from '../support/mocks';
 
 const IMPORT_URL = '/observations/import';
+const OBSERVATION_FILE_SELECTOR = '[data-testid="observation-file-selector"]';
+
+const selectObservationsFile = () =>
+  cy
+    .get(OBSERVATION_FILE_SELECTOR)
+    .find('input[type="file"]')
+    .selectFile('cypress/fixtures/sample-observations.csv', { force: true });
 
 describe('Import Observations Wizard', () => {
   describe('Unauthenticated user', () => {
@@ -38,21 +45,20 @@ describe('Import Observations Wizard', () => {
       mockCaverApis();
 
       cy.visitAuthenticated(IMPORT_URL);
+      cy.checkPageLoaded();
     });
 
     it('completes full wizard flow, exports profile, and redirects to document page', () => {
       // Requirement 1.1: Wizard is accessible
       // Step 0: Upload
-      cy.get('[data-testid="file-input"]').selectFile(
-        'cypress/fixtures/sample-observations.csv',
-        { force: true }
-      );
+      selectObservationsFile();
 
       // Verify file info appears
-      cy.get('[data-testid="file-info"]').should(
+      cy.get(OBSERVATION_FILE_SELECTOR).should(
         'contain',
         'sample-observations.csv'
       );
+      cy.get('[data-testid="file-info"]').should('be.visible');
 
       // Verify preview table renders
       cy.get('[data-testid="file-preview-table"]').should('exist');
@@ -213,16 +219,14 @@ describe('Import Observations Wizard', () => {
     beforeEach(() => {
       cy.mockApiCatchAll();
       cy.visitAuthenticated(IMPORT_URL);
+      cy.checkPageLoaded();
     });
 
     it('resets the wizard to step 0 when "Start over" is clicked', () => {
       // Requirement 18.3: Start over resets wizard state
 
       // Upload a file to get past step 0
-      cy.get('[data-testid="file-input"]').selectFile(
-        'cypress/fixtures/sample-observations.csv',
-        { force: true }
-      );
+      selectObservationsFile();
 
       // Verify we have file loaded
       cy.get('[data-testid="file-info"]').should('exist');
@@ -231,7 +235,7 @@ describe('Import Observations Wizard', () => {
       cy.get('[data-testid="start-over-button"]').click();
 
       // Wizard should be back at step 0 with no file loaded
-      cy.get('[data-testid="file-picker-button"]').should('be.visible');
+      cy.get(OBSERVATION_FILE_SELECTOR).should('be.visible');
       cy.get('[data-testid="file-info"]').should('not.exist');
 
       // Back button should be disabled (step 0)
@@ -249,6 +253,7 @@ describe('Import Observations Wizard', () => {
       mockCaveApis();
 
       cy.visitAuthenticated(IMPORT_URL);
+      cy.checkPageLoaded();
     });
 
     it('imports a profile, walks through all steps, and submits', () => {
@@ -256,10 +261,7 @@ describe('Import Observations Wizard', () => {
       // Uses a static profile fixture with cave, authors, and device references
 
       // Step 0: Upload file
-      cy.get('[data-testid="file-input"]').selectFile(
-        'cypress/fixtures/sample-observations.csv',
-        { force: true }
-      );
+      selectObservationsFile();
 
       // Import the profile JSON (static fixture with cave + authors)
       cy.get('[data-testid="profile-input"]').selectFile(

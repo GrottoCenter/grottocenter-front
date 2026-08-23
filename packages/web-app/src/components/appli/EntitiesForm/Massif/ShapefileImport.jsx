@@ -26,7 +26,11 @@ const WARN_VERTICES = 1000;
 const INFO_VERTICES = 500;
 
 const ACCEPTED_EXTENSIONS = ['.geojson', '.json', '.zip'];
-const ACCEPTED_MIME = '.geojson,.json,.zip';
+const ACCEPTED_MIME = {
+  'application/geo+json': ['.geojson', '.json'],
+  'application/zip': ['.zip'],
+  'application/x-zip-compressed': ['.zip']
+};
 
 // Simplify polygon using simplify-js library
 const simplifyPolygon = (multiPolygon, toleranceValue) => ({
@@ -353,6 +357,14 @@ const ShapefileImport = ({ onImport }) => {
     setTolerance(INITIAL_TOLERANCE);
   };
 
+  const handleFileRejections = () => {
+    setParseError(
+      formatMessage({
+        id: 'Please select a GeoJSON (.geojson) or Shapefile ZIP (.zip) file'
+      })
+    );
+  };
+
   const handleImport = () => {
     if (simplifiedData) {
       const data = simplifiedData;
@@ -406,11 +418,13 @@ const ShapefileImport = ({ onImport }) => {
 
             <FileSelectorInput
               multiple={false}
+              maxFiles={1}
               accept={ACCEPTED_MIME}
               extensions={ACCEPTED_EXTENSIONS}
               files={fileName ? [{ fileName }] : []}
               onFilesAdd={handleFilesAdd}
               onFileRemove={handleFileRemove}
+              onFileRejections={handleFileRejections}
               disabled={analyzing}
             />
 

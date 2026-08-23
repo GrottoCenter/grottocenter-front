@@ -1,5 +1,4 @@
 import { isNil } from 'ramda';
-import { MAX_SIZE_OF_UPLOADED_FILES } from '../../../../../../conf/config';
 
 // Those constants represent the state of the file.
 // The actions performed depend on them.
@@ -14,8 +13,11 @@ export const DOCUMENT_AUTHORIZE_TO_PUBLISH =
   'Authorization present in Grottocenter';
 
 /**
- * Validates and converts a FileList/array of File objects into the internal file entry format.
- * Returns { entries, errors } where entries are ready to append and errors are i18n strings.
+ * Validates and converts a File[] into the internal file entry format.
+ * Size and type are enforced upstream by FileSelectorInput (maxSize / accept);
+ * this function keeps only the domain rules FileSelectorInput cannot know
+ * about — filenames without an extension and same-name collisions with a
+ * pending entry.
  */
 export const validateAndBuildFileEntries = (
   newFiles,
@@ -26,22 +28,6 @@ export const validateAndBuildFileEntries = (
   const errors = [];
   const entries = filesArray
     .filter(file => {
-      if (file.size && file.size > MAX_SIZE_OF_UPLOADED_FILES) {
-        errors.push(
-          formatMessage(
-            {
-              id: 'error on file size',
-              defaultMessage:
-                'The following file is too big: {file}. Max accepted size: {maxSize}'
-            },
-            {
-              file: file.name,
-              maxSize: `${MAX_SIZE_OF_UPLOADED_FILES / 1000000} Mo`
-            }
-          )
-        );
-        return false;
-      }
       if (file.name) {
         const dotIndex = file.name.lastIndexOf('.');
         if (dotIndex <= 0) {

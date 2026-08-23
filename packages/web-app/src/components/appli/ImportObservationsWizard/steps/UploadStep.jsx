@@ -17,9 +17,9 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import { useNotification } from '../../../../hooks';
+import FileSelectorInput from '../../../common/FileSelectorInput';
 
 import {
   parseAndSetFile,
@@ -28,11 +28,15 @@ import {
   SET_CONTEXT,
   SET_DOCUMENT_LANGUAGE,
   SET_ENCODING,
+  SET_FILE,
   SET_HEADER_ROW,
   SET_NUMBER_LOCALE,
   SET_PROFILE_FILE_NAME,
+  SET_RAW_ROWS,
+  SET_SAMPLING_INTERVAL,
   SET_SKIP_FIRST_ROWS,
-  SET_SKIP_LAST_ROWS
+  SET_SKIP_LAST_ROWS,
+  SET_VALIDATION_RESULT
 } from '../../../../actions/Observations/importWizard';
 import { importProfile } from '../utils/profileManager';
 
@@ -196,6 +200,11 @@ FilePreviewTable.propTypes = {
 // ===== UploadStep component =====
 
 const SUPPORTED_ENCODINGS = ['UTF-8', 'UTF-16', 'windows-1252'];
+const ACCEPTED_FILE_TYPES = {
+  'text/csv': ['.csv'],
+  'text/tab-separated-values': ['.tsv'],
+  'text/plain': ['.txt']
+};
 
 const UploadStep = () => {
   const { formatMessage } = useIntl();
@@ -213,8 +222,7 @@ const UploadStep = () => {
     state => state.importWizard.profileFileName
   );
 
-  // Hidden input refs
-  const fileInputRef = useRef(null);
+  // Hidden profile input ref
   const profileInputRef = useRef(null);
 
   // Derive data rows for counting
@@ -224,12 +232,30 @@ const UploadStep = () => {
 
   // ===== Handlers =====
 
-  const handleFileChange = async e => {
-    const selectedFile = e.target.files && e.target.files[0];
+  const clearParsedFileData = () => {
+    dispatch({ type: SET_RAW_ROWS, rawRows: [] });
+    dispatch({ type: SET_COLUMN_MAPPINGS, columnMappings: [] });
+    dispatch({ type: SET_VALIDATION_RESULT, validationResult: null });
+    dispatch({ type: SET_SAMPLING_INTERVAL, samplingIntervalSeconds: null });
+  };
+
+  const handleFilesAdd = ([selectedFile]) => {
     if (!selectedFile) return;
-    // Reset the input so the same file can be re-selected if needed
-    e.target.value = '';
+    clearParsedFileData();
     dispatch(parseAndSetFile(selectedFile, null));
+  };
+
+  const handleFileRemove = () => {
+    dispatch({ type: SET_FILE, file: null });
+    clearParsedFileData();
+  };
+
+  const handleFileRejections = () => {
+    onError(
+      formatMessage({
+        id: 'Only .csv, .tsv, or .txt files are accepted.'
+      })
+    );
   };
 
   const handleEncodingChange = e => {
@@ -395,14 +421,6 @@ const UploadStep = () => {
           })}
         </Typography>
         <input
-          ref={fileInputRef}
-          type="file"
-          accept=".csv,.tsv,.txt"
-          style={{ display: 'none' }}
-          data-testid="file-input"
-          onChange={handleFileChange}
-        />
-        <input
           ref={profileInputRef}
           type="file"
           accept=".json"
@@ -410,32 +428,30 @@ const UploadStep = () => {
           data-testid="profile-input"
           onChange={handleProfileFileChange}
         />
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<UploadFileIcon />}
-            onClick={() => fileInputRef.current && fileInputRef.current.click()}
-            data-testid="file-picker-button">
-            {formatMessage({
-              id: 'ImportObservationsWizard.UploadStep.chooseFile'
-            })}
-          </Button>
-          {file && (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              data-testid="file-info">
-              {file.name}
-              {' — '}
-              {formatMessage(
-                {
-                  id: 'ImportObservationsWizard.UploadStep.dataRowCount'
-                },
-                { count: dataRows.length }
-              )}
-            </Typography>
-          )}
+        <Box data-testid="observation-file-selector">
+          <FileSelectorInput
+            files={file ? [{ fileName: file.name }] : []}
+            multiple={false}
+            accept={ACCEPTED_FILE_TYPES}
+            onFilesAdd={handleFilesAdd}
+            onFileRemove={handleFileRemove}
+            onFileRejections={handleFileRejections}
+          />
         </Box>
+        {file && (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mt: 0.5 }}
+            data-testid="file-info">
+            {formatMessage(
+              {
+                id: 'ImportObservationsWizard.UploadStep.dataRowCount'
+              },
+              { count: dataRows.length }
+            )}
+          </Typography>
+        )}
         <Box sx={{ mt: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
           <Button
             variant="outlined"
