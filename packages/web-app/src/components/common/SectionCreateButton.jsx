@@ -5,6 +5,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useOnlineStatus, useIsDesktopLayout } from '../../hooks';
 import OfflineDisabled from './OfflineDisabled';
+import { MOBILE_SECTION_ACTION_BUTTON_SX } from './sectionActionButtonStyles';
 
 /**
  * The trigger a section header uses to open its own create / associate panel,
@@ -71,11 +72,8 @@ const SectionCreateButton = ({
             {currentLabel}
           </Button>
         ) : (
-          // Same outlined Button on mobile — narrower than a standalone Button
-          // to match the width of the ResponsiveActions burger (which lives in
-          // a ButtonGroup and inherits its 40px minWidth). Standalone Button's
-          // default 64px was visibly wider than the burger sitting next to it
-          // in other section headers.
+          // Same outlined Button on mobile. Small section actions share one
+          // fixed footprint even when callers provide custom composite icons.
           <Button
             color={currentColor}
             size={size}
@@ -84,7 +82,7 @@ const SectionCreateButton = ({
             onClick={onToggle}
             data-testid={testId}
             aria-label={currentLabel}
-            sx={{ minWidth: 40 }}>
+            sx={size === 'small' ? MOBILE_SECTION_ACTION_BUTTON_SX : undefined}>
             {currentIcon}
           </Button>
         )}

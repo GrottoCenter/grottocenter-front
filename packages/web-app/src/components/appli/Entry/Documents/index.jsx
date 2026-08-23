@@ -20,6 +20,9 @@ import DocumentsList from '../../../common/DocumentsList/DocumentsList';
 const DividerStyled = styled(Divider)`
   background-color: ${props => props.theme.palette.divider};
 `;
+
+const SECTION_ACTION_ICON_SIZE = 24;
+
 const Documents = ({ documents, entranceId, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -45,7 +48,12 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
               to={`/ui/entity/add/document?entranceId=${entranceId}`}
               size="small"
               tooltip={formatMessage({ id: 'Create a new document' })}
-              icon={<EntityIcon iconType="bibliography" size={20} />}
+              icon={
+                <EntityIcon
+                  iconType="bibliography"
+                  size={SECTION_ACTION_ICON_SIZE}
+                />
+              }
             />
             <SectionCreateButton
               isOpen={isDocumentSearchVisible}
@@ -58,7 +66,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
               icon={
                 <EntityIcon
                   iconType="bibliography"
-                  size={20}
+                  size={SECTION_ACTION_ICON_SIZE}
                   BadgeIcon={LinkIcon}
                 />
               }

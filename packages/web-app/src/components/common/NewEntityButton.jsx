@@ -9,6 +9,7 @@ import {
   useIsDesktopLayout
 } from '../../hooks';
 import OfflineDisabled from './OfflineDisabled';
+import { MOBILE_SECTION_ACTION_BUTTON_SX } from './sectionActionButtonStyles';
 
 /**
  * The one-shot counterpart to SectionCreateButton: it navigates to a creation
@@ -54,9 +55,9 @@ const NewEntityButton = ({
   // that the label collapses to the tooltip and the button becomes square, so
   // the outline stays consistent instead of the icon floating unbounded.
   //
-  // Mobile minWidth is size-aware:
-  //   - size="small"  → 40px, so section-header usages line up with the
-  //                     ResponsiveActions burger sitting next to them.
+  // Mobile width is size-aware:
+  //   - size="small"  → the shared section-action width, so it lines up with
+  //                     SectionCreateButton.
   //   - size="medium" → MUI default (64px), so page-header usages (Documents,
   //                     Entrances, Massifs, Organizations search pages) keep a
   //                     tappable, visible primary action instead of collapsing
@@ -79,7 +80,7 @@ const NewEntityButton = ({
       disabled={!isOnline}
       onClick={handleClick}
       aria-label={tooltipText}
-      sx={size === 'small' ? { minWidth: 40, padding: 0.5 } : undefined}>
+      sx={size === 'small' ? MOBILE_SECTION_ACTION_BUTTON_SX : undefined}>
       {mobileIcon}
     </Button>
   );
