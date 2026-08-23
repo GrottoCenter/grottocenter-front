@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import PdfPreview from './index';
 
@@ -68,5 +68,19 @@ describe('PdfPreview', () => {
 
     unmount();
     expect(mockDestroy).toHaveBeenCalledOnce();
+  });
+
+  it('keeps the left edge reachable when a zoomed canvas overflows', () => {
+    render(
+      <IntlProvider locale="en">
+        <PdfPreview src="https://example.org/document.pdf" />
+      </IntlProvider>
+    );
+
+    const canvas = screen.getByRole('img', { hidden: true });
+    expect(canvas.parentElement).toHaveStyle({
+      justifyContent: 'flex-start'
+    });
+    expect(canvas).toHaveStyle({ marginInline: 'auto' });
   });
 });
