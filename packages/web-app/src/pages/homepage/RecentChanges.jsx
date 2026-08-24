@@ -42,7 +42,10 @@ const RecentChanges = () => {
   return (
     <Section aria-labelledby="recent-changes-title">
       <TitleRow>
-        <HistoryOutlinedIcon color="primary" sx={{ fontSize: 28 }} />
+        <HistoryOutlinedIcon
+          color="primary"
+          sx={{ fontSize: theme => theme.spacing(3.5) }}
+        />
         <Typography
           id="recent-changes-title"
           variant="h3"
