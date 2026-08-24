@@ -772,6 +772,8 @@ export const ActiveFilterChips = ({
         </Box>
       )}
       {onClearAll && (
+        // Clearing local form state needs no network access, so this action is
+        // deliberately available offline unlike the search submission.
         <ClearAllButton
           onClick={onClearAll}
           sx={{

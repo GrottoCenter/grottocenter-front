@@ -63,3 +63,29 @@ it('presents repeat actions as secondary and finishing as primary', () => {
   expect(onSubmitAnotherDocument).toHaveBeenCalledOnce();
   expect(onFinish).toHaveBeenCalledOnce();
 });
+
+it('hides article-only actions for a non-article document', () => {
+  const onSubmitAnotherArticle = vi.fn();
+
+  render(
+    <IntlProvider locale="en" messages={messages}>
+      <DocumentSubmissionSuccess
+        isArticle={false}
+        isNewDocument
+        onSubmitAnotherArticle={onSubmitAnotherArticle}
+        onSubmitAnotherDocument={vi.fn()}
+        onFinish={vi.fn()}
+      />
+    </IntlProvider>
+  );
+
+  expect(
+    screen.queryByRole('button', { name: 'Add another article' })
+  ).not.toBeInTheDocument();
+  expect(
+    screen.queryByText(
+      'Adding another article will preserve the parent document, publication date, editor and library.'
+    )
+  ).not.toBeInTheDocument();
+  expect(onSubmitAnotherArticle).not.toHaveBeenCalled();
+});

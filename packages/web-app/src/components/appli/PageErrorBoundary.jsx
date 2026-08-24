@@ -148,7 +148,6 @@ export const PageError = ({ error = null }) => {
                 fullWidth
                 sx={{ order: { xs: 2, sm: 1 } }}
                 to="/"
-                underline="none"
                 variant="outlined">
                 <Translate>Return to home</Translate>
               </Button>
