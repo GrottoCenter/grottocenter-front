@@ -19,6 +19,8 @@ const RecentChangesPage = () => {
     refetch
   } = useRecentChangesFeed({ limit: PAGE_SIZE });
   const changes = data?.changes ?? [];
+  // Existing rows mean the failed request was for the next page; with no rows,
+  // the initial request failed and must be restarted from the beginning.
   const handleRetry = changes.length > 0 ? fetchNextPage : refetch;
 
   return (
