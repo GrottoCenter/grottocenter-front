@@ -17,9 +17,9 @@ vi.mock('react-router-dom', async importOriginal => {
 
 vi.mock('@/utils/clipboard', () => ({ default: vi.fn() }));
 
-const renderPage = () =>
+const renderPage = (initialEntry = '/ui/test-page') =>
   renderWithProviders(
-    <MemoryRouter initialEntries={['/ui/test-page']}>
+    <MemoryRouter initialEntries={[initialEntry]}>
       <PageError error={new TypeError('Sensitive error message')} />
     </MemoryRouter>
   );
@@ -56,12 +56,14 @@ describe('PageError', () => {
   });
 
   it('provides safe technical details without the raw error message', () => {
-    renderPage();
+    renderPage('/ui/test-page?type=article#files');
 
     fireEvent.click(screen.getByText('Technical details'));
 
     expect(screen.getByText(/Error type: TypeError/)).toBeVisible();
-    expect(screen.getByText(/Page address: \/ui\/test-page/)).toBeVisible();
+    expect(
+      screen.getByText(/Page address: \/ui\/test-page\?type=article#files/)
+    ).toBeVisible();
     expect(
       screen.queryByText(/Sensitive error message/)
     ).not.toBeInTheDocument();

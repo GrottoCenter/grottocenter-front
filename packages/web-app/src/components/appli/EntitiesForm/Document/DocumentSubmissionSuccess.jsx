@@ -92,6 +92,8 @@ const DocumentSubmissionSuccess = ({
 DocumentSubmissionSuccess.propTypes = {
   isArticle: PropTypes.bool.isRequired,
   isNewDocument: PropTypes.bool.isRequired,
+  // Only called for articles; keeping it required ensures every form
+  // integration wires the complete repeat-submission workflow.
   onSubmitAnotherArticle: PropTypes.func.isRequired,
   onSubmitAnotherDocument: PropTypes.func.isRequired,
   onFinish: PropTypes.func.isRequired

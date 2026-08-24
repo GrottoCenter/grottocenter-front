@@ -60,17 +60,12 @@ const RecentChanges = () => {
           onRetry={refetch}
         />
         <Box sx={{ textAlign: 'center', mt: 2 }}>
-          <AppLink to="/ui/changes/recent">
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{
-                textDecoration: 'underline',
-                cursor: 'pointer',
-                '&:hover': { color: 'text.primary' }
-              }}>
-              {formatMessage({ id: 'See all recent changes' })}
-            </Typography>
+          <AppLink
+            to="/ui/changes/recent"
+            variant="body2"
+            color="text.secondary"
+            sx={{ '&:hover': { color: 'text.primary' } }}>
+            {formatMessage({ id: 'See all recent changes' })}
           </AppLink>
         </Box>
       </Inner>

@@ -57,12 +57,18 @@ export const PageError = ({ error = null }) => {
     () =>
       [
         `${formatMessage({ id: 'UTC date' })}: ${new Date().toISOString()}`,
-        `${formatMessage({ id: 'Page address' })}: ${location.pathname}`,
+        `${formatMessage({ id: 'Page address' })}: ${location.pathname}${location.search}${location.hash}`,
         `${formatMessage({ id: 'Application version' })}: ${appVersion}`,
         `${formatMessage({ id: 'Browser' })}: ${navigator.userAgent}`,
         `${formatMessage({ id: 'Error type' })}: ${error?.name || 'Error'}`
       ].join('\n'),
-    [error?.name, formatMessage, location.pathname]
+    [
+      error?.name,
+      formatMessage,
+      location.hash,
+      location.pathname,
+      location.search
+    ]
   );
 
   useEffect(() => {
