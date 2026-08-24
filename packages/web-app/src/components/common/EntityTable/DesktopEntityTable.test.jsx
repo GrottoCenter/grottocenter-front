@@ -13,6 +13,11 @@ vi.mock('./VisibleColumnsMenu', () => {
 
 vi.mock('../../../hooks/useOpenLink', () => ({ default: () => vi.fn() }));
 
+vi.mock('../../../hooks', async importOriginal => ({
+  ...(await importOriginal()),
+  useMeasuredHeight: () => [vi.fn(), 48]
+}));
+
 const messages = {
   Name: 'Name',
   Export: 'Export',
@@ -259,5 +264,23 @@ describe('DesktopEntityTable - Controlled selection', () => {
     renderTable({ isNewQuery: true, onSelected, selectedIds: [1] });
 
     expect(onSelected).toHaveBeenCalledWith([]);
+  });
+});
+
+describe('DesktopEntityTable - Sticky header', () => {
+  it('does not offset an embedded compact table header', () => {
+    renderTable({ compact: true });
+
+    expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveStyle({
+      top: '0px'
+    });
+  });
+
+  it('keeps the toolbar offset on a full-page table header', () => {
+    renderTable();
+
+    expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveStyle({
+      top: '48px'
+    });
   });
 });
