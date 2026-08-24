@@ -285,6 +285,12 @@ const DesktopEntityTable = ({
   // scroller; the header sits just below the toolbar, at its measured height
   // (see hook). 0 when the toolbar isn't rendered (shouldHideFooter).
   const [toolbarRef, toolbarHeight] = useMeasuredHeight();
+  // Compact tables scroll inside their own TableContainer while the results
+  // toolbar sits outside it. Offsetting the sticky header by the toolbar's
+  // height would therefore leave an empty row-sized gap and make the header
+  // overlap the first result. Full-page tables share their vertical scroller
+  // with the toolbar and still need the measured offset.
+  const stickyHeaderTop = compact ? 0 : toolbarHeight;
   const topRef = useRef(null);
 
   const entityConfig = entitiesConfig[entityType ?? 'placeholder'];
@@ -722,10 +728,10 @@ const DesktopEntityTable = ({
             })
           }}>
           {isPending ? (
-            <LoadingTableHead stickyTop={toolbarHeight} />
+            <LoadingTableHead stickyTop={stickyHeaderTop} />
           ) : (
             <EntityTableHead
-              stickyTop={toolbarHeight}
+              stickyTop={stickyHeaderTop}
               columns={entityColumns}
               numSelected={selected.length}
               order={order}
