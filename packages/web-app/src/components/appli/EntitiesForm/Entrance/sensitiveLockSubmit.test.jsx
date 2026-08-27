@@ -10,6 +10,7 @@ import { ENTRANCE_ONLY } from './caveType';
 // produced by the same wiring as the real form. The point of these tests is
 // the non-admin path: the lock Controller is never mounted for them, so the
 // value can only come from the form defaults.
+// Keep the small defaults subset local so this harness stays unit-focused.
 const defaultEntranceValues = {
   name: '',
   language: 'eng',

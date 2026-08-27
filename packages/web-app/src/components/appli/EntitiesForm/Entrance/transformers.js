@@ -72,8 +72,10 @@ export const hasEntranceChanged = (entranceDataFmt, originalEntranceValues) => {
     entranceDataFmt.name.language !== originalEntranceValues.language ||
     Boolean(entranceDataFmt.isSensitive) !==
       Boolean(originalEntranceValues.isSensitive) ||
-    Boolean(entranceDataFmt.isSensitiveLocked) !==
-      Boolean(originalEntranceValues.isSensitiveLocked) ||
+    ('isSensitiveLocked' in entranceDataFmt
+      ? Boolean(entranceDataFmt.isSensitiveLocked) !==
+        Boolean(originalEntranceValues.isSensitiveLocked)
+      : false) ||
     Boolean(entranceDataFmt.hasBat) !==
       Boolean(originalEntranceValues.hasBat) ||
     Boolean(entranceDataFmt.dangerFlooding) !==

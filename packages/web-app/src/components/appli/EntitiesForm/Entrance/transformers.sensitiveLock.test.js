@@ -84,4 +84,15 @@ describe('hasEntranceChanged isSensitiveLocked', () => {
       hasEntranceChanged(data, { ...originalValues, isSensitiveLocked: true })
     ).toBe(true);
   });
+
+  it('ignores an omitted lock state', () => {
+    const data = makeEntranceData(
+      makeFormData({ isSensitiveLocked: undefined }),
+      ENTRANCE_ONLY
+    );
+
+    expect(
+      hasEntranceChanged(data, { ...originalValues, isSensitiveLocked: true })
+    ).toBe(false);
+  });
 });

@@ -91,6 +91,7 @@ SensitivitySection.propTypes = {
   isSensitiveDisabled: PropTypes.bool,
   showLock: PropTypes.bool,
   isLocked: PropTypes.bool,
+  // Optional because showLock gates whether the callback can be used.
   onLockChange: PropTypes.func,
   isLockDisabled: PropTypes.bool,
   alert: PropTypes.shape({
