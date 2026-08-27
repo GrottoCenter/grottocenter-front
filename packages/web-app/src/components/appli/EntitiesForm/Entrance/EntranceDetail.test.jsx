@@ -46,11 +46,7 @@ const EntranceDetailHarness = () => {
 
   return (
     <IntlProvider locale="en" messages={messages}>
-      <EntranceDetail
-        control={control}
-        errors={errors}
-        getValues={getValues}
-      />
+      <EntranceDetail control={control} errors={errors} getValues={getValues} />
     </IntlProvider>
   );
 };
