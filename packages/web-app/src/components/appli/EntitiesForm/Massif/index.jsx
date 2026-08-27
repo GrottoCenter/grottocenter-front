@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
-import { Button, CircularProgress, Typography } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import LicenseBox from '../utils/LicenseBox';
 import StandardDialog from '../../../common/StandardDialog';
@@ -413,11 +413,6 @@ export const MassifForm = ({ massifValues, onCancel }) => {
           </>
         }>
         <Alert severity="warning" disableMargins content={confirmBody} />
-        <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-          {formatMessage({
-            id: 'The massif will be saved first, then the sensitivity applied to its entrances.'
-          })}
-        </Typography>
       </StandardDialog>
       <LicenseBox />
     </FormContainer>

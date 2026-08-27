@@ -32,7 +32,7 @@ const SensitiveCaveWarning = ({ isLocked = false }) => {
         ) : undefined
       }
       title={formatMessage({
-        id: 'Restricted access entrance'
+        id: 'Sensitive entrance'
       })}
       content={formatMessage({
         id: 'This entrance requires special protection measures. We do not communicate its precise location on Grottocenter.'

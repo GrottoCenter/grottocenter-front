@@ -56,10 +56,10 @@ const EntranceDetail = ({
   // The precise location of an already sensitive entrance stays hidden from
   // non-admin users, who therefore can't unrestrict it either.
   const areCoordinatesHidden = !permissions.isAdmin && initialIsSensitive;
-  // A lock freezes the sensitivity for everyone but administrators, who keep
-  // changing it either way — the API enforces the same rule on update.
+  // As for massifs, a lock freezes the sensitivity for everyone. An
+  // administrator must explicitly unlock it before changing the value.
   const isLockedForUser = isSensitiveLocked && !permissions.isAdmin;
-  const isSensitiveDisabled = isLockedForUser || areCoordinatesHidden;
+  const isSensitiveDisabled = isSensitiveLocked || areCoordinatesHidden;
 
   let sensitivityAlert = null;
   if (isLockedForUser) {
@@ -70,14 +70,12 @@ const EntranceDetail = ({
   } else if (areCoordinatesHidden) {
     sensitivityAlert = {
       severity: 'info',
-      id: "You can't unrestrict a cave access."
+      id: 'The location of this entrance is hidden. Only an administrator can lift this restriction.'
     };
   } else if (isSensitiveLocked) {
-    // Administrators keep editing a locked entrance, but the lock is still
-    // worth stating: it is what stops everybody else from touching it.
     sensitivityAlert = {
       severity: 'info',
-      id: 'The sensitivity of this entrance is locked. Other contributors cannot change it.'
+      id: 'The sensitivity of this entrance is locked. Unlock it to change its sensitivity.'
     };
   }
 
@@ -120,9 +118,9 @@ const EntranceDetail = ({
       <SensitivitySection
         title="Sensitivity Management"
         explanation={formatMessage({
-          id: 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
+          id: 'Marking an entrance as sensitive hides its location from everyone except administrators. For more details, see the User Guide.'
         })}
-        switchLabel="Restricted access entrance"
+        switchLabel="Sensitive entrance"
         isSensitive={!!sensitiveField.value}
         onSensitiveChange={sensitiveField.onChange}
         isSensitiveDisabled={isSensitiveDisabled}

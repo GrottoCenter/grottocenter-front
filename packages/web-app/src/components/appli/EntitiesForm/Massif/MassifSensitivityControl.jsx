@@ -25,7 +25,7 @@ const MassifSensitivityControl = ({
   const explanation = formatMessage({
     id: wasSensitive
       ? 'Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.'
-      : 'Enabling sensitivity will cascade to all entrances within the massif polygon. The designation must be based on applicable legislation.'
+      : 'Marking a massif as sensitive automatically marks all entrances within its polygon as sensitive. Their locations are then hidden from everyone except administrators. This designation must be based on applicable legislation. For more details, see the User Guide.'
   });
 
   let alert = null;
@@ -34,15 +34,6 @@ const MassifSensitivityControl = ({
       severity: 'info',
       content: formatMessage({
         id: 'The sensitivity of this massif is locked. Unlock it to change its sensitivity.'
-      })
-    };
-  } else if (isSensitive && !wasSensitive) {
-    // Mirrors the entrance form: flipping the switch warns immediately, and
-    // the confirmation dialog only comes on save.
-    alert = {
-      severity: 'warning',
-      content: formatMessage({
-        id: 'Entrances within the massif polygon will be marked as sensitive when you save. This designation must be based on applicable legislation.'
       })
     };
   }

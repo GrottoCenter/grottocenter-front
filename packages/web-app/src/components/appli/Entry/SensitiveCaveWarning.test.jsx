@@ -7,7 +7,7 @@ const lockLabel =
   'The sensitivity of this entrance is locked by an administrator.';
 
 const messages = {
-  'Restricted access entrance': 'Restricted access entrance',
+  'Sensitive entrance': 'Sensitive entrance',
   'This entrance requires special protection measures. We do not communicate its precise location on Grottocenter.':
     'This entrance requires special protection measures. We do not communicate its precise location on Grottocenter.',
   [lockLabel]: lockLabel
