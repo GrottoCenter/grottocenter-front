@@ -49,6 +49,9 @@ const getErrorMessage = error => {
   return null;
 };
 
+const hasPolygonChanged = (polygon, initialPolygon) =>
+  JSON.stringify(polygon) !== JSON.stringify(initialPolygon);
+
 export const MassifForm = ({ massifValues, onCancel }) => {
   const { formatMessage } = useIntl();
   const { onWarning, onError, onSuccess } = useNotification();
@@ -58,6 +61,7 @@ export const MassifForm = ({ massifValues, onCancel }) => {
   const [polygonErrors, setPolygonErrors] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [isSubmissionSuccessful, setIsSubmissionSuccessful] = useState(false);
   const [preview, setPreview] = useState(null);
 
   const wasSensitive = !!massifValues?.isSensitive;
@@ -94,7 +98,7 @@ export const MassifForm = ({ massifValues, onCancel }) => {
     watch,
     setValue,
     getValues,
-    formState: { errors, isSubmitting, isSubmitSuccessful }
+    formState: { errors, isSubmitting }
   } = useForm({
     defaultValues: {
       massif: massifValues
@@ -102,7 +106,7 @@ export const MassifForm = ({ massifValues, onCancel }) => {
             nameId: massifValues.names[0]?.id,
             name: massifValues.names[0]?.name,
             language: massifValues.language,
-            geogPolygon: massifValues.geogPolygon,
+            geogPolygon: geoJson,
             isSensitive: wasSensitive,
             isSensitiveLocked: wasLocked
           }
@@ -114,6 +118,7 @@ export const MassifForm = ({ massifValues, onCancel }) => {
   const isSensitiveLocked = !!watch('massif.isSensitiveLocked');
 
   const handleReset = useCallback(() => {
+    setIsSubmissionSuccessful(false);
     reset(undefined, { keepValues: true, keepErrors: false });
   }, [reset]);
 
@@ -154,6 +159,7 @@ export const MassifForm = ({ massifValues, onCancel }) => {
   };
 
   const onSubmit = async data => {
+    setIsSubmissionSuccessful(false);
     if (data.massif.geogPolygon?.coordinates?.length === 0) {
       return;
     }
@@ -181,6 +187,7 @@ export const MassifForm = ({ massifValues, onCancel }) => {
             isSensitiveLocked: true
           });
         }
+        setIsSubmissionSuccessful(true);
         return;
       }
 
@@ -192,7 +199,7 @@ export const MassifForm = ({ massifValues, onCancel }) => {
       }
 
       const body = { id: massifValues.id };
-      if (JSON.stringify(data.massif.geogPolygon) !== JSON.stringify(geoJson)) {
+      if (hasPolygonChanged(data.massif.geogPolygon, geoJson)) {
         body.geogPolygon = data.massif.geogPolygon;
       }
       // Unlocking has to land before the cascade — the API refuses
@@ -204,14 +211,14 @@ export const MassifForm = ({ massifValues, onCancel }) => {
 
       await updateMassifMutation.mutateAsync(body);
 
+      let cascadeResult = null;
+      let wasUnmarked = false;
       if (sensitivityChanged) {
         if (nextSensitive) {
-          notifyCascadeResult(
-            await markMassifMutation.mutateAsync(massifValues.id)
-          );
+          cascadeResult = await markMassifMutation.mutateAsync(massifValues.id);
         } else {
           await unmarkMassifMutation.mutateAsync(massifValues.id);
-          onSuccess(formatMessage({ id: 'Massif unmarked as sensitive.' }));
+          wasUnmarked = true;
         }
       }
 
@@ -221,6 +228,12 @@ export const MassifForm = ({ massifValues, onCancel }) => {
           isSensitiveLocked: true
         });
       }
+
+      if (cascadeResult) notifyCascadeResult(cascadeResult);
+      if (wasUnmarked) {
+        onSuccess(formatMessage({ id: 'Massif unmarked as sensitive.' }));
+      }
+      setIsSubmissionSuccessful(true);
     } catch (error) {
       if (error?.status === 403) {
         onError(
@@ -258,7 +271,11 @@ export const MassifForm = ({ massifValues, onCancel }) => {
     // flipped, so the counts shown are the ones about to be applied.
     const nextSensitive = !!getValues('massif.isSensitive');
     if (isAdmin && nextSensitive !== wasSensitive) {
-      if (!isNewMassif && nextSensitive) {
+      const isPolygonChanged = hasPolygonChanged(
+        getValues('massif.geogPolygon'),
+        geoJson
+      );
+      if (!isNewMassif && nextSensitive && !isPolygonChanged) {
         setIsPreviewLoading(true);
         try {
           setPreview(await previewSensitiveMassif(massifValues.id));
@@ -268,6 +285,10 @@ export const MassifForm = ({ massifValues, onCancel }) => {
         } finally {
           setIsPreviewLoading(false);
         }
+      } else {
+        // The preview endpoint only knows the persisted polygon. Showing its
+        // counts while a new polygon is still local would be misleading.
+        setPreview(null);
       }
       setIsConfirmOpen(true);
       return;
@@ -276,7 +297,10 @@ export const MassifForm = ({ massifValues, onCancel }) => {
     handleSubmit(onSubmit)();
   };
 
-  const handleConfirmCancel = () => setIsConfirmOpen(false);
+  const handleConfirmCancel = () => {
+    setIsConfirmOpen(false);
+    setPreview(null);
+  };
 
   const handleConfirmSubmit = () => {
     setIsConfirmOpen(false);
@@ -317,7 +341,7 @@ export const MassifForm = ({ massifValues, onCancel }) => {
   }
 
   if (
-    isSubmitSuccessful &&
+    isSubmissionSuccessful &&
     !massifLoading &&
     !nameLoading &&
     !is4xxError(massifError) &&
