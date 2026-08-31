@@ -5,7 +5,8 @@ import { PersonPropTypes } from '@/types/person.type';
 import SectionStack from '@/components/common/Layouts/SectionStack';
 import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '@/components/common/Alert';
-import DocumentReferences, {
+import {
+  OrganizationDocumentReferences as DocumentReferences,
   DocumentReferencesSubheader
 } from '@/components/common/DocumentsList/DocumentReferences';
 import PersonProperties from '@/components/common/Person/PersonProperties';

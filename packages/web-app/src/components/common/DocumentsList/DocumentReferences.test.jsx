@@ -1,9 +1,13 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
 
+import renderWithProviders from '@/test/renderWithProviders';
+import { DocumentTypes } from '@/utils/documentTypeHelpers';
 import DocumentReferences, {
-  DocumentReferencesSubheader
+  DocumentReferencesSubheader,
+  OrganizationDocumentReferences
 } from './DocumentReferences';
 
 vi.mock('./DocumentsList', () => ({
@@ -17,24 +21,24 @@ vi.mock('./DocumentsList', () => ({
     )
 }));
 
-const messages = {
+const organizationMessages = {
   'See all documents': 'See all documents',
   'Showing the latest {visible} of {total} documents':
     'Showing the latest {visible} of {total} documents'
 };
 
-const renderReferences = props =>
+const renderOrganizationReferences = props =>
   render(
     <MemoryRouter>
-      <IntlProvider locale="en" messages={messages}>
-        <DocumentReferences {...props} />
+      <IntlProvider locale="en" messages={organizationMessages}>
+        <OrganizationDocumentReferences {...props} />
       </IntlProvider>
     </MemoryRouter>
   );
 
-describe('DocumentReferences', () => {
+describe('OrganizationDocumentReferences', () => {
   it('shows the preview count and links to all matching documents', () => {
-    renderReferences({
+    renderOrganizationReferences({
       documents: [{ id: 1 }, { id: 2 }],
       totalCount: 42,
       searchFilter: { 'authors.nickname': 'Alice & Bob' }
@@ -51,7 +55,7 @@ describe('DocumentReferences', () => {
 
   it('formats the preview summary for a section subheader', () => {
     render(
-      <IntlProvider locale="en" messages={messages}>
+      <IntlProvider locale="en" messages={organizationMessages}>
         <DocumentReferencesSubheader visibleCount={10} totalCount={42} />
       </IntlProvider>
     );
@@ -62,7 +66,7 @@ describe('DocumentReferences', () => {
   });
 
   it('keeps the link when the whole preview fits on the page', () => {
-    renderReferences({
+    renderOrganizationReferences({
       documents: [{ id: 1 }],
       totalCount: 1,
       searchFilter: { 'editor.name': 'Wikicaves' }
@@ -75,7 +79,7 @@ describe('DocumentReferences', () => {
 
   it('hides the preview summary when all documents are displayed', () => {
     const { container } = render(
-      <IntlProvider locale="en" messages={messages}>
+      <IntlProvider locale="en" messages={organizationMessages}>
         <DocumentReferencesSubheader visibleCount={2} totalCount={2} />
       </IntlProvider>
     );
@@ -84,7 +88,7 @@ describe('DocumentReferences', () => {
   });
 
   it('renders the empty state without a see-all link', () => {
-    renderReferences({
+    renderOrganizationReferences({
       documents: [],
       totalCount: 0,
       searchFilter: { 'authorsOrganization.name': 'Wikicaves' },
@@ -93,5 +97,87 @@ describe('DocumentReferences', () => {
 
     expect(screen.getByText('No documents')).toBeInTheDocument();
     expect(screen.queryByRole('link')).toBeNull();
+  });
+});
+
+const bibliographicMessages = {
+  'Bibliographic references': 'Bibliographic references',
+  'Show more': 'Show more',
+  'Show less': 'Show less'
+};
+
+const makeDocument = id => ({
+  id,
+  type: DocumentTypes.TEXT,
+  title: `Document ${id}`
+});
+
+const renderBibliographicReferences = documents =>
+  renderWithProviders(
+    <MemoryRouter>
+      <DocumentReferences documents={documents} />
+    </MemoryRouter>,
+    { messages: bibliographicMessages }
+  );
+
+describe('DocumentReferences', () => {
+  it('renders formatted references as document links', () => {
+    renderBibliographicReferences([
+      {
+        id: 42,
+        type: DocumentTypes.ARTICLE,
+        title: 'Underground rivers',
+        authors: [{ id: 1, nickname: 'DUPONT, Jean' }],
+        datePublication: '2022',
+        parent: { id: 2, title: 'Speleology Review' }
+      }
+    ]);
+
+    const link = screen.getByRole('link', {
+      name: 'DUPONT, Jean, 2022. Underground rivers. Speleology Review.'
+    });
+    expect(link).toHaveAttribute('href', '/ui/documents/42');
+    expect(screen.getByTestId('ArticleIcon')).toBeInTheDocument();
+  });
+
+  it('shows ten references before expanding the complete list', async () => {
+    const user = userEvent.setup();
+    renderBibliographicReferences(
+      Array.from({ length: 12 }, (_, index) => makeDocument(index + 1))
+    );
+
+    expect(screen.getAllByRole('link')).toHaveLength(10);
+    expect(
+      screen.queryByRole('link', { name: 'Document 11' })
+    ).not.toBeInTheDocument();
+
+    const showMore = screen.getByRole('button', { name: 'Show more' });
+    expect(showMore).toHaveAttribute('aria-expanded', 'false');
+    await user.click(showMore);
+
+    expect(screen.getAllByRole('link')).toHaveLength(12);
+    expect(screen.getByRole('link', { name: 'Document 11' })).toHaveAttribute(
+      'href',
+      '/ui/documents/11'
+    );
+    const showLess = screen.getByRole('button', { name: 'Show less' });
+    expect(showLess).toHaveAttribute('aria-expanded', 'true');
+    await user.click(showLess);
+
+    expect(screen.getAllByRole('link')).toHaveLength(10);
+    expect(screen.getByRole('button', { name: 'Show more' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
+  });
+
+  it('uses titles as fallbacks and omits the control for short lists', () => {
+    renderBibliographicReferences([makeDocument(1), makeDocument(2)]);
+
+    expect(screen.getAllByRole('link').map(link => link.textContent)).toEqual([
+      'Document 1',
+      'Document 2'
+    ]);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });

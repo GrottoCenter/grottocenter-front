@@ -9,7 +9,8 @@ import PageTabs from '@/components/common/Layouts/PageTabs';
 import SectionStack from '@/components/common/Layouts/SectionStack';
 import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '@/components/common/Alert';
-import DocumentReferences, {
+import {
+  OrganizationDocumentReferences as DocumentReferences,
   DocumentReferencesSubheader
 } from '@/components/common/DocumentsList/DocumentReferences';
 import EntitiesList from '@/components/common/entitiesList/EntitiesList';

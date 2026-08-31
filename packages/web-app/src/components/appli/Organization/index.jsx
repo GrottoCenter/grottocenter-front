@@ -37,7 +37,8 @@ import {
   useSharePage
 } from '../../../hooks';
 import { organizationKeys } from '../../../api/queryKeys';
-import DocumentReferences, {
+import {
+  OrganizationDocumentReferences as DocumentReferences,
   DocumentReferencesSubheader
 } from '../../common/DocumentsList/DocumentReferences';
 import EntitiesList from '../../common/entitiesList/EntitiesList';

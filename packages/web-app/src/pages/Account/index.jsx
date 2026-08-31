@@ -61,7 +61,8 @@ import { personKeys } from '../../api/queryKeys';
 import Alert from '../../components/common/Alert';
 import BoolIcon from '../../components/common/BoolIcon';
 
-import DocumentReferences, {
+import {
+  OrganizationDocumentReferences as DocumentReferences,
   DocumentReferencesSubheader
 } from '../../components/common/DocumentsList/DocumentReferences';
 import SubscriptionsList from '../../components/common/Subscriptions/SubscriptionsList';
