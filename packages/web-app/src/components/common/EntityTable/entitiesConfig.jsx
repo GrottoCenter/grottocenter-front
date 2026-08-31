@@ -1,6 +1,5 @@
-import { useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Button, Chip, Stack, Typography } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
 import PublishIcon from '@mui/icons-material/Publish';
@@ -25,68 +24,6 @@ const DateTimeCell = ({ value }) => {
 };
 
 DateTimeCell.propTypes = {
-  value: PropTypes.string
-};
-
-const ExpandableDescriptionCell = ({ value }) => {
-  const { formatMessage } = useIntl();
-  const textRef = useRef(null);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isOverflowing, setIsOverflowing] = useState(false);
-
-  useLayoutEffect(() => {
-    const element = textRef.current;
-    if (!element || isExpanded) return undefined;
-
-    const measure = () =>
-      setIsOverflowing(element.scrollHeight > element.clientHeight + 1);
-    measure();
-
-    if (typeof ResizeObserver === 'undefined') return undefined;
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [isExpanded, value]);
-
-  if (!value) return null;
-
-  return (
-    <Box>
-      <Typography
-        ref={textRef}
-        variant="body2"
-        sx={{
-          whiteSpace: 'pre-line',
-          ...(!isExpanded && {
-            display: '-webkit-box',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: { xs: 3, sm: 2 },
-            overflow: 'hidden'
-          })
-        }}>
-        {value}
-      </Typography>
-      {(isOverflowing || isExpanded) && (
-        <Button
-          size="small"
-          variant="text"
-          aria-expanded={isExpanded}
-          onClick={event => {
-            event.preventDefault();
-            event.stopPropagation();
-            setIsExpanded(current => !current);
-          }}
-          sx={{ minWidth: 0, p: 0, mt: 0.25 }}>
-          {formatMessage({
-            id: isExpanded ? 'Show less' : 'Show more'
-          })}
-        </Button>
-      )}
-    </Box>
-  );
-};
-
-ExpandableDescriptionCell.propTypes = {
   value: PropTypes.string
 };
 
@@ -272,13 +209,6 @@ const guidelines = {
     },
     {
       visible: true,
-      field: 'description',
-      label: 'Description',
-      sortable: false,
-      render: value => <ExpandableDescriptionCell value={value} />
-    },
-    {
-      visible: true,
       field: 'language',
       label: 'Language',
       sortable: false,
@@ -298,7 +228,7 @@ const guidelines = {
       field: 'author',
       label: 'Author',
       sortable: false,
-      render: cellsRender.person
+      render: value => value?.nickname ?? value?.name ?? value
     },
     {
       visible: true,
@@ -315,7 +245,7 @@ const guidelines = {
       render: cellsRender.date
     }
   ],
-  link: () => ''
+  link: guideline => `/ui/guidelines/${guideline.id}`
 };
 
 const massifs = {

@@ -30,11 +30,7 @@ const GuidelinesGrouped = ({ guidelines }) => {
             </Typography>
             <List disablePadding>
               {group.items.map(guideline => (
-                <Guideline
-                  key={guideline.id}
-                  guideline={guideline}
-                  isEditAllowed={false}
-                />
+                <Guideline key={guideline.id} guideline={guideline} />
               ))}
             </List>
           </Box>

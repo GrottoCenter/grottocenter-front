@@ -13,15 +13,14 @@ import TextField from '@mui/material/TextField';
 import LinkIcon from '@mui/icons-material/Link';
 import CreateIcon from '@mui/icons-material/Create';
 import { FormattedMessage, useIntl } from 'react-intl';
+import AppLink from '@/components/common/AppLink';
 import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import {
-  usePostGuideline,
   usePatchGuideline,
   usePermissions,
   useNotification
 } from '../../../hooks';
 import GuidelinePropTypes from '../../../types/guideline.type';
-import GuidelineForm from '../EntitiesForm/Guideline/index';
 import Guideline from './Guideline';
 import { getGuidelinesUrl } from '../../../conf/apiRoutes';
 import { checkAndGetStatus } from '../../../actions/utils';
@@ -31,17 +30,16 @@ import { FormActionRow } from '../EntitiesForm/utils/FormContainers';
 import Alert from '../../common/Alert';
 
 const MODE_NONE = 'none';
-const MODE_CREATE = 'create';
 const MODE_ATTACH = 'attach';
 
 // Guidelines attach to a country, a region or a massif; massif is the default.
 const ENTITY_LABEL_IDS = { countries: 'country', regions: 'region' };
+const getScopeId = value => value?.iso ?? value?.id ?? value;
 
 const Guidelines = ({ entityType, entityId, guidelines }) => {
   const permissions = usePermissions();
   const { onError } = useNotification();
   const { formatMessage } = useIntl();
-  const postMutation = usePostGuideline();
   const patchMutation = usePatchGuideline();
   const [mode, setMode] = useState(MODE_NONE);
 
@@ -49,7 +47,6 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
   const [isLoadingGuidelines, setIsLoadingGuidelines] = useState(false);
   const [selectedGuideline, setSelectedGuideline] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [attachFetchTrigger, setAttachFetchTrigger] = useState(0);
 
@@ -94,35 +91,15 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
     setMode(MODE_NONE);
     setSelectedGuideline(null);
     setSearchValue('');
-    setHasSearched(false);
-  };
-
-  const onSubmitCreateForm = async data => {
-    const entities = { countries: [], regions: [], massifs: [] };
-    if (entityType === 'countries') entities.countries = [entityId];
-    else if (entityType === 'regions') entities.regions = [entityId];
-    else if (entityType === 'massifs') entities.massifs = [entityId];
-
-    try {
-      await postMutation.mutateAsync({
-        ...entities,
-        title: data.title,
-        description: data.description,
-        language: data.language
-      });
-      closeForm();
-    } catch {
-      /* toast handled globally */
-    }
   };
 
   const handleAttachGuideline = async e => {
     if (e) e.preventDefault();
     if (!selectedGuideline) return;
 
-    const countries = (selectedGuideline.countries || []).map(c => c.id || c);
-    const regions = (selectedGuideline.regions || []).map(r => r.id || r);
-    const massifs = (selectedGuideline.massifs || []).map(m => m.id || m);
+    const countries = (selectedGuideline.countries || []).map(getScopeId);
+    const regions = (selectedGuideline.regions || []).map(getScopeId);
+    const massifs = (selectedGuideline.massifs || []).map(getScopeId);
 
     if (entityType === 'countries') {
       countries.push(entityId);
@@ -148,15 +125,34 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
     }
   };
 
+  const handleUnlinkGuideline = async guideline => {
+    const scopes = {
+      countries: (guideline.countries ?? []).map(getScopeId),
+      regions: (guideline.regions ?? []).map(getScopeId),
+      massifs: (guideline.massifs ?? []).map(getScopeId)
+    };
+    scopes[entityType] = scopes[entityType].filter(
+      id => String(id) !== String(entityId)
+    );
+
+    await patchMutation.mutateAsync({ id: guideline.id, ...scopes });
+  };
+
   const availableGuidelines = allGuidelines.filter(g => {
     if (entityType === 'countries') {
-      return !g.countries?.some(c => String(c.id || c) === String(entityId));
+      return !g.countries?.some(
+        country => String(getScopeId(country)) === String(entityId)
+      );
     }
     if (entityType === 'regions') {
-      return !g.regions?.some(r => String(r.id || r) === String(entityId));
+      return !g.regions?.some(
+        region => String(getScopeId(region)) === String(entityId)
+      );
     }
     if (entityType === 'massifs') {
-      return !g.massifs?.some(m => String(m.id || m) === String(entityId));
+      return !g.massifs?.some(
+        massif => String(getScopeId(massif)) === String(entityId)
+      );
     }
     return true;
   });
@@ -165,42 +161,6 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
 
   const renderModeContent = () => {
     switch (mode) {
-      case MODE_CREATE:
-        return (
-          <Box mb={1}>
-            <ButtonGroup
-              size="small"
-              sx={{ mb: 1 }}
-              data-testid="guideline-mode-toggle">
-              <Button
-                variant="outlined"
-                startIcon={
-                  <EntityIcon
-                    iconType="guidelines"
-                    size={20}
-                    BadgeIcon={LinkIcon}
-                  />
-                }
-                onClick={() => {
-                  setMode(MODE_ATTACH);
-                  setSelectedGuideline(null);
-                  setAttachFetchTrigger(prev => prev + 1);
-                }}>
-                <FormattedMessage id="Associate" />
-              </Button>
-              <Button variant="contained" startIcon={<CreateIcon />}>
-                <FormattedMessage id="guidelines.create_new" />
-              </Button>
-            </ButtonGroup>
-            <GuidelineForm
-              isNew
-              closeForm={closeForm}
-              onSubmit={onSubmitCreateForm}
-              hideCancel
-            />
-          </Box>
-        );
-
       case MODE_ATTACH:
         return (
           <Box mb={1}>
@@ -212,13 +172,10 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                 <FormattedMessage id="Associate" />
               </Button>
               <Button
+                component={AppLink}
+                to="/ui/entity/add/guideline"
                 variant="outlined"
-                startIcon={<CreateIcon />}
-                disabled={!hasSearched}
-                onClick={() => {
-                  setMode(MODE_CREATE);
-                  setSelectedGuideline(null);
-                }}>
+                startIcon={<CreateIcon />}>
                 <FormattedMessage id="guidelines.create_new" />
               </Button>
             </ButtonGroup>
@@ -238,9 +195,6 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                   inputValue={searchValue}
                   onInputChange={(event, newInputValue) => {
                     setSearchValue(newInputValue);
-                    if (newInputValue.trim().length > 0) {
-                      setHasSearched(true);
-                    }
                   }}
                   onChange={(_event, newValue) =>
                     setSelectedGuideline(newValue)
@@ -360,7 +314,9 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                 <Guideline
                   key={guideline.id}
                   guideline={guideline}
-                  isEditAllowed
+                  onUnlink={
+                    permissions.isAuth ? handleUnlinkGuideline : undefined
+                  }
                 />
               ))}
             </List>

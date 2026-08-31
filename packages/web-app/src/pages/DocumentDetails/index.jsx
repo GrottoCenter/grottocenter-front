@@ -18,6 +18,10 @@ import {
   sortDocuments
 } from '@/utils/documentSort';
 import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
+import LinkedEntitiesList, {
+  ListElement,
+  TextLink
+} from '@/components/common/LinkedEntitiesList';
 import AppLink from '../../components/common/AppLink';
 
 import useOpenLink from '../../hooks/useOpenLink';
@@ -33,12 +37,9 @@ import {
   DetailItem,
   DetailsList,
   EmptySection,
-  EntitiesList,
   EventDateSection,
   FilesSection,
-  ListElement,
-  SummaryText,
-  TextLink
+  SummaryText
 } from './Section';
 import DocumentChildrenList, {
   ChildrenControls,
@@ -752,7 +753,9 @@ const Document = ({
               <ScrollableContent
                 dense
                 title={formatMessage({ id: 'Linked entities' })}
-                content={<EntitiesList>{linkedEntities}</EntitiesList>}
+                content={
+                  <LinkedEntitiesList>{linkedEntities}</LinkedEntitiesList>
+                }
               />
             )}
 
