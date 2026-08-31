@@ -17,6 +17,10 @@ import OpenWithIcon from '@mui/icons-material/OpenWith';
 import useOpenLink from '@/hooks/useOpenLink';
 import CustomIcon from '@/components/common/CustomIcon';
 import { makePointIcon } from './pointIcon';
+import {
+  MAP_CONTROL_BUTTON_SIZE,
+  LEAFLET_CONTROL_MARGIN
+} from './mapControls';
 
 const documentShape = PropTypes.shape({
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -26,6 +30,20 @@ const documentShape = PropTypes.shape({
 });
 
 const EMPTY_DOCUMENTS = [];
+
+// Auto-pan padding so Leaflet never slides the popup under the top-left map
+// controls (zoom, fullscreen, points toggle). The left value is derived from
+// the control column geometry — edge margin + a button + a gap — so it stays
+// correct if the buttons are resized; the rest is a plain viewport margin.
+const AUTOPAN_GAP = 10;
+const AUTOPAN_PADDING_TOP_LEFT = [
+  LEAFLET_CONTROL_MARGIN + MAP_CONTROL_BUTTON_SIZE + AUTOPAN_GAP,
+  LEAFLET_CONTROL_MARGIN
+];
+const AUTOPAN_PADDING_BOTTOM_RIGHT = [
+  LEAFLET_CONTROL_MARGIN,
+  LEAFLET_CONTROL_MARGIN
+];
 
 const docUrl = id => `/ui/documents/${id}`;
 
@@ -132,7 +150,10 @@ const PointMarker = ({
       eventHandlers={
         onMoved ? { dragend: e => onMoved(e.target.getLatLng()) } : undefined
       }>
-      <Popup>
+      <Popup
+        autoPanPaddingTopLeft={AUTOPAN_PADDING_TOP_LEFT}
+        autoPanPaddingBottomRight={AUTOPAN_PADDING_BOTTOM_RIGHT}>
+
         <Box sx={{ minWidth: 240, maxWidth: 320 }}>
           {hasHeader && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
