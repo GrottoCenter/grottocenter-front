@@ -161,9 +161,9 @@ const FitBoundsButton = ({ bounds }) => {
             width: MAP_CONTROL_BUTTON_SIZE,
             height: MAP_CONTROL_BUTTON_SIZE,
             borderRadius: 0,
-            color: '#000',
-            background: '#fff',
-            '&:hover': { background: '#f4f4f4' }
+            color: 'common.black',
+            backgroundColor: 'common.white',
+            '&:hover': { backgroundColor: 'grey.100' }
           }}
         >
           <FitScreenIcon fontSize="small" />
@@ -194,9 +194,11 @@ const PointsToggleButton = ({ active, onToggle }) => {
             width: MAP_CONTROL_BUTTON_SIZE,
             height: MAP_CONTROL_BUTTON_SIZE,
             borderRadius: 0,
-            color: active ? 'primary.main' : '#000',
-            background: '#fff',
-            '&:hover': { background: '#f4f4f4' }
+            color: active ? 'common.white' : 'common.black',
+            backgroundColor: active ? 'secondary.main' : 'common.white',
+            '&:hover': {
+              backgroundColor: active ? 'secondary.dark' : 'grey.100'
+            }
           }}
         >
           <PlaceIcon fontSize="small" />
