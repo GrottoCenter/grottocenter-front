@@ -4,7 +4,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { previewMassifSensitiveUrl } from '../../conf/apiRoutes';
 import { apiGet } from '../../api/client';
 import { massifPreviewKeys } from '../../api/queryKeys';
-import { STALE } from '../../conf/queryClient';
 
 /**
  * Imperative preview of how many entrances would be marked sensitive if a
@@ -13,11 +12,11 @@ import { STALE } from '../../conf/queryClient';
  * user gesture, not a mount).
  *
  * fetchQuery goes through the QueryClient so the response is cached under
- * massifPreviewKeys.sensitive(id) — re-opening the dialog in the same session
- * reuses the count instead of hammering the endpoint. It also routes the
- * error through the global onError, keeping 401 handling in one place.
+ * massifPreviewKeys.sensitive(id). The preview deliberately remains stale so
+ * every confirmation fetches current counts; the key still deduplicates
+ * concurrent requests and routes errors through the global onError.
  *
- * @returns {(massifId: number) => Promise<number>}
+ * @returns {(massifId: number) => Promise<{count: number, lockedCount: number}>}
  */
 export const usePreviewSensitiveMassif = () => {
   const queryClient = useQueryClient();
@@ -26,10 +25,12 @@ export const usePreviewSensitiveMassif = () => {
       queryClient
         .fetchQuery({
           queryKey: massifPreviewKeys.sensitive(massifId),
-          queryFn: () => apiGet(previewMassifSensitiveUrl(massifId)),
-          staleTime: STALE.VOLATILE
+          queryFn: () => apiGet(previewMassifSensitiveUrl(massifId))
         })
-        .then(data => data?.count ?? 0),
+        .then(data => ({
+          count: data?.count ?? 0,
+          lockedCount: data?.lockedCount ?? 0
+        })),
     [queryClient]
   );
 };

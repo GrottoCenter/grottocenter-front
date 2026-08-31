@@ -143,6 +143,7 @@ export {
   useCreateMassif,
   useUpdateMassif,
   useMarkMassifSensitive,
+  useSetMassifSensitiveLock,
   useUnmarkMassifSensitive
 } from './mutations/useMassifForm';
 export { useUpdateName } from './mutations/useUpdateName';

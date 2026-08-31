@@ -4,6 +4,7 @@ import {
   documentKeys,
   entranceKeys,
   massifKeys,
+  massifPreviewKeys,
   organizationKeys,
   personKeys
 } from './queryKeys';
@@ -28,5 +29,11 @@ describe('entity detail query keys', () => {
       '42',
       true
     ]);
+  });
+
+  it('normalizes massif preview ids', () => {
+    expect(massifPreviewKeys.sensitive(42)).toEqual(
+      massifPreviewKeys.sensitive('42')
+    );
   });
 });

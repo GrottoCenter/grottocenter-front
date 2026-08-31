@@ -110,6 +110,7 @@ export const EntrancePropTypes = PropTypes.shape({
   city: PropTypes.string,
   discoveryYear: PropTypes.number,
   isSensitive: PropTypes.bool,
+  isSensitiveLocked: PropTypes.bool,
   hasBat: PropTypes.bool,
   dangerFlooding: PropTypes.bool,
   dangerCo2: PropTypes.bool,

@@ -27,6 +27,12 @@ export const makeEntranceData = (data, entityType) => {
       : null
   };
 
+  // Only administrators edit the sensitivity lock: leave the key out entirely
+  // when the form doesn't hold a value so the API keeps its own default.
+  if (data.entrance.isSensitiveLocked != null) {
+    entranceData.isSensitiveLocked = Boolean(data.entrance.isSensitiveLocked);
+  }
+
   // Only include coordinates when available — they are hidden from non-admin
   // users on sensitive entrances, so omitting them prevents overwriting the
   // stored values with empty ones.
@@ -66,6 +72,10 @@ export const hasEntranceChanged = (entranceDataFmt, originalEntranceValues) => {
     entranceDataFmt.name.language !== originalEntranceValues.language ||
     Boolean(entranceDataFmt.isSensitive) !==
       Boolean(originalEntranceValues.isSensitive) ||
+    ('isSensitiveLocked' in entranceDataFmt
+      ? Boolean(entranceDataFmt.isSensitiveLocked) !==
+        Boolean(originalEntranceValues.isSensitiveLocked)
+      : false) ||
     Boolean(entranceDataFmt.hasBat) !==
       Boolean(originalEntranceValues.hasBat) ||
     Boolean(entranceDataFmt.dangerFlooding) !==

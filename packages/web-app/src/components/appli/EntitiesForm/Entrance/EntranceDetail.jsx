@@ -1,10 +1,10 @@
-import { Box, FormControlLabel, Switch } from '@mui/material';
+import { Box } from '@mui/material';
 import { useRef, useState } from 'react';
-import { Controller, useWatch } from 'react-hook-form';
+import { useController, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { usePermissions, useNearbyEntrances } from '../../../../hooks';
-import Alert from '../../../common/Alert';
+import SensitivitySection from '../../../common/SensitivitySection';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormSection } from '../utils/FormContainers';
 import NumberField from '../utils/NumberField';
@@ -38,12 +38,50 @@ const EntranceDetail = ({
   const values = getValues();
   const initialIsSensitive = useRef(values.entrance.isSensitive).current;
 
-  const isSensitiveDisabled = !permissions.isAdmin && initialIsSensitive;
-  const isSensitive = useWatch({ control, name: 'entrance.isSensitive' });
+  // useController rather than a render-prop Controller: the panel needs both
+  // fields at once, and nesting two Controllers to reach it reads far worse.
+  // No defaultValue on the lock, so an entrance the API returned without one
+  // keeps submitting `undefined` and the transformer can still omit the key.
+  const { field: sensitiveField } = useController({
+    control,
+    name: 'entrance.isSensitive',
+    defaultValue: false
+  });
+  const { field: lockField } = useController({
+    control,
+    name: 'entrance.isSensitiveLocked'
+  });
+  const isSensitiveLocked = !!lockField.value;
+
+  // The precise location of an already sensitive entrance stays hidden from
+  // non-admin users, who therefore can't unrestrict it either.
+  const areCoordinatesHidden = !permissions.isAdmin && initialIsSensitive;
+  // As for massifs, a lock freezes the sensitivity for everyone. An
+  // administrator must explicitly unlock it before changing the value.
+  const isLockedForUser = isSensitiveLocked && !permissions.isAdmin;
+  const isSensitiveDisabled = isSensitiveLocked || areCoordinatesHidden;
+
+  let sensitivityAlert = null;
+  if (isLockedForUser) {
+    sensitivityAlert = {
+      severity: 'info',
+      id: 'An administrator locked the sensitivity of this entrance. It can no longer be changed here.'
+    };
+  } else if (areCoordinatesHidden) {
+    sensitivityAlert = {
+      severity: 'info',
+      id: 'The location of this entrance is hidden. Only an administrator can lift this restriction.'
+    };
+  } else if (isSensitiveLocked) {
+    sensitivityAlert = {
+      severity: 'info',
+      id: 'The sensitivity of this entrance is locked. Unlock it to change its sensitivity.'
+    };
+  }
 
   return (
     <FormSection title="Location">
-      {!isSensitiveDisabled && (
+      {!areCoordinatesHidden && (
         <CoordinateFormSection
           control={control}
           formLatitudeKey="entrance.latitude"
@@ -74,35 +112,28 @@ const EntranceDetail = ({
           unit="m"
           isError={!!errors.entrance?.altitude}
         />
-        <Controller
-          name="entrance.isSensitive"
-          control={control}
-          defaultValue={false}
-          render={({ field: { ref, value, onChange } }) => (
-            <FormControlLabel
-              control={
-                <Switch
-                  inputRef={ref}
-                  disabled={isSensitiveDisabled}
-                  checked={value}
-                  onChange={e => onChange(e.target.checked)}
-                />
-              }
-              label={formatMessage({ id: 'Restricted access entrance' })}
-            />
-          )}
-        />
       </Box>
-      {(isSensitive || isSensitiveDisabled) && (
-        <Alert
-          severity={isSensitiveDisabled ? 'info' : 'warning'}
-          content={formatMessage({
-            id: isSensitiveDisabled
-              ? "You can't unrestrict a cave access."
-              : 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
-          })}
-        />
-      )}
+      {/* Same panel as the massif form: the rules are identical, so the two
+          entities should not look like two different features. */}
+      <SensitivitySection
+        title="Sensitivity Management"
+        explanation={formatMessage({
+          id: 'Marking an entrance as sensitive hides its location from everyone except administrators. For more details, see the User Guide.'
+        })}
+        switchLabel="Sensitive entrance"
+        isSensitive={!!sensitiveField.value}
+        onSensitiveChange={sensitiveField.onChange}
+        isSensitiveDisabled={isSensitiveDisabled}
+        showLock={permissions.isAdmin}
+        isLocked={isSensitiveLocked}
+        onLockChange={lockField.onChange}
+        alert={
+          sensitivityAlert && {
+            severity: sensitivityAlert.severity,
+            content: formatMessage({ id: sensitivityAlert.id })
+          }
+        }
+      />
     </FormSection>
   );
 };

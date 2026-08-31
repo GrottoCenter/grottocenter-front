@@ -209,10 +209,10 @@ export const substanceKeys = {
 
 // Preview of how many entrances would be affected by marking a massif as
 // sensitive. Read-only imperative check used before a moderator confirms the
-// action; keyed on the massif id so a re-open reuses the count.
+// action; keyed on the massif id to deduplicate concurrent requests.
 export const massifPreviewKeys = {
   all: ['massifPreview'],
-  sensitive: massifId => ['massifPreview', 'sensitive', massifId]
+  sensitive: massifId => ['massifPreview', 'sensitive', normalizeId(massifId)]
 };
 
 // Short-lived SSO tokens for the BI dashboard. Not cached under a stable key
