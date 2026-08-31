@@ -296,9 +296,10 @@ const DocumentSvgViewer = ({
   const handleSubmitPoint = useCallback(
     ({ label, documents }) => {
       if (!dialog) return;
-      const docs = documents.map(docId => ({
-        id: `doc-${docId}`,
-        documentId: docId
+      const docs = documents.map(({ documentId, label: docLabel }) => ({
+        id: `doc-${documentId}`,
+        documentId,
+        label: docLabel
       }));
       if (dialog.mode === 'create') {
         if (dialog.coordinates) {
