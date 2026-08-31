@@ -70,3 +70,22 @@ it('does not show the Guidelines card to leaders without moderation rights', () 
 
   expect(screen.queryByRole('link', { name: /Guidelines/ })).toBeNull();
 });
+
+it('orders management groups as content, data and users', () => {
+  usePermissions.mockReturnValue({
+    isAuth: true,
+    isAdmin: true,
+    isLeader: true,
+    isModerator: true,
+    isRealAdmin: true,
+    isTokenExpired: false
+  });
+
+  renderDashboard();
+
+  expect(
+    screen
+      .getAllByText(/^(Content|Data|Users)$/)
+      .map(groupTitle => groupTitle.textContent)
+  ).toEqual(['Content', 'Data', 'Users']);
+});

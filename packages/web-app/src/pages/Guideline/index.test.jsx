@@ -66,7 +66,7 @@ vi.mock('@/components/common/FetchErrorState', () => ({
 }));
 
 const messages = {
-  Description: 'Description',
+  'guidelines.description': 'Instructions',
   'Applies to': 'Applies to',
   Country: 'Country',
   Region: 'Region',
@@ -78,8 +78,7 @@ const messages = {
   Edit: 'Edit',
   History: 'History',
   Delete: 'Delete',
-  No: 'No',
-  Yes: 'Yes',
+  Cancel: 'Cancel',
   close: 'Close',
   'Loading ...': 'Loading',
   'delete-confirmation-dialog': 'Delete this {entityFmt}?',
@@ -136,7 +135,7 @@ beforeEach(() => {
   });
 });
 
-it('shows the full description, contributors and geographical scope', () => {
+it('shows the full instructions, contributors and geographical scope', () => {
   setGuidelineResult(guideline);
   renderPage();
 
@@ -147,7 +146,7 @@ it('shows the full description, contributors and geographical scope', () => {
     whiteSpace: 'pre-wrap'
   });
   expect(
-    screen.getByRole('heading', { name: 'Description' }).closest('section')
+    screen.getByRole('heading', { name: 'Instructions' }).closest('section')
   ).toHaveAttribute('data-dense', 'true');
   expect(
     screen.getByRole('heading', { name: 'Applies to' }).closest('section')
@@ -199,7 +198,7 @@ it('offers edit and confirmed deletion according to RBAC', async () => {
   );
   await user.click(screen.getByRole('button', { name: 'Delete' }));
   expect(screen.getByText('Delete this Access restrictions?')).toBeVisible();
-  await user.click(screen.getByRole('button', { name: 'Yes' }));
+  await user.click(screen.getByRole('button', { name: 'Delete' }));
 
   expect(mutateAsync).toHaveBeenCalledWith({ id: '42', isPermanent: false });
   expect(await screen.findByText('Guidelines list')).toBeVisible();

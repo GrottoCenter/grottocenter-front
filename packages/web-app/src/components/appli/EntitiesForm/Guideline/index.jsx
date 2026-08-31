@@ -12,6 +12,7 @@ import {
   Typography
 } from '@mui/material';
 
+import Alert from '../../../common/Alert';
 import {
   FormContainer,
   FormActionRow,
@@ -24,13 +25,17 @@ import { useEntitySearch, useRegionsSearch } from '../../../../hooks';
 
 import GuidelinePropTypes from '../../../../types/guideline.type';
 
-const getDefaultValues = language => ({
+const INSTRUCTIONS_CHARACTER_LIMIT = 500;
+const INSTRUCTIONS_OVERFLOW_ALLOWANCE = 100;
+
+const getDefaultValues = (language, associatedScope) => ({
   title: '',
   description: '',
   language,
-  countries: [],
-  regions: [],
-  massifs: []
+  countries:
+    associatedScope?.type === 'countries' ? [associatedScope.value] : [],
+  regions: associatedScope?.type === 'regions' ? [associatedScope.value] : [],
+  massifs: associatedScope?.type === 'massifs' ? [associatedScope.value] : []
 });
 
 const COUNTRY_OPTIONS = countryList()
@@ -49,7 +54,13 @@ const mergeSelectedOptions = (getId, selected = [], options = []) => [
 const getCountryId = country => country?.id ?? country;
 const getRegionId = region => region?.iso ?? region?.id ?? region;
 const getMassifId = massif => massif?.id ?? massif;
-const CHIP_SLOT_PROPS = { chip: { color: 'primary' } };
+const getCountryLabel = country =>
+  country?.name ?? country?.id ?? String(country);
+const getRegionLabel = region => {
+  const id = getRegionId(region);
+  return region?.name ? `${region.name} (${id})` : String(id);
+};
+const getMassifLabel = massif => massif?.name ?? String(getMassifId(massif));
 
 const GuidelineForm = ({
   closeForm,
@@ -57,7 +68,8 @@ const GuidelineForm = ({
   values,
   isNew,
   hideCancel = false,
-  withScope = false
+  withScope = false,
+  associatedScope = undefined
 }) => {
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
   const { formatMessage } = useIntl();
@@ -75,7 +87,8 @@ const GuidelineForm = ({
   } = useForm({
     mode: 'onChange',
     defaultValues:
-      normalizedValues ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id)
+      normalizedValues ??
+      getDefaultValues(AVAILABLE_LANGUAGES[locale].id, associatedScope)
   });
 
   const [selectedCountries, selectedRegions, selectedMassifs] = useWatch({
@@ -91,17 +104,19 @@ const GuidelineForm = ({
 
   const isTitleLengthValid = value => !value || value.length <= 150;
 
-  const isDescriptionLengthValid = value => !value || value.length <= 500;
+  const hasInstructions = value => Boolean(value?.trim());
 
   const [regionSearch, setRegionSearch] = useState('');
   const { data: regionOptions = [], isFetching: isLoadingRegions } =
-    useRegionsSearch(withScope ? regionSearch : '');
+    useRegionsSearch(withScope && !associatedScope ? regionSearch : '');
   const {
     inputValue: massifSearch,
     setInputValue: setMassifSearch,
     results: massifOptions,
     isLoading: isLoadingMassifs
-  } = useEntitySearch(['massifs'], { enabled: withScope });
+  } = useEntitySearch(['massifs'], {
+    enabled: withScope && !associatedScope
+  });
 
   const handleValidSubmit = async data => {
     const countries = (data.countries ?? []).map(getCountryId);
@@ -118,6 +133,17 @@ const GuidelineForm = ({
   return (
     <FormContainer sx={{ marginTop: 1 }}>
       <form autoComplete="off" onSubmit={handleSubmit(handleValidSubmit)}>
+        {associatedScope && (
+          <Alert
+            severity="info"
+            content={formatMessage(
+              { id: 'guidelines.creation_association' },
+              {
+                entityName: <strong>{associatedScope.value.name}</strong>
+              }
+            )}
+          />
+        )}
         <FormRow>
           <InputText
             formKey="title"
@@ -147,17 +173,26 @@ const GuidelineForm = ({
           minRows={3}
           control={control}
           isError={!!errors?.description}
-          validatorFn={isDescriptionLengthValid}
+          isRequired
+          characterLimit={INSTRUCTIONS_CHARACTER_LIMIT}
+          characterLimitOverflow={INSTRUCTIONS_OVERFLOW_ALLOWANCE}
+          validatorFn={hasInstructions}
           helperText={
             errors?.description
-              ? formatMessage({
-                  id: 'Description must be less than 500 characters.'
-                })
+              ? formatMessage(
+                  {
+                    id:
+                      errors.description.type === 'maxLength'
+                        ? 'guidelines.instructions_too_long'
+                        : 'guidelines.instructions_required'
+                  },
+                  { count: INSTRUCTIONS_CHARACTER_LIMIT }
+                )
               : undefined
           }
         />
 
-        {withScope && (
+        {withScope && !associatedScope && (
           <FormSection title="Applies to">
             <Stack spacing={1}>
               <Typography
@@ -177,14 +212,12 @@ const GuidelineForm = ({
                     options={COUNTRY_OPTIONS}
                     value={field.value ?? []}
                     onChange={(_event, value) => field.onChange(value)}
-                    getOptionLabel={option =>
-                      option?.name ?? option?.id ?? String(option)
-                    }
+                    getOptionLabel={getCountryLabel}
                     isOptionEqualToValue={(option, value) =>
                       String(getCountryId(option)) ===
                       String(getCountryId(value))
                     }
-                    slotProps={CHIP_SLOT_PROPS}
+                    slotProps={{ chip: { color: 'primary' } }}
                     renderInput={params => (
                       <TextField
                         {...params}
@@ -214,16 +247,11 @@ const GuidelineForm = ({
                       setRegionSearch(reason === 'input' ? value : '')
                     }
                     onChange={(_event, value) => field.onChange(value)}
-                    getOptionLabel={option => {
-                      const id = getRegionId(option);
-                      return option?.name
-                        ? `${option.name} (${id})`
-                        : String(id);
-                    }}
+                    getOptionLabel={getRegionLabel}
                     isOptionEqualToValue={(option, value) =>
                       String(getRegionId(option)) === String(getRegionId(value))
                     }
-                    slotProps={CHIP_SLOT_PROPS}
+                    slotProps={{ chip: { color: 'primary' } }}
                     renderInput={params => (
                       <TextField
                         {...params}
@@ -264,13 +292,11 @@ const GuidelineForm = ({
                       setMassifSearch(reason === 'input' ? value : '')
                     }
                     onChange={(_event, value) => field.onChange(value)}
-                    getOptionLabel={option =>
-                      option?.name ?? String(getMassifId(option))
-                    }
+                    getOptionLabel={getMassifLabel}
                     isOptionEqualToValue={(option, value) =>
                       String(getMassifId(option)) === String(getMassifId(value))
                     }
-                    slotProps={CHIP_SLOT_PROPS}
+                    slotProps={{ chip: { color: 'primary' } }}
                     renderInput={params => (
                       <TextField
                         {...params}
@@ -317,7 +343,14 @@ GuidelineForm.propTypes = {
   // affordance (e.g. a section header's SectionCreateButton), so the two do not
   // stack.
   hideCancel: PropTypes.bool,
-  withScope: PropTypes.bool
+  withScope: PropTypes.bool,
+  associatedScope: PropTypes.shape({
+    type: PropTypes.oneOf(['countries', 'regions', 'massifs']).isRequired,
+    value: PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string.isRequired
+    }).isRequired
+  })
 };
 
 export default GuidelineForm;

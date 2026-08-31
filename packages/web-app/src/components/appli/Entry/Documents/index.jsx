@@ -44,17 +44,6 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
         permissions.isAuth &&
         isEditAllowed && (
           <Box display="flex" gap={0.5}>
-            <NewEntityButton
-              to={`/ui/entity/add/document?entranceId=${entranceId}`}
-              size="small"
-              tooltip={formatMessage({ id: 'Create a new document' })}
-              icon={
-                <EntityIcon
-                  iconType="bibliography"
-                  size={SECTION_ACTION_ICON_SIZE}
-                />
-              }
-            />
             <SectionCreateButton
               isOpen={isDocumentSearchVisible}
               onToggle={() =>
@@ -68,6 +57,17 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
                   iconType="bibliography"
                   size={SECTION_ACTION_ICON_SIZE}
                   BadgeIcon={LinkIcon}
+                />
+              }
+            />
+            <NewEntityButton
+              to={`/ui/entity/add/document?entranceId=${entranceId}`}
+              size="small"
+              tooltip={formatMessage({ id: 'Create a new document' })}
+              icon={
+                <EntityIcon
+                  iconType="bibliography"
+                  size={SECTION_ACTION_ICON_SIZE}
                 />
               }
             />
