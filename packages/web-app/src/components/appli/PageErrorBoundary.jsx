@@ -1,54 +1,27 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useIntl } from 'react-intl';
 import { useLocation, useNavigate } from 'react-router-dom';
-import CheckIcon from '@mui/icons-material/Check';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  IconButton,
-  Tooltip,
-  Typography
-} from '@mui/material';
+import { Box, Button, Card, CardContent, Typography } from '@mui/material';
 
-import copyToClipboard from '@/utils/clipboard';
 import {
   createGitHubIssueForClientLinks,
   contactLinks
 } from '../../conf/externalLinks';
 import AppLink from '../common/AppLink';
+import CopyToClipboardIconButton from '../common/CopyToClipboardIconButton';
 import InternationalizedLink from '../common/InternationalizedLink';
 import PageContainer from '../common/Layouts/PageContainer';
 import Translate from '../common/Translate';
 
 const appVersion = import.meta.env.VITE_APP_VERSION || '—';
-const COPY_STATUS_MESSAGES = {
-  error: 'Unable to copy technical details',
-  success: 'Technical details copied'
-};
-const VISUALLY_HIDDEN = {
-  border: 0,
-  clip: 'rect(0 0 0 0)',
-  height: '1px',
-  margin: -1,
-  overflow: 'hidden',
-  padding: 0,
-  position: 'absolute',
-  whiteSpace: 'nowrap',
-  width: '1px'
-};
-
 export const PageError = ({ error = null }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const location = useLocation();
   const titleRef = useRef(null);
-  const [copyStatus, setCopyStatus] = useState(null);
 
   // Keep the timestamp tied to the error screen's first render. Route-key
   // changes reset the boundary; same-key hash changes intentionally preserve
@@ -74,25 +47,6 @@ export const PageError = ({ error = null }) => {
   useEffect(() => {
     titleRef.current?.focus({ preventScroll: true });
   }, []);
-
-  useEffect(() => {
-    if (!copyStatus) return undefined;
-    const timeout = setTimeout(() => setCopyStatus(null), 2000);
-    return () => clearTimeout(timeout);
-  }, [copyStatus]);
-
-  const copyLabel = formatMessage({
-    id: COPY_STATUS_MESSAGES[copyStatus] || 'Copy details'
-  });
-
-  const handleCopy = async () => {
-    try {
-      await copyToClipboard(technicalReport);
-      setCopyStatus('success');
-    } catch (_error) {
-      setCopyStatus('error');
-    }
-  };
 
   return (
     <PageContainer>
@@ -191,21 +145,17 @@ export const PageError = ({ error = null }) => {
                   }}>
                   {technicalReport}
                 </Box>
-                <Tooltip title={copyLabel}>
-                  <IconButton
-                    aria-label={copyLabel}
-                    onClick={handleCopy}
-                    size="small"
-                    sx={{ position: 'absolute', right: 0.5, top: 0.5 }}>
-                    {copyStatus === 'success' ? (
-                      <CheckIcon color="success" />
-                    ) : (
-                      <ContentCopyIcon />
-                    )}
-                  </IconButton>
-                </Tooltip>
-                <Box aria-live="polite" component="span" sx={VISUALLY_HIDDEN}>
-                  {copyStatus && copyLabel}
+                <Box sx={{ position: 'absolute', right: 0.5, top: 0.5 }}>
+                  <CopyToClipboardIconButton
+                    value={technicalReport}
+                    label={formatMessage({ id: 'Copy details' })}
+                    successLabel={formatMessage({
+                      id: 'Technical details copied'
+                    })}
+                    errorLabel={formatMessage({
+                      id: 'Unable to copy technical details'
+                    })}
+                  />
                 </Box>
               </Box>
             </Box>
