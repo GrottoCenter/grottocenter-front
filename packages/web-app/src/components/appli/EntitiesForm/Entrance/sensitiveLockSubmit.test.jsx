@@ -37,7 +37,6 @@ const LockFormHarness = ({ entranceValues, isAdmin, onPayload }) => {
         <Controller
           name="entrance.isSensitiveLocked"
           control={control}
-          defaultValue={false}
           render={({ field: { value, onChange } }) => (
             <button type="button" onClick={() => onChange(!value)}>
               toggle lock

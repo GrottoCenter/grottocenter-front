@@ -145,6 +145,8 @@ export const MassifForm = ({ massifValues, onCancel }) => {
   // marking endpoint: unmarking never touches entrances.
   const notifyCascadeResult = result => {
     const count = result?.count ?? preview?.count ?? 0;
+    // The preview and mutation endpoints expose the same value under
+    // `lockedCount` and `skippedLockedCount`, respectively.
     const lockedCount = result?.skippedLockedCount ?? preview?.lockedCount ?? 0;
     let messageId;
     if (lockedCount > 0) {

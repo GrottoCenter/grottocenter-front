@@ -378,6 +378,8 @@ export const Entry = ({
                             flexDirection: 'column',
                             gap: 1
                           }}>
+                          {/* Non-admins see SensitiveLocationPlaceholder below,
+                              so only admins reach this lock indicator. */}
                           {entrance.isSensitive && isAdmin && (
                             <SensitiveCaveWarning
                               isLocked={!!entrance.isSensitiveLocked}

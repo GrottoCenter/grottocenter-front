@@ -109,10 +109,15 @@ vi.mock('./MassifFields', async () => {
 });
 
 vi.mock('./MassifSensitivityControl', () => ({
-  default: ({ onSensitiveChange }) => (
-    <button type="button" onClick={() => onSensitiveChange(true)}>
-      enable sensitivity
-    </button>
+  default: ({ onSensitiveChange, onLockChange }) => (
+    <>
+      <button type="button" onClick={() => onSensitiveChange(true)}>
+        enable sensitivity
+      </button>
+      <button type="button" onClick={() => onLockChange(true)}>
+        lock sensitivity
+      </button>
+    </>
   )
 }));
 
@@ -203,6 +208,24 @@ describe('MassifForm React Query flow', () => {
     expect(await screen.findByText('submission complete')).toBeInTheDocument();
     expect(mocks.updateMassif.mutateAsync).toHaveBeenCalledBefore(
       mocks.markMassif.mutateAsync
+    );
+  });
+
+  it('locks a new massif after creating it', async () => {
+    const user = userEvent.setup();
+    render(<MassifForm />);
+
+    await user.click(screen.getByRole('button', { name: 'lock sensitivity' }));
+    await user.click(screen.getByRole('button', { name: 'Update' }));
+
+    expect(await screen.findByText('submission complete')).toBeInTheDocument();
+    expect(mocks.createMassif.mutateAsync).toHaveBeenCalled();
+    expect(mocks.setMassifLock.mutateAsync).toHaveBeenCalledWith({
+      id: 99,
+      isSensitiveLocked: true
+    });
+    expect(mocks.createMassif.mutateAsync).toHaveBeenCalledBefore(
+      mocks.setMassifLock.mutateAsync
     );
   });
 });
