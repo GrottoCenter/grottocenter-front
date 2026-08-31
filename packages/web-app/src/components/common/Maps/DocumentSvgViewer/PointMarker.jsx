@@ -10,12 +10,12 @@ import {
   IconButton,
   Typography
 } from '@mui/material';
-import DescriptionIcon from '@mui/icons-material/Description';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import EditIcon from '@mui/icons-material/Edit';
 import OpenWithIcon from '@mui/icons-material/OpenWith';
 
 import useOpenLink from '@/hooks/useOpenLink';
+import CustomIcon from '@/components/common/CustomIcon';
 import { makePointIcon } from './pointIcon';
 
 const documentShape = PropTypes.shape({
@@ -48,7 +48,7 @@ const MultiDoc = ({ documents, onOpen }) => {
             justifyContent: 'flex-start',
             '&:hover': { bgcolor: 'action.hover' }
           }}>
-          <DescriptionIcon fontSize="small" sx={{ color: 'primary.main' }} />
+          <CustomIcon type="bibliography" size={20} />
           <Typography
             variant="body2"
             noWrap

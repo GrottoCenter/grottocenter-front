@@ -9,9 +9,8 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { MapContainer, useMap, useMapEvent } from 'react-leaflet';
 import { CRS } from 'leaflet';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import {
-  Box,
   CircularProgress,
   IconButton,
   ListItemIcon,
@@ -22,7 +21,7 @@ import {
   Typography
 } from '@mui/material';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
-import DescriptionIcon from '@mui/icons-material/Description';
+import PlaceIcon from '@mui/icons-material/Place';
 
 import { useNotification } from '@/hooks';
 import FullscreenControl from '../common/FullscreenControl';
@@ -33,7 +32,6 @@ import PointFormDialog from './PointFormDialog';
 import useSvgData from './useSvgData';
 import useMockPoints from './useMockPoints';
 import useFullscreenContainer from './useFullscreenContainer';
-import { pointIconHtml } from './pointIcon';
 import { makeFrameToSvg, makeSvgToFrame } from './georef';
 
 const PAN_MARGIN = 0.5;
@@ -77,16 +75,8 @@ const PointCreationHandler = ({
   menuContainer
 }) => {
   const { formatMessage } = useIntl();
-  const theme = useTheme();
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [pendingCoords, setPendingCoords] = useState(null);
-
-  const iconSrc = `data:image/svg+xml,${encodeURIComponent(
-    pointIconHtml({
-      color: theme.palette.primary.main,
-      badgeColor: theme.palette.secondary.main
-    })
-  )}`;
 
   useMapEvent('contextmenu', e => {
     e.originalEvent.preventDefault();
@@ -112,12 +102,7 @@ const PointCreationHandler = ({
     >
       <MenuItem onClick={handleCreate}>
         <ListItemIcon>
-          <Box
-            component="img"
-            src={iconSrc}
-            alt=""
-            sx={{ width: 30, height: 30 }}
-          />
+          <PlaceIcon sx={{ color: 'primary.main' }} />
         </ListItemIcon>
         <ListItemText>
           {formatMessage({ id: 'Create a point here' })}
@@ -213,7 +198,7 @@ const PointsToggleButton = ({ active, onToggle }) => {
             '&:hover': { background: '#f4f4f4' }
           }}
         >
-          <DescriptionIcon fontSize="small" />
+          <PlaceIcon fontSize="small" />
         </IconButton>
       </Tooltip>
     </CustomControl>
