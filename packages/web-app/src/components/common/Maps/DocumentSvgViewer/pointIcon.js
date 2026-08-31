@@ -22,10 +22,15 @@ const renderMarker = (color, badgeColor, count) =>
   (count > 0 ? renderBadge(badgeColor, count) : '') +
   `</svg>`;
 
-export const makePointIcon = ({ color, badgeColor = color, count = 0 }) =>
+// Raw SVG markup of the marker, so the same icon can be reused outside Leaflet
+// (e.g. in a menu item).
+export const pointIconHtml = ({ color, badgeColor = color, count = 0 }) =>
+  renderMarker(color, badgeColor, count);
+
+export const makePointIcon = opts =>
   divIcon({
     className: 'topo-point-marker',
-    html: renderMarker(color, badgeColor, count),
+    html: pointIconHtml(opts),
     iconSize: [MARKER_SIZE, MARKER_SIZE],
     iconAnchor: [MARKER_SIZE / 2, MARKER_SIZE - 3]
   });

@@ -90,6 +90,15 @@ The viewer receives points through the `points` prop (see `index.jsx`). The
 Full example: `src/pages/homepage/TopoViewer.jsx` (wired to
 `public/la-grande-topo.svg`).
 
+### Creating points from the viewer
+
+When the SVG has control points, **right-click** on the drawing opens a small menu
+→ *Create a point here* → a dialog asks for a name and optional document ids. The
+click position is converted to frame coordinates and the point is added to the
+viewer. This has **no backend yet**: created points are a temporary mock,
+persisted in `localStorage` keyed by the SVG url (`useMockPoints.js`). See
+`CreatePointDialog.jsx`. Replace with a real API when available.
+
 ---
 
 ## Files
