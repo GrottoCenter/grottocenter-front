@@ -23,7 +23,7 @@ import {
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 import PlaceIcon from '@mui/icons-material/Place';
 
-import { useNotification } from '@/hooks';
+import { useNotification, usePermissions } from '@/hooks';
 import FullscreenControl from '../common/FullscreenControl';
 import CustomControl from '../common/CustomControl';
 import SvgTileLayer from '../SvgTileLayer';
@@ -223,6 +223,7 @@ const DocumentSvgViewer = ({
 }) => {
   const { formatMessage } = useIntl();
   const { onSuccess } = useNotification();
+  const { isAuth } = usePermissions();
   const state = useSvgData(svgUrl);
   const [showPoints, setShowPoints] = useState(true);
   const { points: mockPoints, addPoint, updatePoint } = useMockPoints(svgUrl);
@@ -379,7 +380,9 @@ const DocumentSvgViewer = ({
         <TilesLayer svgData={state.data} bounds={derived.bounds} />
         {showPoints &&
           placedPoints.map(({ point, position }) => {
-            const editable = mockIds.has(point.id);
+            // Editing/moving mutates data, so gate it on auth (only mock
+            // points are editable for now anyway).
+            const editable = isAuth && mockIds.has(point.id);
             return (
               <PointMarker
                 key={point.id}
@@ -403,7 +406,7 @@ const DocumentSvgViewer = ({
             onToggle={() => setShowPoints(v => !v)}
           />
         )}
-        {latLngToFrame && (
+        {isAuth && latLngToFrame && (
           <PointCreationHandler
             latLngToFrame={latLngToFrame}
             onRequestCreate={handleRequestCreate}
