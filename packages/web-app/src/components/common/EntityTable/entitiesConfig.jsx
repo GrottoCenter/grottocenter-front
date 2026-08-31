@@ -395,9 +395,10 @@ const documents = {
       visible: true,
       field: 'authors',
       label: 'Author',
-      sortable: false,
+      sortable: true,
       render: cellsRender.documentAuthors,
-      apiField: 'authors.nickname'
+      apiField: 'authors.nickname',
+      sortField: 'authorsSort'
     },
     { visible: false, field: 'library.name', label: 'Library', sortable: true },
     { visible: false, field: 'editor.name', label: 'Editor', sortable: true },
