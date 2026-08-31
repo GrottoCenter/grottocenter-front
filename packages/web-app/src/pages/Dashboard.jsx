@@ -29,6 +29,8 @@ import {
 } from '../hooks';
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
 import ImpersonationLauncher from '../components/appli/ImpersonationLauncher';
+import AppLink from '../components/common/AppLink';
+import CustomIcon from '../components/common/CustomIcon';
 
 const Section = styled(Box)(({ theme }) => ({
   '& + &': {
@@ -69,7 +71,7 @@ const ToolCard = ({
   count,
   isLoading = false,
   isError = false,
-  onClick
+  to
 }) => {
   const { formatMessage } = useIntl();
   const roleLabel = formatMessage({ id: roleId });
@@ -91,7 +93,10 @@ const ToolCard = ({
 
   return (
     <Card variant="outlined">
-      <CardActionArea onClick={onClick} aria-label={`${title} — ${roleLabel}`}>
+      <CardActionArea
+        component={AppLink}
+        to={to}
+        aria-label={`${title} — ${roleLabel}`}>
         <CardContent sx={{ position: 'relative', p: 2, pt: 3 }}>
           <Chip
             variant="outlined"
@@ -132,7 +137,7 @@ ToolCard.propTypes = {
   count: PropTypes.number,
   isLoading: PropTypes.bool,
   isError: PropTypes.bool,
-  onClick: PropTypes.func.isRequired
+  to: PropTypes.string.isRequired
 };
 
 const DBExportCard = ({ dbExport, isLoading }) => {
@@ -229,8 +234,6 @@ const Dashboard = () => {
     enabled: permissions.isModerator
   });
 
-  const goTo = url => navigate(url);
-
   useEffect(() => {
     const hasDashboardAccess =
       (permissions.isRealAdmin && !permissions.isTokenExpired) ||
@@ -269,7 +272,7 @@ const Dashboard = () => {
                       id: 'Manage users description'
                     })}
                     roleId="Administrator"
-                    onClick={() => goTo('/ui/admin/users')}
+                    to="/ui/admin/users"
                   />
                 )}
                 <ImpersonationLauncher />
@@ -292,7 +295,7 @@ const Dashboard = () => {
                   count={pendingDocumentsQuery.data ?? 0}
                   isLoading={pendingDocumentsQuery.isPending}
                   isError={pendingDocumentsQuery.isError}
-                  onClick={() => goTo('/ui/documents/validation')}
+                  to="/ui/documents/validation"
                 />
                 <ToolCard
                   icon={<CallMergeIcon />}
@@ -304,7 +307,16 @@ const Dashboard = () => {
                   count={duplicatesQuery.data ?? 0}
                   isLoading={duplicatesQuery.isPending}
                   isError={duplicatesQuery.isError}
-                  onClick={() => goTo('/ui/duplicates')}
+                  to="/ui/duplicates"
+                />
+                <ToolCard
+                  icon={<CustomIcon type="guidelines" size={36} />}
+                  title={formatMessage({ id: 'Guidelines' })}
+                  description={formatMessage({
+                    id: 'guidelines.dashboard.description'
+                  })}
+                  roleId="Moderator"
+                  to="/ui/guidelines"
                 />
               </ToolGrid>
             </Section>
@@ -323,7 +335,7 @@ const Dashboard = () => {
                       id: 'CSV Import description'
                     })}
                     roleId="Moderator"
-                    onClick={() => goTo('/ui/import-csv')}
+                    to="/ui/import-csv"
                   />
                 )}
                 {permissions.isLeader && (

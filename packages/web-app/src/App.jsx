@@ -71,6 +71,7 @@ const OrganizationEdit = lazy(
 const CountryPage = lazy(() => import('./pages/Country'));
 const RegionPage = lazy(() => import('./pages/Region'));
 const NotificationsPage = lazy(() => import('./pages/Notifications'));
+const GuidelinesPage = lazy(() => import('./pages/Guidelines'));
 const MessagesPage = lazy(() => import('./pages/Messages'));
 const SnapshotPage = lazy(() => import('./components/appli/Entry/Snapshots'));
 const EntrancesListPage = lazy(() => import('./pages/EntrancesList'));
@@ -119,6 +120,7 @@ const router = createBrowserRouter(
       <Route path="/ui/contributions" element={<ContributionsPage />} />
       <Route path="/ui/changes/recent" element={<RecentChangesPage />} />
       <Route path="/ui/notifications" element={<NotificationsPage />} />
+      <Route path="/ui/guidelines" element={<GuidelinesPage />} />
       <Route path="/ui/messages" element={<MessagesPage />} />
       <Route path="/ui/messages/:conversationId" element={<MessagesPage />} />
       <Route path="/ui/test" element={<LatestBlogNewsSection />} />
