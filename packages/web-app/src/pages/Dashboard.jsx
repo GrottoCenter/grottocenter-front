@@ -15,6 +15,7 @@ import {
   Typography
 } from '@mui/material';
 import CallMergeIcon from '@mui/icons-material/CallMerge';
+import GradingIcon from '@mui/icons-material/Grading';
 import PeopleIcon from '@mui/icons-material/People';
 import DocumentListIcon from '@mui/icons-material/PlaylistAddCheck';
 import PublishIcon from '@mui/icons-material/Publish';
@@ -30,7 +31,6 @@ import {
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
 import ImpersonationLauncher from '../components/appli/ImpersonationLauncher';
 import AppLink from '../components/common/AppLink';
-import CustomIcon from '../components/common/CustomIcon';
 
 const Section = styled(Box)(({ theme }) => ({
   '& + &': {
@@ -258,27 +258,6 @@ const Dashboard = () => {
       }
       content={
         <>
-          {permissions.isRealAdmin && (
-            <Section>
-              <SectionTitle variant="overline">
-                {formatMessage({ id: 'Users' })}
-              </SectionTitle>
-              <ToolGrid>
-                {permissions.isAdmin && (
-                  <ToolCard
-                    icon={<PeopleIcon />}
-                    title={formatMessage({ id: 'Manage users' })}
-                    description={formatMessage({
-                      id: 'Manage users description'
-                    })}
-                    roleId="Administrator"
-                    to="/ui/admin/users"
-                  />
-                )}
-                <ImpersonationLauncher />
-              </ToolGrid>
-            </Section>
-          )}
           {permissions.isModerator && (
             <Section>
               <SectionTitle variant="overline">
@@ -310,7 +289,7 @@ const Dashboard = () => {
                   to="/ui/duplicates"
                 />
                 <ToolCard
-                  icon={<CustomIcon type="guidelines" size={36} />}
+                  icon={<GradingIcon />}
                   title={formatMessage({ id: 'Guidelines' })}
                   description={formatMessage({
                     id: 'guidelines.dashboard.description'
@@ -344,6 +323,27 @@ const Dashboard = () => {
                     isLoading={isDbExportLoading}
                   />
                 )}
+              </ToolGrid>
+            </Section>
+          )}
+          {permissions.isRealAdmin && (
+            <Section>
+              <SectionTitle variant="overline">
+                {formatMessage({ id: 'Users' })}
+              </SectionTitle>
+              <ToolGrid>
+                {permissions.isAdmin && (
+                  <ToolCard
+                    icon={<PeopleIcon />}
+                    title={formatMessage({ id: 'Manage users' })}
+                    description={formatMessage({
+                      id: 'Manage users description'
+                    })}
+                    roleId="Administrator"
+                    to="/ui/admin/users"
+                  />
+                )}
+                <ImpersonationLauncher />
               </ToolGrid>
             </Section>
           )}

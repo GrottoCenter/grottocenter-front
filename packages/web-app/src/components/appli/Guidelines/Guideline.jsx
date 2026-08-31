@@ -121,7 +121,7 @@ const Guideline = ({ guideline, onUnlink }) => {
               color="error"
               disabled={isUnlinking}
               onClick={handleUnlink}>
-              {formatMessage({ id: 'Yes' })}
+              {formatMessage({ id: 'Unlink' })}
             </Button>
           ]}>
           {formatMessage(

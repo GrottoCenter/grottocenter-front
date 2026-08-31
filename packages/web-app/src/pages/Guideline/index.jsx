@@ -164,7 +164,7 @@ const GuidelinePage = () => {
             key="cancel"
             variant="outlined"
             onClick={() => setDeleteDialogOpen(false)}>
-            {formatMessage({ id: 'No' })}
+            {formatMessage({ id: 'Cancel' })}
           </Button>,
           <Button
             key="confirm"
@@ -172,7 +172,7 @@ const GuidelinePage = () => {
             color="error"
             disabled={deleteMutation.isPending}
             onClick={handleDelete}>
-            {formatMessage({ id: 'Yes' })}
+            {formatMessage({ id: 'Delete' })}
           </Button>
         ]}>
         {data &&
@@ -194,7 +194,7 @@ const GuidelinePage = () => {
             <ScrollableContent
               dense
               collapsible={false}
-              title={formatMessage({ id: 'Description' })}
+              title={formatMessage({ id: 'guidelines.description' })}
               content={
                 <>
                   {isPending ? (

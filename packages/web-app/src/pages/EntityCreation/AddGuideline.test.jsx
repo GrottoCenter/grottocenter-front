@@ -16,10 +16,13 @@ vi.mock('@/components/common/Layouts/Fixed/FixedContent', () => ({
   )
 }));
 vi.mock('@/components/appli/EntitiesForm/Guideline', () => ({
-  default: ({ onSubmit, withScope }) => (
+  default: ({ onSubmit, withScope, associatedScope }) => (
     <button
       type="button"
       data-with-scope={String(withScope)}
+      data-associated-scope-type={associatedScope?.type}
+      data-associated-scope-id={associatedScope?.value.id}
+      data-associated-scope-name={associatedScope?.value.name}
       onClick={() =>
         onSubmit({
           title: 'Access',
@@ -64,4 +67,28 @@ it('creates a scoped guideline and opens its detail page', async () => {
     expect.objectContaining({ countries: ['FR'] })
   );
   expect(await screen.findByText('Guideline detail')).toBeVisible();
+});
+
+it('passes the entity from the URL as the fixed association', () => {
+  usePostGuideline.mockReturnValue({ mutateAsync: vi.fn() });
+
+  render(
+    <MemoryRouter
+      initialEntries={[
+        '/ui/entity/add/guideline?scopeType=massifs&scopeId=7&scopeName=Vercors'
+      ]}>
+      <IntlProvider
+        locale="en"
+        messages={{ 'guidelines.create_new': 'Create a new guideline' }}>
+        <Routes>
+          <Route path="/ui/entity/add/guideline" element={<AddGuideline />} />
+        </Routes>
+      </IntlProvider>
+    </MemoryRouter>
+  );
+
+  const submit = screen.getByRole('button', { name: 'Submit guideline' });
+  expect(submit).toHaveAttribute('data-associated-scope-type', 'massifs');
+  expect(submit).toHaveAttribute('data-associated-scope-id', '7');
+  expect(submit).toHaveAttribute('data-associated-scope-name', 'Vercors');
 });

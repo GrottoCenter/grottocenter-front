@@ -14,8 +14,8 @@ const messages = {
   'author.unknown': '{verb} by an unknown author',
   Language: 'Language',
   unlink: 'Unlink',
+  Unlink: 'Unlink',
   No: 'No',
-  Yes: 'Yes',
   close: 'Close',
   'Are you sure you want to unlink {name}?': 'Unlink {name}?',
   'guidelines.scope_required': 'Select at least one scope.'
@@ -62,7 +62,7 @@ it('renders a linked summary and confirms unlinking', async () => {
 
   await user.click(screen.getByRole('button', { name: 'Unlink' }));
   expect(screen.getByText('Unlink Access restrictions?')).toBeVisible();
-  await user.click(screen.getByRole('button', { name: 'Yes' }));
+  await user.click(screen.getByRole('button', { name: 'Unlink' }));
   expect(onUnlink).toHaveBeenCalledWith(guideline);
 });
 

@@ -317,6 +317,7 @@ const Massif = ({
                   <Guidelines
                     entityType="massifs"
                     entityId={massif.id}
+                    entityName={massif.name}
                     guidelines={massif.guidelines}
                   />
                 )}

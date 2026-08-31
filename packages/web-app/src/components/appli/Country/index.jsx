@@ -194,6 +194,7 @@ const Country = ({
               <Guidelines
                 entityType="countries"
                 entityId={country.id}
+                entityName={title}
                 guidelines={country.guidelines}
               />
             )}
