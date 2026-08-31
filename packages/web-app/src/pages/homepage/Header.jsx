@@ -26,7 +26,7 @@ const Sitename = styled('h1')({
   fontWeight: 600,
   fontSize: 'clamp(1.25rem, 10vw, 55px)',
   lineHeight: 1.2,
-  letterSpacing: -2,
+  letterSpacing: '-0.03em',
   // Explicit since the global Skeleton-CSS `h1..h6 { margin-top: 0 }` is gone;
   // the UA default (0.67em) would otherwise push the brand row down.
   marginTop: 0,
@@ -34,8 +34,17 @@ const Sitename = styled('h1')({
 });
 
 const Slogan = styled('span')({
-  fontSize: '0.9375rem',
-  fontWeight: 400
+  display: 'block',
+  margin: '0 auto',
+  fontSize: '0.9rem',
+  fontWeight: 400,
+  lineHeight: 1.45,
+  textShadow: '0 1px 2px rgba(255, 255, 255, 0.95)',
+  // All current translations fit at this size from 480px. Below that, wrapping
+  // remains preferable to shrinking the slogan or overflowing horizontally.
+  '@media (min-width: 480px)': {
+    whiteSpace: 'nowrap'
+  }
 });
 
 const CTARow = styled(Box)(({ theme }) => ({
@@ -92,7 +101,7 @@ const Header = () => {
           <Sitename>Grottocenter</Sitename>
           <Slogan>
             {formatMessage({
-              id: 'The Wiki database made by cavers for cavers'
+              id: 'Share, understand and protect the underground world.'
             })}
           </Slogan>
           <CTARow>

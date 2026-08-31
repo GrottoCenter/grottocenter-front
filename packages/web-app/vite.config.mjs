@@ -136,7 +136,7 @@ export default defineConfig(({ mode }) => {
           id: '/',
           short_name: 'Grottocenter',
           name: 'Grottocenter',
-          description: 'The Wiki database made by cavers for cavers.',
+          description: 'Share, understand and protect the underground world.',
           lang: 'en',
           dir: 'ltr',
           categories: ['education', 'navigation', 'travel'],
