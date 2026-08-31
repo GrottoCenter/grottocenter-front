@@ -114,28 +114,35 @@ const collectDefsHtml = (svgEl, serializer) =>
     .map(c => serializer.serializeToString(c))
     .join('');
 
-const ANCHOR_ID_PREFIX = 'anchor-';
+const CONTROL_ID_PREFIX = 'control-';
 
-const collectAnchors = group => {
-  const anchors = {};
-  if (!group) return anchors;
+const readPoint = el => {
+  const cx = parseFloat(el.getAttribute('cx'));
+  const cy = parseFloat(el.getAttribute('cy'));
+  if (!Number.isNaN(cx) && !Number.isNaN(cy)) return [cx, cy];
+  const x = parseFloat(el.getAttribute('x'));
+  const y = parseFloat(el.getAttribute('y'));
+  if (!Number.isNaN(x) && !Number.isNaN(y)) return [x, y];
+  return null;
+};
+
+// Reads the 3 control points (#control-1/2/3, in a #control-points group) that
+// georeference app-defined points. They define an affine frame so points stay
+// put across SVG edits / re-exports (translation, rotation, scale). Returns
+// [P1, P2, P3] in SVG coords, or null if the 3 points are not all present.
+const collectControlPoints = group => {
+  if (!group) return null;
+  const byIndex = {};
   for (const child of Array.from(group.children)) {
     const id = child.getAttribute('id') || '';
-    if (!id.startsWith(ANCHOR_ID_PREFIX)) continue;
-    const anchorId = id.slice(ANCHOR_ID_PREFIX.length);
-    const cx = parseFloat(child.getAttribute('cx'));
-    const cy = parseFloat(child.getAttribute('cy'));
-    if (!Number.isNaN(cx) && !Number.isNaN(cy)) {
-      anchors[anchorId] = [cx, cy];
-      continue;
-    }
-    const x = parseFloat(child.getAttribute('x'));
-    const y = parseFloat(child.getAttribute('y'));
-    if (!Number.isNaN(x) && !Number.isNaN(y)) {
-      anchors[anchorId] = [x, y];
-    }
+    if (!id.startsWith(CONTROL_ID_PREFIX)) continue;
+    const n = parseInt(id.slice(CONTROL_ID_PREFIX.length), 10);
+    if (![1, 2, 3].includes(n)) continue;
+    const point = readPoint(child);
+    if (point) byIndex[n] = point;
   }
-  return anchors;
+  if (!byIndex[1] || !byIndex[2] || !byIndex[3]) return null;
+  return [byIndex[1], byIndex[2], byIndex[3]];
 };
 
 const collectRootAttrs = svgEl => {
@@ -179,9 +186,9 @@ export const loadSvg = async url => {
   host.appendChild(svgEl);
   document.body.appendChild(host);
   try {
-    const anchorsGroup = svgEl.querySelector('#anchors');
-    const anchors = collectAnchors(anchorsGroup);
-    if (anchorsGroup) anchorsGroup.remove();
+    const controlGroup = svgEl.querySelector('#control-points');
+    const controlPoints = collectControlPoints(controlGroup);
+    if (controlGroup) controlGroup.remove();
 
     if (!viewBox) {
       const bbox = svgEl.getBBox();
@@ -199,7 +206,7 @@ export const loadSvg = async url => {
     const rootAttrsHtml = collectRootAttrs(svgEl);
     const index = new RBush();
     index.load(items);
-    return { viewBox, items, index, defsHtml, rootAttrsHtml, anchors };
+    return { viewBox, items, index, defsHtml, rootAttrsHtml, controlPoints };
   } finally {
     document.body.removeChild(host);
   }

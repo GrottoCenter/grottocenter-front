@@ -16,11 +16,11 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import FullscreenControl from '../common/FullscreenControl';
 import CustomControl from '../common/CustomControl';
 import SvgTileLayer from '../SvgTileLayer';
-import AnchorPin from './AnchorPin';
+import PointMarker from './PointMarker';
 import useSvgData from './useSvgData';
+import { makeFrameToSvg } from './georef';
 
 const PAN_MARGIN = 0.5;
-const EMPTY_ATTACHMENTS = [];
 
 const Wrapper = styled('div')(({ theme }) => ({
   width: '100%',
@@ -46,15 +46,6 @@ const Wrapper = styled('div')(({ theme }) => ({
 const makeSvgToLatLng =
   viewBox =>
   ([svgX, svgY]) => [viewBox.y + viewBox.h - svgY, svgX - viewBox.x];
-
-const groupByAnchor = attachments => {
-  const map = {};
-  for (const a of attachments) {
-    if (!map[a.anchorId]) map[a.anchorId] = [];
-    map[a.anchorId].push(a);
-  }
-  return map;
-};
 
 const TilesLayer = ({ svgData, bounds }) => {
   const map = useMap();
@@ -102,13 +93,13 @@ FitBoundsButton.propTypes = {
   bounds: PropTypes.array.isRequired
 };
 
-const AnchorsToggleButton = ({ active, onToggle }) => {
+const PointsToggleButton = ({ active, onToggle }) => {
   const { formatMessage } = useIntl();
   return (
     <CustomControl position="topleft" useLeafletControl>
       <Tooltip
         title={formatMessage({
-          id: active ? 'Hide anchors' : 'Show anchors'
+          id: active ? 'Hide points' : 'Show points'
         })}
         placement="right"
       >
@@ -131,14 +122,14 @@ const AnchorsToggleButton = ({ active, onToggle }) => {
   );
 };
 
-AnchorsToggleButton.propTypes = {
+PointsToggleButton.propTypes = {
   active: PropTypes.bool.isRequired,
   onToggle: PropTypes.func.isRequired
 };
 
 const DocumentSvgViewer = ({
   svgUrl,
-  attachments = [],
+  points = [],
   height = '80vh',
   minZoom = -4,
   maxZoom = 8,
@@ -146,7 +137,7 @@ const DocumentSvgViewer = ({
 }) => {
   const { formatMessage } = useIntl();
   const state = useSvgData(svgUrl);
-  const [showAnchors, setShowAnchors] = useState(true);
+  const [showPoints, setShowPoints] = useState(true);
 
   useEffect(() => {
     if (state.status === 'error' && onLoadError) onLoadError(state.error);
@@ -166,23 +157,28 @@ const DocumentSvgViewer = ({
     return { bounds, panBounds, toLatLng: makeSvgToLatLng(viewBox) };
   }, [state]);
 
-  const groupedAttachments = useMemo(
-    () => groupByAnchor(attachments),
-    [attachments]
-  );
+  // Points carry frame coordinates (relative to the SVG's 3 control points), not
+  // raw SVG coords. Convert frame -> SVG -> Leaflet latLng for placement.
+  const placedPoints = useMemo(() => {
+    if (state.status !== 'ready' || !derived) return [];
+    const { controlPoints } = state.data;
+    if (!controlPoints) return [];
+    const frameToSvg = makeFrameToSvg(controlPoints);
+    return points.map(point => ({
+      point,
+      position: derived.toLatLng(frameToSvg(point.coordinates))
+    }));
+  }, [state, derived, points]);
 
   useEffect(() => {
     if (state.status !== 'ready') return;
-    const missing = Object.keys(groupedAttachments).filter(
-      anchorId => !state.data.anchors[anchorId]
-    );
-    if (missing.length > 0) {
+    if (points.length > 0 && !state.data.controlPoints) {
       console.warn(
-        '[DocumentSvgViewer] anchors not found in SVG:',
-        missing.join(', ')
+        '[DocumentSvgViewer] points provided but the SVG has no ' +
+          '#control-points (#control-1/2/3); points cannot be placed.'
       );
     }
-  }, [state, groupedAttachments]);
+  }, [state, points]);
 
   const wrapperStyle = { '--viewer-h': height };
 
@@ -219,20 +215,15 @@ const DocumentSvgViewer = ({
         attributionControl={false}
       >
         <TilesLayer svgData={state.data} bounds={derived.bounds} />
-        {showAnchors &&
-          Object.entries(state.data.anchors).map(([anchorId, svgPos]) => (
-            <AnchorPin
-              key={anchorId}
-              anchorId={anchorId}
-              attachments={groupedAttachments[anchorId] || EMPTY_ATTACHMENTS}
-              position={derived.toLatLng(svgPos)}
-            />
+        {showPoints &&
+          placedPoints.map(({ point, position }) => (
+            <PointMarker key={point.id} point={point} position={position} />
           ))}
         <FitBoundsButton bounds={derived.bounds} />
-        {Object.keys(state.data.anchors).length > 0 && (
-          <AnchorsToggleButton
-            active={showAnchors}
-            onToggle={() => setShowAnchors(v => !v)}
+        {placedPoints.length > 0 && (
+          <PointsToggleButton
+            active={showPoints}
+            onToggle={() => setShowPoints(v => !v)}
           />
         )}
         <FullscreenControl position="topleft" forceSeparateButton={true} />
@@ -243,13 +234,22 @@ const DocumentSvgViewer = ({
 
 DocumentSvgViewer.propTypes = {
   svgUrl: PropTypes.string.isRequired,
-  attachments: PropTypes.arrayOf(
+  // Points are georeferenced by the SVG's 3 control points. `coordinates` is
+  // [u, v] in the control-point frame (see georef.js), not raw SVG coordinates.
+  points: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      anchorId: PropTypes.string.isRequired,
-      documentId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-        .isRequired,
-      label: PropTypes.string
+      coordinates: PropTypes.arrayOf(PropTypes.number).isRequired,
+      label: PropTypes.string,
+      documents: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+            .isRequired,
+          documentId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+            .isRequired,
+          label: PropTypes.string
+        })
+      )
     })
   ),
   height: PropTypes.string,

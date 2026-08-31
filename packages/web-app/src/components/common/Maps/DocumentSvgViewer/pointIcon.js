@@ -1,6 +1,6 @@
 import { divIcon } from 'leaflet';
 
-const PIN_SIZE = 32;
+const MARKER_SIZE = 32;
 
 const PIN_PATH =
   'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z';
@@ -12,8 +12,8 @@ const renderBadge = (color, count) =>
   `<text x="20" y="5.5" font-family="system-ui,sans-serif" font-size="7"` +
   ` font-weight="700" text-anchor="middle" fill="#fff">${count}</text>`;
 
-const renderPin = (color, badgeColor, count) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" width="${PIN_SIZE}" height="${PIN_SIZE}"` +
+const renderMarker = (color, badgeColor, count) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" width="${MARKER_SIZE}" height="${MARKER_SIZE}"` +
   ` viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));overflow:visible">` +
   `<path fill="${color}" stroke="#fff" stroke-width="1" stroke-linejoin="round" d="${PIN_PATH}"/>` +
   `<g transform="translate(7 4)">` +
@@ -22,10 +22,10 @@ const renderPin = (color, badgeColor, count) =>
   (count > 0 ? renderBadge(badgeColor, count) : '') +
   `</svg>`;
 
-export const makePinIcon = ({ color, badgeColor = color, count = 0 }) =>
+export const makePointIcon = ({ color, badgeColor = color, count = 0 }) =>
   divIcon({
-    className: 'topo-anchor-pin',
-    html: renderPin(color, badgeColor, count),
-    iconSize: [PIN_SIZE, PIN_SIZE],
-    iconAnchor: [PIN_SIZE / 2, PIN_SIZE - 3]
+    className: 'topo-point-marker',
+    html: renderMarker(color, badgeColor, count),
+    iconSize: [MARKER_SIZE, MARKER_SIZE],
+    iconAnchor: [MARKER_SIZE / 2, MARKER_SIZE - 3]
   });
