@@ -36,6 +36,35 @@ export const DocumentChildPropTypes = PropTypes.shape({
   dateReviewed: PropTypes.string,
   isValidated: PropTypes.bool,
   isDeleted: PropTypes.bool,
+  authors: PropTypes.arrayOf(authorType),
+  authorsOrganization: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string
+    })
+  ),
+  editor: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string
+  }),
+  library: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string
+  }),
+  parent: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string
+  }),
+  identifier: PropTypes.string,
+  identifierType: PropTypes.string,
+  issue: PropTypes.string,
+  pages: PropTypes.string,
+  oldBBS: PropTypes.shape({
+    pages: PropTypes.string,
+    comments: PropTypes.string,
+    publicationOther: PropTypes.string,
+    publicationFascicule: PropTypes.string
+  }),
   files: PropTypes.arrayOf(FilePropTypes)
 });
 
@@ -82,6 +111,8 @@ export const DocumentPropTypes = PropTypes.shape({
   massifs: PropTypes.arrayOf(idNameType),
   parent: DocumentSimplePropTypes,
   oldBBS: PropTypes.shape({
+    pages: PropTypes.string,
+    comments: PropTypes.string,
     publicationOther: PropTypes.string,
     publicationFascicule: PropTypes.string
   }),

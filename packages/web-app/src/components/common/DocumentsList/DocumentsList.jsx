@@ -19,6 +19,7 @@ import {
 } from '../../../utils/documentSort';
 import { DocumentChildPropTypes } from '../../../types/document.type';
 import Document from './Document';
+import DocumentReferences from './DocumentReferences';
 import ImageLightbox from './ImageLightbox';
 import { isImageFile } from './utils/imageUtils';
 import {
@@ -142,7 +143,7 @@ const DocumentsList = ({
 }) => {
   // Not `useSelector(state => state.intl)`: this component sits in `common/` and
   // has no Redux dependency, and the provider's locale is the same value.
-  const { locale } = useIntl();
+  const { formatMessage, locale } = useIntl();
   const [page, setPage] = useState(1);
   // Not the publication order the collections default to: a document attached
   // to an entity is as often a survey or a photo as a publication, and those
@@ -221,37 +222,51 @@ const DocumentsList = ({
 
   return (
     <>
-      {/* One row for the title and the control, so the select costs no vertical
-          space of its own on the lists that already have a heading. */}
-      {(title || canSortDocuments(sortedDocuments)) && (
+      {title && <Typography variant="h3">{title}</Typography>}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          columnGap: 2,
+          rowGap: 1,
+          mb: 2
+        }}>
         <Box
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: title ? 'space-between' : 'flex-end',
-            flexWrap: 'wrap',
-            columnGap: 2,
-            rowGap: 0.5,
-            mb: 0.5
+            order: { xs: 2, sm: 1 },
+            flex: 1,
+            minWidth: 0,
+            width: { xs: '100%', sm: 'auto' }
           }}>
-          {title && <Typography variant="h3">{title}</Typography>}
-          {canSortDocuments(sortedDocuments) && (
-            // Print keeps the title but drops the control: on paper the order is
-            // already fixed, and a dropdown is not something you can operate.
-            <Box sx={{ '@media print': { display: 'none' } }}>
-              <DocumentSortSelect
-                value={sortOrder}
-                onChange={order => {
-                  setSortOrder(order);
-                  // The document that was on screen is now somewhere else
-                  // entirely; landing back on page 1 is the only honest answer.
-                  setPage(1);
-                }}
-              />
-            </Box>
-          )}
+          <DocumentReferences documents={sortedDocuments} />
         </Box>
-      )}
+        {canSortDocuments(sortedDocuments) && (
+          // Print keeps the references but drops the control: on paper the
+          // order is already fixed, and a dropdown is not operable.
+          <Box
+            sx={{
+              order: { xs: 1, sm: 2 },
+              flexShrink: 0,
+              ml: 'auto',
+              '@media print': { display: 'none' }
+            }}>
+            <DocumentSortSelect
+              value={sortOrder}
+              onChange={order => {
+                setSortOrder(order);
+                // The document that was on screen is now somewhere else
+                // entirely; landing back on page 1 is the only honest answer.
+                setPage(1);
+              }}
+            />
+          </Box>
+        )}
+      </Box>
+      <Typography variant="h5" component="h3" mb={0.5}>
+        {formatMessage({ id: 'Document list' })}
+      </Typography>
       <DocumentsGrid dense disablePadding>
         {sortedDocuments.map((document, i) => {
           const isOnPage = i >= startIndex && i < endIndex;

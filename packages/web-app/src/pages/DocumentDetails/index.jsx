@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Breadcrumbs, Skeleton, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Paper, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -18,6 +18,7 @@ import {
   sortDocuments
 } from '@/utils/documentSort';
 import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
+import { formatDocumentReference } from '@/utils/documentReference';
 import AppLink from '../../components/common/AppLink';
 
 import useOpenLink from '../../hooks/useOpenLink';
@@ -204,6 +205,11 @@ const Document = ({
 
   const mainLanguage =
     documentData?.mainLanguage === '000' ? null : documentData?.mainLanguage;
+
+  const documentReference = useMemo(
+    () => formatDocumentReference(documentData),
+    [documentData]
+  );
 
   const allAuthors = useMemo(() => {
     if (!documentData) return null;
@@ -546,6 +552,29 @@ const Document = ({
                             id: 'A moderator needs to validate the last modification before being able to edit the document again.'
                           })}
                         />
+                      )}
+                      {documentReference && (
+                        <Paper
+                          component="section"
+                          variant="outlined"
+                          sx={{
+                            p: 1,
+                            borderRadius: 2,
+                            bgcolor: 'grey.50',
+                            borderLeft: 4,
+                            borderLeftColor: 'primary.main'
+                          }}>
+                          <Typography
+                            variant="h5"
+                            component="h2"
+                            color="secondary"
+                            mb={0.5}>
+                            {formatMessage({ id: 'Reference' })}
+                          </Typography>
+                          <Typography variant="body2">
+                            {documentReference}
+                          </Typography>
+                        </Paper>
                       )}
                       <SummaryText>{documentData.description}</SummaryText>
                       {bodySection}
