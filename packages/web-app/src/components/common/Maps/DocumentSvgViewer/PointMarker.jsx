@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Marker, Popup, Tooltip as LeafletTooltip } from 'react-leaflet';
+import { Marker, Popup } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
 import {
   Box,
@@ -47,14 +47,12 @@ const MultiDoc = ({ documents, onOpen }) => {
             borderRadius: 0.5,
             justifyContent: 'flex-start',
             '&:hover': { bgcolor: 'action.hover' }
-          }}
-        >
+          }}>
           <DescriptionIcon fontSize="small" sx={{ color: 'primary.main' }} />
           <Typography
             variant="body2"
             noWrap
-            sx={{ flex: 1, minWidth: 0, textAlign: 'left' }}
-          >
+            sx={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
             {d.label ||
               formatMessage({ id: 'Document {id}' }, { id: d.documentId })}
           </Typography>
@@ -84,10 +82,34 @@ const PointMarker = ({
   const { formatMessage } = useIntl();
   const openLink = useOpenLink();
   const theme = useTheme();
+  const markerRef = useRef(null);
 
   const documents = point.documents ?? EMPTY_DOCUMENTS;
   const hasHeader =
     Boolean(point.label) || Boolean(onEdit) || Boolean(onStartMove);
+  const moveHint = formatMessage({ id: 'Drag to move the point' });
+
+  // Toggle "move" mode imperatively via the marker instance. react-leaflet does
+  // not reliably enable dragging when the `draggable` prop flips (the drag
+  // handler only exists when the marker was created draggable), and swapping the
+  // marker's overlay child (Popup <-> Tooltip) breaks its reconciliation. So the
+  // marker is created draggable (when movable) with dragging disabled, and we
+  // enable/disable it here — closing the popup and showing a hint tooltip.
+  useEffect(() => {
+    const marker = markerRef.current;
+    if (!marker || !marker.dragging) return undefined;
+    if (isMoving) {
+      marker.closePopup();
+      marker.dragging.enable();
+      marker
+        .bindTooltip(moveHint, { permanent: true, direction: 'top' })
+        .openTooltip();
+    } else {
+      marker.dragging.disable();
+      marker.unbindTooltip();
+    }
+    return undefined;
+  }, [isMoving, moveHint]);
 
   const icon = useMemo(
     () =>
@@ -103,58 +125,47 @@ const PointMarker = ({
 
   return (
     <Marker
+      ref={markerRef}
       position={position}
       icon={icon}
-      draggable={isMoving}
+      draggable={Boolean(onMoved)}
       eventHandlers={
-        isMoving && onMoved
-          ? { dragend: e => onMoved(e.target.getLatLng()) }
-          : undefined
-      }
-    >
-      {isMoving ? (
-        <LeafletTooltip permanent direction="top">
-          {formatMessage({ id: 'Drag to move the point' })}
-        </LeafletTooltip>
-      ) : (
-        <Popup>
-          <Box sx={{ minWidth: 240, maxWidth: 320 }}>
-            {hasHeader && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={600}
-                  sx={{ flex: 1, minWidth: 0 }}
-                >
-                  {point.label}
-                </Typography>
-                {onStartMove && (
-                  <IconButton
-                    size="small"
-                    onClick={onStartMove}
-                    aria-label={formatMessage({ id: 'Move' })}
-                  >
-                    <OpenWithIcon fontSize="small" />
-                  </IconButton>
-                )}
-                {onEdit && (
-                  <IconButton
-                    size="small"
-                    onClick={onEdit}
-                    aria-label={formatMessage({ id: 'Edit point' })}
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                )}
-              </Box>
-            )}
-            {hasHeader && documents.length > 0 && <Divider sx={{ my: 0.75 }} />}
-            {documents.length > 0 && (
-              <MultiDoc documents={documents} onOpen={handleOpen} />
-            )}
-          </Box>
-        </Popup>
-      )}
+        onMoved ? { dragend: e => onMoved(e.target.getLatLng()) } : undefined
+      }>
+      <Popup>
+        <Box sx={{ minWidth: 240, maxWidth: 320 }}>
+          {hasHeader && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography
+                variant="subtitle2"
+                fontWeight={600}
+                sx={{ flex: 1, minWidth: 0 }}>
+                {point.label}
+              </Typography>
+              {onStartMove && (
+                <IconButton
+                  size="small"
+                  onClick={onStartMove}
+                  aria-label={formatMessage({ id: 'Move' })}>
+                  <OpenWithIcon fontSize="small" />
+                </IconButton>
+              )}
+              {onEdit && (
+                <IconButton
+                  size="small"
+                  onClick={onEdit}
+                  aria-label={formatMessage({ id: 'Edit point' })}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
+          )}
+          {hasHeader && documents.length > 0 && <Divider sx={{ my: 0.75 }} />}
+          {documents.length > 0 && (
+            <MultiDoc documents={documents} onOpen={handleOpen} />
+          )}
+        </Box>
+      </Popup>
     </Marker>
   );
 };
