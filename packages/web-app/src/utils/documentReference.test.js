@@ -10,15 +10,31 @@ describe('formatDocumentReference', () => {
       type: DocumentTypes.ARTICLE,
       title: 'Underground rivers',
       datePublication: '2022-06-15',
-      authors: [{ nickname: 'DUPONT, Jean' }],
+      authors: [{ nickname: 'DUPONT Jean' }],
       authorsOrganization: [{ name: 'Caving Club' }],
-      parent: { title: 'Speleology Review' },
-      issue: '42',
+      parent: { title: 'Speleology Review, no. 42' },
       pages: '12-18'
     };
 
     expect(formatDocumentReference(document)).toBe(
-      'DUPONT, Jean; Caving Club, 2022. Underground rivers. Speleology Review. 42, 12-18.'
+      'DUPONT Jean; Caving Club, 2022. Underground rivers. Speleology Review, no. 42. 2022-06-15. p. 12-18.'
+    );
+  });
+
+  it('formats an article DOI from the current citation payload', () => {
+    const document = {
+      type: DocumentTypes.ARTICLE,
+      title: 'Underground rivers',
+      datePublication: '2022',
+      authors: [{ nickname: 'DUPONT Jean' }],
+      parent: { title: 'Speleology Review, no. 42' },
+      pages: '12-18',
+      identifier: '10.1234/example',
+      identifierType: 'doi'
+    };
+
+    expect(formatDocumentReference(document)).toBe(
+      'DUPONT Jean, 2022. Underground rivers. Speleology Review, no. 42. p. 12-18. DOI 10.1234/example.'
     );
   });
 
@@ -34,24 +50,52 @@ describe('formatDocumentReference', () => {
     };
 
     expect(formatDocumentReference(document)).toBe(
-      'Legacy article. Old Bulletin. 7, 3-5.'
+      'Legacy article. Old Bulletin. no. 7, p. 3-5.'
     );
   });
 
-  it('formats a book with its publisher, collection and ISBN', () => {
+  it('formats a book with its publisher and ISBN', () => {
     const document = {
       type: DocumentTypes.BOOK,
       title: 'Karst atlas',
       datePublication: '1998',
-      authors: [{ nickname: 'MARTIN, Alice' }],
+      authors: [{ nickname: 'MARTIN Alice' }],
       editor: { name: 'Cave Press' },
-      parent: { title: 'Regional atlases' },
       identifier: '978-1-2345-6789-0',
       identifierType: { id: 'isbn' }
     };
 
     expect(formatDocumentReference(document)).toBe(
-      'MARTIN, Alice, 1998. Karst atlas. Cave Press. Regional atlases. 978-1-2345-6789-0.'
+      'MARTIN Alice, 1998. Karst atlas. Cave Press. ISBN 978-1-2345-6789-0.'
+    );
+  });
+
+  it('formats a book URL from the current identifier fields', () => {
+    const document = {
+      type: DocumentTypes.BOOK,
+      title: 'Karst atlas',
+      datePublication: '1998',
+      authors: [{ nickname: 'MARTIN Alice' }],
+      editor: { name: 'Cave Press' },
+      identifier: 'https://example.org/karst-atlas',
+      identifierType: 'url'
+    };
+
+    expect(formatDocumentReference(document)).toBe(
+      'MARTIN Alice, 1998. Karst atlas [online]. Cave Press. Available at: https://example.org/karst-atlas.'
+    );
+  });
+
+  it('starts an anonymous reference with its title', () => {
+    const document = {
+      type: DocumentTypes.BOOK,
+      title: 'Anonymous karst inventory',
+      datePublication: '2001',
+      editor: { name: 'Cave Press' }
+    };
+
+    expect(formatDocumentReference(document)).toBe(
+      'Anonymous karst inventory. 2001. Cave Press.'
     );
   });
 

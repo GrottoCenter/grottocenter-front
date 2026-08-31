@@ -7,9 +7,8 @@ const documents = [
     type: DocumentTypes.ARTICLE,
     title: 'Underground rivers of the Vercors',
     datePublication: '2024',
-    authors: [{ id: 1, nickname: 'DUPONT, Jean' }],
-    parent: { id: 100, title: 'Speleology Review' },
-    issue: '42',
+    authors: [{ id: 1, nickname: 'DUPONT Jean' }],
+    parent: { id: 100, title: 'Speleology Review, no. 42' },
     pages: '12-18'
   },
   {

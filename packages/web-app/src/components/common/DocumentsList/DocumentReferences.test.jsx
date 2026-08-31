@@ -33,14 +33,14 @@ describe('DocumentReferences', () => {
         id: 42,
         type: DocumentTypes.ARTICLE,
         title: 'Underground rivers',
-        authors: [{ id: 1, nickname: 'DUPONT, Jean' }],
+        authors: [{ id: 1, nickname: 'DUPONT Jean' }],
         datePublication: '2022',
         parent: { id: 2, title: 'Speleology Review' }
       }
     ]);
 
     const link = screen.getByRole('link', {
-      name: 'DUPONT, Jean, 2022. Underground rivers. Speleology Review.'
+      name: 'DUPONT Jean, 2022. Underground rivers. Speleology Review.'
     });
     expect(link).toHaveAttribute('href', '/ui/documents/42');
     expect(screen.getByTestId('ArticleIcon')).toBeInTheDocument();
