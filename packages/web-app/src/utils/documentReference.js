@@ -19,11 +19,41 @@ const getIdentifierType = identifierType => {
   return identifierType?.id ?? identifierType?.name ?? null;
 };
 
-const getIsbn = document =>
-  String(getIdentifierType(document.identifierType) ?? '').toLowerCase() ===
-  'isbn'
-    ? document.identifier
-    : null;
+const normalizeIdentifierType = identifierType =>
+  String(getIdentifierType(identifierType) ?? '')
+    .trim()
+    .toLowerCase();
+
+const formatIdentifier = document => {
+  const type = normalizeIdentifierType(document.identifierType);
+  const value = document.identifier?.trim();
+  if (!value) return null;
+
+  if (type === 'url') return `Available at: ${value}`;
+  if (['doi', 'isbn', 'issn'].includes(type))
+    return `${type.toUpperCase()} ${value}`;
+  return value;
+};
+
+const formatPrefixedValue = (value, prefix, existingPrefix) => {
+  if (!value) return null;
+  const normalizedValue = String(value).trim();
+  return existingPrefix.test(normalizedValue)
+    ? normalizedValue
+    : `${prefix}${normalizedValue}`;
+};
+
+const formatPages = pages =>
+  formatPrefixedValue(pages, 'p. ', /^p(?:p)?\.?\s/i);
+
+const formatIssue = issue => formatPrefixedValue(issue, 'no. ', /^no\.?\s*/i);
+
+const getArticleMetadata = document => ({
+  publicationTitle: document.oldBBS?.publicationOther ?? document.parent?.title,
+  publicationDate: document.datePublication ?? null,
+  issue: document.oldBBS?.publicationFascicule,
+  pages: document.pages ?? document.oldBBS?.pages
+});
 
 const joinSegments = segments => {
   const cleaned = segments
@@ -40,28 +70,17 @@ const hasCitationMetadata = document => {
     extractYear(document.datePublication);
 
   if (document.type === DocumentTypes.ARTICLE) {
-    return Boolean(
-      commonMetadata ||
-      document.parent?.title ||
-      document.oldBBS?.publicationOther ||
-      document.library?.name ||
-      document.issue ||
-      document.oldBBS?.publicationFascicule ||
-      document.pages ||
-      document.oldBBS?.pages
-    );
+    const article = getArticleMetadata(document);
+    return Boolean(commonMetadata || Object.values(article).some(Boolean));
   }
 
   return Boolean(
-    commonMetadata ||
-    document.editor?.name ||
-    document.parent?.title ||
-    getIsbn(document)
+    commonMetadata || document.editor?.name || document.identifier
   );
 };
 
 /**
- * Builds the best ISO 690-style reference supported by the document model.
+ * Builds an ISO 690 author-date reference from the available document metadata.
  * Returns null for other document types and for article/book payloads that only
  * carry a title, so callers can deliberately fall back to that bare title.
  */
@@ -73,30 +92,33 @@ export const formatDocumentReference = document => {
   )
     return null;
 
+  const article =
+    document.type === DocumentTypes.ARTICLE
+      ? getArticleMetadata(document)
+      : null;
   const authors = getAuthorNames(document);
   const year = extractYear(document.datePublication);
-  const lead = [authors.join('; '), year].filter(Boolean).join(', ');
-  const segments = [lead, document.title];
+  const isOnline = normalizeIdentifierType(document.identifierType) === 'url';
+  const title =
+    isOnline && document.title ? `${document.title} [online]` : document.title;
+  const segments =
+    authors.length > 0
+      ? [[authors.join('; '), year].filter(Boolean).join(', '), title]
+      : [title, year];
 
-  if (document.type === DocumentTypes.ARTICLE) {
-    segments.push(
-      document.parent?.title ??
-        document.oldBBS?.publicationOther ??
-        document.library?.name
-    );
-    segments.push(
-      [
-        document.issue ?? document.oldBBS?.publicationFascicule,
-        document.pages ?? document.oldBBS?.pages
-      ]
-        .filter(Boolean)
-        .join(', ')
-    );
+  if (article) {
+    const additionalDate =
+      article.publicationDate?.length > 4 ? article.publicationDate : null;
+    const numbering = [formatIssue(article.issue), formatPages(article.pages)]
+      .filter(Boolean)
+      .join(', ');
+
+    segments.push(article.publicationTitle, additionalDate, numbering);
   } else {
     segments.push(document.editor?.name);
-    segments.push(document.parent?.title);
-    segments.push(getIsbn(document));
   }
+
+  segments.push(formatIdentifier(document));
 
   return joinSegments(segments);
 };
