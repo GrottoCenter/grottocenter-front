@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Box, Button, Skeleton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -9,7 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import CustomIcon from '@/components/common/CustomIcon';
 import FetchErrorState from '@/components/common/FetchErrorState';
-import AppLink from '@/components/common/AppLink';
+import ContributionMetadata from '@/components/common/Contribution/ContributionMetadata';
 import StandardDialog from '@/components/common/StandardDialog';
 import LinkedEntitiesList, {
   ListElement
@@ -83,90 +82,6 @@ const GuidelineScope = ({ guideline }) => {
 
 GuidelineScope.propTypes = {
   guideline: GuidelinePropTypes.isRequired
-};
-
-const GuidelineMetadata = ({ guideline, isLoading }) => {
-  const { formatDate, formatMessage } = useIntl();
-  if (isLoading) return <Skeleton width={320} />;
-
-  const formatMetadataDate = date =>
-    date
-      ? formatDate(date, {
-          year: '2-digit',
-          month: '2-digit',
-          day: '2-digit'
-        })
-      : null;
-  const makeContribution = (key, verbId, contributor, date) => {
-    const contributorName = contributor?.nickname ?? contributor?.name;
-    if (!contributorName && !date) return null;
-    const verb = formatMessage({ id: verbId });
-    const prefix = contributorName
-      ? formatMessage({ id: 'author.by' }, { verb })
-      : verb;
-    return (
-      <span key={key}>
-        {prefix}
-        {contributorName && (
-          <>
-            {' '}
-            {contributor?.id ? (
-              <AppLink to={`/ui/persons/${contributor.id}`}>
-                {contributorName}
-              </AppLink>
-            ) : (
-              contributorName
-            )}
-          </>
-        )}
-        {date && ` ${formatMetadataDate(date)}`}
-      </span>
-    );
-  };
-
-  const languageId = guideline?.language?.id ?? guideline?.language;
-  const language = languageId
-    ? String(languageId).toLocaleUpperCase()
-    : (guideline?.language?.refName ?? guideline?.language?.name);
-  const metadata = [
-    makeContribution(
-      'created',
-      'Created',
-      guideline?.author,
-      guideline?.dateInscription
-    ),
-    makeContribution(
-      'updated',
-      'Updated',
-      guideline?.reviewer,
-      guideline?.dateReviewed
-    ),
-    language ? (
-      <span key="language">
-        {formatMessage({ id: 'Language' })} : {language}
-      </span>
-    ) : null
-  ].filter(Boolean);
-
-  if (metadata.length === 0) return null;
-  return (
-    <Typography
-      data-testid="guideline-metadata"
-      variant="caption"
-      color="textSecondary">
-      {metadata.map((item, index) => (
-        <span key={item.key}>
-          {index > 0 && ' · '}
-          {item}
-        </span>
-      ))}
-    </Typography>
-  );
-};
-
-GuidelineMetadata.propTypes = {
-  guideline: GuidelinePropTypes,
-  isLoading: PropTypes.bool.isRequired
 };
 
 const GuidelinePage = () => {
@@ -289,8 +204,18 @@ const GuidelinePage = () => {
                       {data?.description ?? '-'}
                     </Typography>
                   )}
-                  <Box sx={{ mt: 0.5, mb: -1 }}>
-                    <GuidelineMetadata guideline={data} isLoading={isPending} />
+                  <Box data-testid="guideline-metadata">
+                    {isPending ? (
+                      <Skeleton width={320} sx={{ mt: 1 }} />
+                    ) : (
+                      <ContributionMetadata
+                        createdBy={data?.author}
+                        createdAt={data?.dateInscription}
+                        updatedBy={data?.reviewer}
+                        updatedAt={data?.dateReviewed}
+                        language={data?.language}
+                      />
+                    )}
                   </Box>
                 </>
               }

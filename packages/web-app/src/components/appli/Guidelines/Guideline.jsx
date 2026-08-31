@@ -33,7 +33,6 @@ const Guideline = ({ guideline, onUnlink }) => {
   // the API accepts a guideline whose three scope arrays are all empty.
   const isLastScope = getScopeCount(guideline) <= 1;
   const isUnlinkDisabled = !isOnline || isUnlinking || isLastScope;
-  const language = guideline.language?.id ?? guideline.language;
 
   const handleUnlink = async () => {
     setUnlinking(true);
@@ -99,7 +98,7 @@ const Guideline = ({ guideline, onUnlink }) => {
             reviewer={guideline.reviewer}
             dateInscription={guideline.dateInscription}
             dateReviewed={guideline.dateReviewed}
-            language={language}
+            language={guideline.language}
             isDeleted={guideline.isDeleted}
           />
         </Box>
