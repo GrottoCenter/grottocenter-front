@@ -99,6 +99,13 @@ export const notificationKeys = {
   unreadCount: () => ['notification', 'unreadCount']
 };
 
+// Public, paginated guideline catalogue. Kept separate from the parent-entity
+// detail caches because this list has its own pagination lifecycle.
+export const guidelineKeys = {
+  all: ['guideline'],
+  list: opts => ['guideline', 'list', opts]
+};
+
 // Moderator queue counters. Two independent endpoints, one domain root so a
 // single invalidateQueries({ queryKey: countKeys.all }) refreshes both after
 // a moderator processes an item.

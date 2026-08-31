@@ -1,5 +1,6 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '@mui/material';
+import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
 import PublishIcon from '@mui/icons-material/Publish';
@@ -25,6 +26,109 @@ const DateTimeCell = ({ value }) => {
 
 DateTimeCell.propTypes = {
   value: PropTypes.string
+};
+
+const ExpandableDescriptionCell = ({ value }) => {
+  const { formatMessage } = useIntl();
+  const textRef = useRef(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  useLayoutEffect(() => {
+    const element = textRef.current;
+    if (!element || isExpanded) return undefined;
+
+    const measure = () =>
+      setIsOverflowing(element.scrollHeight > element.clientHeight + 1);
+    measure();
+
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [isExpanded, value]);
+
+  if (!value) return null;
+
+  return (
+    <Box>
+      <Typography
+        ref={textRef}
+        variant="body2"
+        sx={{
+          whiteSpace: 'pre-line',
+          ...(!isExpanded && {
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: { xs: 3, sm: 2 },
+            overflow: 'hidden'
+          })
+        }}>
+        {value}
+      </Typography>
+      {(isOverflowing || isExpanded) && (
+        <Button
+          size="small"
+          variant="text"
+          aria-expanded={isExpanded}
+          onClick={event => {
+            event.preventDefault();
+            event.stopPropagation();
+            setIsExpanded(current => !current);
+          }}
+          sx={{ minWidth: 0, p: 0, mt: 0.25 }}>
+          {formatMessage({
+            id: isExpanded ? 'Show less' : 'Show more'
+          })}
+        </Button>
+      )}
+    </Box>
+  );
+};
+
+ExpandableDescriptionCell.propTypes = {
+  value: PropTypes.string
+};
+
+const GuidelineScopeCell = ({ guideline }) => {
+  const { formatMessage } = useIntl();
+  const groups = [
+    ['Country', guideline.countries],
+    ['Region', guideline.regions],
+    ['Massif', guideline.massifs]
+  ];
+
+  return (
+    <Stack direction="row" useFlexGap flexWrap="wrap" gap={0.5}>
+      {groups.flatMap(([label, values]) =>
+        (values ?? []).map(value => {
+          const identifier = value?.name ?? value?.code ?? value?.id ?? value;
+          return (
+            <Chip
+              key={`${label}-${identifier}`}
+              size="small"
+              variant="outlined"
+              label={`${formatMessage({ id: label })}: ${identifier}`}
+            />
+          );
+        })
+      )}
+    </Stack>
+  );
+};
+
+GuidelineScopeCell.propTypes = {
+  guideline: PropTypes.shape({
+    countries: PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})])
+    ),
+    regions: PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})])
+    ),
+    massifs: PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.number, PropTypes.shape({})])
+    )
+  }).isRequired
 };
 
 // React component so it can render AppLink; stops row click propagation.
@@ -154,6 +258,64 @@ const notifications = {
     }
   ],
   link: doc => doc.link
+};
+
+const guidelines = {
+  icon: <CustomIcon type="guidelines" size={16} />,
+  columns: [
+    {
+      visible: true,
+      field: 'title',
+      label: 'Title',
+      sortable: false,
+      isTitle: true
+    },
+    {
+      visible: true,
+      field: 'description',
+      label: 'Description',
+      sortable: false,
+      render: value => <ExpandableDescriptionCell value={value} />
+    },
+    {
+      visible: true,
+      field: 'language',
+      label: 'Language',
+      sortable: false,
+      render: value => value?.refName ?? value?.name ?? value?.id ?? value
+    },
+    {
+      visible: true,
+      field: 'scope',
+      label: 'Applies to',
+      sortable: false,
+      render: (_value, guideline) => (
+        <GuidelineScopeCell guideline={guideline} />
+      )
+    },
+    {
+      visible: true,
+      field: 'author',
+      label: 'Author',
+      sortable: false,
+      render: cellsRender.person
+    },
+    {
+      visible: true,
+      field: 'dateInscription',
+      label: 'Creation date',
+      sortable: false,
+      render: cellsRender.date
+    },
+    {
+      visible: true,
+      field: 'dateReviewed',
+      label: 'Last review date',
+      sortable: false,
+      render: cellsRender.date
+    }
+  ],
+  link: () => ''
 };
 
 const massifs = {
@@ -668,6 +830,7 @@ const o = {
   entrances,
   documents,
   notifications,
+  guidelines,
   csvImportEntrances,
   csvImportDocuments,
   duplicate
