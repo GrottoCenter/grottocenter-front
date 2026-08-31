@@ -5,6 +5,8 @@ import { useIntl } from 'react-intl';
 import EntityTable from '@/components/common/EntityTable';
 import CustomIcon from '@/components/common/CustomIcon';
 import Layout from '@/components/common/Layouts/Fixed/FixedContent';
+import NewEntityButton from '@/components/common/NewEntityButton';
+import { EntityIcon } from '@/pages/EntityCreation/entityConfig';
 import { useGuidelines, useNotification } from '@/hooks';
 
 const GuidelinesPage = () => {
@@ -55,6 +57,12 @@ const GuidelinesPage = () => {
     <Layout
       title={formatMessage({ id: 'Guidelines' })}
       icon={<CustomIcon type="guidelines" size={32} />}
+      action={
+        <NewEntityButton
+          to="/ui/entity/add/guideline"
+          icon={<EntityIcon iconType="guidelines" size={20} />}
+        />
+      }
       subheader={
         <Typography variant="body2" color="text.secondary">
           {formatMessage({ id: 'guidelines.public.introduction' })}

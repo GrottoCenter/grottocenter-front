@@ -61,9 +61,8 @@ const useSnapshotUrl = ({
   const location = useLocation();
 
   // Remember the page the history was opened from so the snapshot page's "back"
-  // button returns here. Some entities (e.g. guidelines) have no standalone
-  // route of their own, and others (regions) live under nested URLs, so we can't
-  // reliably rebuild the origin URL from `type`/`id` alone.
+  // button returns here. Nested entities such as regions cannot reliably rebuild
+  // their origin URL from `type`/`id` alone.
   const backTo = encodeURIComponent(`${location.pathname}${location.search}`);
 
   return `/ui/${type}/${id}/snapshots?${[
@@ -71,9 +70,9 @@ const useSnapshotUrl = ({
     getAll ? `all=true` : '',
     parentId !== undefined ? `parentId=${parentId}` : '',
     parentType ? `parentType=${parentType}` : '',
-    // Entities without a standalone route (e.g. guidelines) can't be re-fetched
-    // by the snapshot page, so carry the current soft-delete state along to gate
-    // the rollback button (a deleted item must be restored before rolling back).
+    // Keep carrying the soft-delete state for compatibility and for guidelines
+    // until api#1782 lets the snapshot page re-fetch a deleted detail. A deleted
+    // item must be restored before rolling back.
     isDeleted !== undefined ? `isDeleted=${isDeleted}` : '',
     `backTo=${backTo}`
   ]

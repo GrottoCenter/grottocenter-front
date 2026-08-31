@@ -13,11 +13,16 @@ vi.mock('@/components/common/CustomIcon', () => ({
   default: () => <span data-testid="guidelines-icon" />
 }));
 
+vi.mock('@/components/common/NewEntityButton', () => ({
+  default: ({ to }) => <a href={to}>New guideline</a>
+}));
+
 vi.mock('@/components/common/Layouts/Fixed/FixedContent', () => ({
-  default: ({ title, subheader, content }) => (
+  default: ({ title, subheader, action, content }) => (
     <main>
       <h1>{title}</h1>
       {subheader}
+      {action}
       {content}
     </main>
   )
@@ -62,6 +67,10 @@ it('renders the total and requests the selected server page', () => {
 
   renderPage();
   expect(screen.getByTestId('total-count')).toHaveTextContent('126');
+  expect(screen.getByRole('link', { name: 'New guideline' })).toHaveAttribute(
+    'href',
+    '/ui/entity/add/guideline'
+  );
 
   fireEvent.click(screen.getByRole('button', { name: 'Change page' }));
   expect(useGuidelines).toHaveBeenLastCalledWith({ limit: 50, skip: 100 });

@@ -1,153 +1,143 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box, ListItem, ListItemText } from '@mui/material';
-import { useIntl } from 'react-intl';
-import { styled } from '@mui/material/styles';
-import GuidelinePropTypes from '../../../types/guideline.type';
-import GuidelineForm from '../EntitiesForm/Guideline/index';
-import ActionButtons from '../Entry/ActionButtons';
-import SectionTitle from '../Entry/SectionTitle';
 import {
-  usePatchGuideline,
-  useDeleteGuideline,
-  useRestoreGuideline,
-  usePermissions,
-  useNotification
-} from '../../../hooks';
-import Contribution from '../../common/Contribution/Contribution';
+  Box,
+  Button,
+  ButtonGroup,
+  ListItem,
+  Paper,
+  Tooltip,
+  Typography
+} from '@mui/material';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
+import { useIntl } from 'react-intl';
 
-const ListItemStyled = styled(ListItem)`
-  display: flow-root;
-  border-top: 1px solid ${({ theme }) => theme.palette.divider};
-  padding-top: ${({ theme }) => theme.spacing(0.5)};
-  padding-bottom: ${({ theme }) => theme.spacing(0.5)};
-`;
+import AppLink from '@/components/common/AppLink';
+import Contribution from '@/components/common/Contribution/Contribution';
+import OfflineDisabled from '@/components/common/OfflineDisabled';
+import StandardDialog from '@/components/common/StandardDialog';
+import { useOnlineStatus } from '@/hooks';
+import GuidelinePropTypes from '@/types/guideline.type';
 
-const Guideline = ({ guideline, isEditAllowed }) => {
-  const permissions = usePermissions();
+const getScopeCount = guideline =>
+  (guideline.countries?.length ?? 0) +
+  (guideline.regions?.length ?? 0) +
+  (guideline.massifs?.length ?? 0);
+
+const Guideline = ({ guideline, onUnlink }) => {
   const { formatMessage } = useIntl();
-  const { onError } = useNotification();
-  const patchMutation = usePatchGuideline();
-  const deleteMutation = useDeleteGuideline();
-  const restoreMutation = useRestoreGuideline();
-  const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(
-    guideline.isDeleted
-  );
+  const isOnline = useOnlineStatus();
+  const [isUnlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
+  const [isUnlinking, setUnlinking] = useState(false);
+  // TODO(api#1775): allow unlinking the final country, region or massif once
+  // the API accepts a guideline whose three scope arrays are all empty.
+  const isLastScope = getScopeCount(guideline) <= 1;
+  const isUnlinkDisabled = !isOnline || isUnlinking || isLastScope;
+  const language = guideline.language?.id ?? guideline.language;
 
-  useEffect(() => {
-    setWantedDeletedState(guideline.isDeleted);
-  }, [guideline.isDeleted]);
-
-  const onSubmitForm = async data => {
+  const handleUnlink = async () => {
+    setUnlinking(true);
     try {
-      await patchMutation.mutateAsync({
-        id: guideline.id,
-        title: data.title,
-        description: data.description,
-        language: data.language
-      });
-      setIsUpdateFormVisible(false);
+      await onUnlink(guideline);
+      setUnlinkDialogOpen(false);
     } catch {
       /* toast handled globally */
+    } finally {
+      setUnlinking(false);
     }
   };
 
-  const onDeletePress = async isPermanent => {
-    setWantedDeletedState(true);
-    try {
-      await deleteMutation.mutateAsync({ id: guideline.id, isPermanent });
-    } catch {
-      setWantedDeletedState(guideline.isDeleted);
-      onError(
-        formatMessage({
-          id: 'guidelines.delete_error',
-          defaultMessage: 'Failed to delete the guideline'
-        })
-      );
-    }
-  };
-  const onRestorePress = async () => {
-    setWantedDeletedState(false);
-    try {
-      await restoreMutation.mutateAsync({ id: guideline.id });
-    } catch {
-      setWantedDeletedState(guideline.isDeleted);
-      onError(
-        formatMessage({
-          id: 'guidelines.restore_error',
-          defaultMessage: 'Failed to restore the guideline'
-        })
-      );
-    }
-  };
-
-  const isActionLoading = wantedDeletedState !== guideline.isDeleted;
+  const unlinkButton = onUnlink ? (
+    <ButtonGroup color="primary" size="small" variant="outlined">
+      <OfflineDisabled disabled={!isOnline}>
+        <Tooltip
+          title={
+            isLastScope
+              ? formatMessage({
+                  id: 'guidelines.scope_required',
+                  defaultMessage:
+                    'Select at least one country, region, or massif.'
+                })
+              : formatMessage({ id: 'unlink' })
+          }>
+          <span>
+            <Button
+              disabled={isUnlinkDisabled}
+              aria-label={formatMessage({ id: 'unlink' })}
+              onClick={() => setUnlinkDialogOpen(true)}>
+              <LinkOffIcon />
+            </Button>
+          </span>
+        </Tooltip>
+      </OfflineDisabled>
+    </ButtonGroup>
+  ) : null;
 
   return (
-    <ListItemStyled disableGutters>
-      {isEditAllowed && (
-        <Box sx={{ float: 'right', ml: 0.5 }}>
-          <ActionButtons
-            isLoading={isActionLoading}
-            isUpdating={isUpdateFormVisible}
-            setIsUpdating={setIsUpdateFormVisible}
+    <ListItem disableGutters sx={{ display: 'block' }}>
+      <Paper
+        variant="outlined"
+        sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 0.5
+          }}>
+          <Typography variant="h4" component="h3">
+            <AppLink openInNewTabDesktop to={`/ui/guidelines/${guideline.id}`}>
+              {guideline.title}
+            </AppLink>
+          </Typography>
+          {unlinkButton}
+        </Box>
+        <Box sx={{ mt: 0.5 }}>
+          <Contribution
+            body={guideline.description}
+            author={guideline.author}
+            reviewer={guideline.reviewer}
+            dateInscription={guideline.dateInscription}
+            dateReviewed={guideline.dateReviewed}
+            language={language}
             isDeleted={guideline.isDeleted}
-            canEdit={isEditAllowed && permissions.isAuth}
-            canDelete={isEditAllowed && permissions.isModerator}
-            // Permanent deletion of a guideline is admin-only on the API
-            // (guideline/delete.js), unlike its soft-delete which moderators may do.
-            canPermanentlyDelete={isEditAllowed && permissions.isAdmin}
-            snapshotProps={{
-              id: guideline.id,
-              type: 'guidelines',
-              isDeleted: guideline.isDeleted
-            }}
-            onDeletePress={onDeletePress}
-            onRestorePress={onRestorePress}
           />
         </Box>
+      </Paper>
+      {onUnlink && (
+        <StandardDialog
+          open={isUnlinkDialogOpen}
+          onClose={() => setUnlinkDialogOpen(false)}
+          title={formatMessage({ id: 'unlink' })}
+          actions={[
+            <Button
+              key="cancel"
+              variant="outlined"
+              onClick={() => setUnlinkDialogOpen(false)}>
+              {formatMessage({ id: 'No' })}
+            </Button>,
+            <Button
+              key="confirm"
+              variant="contained"
+              color="error"
+              disabled={isUnlinking}
+              onClick={handleUnlink}>
+              {formatMessage({ id: 'Yes' })}
+            </Button>
+          ]}>
+          {formatMessage(
+            { id: 'Are you sure you want to unlink {name}?' },
+            { name: guideline.title }
+          )}
+        </StandardDialog>
       )}
-      {isUpdateFormVisible && permissions.isAuth ? (
-        <Box width="100%">
-          <GuidelineForm
-            closeForm={() => setIsUpdateFormVisible(false)}
-            isNew={false}
-            onSubmit={onSubmitForm}
-            values={guideline}
-          />
-        </Box>
-      ) : (
-        <ListItemText
-          style={{ margin: 0 }}
-          disableTypography
-          primary={
-            <SectionTitle
-              title={guideline.title}
-              anchorId={`guideline-${guideline.id}`}
-              isDeleted={guideline.isDeleted}
-            />
-          }
-          secondary={
-            <Contribution
-              body={guideline.description}
-              author={guideline.author}
-              reviewer={guideline.reviewer}
-              dateInscription={guideline.dateInscription}
-              dateReviewed={guideline.dateReviewed}
-              language={guideline.language}
-              isDeleted={guideline.isDeleted}
-            />
-          }
-        />
-      )}
-    </ListItemStyled>
+    </ListItem>
   );
 };
 
 Guideline.propTypes = {
-  guideline: GuidelinePropTypes,
-  isEditAllowed: PropTypes.bool
+  guideline: GuidelinePropTypes.isRequired,
+  onUnlink: PropTypes.func
 };
 
 export default Guideline;

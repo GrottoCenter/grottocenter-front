@@ -162,7 +162,7 @@ export {
   useNotifications,
   useMenuNotifications
 } from './queries/useNotifications';
-export { useGuidelines } from './queries/useGuidelines';
+export { useGuideline, useGuidelines } from './queries/useGuidelines';
 export {
   useUnreadNotificationsCount,
   usePendingDocumentsCount,

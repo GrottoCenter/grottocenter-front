@@ -1209,6 +1209,7 @@
   "guidelines.restore_error": "Failed to restore the guideline",
   "guidelines.search_placeholder": "Type to filter by title or description…",
   "guidelines.select_guideline": "Select a guideline",
+  "guidelines.scope_required": "Select at least one country, region, or massif.",
   "guidelines.title": "Title",
   "Guinea": "Guinea",
   "Guinea-Bissau": "Guinea-Bissau",

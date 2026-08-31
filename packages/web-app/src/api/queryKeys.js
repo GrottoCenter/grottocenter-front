@@ -103,7 +103,8 @@ export const notificationKeys = {
 // detail caches because this list has its own pagination lifecycle.
 export const guidelineKeys = {
   all: ['guideline'],
-  list: opts => ['guideline', 'list', opts]
+  list: opts => ['guideline', 'list', opts],
+  detail: detailKey('guideline')
 };
 
 // Moderator queue counters. Two independent endpoints, one domain root so a

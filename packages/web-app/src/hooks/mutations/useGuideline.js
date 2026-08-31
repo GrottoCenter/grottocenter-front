@@ -8,13 +8,19 @@ import {
   rollbackGuidelineUrl
 } from '../../conf/apiRoutes';
 import { apiPost, apiPatch, apiDelete } from '../../api/client';
-import { countryKeys, massifKeys, regionKeys } from '../../api/queryKeys';
+import {
+  countryKeys,
+  guidelineKeys,
+  massifKeys,
+  regionKeys
+} from '../../api/queryKeys';
 
 // A guideline is many-to-many with country / region / massif. The API
 // response doesn't tell us which specific parents to invalidate cheaply, so
 // we invalidate the three domain roots. RQ only refetches queries currently
 // mounted — at most one detail per open page, and usually zero.
 const invalidateGuidelineHosts = queryClient => {
+  queryClient.invalidateQueries({ queryKey: guidelineKeys.all });
   queryClient.invalidateQueries({ queryKey: countryKeys.all });
   queryClient.invalidateQueries({ queryKey: regionKeys.all });
   queryClient.invalidateQueries({ queryKey: massifKeys.all });
