@@ -35,12 +35,16 @@ const Sitename = styled('h1')({
 
 const Slogan = styled('span')({
   display: 'block',
-  maxWidth: '36ch',
   margin: '0 auto',
-  fontSize: '0.9375rem',
+  fontSize: '0.9rem',
   fontWeight: 400,
   lineHeight: 1.45,
-  textShadow: '0 1px 2px rgba(255, 255, 255, 0.95)'
+  textShadow: '0 1px 2px rgba(255, 255, 255, 0.95)',
+  // All current translations fit at this size from 480px. Below that, wrapping
+  // remains preferable to shrinking the slogan or overflowing horizontally.
+  '@media (min-width: 480px)': {
+    whiteSpace: 'nowrap'
+  }
 });
 
 const CTARow = styled(Box)(({ theme }) => ({
