@@ -33,7 +33,7 @@ const ReferenceList = ({ documents, start = 1 }) => (
               fontSize="small"
               sx={{ flexShrink: 0 }}
             />
-            <AppLink openInNewTabDesktop to={`/ui/documents/${document.id}`}>
+            <AppLink to={`/ui/documents/${document.id}`}>
               {getDocumentReferenceLabel(document)}
             </AppLink>
           </Box>

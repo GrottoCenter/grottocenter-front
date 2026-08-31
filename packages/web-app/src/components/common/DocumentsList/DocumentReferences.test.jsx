@@ -43,6 +43,7 @@ describe('DocumentReferences', () => {
       name: 'DUPONT Jean, 2022. Underground rivers. Speleology Review.'
     });
     expect(link).toHaveAttribute('href', '/ui/documents/42');
+    expect(link).not.toHaveAttribute('target');
     expect(screen.getByTestId('ArticleIcon')).toBeInTheDocument();
   });
 
