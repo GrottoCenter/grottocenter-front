@@ -87,7 +87,7 @@ The viewer receives points through the `points` prop (see `index.jsx`). The
 />
 ```
 
-Full example: `src/pages/homepage/TopoViewer.jsx` (wired to
+Example: the dedicated page `src/pages/Topo.jsx` (route `/ui/topo`, wired to
 `public/la-grande-topo.svg`).
 
 ### Creating points from the viewer
