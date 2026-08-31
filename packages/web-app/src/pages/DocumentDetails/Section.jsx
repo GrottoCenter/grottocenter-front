@@ -142,18 +142,27 @@ const PropertyCell = styled('div', {
   minWidth: 0
 }));
 
-export const DetailsList = ({ children }) => {
+export const DetailsList = ({ children, title }) => {
   const items = React.Children.toArray(children).filter(Boolean);
   if (items.length === 0) return null;
   return (
     <Paper
+      component="section"
       variant="outlined"
       sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+      {title && (
+        <Typography variant="h5" component="h2" color="secondary" mb={1}>
+          {title}
+        </Typography>
+      )}
       <PropertiesGrid>{items}</PropertiesGrid>
     </Paper>
   );
 };
-DetailsList.propTypes = { children: PropTypes.node };
+DetailsList.propTypes = {
+  children: PropTypes.node,
+  title: PropTypes.string
+};
 
 export const DetailItem = ({
   icon,

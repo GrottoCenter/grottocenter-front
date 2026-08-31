@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Breadcrumbs, Paper, Skeleton, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -20,6 +20,7 @@ import {
 import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
 import { formatDocumentReference } from '@/utils/documentReference';
 import AppLink from '../../components/common/AppLink';
+import BibliographicReference from './BibliographicReference';
 
 import useOpenLink from '../../hooks/useOpenLink';
 import CustomIcon from '../../components/common/CustomIcon';
@@ -85,43 +86,42 @@ const AuthorizationIcon =
   DOCUMENT_TYPE_ICONS[DocumentTypes.AUTHORIZATION_TO_PUBLISH];
 
 const HalfSplitContainer = styled('div')`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-areas:
+    'summary'
+    'body'
+    'metadata';
   gap: ${({ theme }) => theme.spacing(1)};
 
   ${({ theme }) => theme.breakpoints.up('md')} {
-    flex-direction: row;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-areas:
+      'summary metadata'
+      'body metadata';
     align-items: flex-start;
-    gap: ${({ theme }) => theme.spacing(2)};
+    column-gap: ${({ theme }) => theme.spacing(2)};
   }
 `;
 
-const MainColumn = styled('div')`
-  flex: 2;
+const MainSummary = styled('div')`
+  grid-area: summary;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(1)};
 `;
 
-const SideColumn = styled('div', {
-  shouldForwardProp: prop => prop[0] !== '$'
-})`
-  flex: 1;
+const MainBody = styled('div')`
+  grid-area: body;
+  min-width: 0;
+`;
+
+const SideColumn = styled('aside')`
+  grid-area: metadata;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(1)};
-
-  /* Collections only: their main column is a grid of dozens of issue tiles, so
-     once the columns stack on a phone the metadata would land far below the
-     fold — the notice has to stay next to the title it describes. Restricted to
-     below md, since side by side the panel is already in the right place. */
-  ${({ theme, $firstOnMobile }) =>
-    $firstOnMobile &&
-    `${theme.breakpoints.down('md')} {
-       order: -1;
-     }`}
 `;
 
 const Document = ({
@@ -544,7 +544,7 @@ const Document = ({
               content={
                 <>
                   <HalfSplitContainer>
-                    <MainColumn>
+                    <MainSummary>
                       {needsValidation && (
                         <Alert
                           severity="warning"
@@ -553,34 +553,24 @@ const Document = ({
                           })}
                         />
                       )}
-                      {documentReference && (
-                        <Paper
-                          component="section"
-                          variant="outlined"
-                          sx={{
-                            p: 1,
-                            borderRadius: 2,
-                            bgcolor: 'grey.50',
-                            borderLeft: 4,
-                            borderLeftColor: 'primary.main'
-                          }}>
-                          <Typography
-                            variant="h5"
-                            component="h2"
-                            color="secondary"
-                            mb={0.5}>
-                            {formatMessage({ id: 'Reference' })}
-                          </Typography>
-                          <Typography variant="body2">
-                            {documentReference}
-                          </Typography>
-                        </Paper>
-                      )}
                       <SummaryText>{documentData.description}</SummaryText>
-                      {bodySection}
-                    </MainColumn>
-                    <SideColumn $firstOnMobile={isCollection(docType)}>
-                      <DetailsList>
+                    </MainSummary>
+                    <MainBody>{bodySection}</MainBody>
+                    <SideColumn>
+                      <DetailsList title={formatMessage({ id: 'Metadata' })}>
+                        <DetailItem
+                          fullWidth
+                          label={formatMessage({
+                            id: 'Bibliographic reference'
+                          })}
+                          value={
+                            documentReference ? (
+                              <BibliographicReference
+                                reference={documentReference}
+                              />
+                            ) : null
+                          }
+                        />
                         <DetailItem
                           label={formatMessage({ id: 'Type' })}
                           value={
