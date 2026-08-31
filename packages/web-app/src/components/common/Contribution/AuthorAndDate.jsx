@@ -1,14 +1,9 @@
 import PropTypes from 'prop-types';
 import { Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
-import { styled } from '@mui/material/styles';
 import AuthorLink from '../AuthorLink/index';
 import authorType from '../../../types/author.type';
 
-const DateSpan = styled(Typography)`
-  color: inherit;
-  margin-left: 4px;
-`;
 const AuthorAndDate = ({
   author,
   textColor = 'textPrimary',
@@ -21,16 +16,19 @@ const AuthorAndDate = ({
     <Typography component="span" variant="caption" color={textColor}>
       <AuthorLink author={author} verb={verb} />
       {date && (
-        <DateSpan variant="caption">
-          {formatDate(date, {
-            year: '2-digit',
-            month: 'numeric',
-            day: 'numeric',
-            hour: withHours ? 'numeric' : undefined,
-            minute: withHours ? 'numeric' : undefined,
-            second: withHours ? 'numeric' : undefined
-          })}
-        </DateSpan>
+        <>
+          {' '}
+          <Typography component="span" variant="caption" color="inherit">
+            {formatDate(date, {
+              year: '2-digit',
+              month: 'numeric',
+              day: 'numeric',
+              hour: withHours ? 'numeric' : undefined,
+              minute: withHours ? 'numeric' : undefined,
+              second: withHours ? 'numeric' : undefined
+            })}
+          </Typography>
+        </>
       )}
     </Typography>
   );
@@ -38,7 +36,11 @@ const AuthorAndDate = ({
 
 AuthorAndDate.propTypes = {
   author: authorType,
-  date: PropTypes.oneOfType([PropTypes.instanceOf(Date), PropTypes.string]),
+  date: PropTypes.oneOfType([
+    PropTypes.instanceOf(Date),
+    PropTypes.string,
+    PropTypes.number
+  ]),
   textColor: PropTypes.oneOf([
     'textPrimary',
     'textSecondary',

@@ -72,7 +72,7 @@ import {
   DELETED_ENTITIES,
   DeletedCard
 } from '../../components/common/card/Deleted';
-import AuthorAndDate from '../../components/common/Contribution/AuthorAndDate';
+import ContributionMetadata from '../../components/common/Contribution/ContributionMetadata';
 import {
   DocumentChildPropTypes,
   DocumentPropTypes
@@ -737,14 +737,10 @@ const Document = ({
                       </DetailsList>
                     </SideColumn>
                   </HalfSplitContainer>
-                  <Box sx={{ mt: 0.5, mb: -1 }}>
-                    <AuthorAndDate
-                      author={documentData.creator}
-                      textColor="textSecondary"
-                      date={documentData.dateInscription}
-                      verb="Created"
-                    />
-                  </Box>
+                  <ContributionMetadata
+                    createdBy={documentData.creator}
+                    createdAt={documentData.dateInscription}
+                  />
                 </>
               }
             />

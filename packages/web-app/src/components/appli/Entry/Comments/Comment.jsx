@@ -1,4 +1,4 @@
-import { ListItem, Box, ListItemText, Typography } from '@mui/material';
+import { ListItem, Box, ListItemText } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
@@ -17,7 +17,7 @@ import CreateCommentForm from '../../EntitiesForm/Comment';
 import { CommentPropTypes } from '../../../../types/entrance.type';
 import Ratings from '../Ratings';
 import Contribution from '../../../common/Contribution/Contribution';
-import AuthorAndDate from '../../../common/Contribution/AuthorAndDate';
+import ContributionMetadata from '../../../common/Contribution/ContributionMetadata';
 import Duration from '../../../common/Properties/Duration';
 
 const ListItemStyled = styled(ListItem)`
@@ -193,34 +193,14 @@ const Comment = ({
               )}
             </Box>
           )}
-          {(comment.author || comment.reviewer || comment.language) && (
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              component="div">
-              {comment.author && (
-                <AuthorAndDate
-                  author={comment.author}
-                  date={comment.dateInscription}
-                  textColor="inherit"
-                />
-              )}
-              {comment.author && comment.reviewer && ' · '}
-              {comment.reviewer && (
-                <AuthorAndDate
-                  author={comment.reviewer}
-                  date={comment.dateReviewed}
-                  verb={comment.author ? 'Updated' : ''}
-                  textColor="inherit"
-                />
-              )}
-              {(comment.author || comment.reviewer) &&
-                comment.language &&
-                ' · '}
-              {comment.language &&
-                `${formatMessage({ id: 'Language' })} : ${comment.language.toUpperCase()}`}
-            </Typography>
-          )}
+          <ContributionMetadata
+            createdBy={comment.author}
+            createdAt={comment.dateInscription}
+            updatedBy={comment.reviewer}
+            updatedAt={comment.dateReviewed}
+            language={comment.language}
+            creationVerb="Posted"
+          />
         </>
       )}
     </ListItemStyled>

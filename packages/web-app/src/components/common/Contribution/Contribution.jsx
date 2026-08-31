@@ -3,9 +3,18 @@ import { useIntl } from 'react-intl';
 import { Typography } from '@mui/material';
 import Linkify from 'linkify-react';
 import MultilinesTypography from '../MultilinesTypography';
-import AuthorAndDate from './AuthorAndDate';
+import ContributionMetadata from './ContributionMetadata';
 import authorType from '../../../types/author.type';
 import linkifyOptions from '../../../helpers/linkifyOptions';
+
+const languageType = PropTypes.oneOfType([
+  PropTypes.string,
+  PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    refName: PropTypes.string
+  })
+]);
 
 const Contribution = ({
   author,
@@ -41,33 +50,15 @@ const Contribution = ({
         </MultilinesTypography>
       )}
       {!hideAttribution && (author || reviewer || language) && (
-        <Typography
-          component="div"
-          variant="caption"
-          color="text.secondary"
-          sx={{ mt: 2 }}>
-          {author && (
-            <AuthorAndDate
-              author={author}
-              date={dateInscription}
-              textColor="inherit"
-              withHours={withHours}
-            />
-          )}
-          {author && reviewer && ' · '}
-          {reviewer && (
-            <AuthorAndDate
-              author={reviewer}
-              date={dateReviewed}
-              verb={author ? 'Updated' : ''}
-              textColor="inherit"
-              withHours={withHours}
-            />
-          )}
-          {(author || reviewer) && language && ' · '}
-          {language &&
-            `${formatMessage({ id: 'Language' })} : ${language.toUpperCase()}`}
-        </Typography>
+        <ContributionMetadata
+          createdBy={author}
+          createdAt={dateInscription}
+          updatedBy={reviewer}
+          updatedAt={dateReviewed}
+          language={language}
+          creationVerb="Posted"
+          withHours={withHours}
+        />
       )}
     </>
   );
@@ -78,14 +69,16 @@ Contribution.propTypes = {
   body: PropTypes.string,
   dateInscription: PropTypes.oneOfType([
     PropTypes.instanceOf(Date),
-    PropTypes.string
+    PropTypes.string,
+    PropTypes.number
   ]),
   reviewer: authorType,
   dateReviewed: PropTypes.oneOfType([
     PropTypes.instanceOf(Date),
-    PropTypes.string
+    PropTypes.string,
+    PropTypes.number
   ]),
-  language: PropTypes.string,
+  language: languageType,
   withHours: PropTypes.bool,
   isDeleted: PropTypes.bool,
   isDeletedWithHeader: PropTypes.bool,
