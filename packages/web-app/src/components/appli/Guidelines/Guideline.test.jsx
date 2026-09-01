@@ -64,6 +64,9 @@ it('renders a linked summary and confirms unlinking', async () => {
   expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
   expect(screen.queryByRole('button', { name: 'Delete' })).toBeNull();
   expect(screen.queryByRole('button', { name: 'History' })).toBeNull();
+  expect(screen.getByRole('button', { name: 'Unlink' })).toHaveClass(
+    'MuiButton-colorError'
+  );
 
   await user.click(screen.getByRole('button', { name: 'Unlink' }));
   expect(screen.getByText('Unlink Access restrictions?')).toBeVisible();
