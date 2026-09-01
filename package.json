@@ -29,10 +29,10 @@
     "translations:report": "node scripts/translations/completeness-report.js"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.5.0",
-    "@commitlint/config-conventional": "20.5.3",
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "21.2.2",
     "@eslint/eslintrc": "3.3.6",
-    "@eslint/js": "9.39.5",
+    "@eslint/js": "10.0.1",
     "@grotto-front/eslint-config": "workspace:*",
     "baseline-browser-mapping": "^2.11.6",
     "cross-env": "10.1.0",
@@ -51,7 +51,7 @@
     "globals": "17.8.0",
     "html-entities": "^2.6.0",
     "husky": "^9.1.7",
-    "lint-staged": "16.4.0",
+    "lint-staged": "17.4.1",
     "prettier": "3.9.6",
     "typescript": "5.9.3"
   },
