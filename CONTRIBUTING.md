@@ -8,7 +8,7 @@ For coding conventions, architecture, and domain vocabulary, see [AGENTS.md](AGE
 
 ## Prerequisites
 
-- **Node.js** ≥ 18 (recommended: 20)
+- **Node.js** ≥ 24.15 (recommended: 24.20.0)
 - **Yarn** 4.5.0 (exactly — defined in `packageManager`)
 - **OS**: Windows, macOS, Linux
 

@@ -56,7 +56,7 @@
     "typescript": "5.9.3"
   },
   "engines": {
-    "node": ">=20.19",
+    "node": ">=24.15",
     "yarn": "4.5.0"
   },
   "packageManager": "yarn@4.5.0",

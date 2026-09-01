@@ -2,7 +2,7 @@
 
 [![Lint](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/lint.yml/badge.svg?branch=develop)](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/lint.yml)
 [![Test](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/test.yml/badge.svg?branch=develop)](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/test.yml)
-[![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
+[![Node](https://img.shields.io/badge/node-%3E%3D24.15-brightgreen)](https://nodejs.org/)
 [![Uptime](https://uptime.betterstack.com/status-badges/v2/monitor/29ko2.svg)](https://wikicaves.betteruptime.com)
 
 Web app frontend for [Grottocenter](https://fr.wikicaves.org/), the Wiki database made by cavers for cavers, maintained by [Wikicaves](https://fr.wikicaves.org/).
@@ -14,7 +14,7 @@ This project uses [Yarn](https://yarnpkg.com/) & [Yarn workspaces](https://yarnp
 
 ## 🚀 Getting Started
 
-- Install [Node.js](https://nodejs.org) (v20 minimum) and [Yarn](https://yarnpkg.com/getting-started/install)
+- Install [Node.js](https://nodejs.org) (v24.15 minimum, v24.20.0 recommended) and [Yarn](https://yarnpkg.com/getting-started/install)
 - Run `yarn` to install dependencies
 - Run `yarn start` to launch the app
 
