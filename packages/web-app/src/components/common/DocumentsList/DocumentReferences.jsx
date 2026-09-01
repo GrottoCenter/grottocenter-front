@@ -15,6 +15,7 @@ import {
   DOCUMENT_TYPE_ICONS
 } from '@/utils/documentTypeHelpers';
 import DocumentsList from './DocumentsList';
+import DocumentReferenceText from '../DocumentReferenceText';
 
 export const DocumentReferencesSubheader = ({ visibleCount, totalCount }) =>
   totalCount > visibleCount ? (
@@ -99,7 +100,7 @@ const ReferenceList = ({ documents, start = 1 }) => (
               sx={{ flexShrink: 0 }}
             />
             <AppLink to={`/ui/documents/${document.id}`}>
-              {getDocumentReferenceLabel(document)}
+              <DocumentReferenceText document={document} fallbackToTitle />
             </AppLink>
           </Box>
         </Typography>

@@ -1,11 +1,19 @@
 import { useIntl } from 'react-intl';
-import PropTypes from 'prop-types';
 import { Box, Typography } from '@mui/material';
 
 import CopyToClipboardIconButton from '@/components/common/CopyToClipboardIconButton';
+import DocumentReferenceText from '@/components/common/DocumentReferenceText';
+import { DocumentPropTypes } from '@/types/document.type';
+import { formatDocumentReference } from '@/utils/documentReference';
 
-const BibliographicReference = ({ reference }) => {
+const BibliographicReference = ({ document }) => {
   const { formatMessage } = useIntl();
+  const reference = formatDocumentReference(document, {
+    availableAt: formatMessage({ id: 'Available at:' }),
+    online: formatMessage({ id: 'online' })
+  });
+
+  if (!reference) return null;
 
   return (
     <Box component="span">
@@ -13,7 +21,7 @@ const BibliographicReference = ({ reference }) => {
         component="span"
         variant="body2"
         sx={{ whiteSpace: 'pre-wrap' }}>
-        {reference}
+        <DocumentReferenceText document={document} />
       </Typography>{' '}
       <CopyToClipboardIconButton
         compact
@@ -27,7 +35,7 @@ const BibliographicReference = ({ reference }) => {
 };
 
 BibliographicReference.propTypes = {
-  reference: PropTypes.string.isRequired
+  document: DocumentPropTypes.isRequired
 };
 
 export default BibliographicReference;
