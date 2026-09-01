@@ -139,6 +139,9 @@ const Guidelines = ({ entityType, entityId, entityName, guidelines }) => {
     <ScrollableContent
       dense
       title={<FormattedMessage id="Guidelines" />}
+      subheader={
+        <FormattedMessage id="Rules and recommendations applicable to this geographical entity and the caves it contains." />
+      }
       anchorId="guidelines"
       count={guidelines?.length ?? 0}
       defaultExpanded={guidelines?.length > 0}
