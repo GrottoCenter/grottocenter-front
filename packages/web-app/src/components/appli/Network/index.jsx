@@ -315,15 +315,15 @@ export const Network = ({
                     </>
                   }
                 />
+                {cave.guidelines && (
+                  <GuidelinesGrouped guidelines={cave.guidelines} />
+                )}
                 <Descriptions
                   descriptions={cave.descriptions}
                   entityType="cave"
                   entityId={cave.id}
                   isEditAllowed={!cave.isDeleted}
                 />
-                {cave.guidelines && (
-                  <GuidelinesGrouped guidelines={cave.guidelines} />
-                )}
                 {isAuth && (
                   <StandardDialog
                     fullWidth
