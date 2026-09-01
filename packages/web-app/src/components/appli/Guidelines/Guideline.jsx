@@ -60,7 +60,7 @@ const Guideline = ({
   };
 
   const unlinkButton = onUnlink ? (
-    <ButtonGroup color="primary" size="small" variant="outlined">
+    <ButtonGroup color="error" size="small" variant="outlined">
       <OfflineDisabled disabled={!isOnline}>
         <Tooltip
           title={
