@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Chip,
   ListItem,
   Paper,
   Tooltip,
@@ -14,17 +15,29 @@ import { useIntl } from 'react-intl';
 
 import AppLink from '@/components/common/AppLink';
 import Contribution from '@/components/common/Contribution/Contribution';
+import CustomIcon from '@/components/common/CustomIcon';
 import OfflineDisabled from '@/components/common/OfflineDisabled';
 import StandardDialog from '@/components/common/StandardDialog';
 import { useOnlineStatus } from '@/hooks';
 import GuidelinePropTypes from '@/types/guideline.type';
+
+const SCOPE_LABEL_IDS = {
+  country: 'Country guideline',
+  region: 'Region guideline',
+  massif: 'Massif guideline'
+};
 
 const getScopeCount = guideline =>
   (guideline.countries?.length ?? 0) +
   (guideline.regions?.length ?? 0) +
   (guideline.massifs?.length ?? 0);
 
-const Guideline = ({ guideline, onUnlink }) => {
+const Guideline = ({
+  guideline,
+  onUnlink,
+  scopeTypes = [],
+  hideAttribution = false
+}) => {
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
   const [isUnlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
@@ -76,7 +89,13 @@ const Guideline = ({ guideline, onUnlink }) => {
     <ListItem disableGutters sx={{ display: 'block' }}>
       <Paper
         variant="outlined"
-        sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+        sx={{
+          p: 1,
+          borderRadius: 2,
+          borderLeftWidth: 3,
+          borderLeftColor: 'secondary.main',
+          bgcolor: 'grey.50'
+        }}>
         <Box
           sx={{
             display: 'flex',
@@ -84,11 +103,48 @@ const Guideline = ({ guideline, onUnlink }) => {
             justifyContent: 'space-between',
             gap: 0.5
           }}>
-          <Typography variant="h4" component="h3">
-            <AppLink openInNewTabDesktop to={`/ui/guidelines/${guideline.id}`}>
-              {guideline.title}
-            </AppLink>
-          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              columnGap: 1,
+              rowGap: 0.5,
+              minWidth: 0
+            }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                minWidth: 0
+              }}>
+              <Box aria-hidden="true" sx={{ flexShrink: 0 }}>
+                <CustomIcon type="guidelines" size={22} />
+              </Box>
+              <Typography
+                variant="h4"
+                component="h3"
+                sx={{ overflowWrap: 'anywhere' }}>
+                <AppLink to={`/ui/guidelines/${guideline.id}`}>
+                  {guideline.title}
+                </AppLink>
+              </Typography>
+            </Box>
+            {scopeTypes.map(scopeType => (
+              <Chip
+                key={scopeType}
+                label={formatMessage({ id: SCOPE_LABEL_IDS[scopeType] })}
+                size="small"
+                variant="outlined"
+                sx={{
+                  height: 22,
+                  color: 'text.secondary',
+                  borderColor: 'divider',
+                  '& .MuiChip-label': { px: 0.75 }
+                }}
+              />
+            ))}
+          </Box>
           {unlinkButton}
         </Box>
         <Box sx={{ mt: 0.5 }}>
@@ -100,6 +156,7 @@ const Guideline = ({ guideline, onUnlink }) => {
             dateReviewed={guideline.dateReviewed}
             language={guideline.language}
             isDeleted={guideline.isDeleted}
+            hideAttribution={hideAttribution}
           />
         </Box>
       </Paper>
@@ -136,7 +193,11 @@ const Guideline = ({ guideline, onUnlink }) => {
 
 Guideline.propTypes = {
   guideline: GuidelinePropTypes.isRequired,
-  onUnlink: PropTypes.func
+  onUnlink: PropTypes.func,
+  scopeTypes: PropTypes.arrayOf(
+    PropTypes.oneOf(['country', 'region', 'massif'])
+  ),
+  hideAttribution: PropTypes.bool
 };
 
 export default Guideline;

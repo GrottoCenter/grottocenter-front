@@ -18,7 +18,8 @@ const messages = {
   No: 'No',
   close: 'Close',
   'Are you sure you want to unlink {name}?': 'Unlink {name}?',
-  'guidelines.scope_required': 'Select at least one scope.'
+  'guidelines.scope_required': 'Select at least one scope.',
+  'Massif guideline': 'Massif guideline'
 };
 
 const guideline = {
@@ -54,6 +55,10 @@ it('renders a linked summary and confirms unlinking', async () => {
     screen.getByRole('link', { name: 'Access restrictions' })
   ).toHaveAttribute('href', '/ui/guidelines/42');
   expect(
+    screen.getByRole('link', { name: 'Access restrictions' })
+  ).not.toHaveAttribute('target');
+  expect(screen.getByAltText('Guidelines')).toBeVisible();
+  expect(
     screen.getByText('Complete description without truncation.')
   ).toBeVisible();
   expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
@@ -73,4 +78,27 @@ it('blocks unlinking the last scope until api#1775', () => {
   });
 
   expect(screen.getByRole('button', { name: 'Unlink' })).toBeDisabled();
+});
+
+it('shows inherited scopes beside the guideline title', () => {
+  renderGuideline({ scopeTypes: ['massif'] });
+
+  const title = screen.getByRole('heading', { name: 'Access restrictions' });
+  const icon = screen.getByAltText('Guidelines');
+  const scope = screen.getByText('Massif guideline');
+
+  expect(scope).toBeVisible();
+  expect(title.previousElementSibling).toContainElement(icon);
+  expect(title.parentElement.parentElement).toContainElement(scope);
+});
+
+it('can hide attribution in inherited guideline summaries', () => {
+  renderGuideline({ hideAttribution: true });
+
+  expect(
+    screen.getByText('Complete description without truncation.')
+  ).toBeVisible();
+  expect(screen.queryByText('Paul')).toBeNull();
+  expect(screen.queryByText('Jane')).toBeNull();
+  expect(screen.queryByText(/Language/)).toBeNull();
 });

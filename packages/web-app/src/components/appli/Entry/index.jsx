@@ -414,6 +414,9 @@ export const Entry = ({
                   isSensitive={entrance.isSensitive}
                   isEditAllowed={!entrance.isDeleted}
                 />
+                {entrance.guidelines && (
+                  <GuidelinesGrouped guidelines={entrance.guidelines} />
+                )}
                 <Descriptions
                   descriptions={entrance.descriptions}
                   entityType="entrance"
@@ -423,9 +426,6 @@ export const Entry = ({
                   networkName={isNetwork ? entrance.cave.name : undefined}
                   networkDescriptionsCount={networkDescriptionsCount}
                 />
-                {entrance.guidelines && (
-                  <GuidelinesGrouped guidelines={entrance.guidelines} />
-                )}
                 <Riggings
                   riggings={entrance.riggings}
                   entranceId={entrance.id}
