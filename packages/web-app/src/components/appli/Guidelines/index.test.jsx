@@ -25,9 +25,10 @@ vi.mock('./Guideline', () => ({
   )
 }));
 vi.mock('../../common/Layouts/Fixed/ScrollableContent', () => ({
-  default: ({ title, icon, content }) => (
+  default: ({ title, subheader, icon, content }) => (
     <section>
       <h2>{title}</h2>
+      <p>{subheader}</p>
       {icon}
       {content}
     </section>
@@ -54,6 +55,8 @@ const messages = {
   'guidelines.none': 'No guidelines attached to this {entityType}.',
   'guidelines.search_placeholder': 'Search',
   'guidelines.select_guideline': 'Select a guideline',
+  'Rules and recommendations applicable to this geographical entity and the caves it contains.':
+    'Rules and recommendations applicable to this geographical entity and the caves it contains.',
   country: 'country',
   massif: 'massif'
 };
@@ -96,6 +99,12 @@ it('patches every remaining scope when unlinking from a direct entity', async ()
   await user.click(
     screen.getByRole('button', { name: 'Unlink Access restrictions' })
   );
+
+  expect(
+    screen.getByText(
+      'Rules and recommendations applicable to this geographical entity and the caves it contains.'
+    )
+  ).toBeVisible();
 
   expect(mutateAsync).toHaveBeenCalledWith({
     id: 42,
