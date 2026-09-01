@@ -142,26 +142,46 @@ const PropertyCell = styled('div', {
   minWidth: 0
 }));
 
-export const DetailsList = ({ children, title }) => {
+export const DetailsList = ({
+  children,
+  title,
+  reference = null,
+  referenceTitle = null
+}) => {
   const items = React.Children.toArray(children).filter(Boolean);
-  if (items.length === 0) return null;
+  if (items.length === 0 && !reference) return null;
   return (
     <Paper
-      component="section"
       variant="outlined"
       sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-      {title && (
-        <Typography variant="h5" component="h2" color="secondary" mb={1}>
-          {title}
-        </Typography>
+      {reference && (
+        <Box component="section" mb={items.length > 0 ? 1.5 : 0}>
+          {referenceTitle && (
+            <Typography variant="h5" component="h2" mb={0.5}>
+              {referenceTitle}
+            </Typography>
+          )}
+          {reference}
+        </Box>
       )}
-      <PropertiesGrid>{items}</PropertiesGrid>
+      {items.length > 0 && (
+        <Box component={title ? 'section' : 'div'}>
+          {title && (
+            <Typography variant="h5" component="h2" mb={1}>
+              {title}
+            </Typography>
+          )}
+          <PropertiesGrid>{items}</PropertiesGrid>
+        </Box>
+      )}
     </Paper>
   );
 };
 DetailsList.propTypes = {
   children: PropTypes.node,
-  title: PropTypes.string
+  title: PropTypes.string,
+  reference: PropTypes.node,
+  referenceTitle: PropTypes.string
 };
 
 export const DetailItem = ({

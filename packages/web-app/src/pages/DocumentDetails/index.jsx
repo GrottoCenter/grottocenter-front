@@ -557,20 +557,16 @@ const Document = ({
                     </MainSummary>
                     <MainBody>{bodySection}</MainBody>
                     <SideColumn>
-                      <DetailsList title={formatMessage({ id: 'Metadata' })}>
-                        <DetailItem
-                          fullWidth
-                          label={formatMessage({
-                            id: 'Bibliographic reference'
-                          })}
-                          value={
-                            documentReference ? (
-                              <BibliographicReference
-                                reference={documentReference}
-                              />
-                            ) : null
-                          }
-                        />
+                      <DetailsList
+                        title={formatMessage({ id: 'Metadata' })}
+                        referenceTitle={formatMessage({
+                          id: 'Bibliographic reference'
+                        })}
+                        reference={
+                          documentReference ? (
+                            <BibliographicReference document={documentData} />
+                          ) : null
+                        }>
                         <DetailItem
                           label={formatMessage({ id: 'Type' })}
                           value={

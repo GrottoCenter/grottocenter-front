@@ -12,6 +12,7 @@ import {
   DOCUMENT_TYPE_ICONS
 } from '@/utils/documentTypeHelpers';
 import AppLink from '../AppLink';
+import DocumentReferenceText from '../DocumentReferenceText';
 
 const REFERENCE_PREVIEW_LIMIT = 10;
 
@@ -34,7 +35,7 @@ const ReferenceList = ({ documents, start = 1 }) => (
               sx={{ flexShrink: 0 }}
             />
             <AppLink to={`/ui/documents/${document.id}`}>
-              {getDocumentReferenceLabel(document)}
+              <DocumentReferenceText document={document} fallbackToTitle />
             </AppLink>
           </Box>
         </Typography>

@@ -1,5 +1,6 @@
 import {
   formatDocumentReference,
+  formatDocumentReferenceParts,
   getDocumentReferenceLabel
 } from './documentReference';
 import { DocumentTypes } from './documentTypeHelpers';
@@ -10,14 +11,33 @@ describe('formatDocumentReference', () => {
       type: DocumentTypes.ARTICLE,
       title: 'Underground rivers',
       datePublication: '2022-06-15',
-      authors: [{ nickname: 'DUPONT Jean' }],
+      authors: [
+        {
+          nickname: 'jdupont',
+          name: 'Jean',
+          surname: 'Dupont'
+        }
+      ],
       authorsOrganization: [{ name: 'Caving Club' }],
       parent: { title: 'Speleology Review, no. 42' },
       pages: '12-18'
     };
 
     expect(formatDocumentReference(document)).toBe(
-      'DUPONT Jean; Caving Club, 2022. Underground rivers. Speleology Review, no. 42. 2022-06-15. p. 12-18.'
+      'Jean Dupont; Caving Club, 2022. Underground rivers. Speleology Review, no. 42. p. 12-18.'
+    );
+  });
+
+  it('falls back to the nickname when the real name is incomplete', () => {
+    const document = {
+      type: DocumentTypes.BOOK,
+      title: 'Karst atlas',
+      datePublication: '1998',
+      authors: [{ nickname: 'caver42', name: 'Alice' }]
+    };
+
+    expect(formatDocumentReference(document)).toBe(
+      'caver42, 1998. Karst atlas.'
     );
   });
 
@@ -84,6 +104,85 @@ describe('formatDocumentReference', () => {
     expect(formatDocumentReference(document)).toBe(
       'MARTIN Alice, 1998. Karst atlas [online]. Cave Press. Available at: https://example.org/karst-atlas.'
     );
+    expect(
+      formatDocumentReferenceParts(document).filter(part => part.isItalic)
+    ).toEqual([{ text: 'Karst atlas', isItalic: true }]);
+  });
+
+  it('formats a periodical issue as a standalone publication', () => {
+    const document = {
+      type: DocumentTypes.ISSUE,
+      title: "Le P'tit Usnia n° 337",
+      datePublication: '2026-09',
+      authorsOrganization: [
+        {
+          id: 21,
+          name: 'Union spéléologique de l’agglomération nancéienne (USAN)'
+        }
+      ],
+      editor: {
+        id: 21,
+        name: 'Union spéléologique de l’agglomération nancéienne (USAN)'
+      },
+      identifier: 'https://example.org/le-ptit-usnia-337.pdf',
+      identifierType: 'url'
+    };
+
+    expect(formatDocumentReference(document)).toBe(
+      "Union spéléologique de l’agglomération nancéienne (USAN), 2026. Le P'tit Usnia n° 337 [online]. Available at: https://example.org/le-ptit-usnia-337.pdf."
+    );
+    expect(
+      formatDocumentReferenceParts(document).filter(part => part.isItalic)
+    ).toEqual([{ text: "Le P'tit Usnia n° 337", isItalic: true }]);
+  });
+
+  it('formats a periodical collection with its publisher and ISSN', () => {
+    const document = {
+      type: DocumentTypes.COLLECTION,
+      title: "Le P'tit Usania",
+      editor: {
+        name: 'Union spéléologique de l’agglomération nancéienne (USAN)'
+      },
+      identifier: '1292-5950',
+      identifierType: 'issn'
+    };
+
+    expect(formatDocumentReference(document)).toBe(
+      "Le P'tit Usania. Union spéléologique de l’agglomération nancéienne (USAN). ISSN 1292-5950."
+    );
+    expect(
+      formatDocumentReferenceParts(document).filter(part => part.isItalic)
+    ).toEqual([{ text: "Le P'tit Usania", isItalic: true }]);
+  });
+
+  it('keeps a same-named publisher when its organization ID differs', () => {
+    const document = {
+      type: DocumentTypes.BOOK,
+      title: 'Karst bulletin',
+      datePublication: '2020',
+      authorsOrganization: [{ id: 1, name: 'Caving Club' }],
+      editor: { id: 2, name: 'Caving Club' }
+    };
+
+    expect(formatDocumentReference(document)).toBe(
+      'Caving Club, 2020. Karst bulletin. Caving Club.'
+    );
+  });
+
+  it('marks the article and host publication titles as italic', () => {
+    const document = {
+      type: DocumentTypes.ARTICLE,
+      title: 'Underground rivers',
+      datePublication: '2022',
+      parent: { title: 'Speleology Review' }
+    };
+
+    expect(
+      formatDocumentReferenceParts(document).filter(part => part.isItalic)
+    ).toEqual([
+      { text: 'Underground rivers', isItalic: true },
+      { text: 'Speleology Review', isItalic: true }
+    ]);
   });
 
   it('starts an anonymous reference with its title', () => {

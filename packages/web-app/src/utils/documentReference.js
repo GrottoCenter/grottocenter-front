@@ -1,6 +1,18 @@
 import { DocumentTypes } from './documentTypeHelpers';
 
-const REFERENCE_TYPES = new Set([DocumentTypes.ARTICLE, DocumentTypes.BOOK]);
+const STANDALONE_REFERENCE_TYPES = new Set([
+  DocumentTypes.BOOK,
+  DocumentTypes.COLLECTION,
+  DocumentTypes.ISSUE
+]);
+const REFERENCE_TYPES = new Set([
+  DocumentTypes.ARTICLE,
+  ...STANDALONE_REFERENCE_TYPES
+]);
+const DEFAULT_LABELS = {
+  availableAt: 'Available at:',
+  online: 'online'
+};
 
 const extractYear = date => {
   if (!date) return null;
@@ -8,11 +20,34 @@ const extractYear = date => {
   return match ? match[0] : null;
 };
 
+const getPersonAuthorName = author =>
+  author.name && author.surname
+    ? `${author.name} ${author.surname}`
+    : author.nickname;
+
 const getAuthorNames = document =>
   [
-    ...(document.authors ?? []).map(author => author.nickname),
+    ...(document.authors ?? []).map(getPersonAuthorName),
     ...(document.authorsOrganization ?? []).map(author => author.name)
   ].filter(Boolean);
+
+const isPublisherSoleCorporateAuthor = document => {
+  const personAuthors = (document.authors ?? []).filter(getPersonAuthorName);
+  const organizationAuthors = (document.authorsOrganization ?? []).filter(
+    author => author.name
+  );
+
+  // ISO 690 recommends retaining a known publisher, but it does not require
+  // repeating the same organization in two roles. Omit that redundant segment
+  // only when the API IDs prove the publisher is the sole corporate author;
+  // comparing display names would incorrectly merge distinct organizations.
+  return (
+    personAuthors.length === 0 &&
+    organizationAuthors.length === 1 &&
+    document.editor?.id != null &&
+    organizationAuthors[0].id === document.editor.id
+  );
+};
 
 const getIdentifierType = identifierType => {
   if (typeof identifierType === 'string') return identifierType;
@@ -24,12 +59,12 @@ const normalizeIdentifierType = identifierType =>
     .trim()
     .toLowerCase();
 
-const formatIdentifier = document => {
+const formatIdentifier = (document, labels) => {
   const type = normalizeIdentifierType(document.identifierType);
   const value = document.identifier?.trim();
   if (!value) return null;
 
-  if (type === 'url') return `Available at: ${value}`;
+  if (type === 'url') return `${labels.availableAt} ${value}`;
   if (['doi', 'isbn', 'issn'].includes(type))
     return `${type.toUpperCase()} ${value}`;
   return value;
@@ -50,18 +85,29 @@ const formatIssue = issue => formatPrefixedValue(issue, 'no. ', /^no\.?\s*/i);
 
 const getArticleMetadata = document => ({
   publicationTitle: document.oldBBS?.publicationOther ?? document.parent?.title,
-  publicationDate: document.datePublication ?? null,
   issue: document.oldBBS?.publicationFascicule,
   pages: document.pages ?? document.oldBBS?.pages
 });
 
-const joinSegments = segments => {
-  const cleaned = segments
-    .map(segment => (segment == null ? '' : String(segment).trim()))
-    .filter(Boolean)
-    .map(segment => segment.replace(/\.+$/, ''));
+const createPart = (text, isItalic = false) => {
+  if (text == null) return null;
+  const cleanedText = String(text).trim().replace(/\.+$/, '');
+  return cleanedText ? { text: cleanedText, isItalic } : null;
+};
 
-  return cleaned.length > 0 ? `${cleaned.join('. ')}.` : null;
+const createSegment = (...parts) => parts.filter(Boolean);
+
+const joinSegments = segments => {
+  const cleaned = segments.filter(segment => segment.length > 0);
+  if (cleaned.length === 0) return null;
+
+  return cleaned.flatMap((segment, index) => [
+    ...segment,
+    {
+      text: index === cleaned.length - 1 ? '.' : '. ',
+      isItalic: false
+    }
+  ]);
 };
 
 const hasCitationMetadata = document => {
@@ -81,10 +127,13 @@ const hasCitationMetadata = document => {
 
 /**
  * Builds an ISO 690 author-date reference from the available document metadata.
- * Returns null for other document types and for article/book payloads that only
+ * Returns null for other document types and for supported payloads that only
  * carry a title, so callers can deliberately fall back to that bare title.
  */
-export const formatDocumentReference = document => {
+export const formatDocumentReferenceParts = (
+  document,
+  labels = DEFAULT_LABELS
+) => {
   if (
     !document ||
     !REFERENCE_TYPES.has(document.type) ||
@@ -99,29 +148,48 @@ export const formatDocumentReference = document => {
   const authors = getAuthorNames(document);
   const year = extractYear(document.datePublication);
   const isOnline = normalizeIdentifierType(document.identifierType) === 'url';
-  const title =
-    isOnline && document.title ? `${document.title} [online]` : document.title;
+  const title = createSegment(
+    createPart(document.title, true),
+    isOnline && document.title
+      ? { text: ` [${labels.online}]`, isItalic: false }
+      : null
+  );
   const segments =
     authors.length > 0
-      ? [[authors.join('; '), year].filter(Boolean).join(', '), title]
-      : [title, year];
+      ? [
+          createSegment(
+            createPart([authors.join('; '), year].filter(Boolean).join(', '))
+          ),
+          title
+        ]
+      : [title, createSegment(createPart(year))];
 
   if (article) {
-    const additionalDate =
-      article.publicationDate?.length > 4 ? article.publicationDate : null;
     const numbering = [formatIssue(article.issue), formatPages(article.pages)]
       .filter(Boolean)
       .join(', ');
 
-    segments.push(article.publicationTitle, additionalDate, numbering);
-  } else {
-    segments.push(document.editor?.name);
+    // This formatter uses the ISO 690 author-date form, so the publication year
+    // is already placed after the author. Repeating the same date as YYYY-MM
+    // after the periodical title adds no distinct source information; the issue
+    // title/number identifies the publication more usefully and concisely.
+    segments.push(
+      createSegment(createPart(article.publicationTitle, true)),
+      createSegment(createPart(numbering))
+    );
+  } else if (!isPublisherSoleCorporateAuthor(document)) {
+    segments.push(createSegment(createPart(document.editor?.name)));
   }
 
-  segments.push(formatIdentifier(document));
+  segments.push(createSegment(createPart(formatIdentifier(document, labels))));
 
   return joinSegments(segments);
 };
+
+export const formatDocumentReference = (document, labels = DEFAULT_LABELS) =>
+  formatDocumentReferenceParts(document, labels)
+    ?.map(part => part.text)
+    .join('') ?? null;
 
 export const getDocumentReferenceLabel = document =>
   formatDocumentReference(document) ?? document?.title ?? null;

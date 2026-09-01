@@ -7,7 +7,9 @@ import { DocumentTypes } from '@/utils/documentTypeHelpers';
 import DocumentReferences from './DocumentReferences';
 
 const messages = {
+  'Available at:': 'Available at:',
   'Bibliographic references': 'Bibliographic references',
+  online: 'online',
   'Show more': 'Show more',
   'Show less': 'Show less'
 };
@@ -33,18 +35,28 @@ describe('DocumentReferences', () => {
         id: 42,
         type: DocumentTypes.ARTICLE,
         title: 'Underground rivers',
-        authors: [{ id: 1, nickname: 'DUPONT Jean' }],
+        authors: [
+          {
+            id: 1,
+            nickname: 'jdupont',
+            name: 'Jean',
+            surname: 'Dupont'
+          }
+        ],
         datePublication: '2022',
         parent: { id: 2, title: 'Speleology Review' }
       }
     ]);
 
     const link = screen.getByRole('link', {
-      name: 'DUPONT Jean, 2022. Underground rivers. Speleology Review.'
+      name: 'Jean Dupont, 2022. Underground rivers. Speleology Review.'
     });
     expect(link).toHaveAttribute('href', '/ui/documents/42');
     expect(link).not.toHaveAttribute('target');
     expect(screen.getByTestId('ArticleIcon')).toBeInTheDocument();
+    expect(
+      [...link.querySelectorAll('cite')].map(title => title.textContent)
+    ).toEqual(['Underground rivers', 'Speleology Review']);
   });
 
   it('shows ten references before expanding the complete list', async () => {
