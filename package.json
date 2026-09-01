@@ -12,6 +12,7 @@
   "scripts": {
     "start": "yarn workspace @grotto-front/web-app start",
     "build": "yarn workspace @grotto-front/web-app build",
+    "preview": "yarn workspace @grotto-front/web-app preview",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "e2e:run": "yarn workspace @grotto-front/web-app e2e-run",

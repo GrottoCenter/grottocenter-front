@@ -49,5 +49,8 @@ jobs:
           browser: ${{ matrix.browser }}
           build: yarn build
           project: packages/web-app
-          start: yarn start
+          # Serve the production build so Vite cannot invalidate optimized
+          # dependency chunks while a slower browser is still using them.
+          start: >
+            yarn preview --host 0.0.0.0 --port 3000 --strictPort
           wait-on: 'http://localhost:3000'
