@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -7,7 +7,8 @@ import {
   useDeleteGuideline,
   useGuideline,
   useNotification,
-  usePermissions
+  usePermissions,
+  useRestoreGuideline
 } from '@/hooks';
 import GuidelinePage from './index';
 
@@ -15,7 +16,8 @@ vi.mock('@/hooks', () => ({
   useDeleteGuideline: vi.fn(),
   useGuideline: vi.fn(),
   useNotification: vi.fn(),
-  usePermissions: vi.fn()
+  usePermissions: vi.fn(),
+  useRestoreGuideline: vi.fn()
 }));
 vi.mock('@/components/common/CustomIcon', () => ({
   default: () => <span data-testid="custom-icon" />
@@ -77,6 +79,7 @@ const messages = {
   Language: 'Language',
   Edit: 'Edit',
   History: 'History',
+  Restore: 'Restore',
   Delete: 'Delete',
   Cancel: 'Cancel',
   close: 'Close',
@@ -110,9 +113,9 @@ const setGuidelineResult = data => {
   });
 };
 
-const renderPage = () =>
+const renderPage = (initialEntry = '/ui/guidelines/42') =>
   render(
-    <MemoryRouter initialEntries={['/ui/guidelines/42']}>
+    <MemoryRouter initialEntries={[initialEntry]}>
       <IntlProvider locale="en" messages={messages}>
         <Routes>
           <Route
@@ -130,6 +133,10 @@ beforeEach(() => {
   usePermissions.mockReturnValue({ isAuth: false, isModerator: false });
   useNotification.mockReturnValue({ onError: vi.fn() });
   useDeleteGuideline.mockReturnValue({
+    mutateAsync: vi.fn(),
+    isPending: false
+  });
+  useRestoreGuideline.mockReturnValue({
     mutateAsync: vi.fn(),
     isPending: false
   });
@@ -172,7 +179,7 @@ it('shows the full instructions, contributors and geographical scope', () => {
     '/ui/persons/4'
   );
   expect(screen.getByTestId('guideline-metadata')).toHaveTextContent(
-    /Created by Paul .* · Modified by Jane .* · Language : ENG/
+    /Created by Paul .* · Modified by Jane .* · Language : English/
   );
   expect(screen.getByRole('link', { name: 'History' })).toHaveAttribute(
     'href',
@@ -184,11 +191,23 @@ it('shows the full instructions, contributors and geographical scope', () => {
   ).not.toBeInTheDocument();
 });
 
-it('offers edit and confirmed deletion according to RBAC', async () => {
+it('keeps a deleted guideline available for moderators to restore', async () => {
   const user = userEvent.setup();
-  const mutateAsync = vi.fn().mockResolvedValue(undefined);
-  usePermissions.mockReturnValue({ isAuth: true, isModerator: true });
-  useDeleteGuideline.mockReturnValue({ mutateAsync, isPending: false });
+  const deleteGuideline = vi.fn().mockResolvedValue(undefined);
+  const restoreGuideline = vi.fn().mockResolvedValue(undefined);
+  usePermissions.mockReturnValue({
+    isAuth: true,
+    isModerator: true,
+    isAdmin: false
+  });
+  useDeleteGuideline.mockReturnValue({
+    mutateAsync: deleteGuideline,
+    isPending: false
+  });
+  useRestoreGuideline.mockReturnValue({
+    mutateAsync: restoreGuideline,
+    isPending: false
+  });
   setGuidelineResult(guideline);
   renderPage();
 
@@ -200,8 +219,17 @@ it('offers edit and confirmed deletion according to RBAC', async () => {
   expect(screen.getByText('Delete this Access restrictions?')).toBeVisible();
   await user.click(screen.getByRole('button', { name: 'Delete' }));
 
-  expect(mutateAsync).toHaveBeenCalledWith({ id: '42', isPermanent: false });
-  expect(await screen.findByText('Guidelines list')).toBeVisible();
+  expect(deleteGuideline).toHaveBeenCalledWith({
+    id: '42',
+    isPermanent: false
+  });
+  await user.click(await screen.findByRole('button', { name: 'Restore' }));
+  expect(restoreGuideline).toHaveBeenCalledWith({ id: '42' });
+  await waitFor(() =>
+    expect(
+      screen.queryByRole('button', { name: 'Restore' })
+    ).not.toBeInTheDocument()
+  );
 });
 
 it('uses the standard fetch error state', () => {
@@ -217,4 +245,32 @@ it('uses the standard fetch error state', () => {
   expect(screen.getByRole('alert')).toHaveTextContent(
     'Unable to load guideline'
   );
+});
+
+it('restores a known soft-deleted guideline after a page reload', async () => {
+  const user = userEvent.setup();
+  const restoreGuideline = vi.fn().mockResolvedValue(undefined);
+  const refetch = vi.fn();
+  usePermissions.mockReturnValue({
+    isAuth: true,
+    isModerator: true,
+    isAdmin: false
+  });
+  useGuideline.mockReturnValue({
+    data: null,
+    error: { status: 404 },
+    isPending: false,
+    fetchStatus: 'idle',
+    refetch
+  });
+  useRestoreGuideline.mockReturnValue({
+    mutateAsync: restoreGuideline,
+    isPending: false
+  });
+
+  renderPage('/ui/guidelines/42?isDeleted=true');
+
+  await user.click(screen.getByRole('button', { name: 'Restore' }));
+  expect(restoreGuideline).toHaveBeenCalledWith({ id: '42' });
+  expect(refetch).toHaveBeenCalledOnce();
 });
