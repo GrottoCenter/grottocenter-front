@@ -16,11 +16,9 @@ const languageType = PropTypes.oneOfType([
 
 const getLanguageLabel = language => {
   if (!language) return null;
-  const value =
-    typeof language === 'string'
-      ? language
-      : (language.id ?? language.refName ?? language.name);
-  return value ? String(value).toLocaleUpperCase() : null;
+  if (typeof language === 'string') return language.toLocaleUpperCase();
+  const value = language.refName ?? language.name ?? language.id;
+  return value ? String(value) : null;
 };
 
 const ContributionMetadata = ({

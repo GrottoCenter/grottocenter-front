@@ -3,8 +3,9 @@ import { Box, Button, Skeleton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
+import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 import { useIntl } from 'react-intl';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import CustomIcon from '@/components/common/CustomIcon';
 import FetchErrorState from '@/components/common/FetchErrorState';
@@ -23,7 +24,8 @@ import {
   useDeleteGuideline,
   useGuideline,
   useNotification,
-  usePermissions
+  usePermissions,
+  useRestoreGuideline
 } from '@/hooks';
 import GuidelinePropTypes from '@/types/guideline.type';
 
@@ -86,28 +88,37 @@ GuidelineScope.propTypes = {
 
 const GuidelinePage = () => {
   const { guidelineId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const { onError } = useNotification();
   const deleteMutation = useDeleteGuideline();
+  const restoreMutation = useRestoreGuideline();
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { data, error, isPending, fetchStatus, refetch } =
     useGuideline(guidelineId);
-  const hasError = Boolean(error) || fetchStatus === 'paused';
+  const isDeletedFromUrl =
+    new URLSearchParams(location.search).get('isDeleted') === 'true';
+  const isDeleted = Boolean(data?.isDeleted || isDeletedFromUrl);
+  const hasError =
+    (!data && Boolean(error)) || (!data && fetchStatus === 'paused');
   const snapshotUrl = useSnapshotUrl({
     id: Number(guidelineId),
     type: 'guidelines',
-    isDeleted: data?.isDeleted
+    isDeleted
   });
 
   const handleDelete = async () => {
     try {
       await deleteMutation.mutateAsync({ id: guidelineId, isPermanent: false });
       setDeleteDialogOpen(false);
-      // TODO(api#1782): stay on a deleted guideline and expose Restore once
-      // GET /api/v1/guidelines/:id can reload soft-deleted guidelines.
-      navigate('/ui/guidelines', { replace: true });
+      // The public detail endpoint deliberately returns 404 for soft-deleted
+      // guidelines. Keep the known deletion state in the URL so the page stays
+      // restorable across a reload without pretending every 404 is deleted.
+      navigate(`/ui/guidelines/${guidelineId}?isDeleted=true`, {
+        replace: true
+      });
     } catch {
       onError(
         formatMessage({
@@ -118,35 +129,59 @@ const GuidelinePage = () => {
     }
   };
 
-  const actions = data ? (
-    <ResponsiveActions
-      loading={deleteMutation.isPending}
-      loadingLabel={formatMessage({ id: 'Loading ...' })}
-      items={[
-        {
-          key: 'edit',
-          icon: <EditIcon />,
-          label: formatMessage({ id: 'Edit' }),
-          href: `/ui/guidelines/${guidelineId}/edit`,
-          hidden: !permissions.isAuth || data.isDeleted
-        },
-        {
-          key: 'history',
-          icon: <ManageHistoryIcon />,
-          label: formatMessage({ id: 'History' }),
-          href: snapshotUrl
-        },
-        {
-          key: 'delete',
-          icon: <DeleteIcon />,
-          label: formatMessage({ id: 'Delete' }),
-          onClick: () => setDeleteDialogOpen(true),
-          destructive: true,
-          hidden: !permissions.isModerator || data.isDeleted
-        }
-      ]}
-    />
-  ) : null;
+  const handleRestore = async () => {
+    try {
+      await restoreMutation.mutateAsync({ id: guidelineId });
+      navigate(`/ui/guidelines/${guidelineId}`, { replace: true });
+      await refetch();
+    } catch {
+      onError(
+        formatMessage({
+          id: 'guidelines.restore_error',
+          defaultMessage: 'Failed to restore the guideline'
+        })
+      );
+    }
+  };
+
+  const canModerate = permissions.isModerator || permissions.isAdmin;
+  const actions =
+    data || isDeletedFromUrl ? (
+      <ResponsiveActions
+        loading={deleteMutation.isPending || restoreMutation.isPending}
+        loadingLabel={formatMessage({ id: 'Loading ...' })}
+        items={[
+          {
+            key: 'restore',
+            icon: <RestoreFromTrashIcon />,
+            label: formatMessage({ id: 'Restore' }),
+            onClick: handleRestore,
+            hidden: !canModerate || !isDeleted
+          },
+          {
+            key: 'edit',
+            icon: <EditIcon />,
+            label: formatMessage({ id: 'Edit' }),
+            href: `/ui/guidelines/${guidelineId}/edit`,
+            hidden: !permissions.isAuth || isDeleted
+          },
+          {
+            key: 'history',
+            icon: <ManageHistoryIcon />,
+            label: formatMessage({ id: 'History' }),
+            href: snapshotUrl
+          },
+          {
+            key: 'delete',
+            icon: <DeleteIcon />,
+            label: formatMessage({ id: 'Delete' }),
+            onClick: () => setDeleteDialogOpen(true),
+            destructive: true,
+            hidden: !canModerate || isDeleted
+          }
+        ]}
+      />
+    ) : null;
 
   return (
     <PageContainer>

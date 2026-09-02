@@ -40,8 +40,14 @@ describe('ContributionMetadata', () => {
       '/ui/persons/2'
     );
     expect(container.firstChild).toHaveTextContent(
-      /Created by Paul .* · Updated by Jane .* · Language : ENG/
+      /Created by Paul .* · Updated by Jane .* · Language : English/
     );
+  });
+
+  it('keeps a legacy language code readable', () => {
+    const { container } = renderMetadata({ language: 'fra' });
+
+    expect(container.firstChild).toHaveTextContent('Language : FRA');
   });
 
   it('renders nothing without attribution metadata', () => {
