@@ -247,6 +247,18 @@ it('uses the standard fetch error state', () => {
   );
 });
 
+it('keeps the scope placeholder visible while data is unavailable', () => {
+  setGuidelineResult(null);
+  renderPage();
+
+  expect(
+    screen
+      .getByRole('heading', { name: 'Applies to' })
+      .closest('section')
+      .querySelector('.MuiSkeleton-root')
+  ).toBeInTheDocument();
+});
+
 it('restores a known soft-deleted guideline after a page reload', async () => {
   const user = userEvent.setup();
   const restoreGuideline = vi.fn().mockResolvedValue(undefined);

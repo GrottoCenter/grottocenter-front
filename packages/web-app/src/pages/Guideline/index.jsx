@@ -260,7 +260,7 @@ const GuidelinePage = () => {
               collapsible={false}
               title={formatMessage({ id: 'Applies to' })}
               content={
-                isPending ? (
+                isPending || !data ? (
                   <Skeleton variant="rounded" height={80} />
                 ) : (
                   <GuidelineScope guideline={data} />
