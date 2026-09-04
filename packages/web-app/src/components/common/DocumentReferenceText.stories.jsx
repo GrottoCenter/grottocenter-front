@@ -22,7 +22,17 @@ export const Article = {
           surname: 'Dupont'
         }
       ],
-      parent: { id: 100, title: 'Speleology Review' }
+      authorsOrganization: [],
+      parent: {
+        id: 100,
+        type: DocumentTypes.ISSUE,
+        issue: 'no. 42',
+        parent: {
+          id: 101,
+          type: DocumentTypes.COLLECTION,
+          title: 'Speleology Review'
+        }
+      }
     }
   }
 };
@@ -34,6 +44,7 @@ export const Book = {
       type: DocumentTypes.BOOK,
       title: 'Karst atlas',
       datePublication: '1998',
+      authors: [],
       authorsOrganization: [{ id: 2, name: 'Caving Club' }],
       editor: { id: 3, name: 'Cave Press' }
     }
@@ -47,6 +58,7 @@ export const PeriodicalIssue = {
       type: DocumentTypes.ISSUE,
       title: "Le P'tit Usnia n° 337",
       datePublication: '2026-09',
+      authors: [],
       authorsOrganization: [
         {
           id: 21,
@@ -69,6 +81,8 @@ export const PeriodicalCollection = {
       id: 4,
       type: DocumentTypes.COLLECTION,
       title: "Le P'tit Usania",
+      authors: [],
+      authorsOrganization: [],
       editor: {
         id: 21,
         name: 'Union spéléologique de l’agglomération nancéienne (USAN)'

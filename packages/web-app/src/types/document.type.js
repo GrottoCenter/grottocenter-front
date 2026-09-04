@@ -21,6 +21,26 @@ export const DocumentSimplePropTypes = PropTypes.shape({
   description: PropTypes.string
 });
 
+const CitationParentPropTypes = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  type: PropTypes.string,
+  title: PropTypes.string,
+  issue: PropTypes.string,
+  datePublication: PropTypes.string,
+  parent: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    type: PropTypes.string,
+    title: PropTypes.string,
+    issue: PropTypes.string,
+    datePublication: PropTypes.string
+  })
+});
+
+const CitationOrganizationPropTypes = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  name: PropTypes.string
+});
+
 // The shape of a document as it comes attached to something else: the children
 // of a collection (GET /documents/{id}/children) and the documents of an
 // entrance, massif, organization or person, which the API returns identically.
@@ -37,24 +57,10 @@ export const DocumentChildPropTypes = PropTypes.shape({
   isValidated: PropTypes.bool,
   isDeleted: PropTypes.bool,
   authors: PropTypes.arrayOf(authorType),
-  authorsOrganization: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string
-    })
-  ),
-  editor: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string
-  }),
-  library: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string
-  }),
-  parent: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    title: PropTypes.string
-  }),
+  authorsOrganization: PropTypes.arrayOf(CitationOrganizationPropTypes),
+  editor: CitationOrganizationPropTypes,
+  library: CitationOrganizationPropTypes,
+  parent: CitationParentPropTypes,
   identifier: PropTypes.string,
   identifierType: PropTypes.string,
   issue: PropTypes.string,

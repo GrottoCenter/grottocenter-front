@@ -1,7 +1,6 @@
 import {
   formatDocumentReference,
-  formatDocumentReferenceParts,
-  getDocumentReferenceLabel
+  formatDocumentReferenceParts
 } from './documentReference';
 import { DocumentTypes } from './documentTypeHelpers';
 
@@ -10,7 +9,7 @@ describe('formatDocumentReference', () => {
     const document = {
       type: DocumentTypes.ARTICLE,
       title: 'Underground rivers',
-      datePublication: '2022-06-15',
+      datePublication: '2020-01-01',
       authors: [
         {
           nickname: 'jdupont',
@@ -19,12 +18,21 @@ describe('formatDocumentReference', () => {
         }
       ],
       authorsOrganization: [{ name: 'Caving Club' }],
-      parent: { title: 'Speleology Review, no. 42' },
+      parent: {
+        type: DocumentTypes.ISSUE,
+        title: 'Issue 42',
+        issue: 'n°42',
+        datePublication: '2022-06-15',
+        parent: {
+          type: DocumentTypes.COLLECTION,
+          title: 'Speleology Review'
+        }
+      },
       pages: '12-18'
     };
 
     expect(formatDocumentReference(document)).toBe(
-      'Jean Dupont; Caving Club, 2022. Underground rivers. Speleology Review, no. 42. p. 12-18.'
+      'Jean Dupont; Caving Club, 2022. Underground rivers. Speleology Review. n°42, p. 12-18.'
     );
   });
 
@@ -33,7 +41,8 @@ describe('formatDocumentReference', () => {
       type: DocumentTypes.BOOK,
       title: 'Karst atlas',
       datePublication: '1998',
-      authors: [{ nickname: 'caver42', name: 'Alice' }]
+      authors: [{ nickname: 'caver42', name: 'Alice' }],
+      authorsOrganization: []
     };
 
     expect(formatDocumentReference(document)).toBe(
@@ -47,14 +56,23 @@ describe('formatDocumentReference', () => {
       title: 'Underground rivers',
       datePublication: '2022',
       authors: [{ nickname: 'DUPONT Jean' }],
-      parent: { title: 'Speleology Review, no. 42' },
+      authorsOrganization: [],
+      parent: {
+        type: DocumentTypes.ISSUE,
+        issue: 'no. 42',
+        datePublication: '2022',
+        parent: {
+          type: DocumentTypes.COLLECTION,
+          title: 'Speleology Review'
+        }
+      },
       pages: '12-18',
       identifier: '10.1234/example',
       identifierType: 'doi'
     };
 
     expect(formatDocumentReference(document)).toBe(
-      'DUPONT Jean, 2022. Underground rivers. Speleology Review, no. 42. p. 12-18. DOI 10.1234/example.'
+      'DUPONT Jean, 2022. Underground rivers. Speleology Review. no. 42, p. 12-18. DOI 10.1234/example.'
     );
   });
 
@@ -62,6 +80,8 @@ describe('formatDocumentReference', () => {
     const document = {
       type: DocumentTypes.ARTICLE,
       title: 'Legacy article',
+      authors: [],
+      authorsOrganization: [],
       oldBBS: {
         publicationOther: 'Old Bulletin',
         publicationFascicule: '7',
@@ -80,9 +100,10 @@ describe('formatDocumentReference', () => {
       title: 'Karst atlas',
       datePublication: '1998',
       authors: [{ nickname: 'MARTIN Alice' }],
+      authorsOrganization: [],
       editor: { name: 'Cave Press' },
       identifier: '978-1-2345-6789-0',
-      identifierType: { id: 'isbn' }
+      identifierType: 'isbn'
     };
 
     expect(formatDocumentReference(document)).toBe(
@@ -96,6 +117,7 @@ describe('formatDocumentReference', () => {
       title: 'Karst atlas',
       datePublication: '1998',
       authors: [{ nickname: 'MARTIN Alice' }],
+      authorsOrganization: [],
       editor: { name: 'Cave Press' },
       identifier: 'https://example.org/karst-atlas',
       identifierType: 'url'
@@ -120,6 +142,7 @@ describe('formatDocumentReference', () => {
           name: 'Union spéléologique de l’agglomération nancéienne (USAN)'
         }
       ],
+      authors: [],
       editor: {
         id: 21,
         name: 'Union spéléologique de l’agglomération nancéienne (USAN)'
@@ -140,6 +163,8 @@ describe('formatDocumentReference', () => {
     const document = {
       type: DocumentTypes.COLLECTION,
       title: "Le P'tit Usania",
+      authors: [],
+      authorsOrganization: [],
       editor: {
         name: 'Union spéléologique de l’agglomération nancéienne (USAN)'
       },
@@ -161,6 +186,7 @@ describe('formatDocumentReference', () => {
       title: 'Karst bulletin',
       datePublication: '2020',
       authorsOrganization: [{ id: 1, name: 'Caving Club' }],
+      authors: [],
       editor: { id: 2, name: 'Caving Club' }
     };
 
@@ -174,7 +200,15 @@ describe('formatDocumentReference', () => {
       type: DocumentTypes.ARTICLE,
       title: 'Underground rivers',
       datePublication: '2022',
-      parent: { title: 'Speleology Review' }
+      authors: [],
+      authorsOrganization: [],
+      parent: {
+        type: DocumentTypes.ISSUE,
+        parent: {
+          type: DocumentTypes.COLLECTION,
+          title: 'Speleology Review'
+        }
+      }
     };
 
     expect(
@@ -190,6 +224,8 @@ describe('formatDocumentReference', () => {
       type: DocumentTypes.BOOK,
       title: 'Anonymous karst inventory',
       datePublication: '2001',
+      authors: [],
+      authorsOrganization: [],
       editor: { name: 'Cave Press' }
     };
 
@@ -205,19 +241,11 @@ describe('formatDocumentReference', () => {
     expect(
       formatDocumentReference({
         type: DocumentTypes.ARTICLE,
-        title: 'Title only'
+        title: 'Title only',
+        authors: [],
+        authorsOrganization: []
       })
     ).toBeNull();
     expect(formatDocumentReference(null)).toBeNull();
-  });
-
-  it('falls back to the title for reference-list labels', () => {
-    expect(
-      getDocumentReferenceLabel({
-        type: DocumentTypes.IMAGE,
-        title: 'Entrance photograph'
-      })
-    ).toBe('Entrance photograph');
-    expect(getDocumentReferenceLabel({ type: DocumentTypes.IMAGE })).toBeNull();
   });
 });

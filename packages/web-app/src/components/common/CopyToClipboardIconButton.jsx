@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { IconButton, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -25,23 +25,22 @@ const CopyToClipboardIconButton = ({
   label,
   successLabel,
   errorLabel,
-  compact = false,
-  feedbackDuration = 2000
+  compact = false
 }) => {
   const [copyStatus, setCopyStatus] = useState(null);
 
   useEffect(() => {
     if (!copyStatus) return undefined;
-    const timeout = setTimeout(() => setCopyStatus(null), feedbackDuration);
+    const timeout = setTimeout(() => setCopyStatus(null), 2000);
     return () => clearTimeout(timeout);
-  }, [copyStatus, feedbackDuration]);
+  }, [copyStatus]);
 
-  const handleCopy = useCallback(() => {
+  const handleCopy = () => {
     copyToClipboard(value).then(
       () => setCopyStatus('success'),
       () => setCopyStatus('error')
     );
-  }, [value]);
+  };
 
   let currentLabel = label;
   let icon = <ContentCopyIcon fontSize="small" />;
@@ -84,8 +83,7 @@ CopyToClipboardIconButton.propTypes = {
   label: PropTypes.string.isRequired,
   successLabel: PropTypes.string.isRequired,
   errorLabel: PropTypes.string.isRequired,
-  compact: PropTypes.bool,
-  feedbackDuration: PropTypes.number
+  compact: PropTypes.bool
 };
 
 export default CopyToClipboardIconButton;

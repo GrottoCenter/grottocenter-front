@@ -8,7 +8,17 @@ const documents = [
     title: 'Underground rivers of the Vercors',
     datePublication: '2024',
     authors: [{ id: 1, nickname: 'DUPONT Jean' }],
-    parent: { id: 100, title: 'Speleology Review, no. 42' },
+    authorsOrganization: [],
+    parent: {
+      id: 100,
+      type: DocumentTypes.ISSUE,
+      issue: 'no. 42',
+      parent: {
+        id: 101,
+        type: DocumentTypes.COLLECTION,
+        title: 'Speleology Review'
+      }
+    },
     pages: '12-18'
   },
   {
@@ -16,6 +26,7 @@ const documents = [
     type: DocumentTypes.BOOK,
     title: 'Karst atlas',
     datePublication: '1998',
+    authors: [],
     authorsOrganization: [{ id: 2, name: 'Caving Club' }],
     editor: { id: 3, name: 'Cave Press' },
     identifier: '978-1-2345-6789-0',
@@ -25,7 +36,9 @@ const documents = [
     id: index + 3,
     type: DocumentTypes.ARTICLE,
     title: `Caving article ${index + 1}`,
-    datePublication: String(2015 + index)
+    datePublication: String(2015 + index),
+    authors: [],
+    authorsOrganization: []
   }))
 ];
 

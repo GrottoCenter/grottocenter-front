@@ -31,7 +31,9 @@ const makeDocument = id => ({
   id,
   type: DocumentTypes.ARTICLE,
   datePublication: '2024',
-  title: `Document ${id}`
+  title: `Document ${id}`,
+  authors: [],
+  authorsOrganization: []
 });
 
 const renderReferences = documents =>
@@ -39,9 +41,26 @@ const renderReferences = documents =>
     messages
   });
 
+const useMobileViewport = () => {
+  vi.spyOn(window, 'matchMedia').mockImplementation(query => ({
+    matches: query.includes('max-width'),
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false
+  }));
+};
+
 describe('DocumentReferences', () => {
   beforeEach(() => {
     clipboard.values = [];
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('renders a formatted reference as plain text with a copy button', async () => {
@@ -59,8 +78,17 @@ describe('DocumentReferences', () => {
             surname: 'Dupont'
           }
         ],
+        authorsOrganization: [],
         datePublication: '2022',
-        parent: { id: 2, title: 'Speleology Review' }
+        parent: {
+          id: 2,
+          type: DocumentTypes.ISSUE,
+          parent: {
+            id: 3,
+            type: DocumentTypes.COLLECTION,
+            title: 'Speleology Review'
+          }
+        }
       }
     ]);
 
@@ -68,7 +96,7 @@ describe('DocumentReferences', () => {
     const copyButton = screen.getByRole('button', { name: 'Copy reference' });
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
     expect(reference.closest('li')).toContainElement(copyButton);
-    expect(screen.getByTestId('ArticleIcon')).toBeInTheDocument();
+    expect(screen.queryByTestId('ArticleIcon')).not.toBeInTheDocument();
     expect(
       [...reference.querySelectorAll('cite')].map(title => title.textContent)
     ).toEqual(['Underground rivers', 'Speleology Review']);
@@ -78,7 +106,7 @@ describe('DocumentReferences', () => {
     ]);
   });
 
-  it('shows ten references before expanding the complete list', async () => {
+  it('shows ten references on desktop before expanding the list', async () => {
     const user = userEvent.setup();
     renderReferences(
       Array.from({ length: 12 }, (_, index) => makeDocument(index + 1))
@@ -87,7 +115,7 @@ describe('DocumentReferences', () => {
     expect(
       screen.getAllByRole('button', { name: 'Copy reference' })
     ).toHaveLength(10);
-    expect(screen.queryByText('Document 11')).not.toBeInTheDocument();
+    expect(screen.getByText('Document 11')).not.toBeVisible();
 
     const showMore = screen.getByRole('button', { name: 'Show more' });
     expect(showMore).toHaveAttribute('aria-expanded', 'false');
@@ -110,12 +138,26 @@ describe('DocumentReferences', () => {
     );
   });
 
+  it('shows five references by default on mobile', () => {
+    useMobileViewport();
+    renderReferences(
+      Array.from({ length: 12 }, (_, index) => makeDocument(index + 1))
+    );
+
+    expect(
+      screen.getAllByRole('button', { name: 'Copy reference' })
+    ).toHaveLength(5);
+    expect(screen.getByText('Document 6')).not.toBeVisible();
+  });
+
   it('omits documents without a genuine bibliographic reference', () => {
     renderReferences([
       {
         id: 1,
         type: DocumentTypes.ARTICLE,
-        title: 'Bare article title'
+        title: 'Bare article title',
+        authors: [],
+        authorsOrganization: []
       },
       {
         id: 2,

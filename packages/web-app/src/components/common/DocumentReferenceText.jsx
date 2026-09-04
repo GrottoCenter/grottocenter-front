@@ -7,14 +7,14 @@ import {
 } from '@/types/document.type';
 import { formatDocumentReferenceParts } from '@/utils/documentReference';
 
-const DocumentReferenceText = ({ document, fallbackToTitle = false }) => {
+const DocumentReferenceText = ({ document }) => {
   const { formatMessage } = useIntl();
   const parts = formatDocumentReferenceParts(document, {
     availableAt: formatMessage({ id: 'Available at:' }),
     online: formatMessage({ id: 'online' })
   });
 
-  if (!parts) return fallbackToTitle ? document.title : null;
+  if (!parts) return null;
 
   return parts.map(part =>
     part.isItalic ? <cite key={part.text}>{part.text}</cite> : part.text
@@ -23,8 +23,7 @@ const DocumentReferenceText = ({ document, fallbackToTitle = false }) => {
 
 DocumentReferenceText.propTypes = {
   document: PropTypes.oneOfType([DocumentChildPropTypes, DocumentPropTypes])
-    .isRequired,
-  fallbackToTitle: PropTypes.bool
+    .isRequired
 };
 
 export default DocumentReferenceText;
