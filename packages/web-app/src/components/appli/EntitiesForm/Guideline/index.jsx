@@ -343,6 +343,8 @@ GuidelineForm.propTypes = {
   // affordance (e.g. a section header's SectionCreateButton), so the two do not
   // stack.
   hideCancel: PropTypes.bool,
+  // Require and display geographic scope fields on standalone creation and
+  // edit pages; entity-embedded forms receive their scope from the caller.
   withScope: PropTypes.bool,
   associatedScope: PropTypes.shape({
     type: PropTypes.oneOf(['countries', 'regions', 'massifs']).isRequired,
