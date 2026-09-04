@@ -14,6 +14,7 @@ import {
   useCave,
   useDocument,
   useEntrance,
+  useGuideline,
   useMassif,
   useOrganization,
   usePerson,
@@ -23,6 +24,7 @@ import {
   caveKeys,
   documentKeys,
   entranceKeys,
+  guidelineKeys,
   massifKeys,
   organizationKeys,
   personKeys
@@ -54,8 +56,8 @@ const SnapshotPage = () => {
   const parentId = queryParameters.get('parentId');
   const parentType = queryParameters.get('parentType');
   const backTo = queryParameters.get('backTo');
-  // Some entities (e.g. guidelines) have no standalone route to re-fetch the
-  // current item from, so their soft-delete state travels in the URL instead.
+  // Compatibility for history links generated before guidelines gained their
+  // standalone detail query, and for soft-deleted guidelines until api#1782.
   const hasIsDeletedParam = queryParameters.has('isDeleted');
   const isDeletedParam = queryParameters.get('isDeleted') === 'true';
 
@@ -93,6 +95,9 @@ const SnapshotPage = () => {
   );
   const currentOrganization = organizationQuery.data ?? null;
   const isOrganizationLoading = organizationQuery.isFetching;
+  const guidelineQuery = useGuideline(type === 'guidelines' ? id : undefined);
+  const currentGuideline = guidelineQuery.data ?? null;
+  const isGuidelineLoading = guidelineQuery.isFetching;
 
   const {
     data: snapshotData = {},
@@ -117,7 +122,11 @@ const SnapshotPage = () => {
       persons: () =>
         queryClient.invalidateQueries({ queryKey: personKeys.detail(id) }),
       organizations: () =>
-        queryClient.invalidateQueries({ queryKey: organizationKeys.detail(id) })
+        queryClient.invalidateQueries({
+          queryKey: organizationKeys.detail(id)
+        }),
+      guidelines: () =>
+        queryClient.invalidateQueries({ queryKey: guidelineKeys.detail(id) })
     };
     const fetchParentByType = {
       entrances: pId =>
@@ -157,11 +166,10 @@ const SnapshotPage = () => {
     massifs: [currentMassif, isMassifLoading],
     persons: [currentPerson, isPersonLoading],
     organizations: [currentOrganization, isOrganizationLoading],
-    // Guidelines have no route to fetch from; the marker only carries isDeleted
-    // to gate the rollback button and intentionally renders no "current" card.
     guidelines: [
-      hasIsDeletedParam ? { isDeleted: isDeletedParam } : null,
-      false
+      currentGuideline ??
+        (hasIsDeletedParam ? { isDeleted: isDeletedParam } : null),
+      isGuidelineLoading
     ],
     descriptions: [currentSubEntity, isParentLoading],
     locations: [currentSubEntity, isParentLoading],

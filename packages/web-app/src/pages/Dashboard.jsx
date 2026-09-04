@@ -15,6 +15,7 @@ import {
   Typography
 } from '@mui/material';
 import CallMergeIcon from '@mui/icons-material/CallMerge';
+import GradingIcon from '@mui/icons-material/Grading';
 import PeopleIcon from '@mui/icons-material/People';
 import DocumentListIcon from '@mui/icons-material/PlaylistAddCheck';
 import PublishIcon from '@mui/icons-material/Publish';
@@ -29,6 +30,7 @@ import {
 } from '../hooks';
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
 import ImpersonationLauncher from '../components/appli/ImpersonationLauncher';
+import AppLink from '../components/common/AppLink';
 
 const Section = styled(Box)(({ theme }) => ({
   '& + &': {
@@ -69,7 +71,7 @@ const ToolCard = ({
   count,
   isLoading = false,
   isError = false,
-  onClick
+  to
 }) => {
   const { formatMessage } = useIntl();
   const roleLabel = formatMessage({ id: roleId });
@@ -91,7 +93,10 @@ const ToolCard = ({
 
   return (
     <Card variant="outlined">
-      <CardActionArea onClick={onClick} aria-label={`${title} — ${roleLabel}`}>
+      <CardActionArea
+        component={AppLink}
+        to={to}
+        aria-label={`${title} — ${roleLabel}`}>
         <CardContent sx={{ position: 'relative', p: 2, pt: 3 }}>
           <Chip
             variant="outlined"
@@ -132,10 +137,10 @@ ToolCard.propTypes = {
   count: PropTypes.number,
   isLoading: PropTypes.bool,
   isError: PropTypes.bool,
-  onClick: PropTypes.func.isRequired
+  to: PropTypes.string.isRequired
 };
 
-const DBExportCard = ({ dbExport, isLoading }) => {
+const DBExportCard = ({ dbExport = null, isLoading = false }) => {
   const { formatMessage } = useIntl();
   const lastUpdate = dbExport?.lastUpdate
     ? dbExport.lastUpdate.split('T')[0]
@@ -210,11 +215,6 @@ DBExportCard.propTypes = {
   isLoading: PropTypes.bool
 };
 
-DBExportCard.defaultProps = {
-  dbExport: null,
-  isLoading: false
-};
-
 const Dashboard = () => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
@@ -228,8 +228,6 @@ const Dashboard = () => {
   const duplicatesQuery = useDuplicatesCount({
     enabled: permissions.isModerator
   });
-
-  const goTo = url => navigate(url);
 
   useEffect(() => {
     const hasDashboardAccess =
@@ -255,27 +253,6 @@ const Dashboard = () => {
       }
       content={
         <>
-          {permissions.isRealAdmin && (
-            <Section>
-              <SectionTitle variant="overline">
-                {formatMessage({ id: 'Users' })}
-              </SectionTitle>
-              <ToolGrid>
-                {permissions.isAdmin && (
-                  <ToolCard
-                    icon={<PeopleIcon />}
-                    title={formatMessage({ id: 'Manage users' })}
-                    description={formatMessage({
-                      id: 'Manage users description'
-                    })}
-                    roleId="Administrator"
-                    onClick={() => goTo('/ui/admin/users')}
-                  />
-                )}
-                <ImpersonationLauncher />
-              </ToolGrid>
-            </Section>
-          )}
           {permissions.isModerator && (
             <Section>
               <SectionTitle variant="overline">
@@ -292,7 +269,7 @@ const Dashboard = () => {
                   count={pendingDocumentsQuery.data ?? 0}
                   isLoading={pendingDocumentsQuery.isPending}
                   isError={pendingDocumentsQuery.isError}
-                  onClick={() => goTo('/ui/documents/validation')}
+                  to="/ui/documents/validation"
                 />
                 <ToolCard
                   icon={<CallMergeIcon />}
@@ -304,7 +281,16 @@ const Dashboard = () => {
                   count={duplicatesQuery.data ?? 0}
                   isLoading={duplicatesQuery.isPending}
                   isError={duplicatesQuery.isError}
-                  onClick={() => goTo('/ui/duplicates')}
+                  to="/ui/duplicates"
+                />
+                <ToolCard
+                  icon={<GradingIcon />}
+                  title={formatMessage({ id: 'Guidelines' })}
+                  description={formatMessage({
+                    id: 'guidelines.dashboard.description'
+                  })}
+                  roleId="Moderator"
+                  to="/ui/guidelines"
                 />
               </ToolGrid>
             </Section>
@@ -323,7 +309,7 @@ const Dashboard = () => {
                       id: 'CSV Import description'
                     })}
                     roleId="Moderator"
-                    onClick={() => goTo('/ui/import-csv')}
+                    to="/ui/import-csv"
                   />
                 )}
                 {permissions.isLeader && (
@@ -332,6 +318,27 @@ const Dashboard = () => {
                     isLoading={isDbExportLoading}
                   />
                 )}
+              </ToolGrid>
+            </Section>
+          )}
+          {permissions.isRealAdmin && (
+            <Section>
+              <SectionTitle variant="overline">
+                {formatMessage({ id: 'Users' })}
+              </SectionTitle>
+              <ToolGrid>
+                {permissions.isAdmin && (
+                  <ToolCard
+                    icon={<PeopleIcon />}
+                    title={formatMessage({ id: 'Manage users' })}
+                    description={formatMessage({
+                      id: 'Manage users description'
+                    })}
+                    roleId="Administrator"
+                    to="/ui/admin/users"
+                  />
+                )}
+                <ImpersonationLauncher />
               </ToolGrid>
             </Section>
           )}

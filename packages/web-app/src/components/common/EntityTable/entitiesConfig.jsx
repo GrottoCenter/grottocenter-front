@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Box } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
 import PublishIcon from '@mui/icons-material/Publish';
@@ -25,6 +25,49 @@ const DateTimeCell = ({ value }) => {
 
 DateTimeCell.propTypes = {
   value: PropTypes.string
+};
+
+const GuidelineScopeCell = ({ guideline }) => {
+  const { formatMessage } = useIntl();
+  const groups = [
+    ['Country', guideline.countries],
+    ['Region', guideline.regions],
+    ['Massif', guideline.massifs]
+  ];
+
+  return (
+    <Stack direction="row" useFlexGap flexWrap="wrap" gap={0.5}>
+      {groups.flatMap(([label, values]) =>
+        (values ?? []).map(value => {
+          // TODO(api#1782): replace raw IDs with readable labels once the list
+          // endpoint guarantees hydrated country, region and massif relations.
+          const identifier = value?.name ?? value?.code ?? value?.id ?? value;
+          return (
+            <Chip
+              key={`${label}-${identifier}`}
+              size="small"
+              variant="outlined"
+              label={`${formatMessage({ id: label })}: ${identifier}`}
+            />
+          );
+        })
+      )}
+    </Stack>
+  );
+};
+
+GuidelineScopeCell.propTypes = {
+  guideline: PropTypes.shape({
+    countries: PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})])
+    ),
+    regions: PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})])
+    ),
+    massifs: PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.number, PropTypes.shape({})])
+    )
+  }).isRequired
 };
 
 // React component so it can render AppLink; stops row click propagation.
@@ -154,6 +197,57 @@ const notifications = {
     }
   ],
   link: doc => doc.link
+};
+
+const guidelines = {
+  icon: <CustomIcon type="guidelines" size={16} />,
+  columns: [
+    {
+      visible: true,
+      field: 'title',
+      label: 'Title',
+      sortable: false,
+      isTitle: true
+    },
+    {
+      visible: true,
+      field: 'language',
+      label: 'Language',
+      sortable: false,
+      render: value => value?.refName ?? value?.name ?? value?.id ?? value
+    },
+    {
+      visible: true,
+      field: 'scope',
+      label: 'Applies to',
+      sortable: false,
+      render: (_value, guideline) => (
+        <GuidelineScopeCell guideline={guideline} />
+      )
+    },
+    {
+      visible: true,
+      field: 'author',
+      label: 'Author',
+      sortable: false,
+      render: value => value?.nickname ?? value?.name ?? value
+    },
+    {
+      visible: true,
+      field: 'dateInscription',
+      label: 'Creation date',
+      sortable: false,
+      render: cellsRender.date
+    },
+    {
+      visible: true,
+      field: 'dateReviewed',
+      label: 'Last review date',
+      sortable: false,
+      render: cellsRender.date
+    }
+  ],
+  link: guideline => `/ui/guidelines/${guideline.id}`
 };
 
 const massifs = {
@@ -668,6 +762,7 @@ const o = {
   entrances,
   documents,
   notifications,
+  guidelines,
   csvImportEntrances,
   csvImportDocuments,
   duplicate

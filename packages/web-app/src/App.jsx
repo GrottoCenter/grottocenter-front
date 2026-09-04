@@ -42,6 +42,7 @@ const DocumentValidation = lazy(() => import('./pages/DocumentValidation'));
 const DocumentEdit = lazy(() => import('./pages/DocumentEdit'));
 const EntityCreation = lazy(() => import('./pages/EntityCreation'));
 const EntityPicker = lazy(() => import('./pages/EntityCreation/EntityPicker'));
+const AddGuideline = lazy(() => import('./pages/EntityCreation/AddGuideline'));
 const AddEntrance = lazy(() => import('./pages/EntityCreation/AddEntrance'));
 const AddDocument = lazy(() => import('./pages/EntityCreation/AddDocument'));
 const AddMassif = lazy(() => import('./pages/EntityCreation/AddMassif'));
@@ -71,6 +72,9 @@ const OrganizationEdit = lazy(
 const CountryPage = lazy(() => import('./pages/Country'));
 const RegionPage = lazy(() => import('./pages/Region'));
 const NotificationsPage = lazy(() => import('./pages/Notifications'));
+const GuidelinesPage = lazy(() => import('./pages/Guidelines'));
+const GuidelinePage = lazy(() => import('./pages/Guideline'));
+const GuidelineEdit = lazy(() => import('./pages/GuidelineEdit'));
 const MessagesPage = lazy(() => import('./pages/Messages'));
 const SnapshotPage = lazy(() => import('./components/appli/Entry/Snapshots'));
 const EntrancesListPage = lazy(() => import('./pages/EntrancesList'));
@@ -119,6 +123,8 @@ const router = createBrowserRouter(
       <Route path="/ui/contributions" element={<ContributionsPage />} />
       <Route path="/ui/changes/recent" element={<RecentChangesPage />} />
       <Route path="/ui/notifications" element={<NotificationsPage />} />
+      <Route path="/ui/guidelines" element={<GuidelinesPage />} />
+      <Route path="/ui/guidelines/:guidelineId" element={<GuidelinePage />} />
       <Route path="/ui/messages" element={<MessagesPage />} />
       <Route path="/ui/messages/:conversationId" element={<MessagesPage />} />
       <Route path="/ui/test" element={<LatestBlogNewsSection />} />
@@ -141,6 +147,7 @@ const router = createBrowserRouter(
         <Route path="document" element={<AddDocument />} />
         <Route path="massif" element={<AddMassif />} />
         <Route path="organization" element={<AddOrganization />} />
+        <Route path="guideline" element={<AddGuideline />} />
       </Route>
       <Route path="/ui/forgotPassword" element={<ForgotPassword />} />
       <Route path="/ui/changePassword" element={<ChangePassword />} />
@@ -169,6 +176,10 @@ const router = createBrowserRouter(
         <Route
           path="/ui/documents/:documentId/edit"
           element={<DocumentEdit />}
+        />
+        <Route
+          path="/ui/guidelines/:guidelineId/edit"
+          element={<GuidelineEdit />}
         />
       </Route>
 
