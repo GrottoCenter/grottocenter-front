@@ -231,23 +231,16 @@ const DocumentsList = ({
           justifyContent: 'space-between',
           columnGap: 2,
           rowGap: 1,
-          mb: 2
+          mb: 0.5
         }}>
-        <Box
-          sx={{
-            order: { xs: 2, sm: 1 },
-            flex: 1,
-            minWidth: 0,
-            width: { xs: '100%', sm: 'auto' }
-          }}>
-          <DocumentReferences documents={sortedDocuments} />
-        </Box>
+        <Typography variant="h5" component="h3">
+          {formatMessage({ id: 'Document list' })}
+        </Typography>
         {canSortDocuments(sortedDocuments) && (
-          // Print keeps the references but drops the control: on paper the
-          // order is already fixed, and a dropdown is not operable.
+          // On paper the order is already fixed, and a dropdown is not
+          // operable.
           <Box
             sx={{
-              order: { xs: 1, sm: 2 },
               flexShrink: 0,
               ml: 'auto',
               '@media print': { display: 'none' }
@@ -264,9 +257,6 @@ const DocumentsList = ({
           </Box>
         )}
       </Box>
-      <Typography variant="h5" component="h3" mb={0.5}>
-        {formatMessage({ id: 'Document list' })}
-      </Typography>
       <DocumentsGrid dense disablePadding>
         {sortedDocuments.map((document, i) => {
           const isOnPage = i >= startIndex && i < endIndex;
@@ -300,6 +290,7 @@ const DocumentsList = ({
           />
         </Box>
       )}
+      <DocumentReferences documents={sortedDocuments} />
       {allImages.length > 0 && (
         <ImageLightbox
           open={lightboxOpen}

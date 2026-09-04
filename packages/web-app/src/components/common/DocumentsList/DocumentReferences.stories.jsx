@@ -23,8 +23,9 @@ const documents = [
   },
   ...Array.from({ length: 9 }, (_, index) => ({
     id: index + 3,
-    type: DocumentTypes.MAP,
-    title: `Survey ${index + 1}`
+    type: DocumentTypes.ARTICLE,
+    title: `Caving article ${index + 1}`,
+    datePublication: String(2015 + index)
   }))
 ];
 

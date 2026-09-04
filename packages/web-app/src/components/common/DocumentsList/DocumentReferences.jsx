@@ -6,43 +6,65 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import { DocumentChildPropTypes } from '@/types/document.type';
-import { getDocumentReferenceLabel } from '@/utils/documentReference';
+import { formatDocumentReference } from '@/utils/documentReference';
 import {
   DOCUMENT_TYPE_FALLBACK_ICON,
   DOCUMENT_TYPE_ICONS
 } from '@/utils/documentTypeHelpers';
-import AppLink from '../AppLink';
+import CopyToClipboardIconButton from '../CopyToClipboardIconButton';
 import DocumentReferenceText from '../DocumentReferenceText';
 
 const REFERENCE_PREVIEW_LIMIT = 10;
 
-const ReferenceList = ({ documents, start = 1 }) => (
-  <Box
-    component="ol"
-    start={start}
-    sx={{ my: 0, pl: 3, display: 'grid', gap: 0.5 }}>
-    {documents.map(document => {
-      const TypeIcon =
-        DOCUMENT_TYPE_ICONS[document.type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
-      return (
-        <Typography component="li" variant="body2" key={document.id}>
-          <Box
-            component="span"
-            sx={{ display: 'inline-flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <TypeIcon
-              aria-hidden="true"
-              fontSize="small"
-              sx={{ flexShrink: 0 }}
-            />
-            <AppLink to={`/ui/documents/${document.id}`}>
-              <DocumentReferenceText document={document} fallbackToTitle />
-            </AppLink>
-          </Box>
-        </Typography>
-      );
-    })}
-  </Box>
-);
+const ReferenceList = ({ documents, start = 1 }) => {
+  const { formatMessage } = useIntl();
+  const labels = {
+    availableAt: formatMessage({ id: 'Available at:' }),
+    online: formatMessage({ id: 'online' })
+  };
+
+  return (
+    <Box
+      component="ol"
+      start={start}
+      sx={{ my: 0, pl: 3, display: 'grid', gap: 0.5 }}>
+      {documents.map(document => {
+        const TypeIcon =
+          DOCUMENT_TYPE_ICONS[document.type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
+        const reference = formatDocumentReference(document, labels);
+        return (
+          <Typography component="li" variant="body2" key={document.id}>
+            <Box
+              component="span"
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'flex-start',
+                gap: 0.5
+              }}>
+              <TypeIcon
+                aria-hidden="true"
+                fontSize="small"
+                sx={{ flexShrink: 0 }}
+              />
+              <Box component="span">
+                <DocumentReferenceText document={document} />{' '}
+                <CopyToClipboardIconButton
+                  compact
+                  value={reference}
+                  label={formatMessage({ id: 'Copy reference' })}
+                  successLabel={formatMessage({ id: 'Reference copied' })}
+                  errorLabel={formatMessage({
+                    id: 'Unable to copy reference'
+                  })}
+                />
+              </Box>
+            </Box>
+          </Typography>
+        );
+      })}
+    </Box>
+  );
+};
 
 ReferenceList.propTypes = {
   documents: PropTypes.arrayOf(DocumentChildPropTypes).isRequired,
@@ -53,7 +75,9 @@ const DocumentReferences = ({ documents }) => {
   const { formatMessage } = useIntl();
   const additionalReferencesId = useId();
   const [isExpanded, setIsExpanded] = useState(false);
-  const references = documents.filter(getDocumentReferenceLabel);
+  const references = documents.filter(document =>
+    Boolean(formatDocumentReference(document))
+  );
 
   if (references.length === 0) return null;
 
@@ -61,7 +85,7 @@ const DocumentReferences = ({ documents }) => {
   const additional = references.slice(REFERENCE_PREVIEW_LIMIT);
 
   return (
-    <Box component="section">
+    <Box component="section" mt={2}>
       <Typography variant="h5" component="h3" mb={0.5}>
         {formatMessage({ id: 'Bibliographic references' })}
       </Typography>
