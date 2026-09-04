@@ -78,7 +78,7 @@ const Document = ({
               minWidth: 0
             }}>
             <Typography variant="h4" component="span">
-              <AppLink openInNewTabDesktop to={`/ui/documents/${document.id}`}>
+              <AppLink to={`/ui/documents/${document.id}`}>
                 {document.title}
               </AppLink>
             </Typography>
