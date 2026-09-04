@@ -5,6 +5,10 @@ import renderWithProviders from '@/test/renderWithProviders';
 import { DocumentTypes } from '@/utils/documentTypeHelpers';
 import DocumentsList from './DocumentsList';
 
+vi.mock('./Document', () => ({ default: () => null }));
+vi.mock('./ImageLightbox', () => ({ default: () => null }));
+vi.mock('./ImageThumbnail', () => ({ GALLERY_MIN_IMAGES: 4 }));
+
 const messages = {
   'Available at:': 'Available at:',
   'Bibliographic references': 'Bibliographic references',
@@ -25,7 +29,9 @@ describe('DocumentsList', () => {
               id: 1,
               type: DocumentTypes.BOOK,
               title: 'Karst atlas',
-              datePublication: '2024'
+              datePublication: '2024',
+              authors: [],
+              authorsOrganization: []
             }
           ]}
         />

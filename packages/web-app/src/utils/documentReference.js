@@ -1,13 +1,10 @@
 import { DocumentTypes } from './documentTypeHelpers';
 
-const STANDALONE_REFERENCE_TYPES = new Set([
+const REFERENCE_TYPES = new Set([
+  DocumentTypes.ARTICLE,
   DocumentTypes.BOOK,
   DocumentTypes.COLLECTION,
   DocumentTypes.ISSUE
-]);
-const REFERENCE_TYPES = new Set([
-  DocumentTypes.ARTICLE,
-  ...STANDALONE_REFERENCE_TYPES
 ]);
 const DEFAULT_LABELS = {
   availableAt: 'Available at:',
@@ -27,13 +24,13 @@ const getPersonAuthorName = author =>
 
 const getAuthorNames = document =>
   [
-    ...(document.authors ?? []).map(getPersonAuthorName),
-    ...(document.authorsOrganization ?? []).map(author => author.name)
+    ...document.authors.map(getPersonAuthorName),
+    ...document.authorsOrganization.map(author => author.name)
   ].filter(Boolean);
 
 const isPublisherSoleCorporateAuthor = document => {
-  const personAuthors = (document.authors ?? []).filter(getPersonAuthorName);
-  const organizationAuthors = (document.authorsOrganization ?? []).filter(
+  const personAuthors = document.authors.filter(getPersonAuthorName);
+  const organizationAuthors = document.authorsOrganization.filter(
     author => author.name
   );
 
@@ -44,20 +41,13 @@ const isPublisherSoleCorporateAuthor = document => {
   return (
     personAuthors.length === 0 &&
     organizationAuthors.length === 1 &&
-    document.editor?.id != null &&
+    document.editor &&
     organizationAuthors[0].id === document.editor.id
   );
 };
 
-const getIdentifierType = identifierType => {
-  if (typeof identifierType === 'string') return identifierType;
-  return identifierType?.id ?? identifierType?.name ?? null;
-};
-
 const normalizeIdentifierType = identifierType =>
-  String(getIdentifierType(identifierType) ?? '')
-    .trim()
-    .toLowerCase();
+  identifierType?.trim().toLowerCase() ?? '';
 
 const formatIdentifier = (document, labels) => {
   const type = normalizeIdentifierType(document.identifierType);
@@ -81,11 +71,16 @@ const formatPrefixedValue = (value, prefix, existingPrefix) => {
 const formatPages = pages =>
   formatPrefixedValue(pages, 'p. ', /^p(?:p)?\.?\s/i);
 
-const formatIssue = issue => formatPrefixedValue(issue, 'no. ', /^no\.?\s*/i);
+const formatIssue = issue =>
+  formatPrefixedValue(issue, 'no. ', /^(?:n[°ºo]|no\.?)\s*/i);
 
 const getArticleMetadata = document => ({
-  publicationTitle: document.oldBBS?.publicationOther ?? document.parent?.title,
-  issue: document.oldBBS?.publicationFascicule,
+  publicationTitle:
+    document.parent?.parent?.title ??
+    document.oldBBS?.publicationOther ??
+    document.parent?.title,
+  publicationDate: document.parent?.datePublication ?? document.datePublication,
+  issue: document.parent?.issue ?? document.oldBBS?.publicationFascicule,
   pages: document.pages ?? document.oldBBS?.pages
 });
 
@@ -110,21 +105,6 @@ const joinSegments = segments => {
   ]);
 };
 
-const hasCitationMetadata = document => {
-  const commonMetadata =
-    getAuthorNames(document).length > 0 ||
-    extractYear(document.datePublication);
-
-  if (document.type === DocumentTypes.ARTICLE) {
-    const article = getArticleMetadata(document);
-    return Boolean(commonMetadata || Object.values(article).some(Boolean));
-  }
-
-  return Boolean(
-    commonMetadata || document.editor?.name || document.identifier
-  );
-};
-
 /**
  * Builds an ISO 690 author-date reference from the available document metadata.
  * Returns null for other document types and for supported payloads that only
@@ -134,19 +114,28 @@ export const formatDocumentReferenceParts = (
   document,
   labels = DEFAULT_LABELS
 ) => {
-  if (
-    !document ||
-    !REFERENCE_TYPES.has(document.type) ||
-    !hasCitationMetadata(document)
-  )
-    return null;
+  if (!document || !REFERENCE_TYPES.has(document.type)) return null;
 
   const article =
     document.type === DocumentTypes.ARTICLE
       ? getArticleMetadata(document)
       : null;
   const authors = getAuthorNames(document);
-  const year = extractYear(document.datePublication);
+  const year = extractYear(
+    article?.publicationDate ?? document.datePublication
+  );
+  const hasMetadata = article
+    ? authors.length > 0 ||
+      year ||
+      article.publicationTitle ||
+      article.issue ||
+      article.pages
+    : authors.length > 0 ||
+      year ||
+      document.editor?.name ||
+      document.identifier;
+  if (!hasMetadata) return null;
+
   const isOnline = normalizeIdentifierType(document.identifierType) === 'url';
   const title = createSegment(
     createPart(document.title, true),
@@ -190,6 +179,3 @@ export const formatDocumentReference = (document, labels = DEFAULT_LABELS) =>
   formatDocumentReferenceParts(document, labels)
     ?.map(part => part.text)
     .join('') ?? null;
-
-export const getDocumentReferenceLabel = document =>
-  formatDocumentReference(document) ?? document?.title ?? null;

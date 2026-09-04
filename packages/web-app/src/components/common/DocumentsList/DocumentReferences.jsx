@@ -1,7 +1,14 @@
 import { useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Box, Button, Collapse, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Collapse,
+  Typography,
+  useMediaQuery
+} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -11,10 +18,6 @@ import DocumentReferenceText from '@/components/common/DocumentReferenceText';
 import { DocumentChildPropTypes } from '@/types/document.type';
 import { formatDocumentReference } from '@/utils/documentReference';
 import { buildDocumentsSearchUrl } from '@/utils/documentReferenceSearch';
-import {
-  DOCUMENT_TYPE_FALLBACK_ICON,
-  DOCUMENT_TYPE_ICONS
-} from '@/utils/documentTypeHelpers';
 import CopyToClipboardIconButton from '../CopyToClipboardIconButton';
 import DocumentsList from './DocumentsList';
 
@@ -77,6 +80,7 @@ OrganizationDocumentReferences.propTypes = {
   emptyMessageComponent: PropTypes.node
 };
 
+const MOBILE_REFERENCE_PREVIEW_LIMIT = 5;
 const REFERENCE_PREVIEW_LIMIT = 10;
 
 const ReferenceList = ({ documents, start = 1 }) => {
@@ -92,36 +96,19 @@ const ReferenceList = ({ documents, start = 1 }) => {
       start={start}
       sx={{ my: 0, pl: 3, display: 'grid', gap: 0.5 }}>
       {documents.map(document => {
-        const TypeIcon =
-          DOCUMENT_TYPE_ICONS[document.type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
         const reference = formatDocumentReference(document, labels);
         return (
           <Typography component="li" variant="body2" key={document.id}>
-            <Box
-              component="span"
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'flex-start',
-                gap: 0.5
-              }}>
-              <TypeIcon
-                aria-hidden="true"
-                fontSize="small"
-                sx={{ flexShrink: 0 }}
-              />
-              <Box component="span">
-                <DocumentReferenceText document={document} />{' '}
-                <CopyToClipboardIconButton
-                  compact
-                  value={reference}
-                  label={formatMessage({ id: 'Copy reference' })}
-                  successLabel={formatMessage({ id: 'Reference copied' })}
-                  errorLabel={formatMessage({
-                    id: 'Unable to copy reference'
-                  })}
-                />
-              </Box>
-            </Box>
+            <DocumentReferenceText document={document} />{' '}
+            <CopyToClipboardIconButton
+              compact
+              value={reference}
+              label={formatMessage({ id: 'Copy reference' })}
+              successLabel={formatMessage({ id: 'Reference copied' })}
+              errorLabel={formatMessage({
+                id: 'Unable to copy reference'
+              })}
+            />
           </Typography>
         );
       })}
@@ -136,16 +123,21 @@ ReferenceList.propTypes = {
 
 const DocumentReferences = ({ documents }) => {
   const { formatMessage } = useIntl();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const additionalReferencesId = useId();
   const [isExpanded, setIsExpanded] = useState(false);
+  const previewLimit = isMobile
+    ? MOBILE_REFERENCE_PREVIEW_LIMIT
+    : REFERENCE_PREVIEW_LIMIT;
   const references = documents.filter(document =>
     Boolean(formatDocumentReference(document))
   );
 
   if (references.length === 0) return null;
 
-  const preview = references.slice(0, REFERENCE_PREVIEW_LIMIT);
-  const additional = references.slice(REFERENCE_PREVIEW_LIMIT);
+  const preview = references.slice(0, previewLimit);
+  const additional = references.slice(previewLimit);
 
   return (
     <Box component="section" mt={2}>
@@ -165,10 +157,7 @@ const DocumentReferences = ({ documents }) => {
                 visibility: 'visible !important'
               }
             }}>
-            <ReferenceList
-              documents={additional}
-              start={REFERENCE_PREVIEW_LIMIT + 1}
-            />
+            <ReferenceList documents={additional} start={previewLimit + 1} />
           </Collapse>
           <Button
             size="small"

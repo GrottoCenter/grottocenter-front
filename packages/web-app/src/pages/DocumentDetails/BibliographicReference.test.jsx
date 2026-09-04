@@ -29,7 +29,16 @@ const document = {
   title: 'Underground rivers',
   datePublication: '2022',
   authors: [{ id: 1, nickname: 'DUPONT' }],
-  parent: { id: 2, title: 'Speleology Review' }
+  authorsOrganization: [],
+  parent: {
+    id: 2,
+    type: DocumentTypes.ISSUE,
+    parent: {
+      id: 3,
+      type: DocumentTypes.COLLECTION,
+      title: 'Speleology Review'
+    }
+  }
 };
 
 describe('BibliographicReference', () => {
@@ -87,6 +96,8 @@ describe('BibliographicReference', () => {
       type: DocumentTypes.BOOK,
       title: 'Karst atlas',
       datePublication: '1998',
+      authors: [],
+      authorsOrganization: [],
       identifier: 'https://example.org/karst-atlas',
       identifierType: 'url'
     };
