@@ -94,6 +94,60 @@ describe('formatDocumentReference', () => {
     );
   });
 
+  it('falls back to the article publication date when its issue has none', () => {
+    const document = {
+      type: DocumentTypes.ARTICLE,
+      title: 'Underground rivers',
+      datePublication: '2020-01-01',
+      authors: [{ nickname: 'DUPONT Jean' }],
+      authorsOrganization: [],
+      parent: {
+        type: DocumentTypes.ISSUE,
+        parent: {
+          type: DocumentTypes.COLLECTION,
+          title: 'Speleology Review'
+        }
+      }
+    };
+
+    expect(formatDocumentReference(document)).toBe(
+      'DUPONT Jean, 2020. Underground rivers. Speleology Review.'
+    );
+  });
+
+  it('uses the host publication title fallback chain in order', () => {
+    const article = {
+      type: DocumentTypes.ARTICLE,
+      title: 'Underground rivers',
+      authors: [],
+      authorsOrganization: []
+    };
+
+    expect(
+      formatDocumentReference({
+        ...article,
+        parent: {
+          title: 'Issue title',
+          parent: { title: 'Collection title' }
+        },
+        oldBBS: { publicationOther: 'Legacy publication' }
+      })
+    ).toBe('Underground rivers. Collection title.');
+    expect(
+      formatDocumentReference({
+        ...article,
+        parent: { title: 'Issue title' },
+        oldBBS: { publicationOther: 'Legacy publication' }
+      })
+    ).toBe('Underground rivers. Legacy publication.');
+    expect(
+      formatDocumentReference({
+        ...article,
+        parent: { title: 'Issue title' }
+      })
+    ).toBe('Underground rivers. Issue title.');
+  });
+
   it('formats a book with its publisher and ISBN', () => {
     const document = {
       type: DocumentTypes.BOOK,

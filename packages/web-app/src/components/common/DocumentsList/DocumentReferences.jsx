@@ -83,23 +83,18 @@ OrganizationDocumentReferences.propTypes = {
 const MOBILE_REFERENCE_PREVIEW_LIMIT = 5;
 const REFERENCE_PREVIEW_LIMIT = 10;
 
-const ReferenceList = ({ documents, start = 1 }) => {
+const ReferenceList = ({ references, start = 1 }) => {
   const { formatMessage } = useIntl();
-  const labels = {
-    availableAt: formatMessage({ id: 'Available at:' }),
-    online: formatMessage({ id: 'online' })
-  };
 
   return (
     <Box
       component="ol"
       start={start}
       sx={{ my: 0, pl: 3, display: 'grid', gap: 0.5 }}>
-      {documents.map(document => {
-        const reference = formatDocumentReference(document, labels);
-        return (
-          <Typography component="li" variant="body2" key={document.id}>
-            <DocumentReferenceText document={document} />{' '}
+      {references.map(({ document, reference }) => (
+        <Typography component="li" variant="body2" key={document.id}>
+          <DocumentReferenceText document={document} />{' '}
+          {reference && (
             <CopyToClipboardIconButton
               compact
               value={reference}
@@ -109,15 +104,20 @@ const ReferenceList = ({ documents, start = 1 }) => {
                 id: 'Unable to copy reference'
               })}
             />
-          </Typography>
-        );
-      })}
+          )}
+        </Typography>
+      ))}
     </Box>
   );
 };
 
 ReferenceList.propTypes = {
-  documents: PropTypes.arrayOf(DocumentChildPropTypes).isRequired,
+  references: PropTypes.arrayOf(
+    PropTypes.shape({
+      document: DocumentChildPropTypes.isRequired,
+      reference: PropTypes.string.isRequired
+    })
+  ).isRequired,
   start: PropTypes.number
 };
 
@@ -130,9 +130,16 @@ const DocumentReferences = ({ documents }) => {
   const previewLimit = isMobile
     ? MOBILE_REFERENCE_PREVIEW_LIMIT
     : REFERENCE_PREVIEW_LIMIT;
-  const references = documents.filter(document =>
-    Boolean(formatDocumentReference(document))
-  );
+  const labels = {
+    availableAt: formatMessage({ id: 'Available at:' }),
+    online: formatMessage({ id: 'online' })
+  };
+  const references = documents
+    .map(document => ({
+      document,
+      reference: formatDocumentReference(document, labels)
+    }))
+    .filter(({ reference }) => Boolean(reference));
 
   if (references.length === 0) return null;
 
@@ -144,7 +151,7 @@ const DocumentReferences = ({ documents }) => {
       <Typography variant="h5" component="h3" mb={0.5}>
         {formatMessage({ id: 'Bibliographic references' })}
       </Typography>
-      <ReferenceList documents={preview} />
+      <ReferenceList references={preview} />
       {additional.length > 0 && (
         <>
           <Collapse
@@ -157,7 +164,7 @@ const DocumentReferences = ({ documents }) => {
                 visibility: 'visible !important'
               }
             }}>
-            <ReferenceList documents={additional} start={previewLimit + 1} />
+            <ReferenceList references={additional} start={previewLimit + 1} />
           </Collapse>
           <Button
             size="small"

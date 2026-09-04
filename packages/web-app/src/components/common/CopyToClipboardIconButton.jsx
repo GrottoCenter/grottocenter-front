@@ -28,6 +28,7 @@ const CopyToClipboardIconButton = ({
   compact = false
 }) => {
   const [copyStatus, setCopyStatus] = useState(null);
+  const [isCopying, setIsCopying] = useState(false);
 
   useEffect(() => {
     if (!copyStatus) return undefined;
@@ -36,10 +37,14 @@ const CopyToClipboardIconButton = ({
   }, [copyStatus]);
 
   const handleCopy = () => {
-    copyToClipboard(value).then(
-      () => setCopyStatus('success'),
-      () => setCopyStatus('error')
-    );
+    if (isCopying) return;
+    setIsCopying(true);
+    copyToClipboard(value)
+      .then(
+        () => setCopyStatus('success'),
+        () => setCopyStatus('error')
+      )
+      .finally(() => setIsCopying(false));
   };
 
   let currentLabel = label;
@@ -55,21 +60,24 @@ const CopyToClipboardIconButton = ({
   return (
     <>
       <Tooltip title={currentLabel}>
-        <IconButton
-          size="small"
-          aria-label={currentLabel}
-          onClick={handleCopy}
-          sx={{
-            verticalAlign: 'text-bottom',
-            ...(compact && {
-              width: 20,
-              height: 20,
-              p: 0,
-              '& .MuiSvgIcon-root': { fontSize: '1rem' }
-            })
-          }}>
-          {icon}
-        </IconButton>
+        <span>
+          <IconButton
+            size="small"
+            aria-label={currentLabel}
+            disabled={isCopying}
+            onClick={handleCopy}
+            sx={{
+              verticalAlign: 'text-bottom',
+              ...(compact && {
+                width: 20,
+                height: 20,
+                p: 0,
+                '& .MuiSvgIcon-root': { fontSize: '1rem' }
+              })
+            }}>
+            {icon}
+          </IconButton>
+        </span>
       </Tooltip>
       <VisuallyHidden aria-live="polite">
         {copyStatus && currentLabel}
