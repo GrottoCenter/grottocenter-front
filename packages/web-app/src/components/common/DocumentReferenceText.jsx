@@ -16,9 +16,16 @@ const DocumentReferenceText = ({ document }) => {
 
   if (!parts) return null;
 
-  return parts.map(part =>
-    part.isItalic ? <cite key={part.text}>{part.text}</cite> : part.text
-  );
+  const occurrences = new Map();
+  return parts.map(part => {
+    const occurrence = occurrences.get(part.text) ?? 0;
+    occurrences.set(part.text, occurrence + 1);
+    return part.isItalic ? (
+      <cite key={`${part.text}-${occurrence}`}>{part.text}</cite>
+    ) : (
+      part.text
+    );
+  });
 };
 
 DocumentReferenceText.propTypes = {

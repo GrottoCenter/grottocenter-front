@@ -290,6 +290,8 @@ const DocumentsList = ({
           />
         </Box>
       )}
+      {/* Keep references aligned with the full sorted list: they have their own
+          preview/expansion and must not be limited to the visible card page. */}
       <DocumentReferences documents={sortedDocuments} />
       {allImages.length > 0 && (
         <ImageLightbox

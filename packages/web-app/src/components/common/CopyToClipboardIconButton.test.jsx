@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import renderWithProviders from '@/test/renderWithProviders';
@@ -75,6 +75,27 @@ describe('CopyToClipboardIconButton', () => {
     expect(screen.getByTestId('ErrorOutlineIcon')).toHaveClass(
       'MuiSvgIcon-colorError'
     );
+  });
+
+  it('prevents overlapping clipboard writes', async () => {
+    let resolveCopy;
+    clipboard.copy = value => {
+      clipboard.values.push(value);
+      return new Promise(resolve => {
+        resolveCopy = resolve;
+      });
+    };
+    renderButton();
+
+    const copyButton = screen.getByRole('button', { name: 'Copy text' });
+    fireEvent.click(copyButton);
+    fireEvent.click(copyButton);
+
+    expect(clipboard.values).toEqual(['Text to copy']);
+    expect(copyButton).toBeDisabled();
+
+    await act(async () => resolveCopy());
+    expect(copyButton).toBeEnabled();
   });
 
   it('uses a line-height-safe size in compact mode', () => {
