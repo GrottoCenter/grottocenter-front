@@ -58,6 +58,9 @@ const GuidelinesPage = () => {
       title={formatMessage({ id: 'Guidelines' })}
       icon={<CustomIcon type="guidelines" size={32} />}
       action={
+        // Keep creation discoverable on public catalogue pages, consistently
+        // with Documents, Entrances, Massifs and Organizations. The shared
+        // button redirects anonymous visitors through the login flow.
         <NewEntityButton
           to="/ui/entity/add/guideline"
           icon={<EntityIcon iconType="guidelines" size={20} />}

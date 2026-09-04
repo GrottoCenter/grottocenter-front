@@ -27,7 +27,7 @@ const wrapper = ({ children }) => (
 
 wrapper.propTypes = { children: PropTypes.node };
 
-it('uses server pagination, Content-Range and excludes deleted rows', async () => {
+it('uses server pagination and preserves the Content-Range total', async () => {
   apiGetWithRange.mockResolvedValue({
     data: [
       { id: 1, title: 'Public', isDeleted: false },
@@ -46,7 +46,10 @@ it('uses server pagination, Content-Range and excludes deleted rows', async () =
     expect.stringContaining('limit=20&skip=20')
   );
   expect(result.current.data).toEqual({
-    guidelines: [{ id: 1, title: 'Public', isDeleted: false }],
+    guidelines: [
+      { id: 1, title: 'Public', isDeleted: false },
+      { id: 2, title: 'Deleted', isDeleted: true }
+    ],
     totalCount: 126
   });
 });
