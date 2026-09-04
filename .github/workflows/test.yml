@@ -17,10 +17,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
           cache: 'yarn'
       - name: Install dependencies
         run: yarn
@@ -36,10 +36,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
           cache: 'yarn'
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
@@ -49,5 +49,8 @@ jobs:
           browser: ${{ matrix.browser }}
           build: yarn build
           project: packages/web-app
-          start: yarn start
+          # Serve the production build so Vite cannot invalidate optimized
+          # dependency chunks while a slower browser is still using them.
+          start: >
+            yarn preview --host 0.0.0.0 --port 3000 --strictPort
           wait-on: 'http://localhost:3000'

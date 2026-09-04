@@ -12,6 +12,7 @@
   "scripts": {
     "start": "yarn workspace @grotto-front/web-app start",
     "build": "yarn workspace @grotto-front/web-app build",
+    "preview": "yarn workspace @grotto-front/web-app preview",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "e2e:run": "yarn workspace @grotto-front/web-app e2e-run",
@@ -56,7 +57,7 @@
     "typescript": "5.9.3"
   },
   "engines": {
-    "node": ">=20.19",
+    "node": ">=24.15",
     "yarn": "4.5.0"
   },
   "packageManager": "yarn@4.5.0",

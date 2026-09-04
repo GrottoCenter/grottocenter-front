@@ -59,7 +59,7 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         env:
-          NODE_VERSION: 20
+          NODE_VERSION: 24
           VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
           VITE_APP_VERSION: ${{ steps.version.outputs.value }}
         with:

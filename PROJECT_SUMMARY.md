@@ -238,7 +238,7 @@ Arabic, Bulgarian, Catalan, German, Greek, English, Spanish, French, Hebrew, Ind
 ## Development Workflow
 
 ### Getting Started
-1. Install Node.js 20+ and Yarn 4.5.0
+1. Install Node.js 24.15+ (24.20.0 recommended) and Yarn 4.5.0
 2. Run `yarn` to install dependencies
 3. Configure `.env` file for API endpoints
 4. Run `yarn start` for development
