@@ -9,7 +9,8 @@ import { STALE } from '../../conf/queryClient';
 // Endpoint is a POST-based search (not RESTful GET), so the queryKey folds
 // the query text in place of a URL path — matches the pre-migration slice
 // that keyed cache by the last submitted query.
-export const useRegionsSearch = query => {
+export const useRegionsSearch = (query, opts = {}) => {
+  const { enabled = true } = opts;
   const trimmed = (query ?? '').trim();
   return useQuery({
     queryKey: [...regionKeys.all, 'search', trimmed],
@@ -17,7 +18,7 @@ export const useRegionsSearch = query => {
       const data = await apiPost(regionsSearchUrl, { query: trimmed });
       return data?.results ?? [];
     },
-    enabled: trimmed.length >= 1,
+    enabled: enabled && trimmed.length >= 1,
     staleTime: STALE.VOLATILE
   });
 };

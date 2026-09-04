@@ -39,6 +39,8 @@ const GuidelineScopeCell = ({ guideline }) => {
     <Stack direction="row" useFlexGap flexWrap="wrap" gap={0.5}>
       {groups.flatMap(([label, values]) =>
         (values ?? []).map(value => {
+          // TODO(api#1782): replace raw IDs with readable labels once the list
+          // endpoint guarantees hydrated country, region and massif relations.
           const identifier = value?.name ?? value?.code ?? value?.id ?? value;
           return (
             <Chip

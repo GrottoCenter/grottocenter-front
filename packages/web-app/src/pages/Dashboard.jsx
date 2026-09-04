@@ -140,7 +140,7 @@ ToolCard.propTypes = {
   to: PropTypes.string.isRequired
 };
 
-const DBExportCard = ({ dbExport, isLoading }) => {
+const DBExportCard = ({ dbExport = null, isLoading = false }) => {
   const { formatMessage } = useIntl();
   const lastUpdate = dbExport?.lastUpdate
     ? dbExport.lastUpdate.split('T')[0]
@@ -213,11 +213,6 @@ DBExportCard.propTypes = {
     size: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   }),
   isLoading: PropTypes.bool
-};
-
-DBExportCard.defaultProps = {
-  dbExport: null,
-  isLoading: false
 };
 
 const Dashboard = () => {

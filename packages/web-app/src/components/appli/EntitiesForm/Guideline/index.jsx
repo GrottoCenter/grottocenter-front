@@ -108,7 +108,9 @@ const GuidelineForm = ({
 
   const [regionSearch, setRegionSearch] = useState('');
   const { data: regionOptions = [], isFetching: isLoadingRegions } =
-    useRegionsSearch(withScope && !associatedScope ? regionSearch : '');
+    useRegionsSearch(regionSearch, {
+      enabled: withScope && !associatedScope
+    });
   const {
     inputValue: massifSearch,
     setInputValue: setMassifSearch,
