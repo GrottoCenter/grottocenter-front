@@ -232,6 +232,22 @@ it('keeps a deleted guideline available for moderators to restore', async () => 
   );
 });
 
+it('keeps delete dialog content explicit if guideline data disappears', async () => {
+  const user = userEvent.setup();
+  usePermissions.mockReturnValue({
+    isAuth: true,
+    isModerator: true,
+    isAdmin: false
+  });
+  setGuidelineResult(guideline);
+  renderPage();
+
+  setGuidelineResult(null);
+  await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+  expect(screen.getByText('Loading')).toBeVisible();
+});
+
 it('uses the standard fetch error state', () => {
   useGuideline.mockReturnValue({
     data: null,

@@ -210,11 +210,12 @@ const GuidelinePage = () => {
             {formatMessage({ id: 'Delete' })}
           </Button>
         ]}>
-        {data &&
-          formatMessage(
-            { id: 'delete-confirmation-dialog' },
-            { entityFmt: data.title }
-          )}
+        {data
+          ? formatMessage(
+              { id: 'delete-confirmation-dialog' },
+              { entityFmt: data.title }
+            )
+          : formatMessage({ id: 'Loading ...' })}
       </StandardDialog>
       <SectionStack>
         {hasError ? (
