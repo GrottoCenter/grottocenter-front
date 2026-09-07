@@ -207,6 +207,8 @@ const Document = ({
   const mainLanguage =
     documentData?.mainLanguage === '000' ? null : documentData?.mainLanguage;
 
+  // This label-independent pre-check keeps DetailsList from rendering an empty
+  // heading; BibliographicReference formats the text with localized labels.
   const documentReference = useMemo(
     () => formatDocumentReference(documentData),
     [documentData]
