@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
-import { Button, Card, CircularProgress, Typography } from '@mui/material';
+import { Button, Card, CircularProgress } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
@@ -41,7 +41,7 @@ import Guidelines from '../Guidelines';
 import Descriptions from '../Descriptions';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomIcon from '../../common/CustomIcon';
-import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
+import ContributionMetadata from '../../common/Contribution/ContributionMetadata';
 import {
   DeletedCard,
   DeleteConfirmationDialog,
@@ -277,40 +277,15 @@ const Massif = ({
                             geogPolygon={massif?.geogPolygon}
                           />
                         )}
-                        {(massif?.author ||
-                          massif?.reviewer ||
-                          massif?.language ||
-                          massif?.names?.[0]?.language) && (
-                          <Typography
-                            component="div"
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ mt: massif?.geogPolygon ? 1 : 0.25 }}>
-                            {massif.author && (
-                              <AuthorAndDate
-                                author={massif.author}
-                                verb="Created"
-                                date={massif.dateInscription}
-                                textColor="inherit"
-                              />
-                            )}
-                            {massif.author && massif.reviewer && ' · '}
-                            {massif.reviewer && (
-                              <AuthorAndDate
-                                author={massif.reviewer}
-                                verb="Updated"
-                                date={massif.dateReviewed}
-                                textColor="inherit"
-                              />
-                            )}
-                            {(massif.author || massif.reviewer) &&
-                              (massif.language ||
-                                massif.names?.[0]?.language) &&
-                              ' · '}
-                            {(massif.language || massif.names?.[0]?.language) &&
-                              `${formatMessage({ id: 'Language' })} : ${(massif.language ?? massif.names[0].language).toUpperCase()}`}
-                          </Typography>
-                        )}
+                        <ContributionMetadata
+                          createdBy={massif?.author}
+                          createdAt={massif?.dateInscription}
+                          updatedBy={massif?.reviewer}
+                          updatedAt={massif?.dateReviewed}
+                          language={
+                            massif?.language ?? massif?.names?.[0]?.language
+                          }
+                        />
                       </>
                     }
                   />
@@ -342,6 +317,7 @@ const Massif = ({
                   <Guidelines
                     entityType="massifs"
                     entityId={massif.id}
+                    entityName={massif.name}
                     guidelines={massif.guidelines}
                   />
                 )}

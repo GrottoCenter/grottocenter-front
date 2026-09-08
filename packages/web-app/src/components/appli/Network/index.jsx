@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Breadcrumbs, Card, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Card } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { NavigateNext, Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
@@ -33,7 +33,7 @@ import Properties from './Properties';
 import Science from '../Science';
 import { NetworkForm } from '../EntitiesForm';
 import StandardDialog from '../../common/StandardDialog';
-import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
+import ContributionMetadata from '../../common/Contribution/ContributionMetadata';
 import FetchErrorState from '../../common/FetchErrorState';
 import EntrancesList from './EntrancesList';
 import Descriptions from '../Descriptions';
@@ -305,48 +305,25 @@ export const Network = ({
                           />
                         </Box>
                       </HalfSplitContainer>
-                      {(cave.author || cave.reviewer || cave.language) && (
-                        <Typography
-                          component="div"
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ mt: 1 }}>
-                          {cave.author && (
-                            <AuthorAndDate
-                              author={cave.author}
-                              verb="Created"
-                              date={cave.dateInscription}
-                              textColor="inherit"
-                            />
-                          )}
-                          {cave.author && cave.reviewer && ' · '}
-                          {cave.reviewer && (
-                            <AuthorAndDate
-                              author={cave.reviewer}
-                              verb="Updated"
-                              date={cave.dateReviewed}
-                              textColor="inherit"
-                            />
-                          )}
-                          {(cave.author || cave.reviewer) &&
-                            cave.language &&
-                            ' · '}
-                          {cave.language &&
-                            `${formatMessage({ id: 'Language' })} : ${cave.language.toUpperCase()}`}
-                        </Typography>
-                      )}
+                      <ContributionMetadata
+                        createdBy={cave.author}
+                        createdAt={cave.dateInscription}
+                        updatedBy={cave.reviewer}
+                        updatedAt={cave.dateReviewed}
+                        language={cave.language}
+                      />
                     </>
                   }
                 />
+                {cave.guidelines && (
+                  <GuidelinesGrouped guidelines={cave.guidelines} />
+                )}
                 <Descriptions
                   descriptions={cave.descriptions}
                   entityType="cave"
                   entityId={cave.id}
                   isEditAllowed={!cave.isDeleted}
                 />
-                {cave.guidelines && (
-                  <GuidelinesGrouped guidelines={cave.guidelines} />
-                )}
                 {isAuth && (
                   <StandardDialog
                     fullWidth

@@ -1,128 +1,74 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Box,
-  Button,
-  Typography,
-  List,
-  ButtonGroup,
-  CircularProgress
-} from '@mui/material';
+import { Box, Typography, List, CircularProgress } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import LinkIcon from '@mui/icons-material/Link';
-import CreateIcon from '@mui/icons-material/Create';
 import { FormattedMessage, useIntl } from 'react-intl';
+import NewEntityButton from '@/components/common/NewEntityButton';
 import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import {
-  usePostGuideline,
+  useGuidelines,
   usePatchGuideline,
   usePermissions,
   useNotification
 } from '../../../hooks';
 import GuidelinePropTypes from '../../../types/guideline.type';
-import GuidelineForm from '../EntitiesForm/Guideline/index';
 import Guideline from './Guideline';
-import { getGuidelinesUrl } from '../../../conf/apiRoutes';
-import { checkAndGetStatus } from '../../../actions/utils';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import SectionCreateButton from '../../common/SectionCreateButton';
 import { FormActionRow } from '../EntitiesForm/utils/FormContainers';
 import Alert from '../../common/Alert';
 
-const MODE_NONE = 'none';
-const MODE_CREATE = 'create';
-const MODE_ATTACH = 'attach';
-
 // Guidelines attach to a country, a region or a massif; massif is the default.
 const ENTITY_LABEL_IDS = { countries: 'country', regions: 'region' };
+const getScopeId = value => value?.iso ?? value?.id ?? value;
 
-const Guidelines = ({ entityType, entityId, guidelines }) => {
+const Guidelines = ({ entityType, entityId, entityName, guidelines }) => {
   const permissions = usePermissions();
   const { onError } = useNotification();
   const { formatMessage } = useIntl();
-  const postMutation = usePostGuideline();
   const patchMutation = usePatchGuideline();
-  const [mode, setMode] = useState(MODE_NONE);
+  const [isGuidelineSearchVisible, setIsGuidelineSearchVisible] =
+    useState(false);
 
-  const [allGuidelines, setAllGuidelines] = useState([]);
-  const [isLoadingGuidelines, setIsLoadingGuidelines] = useState(false);
   const [selectedGuideline, setSelectedGuideline] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
   const [searchValue, setSearchValue] = useState('');
-  const [attachFetchTrigger, setAttachFetchTrigger] = useState(0);
+  const {
+    data: guidelinesData,
+    error: guidelinesError,
+    isFetching: isLoadingGuidelines
+  } = useGuidelines({ limit: 100, enabled: isGuidelineSearchVisible });
+  const allGuidelines = guidelinesData?.guidelines ?? [];
 
   const entityLabel = formatMessage({
     id: ENTITY_LABEL_IDS[entityType] ?? 'massif'
   });
 
   useEffect(() => {
-    if (mode !== MODE_ATTACH) return undefined;
-
-    let cancelled = false;
-    setIsLoadingGuidelines(true);
-
-    fetch(getGuidelinesUrl)
-      .then(checkAndGetStatus)
-      .then(response => response.json())
-      .then(data => {
-        if (!cancelled) {
-          setAllGuidelines(data || []);
-          setIsLoadingGuidelines(false);
-        }
+    if (!guidelinesError || !isGuidelineSearchVisible) return;
+    onError(
+      formatMessage({
+        id: 'guidelines.fetch_error',
+        defaultMessage: 'Failed to load guidelines'
       })
-      .catch(err => {
-        if (!cancelled) {
-          console.error(err);
-          onError(
-            formatMessage({
-              id: 'guidelines.fetch_error',
-              defaultMessage: 'Failed to load guidelines'
-            })
-          );
-          setIsLoadingGuidelines(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [mode, formatMessage, onError, attachFetchTrigger]);
+    );
+  }, [guidelinesError, isGuidelineSearchVisible, formatMessage, onError]);
 
   const closeForm = () => {
-    setMode(MODE_NONE);
+    setIsGuidelineSearchVisible(false);
     setSelectedGuideline(null);
     setSearchValue('');
-    setHasSearched(false);
-  };
-
-  const onSubmitCreateForm = async data => {
-    const entities = { countries: [], regions: [], massifs: [] };
-    if (entityType === 'countries') entities.countries = [entityId];
-    else if (entityType === 'regions') entities.regions = [entityId];
-    else if (entityType === 'massifs') entities.massifs = [entityId];
-
-    try {
-      await postMutation.mutateAsync({
-        ...entities,
-        title: data.title,
-        description: data.description,
-        language: data.language
-      });
-      closeForm();
-    } catch {
-      /* toast handled globally */
-    }
   };
 
   const handleAttachGuideline = async e => {
     if (e) e.preventDefault();
     if (!selectedGuideline) return;
 
-    const countries = (selectedGuideline.countries || []).map(c => c.id || c);
-    const regions = (selectedGuideline.regions || []).map(r => r.id || r);
-    const massifs = (selectedGuideline.massifs || []).map(m => m.id || m);
+    const countries = (selectedGuideline.countries || []).map(getScopeId);
+    const regions = (selectedGuideline.regions || []).map(getScopeId);
+    const massifs = (selectedGuideline.massifs || []).map(getScopeId);
 
     if (entityType === 'countries') {
       countries.push(entityId);
@@ -148,224 +94,193 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
     }
   };
 
+  const handleUnlinkGuideline = async guideline => {
+    const scopes = {
+      countries: (guideline.countries ?? []).map(getScopeId),
+      regions: (guideline.regions ?? []).map(getScopeId),
+      massifs: (guideline.massifs ?? []).map(getScopeId)
+    };
+    scopes[entityType] = scopes[entityType].filter(
+      id => String(id) !== String(entityId)
+    );
+
+    await patchMutation.mutateAsync({ id: guideline.id, ...scopes });
+  };
+
   const availableGuidelines = allGuidelines.filter(g => {
     if (entityType === 'countries') {
-      return !g.countries?.some(c => String(c.id || c) === String(entityId));
+      return !g.countries?.some(
+        country => String(getScopeId(country)) === String(entityId)
+      );
     }
     if (entityType === 'regions') {
-      return !g.regions?.some(r => String(r.id || r) === String(entityId));
+      return !g.regions?.some(
+        region => String(getScopeId(region)) === String(entityId)
+      );
     }
     if (entityType === 'massifs') {
-      return !g.massifs?.some(m => String(m.id || m) === String(entityId));
+      return !g.massifs?.some(
+        massif => String(getScopeId(massif)) === String(entityId)
+      );
     }
     return true;
   });
 
   if (!guidelines?.length && !permissions.isAuth) return null;
 
-  const renderModeContent = () => {
-    switch (mode) {
-      case MODE_CREATE:
-        return (
-          <Box mb={1}>
-            <ButtonGroup
-              size="small"
-              sx={{ mb: 1 }}
-              data-testid="guideline-mode-toggle">
-              <Button
-                variant="outlined"
-                startIcon={
-                  <EntityIcon
-                    iconType="guidelines"
-                    size={20}
-                    BadgeIcon={LinkIcon}
-                  />
-                }
-                onClick={() => {
-                  setMode(MODE_ATTACH);
-                  setSelectedGuideline(null);
-                  setAttachFetchTrigger(prev => prev + 1);
-                }}>
-                <FormattedMessage id="Associate" />
-              </Button>
-              <Button variant="contained" startIcon={<CreateIcon />}>
-                <FormattedMessage id="guidelines.create_new" />
-              </Button>
-            </ButtonGroup>
-            <GuidelineForm
-              isNew
-              closeForm={closeForm}
-              onSubmit={onSubmitCreateForm}
-              hideCancel
-            />
-          </Box>
-        );
-
-      case MODE_ATTACH:
-        return (
-          <Box mb={1}>
-            <ButtonGroup
-              size="small"
-              sx={{ mb: 1 }}
-              data-testid="guideline-mode-toggle">
-              <Button variant="contained" startIcon={<LinkIcon />}>
-                <FormattedMessage id="Associate" />
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<CreateIcon />}
-                disabled={!hasSearched}
-                onClick={() => {
-                  setMode(MODE_CREATE);
-                  setSelectedGuideline(null);
-                }}>
-                <FormattedMessage id="guidelines.create_new" />
-              </Button>
-            </ButtonGroup>
-            <form autoComplete="off" onSubmit={handleAttachGuideline}>
-              {isLoadingGuidelines ? (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    py: 2
-                  }}>
-                  <CircularProgress size={28} />
-                </Box>
-              ) : (
-                <Autocomplete
-                  value={selectedGuideline}
-                  inputValue={searchValue}
-                  onInputChange={(event, newInputValue) => {
-                    setSearchValue(newInputValue);
-                    if (newInputValue.trim().length > 0) {
-                      setHasSearched(true);
-                    }
-                  }}
-                  onChange={(_event, newValue) =>
-                    setSelectedGuideline(newValue)
-                  }
-                  options={availableGuidelines}
-                  getOptionLabel={option => option.title || ''}
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value.id
-                  }
-                  filterOptions={(options, { inputValue }) => {
-                    const term = inputValue.toLowerCase();
-                    return options.filter(
-                      o =>
-                        (o.title || '').toLowerCase().includes(term) ||
-                        (o.description || '').toLowerCase().includes(term)
-                    );
-                  }}
-                  noOptionsText={formatMessage({
-                    id: 'guidelines.no_results'
-                  })}
-                  renderOption={(props, option) => {
-                    // MUI hands `key` inside renderOption's props bag and React 19 requires
-                    // extracting it before the spread; this callback is not a component.
-                    // eslint-disable-next-line react/prop-types
-                    const { key, ...otherProps } = props;
-                    return (
-                      <li key={key} {...otherProps}>
-                        <Box>
-                          <Typography variant="body2">
-                            {option.title}
-                          </Typography>
-                          {option.description && (
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                              sx={{
-                                display: '-webkit-box',
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: 'vertical',
-                                overflow: 'hidden'
-                              }}>
-                              {option.description}
-                            </Typography>
-                          )}
-                        </Box>
-                      </li>
-                    );
-                  }}
-                  renderInput={params => (
-                    <TextField
-                      {...params}
-                      label={formatMessage({
-                        id: 'guidelines.select_guideline'
-                      })}
-                      placeholder={formatMessage({
-                        id: 'guidelines.search_placeholder'
-                      })}
-                      variant="filled"
-                      data-testid="attach-guideline-autocomplete"
-                    />
-                  )}
-                />
-              )}
-
-              <FormActionRow
-                isCenter
-                isSubmitting={isSubmitting}
-                disabled={!selectedGuideline}
-                submitLabel={formatMessage({ id: 'guidelines.btn_attach' })}
-              />
-            </form>
-          </Box>
-        );
-
-      default:
-        return null;
-    }
-  };
+  const createParams = new URLSearchParams({
+    scopeType: entityType,
+    scopeId: String(entityId),
+    scopeName: entityName
+  });
+  const createUrl = `/ui/entity/add/guideline?${createParams.toString()}`;
 
   return (
     <ScrollableContent
       dense
       title={<FormattedMessage id="Guidelines" />}
+      subheader={
+        <FormattedMessage id="Rules and recommendations applicable to this geographical entity and the caves it contains." />
+      }
       anchorId="guidelines"
       count={guidelines?.length ?? 0}
       defaultExpanded={guidelines?.length > 0}
       icon={
         permissions.isAuth && (
-          <SectionCreateButton
-            isOpen={mode !== MODE_NONE}
-            onToggle={() => {
-              if (mode === MODE_NONE) {
-                setMode(MODE_ATTACH);
-                setAttachFetchTrigger(prev => prev + 1);
-              } else {
-                closeForm();
+          <Box display="flex" gap={0.5}>
+            <SectionCreateButton
+              isOpen={isGuidelineSearchVisible}
+              onToggle={() => {
+                if (isGuidelineSearchVisible) closeForm();
+                else setIsGuidelineSearchVisible(true);
+              }}
+              label={formatMessage({ id: 'Associate' })}
+              tooltip={formatMessage({ id: 'guidelines.attach_existing' })}
+              icon={
+                <EntityIcon
+                  iconType="guidelines"
+                  size={20}
+                  BadgeIcon={LinkIcon}
+                />
               }
-            }}
-            label={formatMessage({ id: 'Associate' })}
-            icon={
-              <EntityIcon
-                iconType="guidelines"
-                size={20}
-                BadgeIcon={LinkIcon}
-              />
-            }
-            testId="add-guideline-btn"
-          />
+              testId="add-guideline-btn"
+            />
+            <NewEntityButton
+              to={createUrl}
+              size="small"
+              tooltip={formatMessage({ id: 'guidelines.create_new' })}
+              icon={<EntityIcon iconType="guidelines" size={20} />}
+            />
+          </Box>
         )
       }
       content={
         <>
-          {renderModeContent()}
+          {isGuidelineSearchVisible && (
+            <Box mb={1}>
+              <form autoComplete="off" onSubmit={handleAttachGuideline}>
+                {isLoadingGuidelines ? (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      py: 2
+                    }}>
+                    <CircularProgress size={28} />
+                  </Box>
+                ) : (
+                  <Autocomplete
+                    value={selectedGuideline}
+                    inputValue={searchValue}
+                    onInputChange={(event, newInputValue) => {
+                      setSearchValue(newInputValue);
+                    }}
+                    onChange={(_event, newValue) =>
+                      setSelectedGuideline(newValue)
+                    }
+                    options={availableGuidelines}
+                    getOptionLabel={option => option.title || ''}
+                    isOptionEqualToValue={(option, value) =>
+                      option.id === value.id
+                    }
+                    filterOptions={(options, { inputValue }) => {
+                      const term = inputValue.toLowerCase();
+                      return options.filter(
+                        o =>
+                          (o.title || '').toLowerCase().includes(term) ||
+                          (o.description || '').toLowerCase().includes(term)
+                      );
+                    }}
+                    noOptionsText={formatMessage({
+                      id: 'guidelines.no_results'
+                    })}
+                    renderOption={(props, option) => {
+                      // MUI hands `key` inside renderOption's props bag and React 19 requires
+                      // extracting it before the spread; this callback is not a component.
+                      // eslint-disable-next-line react/prop-types
+                      const { key, ...otherProps } = props;
+                      return (
+                        <li key={key} {...otherProps}>
+                          <Box>
+                            <Typography variant="body2">
+                              {option.title}
+                            </Typography>
+                            {option.description && (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  overflow: 'hidden'
+                                }}>
+                                {option.description}
+                              </Typography>
+                            )}
+                          </Box>
+                        </li>
+                      );
+                    }}
+                    renderInput={params => (
+                      <TextField
+                        {...params}
+                        label={formatMessage({
+                          id: 'guidelines.select_guideline'
+                        })}
+                        placeholder={formatMessage({
+                          id: 'guidelines.search_placeholder'
+                        })}
+                        variant="filled"
+                        data-testid="attach-guideline-autocomplete"
+                      />
+                    )}
+                  />
+                )}
+
+                <FormActionRow
+                  isCenter
+                  isSubmitting={isSubmitting}
+                  disabled={!selectedGuideline}
+                  submitLabel={formatMessage({ id: 'guidelines.btn_attach' })}
+                />
+              </form>
+            </Box>
+          )}
           {guidelines && guidelines.length > 0 ? (
             <List dense disablePadding>
               {guidelines.map(guideline => (
                 <Guideline
                   key={guideline.id}
                   guideline={guideline}
-                  isEditAllowed
+                  onUnlink={
+                    permissions.isAuth ? handleUnlinkGuideline : undefined
+                  }
                 />
               ))}
             </List>
           ) : (
-            mode === MODE_NONE && (
+            !isGuidelineSearchVisible && (
               <Alert
                 severity="info"
                 content={formatMessage(
@@ -385,6 +300,7 @@ Guidelines.propTypes = {
   entityType: PropTypes.string.isRequired,
   entityId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     .isRequired,
+  entityName: PropTypes.string.isRequired,
   guidelines: PropTypes.arrayOf(GuidelinePropTypes)
 };
 

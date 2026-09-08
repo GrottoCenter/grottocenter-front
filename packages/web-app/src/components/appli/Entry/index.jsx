@@ -4,13 +4,7 @@ import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
-import {
-  Box,
-  Breadcrumbs,
-  Card,
-  CircularProgress,
-  Typography
-} from '@mui/material';
+import { Box, Breadcrumbs, Card, CircularProgress } from '@mui/material';
 import { NavigateNext, Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -54,7 +48,7 @@ import {
 import useOpenLink from '../../../hooks/useOpenLink';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
 import SensitiveLocationPlaceholder from './SensitiveLocationPlaceholder';
-import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
+import ContributionMetadata from '../../common/Contribution/ContributionMetadata';
 import FetchErrorState from '../../common/FetchErrorState';
 import Map from '../../common/Maps/MapMultipleMarkers';
 import { EntrancePropTypes } from '../../../types/entrance.type';
@@ -403,38 +397,13 @@ export const Entry = ({
                           />
                         </Box>
                       </HalfSplitContainer>
-                      {(entrance.author ||
-                        entrance.reviewer ||
-                        entrance.language) && (
-                        <Typography
-                          component="div"
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ mt: 1 }}>
-                          {entrance.author && (
-                            <AuthorAndDate
-                              author={entrance.author}
-                              verb="Created"
-                              date={entrance.dateInscription}
-                              textColor="inherit"
-                            />
-                          )}
-                          {entrance.author && entrance.reviewer && ' · '}
-                          {entrance.reviewer && (
-                            <AuthorAndDate
-                              author={entrance.reviewer}
-                              verb="Updated"
-                              date={entrance.dateReviewed}
-                              textColor="inherit"
-                            />
-                          )}
-                          {entrance.language &&
-                            (entrance.author || entrance.reviewer) &&
-                            ' · '}
-                          {entrance.language &&
-                            `${formatMessage({ id: 'Language' })} : ${entrance.language.toUpperCase()}`}
-                        </Typography>
-                      )}
+                      <ContributionMetadata
+                        createdBy={entrance.author}
+                        createdAt={entrance.dateInscription}
+                        updatedBy={entrance.reviewer}
+                        updatedAt={entrance.dateReviewed}
+                        language={entrance.language}
+                      />
                     </>
                   }
                 />
@@ -445,6 +414,9 @@ export const Entry = ({
                   isSensitive={entrance.isSensitive}
                   isEditAllowed={!entrance.isDeleted}
                 />
+                {entrance.guidelines && (
+                  <GuidelinesGrouped guidelines={entrance.guidelines} />
+                )}
                 <Descriptions
                   descriptions={entrance.descriptions}
                   entityType="entrance"
@@ -454,9 +426,6 @@ export const Entry = ({
                   networkName={isNetwork ? entrance.cave.name : undefined}
                   networkDescriptionsCount={networkDescriptionsCount}
                 />
-                {entrance.guidelines && (
-                  <GuidelinesGrouped guidelines={entrance.guidelines} />
-                )}
                 <Riggings
                   riggings={entrance.riggings}
                   entranceId={entrance.id}

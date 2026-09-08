@@ -195,6 +195,7 @@ const Region = ({
               <Guidelines
                 entityType="regions"
                 entityId={region.id}
+                entityName={region.name}
                 guidelines={region.guidelines}
               />
             )}
