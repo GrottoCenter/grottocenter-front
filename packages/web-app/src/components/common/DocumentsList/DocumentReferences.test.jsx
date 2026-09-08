@@ -5,21 +5,10 @@ import { MemoryRouter } from 'react-router-dom';
 
 import renderWithProviders from '@/test/renderWithProviders';
 import { DocumentTypes } from '@/utils/documentTypeHelpers';
-import DocumentReferences, {
-  DocumentReferencesSubheader,
-  OrganizationDocumentReferences
-} from './DocumentReferences';
-
-const clipboard = vi.hoisted(() => ({
-  values: []
-}));
-
-vi.mock('@/utils/clipboard', () => ({
-  default: value => {
-    clipboard.values.push(value);
-    return Promise.resolve();
-  }
-}));
+import DocumentReferences from './DocumentReferences';
+import OrganizationDocumentReferences, {
+  DocumentReferencesSubheader
+} from './OrganizationDocumentReferences';
 
 vi.mock('./DocumentsList', () => ({
   default: ({ documents, emptyMessageComponent, showSort }) =>
@@ -114,12 +103,9 @@ describe('OrganizationDocumentReferences', () => {
 const messages = {
   'Available at:': 'Available at:',
   'Bibliographic references': 'Bibliographic references',
-  'Copy reference': 'Copy reference',
   online: 'online',
-  'Reference copied': 'Reference copied',
   'Show more': 'Show more',
-  'Show less': 'Show less',
-  'Unable to copy reference': 'Unable to copy reference'
+  'Show less': 'Show less'
 };
 
 const makeDocument = id => ({
@@ -150,16 +136,11 @@ const useMobileViewport = () => {
 };
 
 describe('DocumentReferences', () => {
-  beforeEach(() => {
-    clipboard.values = [];
-  });
-
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('renders a formatted reference as plain text with a copy button', async () => {
-    const user = userEvent.setup();
+  it('renders a formatted reference as plain text without a copy button', () => {
     renderReferences([
       {
         id: 42,
@@ -188,17 +169,14 @@ describe('DocumentReferences', () => {
     ]);
 
     const reference = screen.getByText('Jean Dupont, 2022.', { exact: false });
-    const copyButton = screen.getByRole('button', { name: 'Copy reference' });
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
-    expect(reference.closest('li')).toContainElement(copyButton);
+    expect(
+      screen.queryByRole('button', { name: 'Copy reference' })
+    ).not.toBeInTheDocument();
     expect(screen.queryByTestId('ArticleIcon')).not.toBeInTheDocument();
     expect(
       [...reference.querySelectorAll('cite')].map(title => title.textContent)
     ).toEqual(['Underground rivers', 'Speleology Review']);
-    await user.click(copyButton);
-    expect(clipboard.values).toEqual([
-      'Jean Dupont, 2022. Underground rivers. Speleology Review.'
-    ]);
   });
 
   it('shows ten references on desktop before expanding the list', async () => {
@@ -207,26 +185,17 @@ describe('DocumentReferences', () => {
       Array.from({ length: 12 }, (_, index) => makeDocument(index + 1))
     );
 
-    expect(
-      screen.getAllByRole('button', { name: 'Copy reference' })
-    ).toHaveLength(10);
     expect(screen.getByText('Document 11')).not.toBeVisible();
 
     const showMore = screen.getByRole('button', { name: 'Show more' });
     expect(showMore).toHaveAttribute('aria-expanded', 'false');
     await user.click(showMore);
 
-    expect(
-      screen.getAllByRole('button', { name: 'Copy reference' })
-    ).toHaveLength(12);
     expect(screen.getByText('Document 11')).toBeVisible();
     const showLess = screen.getByRole('button', { name: 'Show less' });
     expect(showLess).toHaveAttribute('aria-expanded', 'true');
     await user.click(showLess);
 
-    expect(
-      screen.getAllByRole('button', { name: 'Copy reference' })
-    ).toHaveLength(10);
     expect(screen.getByRole('button', { name: 'Show more' })).toHaveAttribute(
       'aria-expanded',
       'false'
@@ -239,9 +208,6 @@ describe('DocumentReferences', () => {
       Array.from({ length: 12 }, (_, index) => makeDocument(index + 1))
     );
 
-    expect(
-      screen.getAllByRole('button', { name: 'Copy reference' })
-    ).toHaveLength(5);
     expect(screen.getByText('Document 6')).not.toBeVisible();
   });
 
@@ -266,8 +232,5 @@ describe('DocumentReferences', () => {
     expect(screen.queryByText('Bare article title')).not.toBeInTheDocument();
     expect(screen.queryByText('Map with a date')).not.toBeInTheDocument();
     expect(screen.getByText('Document 3')).toBeVisible();
-    expect(
-      screen.getAllByRole('button', { name: 'Copy reference' })
-    ).toHaveLength(1);
   });
 });

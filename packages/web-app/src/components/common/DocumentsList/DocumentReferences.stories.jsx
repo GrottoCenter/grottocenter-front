@@ -1,7 +1,6 @@
 import { DocumentTypes } from '@/utils/documentTypeHelpers';
-import DocumentReferences, {
-  OrganizationDocumentReferences
-} from './DocumentReferences';
+import DocumentReferences from './DocumentReferences';
+import OrganizationDocumentReferences from './OrganizationDocumentReferences';
 
 const documents = [
   {

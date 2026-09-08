@@ -5,10 +5,9 @@ import { PersonPropTypes } from '@/types/person.type';
 import SectionStack from '@/components/common/Layouts/SectionStack';
 import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '@/components/common/Alert';
-import {
-  OrganizationDocumentReferences as DocumentReferences,
+import DocumentReferences, {
   DocumentReferencesSubheader
-} from '@/components/common/DocumentsList/DocumentReferences';
+} from '@/components/common/DocumentsList/OrganizationDocumentReferences';
 import PersonProperties from '@/components/common/Person/PersonProperties';
 
 const AuthorBody = ({ person }) => {

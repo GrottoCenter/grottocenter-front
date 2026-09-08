@@ -220,6 +220,7 @@ const DocumentsList = ({
 
   return (
     <>
+      {title && <Typography variant="h3">{title}</Typography>}
       <Box
         sx={{
           display: 'flex',

@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import {
   Box,
   Button,
@@ -9,107 +9,28 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import AppLink from '@/components/common/AppLink';
 import DocumentReferenceText from '@/components/common/DocumentReferenceText';
 import { DocumentChildPropTypes } from '@/types/document.type';
 import { formatDocumentReference } from '@/utils/documentReference';
-import { buildDocumentsSearchUrl } from '@/utils/documentReferenceSearch';
-import CopyToClipboardIconButton from '../CopyToClipboardIconButton';
-import DocumentsList from './DocumentsList';
-
-export const DocumentReferencesSubheader = ({ visibleCount, totalCount }) =>
-  totalCount > visibleCount ? (
-    <FormattedMessage
-      id="Showing the latest {visible} of {total} documents"
-      defaultMessage="Showing the latest {visible} of {total} documents"
-      values={{ visible: visibleCount, total: totalCount }}
-    />
-  ) : null;
-
-DocumentReferencesSubheader.propTypes = {
-  visibleCount: PropTypes.number.isRequired,
-  totalCount: PropTypes.number.isRequired
-};
-
-export const OrganizationDocumentReferences = ({
-  documents = [],
-  totalCount,
-  searchFilter,
-  emptyMessageComponent
-}) => {
-  const { formatMessage } = useIntl();
-
-  return (
-    <>
-      <DocumentsList
-        documents={documents}
-        emptyMessageComponent={emptyMessageComponent}
-        showSort={false}
-      />
-      {totalCount > 0 && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            mt: 1,
-            '@media print': { display: 'none' }
-          }}>
-          <Button
-            component={AppLink}
-            to={buildDocumentsSearchUrl(searchFilter)}
-            endIcon={<ArrowForwardIcon />}
-            variant="outlined"
-            size="small"
-            sx={{ width: { xs: '100%', sm: 'auto' } }}>
-            {formatMessage({ id: 'See all documents' })}
-          </Button>
-        </Box>
-      )}
-    </>
-  );
-};
-
-OrganizationDocumentReferences.propTypes = {
-  documents: PropTypes.arrayOf(DocumentChildPropTypes),
-  totalCount: PropTypes.number.isRequired,
-  searchFilter: PropTypes.objectOf(PropTypes.string).isRequired,
-  emptyMessageComponent: PropTypes.node
-};
 
 const MOBILE_REFERENCE_PREVIEW_LIMIT = 5;
 const REFERENCE_PREVIEW_LIMIT = 10;
 
-const ReferenceList = ({ references, start = 1 }) => {
-  const { formatMessage } = useIntl();
-
-  return (
-    <Box
-      component="ol"
-      start={start}
-      sx={{ my: 0, pl: 3, display: 'grid', gap: 0.5 }}>
-      {references.map(({ document, reference }) => (
-        <Typography component="li" variant="body2" key={document.id}>
-          <DocumentReferenceText document={document} />{' '}
-          {reference && (
-            <CopyToClipboardIconButton
-              compact
-              value={reference}
-              label={formatMessage({ id: 'Copy reference' })}
-              successLabel={formatMessage({ id: 'Reference copied' })}
-              errorLabel={formatMessage({
-                id: 'Unable to copy reference'
-              })}
-            />
-          )}
-        </Typography>
-      ))}
-    </Box>
-  );
-};
+const ReferenceList = ({ references, start = 1 }) => (
+  <Box
+    component="ol"
+    start={start}
+    sx={{ my: 0, pl: 3, display: 'grid', gap: 0.5 }}>
+    {references.map(({ document }) => (
+      <Typography component="li" variant="body2" key={document.id}>
+        <DocumentReferenceText document={document} />
+      </Typography>
+    ))}
+  </Box>
+);
 
 ReferenceList.propTypes = {
   references: PropTypes.arrayOf(
