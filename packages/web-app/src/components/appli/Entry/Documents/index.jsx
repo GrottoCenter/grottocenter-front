@@ -6,6 +6,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import { styled } from '@mui/material/styles';
 import NewEntityButton from '@/components/common/NewEntityButton';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
+import { DOCUMENT_SORT_ORDERS } from '@/utils/documentSort';
 import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../../SearchDocumentForm';
@@ -88,6 +89,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
 
           <DocumentsList
             documents={documents}
+            defaultSortOrder={DOCUMENT_SORT_ORDERS.TYPE}
             emptyMessageComponent={
               <Alert
                 severity="info"

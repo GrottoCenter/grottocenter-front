@@ -140,17 +140,14 @@ const DocumentsList = ({
   hasSnapshotButton = false,
   onUnlink,
   itemsPerPage = 10,
+  defaultSortOrder = DOCUMENT_SORT_ORDERS.ADDED_DESC,
   showSort = true
 }) => {
   // Not `useSelector(state => state.intl)`: this component sits in `common/` and
   // has no Redux dependency, and the provider's locale is the same value.
   const { formatMessage, locale } = useIntl();
   const [page, setPage] = useState(1);
-  // Not the publication order the collections default to: a document attached
-  // to an entity is as often a survey or a photo as a publication, and those
-  // carry no publication date at all — they would all pile up at the end. What
-  // just arrived on the page is the useful answer here.
-  const [sortOrder, setSortOrder] = useState(DOCUMENT_SORT_ORDERS.ADDED_DESC);
+  const [sortOrder, setSortOrder] = useState(defaultSortOrder);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
@@ -315,6 +312,7 @@ DocumentsList.propTypes = {
   hasSnapshotButton: PropTypes.bool,
   onUnlink: PropTypes.func,
   itemsPerPage: PropTypes.number,
+  defaultSortOrder: PropTypes.oneOf(Object.values(DOCUMENT_SORT_ORDERS)),
   showSort: PropTypes.bool
 };
 

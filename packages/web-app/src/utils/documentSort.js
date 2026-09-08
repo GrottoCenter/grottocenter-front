@@ -1,14 +1,44 @@
+import { DocumentTypes } from './documentTypeHelpers';
+
 // The single sort vocabulary for every list of documents: the ones attached to
 // an entity (entrance, massif, organization, person) and the children of a
 // collection. Both come from the API in the very same shape, so offering two
 // different sets of orders would have been a distinction with no cause.
 export const DOCUMENT_SORT_ORDERS = {
+  TYPE: 'type',
   PUBLICATION_DESC: 'publicationDesc',
   PUBLICATION_ASC: 'publicationAsc',
   ADDED_DESC: 'addedDesc',
   ADDED_ASC: 'addedAsc',
   TITLE: 'title'
 };
+
+// The useful reading order on an entrance: cave-specific media first, then
+// publications and finally the less common supporting document types. "Image"
+// and the Dublin Core "Still Image" describe the same visual group here.
+const DOCUMENT_TYPE_ORDER = new Map(
+  [
+    [DocumentTypes.TOPOGRAPHIC_DRAWING],
+    [DocumentTypes.IMAGE, DocumentTypes.STILL_IMAGE],
+    [DocumentTypes.MAP],
+    [DocumentTypes.MOVING_IMAGE],
+    [DocumentTypes.PHYSICAL_OBJECT],
+    [DocumentTypes.INTERACTIVE_RESOURCE],
+    [DocumentTypes.SOUND],
+    [DocumentTypes.REPORT],
+    [DocumentTypes.BOOK],
+    [DocumentTypes.COLLECTION],
+    [DocumentTypes.ISSUE],
+    [DocumentTypes.ARTICLE],
+    [DocumentTypes.TEXT],
+    [DocumentTypes.EVENT],
+    [DocumentTypes.SOFTWARE],
+    [DocumentTypes.SERVICE],
+    [DocumentTypes.TOPOGRAPHIC_DATA],
+    [DocumentTypes.DATASET],
+    [DocumentTypes.AUTHORIZATION_TO_PUBLISH]
+  ].flatMap((types, rank) => types.map(type => [type, rank]))
+);
 
 // The default here means "for the children of a collection": entity-attached
 // documents pick their own default (see DocumentsList) because a survey or a
@@ -42,6 +72,12 @@ const DIRECTIONS = {
 // A null title would throw on the comparison and reject the whole fetch, so it
 // falls back to an empty string.
 const compareTitles = (a, b, compare) => compare(a.title ?? '', b.title ?? '');
+
+const compareByType = (a, b, compare) => {
+  const rankA = DOCUMENT_TYPE_ORDER.get(a.type) ?? Number.MAX_SAFE_INTEGER;
+  const rankB = DOCUMENT_TYPE_ORDER.get(b.type) ?? Number.MAX_SAFE_INTEGER;
+  return rankA === rankB ? compareTitles(a, b, compare) : rankA - rankB;
+};
 
 // Both date fields are truncated ISO strings — "2011", "2011-06", "2011-06-15"
 // for datePublication, a full timestamp for dateInscription — so plain string
@@ -92,6 +128,9 @@ export const sortDocuments = (
   }
   if (order === DOCUMENT_SORT_ORDERS.TITLE) {
     return sorted.sort((a, b) => compareTitles(a, b, compare));
+  }
+  if (order === DOCUMENT_SORT_ORDERS.TYPE) {
+    return sorted.sort((a, b) => compareByType(a, b, compare));
   }
   // An unknown order lands on the default rather than leaving the list in the
   // raw API order, which is what the sort exists to replace.
