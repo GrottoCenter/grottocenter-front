@@ -27,11 +27,6 @@ const SCOPE_LABEL_IDS = {
   massif: 'Massif guideline'
 };
 
-const getScopeCount = guideline =>
-  (guideline.countries?.length ?? 0) +
-  (guideline.regions?.length ?? 0) +
-  (guideline.massifs?.length ?? 0);
-
 const Guideline = ({
   guideline,
   onUnlink,
@@ -42,10 +37,7 @@ const Guideline = ({
   const isOnline = useOnlineStatus();
   const [isUnlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
   const [isUnlinking, setUnlinking] = useState(false);
-  // TODO(api#1775): allow unlinking the final country, region or massif once
-  // the API accepts a guideline whose three scope arrays are all empty.
-  const isLastScope = getScopeCount(guideline) <= 1;
-  const isUnlinkDisabled = !isOnline || isUnlinking || isLastScope;
+  const isUnlinkDisabled = !isOnline || isUnlinking;
 
   const handleUnlink = async () => {
     setUnlinking(true);
@@ -62,16 +54,7 @@ const Guideline = ({
   const unlinkButton = onUnlink ? (
     <ButtonGroup color="error" size="small" variant="outlined">
       <OfflineDisabled disabled={!isOnline}>
-        <Tooltip
-          title={
-            isLastScope
-              ? formatMessage({
-                  id: 'guidelines.scope_required',
-                  defaultMessage:
-                    'Select at least one country, region, or massif.'
-                })
-              : formatMessage({ id: 'unlink' })
-          }>
+        <Tooltip title={formatMessage({ id: 'unlink' })}>
           <span>
             <Button
               disabled={isUnlinkDisabled}

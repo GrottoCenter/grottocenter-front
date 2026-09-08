@@ -74,13 +74,13 @@ it('renders a linked summary and confirms unlinking', async () => {
   expect(onUnlink).toHaveBeenCalledWith(guideline);
 });
 
-it('blocks unlinking the last scope until api#1775', () => {
+it('allows unlinking the last scope', () => {
   renderGuideline({
     onUnlink: vi.fn(),
     guideline: { ...guideline, regions: [] }
   });
 
-  expect(screen.getByRole('button', { name: 'Unlink' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Unlink' })).toBeEnabled();
 });
 
 it('shows inherited scopes beside the guideline title', () => {
