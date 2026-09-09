@@ -14,7 +14,10 @@ const DocumentsSearchPage = () => {
     () => getDocumentReferenceFilter(new URLSearchParams(search)),
     [search]
   );
-  const lockedFilter = Object.keys(initialFilter);
+  const lockedFilter = useMemo(
+    () => Object.keys(initialFilter),
+    [initialFilter]
+  );
 
   return (
     <EntitySearchPage

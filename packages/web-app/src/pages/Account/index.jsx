@@ -1511,16 +1511,7 @@ const AccountPage = () => {
           <div>
             <SectionStack>
               <ScrollableContent
-                dense
                 collapsible={false}
-                title={formatMessage({ id: 'Documents' })}
-                count={nbDocuments}
-                subheader={
-                  <DocumentReferencesSubheader
-                    visibleCount={person.documents?.length ?? 0}
-                    totalCount={nbDocuments}
-                  />
-                }
                 content={
                   <SubscriptionsList
                     canUnsubscribe
@@ -1549,7 +1540,16 @@ const AccountPage = () => {
           {person?.id === userId && (
             <SectionStack>
               <ScrollableContent
+                dense
                 collapsible={false}
+                title={formatMessage({ id: 'Documents' })}
+                count={nbDocuments}
+                subheader={
+                  <DocumentReferencesSubheader
+                    visibleCount={person?.documents?.length ?? 0}
+                    totalCount={nbDocuments}
+                  />
+                }
                 content={
                   <DocumentReferences
                     documents={person.documents}

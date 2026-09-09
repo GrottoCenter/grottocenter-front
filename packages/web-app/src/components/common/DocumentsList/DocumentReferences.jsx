@@ -9,7 +9,7 @@ import { buildDocumentsSearchUrl } from '@/utils/documentReferenceSearch';
 import DocumentsList from './DocumentsList';
 
 export const DocumentReferencesSubheader = ({ visibleCount, totalCount }) =>
-  totalCount > 0 ? (
+  totalCount > visibleCount ? (
     <FormattedMessage
       id="Showing the latest {visible} of {total} documents"
       defaultMessage="Showing the latest {visible} of {total} documents"

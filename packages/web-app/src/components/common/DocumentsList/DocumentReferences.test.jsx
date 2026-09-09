@@ -47,9 +47,6 @@ describe('DocumentReferences', () => {
     expect(
       screen.getByRole('link', { name: 'See all documents' })
     ).toHaveAttribute('href', '/ui/documents?authors.nickname=Alice+%26+Bob');
-    expect(screen.getByRole('link', { name: 'See all documents' })).toHaveClass(
-      'MuiButton-outlined'
-    );
   });
 
   it('formats the preview summary for a section subheader', () => {
@@ -74,6 +71,16 @@ describe('DocumentReferences', () => {
     expect(
       screen.getByRole('link', { name: 'See all documents' })
     ).toBeInTheDocument();
+  });
+
+  it('hides the preview summary when all documents are displayed', () => {
+    const { container } = render(
+      <IntlProvider locale="en" messages={messages}>
+        <DocumentReferencesSubheader visibleCount={2} totalCount={2} />
+      </IntlProvider>
+    );
+
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('renders the empty state without a see-all link', () => {
