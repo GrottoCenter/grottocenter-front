@@ -37,7 +37,9 @@ import {
   useSharePage
 } from '../../../hooks';
 import { organizationKeys } from '../../../api/queryKeys';
-import DocumentReferences from '../../common/DocumentsList/DocumentReferences';
+import DocumentReferences, {
+  DocumentReferencesSubheader
+} from '../../common/DocumentsList/DocumentReferences';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
 import {
@@ -376,10 +378,17 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
             }
           />
           <ScrollableContent
+            dense
             anchorId="authored-documents"
             defaultExpanded={authoredCount > 0}
             title={formatMessage({ id: 'Authored documents' })}
             count={authoredCount}
+            subheader={
+              <DocumentReferencesSubheader
+                visibleCount={organization.authoredDocuments?.length ?? 0}
+                totalCount={authoredCount}
+              />
+            }
             content={
               <DocumentReferences
                 documents={organization.authoredDocuments}
@@ -399,10 +408,17 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
             }
           />
           <ScrollableContent
+            dense
             anchorId="published-documents"
             defaultExpanded={publishedCount > 0}
             title={formatMessage({ id: 'Published documents' })}
             count={publishedCount}
+            subheader={
+              <DocumentReferencesSubheader
+                visibleCount={organization.publishedDocuments?.length ?? 0}
+                totalCount={publishedCount}
+              />
+            }
             content={
               <DocumentReferences
                 documents={organization.publishedDocuments}

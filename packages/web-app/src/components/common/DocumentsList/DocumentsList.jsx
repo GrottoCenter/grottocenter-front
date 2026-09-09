@@ -138,7 +138,8 @@ const DocumentsList = ({
   emptyMessageComponent,
   hasSnapshotButton = false,
   onUnlink,
-  itemsPerPage = 10
+  itemsPerPage = 10,
+  showSort = true
 }) => {
   // Not `useSelector(state => state.intl)`: this component sits in `common/` and
   // has no Redux dependency, and the provider's locale is the same value.
@@ -223,7 +224,7 @@ const DocumentsList = ({
     <>
       {/* One row for the title and the control, so the select costs no vertical
           space of its own on the lists that already have a heading. */}
-      {(title || canSortDocuments(sortedDocuments)) && (
+      {(title || (showSort && canSortDocuments(sortedDocuments))) && (
         <Box
           sx={{
             display: 'flex',
@@ -235,7 +236,7 @@ const DocumentsList = ({
             mb: 0.5
           }}>
           {title && <Typography variant="h3">{title}</Typography>}
-          {canSortDocuments(sortedDocuments) && (
+          {showSort && canSortDocuments(sortedDocuments) && (
             // Print keeps the title but drops the control: on paper the order is
             // already fixed, and a dropdown is not something you can operate.
             <Box sx={{ '@media print': { display: 'none' } }}>
@@ -306,7 +307,8 @@ DocumentsList.propTypes = {
   emptyMessageComponent: PropTypes.node,
   hasSnapshotButton: PropTypes.bool,
   onUnlink: PropTypes.func,
-  itemsPerPage: PropTypes.number
+  itemsPerPage: PropTypes.number,
+  showSort: PropTypes.bool
 };
 
 export default DocumentsList;

@@ -9,7 +9,9 @@ import PageTabs from '@/components/common/Layouts/PageTabs';
 import SectionStack from '@/components/common/Layouts/SectionStack';
 import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '@/components/common/Alert';
-import DocumentReferences from '@/components/common/DocumentsList/DocumentReferences';
+import DocumentReferences, {
+  DocumentReferencesSubheader
+} from '@/components/common/DocumentsList/DocumentReferences';
 import EntitiesList from '@/components/common/entitiesList/EntitiesList';
 import RelatedCaves from '@/components/common/RelatedCaves/RelatedCaves';
 import PersonProperties from '@/components/common/Person/PersonProperties';
@@ -99,7 +101,16 @@ const CaverBody = ({ person, canEdit, onRefresh }) => {
       <div>
         <SectionStack>
           <ScrollableContent
+            dense
             collapsible={false}
+            title={formatMessage({ id: 'Documents' })}
+            count={nbDocuments}
+            subheader={
+              <DocumentReferencesSubheader
+                visibleCount={person.documents?.length ?? 0}
+                totalCount={nbDocuments}
+              />
+            }
             content={
               <DocumentReferences
                 documents={person.documents}

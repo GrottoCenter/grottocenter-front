@@ -1,12 +1,26 @@
 import PropTypes from 'prop-types';
-import { useIntl } from 'react-intl';
-import { Box, Button, Typography } from '@mui/material';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Box, Button } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 import AppLink from '@/components/common/AppLink';
 import { DocumentChildPropTypes } from '@/types/document.type';
 import { buildDocumentsSearchUrl } from '@/utils/documentReferenceSearch';
 import DocumentsList from './DocumentsList';
+
+export const DocumentReferencesSubheader = ({ visibleCount, totalCount }) =>
+  totalCount > 0 ? (
+    <FormattedMessage
+      id="Showing the latest {visible} of {total} documents"
+      defaultMessage="Showing the latest {visible} of {total} documents"
+      values={{ visible: visibleCount, total: totalCount }}
+    />
+  ) : null;
+
+DocumentReferencesSubheader.propTypes = {
+  visibleCount: PropTypes.number.isRequired,
+  totalCount: PropTypes.number.isRequired
+};
 
 const DocumentReferences = ({
   documents = [],
@@ -21,28 +35,23 @@ const DocumentReferences = ({
       <DocumentsList
         documents={documents}
         emptyMessageComponent={emptyMessageComponent}
+        showSort={false}
       />
       {totalCount > 0 && (
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'center',
             justifyContent: 'flex-end',
-            flexWrap: 'wrap',
-            gap: 1,
-            mt: 1
+            mt: 1,
+            '@media print': { display: 'none' }
           }}>
-          <Typography variant="body2" color="text.secondary">
-            {formatMessage(
-              { id: 'Showing {visible} of {total} documents' },
-              { visible: documents.length, total: totalCount }
-            )}
-          </Typography>
           <Button
             component={AppLink}
             to={buildDocumentsSearchUrl(searchFilter)}
             endIcon={<ArrowForwardIcon />}
-            size="small">
+            variant="outlined"
+            size="small"
+            sx={{ width: { xs: '100%', sm: 'auto' } }}>
             {formatMessage({ id: 'See all documents' })}
           </Button>
         </Box>

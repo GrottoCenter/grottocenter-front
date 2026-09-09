@@ -2,12 +2,16 @@ import { render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
 
-import DocumentReferences from './DocumentReferences';
+import DocumentReferences, {
+  DocumentReferencesSubheader
+} from './DocumentReferences';
 
 vi.mock('./DocumentsList', () => ({
-  default: ({ documents, emptyMessageComponent }) =>
+  default: ({ documents, emptyMessageComponent, showSort }) =>
     documents.length ? (
-      <div data-testid="documents-list">{documents.length}</div>
+      <div data-testid="documents-list" data-show-sort={showSort}>
+        {documents.length}
+      </div>
     ) : (
       emptyMessageComponent
     )
@@ -15,8 +19,8 @@ vi.mock('./DocumentsList', () => ({
 
 const messages = {
   'See all documents': 'See all documents',
-  'Showing {visible} of {total} documents':
-    'Showing {visible} of {total} documents'
+  'Showing the latest {visible} of {total} documents':
+    'Showing the latest {visible} of {total} documents'
 };
 
 const renderReferences = props =>
@@ -36,10 +40,28 @@ describe('DocumentReferences', () => {
       searchFilter: { 'authors.nickname': 'Alice & Bob' }
     });
 
-    expect(screen.getByText('Showing 2 of 42 documents')).toBeInTheDocument();
+    expect(screen.getByTestId('documents-list')).toHaveAttribute(
+      'data-show-sort',
+      'false'
+    );
     expect(
       screen.getByRole('link', { name: 'See all documents' })
     ).toHaveAttribute('href', '/ui/documents?authors.nickname=Alice+%26+Bob');
+    expect(screen.getByRole('link', { name: 'See all documents' })).toHaveClass(
+      'MuiButton-outlined'
+    );
+  });
+
+  it('formats the preview summary for a section subheader', () => {
+    render(
+      <IntlProvider locale="en" messages={messages}>
+        <DocumentReferencesSubheader visibleCount={10} totalCount={42} />
+      </IntlProvider>
+    );
+
+    expect(
+      screen.getByText('Showing the latest 10 of 42 documents')
+    ).toBeInTheDocument();
   });
 
   it('keeps the link when the whole preview fits on the page', () => {

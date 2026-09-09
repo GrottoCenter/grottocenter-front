@@ -2346,7 +2346,7 @@
   "Show less": "表示を減らす",
   "Show more": "さらに表示",
   "Show on map": "地図に表示",
-  "Showing {visible} of {total} documents": "全{total}件中{visible}件の文書を表示",
+  "Showing the latest {visible} of {total} documents": "全{total}件中、最新の{visible}件を表示",
   "Sierra Leone": "シエラレオネ",
   "SierraLeone": "シエラレオネ",
   "Sign up": "サインアップ",
