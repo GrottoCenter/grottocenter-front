@@ -1,13 +1,33 @@
 import { render, screen } from '@testing-library/react';
+import { ThemeProvider } from '@mui/material/styles';
 import { MemoryRouter } from 'react-router-dom';
 
+import grottoTheme from '../../conf/grottoTheme';
 import AppLink from './AppLink';
 
 // jsdom's user agent is a desktop one, so `isMobile` (react-device-detect) is
 // false here: these run the desktop branches.
-const renderLink = ui => render(<MemoryRouter>{ui}</MemoryRouter>);
+const renderLink = ui =>
+  render(
+    <ThemeProvider theme={grottoTheme}>
+      <MemoryRouter>{ui}</MemoryRouter>
+    </ThemeProvider>
+  );
 
 describe('AppLink', () => {
+  it('allows an unbroken link label to wrap within its container', () => {
+    renderLink(
+      <AppLink to="/ui/documents/42">
+        https://example.org/a_very_long_unbroken_document_identifier
+      </AppLink>
+    );
+
+    // Smoke-tests that the theme override reaches the rendered link element.
+    expect(screen.getByRole('link')).toHaveStyle({
+      overflowWrap: 'anywhere'
+    });
+  });
+
   it('keeps an internal route in the same tab', () => {
     renderLink(<AppLink to="/ui/entrances/42">Entrance</AppLink>);
 

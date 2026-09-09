@@ -195,6 +195,19 @@ export const overridings = {
     }
   },
   components: {
+    // Links can display user-provided values (document titles, organization
+    // URLs, descriptions processed by Linkify, ...). A URL or identifier may
+    // contain no regular line-breaking opportunity and would otherwise widen
+    // its flex/grid container beyond the viewport. Keep this on MuiLink so it
+    // covers every AppLink rendering mode, including its router-backed internal
+    // links, as well as the links emitted by Linkify.
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          overflowWrap: 'anywhere'
+        }
+      }
+    },
     MuiTooltip: {
       defaultProps: {
         arrow: true
