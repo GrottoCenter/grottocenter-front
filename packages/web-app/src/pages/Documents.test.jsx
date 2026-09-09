@@ -45,3 +45,16 @@ it('injects a document reference query as a locked search filter', () => {
     '"lockedFilter":["authorsOrganization.name"]'
   );
 });
+
+it('uses no initial or locked filters without document reference query parameters', () => {
+  render(
+    <MemoryRouter initialEntries={['/ui/documents']}>
+      <DocumentsSearchPage />
+    </MemoryRouter>
+  );
+
+  expect(screen.getByTestId('page-filter')).toHaveTextContent('{}');
+  expect(screen.getByTestId('form-filter')).toHaveTextContent(
+    '{"initialFilter":{},"lockedFilter":[]}'
+  );
+});
