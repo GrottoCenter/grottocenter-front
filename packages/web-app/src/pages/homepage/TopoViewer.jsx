@@ -11,13 +11,13 @@ const ATTACHMENTS = [
     id: 'att-1',
     anchorId: 'siphon-boue',
     documentId: 234115,
-    label: 'Topo Siphon du "Boue"'
+    label: 'CR explo 14 juillet 2020'
   },
   {
     id: 'att-2',
     anchorId: 'siphon-boue',
     documentId: 234116,
-    label: 'Photos Siphon du "Boue"'
+    label: 'CR explo 10 juin 2022'
   }
 ];
 
