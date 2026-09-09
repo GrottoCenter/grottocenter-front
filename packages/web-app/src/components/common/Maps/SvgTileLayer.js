@@ -151,8 +151,20 @@ const collectRootAttrs = svgEl => {
   return parts.join('');
 };
 
+// Dev-only CORS shim. The document file host (Azure Blob) lacks CORS headers,
+// so a direct fetch() of the SVG is blocked. In dev we route the read through
+// the Vite proxy (`/blob-proxy`, see vite.config.mjs) to make it same-origin.
+// In production this is a no-op — the real fix is CORS on the blob container.
+const BLOB_ORIGIN = 'https://grottocenter.blob.core.windows.net';
+const toFetchableUrl = url => {
+  if (import.meta.env?.DEV && url.startsWith(BLOB_ORIGIN)) {
+    return `/blob-proxy${url.slice(BLOB_ORIGIN.length)}`;
+  }
+  return url;
+};
+
 export const loadSvg = async url => {
-  const response = await fetch(url);
+  const response = await fetch(toFetchableUrl(url));
   if (!response.ok) throw new Error(`Failed to load SVG (${response.status})`);
   const svgText = await response.text();
   const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
