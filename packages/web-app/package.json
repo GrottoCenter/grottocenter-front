@@ -52,6 +52,7 @@
     "prop-types": "^15.8.1",
     "qrcode.react": "^4.2.0",
     "ramda": "^0.32.0",
+    "rbush": "^4.0.1",
     "react": "^19.2.8",
     "react-alice-carousel": "^2.9.1",
     "react-browser-hooks": "^2.2.4",

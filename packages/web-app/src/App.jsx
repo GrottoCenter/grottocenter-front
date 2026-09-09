@@ -56,6 +56,7 @@ const ImportObservationsPage = lazy(
 );
 const ManageUsers = lazy(() => import('./pages/Admin/ManageUsers'));
 const Map = lazy(() => import('./pages/Map'));
+const Topo = lazy(() => import('./pages/Topo'));
 const MassifPage = lazy(() => import('./pages/Massif'));
 const MoveEntranceToCave = lazy(() => import('./pages/MoveEntranceToCave'));
 const NetworkPage = lazy(() => import('./pages/Network'));
@@ -153,6 +154,7 @@ const router = createBrowserRouter(
       <Route path="/ui/changePassword" element={<ChangePassword />} />
       <Route path="/ui/documents/validation" element={<DocumentValidation />} />
       <Route path="/ui/documents/:documentId" element={<DocumentDetails />} />
+      <Route path="/ui/topo" element={<Topo />} />
       <Route path="/ui/import-csv" element={<ImportContainer />} />
       <Route path="/ui/duplicates" element={<DuplicateImportHandle />} />
 
