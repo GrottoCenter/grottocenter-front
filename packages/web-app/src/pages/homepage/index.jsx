@@ -21,6 +21,7 @@ const RecentChanges = lazy(() => import('./RecentChanges'));
 const LatestBlogNewsSection = lazy(() => import('./LatestBlogNewsSection'));
 const Association = lazy(() => import('./Association'));
 const PartnersSection = lazy(() => import('./PartnersSection'));
+const TopoViewer = lazy(() => import('./TopoViewer'));
 
 const HomepageWrapper = styled('div')(({ theme }) => ({
   fontFamily: theme.typography.fontFamily
@@ -50,6 +51,7 @@ const HomePage = () => {
         <Welcome />
         <JoinCommunity />
         <Suspense fallback={<Box sx={{ minHeight: 200 }} />}>
+          <TopoViewer />
           <RandomEntry />
           <RecentChanges />
           <LatestBlogNewsSection />
