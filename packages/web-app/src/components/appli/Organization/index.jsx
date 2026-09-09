@@ -37,7 +37,7 @@ import {
   useSharePage
 } from '../../../hooks';
 import { organizationKeys } from '../../../api/queryKeys';
-import DocumentsList from '../../common/DocumentsList/DocumentsList';
+import DocumentReferences from '../../common/DocumentsList/DocumentReferences';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
 import {
@@ -171,7 +171,8 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
 
   const isActionLoading = wantedDeletedState !== organization?.isDeleted;
 
-  const nbDocuments = (organization?.documents ?? []).length;
+  const authoredCount = organization?.authoredCount ?? 0;
+  const publishedCount = organization?.publishedCount ?? 0;
   const nbNetworks = (organization?.exploredNetworks ?? []).length;
   const nbEntrances = (organization?.exploredEntrances ?? []).length;
 
@@ -375,18 +376,43 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
             }
           />
           <ScrollableContent
-            anchorId="documents"
-            defaultExpanded={nbDocuments > 0}
-            title={formatMessage({ id: 'Collections' })}
-            count={nbDocuments}
+            anchorId="authored-documents"
+            defaultExpanded={authoredCount > 0}
+            title={formatMessage({ id: 'Authored documents' })}
+            count={authoredCount}
             content={
-              <DocumentsList
-                documents={organization.documents}
+              <DocumentReferences
+                documents={organization.authoredDocuments}
+                totalCount={authoredCount}
+                searchFilter={{
+                  'authorsOrganization.name': organization.name
+                }}
                 emptyMessageComponent={
                   <Alert
                     severity="info"
                     content={formatMessage({
-                      id: 'This organization has no documents listed yet.'
+                      id: 'This organization has no authored documents yet.'
+                    })}
+                  />
+                }
+              />
+            }
+          />
+          <ScrollableContent
+            anchorId="published-documents"
+            defaultExpanded={publishedCount > 0}
+            title={formatMessage({ id: 'Published documents' })}
+            count={publishedCount}
+            content={
+              <DocumentReferences
+                documents={organization.publishedDocuments}
+                totalCount={publishedCount}
+                searchFilter={{ 'editor.name': organization.name }}
+                emptyMessageComponent={
+                  <Alert
+                    severity="info"
+                    content={formatMessage({
+                      id: 'This organization has no published documents yet.'
                     })}
                   />
                 }

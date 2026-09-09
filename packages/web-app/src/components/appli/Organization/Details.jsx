@@ -100,7 +100,8 @@ const Details = ({ organization }) => {
   const nbCavers = (organization.cavers ?? []).length;
   const nbEntrances = (organization.exploredEntrances ?? []).length;
   const nbNetworks = (organization.exploredNetworks ?? []).length;
-  const nbDocuments = (organization.documents ?? []).length;
+  const authoredCount = organization.authoredCount ?? 0;
+  const publishedCount = organization.publishedCount ?? 0;
 
   return (
     <HalfSplitContainer>
@@ -133,7 +134,13 @@ const Details = ({ organization }) => {
         }}>
         {/* Stats — prominent */}
         <SectionPaper variant="outlined">
-          <Box sx={{ display: 'flex', justifyContent: 'space-around' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-around',
+              flexWrap: 'wrap',
+              gap: 1
+            }}>
             <StatItem
               src={caverIcon}
               alt="cavers"
@@ -142,9 +149,15 @@ const Details = ({ organization }) => {
             />
             <StatItem
               src={bibliographyIcon}
-              alt="documents"
-              count={nbDocuments}
-              label={formatMessage({ id: 'Number of collections' })}
+              alt="authored documents"
+              count={authoredCount}
+              label={formatMessage({ id: 'Number of authored documents' })}
+            />
+            <StatItem
+              src={bibliographyIcon}
+              alt="published documents"
+              count={publishedCount}
+              label={formatMessage({ id: 'Number of published documents' })}
             />
             <StatItem
               src={networkIcon}

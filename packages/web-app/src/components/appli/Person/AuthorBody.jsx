@@ -5,12 +5,12 @@ import { PersonPropTypes } from '@/types/person.type';
 import SectionStack from '@/components/common/Layouts/SectionStack';
 import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '@/components/common/Alert';
-import DocumentsList from '@/components/common/DocumentsList/DocumentsList';
+import DocumentReferences from '@/components/common/DocumentsList/DocumentReferences';
 import PersonProperties from '@/components/common/Person/PersonProperties';
 
 const AuthorBody = ({ person }) => {
   const { formatMessage } = useIntl();
-  const nbDocuments = (person?.documents ?? []).length;
+  const nbDocuments = person.authoredCount ?? 0;
 
   return (
     <SectionStack>
@@ -34,8 +34,10 @@ const AuthorBody = ({ person }) => {
         count={nbDocuments}
         defaultExpanded={nbDocuments > 0}
         content={
-          <DocumentsList
+          <DocumentReferences
             documents={person.documents}
+            totalCount={nbDocuments}
+            searchFilter={{ 'authors.nickname': person.nickname }}
             emptyMessageComponent={
               <Alert
                 severity="info"

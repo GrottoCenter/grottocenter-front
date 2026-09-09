@@ -107,10 +107,14 @@ SubjectEntry.propTypes = {
   })
 };
 
-const DocumentSearch = () => {
+const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
   const { formatMessage } = useIntl();
+  const mergedInitialState = useMemo(
+    () => ({ ...initialFilterState, ...initialFilter }),
+    [initialFilter]
+  );
   const { filterState, updateFilter, handleRemoveFilter, resetFilter } =
-    useSearchFilter(initialFilterState);
+    useSearchFilter(mergedInitialState, lockedFilter);
   const [query, setQuery] = useState('');
   const [matchAllFields, setMatchAllFields] = useState(true);
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
@@ -133,7 +137,7 @@ const DocumentSearch = () => {
       size: getStoredRowsPerPage()
     });
 
-  const advancedFilterCount = countActiveFilters(filterState, [
+  const filterableKeys = [
     'title',
     'description',
     'subjects.code',
@@ -154,7 +158,9 @@ const DocumentSearch = () => {
     'cave.name',
     'entrances.name',
     'massifs.name'
-  ]);
+  ].filter(key => !lockedFilter.includes(key));
+
+  const advancedFilterCount = countActiveFilters(filterState, filterableKeys);
 
   const docTypeOptions = useMemo(
     () =>
@@ -185,8 +191,7 @@ const DocumentSearch = () => {
     [subjects]
   );
 
-  const hasClearableFilters =
-    query !== '' || countActiveFilters(filterState) > 0;
+  const hasClearableFilters = query !== '' || advancedFilterCount > 0;
 
   const handleClearAll = () => {
     setQuery('');
@@ -196,7 +201,7 @@ const DocumentSearch = () => {
     resetAdvancedSearch();
     // Override params are required: React state updates from the calls above are async,
     // so filterState/query/matchAllFields still hold stale values at this point.
-    startAdvancedsearch('', initialFilterState, true);
+    startAdvancedsearch('', mergedInitialState, true);
   };
 
   return (
@@ -317,30 +322,36 @@ const DocumentSearch = () => {
         <SearchFieldset
           title="Contributors"
           containerSx={{ justifyContent: 'flex-start' }}>
-          <SearchTextAutocomplete
-            ressourceType={searchEntity}
-            ressourceField="authors.nickname"
-            ressourceFilter={matchAllFields ? filterState : {}}
-            label="Author"
-            onChange={e => updateFilter('authors.nickname', e)}
-            value={filterState['authors.nickname']}
-          />
-          <SearchTextAutocomplete
-            ressourceType={searchEntity}
-            ressourceField="authorsOrganization.name"
-            ressourceFilter={matchAllFields ? filterState : {}}
-            label="Organization author"
-            onChange={e => updateFilter('authorsOrganization.name', e)}
-            value={filterState['authorsOrganization.name']}
-          />
-          <SearchTextAutocomplete
-            ressourceType={searchEntity}
-            ressourceField="editor.name"
-            ressourceFilter={matchAllFields ? filterState : {}}
-            label="Editor"
-            onChange={e => updateFilter('editor.name', e)}
-            value={filterState['editor.name']}
-          />
+          {!lockedFilter.includes('authors.nickname') && (
+            <SearchTextAutocomplete
+              ressourceType={searchEntity}
+              ressourceField="authors.nickname"
+              ressourceFilter={matchAllFields ? filterState : {}}
+              label="Author"
+              onChange={e => updateFilter('authors.nickname', e)}
+              value={filterState['authors.nickname']}
+            />
+          )}
+          {!lockedFilter.includes('authorsOrganization.name') && (
+            <SearchTextAutocomplete
+              ressourceType={searchEntity}
+              ressourceField="authorsOrganization.name"
+              ressourceFilter={matchAllFields ? filterState : {}}
+              label="Organization author"
+              onChange={e => updateFilter('authorsOrganization.name', e)}
+              value={filterState['authorsOrganization.name']}
+            />
+          )}
+          {!lockedFilter.includes('editor.name') && (
+            <SearchTextAutocomplete
+              ressourceType={searchEntity}
+              ressourceField="editor.name"
+              ressourceFilter={matchAllFields ? filterState : {}}
+              label="Editor"
+              onChange={e => updateFilter('editor.name', e)}
+              value={filterState['editor.name']}
+            />
+          )}
           <SearchTextAutocomplete
             ressourceType={searchEntity}
             ressourceField="library.name"
@@ -400,10 +411,16 @@ const DocumentSearch = () => {
         onClearAll={hasClearableFilters ? handleClearAll : undefined}
         labelMap={FILTER_LABELS}
         translatableValueFields={TRANSLATABLE_VALUE_FIELDS}
+        lockedKeys={lockedFilter}
       />
       <SearchActionButtons />
     </SearchForm>
   );
+};
+
+DocumentSearch.propTypes = {
+  initialFilter: PropTypes.shape({}),
+  lockedFilter: PropTypes.arrayOf(PropTypes.string)
 };
 
 export default DocumentSearch;
