@@ -63,7 +63,7 @@ import BoolIcon from '../../components/common/BoolIcon';
 
 import DocumentReferences, {
   DocumentReferencesSubheader
-} from '../../components/common/DocumentsList/DocumentReferences';
+} from '../../components/common/DocumentsList/OrganizationDocumentReferences';
 import SubscriptionsList from '../../components/common/Subscriptions/SubscriptionsList';
 import EntitiesList from '../../components/common/entitiesList/EntitiesList';
 import PageContainer from '../../components/common/Layouts/PageContainer';

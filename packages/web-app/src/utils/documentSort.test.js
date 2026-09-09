@@ -4,6 +4,7 @@ import {
   DOCUMENT_SORT_ORDERS,
   sortDocuments
 } from './documentSort';
+import { DocumentTypes } from './documentTypeHelpers';
 
 const doc = (title, datePublication = null, dateInscription = null) => ({
   title,
@@ -119,6 +120,52 @@ describe('sortDocuments', () => {
       DOCUMENT_SORT_ORDERS.TITLE
     );
     expect(titles(sorted)).toEqual(['No 1', 'No 2', 'No 10', 'No 100']);
+  });
+
+  it('sorts document types in the entrance reading order', () => {
+    const typeOrder = [
+      DocumentTypes.TOPOGRAPHIC_DRAWING,
+      DocumentTypes.IMAGE,
+      DocumentTypes.STILL_IMAGE,
+      DocumentTypes.MAP,
+      DocumentTypes.MOVING_IMAGE,
+      DocumentTypes.PHYSICAL_OBJECT,
+      DocumentTypes.INTERACTIVE_RESOURCE,
+      DocumentTypes.SOUND,
+      DocumentTypes.REPORT,
+      DocumentTypes.BOOK,
+      DocumentTypes.COLLECTION,
+      DocumentTypes.ISSUE,
+      DocumentTypes.ARTICLE,
+      DocumentTypes.TEXT,
+      DocumentTypes.EVENT,
+      DocumentTypes.SOFTWARE,
+      DocumentTypes.SERVICE,
+      DocumentTypes.TOPOGRAPHIC_DATA,
+      DocumentTypes.DATASET,
+      DocumentTypes.AUTHORIZATION_TO_PUBLISH,
+      'Future document type'
+    ];
+    const documents = [...typeOrder]
+      .reverse()
+      .map(type => ({ title: type, type }));
+
+    expect(
+      sortDocuments(documents, DOCUMENT_SORT_ORDERS.TYPE).map(
+        ({ type }) => type
+      )
+    ).toEqual(typeOrder);
+  });
+
+  it('sorts documents of the same type by title', () => {
+    const documents = [
+      { title: 'Topo 10', type: DocumentTypes.TOPOGRAPHIC_DRAWING },
+      { title: 'Topo 2', type: DocumentTypes.TOPOGRAPHIC_DRAWING }
+    ];
+
+    expect(titles(sortDocuments(documents, DOCUMENT_SORT_ORDERS.TYPE))).toEqual(
+      ['Topo 2', 'Topo 10']
+    );
   });
 
   it('ignores case and accents when comparing titles', () => {

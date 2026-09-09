@@ -17,7 +17,7 @@ export const SORT_FIELD_MAP = Object.fromEntries(
       Object.fromEntries(
         config.columns
           .filter(col => col.sortable)
-          .map(col => [col.field, col.apiField ?? col.field])
+          .map(col => [col.field, col.sortField ?? col.apiField ?? col.field])
       )
     ])
     .filter(([, map]) => Object.keys(map).length > 0)

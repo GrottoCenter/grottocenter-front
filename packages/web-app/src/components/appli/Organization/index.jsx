@@ -39,7 +39,7 @@ import {
 import { organizationKeys } from '../../../api/queryKeys';
 import DocumentReferences, {
   DocumentReferencesSubheader
-} from '../../common/DocumentsList/DocumentReferences';
+} from '../../common/DocumentsList/OrganizationDocumentReferences';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
 import {

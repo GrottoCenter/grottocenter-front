@@ -21,6 +21,26 @@ export const DocumentSimplePropTypes = PropTypes.shape({
   description: PropTypes.string
 });
 
+const CitationParentPropTypes = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  type: PropTypes.string,
+  title: PropTypes.string,
+  issue: PropTypes.string,
+  datePublication: PropTypes.string,
+  parent: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    type: PropTypes.string,
+    title: PropTypes.string,
+    issue: PropTypes.string,
+    datePublication: PropTypes.string
+  })
+});
+
+const CitationOrganizationPropTypes = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  name: PropTypes.string
+});
+
 // The shape of a document as it comes attached to something else: the children
 // of a collection (GET /documents/{id}/children) and the documents of an
 // entrance, massif, organization or person, which the API returns identically.
@@ -36,6 +56,21 @@ export const DocumentChildPropTypes = PropTypes.shape({
   dateReviewed: PropTypes.string,
   isValidated: PropTypes.bool,
   isDeleted: PropTypes.bool,
+  authors: PropTypes.arrayOf(authorType),
+  authorsOrganization: PropTypes.arrayOf(CitationOrganizationPropTypes),
+  editor: CitationOrganizationPropTypes,
+  library: CitationOrganizationPropTypes,
+  parent: CitationParentPropTypes,
+  identifier: PropTypes.string,
+  identifierType: PropTypes.string,
+  issue: PropTypes.string,
+  pages: PropTypes.string,
+  oldBBS: PropTypes.shape({
+    pages: PropTypes.string,
+    comments: PropTypes.string,
+    publicationOther: PropTypes.string,
+    publicationFascicule: PropTypes.string
+  }),
   files: PropTypes.arrayOf(FilePropTypes)
 });
 
@@ -82,6 +117,8 @@ export const DocumentPropTypes = PropTypes.shape({
   massifs: PropTypes.arrayOf(idNameType),
   parent: DocumentSimplePropTypes,
   oldBBS: PropTypes.shape({
+    pages: PropTypes.string,
+    comments: PropTypes.string,
     publicationOther: PropTypes.string,
     publicationFascicule: PropTypes.string
   }),

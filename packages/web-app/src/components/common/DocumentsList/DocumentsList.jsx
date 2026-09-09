@@ -19,6 +19,7 @@ import {
 } from '../../../utils/documentSort';
 import { DocumentChildPropTypes } from '../../../types/document.type';
 import Document from './Document';
+import DocumentReferences from './DocumentReferences';
 import ImageLightbox from './ImageLightbox';
 import { isImageFile } from './utils/imageUtils';
 import {
@@ -139,17 +140,14 @@ const DocumentsList = ({
   hasSnapshotButton = false,
   onUnlink,
   itemsPerPage = 10,
+  defaultSortOrder = DOCUMENT_SORT_ORDERS.ADDED_DESC,
   showSort = true
 }) => {
   // Not `useSelector(state => state.intl)`: this component sits in `common/` and
   // has no Redux dependency, and the provider's locale is the same value.
-  const { locale } = useIntl();
+  const { formatMessage, locale } = useIntl();
   const [page, setPage] = useState(1);
-  // Not the publication order the collections default to: a document attached
-  // to an entity is as often a survey or a photo as a publication, and those
-  // carry no publication date at all — they would all pile up at the end. What
-  // just arrived on the page is the useful answer here.
-  const [sortOrder, setSortOrder] = useState(DOCUMENT_SORT_ORDERS.ADDED_DESC);
+  const [sortOrder, setSortOrder] = useState(defaultSortOrder);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
@@ -222,37 +220,41 @@ const DocumentsList = ({
 
   return (
     <>
-      {/* One row for the title and the control, so the select costs no vertical
-          space of its own on the lists that already have a heading. */}
-      {(title || (showSort && canSortDocuments(sortedDocuments))) && (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: title ? 'space-between' : 'flex-end',
-            flexWrap: 'wrap',
-            columnGap: 2,
-            rowGap: 0.5,
-            mb: 0.5
-          }}>
-          {title && <Typography variant="h3">{title}</Typography>}
-          {showSort && canSortDocuments(sortedDocuments) && (
-            // Print keeps the title but drops the control: on paper the order is
-            // already fixed, and a dropdown is not something you can operate.
-            <Box sx={{ '@media print': { display: 'none' } }}>
-              <DocumentSortSelect
-                value={sortOrder}
-                onChange={order => {
-                  setSortOrder(order);
-                  // The document that was on screen is now somewhere else
-                  // entirely; landing back on page 1 is the only honest answer.
-                  setPage(1);
-                }}
-              />
-            </Box>
-          )}
-        </Box>
-      )}
+      {title && <Typography variant="h3">{title}</Typography>}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          columnGap: 2,
+          rowGap: 1,
+          mb: 0.5
+        }}>
+        <Typography variant="h5" component="h3">
+          {formatMessage({ id: 'Document list' })}
+        </Typography>
+        {showSort && canSortDocuments(sortedDocuments) && (
+          // On paper the order is already fixed, and a dropdown is not
+          // operable.
+          <Box
+            sx={{
+              flexShrink: 0,
+              ml: 'auto',
+              '@media print': { display: 'none' }
+            }}>
+            <DocumentSortSelect
+              value={sortOrder}
+              onChange={order => {
+                setSortOrder(order);
+                // The document that was on screen is now somewhere else
+                // entirely; landing back on page 1 is the only honest answer.
+                setPage(1);
+              }}
+            />
+          </Box>
+        )}
+      </Box>
       <DocumentsGrid dense disablePadding>
         {sortedDocuments.map((document, i) => {
           const isOnPage = i >= startIndex && i < endIndex;
@@ -286,6 +288,9 @@ const DocumentsList = ({
           />
         </Box>
       )}
+      {/* Keep references aligned with the full sorted list: they have their own
+          preview/expansion and must not be limited to the visible card page. */}
+      <DocumentReferences documents={sortedDocuments} />
       {allImages.length > 0 && (
         <ImageLightbox
           open={lightboxOpen}
@@ -308,6 +313,7 @@ DocumentsList.propTypes = {
   hasSnapshotButton: PropTypes.bool,
   onUnlink: PropTypes.func,
   itemsPerPage: PropTypes.number,
+  defaultSortOrder: PropTypes.oneOf(Object.values(DOCUMENT_SORT_ORDERS)),
   showSort: PropTypes.bool
 };
 

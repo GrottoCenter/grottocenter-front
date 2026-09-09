@@ -1,70 +1,115 @@
+import { useId, useState } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { Box, Button } from '@mui/material';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useIntl } from 'react-intl';
+import {
+  Box,
+  Button,
+  Collapse,
+  Typography,
+  useMediaQuery
+} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import AppLink from '@/components/common/AppLink';
+import DocumentReferenceText from '@/components/common/DocumentReferenceText';
 import { DocumentChildPropTypes } from '@/types/document.type';
-import { buildDocumentsSearchUrl } from '@/utils/documentReferenceSearch';
-import DocumentsList from './DocumentsList';
+import { formatDocumentReference } from '@/utils/documentReference';
 
-export const DocumentReferencesSubheader = ({ visibleCount, totalCount }) =>
-  totalCount > visibleCount ? (
-    <FormattedMessage
-      id="Showing the latest {visible} of {total} documents"
-      defaultMessage="Showing the latest {visible} of {total} documents"
-      values={{ visible: visibleCount, total: totalCount }}
-    />
-  ) : null;
+const MOBILE_REFERENCE_PREVIEW_LIMIT = 5;
+const REFERENCE_PREVIEW_LIMIT = 10;
 
-DocumentReferencesSubheader.propTypes = {
-  visibleCount: PropTypes.number.isRequired,
-  totalCount: PropTypes.number.isRequired
+const ReferenceList = ({ references, start = 1 }) => (
+  <Box
+    component="ol"
+    start={start}
+    sx={{ my: 0, pl: 3, display: 'grid', gap: 0.5 }}>
+    {references.map(({ document }) => (
+      <Typography component="li" variant="body2" key={document.id}>
+        <DocumentReferenceText document={document} />
+      </Typography>
+    ))}
+  </Box>
+);
+
+ReferenceList.propTypes = {
+  references: PropTypes.arrayOf(
+    PropTypes.shape({
+      document: DocumentChildPropTypes.isRequired,
+      reference: PropTypes.string.isRequired
+    })
+  ).isRequired,
+  start: PropTypes.number
 };
 
-const DocumentReferences = ({
-  documents = [],
-  totalCount,
-  searchFilter,
-  emptyMessageComponent
-}) => {
+const DocumentReferences = ({ documents }) => {
   const { formatMessage } = useIntl();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const additionalReferencesId = useId();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const previewLimit = isMobile
+    ? MOBILE_REFERENCE_PREVIEW_LIMIT
+    : REFERENCE_PREVIEW_LIMIT;
+  const labels = {
+    availableAt: formatMessage({ id: 'Available at:' }),
+    online: formatMessage({ id: 'online' })
+  };
+  const references = documents
+    .map(document => ({
+      document,
+      reference: formatDocumentReference(document, labels)
+    }))
+    .filter(({ reference }) => Boolean(reference));
+
+  if (references.length === 0) return null;
+
+  const preview = references.slice(0, previewLimit);
+  const additional = references.slice(previewLimit);
 
   return (
-    <>
-      <DocumentsList
-        documents={documents}
-        emptyMessageComponent={emptyMessageComponent}
-        showSort={false}
-      />
-      {totalCount > 0 && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            mt: 1,
-            '@media print': { display: 'none' }
-          }}>
+    <Box component="section" mt={2}>
+      <Typography variant="h5" component="h3" mb={0.5}>
+        {formatMessage({ id: 'Bibliographic references' })}
+      </Typography>
+      <ReferenceList references={preview} />
+      {additional.length > 0 && (
+        <>
+          <Collapse
+            id={additionalReferencesId}
+            in={isExpanded}
+            timeout="auto"
+            sx={{
+              '@media print': {
+                height: 'auto !important',
+                visibility: 'visible !important'
+              }
+            }}>
+            <ReferenceList references={additional} start={previewLimit + 1} />
+          </Collapse>
           <Button
-            component={AppLink}
-            to={buildDocumentsSearchUrl(searchFilter)}
-            endIcon={<ArrowForwardIcon />}
-            variant="outlined"
             size="small"
-            sx={{ width: { xs: '100%', sm: 'auto' } }}>
-            {formatMessage({ id: 'See all documents' })}
+            variant="text"
+            endIcon={isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            aria-expanded={isExpanded}
+            aria-controls={additionalReferencesId}
+            sx={{
+              p: 0.25,
+              minWidth: 0,
+              textTransform: 'none',
+              '@media print': { display: 'none' }
+            }}
+            onClick={() => setIsExpanded(value => !value)}>
+            {formatMessage({ id: isExpanded ? 'Show less' : 'Show more' })}
           </Button>
-        </Box>
+        </>
       )}
-    </>
+    </Box>
   );
 };
 
 DocumentReferences.propTypes = {
-  documents: PropTypes.arrayOf(DocumentChildPropTypes),
-  totalCount: PropTypes.number.isRequired,
-  searchFilter: PropTypes.objectOf(PropTypes.string).isRequired,
-  emptyMessageComponent: PropTypes.node
+  documents: PropTypes.arrayOf(DocumentChildPropTypes).isRequired
 };
 
 export default DocumentReferences;

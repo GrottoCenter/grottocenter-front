@@ -11,7 +11,7 @@ import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableConte
 import Alert from '@/components/common/Alert';
 import DocumentReferences, {
   DocumentReferencesSubheader
-} from '@/components/common/DocumentsList/DocumentReferences';
+} from '@/components/common/DocumentsList/OrganizationDocumentReferences';
 import EntitiesList from '@/components/common/entitiesList/EntitiesList';
 import RelatedCaves from '@/components/common/RelatedCaves/RelatedCaves';
 import PersonProperties from '@/components/common/Person/PersonProperties';

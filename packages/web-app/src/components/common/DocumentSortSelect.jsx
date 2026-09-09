@@ -28,6 +28,7 @@ const DocumentSortSelect = ({ value, onChange }) => {
   // direction that follows already says a date is what is being compared, and
   // the option has to stay readable inside the closed select.
   const labels = {
+    [DOCUMENT_SORT_ORDERS.TYPE]: formatMessage({ id: 'Document type' }),
     [DOCUMENT_SORT_ORDERS.PUBLICATION_DESC]: option(
       'Publication',
       'Newest first'

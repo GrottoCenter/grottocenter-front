@@ -1,10 +1,14 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
 
-import DocumentReferences, {
+import renderWithProviders from '@/test/renderWithProviders';
+import { DocumentTypes } from '@/utils/documentTypeHelpers';
+import DocumentReferences from './DocumentReferences';
+import OrganizationDocumentReferences, {
   DocumentReferencesSubheader
-} from './DocumentReferences';
+} from './OrganizationDocumentReferences';
 
 vi.mock('./DocumentsList', () => ({
   default: ({ documents, emptyMessageComponent, showSort }) =>
@@ -17,24 +21,24 @@ vi.mock('./DocumentsList', () => ({
     )
 }));
 
-const messages = {
+const organizationMessages = {
   'See all documents': 'See all documents',
   'Showing the latest {visible} of {total} documents':
     'Showing the latest {visible} of {total} documents'
 };
 
-const renderReferences = props =>
+const renderOrganizationReferences = props =>
   render(
     <MemoryRouter>
-      <IntlProvider locale="en" messages={messages}>
-        <DocumentReferences {...props} />
+      <IntlProvider locale="en" messages={organizationMessages}>
+        <OrganizationDocumentReferences {...props} />
       </IntlProvider>
     </MemoryRouter>
   );
 
-describe('DocumentReferences', () => {
+describe('OrganizationDocumentReferences', () => {
   it('shows the preview count and links to all matching documents', () => {
-    renderReferences({
+    renderOrganizationReferences({
       documents: [{ id: 1 }, { id: 2 }],
       totalCount: 42,
       searchFilter: { 'authors.nickname': 'Alice & Bob' }
@@ -51,7 +55,7 @@ describe('DocumentReferences', () => {
 
   it('formats the preview summary for a section subheader', () => {
     render(
-      <IntlProvider locale="en" messages={messages}>
+      <IntlProvider locale="en" messages={organizationMessages}>
         <DocumentReferencesSubheader visibleCount={10} totalCount={42} />
       </IntlProvider>
     );
@@ -62,7 +66,7 @@ describe('DocumentReferences', () => {
   });
 
   it('keeps the link when the whole preview fits on the page', () => {
-    renderReferences({
+    renderOrganizationReferences({
       documents: [{ id: 1 }],
       totalCount: 1,
       searchFilter: { 'editor.name': 'Wikicaves' }
@@ -75,7 +79,7 @@ describe('DocumentReferences', () => {
 
   it('hides the preview summary when all documents are displayed', () => {
     const { container } = render(
-      <IntlProvider locale="en" messages={messages}>
+      <IntlProvider locale="en" messages={organizationMessages}>
         <DocumentReferencesSubheader visibleCount={2} totalCount={2} />
       </IntlProvider>
     );
@@ -84,7 +88,7 @@ describe('DocumentReferences', () => {
   });
 
   it('renders the empty state without a see-all link', () => {
-    renderReferences({
+    renderOrganizationReferences({
       documents: [],
       totalCount: 0,
       searchFilter: { 'authorsOrganization.name': 'Wikicaves' },
@@ -93,5 +97,140 @@ describe('DocumentReferences', () => {
 
     expect(screen.getByText('No documents')).toBeInTheDocument();
     expect(screen.queryByRole('link')).toBeNull();
+  });
+});
+
+const messages = {
+  'Available at:': 'Available at:',
+  'Bibliographic references': 'Bibliographic references',
+  online: 'online',
+  'Show more': 'Show more',
+  'Show less': 'Show less'
+};
+
+const makeDocument = id => ({
+  id,
+  type: DocumentTypes.ARTICLE,
+  datePublication: '2024',
+  title: `Document ${id}`,
+  authors: [],
+  authorsOrganization: []
+});
+
+const renderReferences = documents =>
+  renderWithProviders(<DocumentReferences documents={documents} />, {
+    messages
+  });
+
+const useMobileViewport = () => {
+  vi.spyOn(window, 'matchMedia').mockImplementation(query => ({
+    matches: query.includes('max-width'),
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false
+  }));
+};
+
+describe('DocumentReferences', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('renders a formatted reference as plain text without a copy button', () => {
+    renderReferences([
+      {
+        id: 42,
+        type: DocumentTypes.ARTICLE,
+        title: 'Underground rivers',
+        authors: [
+          {
+            id: 1,
+            nickname: 'jdupont',
+            name: 'Jean',
+            surname: 'Dupont'
+          }
+        ],
+        authorsOrganization: [],
+        datePublication: '2022',
+        parent: {
+          id: 2,
+          type: DocumentTypes.ISSUE,
+          parent: {
+            id: 3,
+            type: DocumentTypes.COLLECTION,
+            title: 'Speleology Review'
+          }
+        }
+      }
+    ]);
+
+    const reference = screen.getByText('Jean Dupont, 2022.', { exact: false });
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Copy reference' })
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ArticleIcon')).not.toBeInTheDocument();
+    expect(
+      [...reference.querySelectorAll('cite')].map(title => title.textContent)
+    ).toEqual(['Underground rivers', 'Speleology Review']);
+  });
+
+  it('shows ten references on desktop before expanding the list', async () => {
+    const user = userEvent.setup();
+    renderReferences(
+      Array.from({ length: 12 }, (_, index) => makeDocument(index + 1))
+    );
+
+    expect(screen.getByText('Document 11')).not.toBeVisible();
+
+    const showMore = screen.getByRole('button', { name: 'Show more' });
+    expect(showMore).toHaveAttribute('aria-expanded', 'false');
+    await user.click(showMore);
+
+    expect(screen.getByText('Document 11')).toBeVisible();
+    const showLess = screen.getByRole('button', { name: 'Show less' });
+    expect(showLess).toHaveAttribute('aria-expanded', 'true');
+    await user.click(showLess);
+
+    expect(screen.getByRole('button', { name: 'Show more' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
+  });
+
+  it('shows five references by default on mobile', () => {
+    useMobileViewport();
+    renderReferences(
+      Array.from({ length: 12 }, (_, index) => makeDocument(index + 1))
+    );
+
+    expect(screen.getByText('Document 6')).not.toBeVisible();
+  });
+
+  it('omits documents without a genuine bibliographic reference', () => {
+    renderReferences([
+      {
+        id: 1,
+        type: DocumentTypes.ARTICLE,
+        title: 'Bare article title',
+        authors: [],
+        authorsOrganization: []
+      },
+      {
+        id: 2,
+        type: DocumentTypes.MAP,
+        title: 'Map with a date',
+        datePublication: '2024'
+      },
+      makeDocument(3)
+    ]);
+
+    expect(screen.queryByText('Bare article title')).not.toBeInTheDocument();
+    expect(screen.queryByText('Map with a date')).not.toBeInTheDocument();
+    expect(screen.getByText('Document 3')).toBeVisible();
   });
 });
