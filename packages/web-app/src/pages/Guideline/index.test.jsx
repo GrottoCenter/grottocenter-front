@@ -48,8 +48,8 @@ vi.mock('@/components/common/Layouts/PageHeader', () => ({
   )
 }));
 vi.mock('@/components/common/Layouts/ResponsiveActions', () => ({
-  default: ({ items }) => (
-    <div>
+  default: ({ items, loading }) => (
+    <div data-testid="responsive-actions" data-loading={String(loading)}>
       {items
         .filter(item => !item.hidden)
         .map(item =>
@@ -241,7 +241,7 @@ it('allows an authenticated user to unlink the last scope', async () => {
   renderPage();
 
   await user.click(screen.getByRole('button', { name: 'unlink Vercors' }));
-  const dialog = screen.getByRole('dialog', { name: 'unlink' });
+  const dialog = screen.getByRole('dialog', { name: 'Unlink' });
   expect(within(dialog).getByText('Unlink Vercors?')).toBeVisible();
   await user.click(within(dialog).getByRole('button', { name: 'Unlink' }));
 
@@ -350,6 +350,36 @@ it('permanently deletes an already soft-deleted guideline', async () => {
     isPermanent: true
   });
   expect(await screen.findByText('Guidelines list')).toBeVisible();
+});
+
+it('stops showing action loading when a soft delete returns stale data', async () => {
+  const user = userEvent.setup();
+  const deleteGuideline = vi.fn().mockResolvedValue(undefined);
+  usePermissions.mockReturnValue({
+    isAuth: true,
+    isModerator: true,
+    isAdmin: false
+  });
+  useDeleteGuideline.mockReturnValue({
+    mutateAsync: deleteGuideline,
+    isPending: false
+  });
+  setGuidelineResult(guideline);
+  renderPage();
+
+  await user.click(screen.getByRole('button', { name: 'Delete' }));
+  await user.click(
+    within(screen.getByRole('dialog')).getByRole('button', { name: 'Delete' })
+  );
+
+  expect(deleteGuideline).toHaveBeenCalledWith({
+    id: '42',
+    isPermanent: false
+  });
+  expect(screen.getByTestId('responsive-actions')).toHaveAttribute(
+    'data-loading',
+    'false'
+  );
 });
 
 it('uses the standard fetch error state', () => {

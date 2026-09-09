@@ -29,7 +29,7 @@ const LinkedEntityCards = ({
       await onUnlink(entityToUnlink);
       setEntityToUnlink(null);
     } catch {
-      /* toast handled globally */
+      /* Error reporting is owned by the onUnlink callback. */
     } finally {
       setSubmitting(false);
     }
@@ -102,7 +102,7 @@ const LinkedEntityCards = ({
         <StandardDialog
           open={Boolean(entityToUnlink)}
           onClose={() => setEntityToUnlink(null)}
-          title={formatMessage({ id: 'unlink' })}
+          title={formatMessage({ id: 'Unlink' })}
           actions={[
             <Button
               key="cancel"
@@ -143,6 +143,7 @@ LinkedEntityCards.propTypes = {
     })
   ),
   emptyMessage: PropTypes.node,
+  // The callback owns user-facing error reporting when its promise rejects.
   onUnlink: PropTypes.func,
   isUnlinking: PropTypes.bool
 };

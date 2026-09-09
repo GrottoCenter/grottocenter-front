@@ -60,7 +60,7 @@ it('confirms an optional unlink action', async () => {
   renderCards({ onUnlink });
 
   await user.click(screen.getByRole('button', { name: 'unlink Vercors' }));
-  const dialog = screen.getByRole('dialog', { name: 'unlink' });
+  const dialog = screen.getByRole('dialog', { name: 'Unlink' });
   expect(within(dialog).getByText('Unlink Vercors?')).toBeVisible();
   await user.click(within(dialog).getByRole('button', { name: 'Unlink' }));
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Skeleton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -33,6 +33,8 @@ import {
 import GuidelinePropTypes from '@/types/guideline.type';
 
 const getId = value => value?.id ?? value?.iso ?? value?.code ?? value;
+// Scope mutations use geographic ISO identifiers when available, while page
+// links keep the entity's primary id.
 const getScopeId = value => value?.iso ?? value?.id ?? value?.code ?? value;
 
 const getName = value => value?.name ?? value?.label ?? String(getId(value));
@@ -106,13 +108,8 @@ const GuidelinePage = () => {
   const restoreMutation = useRestoreGuideline();
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeletePermanent, setDeletePermanent] = useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
   const { data, error, isPending, fetchStatus, refetch } =
     useGuideline(guidelineId);
-
-  useEffect(() => {
-    if (data) setWantedDeletedState(Boolean(data.isDeleted));
-  }, [data]);
 
   const isDeleted = Boolean(data?.isDeleted);
   const hasError =
@@ -124,7 +121,6 @@ const GuidelinePage = () => {
   });
 
   const handleDelete = async () => {
-    setWantedDeletedState(true);
     try {
       await deleteMutation.mutateAsync({
         id: guidelineId,
@@ -134,7 +130,6 @@ const GuidelinePage = () => {
         navigate('/ui/guidelines', { replace: true });
       }
     } catch {
-      setWantedDeletedState(isDeleted);
       onError(
         formatMessage({
           id: 'guidelines.delete_error',
@@ -145,11 +140,9 @@ const GuidelinePage = () => {
   };
 
   const handleRestore = async () => {
-    setWantedDeletedState(false);
     try {
       await restoreMutation.mutateAsync({ id: guidelineId });
     } catch {
-      setWantedDeletedState(true);
       onError(
         formatMessage({
           id: 'guidelines.restore_error',
@@ -160,6 +153,8 @@ const GuidelinePage = () => {
   };
 
   const handleUnlinkScope = async entity => {
+    if (!data || patchMutation.isPending) return;
+
     const scopes = {
       countries: (data.countries ?? []).map(getScopeId),
       regions: (data.regions ?? []).map(getScopeId),
@@ -172,13 +167,10 @@ const GuidelinePage = () => {
   };
 
   const canModerate = permissions.isModerator || permissions.isAdmin;
-  const isActionLoading =
-    Boolean(data) && wantedDeletedState !== Boolean(data.isDeleted);
+  const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
   const actions = data ? (
     <ResponsiveActions
-      loading={
-        isActionLoading || deleteMutation.isPending || restoreMutation.isPending
-      }
+      loading={isActionLoading}
       loadingLabel={formatMessage({ id: 'Loading ...' })}
       items={[
         {
@@ -238,11 +230,7 @@ const GuidelinePage = () => {
               <DeletedCard
                 entityType={DELETED_ENTITIES.guideline}
                 entity={data}
-                isLoading={
-                  isActionLoading ||
-                  deleteMutation.isPending ||
-                  restoreMutation.isPending
-                }
+                isLoading={isActionLoading}
                 onRestorePress={canModerate ? handleRestore : undefined}
                 onPermanentDeletePress={
                   canModerate
