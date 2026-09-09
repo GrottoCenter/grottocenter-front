@@ -1,4 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  waitForElementToBeRemoved,
+  within
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -13,10 +18,16 @@ import {
 import GuidelinePage from './index';
 
 vi.mock('@/hooks', () => ({
+  useDebounce: value => value,
   useDeleteGuideline: vi.fn(),
   useGuideline: vi.fn(),
   useNotification: vi.fn(),
   usePermissions: vi.fn(),
+  useQuickSearch: () => ({
+    data: { results: [] },
+    error: null,
+    isFetching: false
+  }),
   useRestoreGuideline: vi.fn()
 }));
 vi.mock('@/components/common/CustomIcon', () => ({
@@ -77,14 +88,22 @@ const messages = {
   Updated: 'Modified',
   'author.by': '{verb} by',
   Language: 'Language',
+  Guideline: 'Guideline',
   Edit: 'Edit',
   History: 'History',
   Restore: 'Restore',
+  'Permanently delete': 'Permanently delete',
+  Deleted: 'Deleted',
+  Posted: 'Posted',
   Delete: 'Delete',
   Cancel: 'Cancel',
   close: 'Close',
   'Loading ...': 'Loading',
+  'deleted-card-intro-message': 'This {entityFmt} has been deleted',
   'delete-confirmation-dialog': 'Delete this {entityFmt}?',
+  'delete-permanent-confirmation-dialog':
+    'Permanently delete this {entityFmt}?',
+  'Deletion confirmation': 'Deletion confirmation',
   'guidelines.delete_error': 'Delete failed'
 };
 
@@ -187,13 +206,18 @@ it('shows the full instructions, contributors and geographical scope', () => {
   );
   expect(screen.queryByRole('link', { name: 'Edit' })).not.toBeInTheDocument();
   expect(
-    screen.queryByRole('button', { name: 'Delete' })
+    within(screen.getByRole('banner')).queryByRole('button', {
+      name: 'Delete'
+    })
   ).not.toBeInTheDocument();
 });
 
 it('keeps a deleted guideline available for moderators to restore', async () => {
   const user = userEvent.setup();
-  const deleteGuideline = vi.fn().mockResolvedValue(undefined);
+  const deletedGuideline = { ...guideline, isDeleted: true };
+  const deleteGuideline = vi.fn().mockImplementation(async () => {
+    setGuidelineResult(deletedGuideline);
+  });
   const restoreGuideline = vi.fn().mockResolvedValue(undefined);
   usePermissions.mockReturnValue({
     isAuth: true,
@@ -216,20 +240,25 @@ it('keeps a deleted guideline available for moderators to restore', async () => 
     '/ui/guidelines/42/edit'
   );
   await user.click(screen.getByRole('button', { name: 'Delete' }));
-  expect(screen.getByText('Delete this Access restrictions?')).toBeVisible();
+  expect(screen.getByText('Delete this Guideline?')).toBeVisible();
   await user.click(screen.getByRole('button', { name: 'Delete' }));
 
   expect(deleteGuideline).toHaveBeenCalledWith({
     id: '42',
     isPermanent: false
   });
+  expect(
+    await screen.findByText('This Guideline has been deleted')
+  ).toBeVisible();
+  await waitForElementToBeRemoved(() => screen.queryByRole('dialog'));
+  expect(screen.queryByRole('link', { name: 'Edit' })).not.toBeInTheDocument();
+  expect(
+    within(screen.getByRole('banner')).queryByRole('button', {
+      name: 'Delete'
+    })
+  ).not.toBeInTheDocument();
   await user.click(await screen.findByRole('button', { name: 'Restore' }));
   expect(restoreGuideline).toHaveBeenCalledWith({ id: '42' });
-  await waitFor(() =>
-    expect(
-      screen.queryByRole('button', { name: 'Restore' })
-    ).not.toBeInTheDocument()
-  );
 });
 
 it('keeps delete dialog content explicit if guideline data disappears', async () => {
@@ -245,7 +274,40 @@ it('keeps delete dialog content explicit if guideline data disappears', async ()
   setGuidelineResult(null);
   await user.click(screen.getByRole('button', { name: 'Delete' }));
 
-  expect(screen.getByText('Loading')).toBeVisible();
+  expect(screen.getByText('Delete this Guideline?')).toBeVisible();
+});
+
+it('permanently deletes an already soft-deleted guideline', async () => {
+  const user = userEvent.setup();
+  const deleteGuideline = vi.fn().mockResolvedValue(undefined);
+  usePermissions.mockReturnValue({
+    isAuth: true,
+    isModerator: true,
+    isAdmin: false
+  });
+  useDeleteGuideline.mockReturnValue({
+    mutateAsync: deleteGuideline,
+    isPending: false
+  });
+  setGuidelineResult({ ...guideline, isDeleted: true });
+  renderPage();
+
+  await user.click(screen.getByRole('button', { name: 'Permanently delete' }));
+  const dialog = screen.getByRole('dialog', {
+    name: 'Deletion confirmation'
+  });
+  expect(
+    within(dialog).getByText('Permanently delete this Guideline?')
+  ).toBeVisible();
+  await user.click(
+    within(dialog).getByRole('button', { name: 'Permanently delete' })
+  );
+
+  expect(deleteGuideline).toHaveBeenCalledWith({
+    id: '42',
+    isPermanent: true
+  });
+  expect(await screen.findByText('Guidelines list')).toBeVisible();
 });
 
 it('uses the standard fetch error state', () => {
@@ -275,30 +337,30 @@ it('keeps the scope placeholder visible while data is unavailable', () => {
   ).toBeInTheDocument();
 });
 
-it('restores a known soft-deleted guideline after a page reload', async () => {
+it('restores a soft-deleted guideline returned by the detail endpoint', async () => {
   const user = userEvent.setup();
   const restoreGuideline = vi.fn().mockResolvedValue(undefined);
-  const refetch = vi.fn();
   usePermissions.mockReturnValue({
     isAuth: true,
     isModerator: true,
     isAdmin: false
   });
   useGuideline.mockReturnValue({
-    data: null,
-    error: { status: 404 },
+    data: { ...guideline, isDeleted: true },
+    error: null,
     isPending: false,
     fetchStatus: 'idle',
-    refetch
+    refetch: vi.fn()
   });
   useRestoreGuideline.mockReturnValue({
     mutateAsync: restoreGuideline,
     isPending: false
   });
 
-  renderPage('/ui/guidelines/42?isDeleted=true');
+  renderPage();
 
+  expect(screen.getByText('This Guideline has been deleted')).toBeVisible();
+  expect(screen.queryByText('Unable to load guideline')).toBeNull();
   await user.click(screen.getByRole('button', { name: 'Restore' }));
   expect(restoreGuideline).toHaveBeenCalledWith({ id: '42' });
-  expect(refetch).toHaveBeenCalledOnce();
 });

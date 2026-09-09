@@ -1,16 +1,19 @@
-import { useState } from 'react';
-import { Box, Button, Skeleton, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box, Skeleton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
-import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 import { useIntl } from 'react-intl';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import CustomIcon from '@/components/common/CustomIcon';
 import FetchErrorState from '@/components/common/FetchErrorState';
 import ContributionMetadata from '@/components/common/Contribution/ContributionMetadata';
-import StandardDialog from '@/components/common/StandardDialog';
+import {
+  DeleteConfirmationDialog,
+  DeletedCard,
+  DELETED_ENTITIES
+} from '@/components/common/card/Deleted';
 import LinkedEntitiesList, {
   ListElement
 } from '@/components/common/LinkedEntitiesList';
@@ -31,8 +34,6 @@ import GuidelinePropTypes from '@/types/guideline.type';
 
 const getId = value => value?.id ?? value?.iso ?? value?.code ?? value;
 
-// TODO(api#1782): once the detail endpoint guarantees hydrated relations,
-// remove the ID fallback and rely on the returned readable `name`.
 const getName = value => value?.name ?? value?.label ?? String(getId(value));
 
 const GuidelineScope = ({ guideline }) => {
@@ -88,7 +89,6 @@ GuidelineScope.propTypes = {
 
 const GuidelinePage = () => {
   const { guidelineId } = useParams();
-  const location = useLocation();
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -96,11 +96,16 @@ const GuidelinePage = () => {
   const deleteMutation = useDeleteGuideline();
   const restoreMutation = useRestoreGuideline();
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeletePermanent, setDeletePermanent] = useState(false);
+  const [wantedDeletedState, setWantedDeletedState] = useState(false);
   const { data, error, isPending, fetchStatus, refetch } =
     useGuideline(guidelineId);
-  const isDeletedFromUrl =
-    new URLSearchParams(location.search).get('isDeleted') === 'true';
-  const isDeleted = Boolean(data?.isDeleted || isDeletedFromUrl);
+
+  useEffect(() => {
+    if (data) setWantedDeletedState(Boolean(data.isDeleted));
+  }, [data]);
+
+  const isDeleted = Boolean(data?.isDeleted);
   const hasError =
     (!data && Boolean(error)) || (!data && fetchStatus === 'paused');
   const snapshotUrl = useSnapshotUrl({
@@ -110,16 +115,17 @@ const GuidelinePage = () => {
   });
 
   const handleDelete = async () => {
+    setWantedDeletedState(true);
     try {
-      await deleteMutation.mutateAsync({ id: guidelineId, isPermanent: false });
-      setDeleteDialogOpen(false);
-      // The public detail endpoint deliberately returns 404 for soft-deleted
-      // guidelines. Keep the known deletion state in the URL so the page stays
-      // restorable across a reload without pretending every 404 is deleted.
-      navigate(`/ui/guidelines/${guidelineId}?isDeleted=true`, {
-        replace: true
+      await deleteMutation.mutateAsync({
+        id: guidelineId,
+        isPermanent: isDeletePermanent
       });
+      if (isDeletePermanent) {
+        navigate('/ui/guidelines', { replace: true });
+      }
     } catch {
+      setWantedDeletedState(isDeleted);
       onError(
         formatMessage({
           id: 'guidelines.delete_error',
@@ -130,11 +136,11 @@ const GuidelinePage = () => {
   };
 
   const handleRestore = async () => {
+    setWantedDeletedState(false);
     try {
       await restoreMutation.mutateAsync({ id: guidelineId });
-      navigate(`/ui/guidelines/${guidelineId}`, { replace: true });
-      await refetch();
     } catch {
+      setWantedDeletedState(true);
       onError(
         formatMessage({
           id: 'guidelines.restore_error',
@@ -145,43 +151,42 @@ const GuidelinePage = () => {
   };
 
   const canModerate = permissions.isModerator || permissions.isAdmin;
-  const actions =
-    data || isDeletedFromUrl ? (
-      <ResponsiveActions
-        loading={deleteMutation.isPending || restoreMutation.isPending}
-        loadingLabel={formatMessage({ id: 'Loading ...' })}
-        items={[
-          {
-            key: 'restore',
-            icon: <RestoreFromTrashIcon />,
-            label: formatMessage({ id: 'Restore' }),
-            onClick: handleRestore,
-            hidden: !canModerate || !isDeleted
+  const isActionLoading =
+    Boolean(data) && wantedDeletedState !== Boolean(data.isDeleted);
+  const actions = data ? (
+    <ResponsiveActions
+      loading={
+        isActionLoading || deleteMutation.isPending || restoreMutation.isPending
+      }
+      loadingLabel={formatMessage({ id: 'Loading ...' })}
+      items={[
+        {
+          key: 'edit',
+          icon: <EditIcon />,
+          label: formatMessage({ id: 'Edit' }),
+          href: `/ui/guidelines/${guidelineId}/edit`,
+          hidden: !permissions.isAuth || isDeleted
+        },
+        {
+          key: 'history',
+          icon: <ManageHistoryIcon />,
+          label: formatMessage({ id: 'History' }),
+          href: snapshotUrl
+        },
+        {
+          key: 'delete',
+          icon: <DeleteIcon />,
+          label: formatMessage({ id: 'Delete' }),
+          onClick: () => {
+            setDeletePermanent(false);
+            setDeleteDialogOpen(true);
           },
-          {
-            key: 'edit',
-            icon: <EditIcon />,
-            label: formatMessage({ id: 'Edit' }),
-            href: `/ui/guidelines/${guidelineId}/edit`,
-            hidden: !permissions.isAuth || isDeleted
-          },
-          {
-            key: 'history',
-            icon: <ManageHistoryIcon />,
-            label: formatMessage({ id: 'History' }),
-            href: snapshotUrl
-          },
-          {
-            key: 'delete',
-            icon: <DeleteIcon />,
-            label: formatMessage({ id: 'Delete' }),
-            onClick: () => setDeleteDialogOpen(true),
-            destructive: true,
-            hidden: !canModerate || isDeleted
-          }
-        ]}
-      />
-    ) : null;
+          destructive: true,
+          hidden: !canModerate || isDeleted
+        }
+      ]}
+    />
+  ) : null;
 
   return (
     <PageContainer>
@@ -190,33 +195,14 @@ const GuidelinePage = () => {
         icon={<CustomIcon type="guidelines" />}
         actions={actions}
       />
-      <StandardDialog
-        open={isDeleteDialogOpen}
+      <DeleteConfirmationDialog
+        entityType={DELETED_ENTITIES.guideline}
+        isOpen={isDeleteDialogOpen}
+        isLoading={deleteMutation.isPending}
+        isPermanent={isDeletePermanent}
         onClose={() => setDeleteDialogOpen(false)}
-        title={formatMessage({ id: 'Delete' })}
-        actions={[
-          <Button
-            key="cancel"
-            variant="outlined"
-            onClick={() => setDeleteDialogOpen(false)}>
-            {formatMessage({ id: 'Cancel' })}
-          </Button>,
-          <Button
-            key="confirm"
-            variant="contained"
-            color="error"
-            disabled={deleteMutation.isPending}
-            onClick={handleDelete}>
-            {formatMessage({ id: 'Delete' })}
-          </Button>
-        ]}>
-        {data
-          ? formatMessage(
-              { id: 'delete-confirmation-dialog' },
-              { entityFmt: data.title }
-            )
-          : formatMessage({ id: 'Loading ...' })}
-      </StandardDialog>
+        onConfirmation={handleDelete}
+      />
       <SectionStack>
         {hasError ? (
           <FetchErrorState
@@ -227,6 +213,26 @@ const GuidelinePage = () => {
           />
         ) : (
           <>
+            {data?.isDeleted && (
+              <DeletedCard
+                entityType={DELETED_ENTITIES.guideline}
+                entity={data}
+                isLoading={
+                  isActionLoading ||
+                  deleteMutation.isPending ||
+                  restoreMutation.isPending
+                }
+                onRestorePress={canModerate ? handleRestore : undefined}
+                onPermanentDeletePress={
+                  canModerate
+                    ? () => {
+                        setDeletePermanent(true);
+                        setDeleteDialogOpen(true);
+                      }
+                    : undefined
+                }
+              />
+            )}
             <ScrollableContent
               dense
               collapsible={false}
