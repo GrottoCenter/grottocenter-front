@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { MapContainer, Marker, Popup, useMap } from 'react-leaflet';
 import { CRS, divIcon } from 'leaflet';
-import { useNavigate } from 'react-router-dom';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import {
   Box,
   Button,
@@ -15,15 +14,16 @@ import {
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 import DescriptionIcon from '@mui/icons-material/Description';
 
+import useOpenLink from '../../../../hooks/useOpenLink';
 import FullscreenControl from '../common/FullscreenControl';
 import CustomControl from '../common/CustomControl';
-import SvgTileLayer, { fetchSvg } from '../SvgTileLayer';
+import SvgTileLayer, { loadSvg } from '../SvgTileLayer';
 
 const PAN_MARGIN = 0.5;
 
 const Wrapper = styled('div')(({ theme }) => ({
   width: '100%',
-  height: '80vh',
+  height: 'var(--viewer-h, 80vh)',
   '&.-centered': {
     display: 'flex',
     alignItems: 'center',
@@ -41,14 +41,14 @@ const Wrapper = styled('div')(({ theme }) => ({
   }
 }));
 
-const useSvg = url => {
+const useSvgData = url => {
   const [state, setState] = useState({ status: 'loading' });
   useEffect(() => {
     let cancelled = false;
     setState({ status: 'loading' });
-    fetchSvg(url)
-      .then(result => {
-        if (!cancelled) setState({ status: 'ready', ...result });
+    loadSvg(url)
+      .then(data => {
+        if (!cancelled) setState({ status: 'ready', data });
       })
       .catch(error => {
         if (!cancelled) setState({ status: 'error', error });
@@ -65,18 +65,34 @@ const makeSvgToLatLng = viewBox => ([svgX, svgY]) => [
   svgX - viewBox.x
 ];
 
-const documentPinIcon = divIcon({
-  className: 'topo-doc-pin',
-  html:
-    '<div style="width:28px;height:28px;border-radius:50%;background:#f57c00;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff;font-size:16px;">📄</div>',
-  iconSize: [28, 28],
-  iconAnchor: [14, 14]
-});
+const PIN_SVG_PATH =
+  'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z';
+
+const makeDocPinIcon = color =>
+  divIcon({
+    className: 'topo-doc-pin',
+    html:
+      `<div style="width:28px;height:28px;border-radius:50%;background:${color};` +
+      'color:#fff;display:flex;align-items:center;justify-content:center;' +
+      'box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff;">' +
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" ' +
+      'aria-hidden="true" focusable="false">' +
+      `<path d="${PIN_SVG_PATH}"/>` +
+      '</svg></div>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
 
 const DocumentPin = ({ attachment, position }) => {
-  const navigate = useNavigate();
+  const openLink = useOpenLink();
+  const theme = useTheme();
+  const icon = useMemo(
+    () => makeDocPinIcon(theme.palette.primary.main),
+    [theme.palette.primary.main]
+  );
+  const href = `/ui/documents/${attachment.documentId}`;
   return (
-    <Marker position={position} icon={documentPinIcon}>
+    <Marker position={position} icon={icon}>
       <Popup>
         <Box
           sx={{
@@ -93,7 +109,7 @@ const DocumentPin = ({ attachment, position }) => {
             size="small"
             variant="contained"
             startIcon={<DescriptionIcon fontSize="small" />}
-            onClick={() => navigate(`/ui/documents/${attachment.documentId}`)}
+            onClick={() => openLink(href)}
           >
             Ouvrir
           </Button>
@@ -103,15 +119,15 @@ const DocumentPin = ({ attachment, position }) => {
   );
 };
 
-const TilesLayer = ({ svgUrl, svgText, viewBox, bounds }) => {
+const TilesLayer = ({ svgData, bounds }) => {
   const map = useMap();
   useEffect(() => {
-    const layer = new SvgTileLayer(svgUrl, { svgText, viewBox, bounds });
+    const layer = new SvgTileLayer({ ...svgData, bounds });
     layer.addTo(map);
     return () => {
       layer.remove();
     };
-  }, [map, svgUrl, svgText, viewBox, bounds]);
+  }, [map, svgData, bounds]);
   return null;
 };
 
@@ -139,12 +155,18 @@ const FitBoundsButton = ({ bounds }) => {
   );
 };
 
-const DocumentSvgViewer = ({ svgUrl, attachments, minZoom, maxZoom }) => {
-  const state = useSvg(svgUrl);
+const DocumentSvgViewer = ({
+  svgUrl,
+  attachments = [],
+  height = '80vh',
+  minZoom = -4,
+  maxZoom = 8
+}) => {
+  const state = useSvgData(svgUrl);
 
   const derived = useMemo(() => {
     if (state.status !== 'ready') return null;
-    const { viewBox } = state;
+    const { viewBox } = state.data;
     const bounds = [
       [0, 0],
       [viewBox.h, viewBox.w]
@@ -156,9 +178,11 @@ const DocumentSvgViewer = ({ svgUrl, attachments, minZoom, maxZoom }) => {
     return { bounds, panBounds, toLatLng: makeSvgToLatLng(viewBox) };
   }, [state]);
 
+  const wrapperStyle = { '--viewer-h': height };
+
   if (state.status === 'loading') {
     return (
-      <Wrapper className="-centered">
+      <Wrapper className="-centered" style={wrapperStyle}>
         <CircularProgress />
       </Wrapper>
     );
@@ -166,14 +190,14 @@ const DocumentSvgViewer = ({ svgUrl, attachments, minZoom, maxZoom }) => {
 
   if (state.status === 'error') {
     return (
-      <Wrapper className="-centered">
+      <Wrapper className="-centered" style={wrapperStyle}>
         <Typography color="error">Impossible de charger la topo.</Typography>
       </Wrapper>
     );
   }
 
   return (
-    <Wrapper>
+    <Wrapper style={wrapperStyle}>
       <MapContainer
         crs={CRS.Simple}
         bounds={derived.bounds}
@@ -186,12 +210,7 @@ const DocumentSvgViewer = ({ svgUrl, attachments, minZoom, maxZoom }) => {
         wheelPxPerZoomLevel={80}
         attributionControl={false}
       >
-        <TilesLayer
-          svgUrl={svgUrl}
-          svgText={state.svgText}
-          viewBox={state.viewBox}
-          bounds={derived.bounds}
-        />
+        <TilesLayer svgData={state.data} bounds={derived.bounds} />
         {attachments.map(a => (
           <DocumentPin
             key={a.id}
@@ -200,7 +219,7 @@ const DocumentSvgViewer = ({ svgUrl, attachments, minZoom, maxZoom }) => {
           />
         ))}
         <FitBoundsButton bounds={derived.bounds} />
-        <FullscreenControl position="topleft" forceSeparateButton="true" />
+        <FullscreenControl position="topleft" forceSeparateButton={true} />
       </MapContainer>
     </Wrapper>
   );
@@ -217,14 +236,9 @@ DocumentSvgViewer.propTypes = {
       label: PropTypes.string
     })
   ),
+  height: PropTypes.string,
   minZoom: PropTypes.number,
   maxZoom: PropTypes.number
-};
-
-DocumentSvgViewer.defaultProps = {
-  attachments: [],
-  minZoom: -4,
-  maxZoom: 8
 };
 
 export default DocumentSvgViewer;

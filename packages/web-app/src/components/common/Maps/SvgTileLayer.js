@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import RBush from 'rbush';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const IGNORED_TAGS = new Set([
@@ -18,7 +19,7 @@ const OPAQUE_GROUP_ATTRS = [
   'opacity'
 ];
 
-export const readViewBox = svgEl => {
+const readViewBox = svgEl => {
   const attr = svgEl.getAttribute('viewBox');
   if (attr) {
     const parts = attr.split(/[\s,]+/).map(parseFloat);
@@ -34,49 +35,29 @@ export const readViewBox = svgEl => {
   return null;
 };
 
-const computeRootBBox = svgEl => {
-  const host = document.createElement('div');
-  host.style.cssText =
-    'position:absolute;left:-99999px;top:-99999px;width:1px;height:1px;overflow:hidden;pointer-events:none';
-  host.appendChild(svgEl);
-  document.body.appendChild(host);
-  try {
-    const bbox = svgEl.getBBox();
-    if (bbox && bbox.width > 0 && bbox.height > 0) {
-      return { x: bbox.x, y: bbox.y, w: bbox.width, h: bbox.height };
-    }
-    return null;
-  } finally {
-    document.body.removeChild(host);
-  }
-};
-
-export const fetchSvg = async url => {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Failed to load SVG (${response.status})`);
-  const svgText = await response.text();
-  const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
-  if (doc.querySelector('parsererror')) throw new Error('Malformed SVG');
-  const svgEl = doc.documentElement;
-  let viewBox = readViewBox(svgEl);
-  if (!viewBox) viewBox = computeRootBBox(svgEl.cloneNode(true));
-  if (!viewBox || viewBox.w <= 0 || viewBox.h <= 0) {
-    throw new Error('SVG has no computable dimensions');
-  }
-  return { svgText, viewBox };
-};
-
 const estimateTextBBox = el => {
-  const tx = parseFloat(el.getAttribute('x') || '0');
-  const ty = parseFloat(el.getAttribute('y') || '0');
-  const fs = parseFloat(el.getAttribute('font-size') || '10') || 10;
+  const tx = parseFloat(el.getAttribute('x') || '0') || 0;
+  const ty = parseFloat(el.getAttribute('y') || '0') || 0;
+  const dx = parseFloat(el.getAttribute('dx') || '0') || 0;
+  const dy = parseFloat(el.getAttribute('dy') || '0') || 0;
+  let fs = parseFloat(el.getAttribute('font-size') || '');
+  if (Number.isNaN(fs) || fs <= 0) {
+    let ancestor = el.parentElement;
+    while (ancestor && Number.isNaN(fs)) {
+      fs = parseFloat(ancestor.getAttribute('font-size') || '');
+      ancestor = ancestor.parentElement;
+    }
+    if (Number.isNaN(fs) || fs <= 0) fs = 10;
+  }
   const text = el.textContent || '';
   const width = Math.max(1, text.length * fs * 0.7);
+  const cx = tx + dx;
+  const cy = ty + dy;
   return {
-    x: tx - fs,
-    y: ty - fs,
-    right: tx + width + fs,
-    bottom: ty + fs
+    minX: cx - fs,
+    minY: cy - fs,
+    maxX: cx + width + fs,
+    maxY: cy + fs
   };
 };
 
@@ -85,7 +66,7 @@ const canDescend = el => {
   return !OPAQUE_GROUP_ATTRS.some(a => el.hasAttribute(a));
 };
 
-const collectItems = svgEl => {
+const collectItems = (svgEl, serializer) => {
   const items = [];
   const walk = node => {
     for (const child of Array.from(node.children)) {
@@ -107,39 +88,84 @@ const collectItems = svgEl => {
         }
         if (!bbox || (bbox.width === 0 && bbox.height === 0)) continue;
         box = {
-          x: bbox.x,
-          y: bbox.y,
-          right: bbox.x + bbox.width,
-          bottom: bbox.y + bbox.height
+          minX: bbox.x,
+          minY: bbox.y,
+          maxX: bbox.x + bbox.width,
+          maxY: bbox.y + bbox.height
         };
       }
-      items.push({ node: child, ...box });
+      items.push({
+        ...box,
+        z: items.length,
+        html: serializer.serializeToString(child)
+      });
     }
   };
   walk(svgEl);
   return items;
 };
 
-const collectDefsNodes = svgEl => {
-  const nodes = [];
-  for (const child of Array.from(svgEl.children)) {
-    const tag = child.tagName.toLowerCase();
-    if (tag === 'defs' || tag === 'style') nodes.push(child);
-  }
-  return nodes;
-};
+const collectDefsHtml = (svgEl, serializer) =>
+  Array.from(svgEl.children)
+    .filter(c => {
+      const t = c.tagName.toLowerCase();
+      return t === 'defs' || t === 'style';
+    })
+    .map(c => serializer.serializeToString(c))
+    .join('');
 
 const collectRootAttrs = svgEl => {
-  const attrs = {};
+  const parts = [];
   for (const attr of Array.from(svgEl.attributes)) {
-    if (['viewBox', 'width', 'height'].includes(attr.name)) continue;
-    attrs[attr.name] = attr.value;
+    if (['viewBox', 'width', 'height', 'xmlns'].includes(attr.name)) continue;
+    parts.push(
+      ` ${attr.name}="${attr.value
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')}"`
+    );
   }
-  return attrs;
+  return parts.join('');
+};
+
+export const loadSvg = async url => {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Failed to load SVG (${response.status})`);
+  const svgText = await response.text();
+  const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+  if (doc.querySelector('parsererror')) throw new Error('Malformed SVG');
+  const svgEl = doc.documentElement;
+
+  let viewBox = readViewBox(svgEl);
+
+  const host = document.createElement('div');
+  host.style.cssText =
+    'position:absolute;left:-99999px;top:-99999px;width:1px;height:1px;overflow:hidden;pointer-events:none';
+  host.appendChild(svgEl);
+  document.body.appendChild(host);
+  try {
+    if (!viewBox) {
+      const bbox = svgEl.getBBox();
+      if (bbox && bbox.width > 0 && bbox.height > 0) {
+        viewBox = { x: bbox.x, y: bbox.y, w: bbox.width, h: bbox.height };
+      }
+    }
+    if (!viewBox || viewBox.w <= 0 || viewBox.h <= 0) {
+      throw new Error('SVG has no computable dimensions');
+    }
+    const serializer = new XMLSerializer();
+    const items = collectItems(svgEl, serializer);
+    const defsHtml = collectDefsHtml(svgEl, serializer);
+    const rootAttrsHtml = collectRootAttrs(svgEl);
+    const index = new RBush();
+    index.load(items);
+    return { viewBox, items, index, defsHtml, rootAttrsHtml };
+  } finally {
+    document.body.removeChild(host);
+  }
 };
 
 const SvgTileLayer = L.GridLayer.extend({
-  initialize(url, options = {}) {
+  initialize(options = {}) {
     L.setOptions(this, {
       tileSize: 256,
       keepBuffer: 2,
@@ -148,51 +174,6 @@ const SvgTileLayer = L.GridLayer.extend({
       minZoom: -Infinity,
       maxZoom: Infinity,
       ...options
-    });
-    this._url = url;
-    this._ready = null;
-  },
-
-  onAdd(map) {
-    this._ready = this._load();
-    return L.GridLayer.prototype.onAdd.call(this, map);
-  },
-
-  onRemove(map) {
-    if (this._hiddenHost && this._hiddenHost.parentNode) {
-      this._hiddenHost.parentNode.removeChild(this._hiddenHost);
-    }
-    this._hiddenHost = null;
-    this._items = null;
-    this._defs = null;
-    return L.GridLayer.prototype.onRemove.call(this, map);
-  },
-
-  _load() {
-    const preload =
-      this.options.svgText && this.options.viewBox
-        ? Promise.resolve({
-            svgText: this.options.svgText,
-            viewBox: this.options.viewBox
-          })
-        : fetchSvg(this._url);
-
-    return preload.then(({ svgText, viewBox }) => {
-      const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
-      const svgEl = doc.documentElement;
-
-      const hiddenHost = document.createElement('div');
-      hiddenHost.style.cssText =
-        'position:absolute;left:-99999px;top:-99999px;width:1px;height:1px;overflow:hidden;pointer-events:none';
-      const mountedSvg = svgEl.cloneNode(true);
-      hiddenHost.appendChild(mountedSvg);
-      document.body.appendChild(hiddenHost);
-
-      this._viewBox = viewBox;
-      this._items = collectItems(mountedSvg);
-      this._defs = collectDefsNodes(mountedSvg).map(d => d.cloneNode(true));
-      this._rootAttrs = collectRootAttrs(svgEl);
-      this._hiddenHost = hiddenHost;
     });
   },
 
@@ -205,8 +186,7 @@ const SvgTileLayer = L.GridLayer.extend({
     ctx.fillStyle = this.options.background;
     ctx.fillRect(0, 0, size.x, size.y);
 
-    this._ready
-      .then(() => this._renderTile(canvas, coords, size))
+    this._renderTile(canvas, coords, size)
       .then(() => done(null, canvas))
       .catch(err => {
         ctx.fillStyle = 'red';
@@ -222,15 +202,14 @@ const SvgTileLayer = L.GridLayer.extend({
     const size = this.getTileSize();
     const bounds = this._tileCoordsToBounds(coords);
     const layerBounds = L.latLngBounds(this.options.bounds);
+    const { viewBox } = this.options;
     const layerH = layerBounds.getNorth() - layerBounds.getSouth();
     const layerW = layerBounds.getEast() - layerBounds.getWest();
-    const scaleX = this._viewBox.w / layerW;
-    const scaleY = this._viewBox.h / layerH;
+    const scaleX = viewBox.w / layerW;
+    const scaleY = viewBox.h / layerH;
     return {
-      x: this._viewBox.x + (bounds.getWest() - layerBounds.getWest()) * scaleX,
-      y:
-        this._viewBox.y +
-        (layerBounds.getNorth() - bounds.getNorth()) * scaleY,
+      x: viewBox.x + (bounds.getWest() - layerBounds.getWest()) * scaleX,
+      y: viewBox.y + (layerBounds.getNorth() - bounds.getNorth()) * scaleY,
       w: (bounds.getEast() - bounds.getWest()) * scaleX,
       h: (bounds.getNorth() - bounds.getSouth()) * scaleY,
       pxW: size.x,
@@ -239,32 +218,24 @@ const SvgTileLayer = L.GridLayer.extend({
   },
 
   _renderTile(canvas, coords, size) {
+    const { index, defsHtml, rootAttrsHtml } = this.options;
     const svgBox = this._tileToSvgBox(coords);
-    const right = svgBox.x + svgBox.w;
-    const bottom = svgBox.y + svgBox.h;
-
-    const visible = this._items.filter(
-      it =>
-        it.right >= svgBox.x &&
-        it.x <= right &&
-        it.bottom >= svgBox.y &&
-        it.y <= bottom
-    );
+    const visible = index.search({
+      minX: svgBox.x,
+      minY: svgBox.y,
+      maxX: svgBox.x + svgBox.w,
+      maxY: svgBox.y + svgBox.h
+    });
 
     if (visible.length === 0) return Promise.resolve();
 
-    const svg = document.createElementNS(SVG_NS, 'svg');
-    for (const [name, value] of Object.entries(this._rootAttrs)) {
-      svg.setAttribute(name, value);
-    }
-    svg.setAttribute('xmlns', SVG_NS);
-    svg.setAttribute('viewBox', `${svgBox.x} ${svgBox.y} ${svgBox.w} ${svgBox.h}`);
-    svg.setAttribute('width', svgBox.pxW);
-    svg.setAttribute('height', svgBox.pxH);
-    for (const def of this._defs) svg.appendChild(def.cloneNode(true));
-    for (const it of visible) svg.appendChild(it.node.cloneNode(true));
-
-    const svgString = new XMLSerializer().serializeToString(svg);
+    visible.sort((a, b) => a.z - b.z);
+    const bodyHtml = visible.map(it => it.html).join('');
+    const svgString =
+      `<svg xmlns="${SVG_NS}"${rootAttrsHtml} ` +
+      `viewBox="${svgBox.x} ${svgBox.y} ${svgBox.w} ${svgBox.h}" ` +
+      `width="${svgBox.pxW}" height="${svgBox.pxH}">` +
+      `${defsHtml}${bodyHtml}</svg>`;
     const blob = new Blob([svgString], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
 
@@ -275,9 +246,9 @@ const SvgTileLayer = L.GridLayer.extend({
         URL.revokeObjectURL(url);
         resolve();
       };
-      img.onerror = err => {
+      img.onerror = () => {
         URL.revokeObjectURL(url);
-        reject(err);
+        reject(new Error('SVG image failed to decode'));
       };
       img.src = url;
     });
