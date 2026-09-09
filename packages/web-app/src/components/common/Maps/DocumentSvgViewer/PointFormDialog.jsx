@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -210,7 +210,22 @@ const PointFormDialog = ({
             )}
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{
+            px: 3,
+            pt: 1,
+            pb: {
+              xs: `calc(${theme.spacing(2)} + env(safe-area-inset-bottom))`,
+              sm: 2
+            },
+            flexDirection: { xs: 'column-reverse', sm: 'row' },
+            gap: 1,
+            '& > button': {
+              width: { xs: '100%', sm: 'auto' },
+              m: 0
+            },
+            '& > :not(style) ~ :not(style)': { ml: 0 }
+          }}>
           <Button variant="outlined" onClick={onClose}>
             {formatMessage({ id: 'Cancel' })}
           </Button>
