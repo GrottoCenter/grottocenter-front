@@ -103,6 +103,16 @@ export const isImageFile = fileName =>
   IMAGE_EXTENSIONS.has(getFileExtension(fileName));
 
 /**
+ * Check if a file is an SVG based on its extension.
+ * SVGs are handled separately from raster images: they are rendered with the
+ * tiled DocumentSvgViewer (crisp zoom/pan) instead of the thumbnail/lightbox
+ * gallery, so they must be excluded from `isImageFile`.
+ * @param {string} fileName - The name of the file
+ * @returns {boolean} True if the file is an SVG
+ */
+export const isSvgFile = fileName => getFileExtension(fileName) === '.svg';
+
+/**
  * Build `src`/`srcSet` for a responsive thumbnail card, falling back to
  * `completePath` when `thumbnails` (or a given variant) is null - e.g.
  * non-image files, failed generation, or uploads predating the backfill.

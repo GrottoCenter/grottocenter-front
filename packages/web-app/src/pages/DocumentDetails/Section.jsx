@@ -8,6 +8,7 @@ import Linkify from 'linkify-react';
 
 import PdfPreview from '@/components/common/PdfPreview';
 import { ListElement } from '@/components/common/LinkedEntitiesList';
+import DocumentSvgViewer from '@/components/common/Maps/DocumentSvgViewer';
 import AppLink from '../../components/common/AppLink';
 import linkifyOptions from '../../helpers/linkifyOptions';
 import Property from '../../components/common/Properties/Property';
@@ -19,7 +20,8 @@ import {
   decodeFileName,
   getFileExtension,
   getThumbnailSources,
-  isImageFile
+  isImageFile,
+  isSvgFile
 } from '../../components/common/DocumentsList/utils/imageUtils';
 import { getFileIcon } from '../../components/common/DocumentsList/utils/fileIcons';
 import { ThumbnailsPropTypes } from '../../types/document.type';
@@ -199,7 +201,8 @@ export const EmptySection = ({ icon, message }) => (
       justifyContent: 'center',
       gap: 0.5,
       color: 'text.secondary'
-    }}>
+    }}
+  >
     {icon ?? <InsertDriveFile fontSize="large" color="disabled" />}
     <Typography variant="body2">{message}</Typography>
   </Paper>
@@ -235,6 +238,50 @@ export const EventDateSection = ({ date }) => {
 };
 EventDateSection.propTypes = { date: PropTypes.string };
 
+// Renders an SVG file with the tiled DocumentSvgViewer (crisp zoom/pan). If the
+// SVG cannot be loaded (e.g. the file host lacks CORS headers, so fetch() is
+// blocked), it falls back to a plain download link so the file stays reachable.
+const SvgFileBlock = ({ file }) => {
+  const [hasError, setHasError] = useState(false);
+
+  const header = (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+      {getFileIcon(file.fileName)}
+      <AppLink href={file.completePath}>{decodeFileName(file.fileName)}</AppLink>
+    </Box>
+  );
+
+  if (hasError) {
+    return (
+      <FileRow>
+        {getFileIcon(file.fileName)}
+        <Box sx={{ flex: 1, minWidth: 0, wordBreak: 'break-word' }}>
+          <AppLink href={file.completePath}>
+            {decodeFileName(file.fileName)}
+          </AppLink>
+        </Box>
+      </FileRow>
+    );
+  }
+
+  return (
+    <Box>
+      {header}
+      <DocumentSvgViewer
+        svgUrl={file.completePath}
+        height="480px"
+        onLoadError={() => setHasError(true)}
+      />
+    </Box>
+  );
+};
+SvgFileBlock.propTypes = {
+  file: PropTypes.shape({
+    fileName: PropTypes.string,
+    completePath: PropTypes.string
+  }).isRequired
+};
+
 export const FilesSection = ({ files }) => {
   const { formatMessage } = useIntl();
   const [lightboxIndex, setLightboxIndex] = useState(null);
@@ -243,6 +290,10 @@ export const FilesSection = ({ files }) => {
 
   const images = useMemo(
     () => fileList.filter(f => isImageFile(f.fileName)),
+    [fileList]
+  );
+  const svgs = useMemo(
+    () => fileList.filter(f => isSvgFile(f.fileName)),
     [fileList]
   );
   const pdfs = useMemo(
@@ -262,6 +313,7 @@ export const FilesSection = ({ files }) => {
       fileList.filter(
         f =>
           !isImageFile(f.fileName) &&
+          !isSvgFile(f.fileName) &&
           !isVideoFile(f.fileName) &&
           !isAudioFile(f.fileName) &&
           getFileExtension(f.fileName) !== '.pdf'
@@ -296,6 +348,9 @@ export const FilesSection = ({ files }) => {
           })}
         </ThumbnailsGrid>
       )}
+      {svgs.map(file => (
+        <SvgFileBlock key={file.completePath} file={file} />
+      ))}
       {pdfs.map(file => (
         <Box key={file.completePath}>
           <Box

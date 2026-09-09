@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useIntl } from 'react-intl';
 import { MapContainer, useMap } from 'react-leaflet';
 import { CRS } from 'leaflet';
 import { styled } from '@mui/material/styles';
@@ -20,7 +21,6 @@ import useSvgData from './useSvgData';
 
 const PAN_MARGIN = 0.5;
 const EMPTY_ATTACHMENTS = [];
-
 
 const Wrapper = styled('div')(({ theme }) => ({
   width: '100%',
@@ -43,10 +43,9 @@ const Wrapper = styled('div')(({ theme }) => ({
   }
 }));
 
-const makeSvgToLatLng = viewBox => ([svgX, svgY]) => [
-  viewBox.y + viewBox.h - svgY,
-  svgX - viewBox.x
-];
+const makeSvgToLatLng =
+  viewBox =>
+  ([svgX, svgY]) => [viewBox.y + viewBox.h - svgY, svgX - viewBox.x];
 
 const groupByAnchor = attachments => {
   const map = {};
@@ -76,9 +75,10 @@ TilesLayer.propTypes = {
 
 const FitBoundsButton = ({ bounds }) => {
   const map = useMap();
+  const { formatMessage } = useIntl();
   return (
     <CustomControl position="topleft" useLeafletControl>
-      <Tooltip title="Afficher tout" placement="right">
+      <Tooltip title={formatMessage({ id: 'Show all' })} placement="right">
         <IconButton
           size="small"
           onClick={() => map.fitBounds(bounds)}
@@ -102,29 +102,34 @@ FitBoundsButton.propTypes = {
   bounds: PropTypes.array.isRequired
 };
 
-const AnchorsToggleButton = ({ active, onToggle }) => (
-  <CustomControl position="topleft" useLeafletControl>
-    <Tooltip
-      title={active ? 'Masquer les ancres' : 'Afficher les ancres'}
-      placement="right"
-    >
-      <IconButton
-        size="small"
-        onClick={onToggle}
-        sx={{
-          width: 30,
-          height: 30,
-          borderRadius: 0,
-          color: active ? 'primary.main' : '#000',
-          background: '#fff',
-          '&:hover': { background: '#f4f4f4' }
-        }}
+const AnchorsToggleButton = ({ active, onToggle }) => {
+  const { formatMessage } = useIntl();
+  return (
+    <CustomControl position="topleft" useLeafletControl>
+      <Tooltip
+        title={formatMessage({
+          id: active ? 'Hide anchors' : 'Show anchors'
+        })}
+        placement="right"
       >
-        <DescriptionIcon fontSize="small" />
-      </IconButton>
-    </Tooltip>
-  </CustomControl>
-);
+        <IconButton
+          size="small"
+          onClick={onToggle}
+          sx={{
+            width: 30,
+            height: 30,
+            borderRadius: 0,
+            color: active ? 'primary.main' : '#000',
+            background: '#fff',
+            '&:hover': { background: '#f4f4f4' }
+          }}
+        >
+          <DescriptionIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    </CustomControl>
+  );
+};
 
 AnchorsToggleButton.propTypes = {
   active: PropTypes.bool.isRequired,
@@ -136,10 +141,16 @@ const DocumentSvgViewer = ({
   attachments = [],
   height = '80vh',
   minZoom = -4,
-  maxZoom = 8
+  maxZoom = 8,
+  onLoadError = null
 }) => {
+  const { formatMessage } = useIntl();
   const state = useSvgData(svgUrl);
   const [showAnchors, setShowAnchors] = useState(true);
+
+  useEffect(() => {
+    if (state.status === 'error' && onLoadError) onLoadError(state.error);
+  }, [state.status, state.error, onLoadError]);
 
   const derived = useMemo(() => {
     if (state.status !== 'ready') return null;
@@ -186,7 +197,9 @@ const DocumentSvgViewer = ({
   if (state.status === 'error') {
     return (
       <Wrapper className="-centered" style={wrapperStyle}>
-        <Typography color="error">Impossible de charger la topo.</Typography>
+        <Typography color="error">
+          {formatMessage({ id: 'Unable to load the SVG file.' })}
+        </Typography>
       </Wrapper>
     );
   }
@@ -216,10 +229,12 @@ const DocumentSvgViewer = ({
             />
           ))}
         <FitBoundsButton bounds={derived.bounds} />
-        <AnchorsToggleButton
-          active={showAnchors}
-          onToggle={() => setShowAnchors(v => !v)}
-        />
+        {Object.keys(state.data.anchors).length > 0 && (
+          <AnchorsToggleButton
+            active={showAnchors}
+            onToggle={() => setShowAnchors(v => !v)}
+          />
+        )}
         <FullscreenControl position="topleft" forceSeparateButton={true} />
       </MapContainer>
     </Wrapper>
@@ -239,7 +254,8 @@ DocumentSvgViewer.propTypes = {
   ),
   height: PropTypes.string,
   minZoom: PropTypes.number,
-  maxZoom: PropTypes.number
+  maxZoom: PropTypes.number,
+  onLoadError: PropTypes.func
 };
 
 export default DocumentSvgViewer;
