@@ -178,6 +178,19 @@ const DocumentSvgViewer = ({
     return { bounds, panBounds, toLatLng: makeSvgToLatLng(viewBox) };
   }, [state]);
 
+  useEffect(() => {
+    if (state.status !== 'ready') return;
+    const missing = attachments
+      .filter(a => !state.data.anchors[a.anchorId])
+      .map(a => a.anchorId);
+    if (missing.length > 0) {
+      console.warn(
+        '[DocumentSvgViewer] anchors not found in SVG:',
+        missing.join(', ')
+      );
+    }
+  }, [state, attachments]);
+
   const wrapperStyle = { '--viewer-h': height };
 
   if (state.status === 'loading') {
@@ -211,13 +224,17 @@ const DocumentSvgViewer = ({
         attributionControl={false}
       >
         <TilesLayer svgData={state.data} bounds={derived.bounds} />
-        {attachments.map(a => (
-          <DocumentPin
-            key={a.id}
-            attachment={a}
-            position={derived.toLatLng(a.position)}
-          />
-        ))}
+        {attachments.map(a => {
+          const svgPos = state.data.anchors[a.anchorId];
+          if (!svgPos) return null;
+          return (
+            <DocumentPin
+              key={a.id}
+              attachment={a}
+              position={derived.toLatLng(svgPos)}
+            />
+          );
+        })}
         <FitBoundsButton bounds={derived.bounds} />
         <FullscreenControl position="topleft" forceSeparateButton={true} />
       </MapContainer>
@@ -230,7 +247,7 @@ DocumentSvgViewer.propTypes = {
   attachments: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      position: PropTypes.arrayOf(PropTypes.number).isRequired,
+      anchorId: PropTypes.string.isRequired,
       documentId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
         .isRequired,
       label: PropTypes.string
