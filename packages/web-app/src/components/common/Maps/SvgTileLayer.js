@@ -208,14 +208,17 @@ const SvgTileLayer = L.GridLayer.extend({
 
   createTile(coords, done) {
     const size = this.getTileSize();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
     const canvas = L.DomUtil.create('canvas', 'leaflet-tile');
-    canvas.width = size.x;
-    canvas.height = size.y;
+    canvas.width = size.x * dpr;
+    canvas.height = size.y * dpr;
+    canvas.style.width = `${size.x}px`;
+    canvas.style.height = `${size.y}px`;
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = this.options.background;
-    ctx.fillRect(0, 0, size.x, size.y);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    this._renderTile(canvas, coords, size)
+    this._renderTile(canvas, coords)
       .then(() => done(null, canvas))
       .catch(err => {
         ctx.fillStyle = 'red';
@@ -246,7 +249,7 @@ const SvgTileLayer = L.GridLayer.extend({
     };
   },
 
-  _renderTile(canvas, coords, size) {
+  _renderTile(canvas, coords) {
     const { index, defsHtml, rootAttrsHtml } = this.options;
     const svgBox = this._tileToSvgBox(coords);
     const visible = index.search({
@@ -260,10 +263,12 @@ const SvgTileLayer = L.GridLayer.extend({
 
     visible.sort((a, b) => a.z - b.z);
     const bodyHtml = visible.map(it => it.html).join('');
+    const pxW = canvas.width;
+    const pxH = canvas.height;
     const svgString =
       `<svg xmlns="${SVG_NS}"${rootAttrsHtml} ` +
       `viewBox="${svgBox.x} ${svgBox.y} ${svgBox.w} ${svgBox.h}" ` +
-      `width="${svgBox.pxW}" height="${svgBox.pxH}">` +
+      `width="${pxW}" height="${pxH}">` +
       `${defsHtml}${bodyHtml}</svg>`;
     const blob = new Blob([svgString], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
@@ -271,7 +276,7 @@ const SvgTileLayer = L.GridLayer.extend({
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        canvas.getContext('2d').drawImage(img, 0, 0, size.x, size.y);
+        canvas.getContext('2d').drawImage(img, 0, 0, pxW, pxH);
         URL.revokeObjectURL(url);
         resolve();
       };
