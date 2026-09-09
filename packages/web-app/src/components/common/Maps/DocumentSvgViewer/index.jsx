@@ -1,23 +1,21 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { MapContainer, Marker, Popup, useMap } from 'react-leaflet';
-import { CRS, divIcon } from 'leaflet';
-import { styled, useTheme } from '@mui/material/styles';
+import { MapContainer, useMap } from 'react-leaflet';
+import { CRS } from 'leaflet';
+import { styled } from '@mui/material/styles';
 import {
-  Box,
-  Button,
   CircularProgress,
   IconButton,
   Tooltip,
   Typography
 } from '@mui/material';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
-import DescriptionIcon from '@mui/icons-material/Description';
 
-import useOpenLink from '../../../../hooks/useOpenLink';
 import FullscreenControl from '../common/FullscreenControl';
 import CustomControl from '../common/CustomControl';
-import SvgTileLayer, { loadSvg } from '../SvgTileLayer';
+import SvgTileLayer from '../SvgTileLayer';
+import DocumentPin from './DocumentPin';
+import useSvgData from './useSvgData';
 
 const PAN_MARGIN = 0.5;
 
@@ -41,82 +39,18 @@ const Wrapper = styled('div')(({ theme }) => ({
   }
 }));
 
-const useSvgData = url => {
-  const [state, setState] = useState({ status: 'loading' });
-  useEffect(() => {
-    let cancelled = false;
-    setState({ status: 'loading' });
-    loadSvg(url)
-      .then(data => {
-        if (!cancelled) setState({ status: 'ready', data });
-      })
-      .catch(error => {
-        if (!cancelled) setState({ status: 'error', error });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [url]);
-  return state;
-};
-
 const makeSvgToLatLng = viewBox => ([svgX, svgY]) => [
   viewBox.y + viewBox.h - svgY,
   svgX - viewBox.x
 ];
 
-const PIN_SVG_PATH =
-  'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z';
-
-const makeDocPinIcon = color =>
-  divIcon({
-    className: 'topo-doc-pin',
-    html:
-      `<div style="width:28px;height:28px;border-radius:50%;background:${color};` +
-      'color:#fff;display:flex;align-items:center;justify-content:center;' +
-      'box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff;">' +
-      '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" ' +
-      'aria-hidden="true" focusable="false">' +
-      `<path d="${PIN_SVG_PATH}"/>` +
-      '</svg></div>',
-    iconSize: [28, 28],
-    iconAnchor: [14, 14]
-  });
-
-const DocumentPin = ({ attachment, position }) => {
-  const openLink = useOpenLink();
-  const theme = useTheme();
-  const icon = useMemo(
-    () => makeDocPinIcon(theme.palette.primary.main),
-    [theme.palette.primary.main]
-  );
-  const href = `/ui/documents/${attachment.documentId}`;
-  return (
-    <Marker position={position} icon={icon}>
-      <Popup>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1,
-            minWidth: 160
-          }}
-        >
-          {attachment.label && (
-            <Typography variant="body2">{attachment.label}</Typography>
-          )}
-          <Button
-            size="small"
-            variant="contained"
-            startIcon={<DescriptionIcon fontSize="small" />}
-            onClick={() => openLink(href)}
-          >
-            Ouvrir
-          </Button>
-        </Box>
-      </Popup>
-    </Marker>
-  );
+const groupByAnchor = attachments => {
+  const map = {};
+  for (const a of attachments) {
+    if (!map[a.anchorId]) map[a.anchorId] = [];
+    map[a.anchorId].push(a);
+  }
+  return map;
 };
 
 const TilesLayer = ({ svgData, bounds }) => {
@@ -129,6 +63,11 @@ const TilesLayer = ({ svgData, bounds }) => {
     };
   }, [map, svgData, bounds]);
   return null;
+};
+
+TilesLayer.propTypes = {
+  svgData: PropTypes.object.isRequired,
+  bounds: PropTypes.array.isRequired
 };
 
 const FitBoundsButton = ({ bounds }) => {
@@ -155,6 +94,10 @@ const FitBoundsButton = ({ bounds }) => {
   );
 };
 
+FitBoundsButton.propTypes = {
+  bounds: PropTypes.array.isRequired
+};
+
 const DocumentSvgViewer = ({
   svgUrl,
   attachments = [],
@@ -178,18 +121,23 @@ const DocumentSvgViewer = ({
     return { bounds, panBounds, toLatLng: makeSvgToLatLng(viewBox) };
   }, [state]);
 
+  const groupedAttachments = useMemo(
+    () => groupByAnchor(attachments),
+    [attachments]
+  );
+
   useEffect(() => {
     if (state.status !== 'ready') return;
-    const missing = attachments
-      .filter(a => !state.data.anchors[a.anchorId])
-      .map(a => a.anchorId);
+    const missing = Object.keys(groupedAttachments).filter(
+      anchorId => !state.data.anchors[anchorId]
+    );
     if (missing.length > 0) {
       console.warn(
         '[DocumentSvgViewer] anchors not found in SVG:',
         missing.join(', ')
       );
     }
-  }, [state, attachments]);
+  }, [state, groupedAttachments]);
 
   const wrapperStyle = { '--viewer-h': height };
 
@@ -224,13 +172,13 @@ const DocumentSvgViewer = ({
         attributionControl={false}
       >
         <TilesLayer svgData={state.data} bounds={derived.bounds} />
-        {attachments.map(a => {
-          const svgPos = state.data.anchors[a.anchorId];
+        {Object.entries(groupedAttachments).map(([anchorId, group]) => {
+          const svgPos = state.data.anchors[anchorId];
           if (!svgPos) return null;
           return (
             <DocumentPin
-              key={a.id}
-              attachment={a}
+              key={anchorId}
+              attachments={group}
               position={derived.toLatLng(svgPos)}
             />
           );
