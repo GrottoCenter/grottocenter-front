@@ -22,6 +22,7 @@ describe('AppLink', () => {
       </AppLink>
     );
 
+    // Smoke-tests that the theme override reaches the rendered link element.
     expect(screen.getByRole('link')).toHaveStyle({
       overflowWrap: 'anywhere'
     });
