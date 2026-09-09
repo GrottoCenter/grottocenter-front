@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Box, Skeleton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,9 +15,7 @@ import {
   DeletedCard,
   DELETED_ENTITIES
 } from '@/components/common/card/Deleted';
-import LinkedEntitiesList, {
-  ListElement
-} from '@/components/common/LinkedEntitiesList';
+import LinkedEntityCards from '@/components/common/entitiesList/LinkedEntityCards';
 import PageContainer from '@/components/common/Layouts/PageContainer';
 import PageHeader from '@/components/common/Layouts/PageHeader';
 import ResponsiveActions from '@/components/common/Layouts/ResponsiveActions';
@@ -27,64 +26,73 @@ import {
   useDeleteGuideline,
   useGuideline,
   useNotification,
+  usePatchGuideline,
   usePermissions,
   useRestoreGuideline
 } from '@/hooks';
 import GuidelinePropTypes from '@/types/guideline.type';
 
 const getId = value => value?.id ?? value?.iso ?? value?.code ?? value;
+const getScopeId = value => value?.iso ?? value?.id ?? value?.code ?? value;
 
 const getName = value => value?.name ?? value?.label ?? String(getId(value));
 
-const GuidelineScope = ({ guideline }) => {
+const GuidelineScope = ({ guideline, onUnlink, isUnlinking }) => {
   const { formatMessage } = useIntl();
   const countries = guideline.countries ?? [];
   const regions = guideline.regions ?? [];
   const massifs = guideline.massifs ?? [];
-
-  if (countries.length + regions.length + massifs.length === 0) {
-    return <Typography>-</Typography>;
-  }
+  const entities = [
+    ...countries.map(country => ({
+      id: getId(country),
+      associationId: getScopeId(country),
+      type: 'country',
+      scopeKey: 'countries',
+      iconType: 'country',
+      label: getName(country),
+      secondary: formatMessage({ id: 'Country' }),
+      url: `/ui/countries/${getId(country)}`
+    })),
+    ...regions.map(region => {
+      const regionId = getId(region);
+      const countryId = region?.countryId ?? String(regionId).split('-')[0];
+      return {
+        id: regionId,
+        associationId: getScopeId(region),
+        type: 'region',
+        scopeKey: 'regions',
+        iconType: 'country',
+        label: getName(region),
+        secondary: formatMessage({ id: 'Region' }),
+        url: `/ui/countries/${countryId}/regions/${regionId}`
+      };
+    }),
+    ...massifs.map(massif => ({
+      id: getId(massif),
+      associationId: getScopeId(massif),
+      type: 'massif',
+      scopeKey: 'massifs',
+      iconType: 'massif',
+      label: getName(massif),
+      secondary: formatMessage({ id: 'Massif' }),
+      url: `/ui/massifs/${getId(massif)}`
+    }))
+  ];
 
   return (
-    <LinkedEntitiesList>
-      {countries.map(country => (
-        <ListElement
-          key={`country-${getId(country)}`}
-          icon={<CustomIcon type="country" />}
-          value={getName(country)}
-          secondary={formatMessage({ id: 'Country' })}
-          url={`/ui/countries/${getId(country)}`}
-        />
-      ))}
-      {regions.map(region => {
-        const regionId = getId(region);
-        const countryId = region?.countryId ?? String(regionId).split('-')[0];
-        return (
-          <ListElement
-            key={`region-${regionId}`}
-            icon={<CustomIcon type="country" />}
-            value={getName(region)}
-            secondary={formatMessage({ id: 'Region' })}
-            url={`/ui/countries/${countryId}/regions/${regionId}`}
-          />
-        );
-      })}
-      {massifs.map(massif => (
-        <ListElement
-          key={`massif-${getId(massif)}`}
-          icon={<CustomIcon type="massif" />}
-          value={getName(massif)}
-          secondary={formatMessage({ id: 'Massif' })}
-          url={`/ui/massifs/${getId(massif)}`}
-        />
-      ))}
-    </LinkedEntitiesList>
+    <LinkedEntityCards
+      entities={entities}
+      emptyMessage={<Typography>-</Typography>}
+      onUnlink={onUnlink}
+      isUnlinking={isUnlinking}
+    />
   );
 };
 
 GuidelineScope.propTypes = {
-  guideline: GuidelinePropTypes.isRequired
+  guideline: GuidelinePropTypes.isRequired,
+  onUnlink: PropTypes.func,
+  isUnlinking: PropTypes.bool
 };
 
 const GuidelinePage = () => {
@@ -94,6 +102,7 @@ const GuidelinePage = () => {
   const permissions = usePermissions();
   const { onError } = useNotification();
   const deleteMutation = useDeleteGuideline();
+  const patchMutation = usePatchGuideline();
   const restoreMutation = useRestoreGuideline();
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeletePermanent, setDeletePermanent] = useState(false);
@@ -148,6 +157,18 @@ const GuidelinePage = () => {
         })
       );
     }
+  };
+
+  const handleUnlinkScope = async entity => {
+    const scopes = {
+      countries: (data.countries ?? []).map(getScopeId),
+      regions: (data.regions ?? []).map(getScopeId),
+      massifs: (data.massifs ?? []).map(getScopeId)
+    };
+    scopes[entity.scopeKey] = scopes[entity.scopeKey].filter(
+      id => String(id) !== String(entity.associationId)
+    );
+    await patchMutation.mutateAsync({ id: data.id, ...scopes });
   };
 
   const canModerate = permissions.isModerator || permissions.isAdmin;
@@ -270,7 +291,15 @@ const GuidelinePage = () => {
                 isPending || !data ? (
                   <Skeleton variant="rounded" height={80} />
                 ) : (
-                  <GuidelineScope guideline={data} />
+                  <GuidelineScope
+                    guideline={data}
+                    onUnlink={
+                      permissions.isAuth && !isDeleted
+                        ? handleUnlinkScope
+                        : undefined
+                    }
+                    isUnlinking={patchMutation.isPending}
+                  />
                 )
               }
             />

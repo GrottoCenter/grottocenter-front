@@ -12,6 +12,7 @@ import {
   useDeleteGuideline,
   useGuideline,
   useNotification,
+  usePatchGuideline,
   usePermissions,
   useRestoreGuideline
 } from '@/hooks';
@@ -22,6 +23,8 @@ vi.mock('@/hooks', () => ({
   useDeleteGuideline: vi.fn(),
   useGuideline: vi.fn(),
   useNotification: vi.fn(),
+  useOnlineStatus: () => true,
+  usePatchGuideline: vi.fn(),
   usePermissions: vi.fn(),
   useQuickSearch: () => ({
     data: { results: [] },
@@ -104,6 +107,10 @@ const messages = {
   'delete-permanent-confirmation-dialog':
     'Permanently delete this {entityFmt}?',
   'Deletion confirmation': 'Deletion confirmation',
+  unlink: 'unlink',
+  Unlink: 'Unlink',
+  No: 'No',
+  'Are you sure you want to unlink {name}?': 'Unlink {name}?',
   'guidelines.delete_error': 'Delete failed'
 };
 
@@ -151,6 +158,10 @@ beforeEach(() => {
   vi.clearAllMocks();
   usePermissions.mockReturnValue({ isAuth: false, isModerator: false });
   useNotification.mockReturnValue({ onError: vi.fn() });
+  usePatchGuideline.mockReturnValue({
+    mutateAsync: vi.fn(),
+    isPending: false
+  });
   useDeleteGuideline.mockReturnValue({
     mutateAsync: vi.fn(),
     isPending: false
@@ -177,15 +188,15 @@ it('shows the full instructions, contributors and geographical scope', () => {
   expect(
     screen.getByRole('heading', { name: 'Applies to' }).closest('section')
   ).toHaveAttribute('data-dense', 'true');
-  expect(screen.getByRole('link', { name: 'France' })).toHaveAttribute(
+  expect(screen.getByRole('link', { name: /France/ })).toHaveAttribute(
     'href',
     '/ui/countries/FR'
   );
-  expect(screen.getByRole('link', { name: 'Ain' })).toHaveAttribute(
+  expect(screen.getByRole('link', { name: /Ain/ })).toHaveAttribute(
     'href',
     '/ui/countries/FR/regions/FR-01'
   );
-  expect(screen.getByRole('link', { name: 'Vercors' })).toHaveAttribute(
+  expect(screen.getByRole('link', { name: /Vercors/ })).toHaveAttribute(
     'href',
     '/ui/massifs/7'
   );
@@ -210,6 +221,36 @@ it('shows the full instructions, contributors and geographical scope', () => {
       name: 'Delete'
     })
   ).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /unlink/ })).toBeNull();
+});
+
+it('allows an authenticated user to unlink the last scope', async () => {
+  const user = userEvent.setup();
+  const patchGuideline = vi.fn().mockResolvedValue(undefined);
+  usePermissions.mockReturnValue({ isAuth: true, isModerator: false });
+  usePatchGuideline.mockReturnValue({
+    mutateAsync: patchGuideline,
+    isPending: false
+  });
+  setGuidelineResult({
+    ...guideline,
+    countries: [],
+    regions: [],
+    massifs: [{ id: 7, name: 'Vercors' }]
+  });
+  renderPage();
+
+  await user.click(screen.getByRole('button', { name: 'unlink Vercors' }));
+  const dialog = screen.getByRole('dialog', { name: 'unlink' });
+  expect(within(dialog).getByText('Unlink Vercors?')).toBeVisible();
+  await user.click(within(dialog).getByRole('button', { name: 'Unlink' }));
+
+  expect(patchGuideline).toHaveBeenCalledWith({
+    id: 42,
+    countries: [],
+    regions: [],
+    massifs: []
+  });
 });
 
 it('keeps a deleted guideline available for moderators to restore', async () => {
@@ -257,6 +298,7 @@ it('keeps a deleted guideline available for moderators to restore', async () => 
       name: 'Delete'
     })
   ).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /unlink/ })).toBeNull();
   await user.click(await screen.findByRole('button', { name: 'Restore' }));
   expect(restoreGuideline).toHaveBeenCalledWith({ id: '42' });
 });

@@ -7,7 +7,6 @@ import { EventAvailable, InsertDriveFile } from '@mui/icons-material';
 import Linkify from 'linkify-react';
 
 import PdfPreview from '@/components/common/PdfPreview';
-import { ListElement } from '@/components/common/LinkedEntitiesList';
 import AppLink from '../../components/common/AppLink';
 import linkifyOptions from '../../helpers/linkifyOptions';
 import Property from '../../components/common/Properties/Property';
@@ -127,18 +126,6 @@ DetailItem.propTypes = {
   url: PropTypes.string,
   secondary: PropTypes.bool,
   fullWidth: PropTypes.bool
-};
-
-export const FileListElement = ({ fileName, filePath }) => (
-  <ListElement
-    icon={getFileIcon(fileName)}
-    value={decodeFileName(fileName)}
-    url={filePath}
-  />
-);
-FileListElement.propTypes = {
-  fileName: PropTypes.string.isRequired,
-  filePath: PropTypes.string.isRequired
 };
 
 // The images *are* the document here, not entries in a list, so they get a

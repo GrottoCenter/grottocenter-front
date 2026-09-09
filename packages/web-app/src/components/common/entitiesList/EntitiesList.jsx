@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Box, Tooltip, IconButton } from '@mui/material';
+import { Tooltip, IconButton } from '@mui/material';
 
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import {
   CaveCard,
+  EntityCardsGrid,
   EntranceCard,
   OrganizationCard,
   PersonCard
@@ -72,20 +73,11 @@ const EntitiesList = ({
     cardConfig[type];
 
   return entities.length > 0 ? (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: {
-          xs: '1fr',
-          sm: 'repeat(2, 1fr)',
-          md: 'repeat(3, 1fr)'
-        },
-        gap: { xs: 1, md: 2 }
-      }}>
+    <EntityCardsGrid>
       {sorted.map(e => (
         <ListItemComponent key={e.id} {...listItemProps(e)} />
       ))}
-    </Box>
+    </EntityCardsGrid>
   ) : (
     emptyMessage
   );
