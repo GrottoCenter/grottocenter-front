@@ -9,7 +9,9 @@ import PageTabs from '@/components/common/Layouts/PageTabs';
 import SectionStack from '@/components/common/Layouts/SectionStack';
 import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '@/components/common/Alert';
-import DocumentsList from '@/components/common/DocumentsList/DocumentsList';
+import DocumentReferences, {
+  DocumentReferencesSubheader
+} from '@/components/common/DocumentsList/DocumentReferences';
 import EntitiesList from '@/components/common/entitiesList/EntitiesList';
 import RelatedCaves from '@/components/common/RelatedCaves/RelatedCaves';
 import PersonProperties from '@/components/common/Person/PersonProperties';
@@ -18,7 +20,7 @@ const CaverBody = ({ person, canEdit, onRefresh }) => {
   const { formatMessage } = useIntl();
   const nbOrganizations = (person.organizations ?? []).length;
   const nbEntrances = (person.exploredEntrances ?? []).length;
-  const nbDocuments = (person.documents ?? []).length;
+  const nbDocuments = person.authoredCount ?? 0;
 
   const tabs = [
     {
@@ -99,8 +101,25 @@ const CaverBody = ({ person, canEdit, onRefresh }) => {
       <div>
         <SectionStack>
           <ScrollableContent
+            dense
             collapsible={false}
-            content={<DocumentsList documents={person.documents} />}
+            title={formatMessage({ id: 'Documents' })}
+            count={nbDocuments}
+            subheader={
+              <DocumentReferencesSubheader
+                visibleCount={person.documents?.length ?? 0}
+                totalCount={nbDocuments}
+              />
+            }
+            content={
+              <DocumentReferences
+                documents={person.documents}
+                totalCount={nbDocuments}
+                searchFilter={{
+                  'authors.nickname': person.nickname ?? ''
+                }}
+              />
+            }
           />
         </SectionStack>
       </div>

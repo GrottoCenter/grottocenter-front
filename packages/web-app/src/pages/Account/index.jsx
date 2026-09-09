@@ -61,7 +61,9 @@ import { personKeys } from '../../api/queryKeys';
 import Alert from '../../components/common/Alert';
 import BoolIcon from '../../components/common/BoolIcon';
 
-import DocumentsList from '../../components/common/DocumentsList/DocumentsList';
+import DocumentReferences, {
+  DocumentReferencesSubheader
+} from '../../components/common/DocumentsList/DocumentReferences';
 import SubscriptionsList from '../../components/common/Subscriptions/SubscriptionsList';
 import EntitiesList from '../../components/common/entitiesList/EntitiesList';
 import PageContainer from '../../components/common/Layouts/PageContainer';
@@ -1319,6 +1321,7 @@ const AccountPage = () => {
 
   const nbOrganizations = (person?.organizations ?? []).length;
   const nbEntrances = (person?.exploredEntrances ?? []).length;
+  const nbDocuments = person?.authoredCount ?? 0;
   const nbSubscriptions =
     (subscriptions?.countries?.length ?? 0) +
     (subscriptions?.massifs?.length ?? 0) +
@@ -1350,8 +1353,8 @@ const AccountPage = () => {
       id: 'documents',
       label: formatMessage({ id: 'Documents' }),
       icon: <PermMediaOutlinedIcon fontSize="small" />,
-      count: person?.documents?.length,
-      disabled: !!person && (person.documents?.length ?? 0) === 0
+      count: nbDocuments,
+      disabled: !!person && nbDocuments === 0
     }
   ];
 
@@ -1537,8 +1540,23 @@ const AccountPage = () => {
           {person?.id === userId && (
             <SectionStack>
               <ScrollableContent
+                dense
                 collapsible={false}
-                content={<DocumentsList documents={person.documents} />}
+                title={formatMessage({ id: 'Documents' })}
+                count={nbDocuments}
+                subheader={
+                  <DocumentReferencesSubheader
+                    visibleCount={person?.documents?.length ?? 0}
+                    totalCount={nbDocuments}
+                  />
+                }
+                content={
+                  <DocumentReferences
+                    documents={person.documents}
+                    totalCount={nbDocuments}
+                    searchFilter={{ 'authors.nickname': person.nickname ?? '' }}
+                  />
+                }
               />
             </SectionStack>
           )}

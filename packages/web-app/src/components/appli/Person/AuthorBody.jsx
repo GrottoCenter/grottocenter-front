@@ -5,12 +5,14 @@ import { PersonPropTypes } from '@/types/person.type';
 import SectionStack from '@/components/common/Layouts/SectionStack';
 import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '@/components/common/Alert';
-import DocumentsList from '@/components/common/DocumentsList/DocumentsList';
+import DocumentReferences, {
+  DocumentReferencesSubheader
+} from '@/components/common/DocumentsList/DocumentReferences';
 import PersonProperties from '@/components/common/Person/PersonProperties';
 
 const AuthorBody = ({ person }) => {
   const { formatMessage } = useIntl();
-  const nbDocuments = (person?.documents ?? []).length;
+  const nbDocuments = person.authoredCount ?? 0;
 
   return (
     <SectionStack>
@@ -29,13 +31,22 @@ const AuthorBody = ({ person }) => {
         }
       />
       <ScrollableContent
+        dense
         anchorId="documents"
         title={formatMessage({ id: 'Documents' })}
         count={nbDocuments}
         defaultExpanded={nbDocuments > 0}
+        subheader={
+          <DocumentReferencesSubheader
+            visibleCount={person.documents?.length ?? 0}
+            totalCount={nbDocuments}
+          />
+        }
         content={
-          <DocumentsList
+          <DocumentReferences
             documents={person.documents}
+            totalCount={nbDocuments}
+            searchFilter={{ 'authors.nickname': person.nickname ?? '' }}
             emptyMessageComponent={
               <Alert
                 severity="info"

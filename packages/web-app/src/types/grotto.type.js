@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 
+import { DocumentChildPropTypes } from './document.type';
 import { EntranceSimplePropTypes } from './entrance.type';
 
 export const CaverPropTypes = PropTypes.shape({
@@ -36,7 +37,10 @@ export const GrottoFullPropTypes = PropTypes.shape({
   yearBirth: PropTypes.number,
   longitude: PropTypes.number,
   latitude: PropTypes.number,
-  documents: PropTypes.arrayOf(PropTypes.shape({})),
+  authoredDocuments: PropTypes.arrayOf(DocumentChildPropTypes),
+  publishedDocuments: PropTypes.arrayOf(DocumentChildPropTypes),
+  authoredCount: PropTypes.number,
+  publishedCount: PropTypes.number,
   position: PropTypes.arrayOf(PropTypes.number),
   organization: PropTypes.shape({})
 });

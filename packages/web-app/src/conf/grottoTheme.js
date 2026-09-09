@@ -268,6 +268,13 @@ export const overridings = {
       }
     },
     MuiCardHeader: {
+      defaultProps: {
+        slotProps: {
+          subheader: {
+            variant: 'subtitle2'
+          }
+        }
+      },
       styleOverrides: {
         root: ({ theme }) => ({
           padding: theme.spacing(1),

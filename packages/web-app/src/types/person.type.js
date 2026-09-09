@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 
+import { DocumentChildPropTypes } from './document.type';
 import { EntranceSimplePropTypes } from './entrance.type';
 
 export const PersonPropTypes = PropTypes.shape({
@@ -10,6 +11,7 @@ export const PersonPropTypes = PropTypes.shape({
   language: PropTypes.string,
   groups: PropTypes.arrayOf(PropTypes.shape({})),
   organizations: PropTypes.arrayOf(PropTypes.shape({})),
-  documents: PropTypes.arrayOf(PropTypes.shape({})),
+  documents: PropTypes.arrayOf(DocumentChildPropTypes),
+  authoredCount: PropTypes.number,
   exploredEntrances: PropTypes.arrayOf(EntranceSimplePropTypes)
 });
