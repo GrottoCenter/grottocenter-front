@@ -30,4 +30,14 @@ describe('document reference search URLs', () => {
   it('returns the unfiltered documents page for an empty filter', () => {
     expect(buildDocumentsSearchUrl({})).toBe('/ui/documents');
   });
+
+  it('ignores nullish document relation filters', () => {
+    expect(
+      buildDocumentsSearchUrl({
+        'authors.nickname': undefined,
+        'authorsOrganization.name': null,
+        'editor.name': ''
+      })
+    ).toBe('/ui/documents');
+  });
 });

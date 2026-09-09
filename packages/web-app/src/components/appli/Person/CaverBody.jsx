@@ -115,7 +115,9 @@ const CaverBody = ({ person, canEdit, onRefresh }) => {
               <DocumentReferences
                 documents={person.documents}
                 totalCount={nbDocuments}
-                searchFilter={{ 'authors.nickname': person.nickname }}
+                searchFilter={{
+                  'authors.nickname': person.nickname ?? ''
+                }}
               />
             }
           />

@@ -46,7 +46,7 @@ const AuthorBody = ({ person }) => {
           <DocumentReferences
             documents={person.documents}
             totalCount={nbDocuments}
-            searchFilter={{ 'authors.nickname': person.nickname }}
+            searchFilter={{ 'authors.nickname': person.nickname ?? '' }}
             emptyMessageComponent={
               <Alert
                 severity="info"

@@ -394,7 +394,7 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
                 documents={organization.authoredDocuments}
                 totalCount={authoredCount}
                 searchFilter={{
-                  'authorsOrganization.name': organization.name
+                  'authorsOrganization.name': organization.name ?? ''
                 }}
                 emptyMessageComponent={
                   <Alert
@@ -423,7 +423,7 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
               <DocumentReferences
                 documents={organization.publishedDocuments}
                 totalCount={publishedCount}
-                searchFilter={{ 'editor.name': organization.name }}
+                searchFilter={{ 'editor.name': organization.name ?? '' }}
                 emptyMessageComponent={
                   <Alert
                     severity="info"
