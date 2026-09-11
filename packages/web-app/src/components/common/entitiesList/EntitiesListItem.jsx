@@ -40,8 +40,7 @@ CardLabel.propTypes = {
   children: PropTypes.node.isRequired
 };
 
-// "remove-btn" is a CSS class selector used in cardPaperSx below to coordinate
-// hover visibility with the child Box in BaseCard. Renaming either breaks the reveal.
+// "item-action" coordinates the card hover state with its optional action.
 const cardPaperSx = {
   borderRadius: 2,
   overflow: 'hidden',
@@ -49,11 +48,11 @@ const cardPaperSx = {
   transition: 'box-shadow 0.15s',
   '@media (hover: hover)': {
     '&:hover': { boxShadow: 3 },
-    '&:hover .remove-btn': { opacity: 1 }
+    '&:hover .item-action': { opacity: 1 }
   },
-  '& .remove-btn': { opacity: 0, transition: 'opacity 0.15s' },
-  '&:focus-within .remove-btn': { opacity: 1 },
-  '@media (hover: none)': { '& .remove-btn': { opacity: 1 } }
+  '& .item-action': { opacity: 0, transition: 'opacity 0.15s' },
+  '&:focus-within .item-action': { opacity: 1 },
+  '@media (hover: none)': { '& .item-action': { opacity: 1 } }
 };
 
 const cardLinkSx = {
@@ -70,7 +69,7 @@ const cardLinkSx = {
   WebkitTapHighlightColor: 'transparent'
 };
 
-const BaseCard = ({ to, icon, children, itemActionButton }) => (
+export const EntityCard = ({ to, icon, children, itemActionButton }) => (
   <Paper variant="outlined" sx={cardPaperSx}>
     <Box sx={{ display: 'flex', alignItems: 'stretch', minHeight: 72 }}>
       <Box component={AppLink} to={to} sx={cardLinkSx}>
@@ -81,7 +80,7 @@ const BaseCard = ({ to, icon, children, itemActionButton }) => (
       </Box>
       {itemActionButton && (
         <Box
-          className="remove-btn"
+          className="item-action"
           sx={{ display: 'flex', alignItems: 'center', pr: 0.5 }}>
           {itemActionButton}
         </Box>
@@ -90,18 +89,37 @@ const BaseCard = ({ to, icon, children, itemActionButton }) => (
   </Paper>
 );
 
-BaseCard.propTypes = {
+EntityCard.propTypes = {
   to: PropTypes.string.isRequired,
   icon: PropTypes.node.isRequired,
   children: PropTypes.node.isRequired,
   itemActionButton: PropTypes.node
 };
 
+export const EntityCardsGrid = ({ children }) => (
+  <Box
+    sx={{
+      display: 'grid',
+      gridTemplateColumns: {
+        xs: '1fr',
+        sm: 'repeat(2, 1fr)',
+        md: 'repeat(3, 1fr)'
+      },
+      gap: { xs: 1, md: 2 }
+    }}>
+    {children}
+  </Box>
+);
+
+EntityCardsGrid.propTypes = {
+  children: PropTypes.node.isRequired
+};
+
 export const CaveCard = ({ cave, itemActionButton }) => {
   const locale = useSelector(state => state.intl.locale);
 
   return (
-    <BaseCard
+    <EntityCard
       to={`/ui/caves/${cave.id}`}
       icon={<CustomIcon type="network" size={32} />}
       itemActionButton={itemActionButton}>
@@ -143,7 +161,7 @@ export const CaveCard = ({ cave, itemActionButton }) => {
           </Box>
         )}
       </Box>
-    </BaseCard>
+    </EntityCard>
   );
 };
 
@@ -158,12 +176,12 @@ CaveCard.propTypes = {
 };
 
 export const EntranceCard = ({ link, label, itemActionButton }) => (
-  <BaseCard
+  <EntityCard
     to={link}
     icon={<CustomIcon type="entrance" size={32} />}
     itemActionButton={itemActionButton}>
     <CardLabel>{label}</CardLabel>
-  </BaseCard>
+  </EntityCard>
 );
 
 EntranceCard.propTypes = {
@@ -173,12 +191,12 @@ EntranceCard.propTypes = {
 };
 
 export const PersonCard = ({ person, itemActionButton }) => (
-  <BaseCard
+  <EntityCard
     to={`/ui/persons/${person.id}`}
     icon={<CustomIcon type="caver" size={32} />}
     itemActionButton={itemActionButton}>
     <CardLabel>{person.nickname}</CardLabel>
-  </BaseCard>
+  </EntityCard>
 );
 
 PersonCard.propTypes = {
@@ -199,7 +217,7 @@ export const OrganizationCard = ({ organization, itemActionButton }) => {
       ? `/ui/organizations/${organization.redirectTo}`
       : `/ui/organizations/${organization.id}`;
     return (
-      <BaseCard
+      <EntityCard
         to={to}
         icon={<CustomIcon type="organization" size={32} />}
         itemActionButton={itemActionButton}>
@@ -230,17 +248,17 @@ export const OrganizationCard = ({ organization, itemActionButton }) => {
             label={formatMessage({ id: 'Deleted' })}
           />
         </Box>
-      </BaseCard>
+      </EntityCard>
     );
   }
 
   return (
-    <BaseCard
+    <EntityCard
       to={`/ui/organizations/${organization.id}`}
       icon={<CustomIcon type="organization" size={32} />}
       itemActionButton={itemActionButton}>
       <CardLabel>{organization.name}</CardLabel>
-    </BaseCard>
+    </EntityCard>
   );
 };
 

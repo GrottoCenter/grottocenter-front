@@ -19,10 +19,7 @@ import {
 } from '@/utils/documentSort';
 import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
 import { formatDocumentReference } from '@/utils/documentReference';
-import LinkedEntitiesList, {
-  ListElement,
-  TextLink
-} from '@/components/common/LinkedEntitiesList';
+import LinkedEntityCards from '@/components/common/entitiesList/LinkedEntityCards';
 import AppLink from '../../components/common/AppLink';
 import BibliographicReference from './BibliographicReference';
 
@@ -85,6 +82,19 @@ import {
 // `type` field to look it up from.
 const AuthorizationIcon =
   DOCUMENT_TYPE_ICONS[DocumentTypes.AUTHORIZATION_TO_PUBLISH];
+
+const InternalTextLink = ({ value, url, icon }) => (
+  <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center' }}>
+    {icon && <Box sx={{ display: 'inline-flex', mr: 0.25 }}>{icon}</Box>}
+    <AppLink to={url}>{value}</AppLink>
+  </Box>
+);
+
+InternalTextLink.propTypes = {
+  value: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+  icon: PropTypes.node
+};
 
 const HalfSplitContainer = styled('div')`
   display: grid;
@@ -233,7 +243,7 @@ const Document = ({
     if (items.length === 0) return null;
     return items.flatMap((a, i) => {
       const entry = (
-        <TextLink
+        <InternalTextLink
           key={a.id}
           icon={<CustomIcon type={a.iconType} size={18} />}
           value={a.name}
@@ -313,34 +323,35 @@ const Document = ({
   const linkedEntities = useMemo(() => {
     if (!documentData) return [];
     return [
-      ...(documentData.massifs ?? []).map(e => (
-        <ListElement
-          key={`massif-${e.id}`}
-          icon={<CustomIcon type="massif" />}
-          value={e.name}
-          secondary={formatMessage({ id: 'Massif' })}
-          url={`/ui/massifs/${e.id}`}
-        />
-      )),
-      documentData.cave && (
-        <ListElement
-          key={`cave-${documentData.cave.id}`}
-          icon={<CustomIcon type="network" />}
-          value={documentData.cave.name}
-          secondary={formatMessage({ id: 'Cave' })}
-          url={`/ui/caves/${documentData.cave.id}`}
-        />
-      ),
-      ...(documentData.entrances ?? []).map(entrance => (
-        <ListElement
-          key={`entrance-${entrance.id}`}
-          icon={<CustomIcon type="entrance" />}
-          value={entrance.name}
-          secondary={formatMessage({ id: 'Entrance' })}
-          url={`/ui/entrances/${entrance.id}`}
-        />
-      ))
-    ].filter(Boolean);
+      ...(documentData.massifs ?? []).map(entity => ({
+        id: entity.id,
+        type: 'massif',
+        iconType: 'massif',
+        label: entity.name,
+        secondary: formatMessage({ id: 'Massif' }),
+        url: `/ui/massifs/${entity.id}`
+      })),
+      ...(documentData.cave
+        ? [
+            {
+              id: documentData.cave.id,
+              type: 'cave',
+              iconType: 'network',
+              label: documentData.cave.name,
+              secondary: formatMessage({ id: 'Cave' }),
+              url: `/ui/caves/${documentData.cave.id}`
+            }
+          ]
+        : []),
+      ...(documentData.entrances ?? []).map(entity => ({
+        id: entity.id,
+        type: 'entrance',
+        iconType: 'entrance',
+        label: entity.name,
+        secondary: formatMessage({ id: 'Entrance' }),
+        url: `/ui/entrances/${entity.id}`
+      }))
+    ];
   }, [documentData, formatMessage]);
 
   const { isCollection, isEvent } = documentTypeHelpers;
@@ -615,7 +626,7 @@ const Document = ({
                           label={formatMessage({ id: 'Parent document' })}
                           value={
                             documentData.parent ? (
-                              <TextLink
+                              <InternalTextLink
                                 // primary, to read as one unit with the link it
                                 // labels rather than as a separate black glyph
                                 icon={
@@ -640,7 +651,7 @@ const Document = ({
                           label={formatMessage({ id: 'Editor' })}
                           value={
                             documentData.editor ? (
-                              <TextLink
+                              <InternalTextLink
                                 icon={
                                   <CustomIcon type="organization" size={18} />
                                 }
@@ -655,7 +666,7 @@ const Document = ({
                           label={formatMessage({ id: 'Library' })}
                           value={
                             documentData.library ? (
-                              <TextLink
+                              <InternalTextLink
                                 icon={
                                   <CustomIcon type="organization" size={18} />
                                 }
@@ -726,7 +737,7 @@ const Document = ({
                             label={formatMessage({ id: 'Authorization' })}
                             value={
                               documentData.authorizationDocument?.title ? (
-                                <TextLink
+                                <InternalTextLink
                                   icon={
                                     <AuthorizationIcon
                                       fontSize="small"
@@ -766,9 +777,7 @@ const Document = ({
               <ScrollableContent
                 dense
                 title={formatMessage({ id: 'Linked entities' })}
-                content={
-                  <LinkedEntitiesList>{linkedEntities}</LinkedEntitiesList>
-                }
+                content={<LinkedEntityCards entities={linkedEntities} />}
               />
             )}
 

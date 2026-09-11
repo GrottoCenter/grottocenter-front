@@ -49,6 +49,10 @@ export const DELETED_ENTITIES = {
     url: '/ui/documents/',
     searchType: ADVANCED_SEARCH_TYPES.DOCUMENTS
   },
+  guideline: {
+    str: 'Guideline',
+    url: '/ui/guidelines/'
+  },
   network: {
     str: 'Network',
     url: '/ui/caves/',
@@ -198,6 +202,7 @@ export const DeleteConfirmationDialog = ({
   isSearchMandatory = false
 }) => {
   const { formatMessage } = useIntl();
+  const canSelectRedirect = Boolean(entityType.searchType);
   const [inputValue, setInputValue] = useState('');
   const [selectedEntity, setSelectedEntity] = useState(null);
   const debouncedInput = useDebounce(inputValue);
@@ -207,7 +212,8 @@ export const DeleteConfirmationDialog = ({
     isFetching: isQuickSearchLoading
   } = useQuickSearch({
     query: debouncedInput,
-    entities: [entityType.searchType],
+    entities: canSelectRedirect ? [entityType.searchType] : [],
+    enabled: canSelectRedirect,
     // Preserve the legacy `debouncedInput.length > 2` threshold — the hook
     // defaults to AUTOCOMPLETE_MIN_CHARACTERS (2), which would fire one
     // character earlier than the pre-migration behavior of this dialog.
@@ -317,44 +323,52 @@ export const DeleteConfirmationDialog = ({
         </Typography>
         <br />
         <br />
-        <Typography>{searchTitle}</Typography>
-        {!selectedEntity && (
-          <AutoCompleteSearch
-            onInputChange={setInputValue}
-            onSelection={handleSelection}
-            hasError={!!error}
-            isLoading={isQuickSearchLoading}
-            label={formatMessage(
-              {
-                id: `Search for a {entityFmt}`,
-                defaultMessage: `Search for a {entityFmt}`
-              },
-              { entityFmt }
+        {canSelectRedirect && (
+          <>
+            <Typography>{searchTitle}</Typography>
+            {!selectedEntity && (
+              <AutoCompleteSearch
+                onInputChange={setInputValue}
+                onSelection={handleSelection}
+                hasError={!!error}
+                isLoading={isQuickSearchLoading}
+                label={formatMessage(
+                  {
+                    id: `Search for a {entityFmt}`,
+                    defaultMessage: `Search for a {entityFmt}`
+                  },
+                  { entityFmt }
+                )}
+                inputValue={inputValue}
+                suggestions={suggestions}
+              />
             )}
-            inputValue={inputValue}
-            suggestions={suggestions}
-          />
-        )}
 
-        {selectedEntity && (
-          <Box sx={{ padding: 1, background: 'white' }}>
-            {selectedEntity.iconSrc && (
-              <StyledEntityIcon src={selectedEntity.iconSrc} />
+            {selectedEntity && (
+              <Box sx={{ padding: 1, background: 'white' }}>
+                {selectedEntity.iconSrc && (
+                  <StyledEntityIcon src={selectedEntity.iconSrc} />
+                )}
+                <IconButton
+                  aria-label={formatMessage({ id: 'remove' })}
+                  sx={{
+                    float: 'right',
+                    padding: selectedEntity?.subtitle ? 1 : 0.25
+                  }}
+                  onClick={() => {
+                    setSelectedEntity(null);
+                  }}>
+                  <CloseRoundedIcon />
+                </IconButton>
+                <Typography variant="subtitle1">
+                  {selectedEntity.title}
+                </Typography>
+                <Typography variant="body2">
+                  {selectedEntity.subtitle}
+                </Typography>
+              </Box>
             )}
-            <IconButton
-              aria-label={formatMessage({ id: 'remove' })}
-              sx={{
-                float: 'right',
-                padding: selectedEntity?.subtitle ? 1 : 0.25
-              }}
-              onClick={() => {
-                setSelectedEntity(null);
-              }}>
-              <CloseRoundedIcon />
-            </IconButton>
-            <Typography variant="subtitle1">{selectedEntity.title}</Typography>
-            <Typography variant="body2">{selectedEntity.subtitle}</Typography>
-          </Box>
+          </>
         )}
       </Box>
     </StandardDialog>

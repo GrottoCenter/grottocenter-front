@@ -78,24 +78,12 @@ it('uses the dedicated detail endpoint when it is available', async () => {
   expect(result.current.data.title).toBe('Access');
 });
 
-it('temporarily finds a detail in the paginated public list', async () => {
+it('surfaces detail endpoint errors without scanning the paginated list', async () => {
   apiGet.mockRejectedValue({ status: 404 });
-  apiGetWithRange
-    .mockResolvedValueOnce({
-      data: Array.from({ length: 100 }, (_, index) => ({
-        id: index + 1,
-        title: `Guideline ${index + 1}`
-      })),
-      contentRange: '0-99/126'
-    })
-    .mockResolvedValueOnce({
-      data: [{ id: 126, title: 'Found guideline' }],
-      contentRange: '100-125/126'
-    });
 
   const { result } = renderHook(() => useGuideline(126), { wrapper });
-  await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  await waitFor(() => expect(result.current.isError).toBe(true));
 
-  expect(apiGetWithRange).toHaveBeenCalledTimes(2);
-  expect(result.current.data.title).toBe('Found guideline');
+  expect(apiGetWithRange).not.toHaveBeenCalled();
+  expect(result.current.error).toEqual({ status: 404 });
 });
