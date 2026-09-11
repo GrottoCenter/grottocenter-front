@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
@@ -21,6 +21,17 @@ const LinkedEntityCards = ({
   const [entityToUnlink, setEntityToUnlink] = useState(null);
   const [isSubmitting, setSubmitting] = useState(false);
   const isBusy = isUnlinking || isSubmitting;
+
+  useEffect(() => {
+    const isSelectedEntityPresent = entities.some(
+      entity =>
+        entity.id === entityToUnlink?.id && entity.type === entityToUnlink.type
+    );
+
+    if (entityToUnlink && !isSelectedEntityPresent) {
+      setEntityToUnlink(null);
+    }
+  }, [entities, entityToUnlink]);
 
   const handleUnlink = async () => {
     if (!entityToUnlink || !onUnlink) return;

@@ -120,7 +120,9 @@ const GuidelinePage = () => {
     isDeleted
   });
 
-  const handleDelete = async () => {
+  // The confirmation dialog supplies a redirect target, which guidelines do
+  // not support. It closes immediately; errors are reported through a toast.
+  const handleDelete = async _selectedEntity => {
     try {
       await deleteMutation.mutateAsync({
         id: guidelineId,

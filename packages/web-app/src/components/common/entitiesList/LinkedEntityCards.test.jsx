@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
@@ -34,11 +34,11 @@ const entities = [
   }
 ];
 
-const renderCards = props =>
+const renderCards = ({ linkedEntities = entities, ...props } = {}) =>
   render(
     <MemoryRouter>
       <IntlProvider locale="en" messages={messages}>
-        <LinkedEntityCards entities={entities} {...props} />
+        <LinkedEntityCards entities={linkedEntities} {...props} />
       </IntlProvider>
     </MemoryRouter>
   );
@@ -65,4 +65,25 @@ it('confirms an optional unlink action', async () => {
   await user.click(within(dialog).getByRole('button', { name: 'Unlink' }));
 
   expect(onUnlink).toHaveBeenCalledWith(entities[0]);
+});
+
+it('closes the unlink dialog when its entity is removed', async () => {
+  const user = userEvent.setup();
+  const onUnlink = vi.fn();
+  const { rerender } = renderCards({ onUnlink });
+
+  await user.click(screen.getByRole('button', { name: 'unlink Vercors' }));
+  expect(screen.getByRole('dialog', { name: 'Unlink' })).toBeVisible();
+
+  rerender(
+    <MemoryRouter>
+      <IntlProvider locale="en" messages={messages}>
+        <LinkedEntityCards entities={[entities[1]]} onUnlink={onUnlink} />
+      </IntlProvider>
+    </MemoryRouter>
+  );
+
+  await waitFor(() => {
+    expect(screen.queryByRole('dialog', { name: 'Unlink' })).toBeNull();
+  });
 });

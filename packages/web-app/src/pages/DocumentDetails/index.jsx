@@ -83,14 +83,14 @@ import {
 const AuthorizationIcon =
   DOCUMENT_TYPE_ICONS[DocumentTypes.AUTHORIZATION_TO_PUBLISH];
 
-const TextLink = ({ value, url, icon }) => (
+const InternalTextLink = ({ value, url, icon }) => (
   <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center' }}>
     {icon && <Box sx={{ display: 'inline-flex', mr: 0.25 }}>{icon}</Box>}
     <AppLink to={url}>{value}</AppLink>
   </Box>
 );
 
-TextLink.propTypes = {
+InternalTextLink.propTypes = {
   value: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   icon: PropTypes.node
@@ -243,7 +243,7 @@ const Document = ({
     if (items.length === 0) return null;
     return items.flatMap((a, i) => {
       const entry = (
-        <TextLink
+        <InternalTextLink
           key={a.id}
           icon={<CustomIcon type={a.iconType} size={18} />}
           value={a.name}
@@ -626,7 +626,7 @@ const Document = ({
                           label={formatMessage({ id: 'Parent document' })}
                           value={
                             documentData.parent ? (
-                              <TextLink
+                              <InternalTextLink
                                 // primary, to read as one unit with the link it
                                 // labels rather than as a separate black glyph
                                 icon={
@@ -651,7 +651,7 @@ const Document = ({
                           label={formatMessage({ id: 'Editor' })}
                           value={
                             documentData.editor ? (
-                              <TextLink
+                              <InternalTextLink
                                 icon={
                                   <CustomIcon type="organization" size={18} />
                                 }
@@ -666,7 +666,7 @@ const Document = ({
                           label={formatMessage({ id: 'Library' })}
                           value={
                             documentData.library ? (
-                              <TextLink
+                              <InternalTextLink
                                 icon={
                                   <CustomIcon type="organization" size={18} />
                                 }
@@ -737,7 +737,7 @@ const Document = ({
                             label={formatMessage({ id: 'Authorization' })}
                             value={
                               documentData.authorizationDocument?.title ? (
-                                <TextLink
+                                <InternalTextLink
                                   icon={
                                     <AuthorizationIcon
                                       fontSize="small"
