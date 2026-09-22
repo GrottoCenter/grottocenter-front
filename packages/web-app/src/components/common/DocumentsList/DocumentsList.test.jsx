@@ -33,6 +33,7 @@ describe('DocumentsList', () => {
     renderWithProviders(
       <MemoryRouter>
         <DocumentsList
+          showBibliographicReferences
           documents={[
             {
               id: 1,
@@ -58,6 +59,30 @@ describe('DocumentsList', () => {
     expect(documentListHeading.compareDocumentPosition(referencesHeading)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING
     );
+  });
+
+  it('does not render bibliographic references by default', () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <DocumentsList
+          documents={[
+            {
+              id: 1,
+              type: DocumentTypes.BOOK,
+              title: 'Karst atlas',
+              datePublication: '2024',
+              authors: [],
+              authorsOrganization: []
+            }
+          ]}
+        />
+      </MemoryRouter>,
+      { messages }
+    );
+
+    expect(
+      screen.queryByRole('heading', { name: 'Bibliographic references' })
+    ).not.toBeInTheDocument();
   });
 
   it('accepts document type as its initial sort order', () => {
