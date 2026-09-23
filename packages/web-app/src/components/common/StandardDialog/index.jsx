@@ -24,7 +24,7 @@ const DialogContent = styled(MuiDialogContent, {
   && {
     overflow: ${({ $scrollable }) => ($scrollable ? 'auto' : 'visible')};
     @media (max-width: 600px) {
-      padding: 8px 16px;
+      padding: ${({ $dense }) => ($dense ? '8px 4px' : '8px 16px')};
       ${({ $centerMobile }) =>
         $centerMobile
           ? 'display: flex; flex-direction: column; justify-content: center;'
@@ -51,6 +51,7 @@ const StandardDialog = ({
   fullWidth = false,
   scrollable = false,
   centerContentMobile = false,
+  dense = false,
   maxWidth = 'sm',
   open = false,
   onClose = () => {},
@@ -79,7 +80,8 @@ const StandardDialog = ({
       {children && (
         <DialogContent
           $scrollable={scrollable}
-          $centerMobile={centerContentMobile}>
+          $centerMobile={centerContentMobile}
+          $dense={dense}>
           {children}
         </DialogContent>
       )}
@@ -97,6 +99,7 @@ StandardDialog.propTypes = {
   ]),
   centerContentMobile: PropTypes.bool,
   children: PropTypes.node,
+  dense: PropTypes.bool,
   fullScreen: PropTypes.bool,
   fullWidth: PropTypes.bool,
   maxWidth: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl']),

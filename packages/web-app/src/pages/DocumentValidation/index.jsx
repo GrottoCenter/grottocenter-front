@@ -99,6 +99,7 @@ const DocumentValidationPage = () => {
       <StandardDialog
         maxWidth="lg"
         fullScreen={isNarrowViewport}
+        dense={isNarrowViewport}
         fullWidth
         scrollable
         open={!!detailedView}
