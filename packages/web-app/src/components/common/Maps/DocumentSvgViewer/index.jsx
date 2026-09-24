@@ -134,6 +134,17 @@ PointCreationHandler.propTypes = {
   menuContainer: PropTypes.object
 };
 
+// While a point is in "move" mode, a click on the map (not on the marker)
+// cancels it.
+const MoveModeHandler = ({ onCancel }) => {
+  useMapEvent('click', onCancel);
+  return null;
+};
+
+MoveModeHandler.propTypes = {
+  onCancel: PropTypes.func.isRequired
+};
+
 const TilesLayer = ({ svgData, bounds }) => {
   const map = useMap();
   useEffect(() => {
@@ -229,6 +240,7 @@ const DocumentSvgViewer = ({
   const { points: mockPoints, addPoint, updatePoint } = useMockPoints(svgUrl);
   // null | { mode: 'create', coordinates } | { mode: 'edit', point }
   const [dialog, setDialog] = useState(null);
+  const [movingPointId, setMovingPointId] = useState(null);
   const wrapperRef = useRef(null);
   // Container so menus/dialogs stay visible in fullscreen (see hook).
   const modalContainer = useFullscreenContainer(wrapperRef);
@@ -317,6 +329,20 @@ const DocumentSvgViewer = ({
     [dialog, addPoint, updatePoint, onSuccess, formatMessage]
   );
 
+  const handleStartMove = useCallback(id => setMovingPointId(id), []);
+
+  const handleMoved = useCallback(
+    (id, latlng) => {
+      const coordinates = latLngToFrame?.(latlng);
+      if (coordinates) {
+        updatePoint(id, { coordinates });
+        onSuccess(formatMessage({ id: 'Point moved' }));
+      }
+      setMovingPointId(null);
+    },
+    [latLngToFrame, updatePoint, onSuccess, formatMessage]
+  );
+
   useEffect(() => {
     if (state.status !== 'ready') return;
     if (points.length > 0 && !state.data.controlPoints) {
@@ -363,18 +389,24 @@ const DocumentSvgViewer = ({
       >
         <TilesLayer svgData={state.data} bounds={derived.bounds} />
         {showPoints &&
-          placedPoints.map(({ point, position }) => (
-            <PointMarker
-              key={point.id}
-              point={point}
-              position={position}
-              onEdit={
-                mockIds.has(point.id)
-                  ? () => handleRequestEdit(point)
-                  : undefined
-              }
-            />
-          ))}
+          placedPoints.map(({ point, position }) => {
+            const editable = mockIds.has(point.id);
+            return (
+              <PointMarker
+                key={point.id}
+                point={point}
+                position={position}
+                onEdit={editable ? () => handleRequestEdit(point) : undefined}
+                onStartMove={
+                  editable ? () => handleStartMove(point.id) : undefined
+                }
+                onMoved={
+                  editable ? latlng => handleMoved(point.id, latlng) : undefined
+                }
+                isMoving={movingPointId === point.id}
+              />
+            );
+          })}
         <FitBoundsButton bounds={derived.bounds} />
         {placedPoints.length > 0 && (
           <PointsToggleButton
@@ -388,6 +420,9 @@ const DocumentSvgViewer = ({
             onRequestCreate={handleRequestCreate}
             menuContainer={modalContainer}
           />
+        )}
+        {movingPointId && (
+          <MoveModeHandler onCancel={() => setMovingPointId(null)} />
         )}
         <FullscreenControl position="topleft" forceSeparateButton={true} />
       </MapContainer>

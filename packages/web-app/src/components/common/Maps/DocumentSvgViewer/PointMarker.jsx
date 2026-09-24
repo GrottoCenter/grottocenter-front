@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Marker, Popup } from 'react-leaflet';
+import { Marker, Popup, Tooltip as LeafletTooltip } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
 import {
   Box,
@@ -13,6 +13,7 @@ import {
 import DescriptionIcon from '@mui/icons-material/Description';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import EditIcon from '@mui/icons-material/Edit';
+import OpenWithIcon from '@mui/icons-material/OpenWith';
 
 import useOpenLink from '@/hooks/useOpenLink';
 import { makePointIcon } from './pointIcon';
@@ -72,13 +73,21 @@ MultiDoc.propTypes = {
   onOpen: PropTypes.func.isRequired
 };
 
-const PointMarker = ({ point, position, onEdit = null }) => {
+const PointMarker = ({
+  point,
+  position,
+  onEdit = null,
+  onStartMove = null,
+  onMoved = null,
+  isMoving = false
+}) => {
   const { formatMessage } = useIntl();
   const openLink = useOpenLink();
   const theme = useTheme();
 
   const documents = point.documents ?? EMPTY_DOCUMENTS;
-  const hasHeader = Boolean(point.label) || Boolean(onEdit);
+  const hasHeader =
+    Boolean(point.label) || Boolean(onEdit) || Boolean(onStartMove);
 
   const icon = useMemo(
     () =>
@@ -93,35 +102,59 @@ const PointMarker = ({ point, position, onEdit = null }) => {
   const handleOpen = documentId => openLink(docUrl(documentId));
 
   return (
-    <Marker position={position} icon={icon}>
-      <Popup>
-        <Box sx={{ minWidth: 240, maxWidth: 320 }}>
-          {hasHeader && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Typography
-                variant="subtitle2"
-                fontWeight={600}
-                sx={{ flex: 1, minWidth: 0 }}
-              >
-                {point.label}
-              </Typography>
-              {onEdit && (
-                <IconButton
-                  size="small"
-                  onClick={onEdit}
-                  aria-label={formatMessage({ id: 'Edit point' })}
+    <Marker
+      position={position}
+      icon={icon}
+      draggable={isMoving}
+      eventHandlers={
+        isMoving && onMoved
+          ? { dragend: e => onMoved(e.target.getLatLng()) }
+          : undefined
+      }
+    >
+      {isMoving ? (
+        <LeafletTooltip permanent direction="top">
+          {formatMessage({ id: 'Drag to move the point' })}
+        </LeafletTooltip>
+      ) : (
+        <Popup>
+          <Box sx={{ minWidth: 240, maxWidth: 320 }}>
+            {hasHeader && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight={600}
+                  sx={{ flex: 1, minWidth: 0 }}
                 >
-                  <EditIcon fontSize="small" />
-                </IconButton>
-              )}
-            </Box>
-          )}
-          {hasHeader && documents.length > 0 && <Divider sx={{ my: 0.75 }} />}
-          {documents.length > 0 && (
-            <MultiDoc documents={documents} onOpen={handleOpen} />
-          )}
-        </Box>
-      </Popup>
+                  {point.label}
+                </Typography>
+                {onStartMove && (
+                  <IconButton
+                    size="small"
+                    onClick={onStartMove}
+                    aria-label={formatMessage({ id: 'Move' })}
+                  >
+                    <OpenWithIcon fontSize="small" />
+                  </IconButton>
+                )}
+                {onEdit && (
+                  <IconButton
+                    size="small"
+                    onClick={onEdit}
+                    aria-label={formatMessage({ id: 'Edit point' })}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
+            )}
+            {hasHeader && documents.length > 0 && <Divider sx={{ my: 0.75 }} />}
+            {documents.length > 0 && (
+              <MultiDoc documents={documents} onOpen={handleOpen} />
+            )}
+          </Box>
+        </Popup>
+      )}
     </Marker>
   );
 };
@@ -134,7 +167,10 @@ PointMarker.propTypes = {
     documents: PropTypes.arrayOf(documentShape)
   }).isRequired,
   position: PropTypes.arrayOf(PropTypes.number).isRequired,
-  onEdit: PropTypes.func
+  onEdit: PropTypes.func,
+  onStartMove: PropTypes.func,
+  onMoved: PropTypes.func,
+  isMoving: PropTypes.bool
 };
 
 export default PointMarker;

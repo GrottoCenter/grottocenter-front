@@ -31,12 +31,13 @@ const useMockPoints = svgKey => {
     [setByKey, svgKey]
   );
 
+  // Merge a partial patch (label, documents and/or coordinates) into a point.
   const updatePoint = useCallback(
-    (id, { label, documents }) => {
+    (id, patch) => {
       setByKey(prev => ({
         ...prev,
         [svgKey]: (prev[svgKey] ?? []).map(p =>
-          p.id === id ? { ...p, label, documents: documents ?? p.documents } : p
+          p.id === id ? { ...p, ...patch } : p
         )
       }));
     },
