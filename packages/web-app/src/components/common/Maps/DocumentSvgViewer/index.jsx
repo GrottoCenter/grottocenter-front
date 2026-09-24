@@ -32,6 +32,7 @@ import PointFormDialog from './PointFormDialog';
 import useSvgData from './useSvgData';
 import useMockPoints from './useMockPoints';
 import useFullscreenContainer from './useFullscreenContainer';
+import { MAP_CONTROL_BUTTON_SIZE } from './mapControls';
 import { makeFrameToSvg, makeSvgToFrame } from './georef';
 
 const PAN_MARGIN = 0.5;
@@ -157,8 +158,8 @@ const FitBoundsButton = ({ bounds }) => {
           size="small"
           onClick={() => map.fitBounds(bounds)}
           sx={{
-            width: 30,
-            height: 30,
+            width: MAP_CONTROL_BUTTON_SIZE,
+            height: MAP_CONTROL_BUTTON_SIZE,
             borderRadius: 0,
             color: '#000',
             background: '#fff',
@@ -190,8 +191,8 @@ const PointsToggleButton = ({ active, onToggle }) => {
           size="small"
           onClick={onToggle}
           sx={{
-            width: 30,
-            height: 30,
+            width: MAP_CONTROL_BUTTON_SIZE,
+            height: MAP_CONTROL_BUTTON_SIZE,
             borderRadius: 0,
             color: active ? 'primary.main' : '#000',
             background: '#fff',
