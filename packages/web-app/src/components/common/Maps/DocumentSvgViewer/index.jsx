@@ -219,11 +219,13 @@ const DocumentSvgViewer = ({
   height = '80vh',
   minZoom = -4,
   maxZoom = 8,
+  allowUnauthenticatedPointEditing = false,
   onLoadError = null
 }) => {
   const { formatMessage } = useIntl();
   const { onSuccess } = useNotification();
   const { isAuth } = usePermissions();
+  const canEditPoints = isAuth || allowUnauthenticatedPointEditing;
   const state = useSvgData(svgUrl);
   const [showPoints, setShowPoints] = useState(true);
   const { points: mockPoints, addPoint, updatePoint } = useMockPoints(svgUrl);
@@ -380,9 +382,8 @@ const DocumentSvgViewer = ({
         <TilesLayer svgData={state.data} bounds={derived.bounds} />
         {showPoints &&
           placedPoints.map(({ point, position }) => {
-            // Editing/moving mutates data, so gate it on auth (only mock
-            // points are editable for now anyway).
-            const editable = isAuth && mockIds.has(point.id);
+            // Only locally mocked points are editable until their API exists.
+            const editable = canEditPoints && mockIds.has(point.id);
             return (
               <PointMarker
                 key={point.id}
@@ -406,7 +407,7 @@ const DocumentSvgViewer = ({
             onToggle={() => setShowPoints(v => !v)}
           />
         )}
-        {isAuth && latLngToFrame && (
+        {canEditPoints && latLngToFrame && (
           <PointCreationHandler
             latLngToFrame={latLngToFrame}
             onRequestCreate={handleRequestCreate}
@@ -452,6 +453,7 @@ DocumentSvgViewer.propTypes = {
   height: PropTypes.string,
   minZoom: PropTypes.number,
   maxZoom: PropTypes.number,
+  allowUnauthenticatedPointEditing: PropTypes.bool,
   onLoadError: PropTypes.func
 };
 
