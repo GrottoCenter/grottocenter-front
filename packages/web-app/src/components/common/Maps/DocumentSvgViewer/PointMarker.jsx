@@ -3,9 +3,16 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Marker, Popup } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
-import { Box, ButtonBase, Divider, Typography } from '@mui/material';
+import {
+  Box,
+  ButtonBase,
+  Divider,
+  IconButton,
+  Typography
+} from '@mui/material';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import EditIcon from '@mui/icons-material/Edit';
 
 import useOpenLink from '@/hooks/useOpenLink';
 import { makePointIcon } from './pointIcon';
@@ -65,11 +72,13 @@ MultiDoc.propTypes = {
   onOpen: PropTypes.func.isRequired
 };
 
-const PointMarker = ({ point, position }) => {
+const PointMarker = ({ point, position, onEdit = null }) => {
+  const { formatMessage } = useIntl();
   const openLink = useOpenLink();
   const theme = useTheme();
 
   const documents = point.documents ?? EMPTY_DOCUMENTS;
+  const hasHeader = Boolean(point.label) || Boolean(onEdit);
 
   const icon = useMemo(
     () =>
@@ -87,12 +96,27 @@ const PointMarker = ({ point, position }) => {
     <Marker position={position} icon={icon}>
       <Popup>
         <Box sx={{ minWidth: 240, maxWidth: 320 }}>
-          {point.label && (
-            <Typography variant="subtitle2" fontWeight={600}>
-              {point.label}
-            </Typography>
+          {hasHeader && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography
+                variant="subtitle2"
+                fontWeight={600}
+                sx={{ flex: 1, minWidth: 0 }}
+              >
+                {point.label}
+              </Typography>
+              {onEdit && (
+                <IconButton
+                  size="small"
+                  onClick={onEdit}
+                  aria-label={formatMessage({ id: 'Edit point' })}
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
           )}
-          {point.label && documents.length > 0 && <Divider sx={{ my: 0.75 }} />}
+          {hasHeader && documents.length > 0 && <Divider sx={{ my: 0.75 }} />}
           {documents.length > 0 && (
             <MultiDoc documents={documents} onOpen={handleOpen} />
           )}
@@ -109,7 +133,8 @@ PointMarker.propTypes = {
     label: PropTypes.string,
     documents: PropTypes.arrayOf(documentShape)
   }).isRequired,
-  position: PropTypes.arrayOf(PropTypes.number).isRequired
+  position: PropTypes.arrayOf(PropTypes.number).isRequired,
+  onEdit: PropTypes.func
 };
 
 export default PointMarker;

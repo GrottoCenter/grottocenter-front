@@ -1,24 +1,40 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { MapContainer, useMap } from 'react-leaflet';
+import { MapContainer, useMap, useMapEvent } from 'react-leaflet';
 import { CRS } from 'leaflet';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import {
+  Box,
   CircularProgress,
   IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
   Tooltip,
   Typography
 } from '@mui/material';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 import DescriptionIcon from '@mui/icons-material/Description';
 
+import { useNotification } from '@/hooks';
 import FullscreenControl from '../common/FullscreenControl';
 import CustomControl from '../common/CustomControl';
 import SvgTileLayer from '../SvgTileLayer';
 import PointMarker from './PointMarker';
+import PointFormDialog from './PointFormDialog';
 import useSvgData from './useSvgData';
-import { makeFrameToSvg } from './georef';
+import useMockPoints from './useMockPoints';
+import useFullscreenContainer from './useFullscreenContainer';
+import { pointIconHtml } from './pointIcon';
+import { makeFrameToSvg, makeSvgToFrame } from './georef';
 
 const PAN_MARGIN = 0.5;
 
@@ -46,6 +62,77 @@ const Wrapper = styled('div')(({ theme }) => ({
 const makeSvgToLatLng =
   viewBox =>
   ([svgX, svgY]) => [viewBox.y + viewBox.h - svgY, svgX - viewBox.x];
+
+// Inverse of makeSvgToLatLng: Leaflet latLng -> SVG [x, y].
+const makeLatLngToSvg =
+  viewBox =>
+  ({ lat, lng }) => [lng + viewBox.x, viewBox.y + viewBox.h - lat];
+
+// Right-click on the drawing -> context menu -> ask the viewer to open the
+// create-point dialog at the clicked position. Only rendered when the SVG has
+// usable control points, so `latLngToFrame` always yields frame coordinates.
+const PointCreationHandler = ({
+  latLngToFrame,
+  onRequestCreate,
+  menuContainer
+}) => {
+  const { formatMessage } = useIntl();
+  const theme = useTheme();
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [pendingCoords, setPendingCoords] = useState(null);
+
+  const iconSrc = `data:image/svg+xml,${encodeURIComponent(
+    pointIconHtml({
+      color: theme.palette.primary.main,
+      badgeColor: theme.palette.secondary.main
+    })
+  )}`;
+
+  useMapEvent('contextmenu', e => {
+    e.originalEvent.preventDefault();
+    setPendingCoords(latLngToFrame(e.latlng));
+    setMenuAnchor({
+      top: e.originalEvent.clientY,
+      left: e.originalEvent.clientX
+    });
+  });
+
+  const handleCreate = () => {
+    setMenuAnchor(null);
+    onRequestCreate(pendingCoords);
+  };
+
+  return (
+    <Menu
+      open={Boolean(menuAnchor)}
+      onClose={() => setMenuAnchor(null)}
+      anchorReference="anchorPosition"
+      anchorPosition={menuAnchor}
+      container={menuContainer}
+    >
+      <MenuItem onClick={handleCreate}>
+        <ListItemIcon>
+          <Box
+            component="img"
+            src={iconSrc}
+            alt=""
+            sx={{ width: 30, height: 30 }}
+          />
+        </ListItemIcon>
+        <ListItemText>
+          {formatMessage({ id: 'Create a point here' })}
+        </ListItemText>
+      </MenuItem>
+    </Menu>
+  );
+};
+
+PointCreationHandler.propTypes = {
+  latLngToFrame: PropTypes.func.isRequired,
+  onRequestCreate: PropTypes.func.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  menuContainer: PropTypes.object
+};
 
 const TilesLayer = ({ svgData, bounds }) => {
   const map = useMap();
@@ -136,12 +223,30 @@ const DocumentSvgViewer = ({
   onLoadError = null
 }) => {
   const { formatMessage } = useIntl();
+  const { onSuccess } = useNotification();
   const state = useSvgData(svgUrl);
   const [showPoints, setShowPoints] = useState(true);
+  const { points: mockPoints, addPoint, updatePoint } = useMockPoints(svgUrl);
+  // null | { mode: 'create', coordinates } | { mode: 'edit', point }
+  const [dialog, setDialog] = useState(null);
+  const wrapperRef = useRef(null);
+  // Container so menus/dialogs stay visible in fullscreen (see hook).
+  const modalContainer = useFullscreenContainer(wrapperRef);
 
   useEffect(() => {
     if (state.status === 'error' && onLoadError) onLoadError(state.error);
   }, [state.status, state.error, onLoadError]);
+
+  // Points from the caller plus locally-created (mocked) ones. Only mock points
+  // are editable (they can be persisted).
+  const allPoints = useMemo(
+    () => [...points, ...mockPoints],
+    [points, mockPoints]
+  );
+  const mockIds = useMemo(
+    () => new Set(mockPoints.map(p => p.id)),
+    [mockPoints]
+  );
 
   const derived = useMemo(() => {
     if (state.status !== 'ready') return null;
@@ -157,6 +262,18 @@ const DocumentSvgViewer = ({
     return { bounds, panBounds, toLatLng: makeSvgToLatLng(viewBox) };
   }, [state]);
 
+  // Leaflet latLng -> frame [u, v], for placing a point from a right-click.
+  // null when the SVG has no usable (non-degenerate) control points.
+  const latLngToFrame = useMemo(() => {
+    if (state.status !== 'ready') return null;
+    const { controlPoints, viewBox } = state.data;
+    if (!controlPoints) return null;
+    const svgToFrame = makeSvgToFrame(controlPoints);
+    if (!svgToFrame) return null;
+    const latLngToSvg = makeLatLngToSvg(viewBox);
+    return latlng => svgToFrame(latLngToSvg(latlng));
+  }, [state]);
+
   // Points carry frame coordinates (relative to the SVG's 3 control points), not
   // raw SVG coords. Convert frame -> SVG -> Leaflet latLng for placement.
   const placedPoints = useMemo(() => {
@@ -164,11 +281,41 @@ const DocumentSvgViewer = ({
     const { controlPoints } = state.data;
     if (!controlPoints) return [];
     const frameToSvg = makeFrameToSvg(controlPoints);
-    return points.map(point => ({
+    return allPoints.map(point => ({
       point,
       position: derived.toLatLng(frameToSvg(point.coordinates))
     }));
-  }, [state, derived, points]);
+  }, [state, derived, allPoints]);
+
+  const handleRequestCreate = useCallback(
+    coordinates => setDialog({ mode: 'create', coordinates }),
+    []
+  );
+  const handleRequestEdit = useCallback(
+    point => setDialog({ mode: 'edit', point }),
+    []
+  );
+
+  const handleSubmitPoint = useCallback(
+    ({ label, documents }) => {
+      if (!dialog) return;
+      const docs = documents.map(docId => ({
+        id: `doc-${docId}`,
+        documentId: docId
+      }));
+      if (dialog.mode === 'create') {
+        if (dialog.coordinates) {
+          addPoint({ label, coordinates: dialog.coordinates, documents: docs });
+          onSuccess(formatMessage({ id: 'Point created' }));
+        }
+      } else {
+        updatePoint(dialog.point.id, { label, documents: docs });
+        onSuccess(formatMessage({ id: 'Point updated' }));
+      }
+      setDialog(null);
+    },
+    [dialog, addPoint, updatePoint, onSuccess, formatMessage]
+  );
 
   useEffect(() => {
     if (state.status !== 'ready') return;
@@ -201,7 +348,7 @@ const DocumentSvgViewer = ({
   }
 
   return (
-    <Wrapper style={wrapperStyle}>
+    <Wrapper style={wrapperStyle} ref={wrapperRef}>
       <MapContainer
         crs={CRS.Simple}
         bounds={derived.bounds}
@@ -217,7 +364,16 @@ const DocumentSvgViewer = ({
         <TilesLayer svgData={state.data} bounds={derived.bounds} />
         {showPoints &&
           placedPoints.map(({ point, position }) => (
-            <PointMarker key={point.id} point={point} position={position} />
+            <PointMarker
+              key={point.id}
+              point={point}
+              position={position}
+              onEdit={
+                mockIds.has(point.id)
+                  ? () => handleRequestEdit(point)
+                  : undefined
+              }
+            />
           ))}
         <FitBoundsButton bounds={derived.bounds} />
         {placedPoints.length > 0 && (
@@ -226,8 +382,22 @@ const DocumentSvgViewer = ({
             onToggle={() => setShowPoints(v => !v)}
           />
         )}
+        {latLngToFrame && (
+          <PointCreationHandler
+            latLngToFrame={latLngToFrame}
+            onRequestCreate={handleRequestCreate}
+            menuContainer={modalContainer}
+          />
+        )}
         <FullscreenControl position="topleft" forceSeparateButton={true} />
       </MapContainer>
+      <PointFormDialog
+        open={Boolean(dialog)}
+        point={dialog?.mode === 'edit' ? dialog.point : null}
+        container={modalContainer}
+        onClose={() => setDialog(null)}
+        onSubmit={handleSubmitPoint}
+      />
     </Wrapper>
   );
 };
