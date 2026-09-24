@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { MapContainer, useMap } from 'react-leaflet';
 import { CRS } from 'leaflet';
@@ -10,14 +10,16 @@ import {
   Typography
 } from '@mui/material';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 import FullscreenControl from '../common/FullscreenControl';
 import CustomControl from '../common/CustomControl';
 import SvgTileLayer from '../SvgTileLayer';
-import DocumentPin from './DocumentPin';
+import AnchorPin from './AnchorPin';
 import useSvgData from './useSvgData';
 
 const PAN_MARGIN = 0.5;
+const EMPTY_ATTACHMENTS = [];
 
 const Wrapper = styled('div')(({ theme }) => ({
   width: '100%',
@@ -98,6 +100,35 @@ FitBoundsButton.propTypes = {
   bounds: PropTypes.array.isRequired
 };
 
+const AnchorsToggleButton = ({ active, onToggle }) => (
+  <CustomControl position="topleft" useLeafletControl>
+    <Tooltip
+      title={active ? 'Masquer les ancres' : 'Afficher les ancres'}
+      placement="right"
+    >
+      <IconButton
+        size="small"
+        onClick={onToggle}
+        sx={{
+          width: 30,
+          height: 30,
+          borderRadius: 0,
+          color: active ? 'primary.main' : '#000',
+          background: '#fff',
+          '&:hover': { background: '#f4f4f4' }
+        }}
+      >
+        <DescriptionIcon fontSize="small" />
+      </IconButton>
+    </Tooltip>
+  </CustomControl>
+);
+
+AnchorsToggleButton.propTypes = {
+  active: PropTypes.bool.isRequired,
+  onToggle: PropTypes.func.isRequired
+};
+
 const DocumentSvgViewer = ({
   svgUrl,
   attachments = [],
@@ -106,6 +137,7 @@ const DocumentSvgViewer = ({
   maxZoom = 8
 }) => {
   const state = useSvgData(svgUrl);
+  const [showAnchors, setShowAnchors] = useState(true);
 
   const derived = useMemo(() => {
     if (state.status !== 'ready') return null;
@@ -172,18 +204,20 @@ const DocumentSvgViewer = ({
         attributionControl={false}
       >
         <TilesLayer svgData={state.data} bounds={derived.bounds} />
-        {Object.entries(groupedAttachments).map(([anchorId, group]) => {
-          const svgPos = state.data.anchors[anchorId];
-          if (!svgPos) return null;
-          return (
-            <DocumentPin
+        {showAnchors &&
+          Object.entries(state.data.anchors).map(([anchorId, svgPos]) => (
+            <AnchorPin
               key={anchorId}
-              attachments={group}
+              anchorId={anchorId}
+              attachments={groupedAttachments[anchorId] || EMPTY_ATTACHMENTS}
               position={derived.toLatLng(svgPos)}
             />
-          );
-        })}
+          ))}
         <FitBoundsButton bounds={derived.bounds} />
+        <AnchorsToggleButton
+          active={showAnchors}
+          onToggle={() => setShowAnchors(v => !v)}
+        />
         <FullscreenControl position="topleft" forceSeparateButton={true} />
       </MapContainer>
     </Wrapper>
