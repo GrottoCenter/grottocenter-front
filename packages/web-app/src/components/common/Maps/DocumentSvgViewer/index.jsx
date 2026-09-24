@@ -21,6 +21,7 @@ import useSvgData from './useSvgData';
 const PAN_MARGIN = 0.5;
 const EMPTY_ATTACHMENTS = [];
 
+
 const Wrapper = styled('div')(({ theme }) => ({
   width: '100%',
   height: 'var(--viewer-h, 80vh)',
@@ -36,6 +37,7 @@ const Wrapper = styled('div')(({ theme }) => ({
     borderRadius: theme.shape.borderRadius,
     boxShadow: theme.shadows[3]
   },
+  '& .leaflet-container.leaflet-grab': { cursor: 'move' },
   '&:fullscreen .leaflet-container, .leaflet-container:fullscreen': {
     borderRadius: 0
   }
