@@ -2,7 +2,11 @@ import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MapIcon from '@mui/icons-material/Map';
 import SearchIcon from '@mui/icons-material/Search';
+import TerrainIcon from '@mui/icons-material/Terrain';
 import { useIntl } from 'react-intl';
+
+import AppLink from '@/components/common/AppLink';
+
 import { fseLinks, uisLinks } from '../../conf/externalLinks';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import GCLogo from '../../components/common/GCLogo';
@@ -55,6 +59,7 @@ const CTARow = styled(Box)(({ theme }) => ({
   marginTop: 40,
   [theme.breakpoints.up('sm')]: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
     gap: 16
   },
@@ -121,6 +126,14 @@ const Header = () => {
               startIcon={<SearchIcon />}
               sx={{ fontWeight: 600 }}>
               {formatMessage({ id: 'Find an entrance' })}
+            </AttractiveButton>
+            <AttractiveButton
+              color="primary"
+              component={AppLink}
+              to="/ui/topo"
+              startIcon={<TerrainIcon />}
+              sx={{ fontWeight: 600 }}>
+              {formatMessage({ id: 'Topography POC' })}
             </AttractiveButton>
           </CTARow>
         </BrandRow>
