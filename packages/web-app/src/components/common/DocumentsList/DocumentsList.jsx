@@ -141,7 +141,8 @@ const DocumentsList = ({
   onUnlink,
   itemsPerPage = 10,
   defaultSortOrder = DOCUMENT_SORT_ORDERS.ADDED_DESC,
-  showSort = true
+  showSort = true,
+  showBibliographicReferences = false
 }) => {
   // Not `useSelector(state => state.intl)`: this component sits in `common/` and
   // has no Redux dependency, and the provider's locale is the same value.
@@ -288,9 +289,11 @@ const DocumentsList = ({
           />
         </Box>
       )}
-      {/* Keep references aligned with the full sorted list: they have their own
-          preview/expansion and must not be limited to the visible card page. */}
-      <DocumentReferences documents={sortedDocuments} />
+      {showBibliographicReferences && (
+        // Keep references aligned with the full sorted list: they have their
+        // own preview/expansion and must not be limited to the visible card page.
+        <DocumentReferences documents={sortedDocuments} />
+      )}
       {allImages.length > 0 && (
         <ImageLightbox
           open={lightboxOpen}
@@ -314,7 +317,8 @@ DocumentsList.propTypes = {
   onUnlink: PropTypes.func,
   itemsPerPage: PropTypes.number,
   defaultSortOrder: PropTypes.oneOf(Object.values(DOCUMENT_SORT_ORDERS)),
-  showSort: PropTypes.bool
+  showSort: PropTypes.bool,
+  showBibliographicReferences: PropTypes.bool
 };
 
 export default DocumentsList;

@@ -63,6 +63,7 @@ const Documents = ({ documents, massifId }) => {
           )}
           <DocumentsList
             documents={documents}
+            showBibliographicReferences
             emptyMessageComponent={
               <Alert
                 severity="info"

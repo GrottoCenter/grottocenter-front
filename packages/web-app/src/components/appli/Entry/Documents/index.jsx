@@ -90,6 +90,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
           <DocumentsList
             documents={documents}
             defaultSortOrder={DOCUMENT_SORT_ORDERS.TYPE}
+            showBibliographicReferences
             emptyMessageComponent={
               <Alert
                 severity="info"
