@@ -21,9 +21,17 @@ import SvgTileLayer, { fetchSvg } from '../SvgTileLayer';
 
 const PAN_MARGIN = 0.5;
 
-const Wrapper = styled(Box)(({ theme }) => ({
+const Wrapper = styled('div')(({ theme }) => ({
+  width: '100%',
+  height: '80vh',
+  '&.-centered': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   '& .leaflet-container': {
     width: '100%',
+    height: '100%',
     background: '#fff',
     borderRadius: theme.shape.borderRadius,
     boxShadow: theme.shadows[3]
@@ -131,13 +139,7 @@ const FitBoundsButton = ({ bounds }) => {
   );
 };
 
-const DocumentSvgViewer = ({
-  svgUrl,
-  attachments,
-  height,
-  minZoom,
-  maxZoom
-}) => {
+const DocumentSvgViewer = ({ svgUrl, attachments, minZoom, maxZoom }) => {
   const state = useSvg(svgUrl);
 
   const derived = useMemo(() => {
@@ -156,14 +158,7 @@ const DocumentSvgViewer = ({
 
   if (state.status === 'loading') {
     return (
-      <Wrapper
-        sx={{
-          height,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
+      <Wrapper className="-centered">
         <CircularProgress />
       </Wrapper>
     );
@@ -171,21 +166,14 @@ const DocumentSvgViewer = ({
 
   if (state.status === 'error') {
     return (
-      <Wrapper
-        sx={{
-          height,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
+      <Wrapper className="-centered">
         <Typography color="error">Impossible de charger la topo.</Typography>
       </Wrapper>
     );
   }
 
   return (
-    <Wrapper sx={{ '& .leaflet-container': { height } }}>
+    <Wrapper>
       <MapContainer
         crs={CRS.Simple}
         bounds={derived.bounds}
@@ -229,14 +217,12 @@ DocumentSvgViewer.propTypes = {
       label: PropTypes.string
     })
   ),
-  height: PropTypes.string,
   minZoom: PropTypes.number,
   maxZoom: PropTypes.number
 };
 
 DocumentSvgViewer.defaultProps = {
   attachments: [],
-  height: '80vh',
   minZoom: -4,
   maxZoom: 8
 };
