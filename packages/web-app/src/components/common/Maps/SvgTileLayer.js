@@ -114,6 +114,30 @@ const collectDefsHtml = (svgEl, serializer) =>
     .map(c => serializer.serializeToString(c))
     .join('');
 
+const ANCHOR_ID_PREFIX = 'anchor-';
+
+const collectAnchors = group => {
+  const anchors = {};
+  if (!group) return anchors;
+  for (const child of Array.from(group.children)) {
+    const id = child.getAttribute('id') || '';
+    if (!id.startsWith(ANCHOR_ID_PREFIX)) continue;
+    const anchorId = id.slice(ANCHOR_ID_PREFIX.length);
+    const cx = parseFloat(child.getAttribute('cx'));
+    const cy = parseFloat(child.getAttribute('cy'));
+    if (!Number.isNaN(cx) && !Number.isNaN(cy)) {
+      anchors[anchorId] = [cx, cy];
+      continue;
+    }
+    const x = parseFloat(child.getAttribute('x'));
+    const y = parseFloat(child.getAttribute('y'));
+    if (!Number.isNaN(x) && !Number.isNaN(y)) {
+      anchors[anchorId] = [x, y];
+    }
+  }
+  return anchors;
+};
+
 const collectRootAttrs = svgEl => {
   const parts = [];
   for (const attr of Array.from(svgEl.attributes)) {
@@ -143,6 +167,10 @@ export const loadSvg = async url => {
   host.appendChild(svgEl);
   document.body.appendChild(host);
   try {
+    const anchorsGroup = svgEl.querySelector('#anchors');
+    const anchors = collectAnchors(anchorsGroup);
+    if (anchorsGroup) anchorsGroup.remove();
+
     if (!viewBox) {
       const bbox = svgEl.getBBox();
       if (bbox && bbox.width > 0 && bbox.height > 0) {
@@ -152,13 +180,14 @@ export const loadSvg = async url => {
     if (!viewBox || viewBox.w <= 0 || viewBox.h <= 0) {
       throw new Error('SVG has no computable dimensions');
     }
+
     const serializer = new XMLSerializer();
     const items = collectItems(svgEl, serializer);
     const defsHtml = collectDefsHtml(svgEl, serializer);
     const rootAttrsHtml = collectRootAttrs(svgEl);
     const index = new RBush();
     index.load(items);
-    return { viewBox, items, index, defsHtml, rootAttrsHtml };
+    return { viewBox, items, index, defsHtml, rootAttrsHtml, anchors };
   } finally {
     document.body.removeChild(host);
   }

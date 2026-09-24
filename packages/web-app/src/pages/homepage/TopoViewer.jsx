@@ -9,7 +9,7 @@ const SVG_URL = '/la-grande-topo.svg';
 const ATTACHMENTS = [
   {
     id: 'doc-234115',
-    position: [2310, 3350],
+    anchorId: 'siphon-boue',
     documentId: 234115,
     label: 'Siphon du "Boue"'
   }
