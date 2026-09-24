@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
-import { MapContainer, useMap } from 'react-leaflet';
-import { CRS } from 'leaflet';
+import React, { useEffect, useMemo } from 'react';
+import { MapContainer, Marker, Popup, useMap } from 'react-leaflet';
+import { CRS, divIcon } from 'leaflet';
+import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
-import { Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 import FullscreenControl from '../../components/common/Maps/common/FullscreenControl';
 import CustomControl from '../../components/common/Maps/common/CustomControl';
@@ -22,6 +24,15 @@ const PAN_BOUNDS = [
   [TOPO_HEIGHT * (1 + PAN_MARGIN), TOPO_WIDTH * (1 + PAN_MARGIN)]
 ];
 
+const DOCUMENT_ATTACHMENTS = [
+  {
+    id: 'doc-234115',
+    position: [1970, 1330],
+    documentId: 234115,
+    label: 'Siphon du "Boue"'
+  }
+];
+
 const ViewerWrapper = styled(Box)(({ theme }) => ({
   padding: theme.spacing(4, 2),
   '& .leaflet-container': {
@@ -36,6 +47,38 @@ const ViewerWrapper = styled(Box)(({ theme }) => ({
     borderRadius: 0
   }
 }));
+
+const DocumentPin = ({ attachment }) => {
+  const navigate = useNavigate();
+  const icon = useMemo(
+    () =>
+      divIcon({
+        className: 'topo-doc-pin',
+        html:
+          '<div style="width:28px;height:28px;border-radius:50%;background:#f57c00;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff;font-size:16px;">📄</div>',
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      }),
+    []
+  );
+  return (
+    <Marker position={attachment.position} icon={icon}>
+      <Popup>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 160 }}>
+          <Typography variant="body2">{attachment.label}</Typography>
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={<DescriptionIcon fontSize="small" />}
+            onClick={() => navigate(`/ui/documents/${attachment.documentId}`)}
+          >
+            Ouvrir
+          </Button>
+        </Box>
+      </Popup>
+    </Marker>
+  );
+};
 
 const TilesLayer = ({ url, bounds }) => {
   const map = useMap();
@@ -93,6 +136,9 @@ const TopoViewer = () => (
       attributionControl={false}
     >
       <TilesLayer url={TOPO_URL} bounds={BOUNDS} />
+      {DOCUMENT_ATTACHMENTS.map(a => (
+        <DocumentPin key={a.id} attachment={a} />
+      ))}
       <FitBoundsButton bounds={BOUNDS} />
       <FullscreenControl position="topleft" forceSeparateButton="true" />
     </MapContainer>
