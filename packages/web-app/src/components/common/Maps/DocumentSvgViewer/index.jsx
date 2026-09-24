@@ -135,7 +135,7 @@ PointCreationHandler.propTypes = {
 };
 
 // While a point is in "move" mode, a click on the map (not on the marker)
-// cancels it.
+// cancels it (the point is moved by dragging its marker).
 const MoveModeHandler = ({ onCancel }) => {
   useMapEvent('click', onCancel);
   return null;
