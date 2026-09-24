@@ -5,13 +5,9 @@ import { useTheme } from '@mui/material/styles';
 import {
   Box,
   Button,
+  ButtonBase,
   Divider,
   IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Tooltip,
   Typography
 } from '@mui/material';
@@ -91,30 +87,38 @@ SingleDoc.propTypes = {
 };
 
 const MultiDoc = ({ attachments, onOpen }) => (
-  <List dense disablePadding sx={{ maxHeight: 260, overflow: 'auto' }}>
+  <Box sx={{ maxHeight: 260, overflow: 'auto' }}>
     {attachments.map(a => (
-      <ListItem key={a.id} disablePadding>
-        <ListItemButton
-          onClick={() => onOpen(a.documentId)}
-          sx={{ py: 0.5, px: 1 }}
+      <ButtonBase
+        key={a.id}
+        onClick={() => onOpen(a.documentId)}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          gap: 1,
+          px: 1,
+          py: 0.5,
+          borderRadius: 0.5,
+          justifyContent: 'flex-start',
+          '&:hover': { bgcolor: 'action.hover' }
+        }}
+      >
+        <DescriptionIcon fontSize="small" sx={{ color: 'primary.main' }} />
+        <Typography
+          variant="body2"
+          noWrap
+          sx={{ flex: 1, minWidth: 0, textAlign: 'left' }}
         >
-          <ListItemIcon sx={{ minWidth: 32, color: 'primary.main' }}>
-            <DescriptionIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText
-            primary={a.label || `Document ${a.documentId}`}
-            slotProps={{
-              primary: { variant: 'body2', noWrap: true }
-            }}
-          />
-          <ChevronRightIcon
-            fontSize="small"
-            sx={{ color: 'action.active', opacity: 0.5, ml: 1 }}
-          />
-        </ListItemButton>
-      </ListItem>
+          {a.label || `Document ${a.documentId}`}
+        </Typography>
+        <ChevronRightIcon
+          fontSize="small"
+          sx={{ color: 'action.active', opacity: 0.5 }}
+        />
+      </ButtonBase>
     ))}
-  </List>
+  </Box>
 );
 
 MultiDoc.propTypes = {
