@@ -21,6 +21,7 @@ export { default as locationIcon } from './location.svg';
 export { default as massifIcon } from './massif.svg';
 export { default as networkIcon } from './network.svg';
 export { default as organizationIcon } from './organization.svg';
+export { default as pointIcon } from './point.svg';
 export { default as pollutionIcon } from './pollution.svg';
 export { default as rockfallIcon } from './rockfall.svg';
 export { default as ropeIcon } from './rope.svg';
