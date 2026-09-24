@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { MapContainer, useMap } from 'react-leaflet';
-import L, { CRS } from 'leaflet';
+import { CRS } from 'leaflet';
 import { styled } from '@mui/material/styles';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 
 import FullscreenControl from '../../components/common/Maps/common/FullscreenControl';
 import CustomControl from '../../components/common/Maps/common/CustomControl';
+import SvgTileLayer from '../../components/common/Maps/SvgTileLayer';
 
 const TOPO_URL = '/la-grande-topo.svg';
 const TOPO_WIDTH = 2820;
@@ -36,25 +37,14 @@ const ViewerWrapper = styled(Box)(({ theme }) => ({
   }
 }));
 
-const SvgLayer = ({ url, bounds }) => {
+const TilesLayer = ({ url, bounds }) => {
   const map = useMap();
 
   useEffect(() => {
-    let layer;
-    let cancelled = false;
-    fetch(url)
-      .then(response => response.text())
-      .then(svgText => {
-        if (cancelled) return;
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(svgText, 'image/svg+xml');
-        layer = L.svgOverlay(doc.documentElement, bounds, {
-          interactive: true
-        }).addTo(map);
-      });
+    const layer = new SvgTileLayer(url, { bounds });
+    layer.addTo(map);
     return () => {
-      cancelled = true;
-      if (layer) map.removeLayer(layer);
+      layer.remove();
     };
   }, [map, url, bounds]);
 
@@ -102,7 +92,7 @@ const TopoViewer = () => (
       wheelPxPerZoomLevel={80}
       attributionControl={false}
     >
-      <SvgLayer url={TOPO_URL} bounds={BOUNDS} />
+      <TilesLayer url={TOPO_URL} bounds={BOUNDS} />
       <FitBoundsButton bounds={BOUNDS} />
       <FullscreenControl position="topleft" forceSeparateButton="true" />
     </MapContainer>
