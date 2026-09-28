@@ -18,9 +18,10 @@ describe('Account deletion request', () => {
     ).as('deleteCaver');
 
     cy.loginAs();
-    cy.visit('/ui/account', {
+    cy.visit('/account', {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
+    cy.location('pathname').should('eq', '/ui/account');
     cy.wait('@getAccount');
     cy.get('[data-testid="request-account-deletion"]').click();
 
