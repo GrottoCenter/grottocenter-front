@@ -37,6 +37,7 @@ import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import TuneIcon from '@mui/icons-material/Tune';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import NoAccountsOutlinedIcon from '@mui/icons-material/NoAccountsOutlined';
 import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { styled } from '@mui/material/styles';
 
@@ -83,6 +84,7 @@ import AppLink from '../../components/common/AppLink';
 import OfflineDisabled from '../../components/common/OfflineDisabled';
 import SectionCreateButton from '../../components/common/SectionCreateButton';
 import { AVAILABLE_LANGUAGES, isPasswordValid } from '../../conf/config';
+import { contactLinks } from '../../conf/externalLinks';
 import {
   languageIdToLocale,
   localeToLanguageId
@@ -1233,6 +1235,67 @@ const OfflineDataSection = () => {
   );
 };
 
+const AccountDeletionSection = () => {
+  const { formatMessage, locale } = useIntl();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const contactUrl = contactLinks[locale] ?? contactLinks['*'];
+
+  return (
+    <>
+      <SectionPaper elevation={2}>
+        <SectionHeader>
+          <SectionHeaderTitle>
+            <NoAccountsOutlinedIcon color="action" />
+            <Typography variant="h3" component="h2">
+              {formatMessage({ id: 'Account deletion' })}
+            </Typography>
+          </SectionHeaderTitle>
+        </SectionHeader>
+        <Divider />
+        <SectionBody>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {formatMessage({ id: 'accountDeletionDescription' })}
+          </Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => setIsDialogOpen(true)}
+            data-testid="request-account-deletion">
+            {formatMessage({ id: 'Request account deletion' })}
+          </Button>
+        </SectionBody>
+      </SectionPaper>
+      <StandardDialog
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        fullWidth
+        title={formatMessage({ id: 'Account deletion' })}
+        actions={
+          <>
+            <Button onClick={() => setIsDialogOpen(false)} variant="outlined">
+              {formatMessage({ id: 'Go back' })}
+            </Button>
+            <Button
+              component={AppLink}
+              href={contactUrl}
+              variant="contained"
+              color="error"
+              data-testid="account-deletion-contact-link">
+              {formatMessage({ id: 'Open contact form' })}
+            </Button>
+          </>
+        }>
+        <Typography sx={{ mb: 2 }}>
+          {formatMessage({ id: 'accountDeletionInstructions' })}
+        </Typography>
+        <Typography>
+          {formatMessage({ id: 'accountDeletionOutcome' })}
+        </Typography>
+      </StandardDialog>
+    </>
+  );
+};
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 const AccountPage = () => {
@@ -1400,6 +1463,7 @@ const AccountPage = () => {
           may be exactly what's needed to unstick the app. Hidden on browsers
           with no service worker support (nothing to show / clear). */}
       {HAS_SERVICE_WORKER && <OfflineDataSection />}
+      {!isAccountLoading && account && <AccountDeletionSection />}
     </SectionStack>
   );
 
