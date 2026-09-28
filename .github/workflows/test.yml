@@ -39,7 +39,8 @@ jobs:
         run: |
           # A separate Firefox runner per spec avoids the browser reconnect
           # failure seen between specs; Chrome can run the whole suite at once.
-          include=$(find packages/web-app/cypress/e2e -maxdepth 1 -type f -name '*.cy.js' -printf '%f\n' | sort | jq -R . | jq -s -c 'map({browser: "firefox", spec: ("cypress/e2e/" + .)}) + [{browser: "chrome", spec: ""}]')
+          # The action resolves spec paths from the repository root.
+          include=$(find packages/web-app/cypress/e2e -maxdepth 1 -type f -name '*.cy.js' | sort | jq -R . | jq -s -c 'map({browser: "firefox", spec: .}) + [{browser: "chrome", spec: ""}]')
           echo "include=$include" >> "$GITHUB_OUTPUT"
 
   e2e:
