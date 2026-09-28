@@ -27,11 +27,29 @@ jobs:
       - name: Run unit tests
         run: yarn test
 
+  e2e-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      include: ${{ steps.specs.outputs.include }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: List E2E specs
+        id: specs
+        run: |
+          # A separate Firefox runner per spec avoids the browser reconnect
+          # failure seen between specs; Chrome can run the whole suite at once.
+          include=$(find packages/web-app/cypress/e2e -maxdepth 1 -type f -name '*.cy.js' -printf '%f\n' | sort | jq -R . | jq -s -c 'map({browser: "firefox", spec: ("cypress/e2e/" + .)}) + [{browser: "chrome", spec: ""}]')
+          echo "include=$include" >> "$GITHUB_OUTPUT"
+
   e2e:
+    needs: e2e-matrix
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        browser: [firefox, chrome]
+        include: ${{ fromJSON(needs.e2e-matrix.outputs.include) }}
+    name: ${{ matrix.spec && format('e2e ({0}, {1})', matrix.browser, matrix.spec) || format('e2e ({0})', matrix.browser) }}
 
     steps:
       - name: Checkout
@@ -47,6 +65,7 @@ jobs:
         uses: cypress-io/github-action@v7
         with:
           browser: ${{ matrix.browser }}
+          spec: ${{ matrix.spec }}
           build: yarn build
           project: packages/web-app
           # Serve the production build so Vite cannot invalidate optimized
