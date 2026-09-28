@@ -317,11 +317,15 @@ export default defineConfig(({ mode }) => {
           // for content most will never see. Mobile JPGs are already outside
           // the precache glob and excluded from the runtime image cache — this
           // extends the same intent to the tablet PNGs.
+          // la-grande-topo.svg is fetched on demand: at ~10 MB it exceeds
+          // Workbox's precache limit and would penalize users who never open
+          // the dedicated viewer. A runtime rule below caches it after use.
           globIgnores: [
             '**/stats.html',
             '**/*.{gz,br}',
             '**/.well-known/**',
-            '**/screenshots/**'
+            '**/screenshots/**',
+            '**/la-grande-topo.svg'
           ],
           // Take control of the page on the very first load so offline works
           // from the first visit (matches the previous CRA SW's clientsClaim()).
@@ -678,6 +682,23 @@ export default defineConfig(({ mode }) => {
                 cacheName: 'blob-images-full',
                 expiration: {
                   maxEntries: 50,
+                  purgeOnQuotaError: true
+                },
+                cacheableResponse: { statuses: [0, 200] }
+              }
+            },
+            {
+              // The dedicated topo viewer's SVG is too large to precache. Cache
+              // it only after the viewer is opened so subsequent visits also
+              // work offline without adding ~10 MB to every installation.
+              urlPattern: ({ url, sameOrigin }) =>
+                sameOrigin && url.pathname === '/la-grande-topo.svg',
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'static-topo',
+                expiration: {
+                  maxEntries: 1,
+                  maxAgeSeconds: 60 * 60 * 24 * 30,
                   purgeOnQuotaError: true
                 },
                 cacheableResponse: { statuses: [0, 200] }
