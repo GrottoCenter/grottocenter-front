@@ -1278,6 +1278,8 @@ const AccountDeletionSection = () => {
             <Button
               component={AppLink}
               href={contactUrl}
+              onClick={() => setIsDialogOpen(false)}
+              endIcon={<OpenInNewIcon />}
               variant="contained"
               color="error"
               data-testid="account-deletion-contact-link">
@@ -1463,7 +1465,7 @@ const AccountPage = () => {
           may be exactly what's needed to unstick the app. Hidden on browsers
           with no service worker support (nothing to show / clear). */}
       {HAS_SERVICE_WORKER && <OfflineDataSection />}
-      {!isAccountLoading && account && <AccountDeletionSection />}
+      <AccountDeletionSection />
     </SectionStack>
   );
 

@@ -30,9 +30,39 @@ describe('Account deletion request', () => {
       .and('contain.text', 'Your published contributions stay visible');
     cy.get('[data-testid="account-deletion-contact-link"]')
       .should('have.attr', 'href', 'https://en.wikicaves.org/contact')
-      .and('have.attr', 'target', '_blank');
+      .and('have.attr', 'target', '_blank')
+      .find('svg')
+      .should('exist');
     cy.get('@deleteCaver.all').should('have.length', 0);
+    cy.get('[data-testid="account-deletion-contact-link"]')
+      .invoke('removeAttr', 'href')
+      .click();
+    cy.get('[role="dialog"]').should('not.exist');
+
+    cy.get('[data-testid="request-account-deletion"]').click();
     cy.get('[role="dialog"]').contains('button', 'Go back').click();
     cy.get('[role="dialog"]').should('not.exist');
+  });
+
+  it('keeps the deletion guidance available when account loading fails', () => {
+    cy.mockApiCatchAll();
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/account' },
+      { statusCode: 503, body: {} }
+    ).as('getAccount');
+
+    cy.loginAs();
+    cy.visit('/account', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.wait('@getAccount');
+    cy.contains('An error occurred. Please try again.').should('be.visible');
+    cy.get('[data-testid="request-account-deletion"]')
+      .should('be.visible')
+      .click();
+    cy.get('[role="dialog"]').should(
+      'contain.text',
+      'Opening this window does not send a request.'
+    );
   });
 });
