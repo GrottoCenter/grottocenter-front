@@ -34,15 +34,19 @@ describe('Account deletion request', () => {
       .find('svg')
       .should('exist');
     cy.get('@deleteCaver.all').should('have.length', 0);
-    let wasNavigationBlocked;
-    cy.get('[data-testid="account-deletion-contact-link"]').then($link => {
-      $link[0].addEventListener('click', event => {
-        wasNavigationBlocked = event.defaultPrevented;
-        event.preventDefault();
-      });
+    let anchorStillConnected;
+    cy.document().then(doc => {
+      doc.addEventListener(
+        'click',
+        event => {
+          anchorStillConnected = event.target.isConnected;
+          event.preventDefault();
+        },
+        { once: true }
+      );
     });
     cy.get('[data-testid="account-deletion-contact-link"]').click();
-    cy.then(() => expect(wasNavigationBlocked).to.eq(false));
+    cy.then(() => expect(anchorStillConnected).to.eq(true));
     cy.get('[role="dialog"]').should('not.exist');
 
     cy.get('[data-testid="request-account-deletion"]').click();
@@ -63,7 +67,10 @@ describe('Account deletion request', () => {
     });
     cy.wait('@getAccount');
     cy.contains('An error occurred. Please try again.').should('be.visible');
-    cy.get('#notistack-snackbar', { timeout: 10000 }).should('not.exist');
+    cy.get('[data-testid="app-snackbar"]').should('be.visible');
+    cy.get('[data-testid="app-snackbar"]', { timeout: 10000 }).should(
+      'not.exist'
+    );
     cy.get('[data-testid="request-account-deletion"]')
       .should('be.visible')
       .click();
@@ -82,16 +89,15 @@ describe('Account deletion request', () => {
 
     cy.loginAs();
     cy.visit('/account', {
-      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+      onBeforeLoad: win => {
+        win.localStorage.setItem('selectedLanguage', 'en');
+        Object.defineProperty(win.navigator, 'onLine', {
+          configurable: true,
+          value: false
+        });
+      }
     });
     cy.wait('@getAccount');
-    cy.window().then(win => {
-      Object.defineProperty(win.navigator, 'onLine', {
-        configurable: true,
-        value: false
-      });
-      win.dispatchEvent(new win.Event('offline'));
-    });
     cy.get('[data-testid="request-account-deletion"]').should('be.visible');
     cy.contains('An error occurred. Please try again.').should('not.exist');
   });
