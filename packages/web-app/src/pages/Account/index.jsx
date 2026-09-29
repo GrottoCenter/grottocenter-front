@@ -1308,7 +1308,7 @@ const AccountPage = () => {
 
   const {
     data: account,
-    isPending: isAccountLoading,
+    isLoading: isAccountLoading,
     error: accountError
   } = useAccount();
   const { data: person, isFetching: isPersonFetching } = usePerson(userId);

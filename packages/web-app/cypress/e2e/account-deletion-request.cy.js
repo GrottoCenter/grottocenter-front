@@ -19,14 +19,7 @@ describe('Account deletion request', () => {
 
     cy.loginAs();
     cy.visit('/account', {
-      onBeforeLoad: win => {
-        win.localStorage.setItem('selectedLanguage', 'en');
-        // Stub window.open so the click doesn't actually spawn a new tab we
-        // can't drive from Cypress. Keeps the anchor's real href/target
-        // intact so the click still exercises the same code path a user
-        // would trigger.
-        cy.stub(win, 'open').as('winOpen');
-      }
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
     cy.location('pathname').should('eq', '/ui/account');
     cy.wait('@getAccount');
@@ -41,7 +34,15 @@ describe('Account deletion request', () => {
       .find('svg')
       .should('exist');
     cy.get('@deleteCaver.all').should('have.length', 0);
+    let wasNavigationBlocked;
+    cy.get('[data-testid="account-deletion-contact-link"]').then($link => {
+      $link[0].addEventListener('click', event => {
+        wasNavigationBlocked = event.defaultPrevented;
+        event.preventDefault();
+      });
+    });
     cy.get('[data-testid="account-deletion-contact-link"]').click();
+    cy.then(() => expect(wasNavigationBlocked).to.eq(false));
     cy.get('[role="dialog"]').should('not.exist');
 
     cy.get('[data-testid="request-account-deletion"]').click();
@@ -62,6 +63,7 @@ describe('Account deletion request', () => {
     });
     cy.wait('@getAccount');
     cy.contains('An error occurred. Please try again.').should('be.visible');
+    cy.get('#notistack-snackbar', { timeout: 10000 }).should('not.exist');
     cy.get('[data-testid="request-account-deletion"]')
       .should('be.visible')
       .click();
@@ -69,5 +71,28 @@ describe('Account deletion request', () => {
       'contain.text',
       'Opening this window does not send a request.'
     );
+  });
+
+  it('keeps the deletion guidance available when an offline retry pauses', () => {
+    cy.mockApiCatchAll();
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/account' },
+      { statusCode: 503, body: {} }
+    ).as('getAccount');
+
+    cy.loginAs();
+    cy.visit('/account', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.wait('@getAccount');
+    cy.window().then(win => {
+      Object.defineProperty(win.navigator, 'onLine', {
+        configurable: true,
+        value: false
+      });
+      win.dispatchEvent(new win.Event('offline'));
+    });
+    cy.get('[data-testid="request-account-deletion"]').should('be.visible');
+    cy.contains('An error occurred. Please try again.').should('not.exist');
   });
 });
