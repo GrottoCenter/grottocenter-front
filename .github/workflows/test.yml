@@ -58,7 +58,10 @@ jobs:
           path: packages/web-app/dist
           include-hidden-files: true
           if-no-files-found: error
-          retention-days: 1
+          # Keep the artifact around for "Re-run failed jobs": e2e-build won't
+          # re-run when it's green, so a next-day retry needs the dist to still
+          # be here.
+          retention-days: 7
 
   e2e:
     needs: e2e-build

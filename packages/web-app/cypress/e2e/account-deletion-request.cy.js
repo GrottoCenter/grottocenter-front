@@ -19,7 +19,14 @@ describe('Account deletion request', () => {
 
     cy.loginAs();
     cy.visit('/account', {
-      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+      onBeforeLoad: win => {
+        win.localStorage.setItem('selectedLanguage', 'en');
+        // Stub window.open so the click doesn't actually spawn a new tab we
+        // can't drive from Cypress. Keeps the anchor's real href/target
+        // intact so the click still exercises the same code path a user
+        // would trigger.
+        cy.stub(win, 'open').as('winOpen');
+      }
     });
     cy.location('pathname').should('eq', '/ui/account');
     cy.wait('@getAccount');
@@ -34,9 +41,7 @@ describe('Account deletion request', () => {
       .find('svg')
       .should('exist');
     cy.get('@deleteCaver.all').should('have.length', 0);
-    cy.get('[data-testid="account-deletion-contact-link"]')
-      .invoke('removeAttr', 'href')
-      .click();
+    cy.get('[data-testid="account-deletion-contact-link"]').click();
     cy.get('[role="dialog"]').should('not.exist');
 
     cy.get('[data-testid="request-account-deletion"]').click();

@@ -1279,7 +1279,7 @@ const AccountDeletionSection = () => {
               component={AppLink}
               href={contactUrl}
               onClick={() => setIsDialogOpen(false)}
-              endIcon={<OpenInNewIcon />}
+              endIcon={<OpenInNewIcon fontSize="small" />}
               variant="contained"
               color="error"
               data-testid="account-deletion-contact-link">
@@ -1461,11 +1461,16 @@ const AccountPage = () => {
           <PreferencesSection account={account} onSaved={handleSaved} />
         </>
       )}
-      {/* Rendered even when the account fetch failed — clearing the cache
-          may be exactly what's needed to unstick the app. Hidden on browsers
-          with no service worker support (nothing to show / clear). */}
+      {/* OfflineDataSection is rendered even when the account fetch failed —
+          clearing the cache may be exactly what's needed to unstick the app.
+          Hidden on browsers with no service worker support (nothing to show /
+          clear). */}
       {HAS_SERVICE_WORKER && <OfflineDataSection />}
-      <AccountDeletionSection />
+      {/* AccountDeletionSection doesn't depend on the account payload, so we
+          keep it rendered on error too. We still wait for the initial fetch
+          to settle so the card doesn't sit next to the skeleton placeholders
+          on slow connections. */}
+      {!isAccountLoading && <AccountDeletionSection />}
     </SectionStack>
   );
 
