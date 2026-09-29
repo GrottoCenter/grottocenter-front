@@ -81,10 +81,14 @@ describe('Account deletion request', () => {
   });
 
   it('keeps the deletion guidance available when an offline retry pauses', () => {
+    // Hold the failed response until React Query has received the offline event.
+    let releaseAccountResponse;
+    const accountResponseGate = new Promise(resolve => {
+      releaseAccountResponse = resolve;
+    });
     cy.mockApiCatchAll();
-    cy.intercept(
-      { method: 'GET', pathname: '/api/v1/account' },
-      { statusCode: 503, body: {} }
+    cy.intercept({ method: 'GET', pathname: '/api/v1/account' }, req =>
+      accountResponseGate.then(() => req.reply({ statusCode: 503, body: {} }))
     ).as('getAccount');
 
     cy.loginAs();
@@ -97,8 +101,14 @@ describe('Account deletion request', () => {
         });
       }
     });
+    cy.contains('h1', 'My Account').should('be.visible');
+    cy.window().then(win => {
+      win.dispatchEvent(new win.Event('offline'));
+      releaseAccountResponse();
+    });
     cy.wait('@getAccount');
     cy.get('[data-testid="request-account-deletion"]').should('be.visible');
+    cy.get('@getAccount.all').should('have.length', 1);
     cy.contains('An error occurred. Please try again.').should('not.exist');
   });
 });
