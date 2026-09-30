@@ -66,7 +66,10 @@ const TourTooltip = ({ currentStep, steps, setCurrentStep, setIsOpen }) => {
       </CardContent>
       <CardActions sx={{ justifyContent: 'flex-end', pt: 0.25 }}>
         {currentStep > 0 && (
-          <Button size="small" onClick={() => setCurrentStep(s => s - 1)}>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => setCurrentStep(s => s - 1)}>
             {formatMessage({ id: 'Tour - Back' })}
           </Button>
         )}

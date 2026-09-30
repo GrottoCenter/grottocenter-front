@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { includes, values } from 'ramda';
 import PropTypes from 'prop-types';
-import { layerTypes } from './DataControl';
+import { layerTypes } from './DataDisplayControl';
 import useMarkers from '../common/Markers/useMarkers';
 import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
 import useNetworkHighlight from './useNetworkHighlight';

@@ -92,6 +92,15 @@ export const ENTRANCE_QUALITY_FILTERS = [
   DATA_QUALITY_LEVELS.GOOD
 ].map(id => ({ id, labelKey: DATA_QUALITY_LABEL_KEYS[id] }));
 
+// Interest filter — the backend `aestheticism` field is a 0–10 average, but
+// the app always displays it as N/5 with the MUI Rating component (see
+// Entry/Ratings.jsx and the api PR #1825 review note). The filter picks a
+// minimum on the 1★–5★ scale and stores it on the same 0–10 scale as the
+// backend value, so the comparison stays a plain `>=`.
+export const DEFAULT_MIN_INTEREST = 0;
+export const getInterest = entrance =>
+  typeof entrance.aestheticism === 'number' ? entrance.aestheticism : null;
+
 export const MARKERS_LIMIT = 13;
 // Zoom level at which massif polygons are fetched and displayed
 export const MASSIFS_POLYGON_LIMIT = 8;

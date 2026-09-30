@@ -23,7 +23,8 @@ import { useIntl } from 'react-intl';
 import copyToClipboard from '@/utils/clipboard';
 import GeocodingControl from '../common/GeocodingControl';
 import MapTour from './MapTour';
-import DataControl, { layerTypes } from './DataControl';
+import DataDisplayControl, { layerTypes } from './DataDisplayControl';
+import FiltersControl from './FiltersControl';
 import {
   formatCoordinatesForCopy,
   formatWGS84
@@ -61,8 +62,10 @@ import {
   ENTRANCE_QUALITY_FILTERS,
   getCaveSize,
   getCaveQuality,
+  getInterest,
   CAVE_SIZE,
-  CAVE_QUALITY
+  CAVE_QUALITY,
+  DEFAULT_MIN_INTEREST
 } from './constants';
 
 const ZOOM_STATE = {
@@ -164,18 +167,47 @@ const HydratedMap = ({
     Object.fromEntries(Object.values(CAVE_QUALITY).map(q => [q, true])),
     { merge: true }
   );
+  const [minInterest, setMinInterest] = useLocalStorage(
+    'grottocenter_minInterest',
+    DEFAULT_MIN_INTEREST
+  );
 
   const filteredEntranceMarkers = useMemo(
     () =>
       entranceMarkers.filter(e => {
         if (!activeEntranceFilters[getCaveSize(e)]) return false;
         const quality = getCaveQuality(e);
-        // Entrances without quality data are always shown
-        if (quality === null) return true;
-        return activeQualityFilters[quality];
+        // Entrances without quality data are always shown by the quality filter.
+        if (quality !== null && !activeQualityFilters[quality]) return false;
+        // Interest: null aestheticism (no rating yet) is implicitly excluded as
+        // soon as the user asks for at least one star — "if you ask for stars,
+        // we only show what has stars." Above 0 means the filter is active.
+        if (minInterest > 0) {
+          const interest = getInterest(e);
+          if (interest == null || interest < minInterest) return false;
+        }
+        return true;
       }),
-    [entranceMarkers, activeEntranceFilters, activeQualityFilters]
+    [entranceMarkers, activeEntranceFilters, activeQualityFilters, minInterest]
   );
+
+  const hasActiveFilters = useMemo(
+    () =>
+      Object.values(activeEntranceFilters).some(v => !v) ||
+      Object.values(activeQualityFilters).some(v => !v) ||
+      minInterest !== DEFAULT_MIN_INTEREST,
+    [activeEntranceFilters, activeQualityFilters, minInterest]
+  );
+
+  const resetAllFilters = useCallback(() => {
+    setActiveEntranceFilters(
+      Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true]))
+    );
+    setActiveQualityFilters(
+      Object.fromEntries(Object.values(CAVE_QUALITY).map(q => [q, true]))
+    );
+    setMinInterest(DEFAULT_MIN_INTEREST);
+  }, [setActiveEntranceFilters, setActiveQualityFilters, setMinInterest]);
 
   // Marker-eligible layers currently selected — the set to fetch and render as
   // real markers whenever we're above MARKERS_LIMIT. Massifs never appear here
@@ -421,20 +453,28 @@ const HydratedMap = ({
       {ClusterGlobalCss}
       <GeocodingControl />
       <MeasureControl />
-      <DataControl
+      <DataDisplayControl
         selectedLayers={selectedLayers}
         toggleLayer={toggleLayer}
+        isAuth={isAuth}
+        showExplored={showExplored}
+        setShowExplored={setShowExplored}
+        hasExploredData={hasExploredData}
+        useLeafletControl
+      />
+      <FiltersControl
         entranceFilters={ENTRANCE_MARKER_FILTERS}
         activeEntranceFilters={activeEntranceFilters}
         setActiveEntranceFilters={setActiveEntranceFilters}
         qualityFilters={ENTRANCE_QUALITY_FILTERS}
         activeQualityFilters={activeQualityFilters}
         setActiveQualityFilters={setActiveQualityFilters}
+        minInterest={minInterest}
+        setMinInterest={setMinInterest}
         isMarkersMode={isMarkersMode}
-        isAuth={isAuth}
-        showExplored={showExplored}
-        setShowExplored={setShowExplored}
-        hasExploredData={hasExploredData}
+        isEntrancesLayerOn={!!selectedLayers[layerTypes.ENTRANCES]}
+        hasActiveFilters={hasActiveFilters}
+        resetAllFilters={resetAllFilters}
         useLeafletControl
       />
       <ExploredOverlay points={showExplored && isAuth ? exploredPoints : []} />
@@ -546,7 +586,7 @@ const HydratedMap = ({
 
 // Bump MAP_TOUR_VERSION whenever tour content changes significantly enough to re-show to all users.
 // This invalidates every user's stored preference automatically (old key is simply never read).
-const MAP_TOUR_VERSION = 1;
+const MAP_TOUR_VERSION = 2;
 const MAP_TOUR_SEEN_KEY = `mapTourSeen_v${MAP_TOUR_VERSION}`;
 const MAP_TOUR_SESSION_KEY = `mapTourSeenThisSession_v${MAP_TOUR_VERSION}`;
 // Set VITE_DISABLE_MAP_TOUR=true in .env.local to prevent the tour from launching in dev.

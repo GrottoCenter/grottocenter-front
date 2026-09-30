@@ -1,21 +1,11 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import { Popover } from '@mui/material';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useIntl } from 'react-intl';
 import { useFullScreen } from 'react-browser-hooks';
 
 import CustomControl, { customControlProps } from '../common/CustomControl';
-import {
-  CAVE_SIZE,
-  CAVE_SIZE_STYLE,
-  CAVE_SIZE_THRESHOLDS,
-  CAVE_QUALITY_BADGE_VALUE
-} from './constants';
-import DataQualityBadge from '../../DataQualityBadge';
-import DataQualityHelpButton from '../../DataQualityBadge/DataQualityHelpButton';
 import {
   entranceIcon,
   networkIcon,
@@ -23,27 +13,6 @@ import {
   massifIcon
 } from '../../../../assets/icons';
 import { EXPLORED_PIN_PATH } from './ExploredOverlay';
-
-const CAVE_SIZE_POPOVER_ROWS = [
-  {
-    id: CAVE_SIZE.SMALL,
-    labelKey: 'Small caves',
-    messageKey: 'cave size small threshold',
-    thresholds: CAVE_SIZE_THRESHOLDS.MEDIUM
-  },
-  {
-    id: CAVE_SIZE.MEDIUM,
-    labelKey: 'Medium caves',
-    messageKey: 'cave size medium threshold',
-    thresholds: CAVE_SIZE_THRESHOLDS.MEDIUM
-  },
-  {
-    id: CAVE_SIZE.LARGE,
-    labelKey: 'Large caves',
-    messageKey: 'cave size large threshold',
-    thresholds: CAVE_SIZE_THRESHOLDS.LARGE
-  }
-];
 
 // Every dataset the user can toggle on the map. At low zoom each type shows as
 // clusters; at high zoom entrances/networks/organizations switch to real
@@ -99,11 +68,6 @@ const SectionTitle = styled('div')(({ theme }) => ({
   }
 }));
 
-const PopoverContent = styled('div')`
-  padding: 8px 12px;
-  font-size: 13px;
-`;
-
 const OptionLabel = styled('label')`
   display: flex !important;
   align-items: center;
@@ -144,30 +108,6 @@ const ExploredBadgeIcon = () => (
   </svg>
 );
 
-const CaveSizeDot = ({ caveSize }) => {
-  const { radius, fillColor, color, weight } = CAVE_SIZE_STYLE[caveSize];
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 32 32"
-      style={{ flexShrink: 0, marginRight: 4 }}>
-      <circle
-        cx="16"
-        cy="16"
-        r={radius}
-        fill={fillColor}
-        stroke={color}
-        strokeWidth={weight}
-      />
-    </svg>
-  );
-};
-
-CaveSizeDot.propTypes = {
-  caveSize: PropTypes.string.isRequired
-};
-
 const MARKER_ICON = {
   [layerTypes.ENTRANCES]: entranceIcon,
   [layerTypes.NETWORKS]: networkIcon,
@@ -194,16 +134,9 @@ MarkerIcon.propTypes = {
   type: PropTypes.string.isRequired
 };
 
-const DataControl = ({
+const DataDisplayControl = ({
   selectedLayers,
   toggleLayer,
-  entranceFilters,
-  activeEntranceFilters,
-  setActiveEntranceFilters,
-  qualityFilters,
-  activeQualityFilters,
-  setActiveQualityFilters,
-  isMarkersMode,
   isAuth,
   showExplored,
   setShowExplored,
@@ -213,13 +146,6 @@ const DataControl = ({
   const { fullScreen } = useFullScreen();
   const { formatMessage } = useIntl();
   const wrapperRef = useRef(null);
-  const [sizeInfoAnchor, setSizeInfoAnchor] = useState(null);
-
-  // Close the size info popover when leaving markers mode — the anchor element
-  // disappears and MUI would otherwise reopen it with a stale reference on next mount.
-  useEffect(() => {
-    if (!isMarkersMode) setSizeInfoAnchor(null);
-  }, [isMarkersMode]);
 
   const toggleExpanded = useCallback(expanded => {
     const container = wrapperRef.current?.closest('.leaflet-control-layers');
@@ -228,10 +154,8 @@ const DataControl = ({
     }
   }, []);
 
-  // Remove expanded class on unmount
   useEffect(() => () => toggleExpanded(false), [toggleExpanded]);
 
-  // Close panel when touching outside on mobile
   useEffect(() => {
     const handleClickOutside = e => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
@@ -313,94 +237,6 @@ const DataControl = ({
                 )}
               </div>
             )}
-
-            {selectedLayers[layerTypes.ENTRANCES] && (
-              <div
-                style={
-                  !isMarkersMode
-                    ? { opacity: 0.5, pointerEvents: 'none' }
-                    : undefined
-                }>
-                {!isMarkersMode && (
-                  <div
-                    style={{
-                      fontSize: 11,
-                      fontStyle: 'italic',
-                      color: '#666',
-                      padding: '2px 0 4px'
-                    }}>
-                    {formatMessage({ id: 'Available in point view' })}
-                  </div>
-                )}
-                <SectionTitle>
-                  {formatMessage({ id: 'Filter by size' }).toUpperCase()}
-                  <HelpOutlineIcon
-                    fontSize="small"
-                    sx={{ cursor: 'pointer', color: 'text.secondary' }}
-                    onClick={e => setSizeInfoAnchor(e.currentTarget)}
-                  />
-                </SectionTitle>
-                <Popover
-                  open={Boolean(sizeInfoAnchor)}
-                  anchorEl={sizeInfoAnchor}
-                  onClose={() => setSizeInfoAnchor(null)}
-                  anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
-                  transformOrigin={{ vertical: 'center', horizontal: 'left' }}>
-                  <PopoverContent>
-                    {CAVE_SIZE_POPOVER_ROWS.map(
-                      ({ id, labelKey, messageKey, thresholds }) => (
-                        <div key={id}>
-                          <strong>{formatMessage({ id: labelKey })}</strong>
-                          {`: ${formatMessage({ id: messageKey }, thresholds)}`}
-                        </div>
-                      )
-                    )}
-                  </PopoverContent>
-                </Popover>
-                {entranceFilters.map(filter => (
-                  <OptionLabel key={filter.id}>
-                    <input
-                      type="checkbox"
-                      name={filter.id}
-                      checked={activeEntranceFilters[filter.id] ?? false}
-                      onChange={() =>
-                        setActiveEntranceFilters(prev => ({
-                          ...prev,
-                          [filter.id]: !prev[filter.id]
-                        }))
-                      }
-                    />
-                    <CaveSizeDot caveSize={filter.id} />
-                    <span>{formatMessage({ id: filter.labelKey })}</span>
-                  </OptionLabel>
-                ))}
-
-                <SectionTitle>
-                  {formatMessage({ id: 'Filter by quality' }).toUpperCase()}
-                  <DataQualityHelpButton />
-                </SectionTitle>
-                {qualityFilters.map(filter => (
-                  <OptionLabel key={filter.id}>
-                    <input
-                      type="checkbox"
-                      name={filter.id}
-                      checked={activeQualityFilters[filter.id] ?? false}
-                      onChange={() =>
-                        setActiveQualityFilters(prev => ({
-                          ...prev,
-                          [filter.id]: !prev[filter.id]
-                        }))
-                      }
-                    />
-                    <DataQualityBadge
-                      value={CAVE_QUALITY_BADGE_VALUE[filter.id]}
-                      size={20}
-                    />
-                    <span>{formatMessage({ id: filter.labelKey })}</span>
-                  </OptionLabel>
-                ))}
-              </div>
-            )}
           </div>
         </section>
       </div>
@@ -408,28 +244,11 @@ const DataControl = ({
   );
 };
 
-const MemoizedDataControl = React.memo(DataControl);
+const MemoizedDataDisplayControl = React.memo(DataDisplayControl);
 
-DataControl.propTypes = {
+DataDisplayControl.propTypes = {
   selectedLayers: PropTypes.objectOf(PropTypes.bool).isRequired,
   toggleLayer: PropTypes.func.isRequired,
-  entranceFilters: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      labelKey: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  activeEntranceFilters: PropTypes.objectOf(PropTypes.bool).isRequired,
-  setActiveEntranceFilters: PropTypes.func.isRequired,
-  qualityFilters: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      labelKey: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  activeQualityFilters: PropTypes.objectOf(PropTypes.bool).isRequired,
-  setActiveQualityFilters: PropTypes.func.isRequired,
-  isMarkersMode: PropTypes.bool.isRequired,
   isAuth: PropTypes.bool,
   showExplored: PropTypes.bool,
   setShowExplored: PropTypes.func,
@@ -437,6 +256,6 @@ DataControl.propTypes = {
   ...customControlProps
 };
 
-MemoizedDataControl.propTypes = DataControl.propTypes;
+MemoizedDataDisplayControl.propTypes = DataDisplayControl.propTypes;
 
-export default MemoizedDataControl;
+export default MemoizedDataDisplayControl;

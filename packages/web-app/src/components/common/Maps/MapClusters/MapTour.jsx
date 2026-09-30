@@ -15,6 +15,12 @@ const MapTour = ({ run, onEnd }) => {
         position: 'right'
       },
       {
+        selector: '[data-tour="filters-control-toggle"]',
+        title: formatMessage({ id: 'Tour - Filters' }),
+        content: formatMessage({ id: 'Tour - Filters description' }),
+        position: 'right'
+      },
+      {
         selector: '.leaflet-control-layers a.leaflet-control-layers-toggle',
         title: formatMessage({ id: 'Tour - Map layers' }),
         content: formatMessage({ id: 'Tour - Map layers description' }),

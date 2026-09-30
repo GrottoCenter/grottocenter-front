@@ -2,10 +2,12 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import CustomIcon from '../../../../CustomIcon';
 import DataQualityBadge from '../../../../DataQualityBadge';
+import InterestStars from '../../../../InterestStars';
 import {
   getDataQualityValue,
   getDataQualityLabelKey
 } from '../../../../../../utils/dataQuality';
+import { getInterestLabelKey } from '../../../../../../utils/interest';
 import { Information } from './utils';
 
 export const EntrancePopup = ({ entrance }) => {
@@ -52,6 +54,14 @@ export const EntrancePopup = ({ entrance }) => {
           })}
         />
       )}
+      {typeof entrance.aestheticism === 'number' && (
+        <Information
+          icon={<InterestStars value={entrance.aestheticism} size={20} />}
+          value={formatMessage({
+            id: getInterestLabelKey(entrance.aestheticism)
+          })}
+        />
+      )}
     </>
   );
 };
@@ -69,7 +79,8 @@ EntrancePopup.propTypes = {
     dataQuality: PropTypes.oneOfType([
       PropTypes.number,
       PropTypes.shape({ total: PropTypes.number })
-    ])
+    ]),
+    aestheticism: PropTypes.number
   }).isRequired
 };
 
