@@ -242,6 +242,7 @@ const Massif = ({
                 )}
                 <DeleteConfirmationDialog
                   entityType={DELETED_ENTITIES.massif}
+                  entityId={massif.id}
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
                   isPermanent={isDeleteConfirmationPermanent}

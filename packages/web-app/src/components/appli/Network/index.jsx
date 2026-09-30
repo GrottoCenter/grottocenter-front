@@ -263,6 +263,7 @@ export const Network = ({
                 )}
                 <DeleteConfirmationDialog
                   entityType={DELETED_ENTITIES.network}
+                  entityId={cave.id}
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
                   isPermanent={isDeleteConfirmationPermanent}

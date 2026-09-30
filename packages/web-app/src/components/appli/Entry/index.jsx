@@ -352,6 +352,7 @@ export const Entry = ({
                 )}
                 <DeleteConfirmationDialog
                   entityType={DELETED_ENTITIES.entrance}
+                  entityId={entrance.id}
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
                   isPermanent={isDeleteConfirmationPermanent}

@@ -235,6 +235,7 @@ const Person = ({
         <>
           <DeleteConfirmationDialog
             entityType={DELETED_ENTITIES.person}
+            entityId={person.id}
             isOpen={isDeleteConfirmationOpen}
             isLoading={false}
             isPermanent

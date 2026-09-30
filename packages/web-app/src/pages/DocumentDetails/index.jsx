@@ -497,6 +497,7 @@ const Document = ({
       />
       <DeleteConfirmationDialog
         entityType={DELETED_ENTITIES.document}
+        entityId={documentData?.id}
         isOpen={isDeleteConfirmationOpen}
         isLoading={isActionLoading}
         isPermanent={isDeleteConfirmationPermanent}
