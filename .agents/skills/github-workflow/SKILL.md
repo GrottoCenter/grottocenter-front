@@ -69,10 +69,18 @@ The file must already exist on disk before asking for confirmation.
 
 ```bash
 git push origin <branch-name>
-gh pr create --title "<type(scope): description>" --body-file pr_body.md --base develop --repo <repo>
+gh pr create --title "<type(scope): description>" --body-file pr_body.md --base develop --repo <repo> --reviewer ClemRz,urien --assignee "@me"
 ```
 
 Where `<repo>` is detected via `gh repo view --json nameWithOwner -q .nameWithOwner`.
+
+Request reviews from [ClemRz](https://github.com/ClemRz) and
+[urien](https://github.com/urien), and assign the PR to the authenticated
+account. For an existing PR, add only missing reviewers with `gh pr edit
+<pr-number> --add-reviewer <login> --add-assignee "@me"`; avoid re-requesting
+a review from someone already requested. Verify the result with
+`gh pr view <pr-number> --repo <repo> --json reviewRequests,assignees`.
+Report any GitHub rejection instead of silently leaving the PR unassigned.
 
 **4. Clean up:**
 
