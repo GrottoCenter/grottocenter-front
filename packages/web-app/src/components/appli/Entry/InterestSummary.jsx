@@ -8,16 +8,12 @@ import CustomIcon from '@/components/common/CustomIcon';
 import InfoSection from '@/components/common/InfoSection';
 import { Property } from '@/components/common/Properties';
 import { CommentPropTypes } from '@/types/entrance.type';
-import { durationStringToMinutes } from '@/utils/dateTimeDuration';
+import {
+  durationStringToMinutes,
+  formatDurationMinutes
+} from '@/utils/dateTimeDuration';
 
-const formatDuration = minutes => {
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  if (hours === 0) return `${minutes}min`;
-  return `${hours}h${remainingMinutes ? String(remainingMinutes).padStart(2, '0') : ''}`;
-};
-
-const getDurationRange = (comments, field) => {
+const getDurationRange = (comments, field, formatNumber) => {
   const durations = comments
     .map(comment => durationStringToMinutes(comment[field]))
     .filter(minutes => Number.isFinite(minutes) && minutes > 0);
@@ -25,22 +21,29 @@ const getDurationRange = (comments, field) => {
 
   const minimum = Math.min(...durations);
   const maximum = Math.max(...durations);
-  if (minimum === maximum) return formatDuration(minimum);
-  if (maximum < 60) return `${minimum}-${maximum}min`;
-  return `${formatDuration(minimum)}-${formatDuration(maximum)}`;
+  if (minimum === maximum) return formatDurationMinutes(minimum, formatNumber);
+  return `${formatDurationMinutes(minimum, formatNumber)}–${formatDurationMinutes(maximum, formatNumber)}`;
 };
 
 const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {
   const { formatMessage, formatNumber } = useIntl();
   const activeComments = comments.filter(comment => !comment.isDeleted);
-  const ratings = activeComments
+  const ratings = comments
     .map(comment => comment.aestheticism)
     .filter(value => Number.isFinite(value) && value > 0);
   const average = ratings.length
     ? ratings.reduce((sum, value) => sum + value, 0) / ratings.length / 2
     : null;
-  const approachTime = getDurationRange(activeComments, 'eTTrail');
-  const undergroundTime = getDurationRange(activeComments, 'eTUnderground');
+  const approachTime = getDurationRange(
+    activeComments,
+    'eTTrail',
+    formatNumber
+  );
+  const undergroundTime = getDurationRange(
+    activeComments,
+    'eTUnderground',
+    formatNumber
+  );
   const commentsUrl = `/ui/entrances/${entranceId}?tab=comments`;
 
   return (

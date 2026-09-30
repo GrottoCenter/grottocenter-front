@@ -23,7 +23,7 @@ const renderSummary = (comments, canComment = false, locale = 'en') =>
   );
 
 describe('InterestSummary', () => {
-  it('counts rated active comments and ignores deleted or unrated comments', () => {
+  it('matches the API average, including ratings on deleted comments', () => {
     renderSummary([
       { aestheticism: 7, isDeleted: false },
       { aestheticism: 8, isDeleted: false },
@@ -34,8 +34,8 @@ describe('InterestSummary', () => {
     expect(
       screen.getByRole('heading', { name: 'Interest of the visit' })
     ).toBeInTheDocument();
-    expect(screen.getByText('3.8/5')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '2 ratings' })).toHaveAttribute(
+    expect(screen.getByText('4.2/5')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '3 ratings' })).toHaveAttribute(
       'href',
       '/ui/entrances/42?tab=comments'
     );
@@ -88,9 +88,9 @@ describe('InterestSummary', () => {
     );
 
     expect(screen.getByText("Temps d'accès")).toBeVisible();
-    expect(screen.getByText('15-30min')).toBeVisible();
+    expect(screen.getByText('15min–30min')).toBeVisible();
     expect(screen.getByText('Temps passé sous terre')).toBeVisible();
-    expect(screen.getByText('1h30-2h')).toBeVisible();
+    expect(screen.getByText('1h 30min–2h')).toBeVisible();
     expect(screen.getByRole('link', { name: '1 évaluation' })).toBeVisible();
   });
 
@@ -100,7 +100,7 @@ describe('InterestSummary', () => {
       { eTTrail: null, eTUnderground: 'invalid' }
     ]);
 
-    expect(screen.getByText('1h05')).toBeVisible();
+    expect(screen.getByText('1h 5m')).toBeVisible();
     expect(screen.queryByText('Time to go')).not.toBeInTheDocument();
     expect(screen.getByText('Not rated')).toBeVisible();
   });

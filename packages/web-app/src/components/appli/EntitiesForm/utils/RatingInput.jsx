@@ -73,7 +73,7 @@ const RatingInput = ({
             setHoveredRating(newHover === -1 ? null : newHover)
           }
           onFocusCapture={event => {
-            if (event.target.type === 'radio') {
+            if (event.target.type === 'radio' && event.target.value !== '') {
               setFocusedRating(Number(event.target.value));
             }
           }}

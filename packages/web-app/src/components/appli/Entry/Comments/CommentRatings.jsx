@@ -10,9 +10,13 @@ import {
 } from '@/utils/visitRatingLevels';
 
 const ratingDefinitions = [
-  { key: 'interest', labelId: 'Interest', levels: INTEREST_LEVELS },
-  { key: 'progression', labelId: 'Progression', levels: EASE_LEVELS },
-  { key: 'access', labelId: 'Access', levels: EASE_LEVELS }
+  {
+    key: 'interest',
+    labelId: 'Interest of the visit',
+    levels: INTEREST_LEVELS
+  },
+  { key: 'progression', labelId: 'Ease of move', levels: EASE_LEVELS },
+  { key: 'access', labelId: 'Ease of reach', levels: EASE_LEVELS }
 ];
 
 const CommentRatings = ({ interest, progression, access }) => {

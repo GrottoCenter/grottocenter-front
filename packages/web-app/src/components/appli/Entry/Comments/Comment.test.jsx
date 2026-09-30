@@ -46,16 +46,18 @@ describe('Comment', () => {
     });
 
     const title = screen.getByRole('heading', { name: 'A memorable visit' });
-    const interest = screen.getByRole('group', { name: 'Interest' });
-    const progression = screen.getByRole('group', { name: 'Progression' });
-    const access = screen.getByRole('group', { name: 'Access' });
+    const interest = screen.getByRole('group', {
+      name: 'Interest of the visit'
+    });
+    const progression = screen.getByRole('group', { name: 'Ease of move' });
+    const access = screen.getByRole('group', { name: 'Ease of reach' });
     const body = screen.getByText('The main passage was impressive.');
     const metadata = screen.getByText('Metadata footer');
 
     expect(screen.getByAltText('Time to go')).toBeInTheDocument();
     expect(screen.getByAltText('Underground time')).toBeInTheDocument();
-    expect(screen.getByText('1h30m')).toBeInTheDocument();
-    expect(screen.getByText('4h20m')).toBeInTheDocument();
+    expect(screen.getByText('1h 30m')).toBeInTheDocument();
+    expect(screen.getByText('4h 20m')).toBeInTheDocument();
     expect(within(interest).getByText('4/5 · Remarkable')).toBeInTheDocument();
     expect(
       within(progression).getByText('3.5/5 · Intermediate – Easy')
@@ -84,7 +86,7 @@ describe('Comment', () => {
     });
 
     expect(
-      screen.queryByRole('group', { name: 'Interest' })
+      screen.queryByRole('group', { name: 'Interest of the visit' })
     ).not.toBeInTheDocument();
     expect(screen.queryByAltText('Time to go')).not.toBeInTheDocument();
     expect(screen.getByText('Just a note.')).toBeInTheDocument();

@@ -2,10 +2,40 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { describe, expect, it, vi } from 'vitest';
 
+import useSearchFilter from '@/hooks/useSearchFilter';
+import { normalizeRatingFilterState } from '@/utils/ratingFilter';
 import messages from '../../../../public/lang/en.json';
 import frenchMessages from '../../../../public/lang/fr.json';
-import { ActiveFilterChips } from './SearchElements';
+import { ActiveFilterChips, countActiveFilters } from './SearchElements';
 import SearchRatingSlider from './SearchRatingSlider';
+
+const initialFilterState = { 'commentsRating.aestheticism': null };
+
+const RatingFilterFixture = () => {
+  const { filterState, updateFilter, handleRemoveFilter } =
+    useSearchFilter(initialFilterState);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => updateFilter('commentsRating.aestheticism', [2, 10])}>
+        Set rating filter
+      </button>
+      <SearchRatingSlider
+        label="Interest of the visit"
+        value={filterState['commentsRating.aestheticism']}
+        onChange={value => updateFilter('commentsRating.aestheticism', value)}
+      />
+      <ActiveFilterChips
+        filterState={filterState}
+        query=""
+        onClearQuery={() => {}}
+        onRemoveFilter={handleRemoveFilter}
+        labelMap={{ 'commentsRating.aestheticism': 'Interest of the visit' }}
+      />
+    </>
+  );
+};
 
 const renderWithIntl = child =>
   render(
@@ -15,6 +45,65 @@ const renderWithIntl = child =>
   );
 
 describe('SearchRatingSlider', () => {
+  it('clears a rating chip without crashing the controlled slider', () => {
+    renderWithIntl(<RatingFilterFixture />);
+    fireEvent.click(screen.getByRole('button', { name: 'Set rating filter' }));
+    expect(screen.getByText('Interest of the visit: ≥ 1★')).toBeVisible();
+
+    fireEvent.click(
+      screen
+        .getByRole('button', { name: 'Interest of the visit: ≥ 1★' })
+        .querySelector('[data-testid="CancelIcon"]')
+    );
+
+    expect(
+      screen.getByRole('slider', {
+        name: 'Interest of the visit: Minimum rating'
+      })
+    ).toHaveAttribute('aria-valuetext', '0');
+    expect(
+      screen.queryByText('Interest of the visit: ≥ 1★')
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not count or display a restored full-range rating', () => {
+    const filterState = { 'commentsRating.aestheticism': [0, 10] };
+    expect(countActiveFilters(filterState)).toBe(0);
+    expect(normalizeRatingFilterState(filterState)).toEqual({
+      'commentsRating.aestheticism': null
+    });
+
+    renderWithIntl(
+      <ActiveFilterChips
+        filterState={filterState}
+        query=""
+        onClearQuery={() => {}}
+        labelMap={{ 'commentsRating.aestheticism': 'Interest of the visit' }}
+      />
+    );
+    expect(
+      screen.queryByText(/Interest of the visit:/)
+    ).not.toBeInTheDocument();
+  });
+
+  it('treats a legacy non-array value as an empty rating filter', () => {
+    const onChange = vi.fn();
+    renderWithIntl(
+      <SearchRatingSlider
+        label="Interest of the visit"
+        value=""
+        onChange={onChange}
+      />
+    );
+
+    expect(
+      screen.getByRole('slider', {
+        name: 'Interest of the visit: Minimum rating'
+      })
+    ).toHaveAttribute('aria-valuetext', '0');
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it('shows stars and sends the existing 0–10 scale to the search', () => {
     const onChange = vi.fn();
     renderWithIntl(

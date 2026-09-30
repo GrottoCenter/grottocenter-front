@@ -64,10 +64,9 @@ describe('CreateCommentForm', () => {
       }
     );
     fireEvent.click(
-      within(screen.getByRole('group', { name: 'Interest rating' })).getByRole(
-        'radio',
-        { name: '4 out of 5 stars' }
-      )
+      within(
+        screen.getByRole('group', { name: 'Interest of the visit' })
+      ).getByRole('radio', { name: '4 out of 5 stars' })
     );
     fireEvent.change(
       screen.getByRole('textbox', { name: 'Approach time — Hours' }),

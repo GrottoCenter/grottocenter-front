@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { useIntl } from 'react-intl';
 import DataUsageIcon from '@mui/icons-material/DataUsage';
+import { normalizeRatingFilterState } from '@/utils/ratingFilter';
 import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
 import SearchInput from '../../common/SearchInput';
 import SearchRatingSlider from './SearchRatingSlider';
@@ -95,7 +96,8 @@ const EntrancesSearch = ({
   valueLabels = {}
 }) => {
   const mergedInitialState = useMemo(
-    () => ({ ...initialFilterState, ...initialFilter }),
+    () =>
+      normalizeRatingFilterState({ ...initialFilterState, ...initialFilter }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -115,7 +117,9 @@ const EntrancesSearch = ({
     startAdvancedSearch({
       entity: searchEntity,
       query: overrideQuery !== undefined ? overrideQuery : query,
-      filter: overrideFilter !== undefined ? overrideFilter : filterState,
+      filter: normalizeRatingFilterState(
+        overrideFilter !== undefined ? overrideFilter : filterState
+      ),
       matchAllFields:
         overrideMatchAll !== undefined ? overrideMatchAll : matchAllFields,
       size: getStoredRowsPerPage()

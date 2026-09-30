@@ -22,3 +22,26 @@ export const durationStringToMinutes = durationStr => {
   const splitDuration = durationStr.split(':');
   return +splitDuration[0] * 60 + +splitDuration[1];
 };
+
+export const formatDurationMinutes = (minutes, formatNumber) => {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  const parts = [];
+  if (hours > 0)
+    parts.push(
+      formatNumber(hours, {
+        style: 'unit',
+        unit: 'hour',
+        unitDisplay: 'narrow'
+      })
+    );
+  if (remainingMinutes > 0)
+    parts.push(
+      formatNumber(remainingMinutes, {
+        style: 'unit',
+        unit: 'minute',
+        unitDisplay: 'narrow'
+      })
+    );
+  return parts.join(' ');
+};

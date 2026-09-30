@@ -18,7 +18,7 @@ const RatingFixture = () => {
   const [value, setValue] = useState(null);
   return (
     <RatingInput
-      labelId="Interest rating"
+      labelId="Interest of the visit"
       descriptionIds={levels}
       value={value}
       onChange={setValue}
@@ -35,6 +35,14 @@ const renderRating = child =>
   );
 
 describe('RatingInput', () => {
+  it('keeps the unrated label when keyboard focus enters the empty option', () => {
+    const { container } = renderRating(<RatingFixture />);
+    const emptyRadio = container.querySelector('input[type="radio"][value=""]');
+    fireEvent.focus(emptyRadio);
+    expect(screen.getByText('No Rating')).toBeInTheDocument();
+    expect(screen.queryByText('0/5')).not.toBeInTheDocument();
+  });
+
   it('previews a level on hover and restores the unselected state', () => {
     const { container } = renderRating(<RatingFixture />);
     const rating = container.querySelector('.MuiRating-root');
@@ -72,7 +80,7 @@ describe('RatingInput', () => {
   it('describes a historical half-star rating without changing it', () => {
     renderRating(
       <RatingInput
-        labelId="Interest rating"
+        labelId="Interest of the visit"
         descriptionIds={levels}
         precision={0.5}
         value={9}

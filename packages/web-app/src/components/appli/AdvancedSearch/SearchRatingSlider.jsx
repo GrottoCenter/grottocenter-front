@@ -9,18 +9,19 @@ import { normalizeRatingRange } from '@/utils/ratingFilter';
 
 const SearchRatingSlider = ({ label, value, onChange }) => {
   const { formatMessage, formatNumber } = useIntl();
-  const currentValue = normalizeRatingRange(value ?? [0, 10]);
+  const hasValue = Array.isArray(value);
+  const currentValue = normalizeRatingRange(hasValue ? value : [0, 10]);
   const displayedValue = currentValue.map(rating => rating / 2);
   const formatStars = rating =>
     rating === 0 ? '0' : `${formatNumber(rating)}★`;
 
   useEffect(() => {
-    if (value == null) return;
+    if (!hasValue) return;
     const normalizedValue = normalizeRatingRange(value);
     if (normalizedValue.some((rating, index) => rating !== value[index])) {
       onChange(normalizedValue);
     }
-  }, [value, onChange]);
+  }, [hasValue, value, onChange]);
 
   const handleChange = (_, nextValue) => {
     const rawValue = nextValue.map(rating => rating * 2);
@@ -45,7 +46,7 @@ const SearchRatingSlider = ({ label, value, onChange }) => {
           size="small"
           onClick={() => onChange(null)}
           aria-label={`${formatMessage({ id: 'clear filter' })}: ${label}`}
-          sx={{ visibility: value == null ? 'hidden' : 'visible', p: 0.25 }}>
+          sx={{ visibility: hasValue ? 'visible' : 'hidden', p: 0.25 }}>
           <ClearIcon fontSize="small" />
         </IconButton>
       </FormLabel>

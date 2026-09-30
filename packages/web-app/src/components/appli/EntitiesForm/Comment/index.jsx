@@ -143,7 +143,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
             <InputRating
               control={control}
               formKey="aestheticism"
-              labelId="Interest rating"
+              labelId="Interest of the visit"
               descriptionIds={INTEREST_LEVELS}
               precision={(values?.aestheticism ?? 0) % 2 === 1 ? 0.5 : 1}
             />

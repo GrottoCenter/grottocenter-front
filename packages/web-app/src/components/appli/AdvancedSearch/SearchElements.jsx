@@ -38,7 +38,11 @@ import LockIcon from '@mui/icons-material/Lock';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { sxPropType } from '@/types/mui.type';
-import { formatRatingRange, isRatingFilter } from '@/utils/ratingFilter';
+import {
+  formatRatingRange,
+  isFullRatingRange,
+  isRatingFilter
+} from '@/utils/ratingFilter';
 import { fetchFieldSearch } from '../../../actions/FieldSearch';
 import Translate from '../../common/Translate';
 import OfflineDisabled from '../../common/OfflineDisabled';
@@ -656,8 +660,13 @@ export const countActiveFilters = (filterState, includeKeys) => {
   const entries = includeKeys
     ? Object.entries(filterState).filter(([k]) => includeKeys.includes(k))
     : Object.entries(filterState);
-  return entries.filter(([, v]) => v !== null && v !== '' && v !== undefined)
-    .length;
+  return entries.filter(
+    ([key, value]) =>
+      value !== null &&
+      value !== '' &&
+      value !== undefined &&
+      !isFullRatingRange(key, value)
+  ).length;
 };
 
 const formatRangeValue = (key, value, formatNumber) => {
@@ -710,7 +719,13 @@ export const ActiveFilterChips = ({
   }
 
   Object.entries(filterState).forEach(([key, value]) => {
-    if (value === null || value === '' || value === undefined) return;
+    if (
+      value === null ||
+      value === '' ||
+      value === undefined ||
+      isFullRatingRange(key, value)
+    )
+      return;
     const isLocked = lockedKeys.includes(key);
     const labelId = labelMap[key] || key;
     const translatedLabel = formatMessage({ id: labelId });
