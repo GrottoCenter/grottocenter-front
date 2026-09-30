@@ -7,7 +7,7 @@ import {
   getDataQualityValue,
   getDataQualityLabelKey
 } from '../../../../../../utils/dataQuality';
-import { getInterestLabelKey } from '../../../../../../utils/interest';
+import { getInterestLabelKeys } from '../../../../../../utils/interest';
 import { Information } from './utils';
 
 export const EntrancePopup = ({ entrance }) => {
@@ -54,12 +54,12 @@ export const EntrancePopup = ({ entrance }) => {
           })}
         />
       )}
-      {typeof entrance.aestheticism === 'number' && (
+      {entrance.aestheticism > 0 && (
         <Information
           icon={<InterestStars value={entrance.aestheticism} size={20} />}
-          value={formatMessage({
-            id: getInterestLabelKey(entrance.aestheticism)
-          })}
+          value={getInterestLabelKeys(entrance.aestheticism)
+            .map(id => formatMessage({ id }))
+            .join(' – ')}
         />
       )}
     </>

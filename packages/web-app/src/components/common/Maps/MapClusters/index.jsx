@@ -21,7 +21,11 @@ import { ContentCopy, LocationOn, Tune } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import copyToClipboard from '@/utils/clipboard';
-import { meetsMinimumInterest } from '@/utils/interest';
+import {
+  interestToStars,
+  meetsMinimumInterest,
+  starsToInterest
+} from '@/utils/interest';
 import GeocodingControl from '../common/GeocodingControl';
 import MapTour from './MapTour';
 import DataDisplayControl, { layerTypes } from './DataDisplayControl';
@@ -171,6 +175,7 @@ const HydratedMap = ({
     'grottocenter_minInterest',
     DEFAULT_MIN_INTEREST
   );
+  const effectiveMinInterest = starsToInterest(interestToStars(minInterest));
 
   const filteredEntranceMarkers = useMemo(
     () =>
@@ -181,17 +186,22 @@ const HydratedMap = ({
         if (quality !== null && !activeQualityFilters[quality]) return false;
         // Compare the displayed star level so an entrance shown with two stars
         // is included when the user selects a two-star minimum.
-        return meetsMinimumInterest(e.aestheticism, minInterest);
+        return meetsMinimumInterest(e.aestheticism, effectiveMinInterest);
       }),
-    [entranceMarkers, activeEntranceFilters, activeQualityFilters, minInterest]
+    [
+      entranceMarkers,
+      activeEntranceFilters,
+      activeQualityFilters,
+      effectiveMinInterest
+    ]
   );
 
   const hasActiveFilters = useMemo(
     () =>
       Object.values(activeEntranceFilters).some(v => !v) ||
       Object.values(activeQualityFilters).some(v => !v) ||
-      minInterest !== DEFAULT_MIN_INTEREST,
-    [activeEntranceFilters, activeQualityFilters, minInterest]
+      effectiveMinInterest !== DEFAULT_MIN_INTEREST,
+    [activeEntranceFilters, activeQualityFilters, effectiveMinInterest]
   );
 
   const resetAllFilters = useCallback(() => {
@@ -460,7 +470,7 @@ const HydratedMap = ({
         qualityFilters={ENTRANCE_QUALITY_FILTERS}
         activeQualityFilters={activeQualityFilters}
         setActiveQualityFilters={setActiveQualityFilters}
-        minInterest={minInterest}
+        minInterest={effectiveMinInterest}
         setMinInterest={setMinInterest}
         isMarkersMode={isMarkersMode}
         isEntrancesLayerOn={!!selectedLayers[layerTypes.ENTRANCES]}
@@ -627,7 +637,8 @@ const markerType = PropTypes.shape({
   latitude: PropTypes.number.isRequired,
   longitude: PropTypes.number.isRequired,
   id: PropTypes.number.isRequired,
-  name: PropTypes.string
+  name: PropTypes.string,
+  aestheticism: PropTypes.number
 });
 
 HydratedMap.propTypes = {

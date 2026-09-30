@@ -1,28 +1,33 @@
-// Interest ("aestheticism") — the backend returns a 0–10 average and the whole
-// app displays it as N/5 stars. Helpers here mirror utils/dataQuality.js so the
-// two rating families use the same shape (level → label key, single rounding
-// rule reused everywhere).
+// Interest ("aestheticism") — the backend returns a 0–10 average. The map
+// rounds it to half-star steps, matching the comment rating stars.
 
-import { INTEREST_LEVELS } from './visitRatingLevels';
+import { INTEREST_LEVELS, getRatingLevelIds } from './visitRatingLevels';
 
 // Same amber tone as the MUI Rating default fill — used across the map filter
 // widget and the popup stars, so the two read as the same rating semantic.
 export const INTEREST_STAR_COLOR = '#faaf00';
 
-// value is on the raw 0–10 scale returned by the API.
-// Returns null when the entrance has no rating yet — callers must guard.
+// Convert the API's 0–10 scale to the half stars used by the map filter.
+// Clamp stored filter values too, so a stale or invalid localStorage entry
+// cannot show six stars or hide every entrance with an impossible minimum.
+export const interestToStars = value =>
+  Number.isFinite(value) ? Math.min(5, Math.max(0, Math.round(value) / 2)) : 0;
+
+export const starsToInterest = stars =>
+  Math.min(10, Math.max(0, Math.round(stars * 2)));
+
+// A zero or missing average means unrated; the API excludes zero ratings.
 export const getInterestLevel = value => {
-  if (value == null) return null;
-  // Round to nearest star, but a strictly-positive rating never rounds to 0
-  // (a comment giving 0.5/10 is still "one star's worth" for display).
-  const stars = Math.max(1, Math.round(value / 2));
-  return Math.min(5, stars);
+  if (!Number.isFinite(value) || value <= 0) return null;
+  // A strictly-positive average still receives at least half a star.
+  return Math.max(0.5, interestToStars(value));
 };
 
-export const getInterestLabelKey = value => {
+export const getInterestLabelKeys = value => {
   const level = getInterestLevel(value);
-  return level == null ? null : INTEREST_LEVELS[level - 1];
+  return getRatingLevelIds(level == null ? null : value / 2, INTEREST_LEVELS);
 };
 
 export const meetsMinimumInterest = (value, minimum) =>
-  minimum <= 0 || (getInterestLevel(value) ?? 0) >= minimum / 2;
+  interestToStars(minimum) === 0 ||
+  (getInterestLevel(value) ?? 0) >= interestToStars(minimum);

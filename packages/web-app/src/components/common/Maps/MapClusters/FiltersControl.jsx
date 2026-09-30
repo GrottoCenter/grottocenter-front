@@ -13,12 +13,15 @@ import {
   CAVE_SIZE,
   CAVE_SIZE_STYLE,
   CAVE_SIZE_THRESHOLDS,
-  CAVE_QUALITY_BADGE_VALUE,
-  DEFAULT_MIN_INTEREST
+  CAVE_QUALITY_BADGE_VALUE
 } from './constants';
 import DataQualityBadge from '../../DataQualityBadge';
 import DataQualityHelpButton from '../../DataQualityBadge/DataQualityHelpButton';
-import { INTEREST_STAR_COLOR } from '../../../../utils/interest';
+import {
+  INTEREST_STAR_COLOR,
+  interestToStars,
+  starsToInterest
+} from '../../../../utils/interest';
 import {
   ControlToggleButton,
   ControlSectionTitle,
@@ -124,13 +127,9 @@ CaveSizeDot.propTypes = {
   caveSize: PropTypes.string.isRequired
 };
 
-// Backend "aestheticism" is a 0–10 average; the UI displays it on N/5 with the
-// same MUI Rating component used on every entrance card, so choosing the min
-// here reads exactly like the value it filters.
+// Backend "aestheticism" is a 0–10 average. The filter uses half-star steps,
+// matching the stars displayed in the popup and in comment ratings.
 const MAX_STARS = 5;
-const interestToStars = value => Math.round(value / 2);
-const starsToInterest = stars => stars * 2;
-
 const FiltersControl = ({
   entranceFilters,
   activeEntranceFilters,
@@ -183,9 +182,16 @@ const FiltersControl = ({
   }, [toggleExpanded]);
 
   const filtersDisabled = !isMarkersMode || !isEntrancesLayerOn;
-  const disabledReasonKey = !isEntrancesLayerOn
-    ? 'Turn on entrances to enable filters'
-    : 'Zoom in to enable filters';
+  let disabledReasonKey;
+  if (!isMarkersMode) {
+    disabledReasonKey = hasActiveFilters
+      ? 'Zoom in to apply saved filters'
+      : 'Zoom in to enable filters';
+  } else {
+    disabledReasonKey = hasActiveFilters
+      ? 'Turn on entrances to apply saved filters'
+      : 'Turn on entrances to enable filters';
+  }
 
   return (
     <CustomControl
@@ -312,6 +318,7 @@ const FiltersControl = ({
               <InterestRow>
                 <Rating
                   max={MAX_STARS}
+                  precision={0.5}
                   value={interestToStars(minInterest)}
                   // MUI Rating fires with `null` when the user clicks the
                   // currently-active star (native "clear" gesture). That maps
@@ -392,5 +399,4 @@ FiltersControl.propTypes = {
 
 MemoizedFiltersControl.propTypes = FiltersControl.propTypes;
 
-export { DEFAULT_MIN_INTEREST };
 export default MemoizedFiltersControl;

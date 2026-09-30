@@ -5,7 +5,8 @@ import L from 'leaflet';
 import { GlobalStyles } from '@mui/material';
 import {
   MAP_MARKER_OUTLINE_COLOR,
-  MAP_MARKER_OUTLINE_WIDTH
+  MAP_MARKER_OUTLINE_WIDTH,
+  CSS_MARKER_OUTLINE_WIDTH
 } from '../common/mapMarkerOutline';
 import useCluster from './useCluster';
 
@@ -19,9 +20,6 @@ const SIZE_BUCKETS = [
 ];
 
 const sizeForCount = count => SIZE_BUCKETS.find(b => count < b.max).size;
-
-// CSS borders read slightly thinner than the network's SVG stroke at 1.5px.
-const CSS_BUBBLE_OUTLINE_WIDTH = 2;
 
 // Per-type pixel offset applied to the bubble via CSS translate. Nudges the
 // layers apart at the same geo point so users see distinct bubbles instead of
@@ -54,7 +52,7 @@ export const ClusterGlobalCss = (
       /* Entrance — circle */
       .cluster-bubble[data-type="entrance"] {
         background: rgba(139, 69, 19, 0.85);
-        border: ${CSS_BUBBLE_OUTLINE_WIDTH}px solid ${MAP_MARKER_OUTLINE_COLOR};
+        border: ${CSS_MARKER_OUTLINE_WIDTH}px solid ${MAP_MARKER_OUTLINE_COLOR};
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         border-radius: 50%;
       }
@@ -62,15 +60,15 @@ export const ClusterGlobalCss = (
       .cluster-bubble[data-type="organization"] {
         background: rgba(255, 193, 7, 0.9);
         color: #3E2723;
-        border: ${CSS_BUBBLE_OUTLINE_WIDTH}px solid ${MAP_MARKER_OUTLINE_COLOR};
+        border: ${CSS_MARKER_OUTLINE_WIDTH}px solid ${MAP_MARKER_OUTLINE_COLOR};
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         border-radius: 22%;
       }
       /* Massif — rounded square rotated 45°, with a border compensated for
-         the scale so its visible width remains 1.7 CSS pixels. */
+         the scale so its visible width remains 2 CSS pixels. */
       .cluster-bubble[data-type="massif"] {
         background: rgba(56, 142, 60, 0.85);
-        border: ${CSS_BUBBLE_OUTLINE_WIDTH / 0.88}px solid ${MAP_MARKER_OUTLINE_COLOR};
+        border: ${CSS_MARKER_OUTLINE_WIDTH / 0.88}px solid ${MAP_MARKER_OUTLINE_COLOR};
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         border-radius: 22%;
         transform: rotate(45deg) scale(0.88);
@@ -102,7 +100,7 @@ export const ClusterGlobalCss = (
       }
       .cluster-bubble[data-type="massif"]:hover {
         transform: rotate(45deg) scale(0.95);
-        border-width: ${CSS_BUBBLE_OUTLINE_WIDTH / 0.95}px;
+        border-width: ${CSS_MARKER_OUTLINE_WIDTH / 0.95}px;
         filter: brightness(1.15);
       }
       .cluster-bubble[data-type="network"]:hover {

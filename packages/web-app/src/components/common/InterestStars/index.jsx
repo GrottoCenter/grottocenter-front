@@ -10,17 +10,26 @@ const InterestStars = ({ value, size = 18 }) => {
   if (stars == null) return null;
   return (
     <span
+      aria-hidden="true"
       style={{
         flexShrink: 0,
         display: 'inline-flex',
+        position: 'relative',
         fontSize: size,
         lineHeight: 1,
         letterSpacing: '1px'
       }}>
-      <span style={{ color: INTEREST_STAR_COLOR }}>{'★'.repeat(stars)}</span>
-      {stars < 5 && (
-        <span style={{ color: EMPTY_STAR_COLOR }}>{'★'.repeat(5 - stars)}</span>
-      )}
+      <span style={{ color: EMPTY_STAR_COLOR }}>{'★'.repeat(5)}</span>
+      <span
+        style={{
+          color: INTEREST_STAR_COLOR,
+          position: 'absolute',
+          inset: 0,
+          whiteSpace: 'nowrap',
+          clipPath: `inset(0 ${100 - stars * 20}% 0 0)`
+        }}>
+        {'★'.repeat(5)}
+      </span>
     </span>
   );
 };
