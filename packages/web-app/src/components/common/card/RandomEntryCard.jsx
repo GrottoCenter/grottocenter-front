@@ -15,6 +15,10 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
 import { FormattedMessage, useIntl } from 'react-intl';
+import {
+  durationStringToMinutes,
+  formatDurationMinutes
+} from '@/utils/dateTimeDuration';
 import CustomIcon from '../CustomIcon';
 import AppLink from '../AppLink';
 import { depthIcon, lengthIcon } from '../../../assets/icons';
@@ -54,14 +58,6 @@ const WhiteRating = styled(MuiRating)({
   fontSize: '0.875rem'
 });
 
-const formatTime = timeStr => {
-  if (!timeStr) return null;
-  const [h, m] = timeStr.split(':').map(Number);
-  if (h === 0) return `${m}min`;
-  if (m === 0) return `${h}h`;
-  return `${h}h${m}`;
-};
-
 const getTopoImage = documents => {
   if (!documents) return null;
   const topoDoc = documents.find(d => d.type === 13);
@@ -71,7 +67,13 @@ const getTopoImage = documents => {
 };
 
 const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatNumberToParts } = useIntl();
+  const formatTime = timeStr =>
+    timeStr &&
+    formatDurationMinutes(
+      durationStringToMinutes(timeStr),
+      formatNumberToParts
+    );
 
   useEffect(() => {
     fetch();

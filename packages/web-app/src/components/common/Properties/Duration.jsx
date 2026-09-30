@@ -17,10 +17,10 @@ const DurationWrapper = styled('div')`
 `;
 
 const Duration = ({ image, durationStr, title }) => {
-  const { formatMessage, formatNumber } = useIntl();
+  const { formatMessage, formatNumberToParts } = useIntl();
   const valueToDisplay = formatDurationMinutes(
     durationStringToMinutes(durationStr),
-    formatNumber
+    formatNumberToParts
   );
   return (
     <Tooltip title={formatMessage({ id: title })}>

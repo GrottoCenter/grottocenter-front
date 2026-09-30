@@ -88,9 +88,13 @@ describe('InterestSummary', () => {
     );
 
     expect(screen.getByText("Temps d'accès")).toBeVisible();
-    expect(screen.getByText('5min–30min')).toBeVisible();
+    expect(screen.getByText('5 min - 30 min').textContent).toBe(
+      '5\u00a0min - 30\u00a0min'
+    );
     expect(screen.getByText('Temps passé sous terre')).toBeVisible();
-    expect(screen.getByText('1h 30min–5h')).toBeVisible();
+    expect(screen.getByText('1 h 30 - 5 h').textContent).toBe(
+      '1\u00a0h\u00a030 - 5\u00a0h'
+    );
     expect(screen.getByRole('link', { name: '1 évaluation' })).toBeVisible();
   });
 
@@ -100,8 +104,20 @@ describe('InterestSummary', () => {
       { eTTrail: null, eTUnderground: 'invalid' }
     ]);
 
-    expect(screen.getByText('1h 5m')).toBeVisible();
+    expect(screen.getByText('1 h 5').textContent).toBe('1\u00a0h\u00a05');
     expect(screen.queryByText('Time to go')).not.toBeInTheDocument();
     expect(screen.getByText('Not rated')).toBeVisible();
+  });
+
+  it('separates whole-hour range bounds with non-breaking spaces', () => {
+    renderSummary(
+      [{ eTTrail: '5:00:00' }, { eTTrail: '10:00:00' }],
+      false,
+      'fr'
+    );
+
+    expect(screen.getByText('5 h - 10 h').textContent).toBe(
+      '5\u00a0h - 10\u00a0h'
+    );
   });
 });

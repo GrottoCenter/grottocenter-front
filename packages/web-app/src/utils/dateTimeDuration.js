@@ -23,32 +23,31 @@ export const durationStringToMinutes = durationStr => {
   return +splitDuration[0] * 60 + +splitDuration[1];
 };
 
-export const formatDurationUnit = (unit, formatNumberToParts) =>
-  formatNumberToParts(0, { style: 'unit', unit, unitDisplay: 'narrow' })
+export const formatDurationUnit = (
+  unit,
+  formatNumberToParts,
+  unitDisplay = 'narrow'
+) =>
+  formatNumberToParts(0, { style: 'unit', unit, unitDisplay })
     .filter(part => part.type === 'unit' || part.type === 'literal')
     .map(part => part.value)
     .join('')
     .trim();
 
-export const formatDurationMinutes = (minutes, formatNumber) => {
+export const formatDurationMinutes = (minutes, formatNumberToParts) => {
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
-  const parts = [];
-  if (hours > 0)
-    parts.push(
-      formatNumber(hours, {
-        style: 'unit',
-        unit: 'hour',
-        unitDisplay: 'narrow'
-      })
-    );
-  if (remainingMinutes > 0)
-    parts.push(
-      formatNumber(remainingMinutes, {
-        style: 'unit',
-        unit: 'minute',
-        unitDisplay: 'narrow'
-      })
-    );
-  return parts.join(' ');
+  const formatNumber = value =>
+    formatNumberToParts(value)
+      .map(part => part.value)
+      .join('');
+  if (hours > 0) {
+    const formattedHours = `${formatNumber(hours)}\u00a0${formatDurationUnit('hour', formatNumberToParts)}`;
+    return remainingMinutes > 0
+      ? `${formattedHours}\u00a0${formatNumber(remainingMinutes)}`
+      : formattedHours;
+  }
+  return remainingMinutes > 0
+    ? `${formatNumber(remainingMinutes)}\u00a0${formatDurationUnit('minute', formatNumberToParts, 'short')}`
+    : '';
 };

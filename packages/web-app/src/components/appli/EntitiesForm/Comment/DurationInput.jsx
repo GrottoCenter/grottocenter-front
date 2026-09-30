@@ -18,7 +18,7 @@ const DurationInput = ({ labelId, helperId, icon, value, onChange }) => {
   const [parts, setParts] = useState(() => splitMinutes(value));
   const label = formatMessage({ id: labelId });
   const hourUnit = formatDurationUnit('hour', formatNumberToParts);
-  const minuteUnit = formatDurationUnit('minute', formatNumberToParts);
+  const minuteUnit = formatDurationUnit('minute', formatNumberToParts, 'short');
 
   const handlePartChange = (part, nextValue) => {
     if (!/^\d*$/.test(nextValue)) return;

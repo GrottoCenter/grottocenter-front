@@ -13,7 +13,7 @@ import {
   formatDurationMinutes
 } from '@/utils/dateTimeDuration';
 
-const getDurationRange = (comments, field, formatNumber) => {
+const getDurationRange = (comments, field, formatNumberToParts) => {
   const durations = comments
     .map(comment => durationStringToMinutes(comment[field]))
     .filter(minutes => Number.isFinite(minutes) && minutes > 0);
@@ -21,23 +21,28 @@ const getDurationRange = (comments, field, formatNumber) => {
 
   const minimum = Math.min(...durations);
   const maximum = Math.max(...durations);
-  if (minimum === maximum) return formatDurationMinutes(minimum, formatNumber);
-  return `${formatDurationMinutes(minimum, formatNumber)}–${formatDurationMinutes(maximum, formatNumber)}`;
+  if (minimum === maximum)
+    return formatDurationMinutes(minimum, formatNumberToParts);
+  return `${formatDurationMinutes(minimum, formatNumberToParts)} - ${formatDurationMinutes(maximum, formatNumberToParts)}`;
 };
 
 const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {
-  const { formatMessage, formatNumber } = useIntl();
+  const { formatMessage, formatNumber, formatNumberToParts } = useIntl();
   const ratings = comments
     .map(comment => comment.aestheticism)
     .filter(value => Number.isFinite(value) && value > 0);
   const average = ratings.length
     ? ratings.reduce((sum, value) => sum + value, 0) / ratings.length / 2
     : null;
-  const approachTime = getDurationRange(comments, 'eTTrail', formatNumber);
+  const approachTime = getDurationRange(
+    comments,
+    'eTTrail',
+    formatNumberToParts
+  );
   const undergroundTime = getDurationRange(
     comments,
     'eTUnderground',
-    formatNumber
+    formatNumberToParts
   );
   const commentsUrl = `/ui/entrances/${entranceId}?tab=comments`;
 
