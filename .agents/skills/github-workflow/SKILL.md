@@ -20,7 +20,14 @@ gh auth status
   > - Windows: `winget install --id GitHub.cli`
   > - Linux: https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 
-- If `gh` is **not authenticated**, stop and tell the user to run `gh auth login`.
+- On Windows, credentials may be hidden inside the sandbox. Run authenticated
+  `gh` commands and Git network operations with escalated permissions. If a
+  sandboxed auth check fails, retry with escalated permissions before asking.
+- If `gh` is still **not authenticated**, stop and tell the user to run
+  `gh auth login`.
+- Do not print remote URLs: `git remote -v` and
+  `git config --get remote.origin.url` may expose an embedded token.
+  Use `gh repo view` to identify the repository.
 
 ## Language
 
@@ -30,9 +37,9 @@ All generated content (PR titles, PR bodies, issue comments) must be written in 
 
 Format: `type(scope): description`
 
-Types: `feat` `fix` `refactor` `test` `docs` `chore` `style` `ci`
-Scope: domain area — `cave`, `entrance`, `massif`, `auth`, `search`, `deps`, …
-Example: `feat(massif): add area validation`
+Use the types and scope casing in the repository's `AGENTS.md`.
+
+Example: `feat(Massif): add area validation`
 
 ## Branching
 
@@ -53,7 +60,10 @@ In the `## 🧪 Testing` section, write every test or verification as a GitHub
 checklist item. Use `- [x]` only for checks that were actually run and passed,
 and `- [ ]` for checks that are pending or were not run.
 
-**2. Show and confirm** — display the title and the **actual content of `pr_body.md`** to the user and **wait for explicit approval before proceeding**. Do not push or create the PR until the user confirms. The file must already exist on disk before asking for confirmation.
+**2. Show and confirm** — display the title and the **actual content of
+`pr_body.md`** to the user. If the user has already explicitly authorized
+pushing and creating the PR, proceed. Otherwise wait for explicit approval.
+The file must already exist on disk before asking for confirmation.
 
 **3. Push and create:**
 
@@ -64,7 +74,7 @@ gh pr create --title "<type(scope): description>" --body-file pr_body.md --base 
 
 Where `<repo>` is detected via `gh repo view --json nameWithOwner -q .nameWithOwner`.
 
-**3. Clean up:**
+**4. Clean up:**
 
 ```bash
 # bash/zsh
