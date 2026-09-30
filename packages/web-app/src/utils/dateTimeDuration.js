@@ -23,6 +23,7 @@ export const durationStringToMinutes = durationStr => {
   return +splitDuration[0] * 60 + +splitDuration[1];
 };
 
+// Field adornments have no value, so they use a standalone unit label.
 export const formatDurationUnit = (
   unit,
   formatNumberToParts,
@@ -37,19 +38,25 @@ export const formatDurationUnit = (
 export const formatDurationMinutes = (minutes, formatNumberToParts) => {
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
-  const formatNumber = (value, options) =>
-    formatNumberToParts(value, options)
+  const formatUnitValue = (value, unit, options = {}) =>
+    formatNumberToParts(value, {
+      style: 'unit',
+      unit,
+      unitDisplay: 'short',
+      ...options
+    })
       .map(part => part.value)
-      .join('');
+      .join('')
+      .replace(/\s+/gu, '\u00a0');
   if (hours > 0) {
-    const formattedHours = `${formatNumber(hours)}\u00a0${formatDurationUnit('hour', formatNumberToParts)}`;
+    const formattedHours = formatUnitValue(hours, 'hour');
     return remainingMinutes > 0
-      ? `${formattedHours}\u00a0${formatNumber(remainingMinutes, {
+      ? `${formattedHours}\u00a0${formatUnitValue(remainingMinutes, 'minute', {
           minimumIntegerDigits: 2
-        })}\u00a0${formatDurationUnit('minute', formatNumberToParts)}`
+        })}`
       : formattedHours;
   }
   return remainingMinutes > 0
-    ? `${formatNumber(remainingMinutes)}\u00a0${formatDurationUnit('minute', formatNumberToParts)}`
+    ? formatUnitValue(remainingMinutes, 'minute')
     : '';
 };

@@ -31,6 +31,28 @@ describe('formatDurationMinutes', () => {
     );
   });
 
+  it('inflects hour units for the value in Romanian', () => {
+    const formatNumberToParts = partsFor('ro');
+
+    expect(formatDurationMinutes(65, formatNumberToParts)).toBe(
+      '1\u00a0oră\u00a005\u00a0min.'
+    );
+    expect(formatDurationMinutes(125, formatNumberToParts)).toBe(
+      '2\u00a0ore\u00a005\u00a0min.'
+    );
+  });
+
+  it('preserves Hebrew singular and dual hour forms', () => {
+    const formatNumberToParts = partsFor('he');
+
+    expect(formatDurationMinutes(65, formatNumberToParts)).toBe(
+      '1\u00a0שעה\u00a005\u00a0דק׳'
+    );
+    expect(formatDurationMinutes(125, formatNumberToParts)).toBe(
+      'שעתיים\u00a005\u00a0דק׳'
+    );
+  });
+
   it('formats hour and minute units for the duration form', () => {
     const formatNumberToParts = partsFor('de');
 
