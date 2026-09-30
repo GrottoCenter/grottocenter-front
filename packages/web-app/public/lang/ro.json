@@ -2347,7 +2347,7 @@
   "Select an authorization document": "Selectați un document de autorizare",
   "Select an existing organization from the list, or a new one named \"{name}\" will be created.": "Selectați o organizație existentă din listă, altfel va fi creată una nouă numită „{name}”.",
   "Select an identifier type": "Selectați un tip de identificator",
-  "Select document(s) by clicking on the result table above.": "Selectați document(e) făcând clic pe tabelul de rezultate de mai sus.",
+  "Select documents with the checkboxes. Preview any document before associating it.": "Selectați documentele folosind casetele de selectare. Previzualizați un document înainte de a-l asocia.",
   "Select the attributes that apply to this entrance": "Selectați atributele care se aplică acestei intrări",
   "Selected": "Selectat",
   "Semi-major radius: ": "Rază semimajoră",

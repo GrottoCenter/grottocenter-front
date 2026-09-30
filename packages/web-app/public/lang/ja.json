@@ -2347,7 +2347,7 @@
   "Select an authorization document": "認証文書を選択",
   "Select an existing organization from the list, or a new one named \"{name}\" will be created.": "リストから既存の組織を選択してください。選択しない場合、「{name}」という名前の新しい組織が作成されます。",
   "Select an identifier type": "識別子タイプを選択",
-  "Select document(s) by clicking on the result table above.": "上の結果テーブルをクリックして文書を選択してください。",
+  "Select documents with the checkboxes. Preview any document before associating it.": "チェックボックスで文書を選択してください。関連付ける前に文書をプレビューできます。",
   "Select the attributes that apply to this entrance": "この入口に該当する特性を選択してください",
   "Selected": "選択済み",
   "Semi-major radius: ": "半主要半径：",

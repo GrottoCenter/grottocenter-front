@@ -2347,7 +2347,7 @@
   "Select an authorization document": "Wählen Sie ein Autorisierungsdokument",
   "Select an existing organization from the list, or a new one named \"{name}\" will be created.": "Wählen Sie eine bestehende Organisation aus der Liste, andernfalls wird eine neue namens „{name}“ erstellt.",
   "Select an identifier type": "Identifikatortyp auswählen",
-  "Select document(s) by clicking on the result table above.": "Wählen Sie Dokument(e) aus, indem Sie auf die Ergebnistabelle oben klicken.",
+  "Select documents with the checkboxes. Preview any document before associating it.": "Wählen Sie Dokumente über die Kontrollkästchen aus. Sehen Sie sich ein Dokument vor der Zuordnung in der Vorschau an.",
   "Select the attributes that apply to this entrance": "Wählen Sie die Merkmale aus, die auf diesen Eingang zutreffen",
   "Selected": "Ausgewählt",
   "Semi-major radius: ": "Semi-Dur Radius:",

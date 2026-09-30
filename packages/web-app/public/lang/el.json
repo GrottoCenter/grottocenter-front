@@ -2347,7 +2347,7 @@
   "Select an authorization document": "Επιλέξτε έγγραφο εξουσιοδότησης",
   "Select an existing organization from the list, or a new one named \"{name}\" will be created.": "Επιλέξτε έναν υπάρχοντα οργανισμό από τη λίστα, διαφορετικά θα δημιουργηθεί ένας νέος με το όνομα «{name}».",
   "Select an identifier type": "Επιλέξτε τύπο αναγνωριστικού",
-  "Select document(s) by clicking on the result table above.": "Επιλέξτε έγγραφο(-α) κάνοντας κλικ στον παραπάνω πίνακα αποτελεσμάτων.",
+  "Select documents with the checkboxes. Preview any document before associating it.": "Επιλέξτε έγγραφα με τα πλαίσια επιλογής. Κάντε προεπισκόπηση οποιουδήποτε εγγράφου πριν το συσχετίσετε.",
   "Select the attributes that apply to this entrance": "Επιλέξτε τα χαρακτηριστικά που ισχύουν για αυτήν την είσοδο",
   "Selected": "Επιλεγμένο",
   "Semi-major radius: ": "Ημι-μείζων ακτίνα: ",

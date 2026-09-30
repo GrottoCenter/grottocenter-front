@@ -2347,7 +2347,7 @@
   "Select an authorization document": "בחר מסמך הרשאה",
   "Select an existing organization from the list, or a new one named \"{name}\" will be created.": "בחר ארגון קיים מהרשימה, אחרת ייווצר ארגון חדש בשם \"{name}\".",
   "Select an identifier type": "בחר סוג מזהה",
-  "Select document(s) by clicking on the result table above.": "בחר מסמך/ים על ידי לחיצה על טבלת התוצאות למעלה.",
+  "Select documents with the checkboxes. Preview any document before associating it.": "בחרו מסמכים באמצעות תיבות הסימון. צפו בתצוגה מקדימה של כל מסמך לפני שיוכו.",
   "Select the attributes that apply to this entrance": "בחרו את המאפיינים החלים על כניסה זו",
   "Selected": "נבחר",
   "Semi-major radius: ": "רדיוס חצי-ראשי: ",

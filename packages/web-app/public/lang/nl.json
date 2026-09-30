@@ -2347,7 +2347,7 @@
   "Select an authorization document": "Selecteer een autorisatiedocument",
   "Select an existing organization from the list, or a new one named \"{name}\" will be created.": "Selecteer een bestaande organisatie uit de lijst, anders wordt een nieuwe met de naam '{name}' aangemaakt.",
   "Select an identifier type": "Selecteer een identificatortype",
-  "Select document(s) by clicking on the result table above.": "Selecteer document(en) door op de resultaattabel hierboven te klikken.",
+  "Select documents with the checkboxes. Preview any document before associating it.": "Selecteer documenten met de selectievakjes. Bekijk een document voordat u het koppelt.",
   "Select the attributes that apply to this entrance": "Selecteer de kenmerken die op deze ingang van toepassing zijn",
   "Selected": "Geselecteerd",
   "Semi-major radius: ": "Halve grote as",

@@ -2347,7 +2347,7 @@
   "Select an authorization document": "Pilih dokumen otorisasi",
   "Select an existing organization from the list, or a new one named \"{name}\" will be created.": "Pilih organisasi yang sudah ada dari daftar, atau organisasi baru bernama \"{name}\" akan dibuat.",
   "Select an identifier type": "Pilih jenis pengidentifikasi",
-  "Select document(s) by clicking on the result table above.": "Pilih dokumen dengan mengklik tabel hasil di atas.",
+  "Select documents with the checkboxes. Preview any document before associating it.": "Pilih dokumen menggunakan kotak centang. Pratinjau dokumen sebelum mengaitkannya.",
   "Select the attributes that apply to this entrance": "Pilih atribut yang berlaku untuk pintu masuk ini",
   "Selected": "Dipilih",
   "Semi-major radius: ": "Radius semi-mayor: ",

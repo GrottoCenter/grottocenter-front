@@ -2347,7 +2347,7 @@
   "Select an authorization document": "Изберете документ за разрешение",
   "Select an existing organization from the list, or a new one named \"{name}\" will be created.": "Изберете съществуваща организация от списъка, в противен случай ще бъде създадена нова с име „{name}“.",
   "Select an identifier type": "Изберете тип идентификатор",
-  "Select document(s) by clicking on the result table above.": "Изберете документ(и), като щракнете върху таблицата с резултати по-горе.",
+  "Select documents with the checkboxes. Preview any document before associating it.": "Изберете документи с квадратчетата за отметка. Прегледайте всеки документ, преди да го свържете.",
   "Select the attributes that apply to this entrance": "Изберете характеристиките, които се отнасят за този вход",
   "Selected": "Избрано",
   "Semi-major radius: ": "Голяма полуос",

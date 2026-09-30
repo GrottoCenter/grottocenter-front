@@ -47,6 +47,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
           <Box display="flex" gap={0.5}>
             <SectionCreateButton
               isOpen={isDocumentSearchVisible}
+              testId="associate-documents-button"
               onToggle={() =>
                 setIsDocumentSearchVisible(!isDocumentSearchVisible)
               }
