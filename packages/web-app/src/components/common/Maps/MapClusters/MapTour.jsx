@@ -25,6 +25,12 @@ const MapTour = ({ run, onEnd }) => {
         title: formatMessage({ id: 'Tour - Map layers' }),
         content: formatMessage({ id: 'Tour - Map layers description' }),
         position: 'left'
+      },
+      {
+        selector: '[data-tour="location-control-toggle"]',
+        title: formatMessage({ id: 'Tour - Location' }),
+        content: formatMessage({ id: 'Tour - Location description' }),
+        position: 'left'
       }
     ],
     [formatMessage]

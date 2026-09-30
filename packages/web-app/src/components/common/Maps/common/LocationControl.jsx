@@ -443,6 +443,7 @@ const LocationControl = () => {
               size="small"
               onClick={handleClick}
               aria-label={label}
+              data-tour="location-control-toggle"
               sx={{
                 bgcolor: isError ? 'error.main' : 'background.paper',
                 borderRadius: '4px',
