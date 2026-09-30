@@ -104,10 +104,8 @@ export const DEFAULT_QUALITY_FILTERS = allOn(Object.values(CAVE_QUALITY));
 // the app always displays it as N/5 with the MUI Rating component (see
 // Entry/Ratings.jsx and the api PR #1825 review note). The filter picks a
 // minimum on the 1★–5★ scale and stores it on the same 0–10 scale as the
-// backend value, so the comparison stays a plain `>=`.
+// backend value. The filter compares displayed star levels after rounding.
 export const DEFAULT_MIN_INTEREST = 0;
-export const getInterest = entrance =>
-  typeof entrance.aestheticism === 'number' ? entrance.aestheticism : null;
 
 export const MARKERS_LIMIT = 13;
 // Zoom level at which massif polygons are fetched and displayed

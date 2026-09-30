@@ -23,3 +23,6 @@ export const getInterestLabelKey = value => {
   const level = getInterestLevel(value);
   return level == null ? null : INTEREST_LEVELS[level - 1];
 };
+
+export const meetsMinimumInterest = (value, minimum) =>
+  minimum <= 0 || (getInterestLevel(value) ?? 0) >= minimum / 2;

@@ -21,6 +21,7 @@ import { ContentCopy, LocationOn, Tune } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import copyToClipboard from '@/utils/clipboard';
+import { meetsMinimumInterest } from '@/utils/interest';
 import GeocodingControl from '../common/GeocodingControl';
 import MapTour from './MapTour';
 import DataDisplayControl, { layerTypes } from './DataDisplayControl';
@@ -62,7 +63,6 @@ import {
   ENTRANCE_QUALITY_FILTERS,
   getCaveSize,
   getCaveQuality,
-  getInterest,
   DEFAULT_ENTRANCE_FILTERS,
   DEFAULT_QUALITY_FILTERS,
   DEFAULT_MIN_INTEREST
@@ -179,14 +179,9 @@ const HydratedMap = ({
         const quality = getCaveQuality(e);
         // Entrances without quality data are always shown by the quality filter.
         if (quality !== null && !activeQualityFilters[quality]) return false;
-        // Interest: null aestheticism (no rating yet) is implicitly excluded as
-        // soon as the user asks for at least one star — "if you ask for stars,
-        // we only show what has stars." Above 0 means the filter is active.
-        if (minInterest > 0) {
-          const interest = getInterest(e);
-          if (interest == null || interest < minInterest) return false;
-        }
-        return true;
+        // Compare the displayed star level so an entrance shown with two stars
+        // is included when the user selects a two-star minimum.
+        return meetsMinimumInterest(e.aestheticism, minInterest);
       }),
     [entranceMarkers, activeEntranceFilters, activeQualityFilters, minInterest]
   );
