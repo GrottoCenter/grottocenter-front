@@ -71,6 +71,12 @@ export const ENTRANCE_MARKER_FILTERS = [
   { id: CAVE_SIZE.LARGE, labelKey: 'Large caves' }
 ];
 
+// "All categories on" — the default and also the reset target. Same object
+// shape used by the LocalStorage seed and by resetAllFilters, so a single
+// constant keeps the two in step.
+const allOn = keys => Object.fromEntries(keys.map(k => [k, true]));
+export const DEFAULT_ENTRANCE_FILTERS = allOn(Object.values(CAVE_SIZE));
+
 // Alias — keeps map code readable without re-importing from utils directly.
 export const CAVE_QUALITY = DATA_QUALITY_LEVELS;
 
@@ -91,6 +97,8 @@ export const ENTRANCE_QUALITY_FILTERS = [
   DATA_QUALITY_LEVELS.SATISFACTORY,
   DATA_QUALITY_LEVELS.GOOD
 ].map(id => ({ id, labelKey: DATA_QUALITY_LABEL_KEYS[id] }));
+
+export const DEFAULT_QUALITY_FILTERS = allOn(Object.values(CAVE_QUALITY));
 
 // Interest filter — the backend `aestheticism` field is a 0–10 average, but
 // the app always displays it as N/5 with the MUI Rating component (see

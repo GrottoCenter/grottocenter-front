@@ -18,6 +18,12 @@ import {
 } from './constants';
 import DataQualityBadge from '../../DataQualityBadge';
 import DataQualityHelpButton from '../../DataQualityBadge/DataQualityHelpButton';
+import { INTEREST_STAR_COLOR } from '../../../../utils/interest';
+import {
+  ControlToggleButton,
+  ControlSectionTitle,
+  ControlOptionLabel
+} from './controlStyles';
 
 const CAVE_SIZE_POPOVER_ROWS = [
   {
@@ -40,31 +46,6 @@ const CAVE_SIZE_POPOVER_ROWS = [
   }
 ];
 
-const ToggleButton = styled('button')`
-  appearance: none;
-  background: none;
-  border: none;
-  margin: 0;
-  padding: 0;
-  width: 36px;
-  height: 36px;
-  background-image: none !important;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  position: relative;
-
-  &:disabled {
-    cursor: default;
-    opacity: 0.5;
-  }
-
-  .leaflet-control-layers-expanded & {
-    display: none !important;
-  }
-`;
-
 // Small orange dot signaling "at least one filter is not at its default value".
 // Warning colour rather than error: this is a notice, not an alarm — a filter
 // being active is normal. Pointer-events off so it never steals the click meant
@@ -81,38 +62,10 @@ const ActiveFiltersDot = styled('span')(({ theme }) => ({
   pointerEvents: 'none'
 }));
 
-const SectionTitle = styled('div')(({ theme }) => ({
-  fontWeight: 'bold',
-  fontSize: 12,
-  padding: '4px 0 2px',
-  color: theme.palette.text.primary,
-  display: 'flex',
-  alignItems: 'center',
-  gap: 4,
-  '&:not(:first-of-type)': {
-    marginTop: 6
-  }
-}));
-
 const PopoverContent = styled('div')`
   padding: 8px 12px;
   font-size: 13px;
   max-width: 260px;
-`;
-
-const OptionLabel = styled('label')`
-  display: flex !important;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  cursor: pointer;
-  padding: 2px 0;
-  white-space: nowrap;
-
-  input {
-    margin: 8px;
-    flex-shrink: 0;
-  }
 `;
 
 // Row hosting the interest Rating widget. Wraps so the "Any rating" hint drops
@@ -178,10 +131,6 @@ const MAX_STARS = 5;
 const interestToStars = value => Math.round(value / 2);
 const starsToInterest = stars => stars * 2;
 
-// Same amber tone as the default MuiRating fill, for visual continuity with
-// entrance cards where the interest stars appear.
-const INTEREST_STAR_COLOR = '#faaf00';
-
 const FiltersControl = ({
   entranceFilters,
   activeEntranceFilters,
@@ -246,7 +195,7 @@ const FiltersControl = ({
         ref={wrapperRef}
         onMouseEnter={() => !fullScreen && toggleExpanded(true)}
         onMouseLeave={() => toggleExpanded(false)}>
-        <ToggleButton
+        <ControlToggleButton
           type="button"
           className="leaflet-control-layers-toggle"
           title={formatMessage({ id: 'filters-control' })}
@@ -258,7 +207,7 @@ const FiltersControl = ({
             sx={{ color: theme => theme.palette.mapControlIcon }}
           />
           {hasActiveFilters && <ActiveFiltersDot />}
-        </ToggleButton>
+        </ControlToggleButton>
 
         <section className="leaflet-control-layers-list">
           <div className="leaflet-control-layers-overlays">
@@ -274,14 +223,14 @@ const FiltersControl = ({
                   ? { opacity: 0.5, pointerEvents: 'none' }
                   : undefined
               }>
-              <SectionTitle>
+              <ControlSectionTitle>
                 {formatMessage({ id: 'Filter by size' }).toUpperCase()}
                 <HelpOutlineIcon
                   fontSize="small"
                   sx={{ cursor: 'pointer', color: 'text.secondary' }}
                   onClick={e => setSizeInfoAnchor(e.currentTarget)}
                 />
-              </SectionTitle>
+              </ControlSectionTitle>
               <Popover
                 open={Boolean(sizeInfoAnchor)}
                 anchorEl={sizeInfoAnchor}
@@ -300,7 +249,7 @@ const FiltersControl = ({
                 </PopoverContent>
               </Popover>
               {entranceFilters.map(filter => (
-                <OptionLabel key={filter.id}>
+                <ControlOptionLabel key={filter.id}>
                   <input
                     type="checkbox"
                     name={filter.id}
@@ -314,15 +263,15 @@ const FiltersControl = ({
                   />
                   <CaveSizeDot caveSize={filter.id} />
                   <span>{formatMessage({ id: filter.labelKey })}</span>
-                </OptionLabel>
+                </ControlOptionLabel>
               ))}
 
-              <SectionTitle>
+              <ControlSectionTitle>
                 {formatMessage({ id: 'Filter by quality' }).toUpperCase()}
                 <DataQualityHelpButton />
-              </SectionTitle>
+              </ControlSectionTitle>
               {qualityFilters.map(filter => (
-                <OptionLabel key={filter.id}>
+                <ControlOptionLabel key={filter.id}>
                   <input
                     type="checkbox"
                     name={filter.id}
@@ -339,17 +288,17 @@ const FiltersControl = ({
                     size={20}
                   />
                   <span>{formatMessage({ id: filter.labelKey })}</span>
-                </OptionLabel>
+                </ControlOptionLabel>
               ))}
 
-              <SectionTitle>
+              <ControlSectionTitle>
                 {formatMessage({ id: 'Filter by interest' }).toUpperCase()}
                 <HelpOutlineIcon
                   fontSize="small"
                   sx={{ cursor: 'pointer', color: 'text.secondary' }}
                   onClick={e => setInterestInfoAnchor(e.currentTarget)}
                 />
-              </SectionTitle>
+              </ControlSectionTitle>
               <Popover
                 open={Boolean(interestInfoAnchor)}
                 anchorEl={interestInfoAnchor}

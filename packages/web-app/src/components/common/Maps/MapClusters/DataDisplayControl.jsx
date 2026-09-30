@@ -1,6 +1,5 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useIntl } from 'react-intl';
 import { useFullScreen } from 'react-browser-hooks';
@@ -13,6 +12,11 @@ import {
   massifIcon
 } from '../../../../assets/icons';
 import { EXPLORED_PIN_PATH } from './ExploredOverlay';
+import {
+  ControlToggleButton,
+  ControlSectionTitle,
+  ControlOptionLabel
+} from './controlStyles';
 
 // Every dataset the user can toggle on the map. At low zoom each type shows as
 // clusters; at high zoom entrances/networks/organizations switch to real
@@ -30,58 +34,6 @@ export const LAYER_TYPES_LIST = [
   layerTypes.MASSIFS,
   layerTypes.ORGANIZATIONS
 ];
-
-const ToggleButton = styled('button')`
-  appearance: none;
-  background: none;
-  border: none;
-  margin: 0;
-  padding: 0;
-  width: 36px;
-  height: 36px;
-  background-image: none !important;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-
-  &:disabled {
-    cursor: default;
-    opacity: 0.5;
-  }
-
-  .leaflet-control-layers-expanded & {
-    display: none !important;
-  }
-`;
-
-const SectionTitle = styled('div')(({ theme }) => ({
-  fontWeight: 'bold',
-  fontSize: 12,
-  padding: '4px 0 2px',
-  color: theme.palette.text.primary,
-  display: 'flex',
-  alignItems: 'center',
-  gap: 4,
-  '&:not(:first-of-type)': {
-    marginTop: 6
-  }
-}));
-
-const OptionLabel = styled('label')`
-  display: flex !important;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  cursor: pointer;
-  padding: 2px 0;
-  white-space: nowrap;
-
-  input {
-    margin: 8px;
-    flex-shrink: 0;
-  }
-`;
 
 const ExploredBadgeIcon = () => (
   <svg
@@ -175,7 +127,7 @@ const DataDisplayControl = ({
         ref={wrapperRef}
         onMouseEnter={() => !fullScreen && toggleExpanded(true)}
         onMouseLeave={() => toggleExpanded(false)}>
-        <ToggleButton
+        <ControlToggleButton
           type="button"
           className="leaflet-control-layers-toggle"
           title={formatMessage({ id: 'data-control' })}
@@ -186,15 +138,15 @@ const DataDisplayControl = ({
           <VisibilityIcon
             sx={{ color: theme => theme.palette.mapControlIcon }}
           />
-        </ToggleButton>
+        </ControlToggleButton>
 
         <section className="leaflet-control-layers-list">
           <div className="leaflet-control-layers-overlays">
-            <SectionTitle>
+            <ControlSectionTitle>
               {formatMessage({ id: 'Data display' }).toUpperCase()}
-            </SectionTitle>
+            </ControlSectionTitle>
             {LAYER_TYPES_LIST.map(type => (
-              <OptionLabel key={type}>
+              <ControlOptionLabel key={type}>
                 <input
                   type="checkbox"
                   name={type}
@@ -205,7 +157,7 @@ const DataDisplayControl = ({
                 <span style={{ textTransform: 'capitalize' }}>
                   {formatMessage({ id: type })}
                 </span>
-              </OptionLabel>
+              </ControlOptionLabel>
             ))}
 
             {isAuth && (
@@ -213,7 +165,7 @@ const DataDisplayControl = ({
                 style={
                   hasExploredData === false ? { opacity: 0.5 } : undefined
                 }>
-                <OptionLabel>
+                <ControlOptionLabel>
                   <input
                     type="checkbox"
                     name="exploredCaves"
@@ -223,7 +175,7 @@ const DataDisplayControl = ({
                   />
                   <ExploredBadgeIcon />
                   <span>{formatMessage({ id: 'My explored entrances' })}</span>
-                </OptionLabel>
+                </ControlOptionLabel>
                 {hasExploredData === false && (
                   <div
                     style={{

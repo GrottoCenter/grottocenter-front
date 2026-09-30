@@ -63,8 +63,8 @@ import {
   getCaveSize,
   getCaveQuality,
   getInterest,
-  CAVE_SIZE,
-  CAVE_QUALITY,
+  DEFAULT_ENTRANCE_FILTERS,
+  DEFAULT_QUALITY_FILTERS,
   DEFAULT_MIN_INTEREST
 } from './constants';
 
@@ -159,12 +159,12 @@ const HydratedMap = ({
   );
   const [activeEntranceFilters, setActiveEntranceFilters] = useLocalStorage(
     'grottocenter_activeEntranceFilters',
-    Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true])),
+    DEFAULT_ENTRANCE_FILTERS,
     { merge: true }
   );
   const [activeQualityFilters, setActiveQualityFilters] = useLocalStorage(
     'grottocenter_activeQualityFilters',
-    Object.fromEntries(Object.values(CAVE_QUALITY).map(q => [q, true])),
+    DEFAULT_QUALITY_FILTERS,
     { merge: true }
   );
   const [minInterest, setMinInterest] = useLocalStorage(
@@ -200,12 +200,8 @@ const HydratedMap = ({
   );
 
   const resetAllFilters = useCallback(() => {
-    setActiveEntranceFilters(
-      Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true]))
-    );
-    setActiveQualityFilters(
-      Object.fromEntries(Object.values(CAVE_QUALITY).map(q => [q, true]))
-    );
+    setActiveEntranceFilters(DEFAULT_ENTRANCE_FILTERS);
+    setActiveQualityFilters(DEFAULT_QUALITY_FILTERS);
     setMinInterest(DEFAULT_MIN_INTEREST);
   }, [setActiveEntranceFilters, setActiveQualityFilters, setMinInterest]);
 

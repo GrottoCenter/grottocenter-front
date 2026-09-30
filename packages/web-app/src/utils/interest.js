@@ -3,17 +3,11 @@
 // two rating families use the same shape (level → label key, single rounding
 // rule reused everywhere).
 
+import { INTEREST_LEVELS } from './visitRatingLevels';
+
 // Same amber tone as the MUI Rating default fill — used across the map filter
 // widget and the popup stars, so the two read as the same rating semantic.
 export const INTEREST_STAR_COLOR = '#faaf00';
-
-export const INTEREST_LABEL_KEYS = {
-  1: 'Interest - poor',
-  2: 'Interest - fair',
-  3: 'Interest - interesting',
-  4: 'Interest - very interesting',
-  5: 'Interest - exceptional'
-};
 
 // value is on the raw 0–10 scale returned by the API.
 // Returns null when the entrance has no rating yet — callers must guard.
@@ -27,5 +21,5 @@ export const getInterestLevel = value => {
 
 export const getInterestLabelKey = value => {
   const level = getInterestLevel(value);
-  return level == null ? null : INTEREST_LABEL_KEYS[level];
+  return level == null ? null : INTEREST_LEVELS[level - 1];
 };
