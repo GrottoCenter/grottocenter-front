@@ -45,7 +45,7 @@ describe('RatingInput', () => {
     });
 
     fireEvent.mouseMove(rating, { clientX: 50 });
-    expect(screen.getByText('3 / 5 · Interesting')).toBeInTheDocument();
+    expect(screen.getByText('3/5 · Interesting')).toBeInTheDocument();
 
     fireEvent.mouseLeave(rating);
     expect(screen.getByText('No Rating')).toBeInTheDocument();
@@ -60,9 +60,9 @@ describe('RatingInput', () => {
         name: `${rating} out of 5 stars`
       });
       fireEvent.focus(radio);
-      expect(screen.getByText(`${rating} / 5 · ${label}`)).toBeInTheDocument();
+      expect(screen.getByText(`${rating}/5 · ${label}`)).toBeInTheDocument();
       fireEvent.click(radio);
-      expect(screen.getByText(`${rating} / 5 · ${label}`)).toBeInTheDocument();
+      expect(screen.getByText(`${rating}/5 · ${label}`)).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
@@ -82,7 +82,7 @@ describe('RatingInput', () => {
     );
 
     expect(
-      screen.getByText('4.5 / 5 · Remarkable – Exceptional')
+      screen.getByText('4.5/5 · Remarkable – Exceptional')
     ).toBeInTheDocument();
   });
 });

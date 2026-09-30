@@ -21,7 +21,7 @@
   "{entity} created": "{entity} created",
   "{entity} deleted": "{entity} deleted",
   "{entity} updated": "{entity} updated",
-  "{rating} / 5": "{rating} / 5",
+  "{rating} / 5": "{rating}/5",
   "{rating} out of 5 stars": "{rating} out of 5 stars",
   "{rawValue} → {parsedValue}": "{rawValue} → {parsedValue}",
   "1.1": "KARSTOLOGY",

@@ -53,7 +53,15 @@ const CommentRatings = ({ interest, progression, access }) => {
               emptyIcon={<StarBorderIcon fontSize="inherit" />}
             />
             <Typography variant="body2" color="text.secondary">
-              {formatNumber(value / 2, { maximumFractionDigits: 1 })} / 5 ·{' '}
+              {formatMessage(
+                { id: '{rating} / 5' },
+                {
+                  rating: formatNumber(value / 2, {
+                    maximumFractionDigits: 1
+                  })
+                }
+              )}
+              {' · '}
               {description}
             </Typography>
           </Box>

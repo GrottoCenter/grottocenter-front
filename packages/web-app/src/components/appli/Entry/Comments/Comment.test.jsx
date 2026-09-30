@@ -56,14 +56,12 @@ describe('Comment', () => {
     expect(screen.getByAltText('Underground time')).toBeInTheDocument();
     expect(screen.getByText('1h30m')).toBeInTheDocument();
     expect(screen.getByText('4h20m')).toBeInTheDocument();
+    expect(within(interest).getByText('4/5 · Remarkable')).toBeInTheDocument();
     expect(
-      within(interest).getByText('4 / 5 · Remarkable')
+      within(progression).getByText('3.5/5 · Intermediate – Easy')
     ).toBeInTheDocument();
     expect(
-      within(progression).getByText('3.5 / 5 · Intermediate – Easy')
-    ).toBeInTheDocument();
-    expect(
-      within(access).getByText('1 / 5 · Very difficult')
+      within(access).getByText('1/5 · Very difficult')
     ).toBeInTheDocument();
     expect(title.compareDocumentPosition(body)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING

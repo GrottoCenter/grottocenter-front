@@ -97,9 +97,9 @@ describe('CreateCommentForm', () => {
         { name: '5 out of 5 stars' }
       )
     );
-    expect(screen.getByText(/2 \/ 5.*Difficult/)).toBeInTheDocument();
-    expect(screen.getByText(/5 \/ 5.*Very easy/)).toBeInTheDocument();
-    expect(screen.getByText('4 / 5 · Remarkable')).toBeInTheDocument();
+    expect(screen.getByText(/2\/5.*Difficult/)).toBeInTheDocument();
+    expect(screen.getByText(/5\/5.*Very easy/)).toBeInTheDocument();
+    expect(screen.getByText('4/5 · Remarkable')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Create' }));
 
     await waitFor(() =>
@@ -135,7 +135,7 @@ describe('CreateCommentForm', () => {
     );
 
     expect(
-      screen.getByText('4.5 / 5 · Remarkable – Exceptional')
+      screen.getByText('4.5/5 · Remarkable – Exceptional')
     ).toBeInTheDocument();
     expect(
       screen.getByRole('textbox', { name: 'Approach time — Hours' })
@@ -146,9 +146,7 @@ describe('CreateCommentForm', () => {
     expect(
       screen.getByRole('textbox', { name: 'Underground time — Hours' })
     ).toHaveValue('26');
-    expect(
-      screen.getByText(/3.5 \/ 5.*Intermediate.*Easy/)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/3.5\/5.*Intermediate.*Easy/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Update' }));
 
     await waitFor(() =>

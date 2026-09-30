@@ -27,9 +27,12 @@ const RatingInput = ({
   const activeLabel =
     activeRating == null
       ? formatMessage({ id: 'No Rating' })
-      : `${formatNumber(activeRating, { maximumFractionDigits: 1 })} / 5${
-          description ? ` · ${description}` : ''
-        }`;
+      : `${formatMessage(
+          { id: '{rating} / 5' },
+          {
+            rating: formatNumber(activeRating, { maximumFractionDigits: 1 })
+          }
+        )}${description ? ` · ${description}` : ''}`;
 
   return (
     <Box

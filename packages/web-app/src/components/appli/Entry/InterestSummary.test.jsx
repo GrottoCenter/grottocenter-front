@@ -4,12 +4,15 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
 import messages from '../../../../public/lang/en.json';
+import frMessages from '../../../../public/lang/fr.json';
 import InterestSummary from './InterestSummary';
 
-const renderSummary = (comments, canComment = false) =>
+const renderSummary = (comments, canComment = false, locale = 'en') =>
   render(
     <MemoryRouter>
-      <IntlProvider locale="en" messages={messages}>
+      <IntlProvider
+        locale={locale}
+        messages={locale === 'fr' ? frMessages : messages}>
         <InterestSummary
           entranceId={42}
           comments={comments}
@@ -31,7 +34,7 @@ describe('InterestSummary', () => {
     expect(
       screen.getByRole('heading', { name: 'Interest of the visit' })
     ).toBeInTheDocument();
-    expect(screen.getByText('3.8 / 5')).toBeInTheDocument();
+    expect(screen.getByText('3.8/5')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '2 ratings' })).toHaveAttribute(
       'href',
       '/ui/entrances/42?tab=comments'
@@ -45,5 +48,12 @@ describe('InterestSummary', () => {
     expect(
       screen.getByRole('link', { name: 'Add a new comment' })
     ).toBeInTheDocument();
+  });
+
+  it('shows a compact rating in French', () => {
+    renderSummary([{ aestheticism: 6, isDeleted: false }], false, 'fr');
+
+    expect(screen.getByText('3/5')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '1 évaluation' })).toBeVisible();
   });
 });
