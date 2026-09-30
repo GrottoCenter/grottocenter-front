@@ -1,20 +1,46 @@
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Paper, Rating, Typography } from '@mui/material';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 import AppLink from '@/components/common/AppLink';
+import CustomIcon from '@/components/common/CustomIcon';
 import InfoSection from '@/components/common/InfoSection';
+import { Property } from '@/components/common/Properties';
 import { CommentPropTypes } from '@/types/entrance.type';
+import { durationStringToMinutes } from '@/utils/dateTimeDuration';
+
+const formatDuration = minutes => {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (hours === 0) return `${minutes}min`;
+  return `${hours}h${remainingMinutes ? String(remainingMinutes).padStart(2, '0') : ''}`;
+};
+
+const getDurationRange = (comments, field) => {
+  const durations = comments
+    .map(comment => durationStringToMinutes(comment[field]))
+    .filter(minutes => Number.isFinite(minutes) && minutes > 0);
+  if (durations.length === 0) return null;
+
+  const minimum = Math.min(...durations);
+  const maximum = Math.max(...durations);
+  if (minimum === maximum) return formatDuration(minimum);
+  if (maximum < 60) return `${minimum}-${maximum}min`;
+  return `${formatDuration(minimum)}-${formatDuration(maximum)}`;
+};
 
 const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {
   const { formatMessage, formatNumber } = useIntl();
-  const ratings = comments
-    .filter(comment => !comment.isDeleted)
+  const activeComments = comments.filter(comment => !comment.isDeleted);
+  const ratings = activeComments
     .map(comment => comment.aestheticism)
     .filter(value => Number.isFinite(value) && value > 0);
   const average = ratings.length
     ? ratings.reduce((sum, value) => sum + value, 0) / ratings.length / 2
     : null;
+  const approachTime = getDurationRange(activeComments, 'eTTrail');
+  const undergroundTime = getDurationRange(activeComments, 'eTUnderground');
   const commentsUrl = `/ui/entrances/${entranceId}?tab=comments`;
 
   return (
@@ -37,8 +63,15 @@ const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {
                 {formatMessage({ id: 'Interest not rated yet' })}
               </Typography>
               {canComment && (
-                <AppLink to={commentsUrl}>
-                  {formatMessage({ id: 'Add a new comment' })}
+                <AppLink
+                  to={commentsUrl}
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.5
+                  }}>
+                  <AddCircleIcon fontSize="small" aria-hidden="true" />
+                  {formatMessage({ id: 'Comment and rate' })}
                 </AppLink>
               )}
             </>
@@ -76,6 +109,30 @@ const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {
             </>
           )}
         </Box>
+        {(approachTime || undergroundTime) && (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+              gap: 0.5,
+              mt: 1
+            }}>
+            {approachTime && (
+              <Property
+                label={formatMessage({ id: 'Time to go' })}
+                value={approachTime}
+                icon={<CustomIcon type="time_to_go" />}
+              />
+            )}
+            {undergroundTime && (
+              <Property
+                label={formatMessage({ id: 'Underground time' })}
+                value={undergroundTime}
+                icon={<CustomIcon type="underground_time" />}
+              />
+            )}
+          </Box>
+        )}
       </InfoSection>
     </Paper>
   );
