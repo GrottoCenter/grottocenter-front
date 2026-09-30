@@ -38,6 +38,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { sxPropType } from '@/types/mui.type';
+import { formatRatingRange, isRatingFilter } from '@/utils/ratingFilter';
 import { fetchFieldSearch } from '../../../actions/FieldSearch';
 import Translate from '../../common/Translate';
 import OfflineDisabled from '../../common/OfflineDisabled';
@@ -659,7 +660,8 @@ export const countActiveFilters = (filterState, includeKeys) => {
     .length;
 };
 
-const formatRangeValue = (key, value) => {
+const formatRangeValue = (key, value, formatNumber) => {
+  if (isRatingFilter(key)) return formatRatingRange(value, formatNumber);
   const unit = key === 'cave.depth' || key === 'cave.length' ? ' m' : '';
   const fmt = v => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v);
   return `${fmt(value[0])} – ${fmt(value[1])}${unit}`;
@@ -695,7 +697,7 @@ export const ActiveFilterChips = ({
   lockedKeys = [],
   valueLabels = {}
 }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatNumber } = useIntl();
 
   const chips = [];
 
@@ -714,7 +716,7 @@ export const ActiveFilterChips = ({
     const translatedLabel = formatMessage({ id: labelId });
     let formattedValue;
     if (Array.isArray(value)) {
-      formattedValue = formatRangeValue(key, value);
+      formattedValue = formatRangeValue(key, value, formatNumber);
     } else if (typeof value === 'boolean') {
       formattedValue = formatMessage({ id: value ? 'yes' : 'no' });
     } else if (translatableValueFields?.has(key)) {

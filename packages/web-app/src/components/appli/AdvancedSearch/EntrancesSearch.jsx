@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import DataUsageIcon from '@mui/icons-material/DataUsage';
 import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
 import SearchInput from '../../common/SearchInput';
+import SearchRatingSlider from './SearchRatingSlider';
 
 import useSearchFilter from '../../../hooks/useSearchFilter';
 import {
@@ -54,9 +55,9 @@ const FILTER_LABELS = {
   'massifs.name': 'Massif',
   region: 'Region',
   'cave.name': 'Network name',
+  'commentsRating.aestheticism': 'Interest of the visit',
   'commentsRating.approach': 'Ease of reach',
   'commentsRating.caving': 'Ease of move',
-  'commentsRating.aestheticism': 'Aesthetic',
   'cave.depth': 'Depth',
   'cave.length': 'Length',
   'cave.isDiving': 'Diving cave',
@@ -76,9 +77,9 @@ const initialFilterState = {
   'massifs.name': '',
   city: '',
   // postalCode is intentionally absent: the entrances API endpoint does not support postal code filtering
+  'commentsRating.aestheticism': null,
   'commentsRating.approach': null,
   'commentsRating.caving': null,
-  'commentsRating.aestheticism': null,
   'cave.name': '',
   'cave.depth': null,
   'cave.length': null,
@@ -129,9 +130,9 @@ const EntrancesSearch = ({
     'massifs.name',
     'city',
     'cave.name',
+    'commentsRating.aestheticism',
     'commentsRating.approach',
     'commentsRating.caving',
-    'commentsRating.aestheticism',
     'isTouristic',
     'dangerPollution',
     'cave.isDiving',
@@ -236,20 +237,20 @@ const EntrancesSearch = ({
         </SearchFieldset>
 
         <SearchFieldset title="Rating criterias">
-          <SearchSlider
+          <SearchRatingSlider
+            label={formatMessage({ id: 'Interest of the visit' })}
+            value={filterState['commentsRating.aestheticism']}
+            onChange={e => updateFilter('commentsRating.aestheticism', e)}
+          />
+          <SearchRatingSlider
             label={formatMessage({ id: 'Ease of reach' })}
             value={filterState['commentsRating.approach']}
             onChange={e => updateFilter('commentsRating.approach', e)}
           />
-          <SearchSlider
+          <SearchRatingSlider
             label={formatMessage({ id: 'Ease of move' })}
             value={filterState['commentsRating.caving']}
             onChange={e => updateFilter('commentsRating.caving', e)}
-          />
-          <SearchSlider
-            label={formatMessage({ id: 'Aesthetic' })}
-            value={filterState['commentsRating.aestheticism']}
-            onChange={e => updateFilter('commentsRating.aestheticism', e)}
           />
         </SearchFieldset>
 

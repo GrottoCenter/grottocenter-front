@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import { Box, Chip, Stack } from '@mui/material';
+import { Box, Chip, Rating, Stack, Typography } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
 import PublishIcon from '@mui/icons-material/Publish';
 import { useIntl } from 'react-intl';
@@ -84,7 +85,37 @@ PersonLinkCell.propTypes = {
   }).isRequired
 };
 
+const RatingCell = ({ value }) => {
+  const { formatNumber } = useIntl();
+  const rating = Math.round(value * 5) / 10;
+  const label = `${formatNumber(rating, { maximumFractionDigits: 1 })}/${formatNumber(5)}`;
+
+  return (
+    <Box
+      component="span"
+      sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+      <Rating
+        value={rating}
+        precision={0.1}
+        size="small"
+        readOnly
+        getLabelText={() => label}
+        emptyIcon={<StarBorderIcon fontSize="inherit" />}
+      />
+      <Typography component="span" variant="body2" aria-hidden="true" noWrap>
+        {label}
+      </Typography>
+    </Box>
+  );
+};
+
+RatingCell.propTypes = {
+  value: PropTypes.number.isRequired
+};
+
 const cellsRender = {
+  rating: value =>
+    Number.isFinite(value) && value > 0 ? <RatingCell value={value} /> : null,
   notificationIsRead: value =>
     value ? (
       <CheckIcon color="primary" fontSize="small" />
@@ -377,21 +408,24 @@ const entrances = {
     },
     {
       visible: true,
+      field: 'commentsRating.aestheticism',
+      label: 'Interest of the visit',
+      sortable: true,
+      render: cellsRender.rating
+    },
+    {
+      visible: true,
       field: 'commentsRating.approach',
       label: 'Ease of reach',
-      sortable: true
+      sortable: true,
+      render: cellsRender.rating
     },
     {
       visible: true,
       field: 'commentsRating.caving',
       label: 'Ease of move',
-      sortable: true
-    },
-    {
-      visible: true,
-      field: 'commentsRating.aestheticism',
-      label: 'Aesthetic',
-      sortable: true
+      sortable: true,
+      render: cellsRender.rating
     },
     {
       visible: false,
