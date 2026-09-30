@@ -7,6 +7,10 @@ import useOpenLink from '../../../../hooks/useOpenLink';
 import useMarkers from '../common/Markers/useMarkers';
 import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
 import { entranceIcon } from '../../../../assets/icons';
+import {
+  MAP_MARKER_OUTLINE_COLOR,
+  MAP_MARKER_OUTLINE_WIDTH
+} from '../common/mapMarkerOutline';
 
 export const ExploredGlobalCss = (
   <GlobalStyles
@@ -26,7 +30,7 @@ export const EXPLORED_PIN_PATH =
 const exploredBadgeIcon = L.divIcon({
   className: 'explored-badge',
   html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 28" width="20" height="28">
-    <path d="${EXPLORED_PIN_PATH}" fill="#2e7d32" stroke="#fff" stroke-width="1.5"/>
+    <path d="${EXPLORED_PIN_PATH}" fill="#2e7d32" stroke="${MAP_MARKER_OUTLINE_COLOR}" stroke-width="${MAP_MARKER_OUTLINE_WIDTH}"/>
     <text x="10" y="11.5" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold" font-family="sans-serif">✓</text>
   </svg>`,
   iconSize: [20, 28],

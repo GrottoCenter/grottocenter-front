@@ -1,5 +1,9 @@
 import { blue, green } from '@mui/material/colors';
 import {
+  MAP_MARKER_OUTLINE_COLOR,
+  MAP_MARKER_OUTLINE_WIDTH
+} from '../common/mapMarkerOutline';
+import {
   DATA_QUALITY_LEVELS,
   DATA_QUALITY_LABEL_KEYS,
   DATA_QUALITY_THRESHOLDS,
@@ -20,22 +24,22 @@ export const CAVE_SIZE = {
 export const CAVE_SIZE_STYLE = {
   [CAVE_SIZE.SMALL]: {
     radius: 8,
-    color: '#FFFFFF',
-    weight: 1,
+    color: MAP_MARKER_OUTLINE_COLOR,
+    weight: MAP_MARKER_OUTLINE_WIDTH,
     fillColor: '#D2691E',
     fillOpacity: 0.9
   },
   [CAVE_SIZE.MEDIUM]: {
     radius: 11,
-    color: '#FFFFFF',
-    weight: 1,
+    color: MAP_MARKER_OUTLINE_COLOR,
+    weight: MAP_MARKER_OUTLINE_WIDTH,
     fillColor: '#8B4513',
     fillOpacity: 0.9
   },
   [CAVE_SIZE.LARGE]: {
     radius: 15,
-    color: '#FFFFFF',
-    weight: 1,
+    color: MAP_MARKER_OUTLINE_COLOR,
+    weight: MAP_MARKER_OUTLINE_WIDTH,
     fillColor: '#2C0F00',
     fillOpacity: 0.9
   }
@@ -145,8 +149,8 @@ export const NETWORK_ENTRANCE_HALO_STYLE = {
 };
 export const NETWORK_ENTRANCE_GHOST_STYLE = {
   radius: 5,
-  color: '#FFFFFF',
-  weight: 2,
+  color: MAP_MARKER_OUTLINE_COLOR,
+  weight: MAP_MARKER_OUTLINE_WIDTH,
   fillColor: NETWORK_HIGHLIGHT_ACCENT,
   fillOpacity: 1,
   interactive: false

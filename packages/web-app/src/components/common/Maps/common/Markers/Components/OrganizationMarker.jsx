@@ -1,6 +1,10 @@
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
 import { amber } from '@mui/material/colors';
+import {
+  MAP_MARKER_OUTLINE_COLOR,
+  MAP_MARKER_OUTLINE_WIDTH
+} from '@/components/common/Maps/common/mapMarkerOutline';
 
 // viewBox keeps the original organization.svg coordinate space (100×100) for the
 // body so content paths are verbatim. Extended to 100×130 for the pointer below
@@ -17,8 +21,9 @@ const OrganizationIcon = () => (
     <path
       d="M14 2 H86 Q98 2 98 14 V86 Q98 98 86 98 H67 L50 128 L33 98 H14 Q2 98 2 86 V14 Q2 2 14 2 Z"
       fill={amber[500]}
-      stroke="#fff"
-      strokeWidth="4"
+      stroke={MAP_MARKER_OUTLINE_COLOR}
+      strokeWidth={MAP_MARKER_OUTLINE_WIDTH}
+      vectorEffect="non-scaling-stroke"
       strokeLinejoin="round"
     />
     {/* Content centered: bounding box of building is ~(6,5)→(88,87), center
