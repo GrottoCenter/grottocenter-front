@@ -3,6 +3,11 @@ import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import { Tooltip } from '@mui/material';
 
+import {
+  durationStringToMinutes,
+  formatDurationMinutes
+} from '@/utils/dateTimeDuration';
+
 const DurationWrapper = styled('div')`
   display: flex;
   align-items: center;
@@ -12,11 +17,11 @@ const DurationWrapper = styled('div')`
 `;
 
 const Duration = ({ image, durationStr, title }) => {
-  const { formatMessage } = useIntl();
-  const splittedTime = durationStr.split(':');
-  const valueToDisplay = `${
-    +splittedTime[0] > 0 ? `${+splittedTime[0]}h` : ''
-  }${+splittedTime[1] > 0 ? `${splittedTime[1].padStart(2, '0')}m` : ''}`;
+  const { formatMessage, formatNumberToParts } = useIntl();
+  const valueToDisplay = formatDurationMinutes(
+    durationStringToMinutes(durationStr),
+    formatNumberToParts
+  );
   return (
     <Tooltip title={formatMessage({ id: title })}>
       <DurationWrapper>

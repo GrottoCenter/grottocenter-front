@@ -5,7 +5,10 @@ const useSearchFilter = (initialFilterState, lockedKeys = []) => {
   const updateFilter = (key, value) =>
     setFilterState(prev => ({ ...prev, [key]: value }));
   const handleRemoveFilter = key =>
-    updateFilter(key, initialFilterState[key] ?? '');
+    updateFilter(
+      key,
+      initialFilterState[key] === undefined ? '' : initialFilterState[key]
+    );
   const resetFilter = () =>
     setFilterState(prev =>
       Object.fromEntries(

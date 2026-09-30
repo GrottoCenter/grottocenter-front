@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 import { isEmpty, pathOr } from 'ramda';
 import { timeToGoIcon, undergroundTimeIcon } from '../../../../../assets/icons';
 
-import Ratings from '../../Ratings';
+import CommentRatings from '../../Comments/CommentRatings';
 import Duration from '../../../../common/Properties/Duration';
 import GenericSnapshots from './GenericSnapshots';
 
@@ -46,12 +46,10 @@ const CommentSnapshots = ({ comment, previous }) => {
     <>
       <GenericSnapshots data={{ body }} previous={previous} />
       <HalfSplitContainer>
-        <Ratings
+        <CommentRatings
           interest={aestheticism ?? interest}
           progression={caving ?? progression}
           access={approach ?? access}
-          size="small"
-          mode="column"
         />
         <DurationContainer>
           {!isEmpty(eTTrail) && (

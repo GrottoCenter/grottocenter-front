@@ -394,6 +394,7 @@ export const Entry = ({
                           <Properties
                             entrance={entrance}
                             dataQuality={entrance.dataQuality}
+                            canComment={isAuth && !entrance.isDeleted}
                           />
                         </Box>
                       </HalfSplitContainer>

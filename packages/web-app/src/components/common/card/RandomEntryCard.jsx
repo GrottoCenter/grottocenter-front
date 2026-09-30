@@ -9,12 +9,16 @@ import {
   Skeleton,
   Typography
 } from '@mui/material';
-import { Autorenew } from '@mui/icons-material';
+import Autorenew from '@mui/icons-material/Autorenew';
 import MuiRating from '@mui/material/Rating';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
 import { FormattedMessage, useIntl } from 'react-intl';
+import {
+  durationStringToMinutes,
+  formatDurationMinutes
+} from '@/utils/dateTimeDuration';
 import CustomIcon from '../CustomIcon';
 import AppLink from '../AppLink';
 import { depthIcon, lengthIcon } from '../../../assets/icons';
@@ -54,14 +58,6 @@ const WhiteRating = styled(MuiRating)({
   fontSize: '0.875rem'
 });
 
-const formatTime = timeStr => {
-  if (!timeStr) return null;
-  const [h, m] = timeStr.split(':').map(Number);
-  if (h === 0) return `${m}min`;
-  if (m === 0) return `${h}h`;
-  return `${h}h${m}`;
-};
-
 const getTopoImage = documents => {
   if (!documents) return null;
   const topoDoc = documents.find(d => d.type === 13);
@@ -71,7 +67,13 @@ const getTopoImage = documents => {
 };
 
 const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatNumberToParts } = useIntl();
+  const formatTime = timeStr =>
+    timeStr &&
+    formatDurationMinutes(
+      durationStringToMinutes(timeStr),
+      formatNumberToParts
+    );
 
   useEffect(() => {
     fetch();
@@ -142,27 +144,37 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
             gap: 0.5,
             mt: '4px'
           }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1fr) auto',
+              alignItems: 'center',
+              columnGap: 0.75,
+              rowGap: 0.25,
+              minWidth: 0
+            }}>
             {[
-              { labelId: 'Interest', value: stats?.aestheticism, time: null },
               {
-                labelId: 'Access',
+                labelId: 'Interest of the visit',
+                value: stats?.aestheticism,
+                time: null
+              },
+              {
+                labelId: 'Ease of reach',
                 value: stats?.approach,
                 time: formatTime(timeInfo?.eTTrail)
               },
               {
-                labelId: 'Progression',
+                labelId: 'Ease of move',
                 value: stats?.caving,
                 time: formatTime(timeInfo?.eTUnderground)
               }
             ].map(({ labelId, value, time }) =>
               value > 0 ? (
-                <Box
-                  key={labelId}
-                  sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Box key={labelId} sx={{ display: 'contents' }}>
                   <Typography
                     variant="caption"
-                    sx={{ color: 'rgba(255,255,255,0.75)', minWidth: 78 }}>
+                    sx={{ color: 'rgba(255,255,255,0.75)' }}>
                     {formatMessage({ id: labelId })}
                     {time && ` (${time})`}
                   </Typography>
@@ -182,7 +194,13 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
               ) : null
             )}
             {cave && (cave.depth || cave.length) && (
-              <Box sx={{ display: 'flex', gap: 1, mt: '4px' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1,
+                  mt: '4px',
+                  gridColumn: '1 / -1'
+                }}>
                 {cave.depth && (
                   <Box
                     sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

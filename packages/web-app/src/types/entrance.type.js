@@ -18,6 +18,7 @@ export const CommentPropTypes = PropTypes.shape({
   dateReviewed: PropTypes.string,
   relevance: PropTypes.number,
   aestheticism: PropTypes.number,
+  caving: PropTypes.number,
   approach: PropTypes.number,
   eTTrail: PropTypes.string, // hh:mm:ss
   eTUnderground: PropTypes.string, // hh:mm:ss
