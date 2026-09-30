@@ -23,7 +23,7 @@ const getDurationRange = (comments, field, formatNumberToParts) => {
   const maximum = Math.max(...durations);
   if (minimum === maximum)
     return formatDurationMinutes(minimum, formatNumberToParts);
-  return `${formatDurationMinutes(minimum, formatNumberToParts)} - ${formatDurationMinutes(maximum, formatNumberToParts)}`;
+  return `${formatDurationMinutes(minimum, formatNumberToParts)} –\u00a0${formatDurationMinutes(maximum, formatNumberToParts)}`;
 };
 
 const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {

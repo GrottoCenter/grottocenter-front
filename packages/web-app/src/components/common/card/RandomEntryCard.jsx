@@ -9,7 +9,7 @@ import {
   Skeleton,
   Typography
 } from '@mui/material';
-import { Autorenew } from '@mui/icons-material';
+import Autorenew from '@mui/icons-material/Autorenew';
 import MuiRating from '@mui/material/Rating';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { styled } from '@mui/material/styles';
@@ -144,7 +144,15 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
             gap: 0.5,
             mt: '4px'
           }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1fr) auto',
+              alignItems: 'center',
+              columnGap: 0.75,
+              rowGap: 0.25,
+              minWidth: 0
+            }}>
             {[
               {
                 labelId: 'Interest of the visit',
@@ -163,12 +171,10 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
               }
             ].map(({ labelId, value, time }) =>
               value > 0 ? (
-                <Box
-                  key={labelId}
-                  sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Box key={labelId} sx={{ display: 'contents' }}>
                   <Typography
                     variant="caption"
-                    sx={{ color: 'rgba(255,255,255,0.75)', minWidth: 78 }}>
+                    sx={{ color: 'rgba(255,255,255,0.75)' }}>
                     {formatMessage({ id: labelId })}
                     {time && ` (${time})`}
                   </Typography>
@@ -188,7 +194,13 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
               ) : null
             )}
             {cave && (cave.depth || cave.length) && (
-              <Box sx={{ display: 'flex', gap: 1, mt: '4px' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1,
+                  mt: '4px',
+                  gridColumn: '1 / -1'
+                }}>
                 {cave.depth && (
                   <Box
                     sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

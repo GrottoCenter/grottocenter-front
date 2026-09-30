@@ -15,7 +15,7 @@ describe('RandomEntryCard durations', () => {
             entry={{
               id: 1,
               name: 'Entrée',
-              stats: { approach: 4, caving: 4 },
+              stats: { aestheticism: 6, approach: 4, caving: 4 },
               timeInfo: {
                 eTTrail: '0:30:00',
                 eTUnderground: '1:30:00'
@@ -26,9 +26,12 @@ describe('RandomEntryCard durations', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/30 min/).textContent).toContain('30\u00a0min');
-    expect(screen.getByText(/1 h 30/).textContent).toContain(
-      '1\u00a0h\u00a030'
+    expect(screen.getByText('Intérêt de la visite')).toBeVisible();
+    expect(screen.getByText(/Facilité d'accès à l'entrée/).textContent).toBe(
+      "Facilité d'accès à l'entrée (30\u00a0min)"
     );
+    expect(
+      screen.getByText(/Facilité de progression sous terre/).textContent
+    ).toBe('Facilité de progression sous terre (1\u00a0h\u00a030\u00a0min)');
   });
 });

@@ -56,8 +56,12 @@ describe('Comment', () => {
 
     expect(screen.getByAltText('Time to go')).toBeInTheDocument();
     expect(screen.getByAltText('Underground time')).toBeInTheDocument();
-    expect(screen.getByText('1 h 30').textContent).toBe('1\u00a0h\u00a030');
-    expect(screen.getByText('4 h 20').textContent).toBe('4\u00a0h\u00a020');
+    expect(screen.getByText('1 hr 30 min').textContent).toBe(
+      '1\u00a0hr\u00a030\u00a0min'
+    );
+    expect(screen.getByText('4 hr 20 min').textContent).toBe(
+      '4\u00a0hr\u00a020\u00a0min'
+    );
     expect(within(interest).getByText('4/5 · Remarkable')).toBeInTheDocument();
     expect(
       within(progression).getByText('3.5/5 · Intermediate – Easy')
