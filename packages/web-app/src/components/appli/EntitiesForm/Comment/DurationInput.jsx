@@ -66,39 +66,43 @@ const DurationInput = ({ labelId, helperId, icon, value, onChange }) => {
           )}
         </Box>
       </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="0"
-          value={parts.hours}
-          onChange={event => handlePartChange('hours', event.target.value)}
-          slotProps={{
-            htmlInput: {
-              inputMode: 'numeric',
-              pattern: '[0-9]*',
-              'aria-label': `${label} — ${formatMessage({ id: 'Hours' })}`
-            }
-          }}
-          sx={{ width: '4rem' }}
-        />
-        <Typography variant="body2">{hourUnit}</Typography>
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="00"
-          value={parts.minutes}
-          onChange={event => handlePartChange('minutes', event.target.value)}
-          slotProps={{
-            htmlInput: {
-              inputMode: 'numeric',
-              pattern: '[0-9]*',
-              'aria-label': `${label} — ${formatMessage({ id: 'Minutes' })}`
-            }
-          }}
-          sx={{ width: '4rem' }}
-        />
-        <Typography variant="body2">{minuteUnit}</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 0.75 }}>
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="0"
+            value={parts.hours}
+            onChange={event => handlePartChange('hours', event.target.value)}
+            slotProps={{
+              htmlInput: {
+                inputMode: 'numeric',
+                pattern: '[0-9]*',
+                'aria-label': `${label} — ${formatMessage({ id: 'Hours' })}`
+              }
+            }}
+            sx={{ width: '4rem' }}
+          />
+          <Typography variant="body2">{hourUnit}</Typography>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 0.75 }}>
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="00"
+            value={parts.minutes}
+            onChange={event => handlePartChange('minutes', event.target.value)}
+            slotProps={{
+              htmlInput: {
+                inputMode: 'numeric',
+                pattern: '[0-9]*',
+                'aria-label': `${label} — ${formatMessage({ id: 'Minutes' })}`
+              }
+            }}
+            sx={{ width: '4rem' }}
+          />
+          <Typography variant="body2">{minuteUnit}</Typography>
+        </Box>
       </Box>
     </Box>
   );
