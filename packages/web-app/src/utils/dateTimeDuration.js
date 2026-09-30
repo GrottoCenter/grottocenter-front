@@ -23,6 +23,13 @@ export const durationStringToMinutes = durationStr => {
   return +splitDuration[0] * 60 + +splitDuration[1];
 };
 
+export const formatDurationUnit = (unit, formatNumberToParts) =>
+  formatNumberToParts(0, { style: 'unit', unit, unitDisplay: 'narrow' })
+    .filter(part => part.type === 'unit' || part.type === 'literal')
+    .map(part => part.value)
+    .join('')
+    .trim();
+
 export const formatDurationMinutes = (minutes, formatNumber) => {
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;

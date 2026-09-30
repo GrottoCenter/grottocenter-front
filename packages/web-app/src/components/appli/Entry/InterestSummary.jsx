@@ -27,20 +27,15 @@ const getDurationRange = (comments, field, formatNumber) => {
 
 const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {
   const { formatMessage, formatNumber } = useIntl();
-  const activeComments = comments.filter(comment => !comment.isDeleted);
   const ratings = comments
     .map(comment => comment.aestheticism)
     .filter(value => Number.isFinite(value) && value > 0);
   const average = ratings.length
     ? ratings.reduce((sum, value) => sum + value, 0) / ratings.length / 2
     : null;
-  const approachTime = getDurationRange(
-    activeComments,
-    'eTTrail',
-    formatNumber
-  );
+  const approachTime = getDurationRange(comments, 'eTTrail', formatNumber);
   const undergroundTime = getDurationRange(
-    activeComments,
+    comments,
     'eTUnderground',
     formatNumber
   );

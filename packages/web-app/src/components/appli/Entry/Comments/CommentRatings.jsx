@@ -54,6 +54,12 @@ const CommentRatings = ({ interest, progression, access }) => {
               precision={0.5}
               size="small"
               readOnly
+              getLabelText={rating =>
+                formatMessage(
+                  { id: '{rating} out of 5 stars' },
+                  { rating: formatNumber(rating, { maximumFractionDigits: 1 }) }
+                )
+              }
               emptyIcon={<StarBorderIcon fontSize="inherit" />}
             />
             <Typography variant="body2" color="text.secondary">

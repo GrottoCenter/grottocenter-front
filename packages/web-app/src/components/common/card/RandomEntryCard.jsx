@@ -144,14 +144,18 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
           }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             {[
-              { labelId: 'Interest', value: stats?.aestheticism, time: null },
               {
-                labelId: 'Access',
+                labelId: 'Interest of the visit',
+                value: stats?.aestheticism,
+                time: null
+              },
+              {
+                labelId: 'Ease of reach',
                 value: stats?.approach,
                 time: formatTime(timeInfo?.eTTrail)
               },
               {
-                labelId: 'Progression',
+                labelId: 'Ease of move',
                 value: stats?.caving,
                 time: formatTime(timeInfo?.eTUnderground)
               }

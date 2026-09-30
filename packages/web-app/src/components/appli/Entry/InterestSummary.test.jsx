@@ -64,7 +64,7 @@ describe('InterestSummary', () => {
     expect(screen.getByRole('link', { name: '1 évaluation' })).toBeVisible();
   });
 
-  it('shows the range of reported times, excluding deleted comments', () => {
+  it('shows the range of reported times, including deleted comments', () => {
     renderSummary(
       [
         {
@@ -88,9 +88,9 @@ describe('InterestSummary', () => {
     );
 
     expect(screen.getByText("Temps d'accès")).toBeVisible();
-    expect(screen.getByText('15min–30min')).toBeVisible();
+    expect(screen.getByText('5min–30min')).toBeVisible();
     expect(screen.getByText('Temps passé sous terre')).toBeVisible();
-    expect(screen.getByText('1h 30min–2h')).toBeVisible();
+    expect(screen.getByText('1h 30min–5h')).toBeVisible();
     expect(screen.getByRole('link', { name: '1 évaluation' })).toBeVisible();
   });
 

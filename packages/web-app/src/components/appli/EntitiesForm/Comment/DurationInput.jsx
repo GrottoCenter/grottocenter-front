@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, TextField, Typography } from '@mui/material';
 import CustomIcon from '@/components/common/CustomIcon';
+import { formatDurationUnit } from '@/utils/dateTimeDuration';
 
 const splitMinutes = value =>
   value == null
@@ -13,9 +14,11 @@ const splitMinutes = value =>
       };
 
 const DurationInput = ({ labelId, helperId, icon, value, onChange }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatNumberToParts } = useIntl();
   const [parts, setParts] = useState(() => splitMinutes(value));
   const label = formatMessage({ id: labelId });
+  const hourUnit = formatDurationUnit('hour', formatNumberToParts);
+  const minuteUnit = formatDurationUnit('minute', formatNumberToParts);
 
   const handlePartChange = (part, nextValue) => {
     if (!/^\d*$/.test(nextValue)) return;
@@ -79,7 +82,7 @@ const DurationInput = ({ labelId, helperId, icon, value, onChange }) => {
           }}
           sx={{ width: '4rem' }}
         />
-        <Typography variant="body2">h</Typography>
+        <Typography variant="body2">{hourUnit}</Typography>
         <TextField
           variant="outlined"
           size="small"
@@ -95,7 +98,7 @@ const DurationInput = ({ labelId, helperId, icon, value, onChange }) => {
           }}
           sx={{ width: '4rem' }}
         />
-        <Typography variant="body2">min</Typography>
+        <Typography variant="body2">{minuteUnit}</Typography>
       </Box>
     </Box>
   );

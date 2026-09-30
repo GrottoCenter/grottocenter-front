@@ -6,6 +6,12 @@ import ClearIcon from '@mui/icons-material/Clear';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { getRatingLevelIds } from '@/utils/visitRatingLevels';
 
+const slugifyName = name =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
 const RatingInput = ({
   labelId,
   value,
@@ -19,6 +25,7 @@ const RatingInput = ({
   const [focusedRating, setFocusedRating] = useState(null);
   const selectedRating = value == null ? null : value / valueMultiplier;
   const activeRating = hoveredRating ?? focusedRating ?? selectedRating;
+  const inputName = slugifyName(labelId);
 
   const description = getRatingLevelIds(activeRating, descriptionIds)
     .map(id => formatMessage({ id }))
@@ -56,7 +63,7 @@ const RatingInput = ({
           gap: 1
         }}>
         <Rating
-          name={labelId}
+          name={inputName}
           value={selectedRating}
           precision={precision}
           size="large"

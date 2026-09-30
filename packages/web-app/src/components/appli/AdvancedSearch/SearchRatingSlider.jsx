@@ -72,6 +72,8 @@ const SearchRatingSlider = ({ label, value, onChange }) => {
           touchAction: 'pan-y',
           width: '100%',
           mb: 1,
+          pointerEvents: 'none',
+          '& .MuiSlider-thumb': { pointerEvents: 'auto' },
           '& .MuiSlider-markLabel[data-index="0"]': {
             transform: 'translateX(0)'
           },
