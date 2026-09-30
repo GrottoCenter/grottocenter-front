@@ -1,118 +1,69 @@
-import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import {
-  Box,
-  TextField,
-  Typography,
-  IconButton,
-  InputAdornment
-} from '@mui/material';
-import Rating from '@mui/material/Rating';
+import { Box } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-import NotInterestedIcon from '@mui/icons-material/NotInterested';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
 
+import { INTEREST_LEVELS, EASE_LEVELS } from '@/utils/visitRatingLevels';
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
 import InputText from '../utils/InputText';
 import InputLanguage from '../utils/InputLanguage';
+import RatingInput from '../utils/RatingInput';
+import DurationInput from './DurationInput';
 
 import { durationStringToMinutes } from '../../../../utils/dateTimeDuration';
 import { CommentPropTypes } from '../../../../types/entrance.type';
 
-const InputMinutes = ({ control, formKey, labelName, helperText }) => {
-  const { formatMessage } = useIntl();
-  return (
-    <Controller
-      control={control}
-      name={formKey}
-      render={({ field: { onChange, value } }) => (
-        <TextField
-          type="number"
-          min="1"
-          step="1"
-          fullWidth
-          helperText={formatMessage({ id: helperText })}
-          label={formatMessage({ id: labelName })}
-          onChange={onChange}
-          onKeyPress={e => !/\d/.test(e.key) && e.preventDefault()}
-          style={{ mb: 2 }}
-          value={value}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">minutes</InputAdornment>
-            )
-          }}
-        />
-      )}
-    />
-  );
-};
-InputMinutes.propTypes = {
+const InputDuration = ({ control, formKey, labelId, helperId, icon }) => (
+  <Controller
+    control={control}
+    name={formKey}
+    render={({ field: { onChange, value } }) => (
+      <DurationInput
+        labelId={labelId}
+        helperId={helperId}
+        icon={icon}
+        value={value}
+        onChange={onChange}
+      />
+    )}
+  />
+);
+InputDuration.propTypes = {
   control: PropTypes.shape({}).isRequired,
   formKey: PropTypes.string.isRequired,
-  labelName: PropTypes.string.isRequired,
-  helperText: PropTypes.string.isRequired
+  labelId: PropTypes.string.isRequired,
+  helperId: PropTypes.string,
+  icon: PropTypes.oneOf(['time_to_go', 'underground_time']).isRequired
 };
 
-const InputRating = ({ control, formKey, labelName }) => {
-  const { formatMessage } = useIntl();
-  return (
-    <Controller
-      control={control}
-      name={formKey}
-      render={({ field: { onChange, value } }) => (
-        <Box display="flex">
-          <div>
-            <Typography>{formatMessage({ id: labelName })}</Typography>
-            <Rating
-              name={labelName}
-              value={value / 2}
-              precision={0.5}
-              size="large"
-              onChange={(event, newValue) => {
-                onChange(newValue !== null ? +newValue * 2 : null);
-              }}
-              emptyIcon={<StarBorderIcon fontSize="inherit" />}
-            />
-          </div>
-          {value !== null && (
-            <div>
-              <Typography variant="subtitle2" gutterBottom>
-                {formatMessage({ id: 'Clear' })}
-              </Typography>
-              <IconButton
-                onClick={() => {
-                  onChange(null);
-                }}
-                color="primary"
-                aria-label="clear rate"
-                component="label"
-                size="small">
-                <NotInterestedIcon />
-              </IconButton>
-            </div>
-          )}
-          {value === null && (
-            <Box
-              display="flex"
-              justifyContent="center"
-              flexDirection="column"
-              style={{ mt: 3 }}>
-              <Typography variant="caption">
-                {formatMessage({ id: 'No Rating' })}
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      )}
-    />
-  );
-};
+const InputRating = ({
+  control,
+  formKey,
+  labelId,
+  descriptionIds,
+  precision = 0.5
+}) => (
+  <Controller
+    control={control}
+    name={formKey}
+    render={({ field: { onChange, value } }) => (
+      <RatingInput
+        labelId={labelId}
+        value={value}
+        onChange={onChange}
+        descriptionIds={descriptionIds}
+        precision={precision}
+        valueMultiplier={2}
+      />
+    )}
+  />
+);
 InputRating.propTypes = {
   control: PropTypes.shape({}).isRequired,
   formKey: PropTypes.string.isRequired,
-  labelName: PropTypes.string.isRequired
+  labelId: PropTypes.string.isRequired,
+  descriptionIds: PropTypes.arrayOf(PropTypes.string),
+  precision: PropTypes.number
 };
 
 const getDefaultValues = (values, language) => {
@@ -167,44 +118,51 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
         </FormRow>
         <InputText
           formKey="body"
-          labelName="Text"
+          labelName="Describe your visit and the highlights."
           minRows={3}
           control={control}
           isError={!!errors?.body}
           isRequired
         />
 
-        <FormRow>
-          <InputMinutes
+        <Box sx={{ mt: 2, maxWidth: '48rem', display: 'grid', gap: 1.25 }}>
+          <InputDuration
             control={control}
             formKey="eTTrail"
-            labelName="Access duration"
-            helperText="Number of minutes between parking and entrance"
+            labelId="Approach time"
+            helperId="From parking to entrance"
+            icon="time_to_go"
           />
-          <InputMinutes
+          <InputDuration
             control={control}
             formKey="eTUnderground"
-            labelName="Underground time"
-            helperText="Number of minutes spent underground"
+            labelId="Underground time"
+            icon="underground_time"
           />
-        </FormRow>
-        <FormRow>
-          <InputRating
-            control={control}
-            formKey="aestheticism"
-            labelName="Interest"
-          />
+          <Box sx={{ mt: 1 }}>
+            <InputRating
+              control={control}
+              formKey="aestheticism"
+              labelId="Interest rating"
+              descriptionIds={INTEREST_LEVELS}
+              precision={(values?.aestheticism ?? 0) % 2 === 1 ? 0.5 : 1}
+            />
+          </Box>
           <InputRating
             control={control}
             formKey="caving"
-            labelName="Progression"
+            labelId="Ease of move"
+            descriptionIds={EASE_LEVELS}
+            precision={(values?.caving ?? 0) % 2 === 1 ? 0.5 : 1}
           />
           <InputRating
             control={control}
             formKey="approach"
-            labelName="Access"
+            labelId="Ease of reach"
+            descriptionIds={EASE_LEVELS}
+            precision={(values?.approach ?? 0) % 2 === 1 ? 0.5 : 1}
           />
-        </FormRow>
+        </Box>
 
         <FormActionRow
           isNew={isNewComment}

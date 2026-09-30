@@ -20,7 +20,7 @@ import { getDataQualityLabelKey } from '../../../utils/dataQuality';
 import CustomIcon from '../../common/CustomIcon';
 import { Property } from '../../common/Properties';
 import InfoSection from '../../common/InfoSection';
-import Ratings from './Ratings';
+import InterestSummary from './InterestSummary';
 import {
   EntrancePropTypes,
   DataQualityPropTypes
@@ -49,10 +49,6 @@ const GlobalWrapper = styled('div')`
   gap: ${({ theme }) => theme.spacing(1)};
 `;
 
-const StyledRatings = styled(Ratings)`
-  justify-content: space-evenly;
-`;
-
 const CATEGORY_KEYS = [
   { key: 'general', label: 'General data' },
   { key: 'location', label: 'Location' },
@@ -73,7 +69,12 @@ const QUALITY_COLORS = [
 const qualityColor = score =>
   QUALITY_COLORS.find(({ min }) => score >= min).color;
 
-const Properties = ({ isLoading = false, entrance, dataQuality }) => {
+const Properties = ({
+  isLoading = false,
+  entrance,
+  dataQuality,
+  canComment
+}) => {
   const { formatMessage } = useIntl();
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [preferredCRS] = useCoordinatePreference();
@@ -194,6 +195,13 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
             </Box>
           </InfoSection>
         </Paper>
+      )}
+      {!entrance.isDeleted && (
+        <InterestSummary
+          entranceId={entrance.id}
+          comments={entrance.comments}
+          canComment={canComment}
+        />
       )}
       {(entrance.hasBat ||
         entrance.dangerFlooding ||
@@ -377,17 +385,6 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
           </InfoSection>
         </Paper>
       )}
-      {!!entrance.stats &&
-        !!entrance.stats.approach &&
-        !!entrance.stats.aestheticism &&
-        !!entrance.stats.caving && (
-          <StyledRatings
-            access={entrance.stats.approach}
-            interest={entrance.stats.aestheticism}
-            progression={entrance.stats.caving}
-            size="small"
-          />
-        )}
     </GlobalWrapper>
   );
 };
@@ -395,7 +392,8 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
 Properties.propTypes = {
   isLoading: PropTypes.bool,
   entrance: EntrancePropTypes,
-  dataQuality: DataQualityPropTypes
+  dataQuality: DataQualityPropTypes,
+  canComment: PropTypes.bool
 };
 
 export default Properties;

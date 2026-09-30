@@ -15,10 +15,10 @@ import ActionButtons from '../ActionButtons';
 import SectionTitle from '../SectionTitle';
 import CreateCommentForm from '../../EntitiesForm/Comment';
 import { CommentPropTypes } from '../../../../types/entrance.type';
-import Ratings from '../Ratings';
 import Contribution from '../../../common/Contribution/Contribution';
 import ContributionMetadata from '../../../common/Contribution/ContributionMetadata';
 import Duration from '../../../common/Properties/Duration';
+import CommentRatings from './CommentRatings';
 
 const ListItemStyled = styled(ListItem)`
   display: flow-root;
@@ -27,10 +27,6 @@ const ListItemStyled = styled(ListItem)`
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
-`;
-
-const StyledRatings = styled(Ratings)`
-  gap: ${({ theme }) => theme.spacing(1)};
 `;
 
 const Comment = ({
@@ -88,6 +84,10 @@ const Comment = ({
       userId?.toString() === comment.author?.id.toString()) ||
     permissions.isAdmin ||
     permissions.isModerator;
+  const hasDurations =
+    comment.eTTrail?.length > 0 || comment.eTUnderground?.length > 0;
+  const hasRatings =
+    comment.aestheticism > 0 || comment.caving > 0 || comment.approach > 0;
 
   return (
     <ListItemStyled disableGutters>
@@ -151,22 +151,18 @@ const Comment = ({
               />
             }
           />
-          {(comment.aestheticism ||
-            comment.caving ||
-            comment.approach ||
-            comment.eTTrail?.length > 0 ||
-            comment.eTUnderground?.length > 0) && (
+          {(hasDurations || hasRatings) && (
             <Box
               sx={{
                 display: 'flex',
                 flexWrap: 'wrap',
                 alignItems: 'center',
-                gap: 0.5,
+                columnGap: 1.5,
+                rowGap: { xs: 0.25, sm: 0.5 },
                 pt: 0.5
               }}>
-              {(comment.eTTrail?.length > 0 ||
-                comment.eTUnderground?.length > 0) && (
-                <Box sx={{ display: 'flex', gap: 1 }}>
+              {hasDurations && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                   {comment.eTTrail?.length > 0 && (
                     <Duration
                       image={timeToGoIcon}
@@ -183,12 +179,11 @@ const Comment = ({
                   )}
                 </Box>
               )}
-              {(comment.aestheticism || comment.caving || comment.approach) && (
-                <StyledRatings
+              {hasRatings && (
+                <CommentRatings
                   interest={comment.aestheticism}
                   progression={comment.caving}
                   access={comment.approach}
-                  size="small"
                 />
               )}
             </Box>
