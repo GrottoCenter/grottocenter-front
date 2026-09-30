@@ -21,7 +21,11 @@ const AppSnackbar = ({
   const severity = variant === 'default' ? 'info' : variant;
   const resolvedAction = typeof action === 'function' ? action(id) : action;
   return (
-    <SnackbarContent ref={ref} className={className} style={style}>
+    <SnackbarContent
+      ref={ref}
+      className={className}
+      style={style}
+      data-testid="app-snackbar">
       <Alert
         severity={severity}
         action={resolvedAction}
