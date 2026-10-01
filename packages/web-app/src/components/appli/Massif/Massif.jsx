@@ -12,6 +12,7 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ShareIcon from '@mui/icons-material/Share';
 import { useReactToPrint } from 'react-to-print';
+import { getPostDeletionUrl } from '@/utils/deletedEntityRedirect';
 
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
@@ -98,8 +99,24 @@ const Massif = ({
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    deleteMutation.mutate({ id: massifId, entityId, isPermanent });
-    if (isPermanent) navigate('/', { replace: true });
+    deleteMutation.mutate(
+      { id: massifId, entityId, isPermanent },
+      {
+        onSuccess: () => {
+          if (isPermanent) {
+            navigate(
+              getPostDeletionUrl(
+                DELETED_ENTITIES.massif,
+                entityId,
+                massif?.redirectTo
+              ),
+              { replace: true }
+            );
+          }
+        },
+        onError: () => setWantedDeletedState(massif?.isDeleted ?? false)
+      }
+    );
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);

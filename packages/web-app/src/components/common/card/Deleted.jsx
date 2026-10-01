@@ -15,6 +15,7 @@ import RestoreIcon from '@mui/icons-material/RestoreFromTrashRounded';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForeverRounded';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import { getDeletedEntityRedirectUrl } from '@/utils/deletedEntityRedirect';
 
 import StandardDialog from '../StandardDialog';
 import Alert from '../Alert';
@@ -93,9 +94,10 @@ export const DeletedCard = ({
 }) => {
   const { formatMessage } = useIntl();
   const entityI18n = formatMessage({ id: entityType.str });
-  const redirectToUrl = entity.redirectTo
-    ? entityType.url + entity.redirectTo
-    : null;
+  const redirectToUrl = getDeletedEntityRedirectUrl(
+    entityType,
+    entity.redirectTo
+  );
 
   const hasActions =
     !!redirectToUrl ||

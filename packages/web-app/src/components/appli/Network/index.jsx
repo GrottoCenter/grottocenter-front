@@ -12,6 +12,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import BiotechIcon from '@mui/icons-material/Biotech';
 import { useReactToPrint } from 'react-to-print';
+import { getPostDeletionUrl } from '@/utils/deletedEntityRedirect';
 import AppLink from '../../common/AppLink';
 
 import {
@@ -97,8 +98,24 @@ export const Network = ({
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    deleteMutation.mutate({ id: caveId, entityId, isPermanent });
-    if (isPermanent) navigate('/', { replace: true });
+    deleteMutation.mutate(
+      { id: caveId, entityId, isPermanent },
+      {
+        onSuccess: () => {
+          if (isPermanent) {
+            navigate(
+              getPostDeletionUrl(
+                DELETED_ENTITIES.network,
+                entityId,
+                cave?.redirectTo
+              ),
+              { replace: true }
+            );
+          }
+        },
+        onError: () => setWantedDeletedState(cave?.isDeleted ?? false)
+      }
+    );
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);

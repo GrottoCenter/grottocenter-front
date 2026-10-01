@@ -14,6 +14,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShareIcon from '@mui/icons-material/Share';
+import { getPostDeletionUrl } from '@/utils/deletedEntityRedirect';
 import AppLink from '../../common/AppLink';
 import StandardDialog from '../../common/StandardDialog';
 import PageContainer from '../../common/Layouts/PageContainer';
@@ -99,12 +100,24 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    deleteOrganizationMutation.mutate({
-      id: organizationId,
-      entityId,
-      isPermanent
-    });
-    if (isPermanent) navigate('/', { replace: true });
+    deleteOrganizationMutation.mutate(
+      { id: organizationId, entityId, isPermanent },
+      {
+        onSuccess: () => {
+          if (isPermanent) {
+            navigate(
+              getPostDeletionUrl(
+                DELETED_ENTITIES.organization,
+                entityId,
+                organization?.redirectTo
+              ),
+              { replace: true }
+            );
+          }
+        },
+        onError: () => setWantedDeletedState(organization?.isDeleted ?? false)
+      }
+    );
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);

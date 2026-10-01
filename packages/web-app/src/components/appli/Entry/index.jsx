@@ -18,6 +18,7 @@ import BiotechIcon from '@mui/icons-material/Biotech';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import { useReactToPrint } from 'react-to-print';
+import { getPostDeletionUrl } from '@/utils/deletedEntityRedirect';
 import AppLink from '../../common/AppLink';
 
 import PageContainer from '../../common/Layouts/PageContainer';
@@ -115,8 +116,24 @@ export const Entry = ({
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    deleteMutation.mutate({ id: entranceId, entityId, isPermanent });
-    if (isPermanent) navigate('/', { replace: true });
+    deleteMutation.mutate(
+      { id: entranceId, entityId, isPermanent },
+      {
+        onSuccess: () => {
+          if (isPermanent) {
+            navigate(
+              getPostDeletionUrl(
+                DELETED_ENTITIES.entrance,
+                entityId,
+                entrance?.redirectTo
+              ),
+              { replace: true }
+            );
+          }
+        },
+        onError: () => setWantedDeletedState(entrance?.isDeleted ?? false)
+      }
+    );
   };
 
   const onRestorePress = () => {
