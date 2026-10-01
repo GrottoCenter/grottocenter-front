@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Divider, Link as MuiLink, List, Typography } from '@mui/material';
+import {
+  Divider,
+  Link as MuiLink,
+  List,
+  Paper,
+  Typography
+} from '@mui/material';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
 import NetworkInlineLink from '../../common/NetworkInlineLink';
 
@@ -72,12 +78,17 @@ const Descriptions = ({
       content={
         <>
           {hasNetworkDescriptions && (
-            <>
-              <Divider sx={{ mb: 0.5 }} />
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                sx={{ mb: 0.5 }}>
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 1,
+                mb: 1,
+                borderRadius: 2,
+                borderLeftWidth: 3,
+                borderLeftColor: 'secondary.main',
+                bgcolor: 'grey.50'
+              }}>
+              <Typography variant="body1" sx={{ overflowWrap: 'anywhere' }}>
                 <FormattedMessage
                   id="network.descriptions.callout"
                   values={{
@@ -105,7 +116,7 @@ const Descriptions = ({
                   }}
                 />
               </Typography>
-            </>
+            </Paper>
           )}
 
           {isFormVisible && (
