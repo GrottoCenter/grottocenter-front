@@ -83,6 +83,7 @@ export { useDeleteEntrance } from './mutations/useDeleteEntrance';
 export { useRestoreEntrance } from './mutations/useRestoreEntrance';
 export {
   useLinkDocumentToEntrance,
+  useLinkDocumentToEntrances,
   useLinkDocumentsToEntrance,
   useUnlinkDocumentToEntrance
 } from './mutations/useLinkDocumentToEntrance';

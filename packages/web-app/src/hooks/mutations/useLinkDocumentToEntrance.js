@@ -48,6 +48,39 @@ export const useLinkDocumentToEntrance = () => {
   });
 };
 
+export const useLinkDocumentToEntrances = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ documentId, entrances }) => {
+      const results = await Promise.allSettled(
+        entrances.map(entrance =>
+          apiPut(associateDocumentToEntranceUrl(entrance.id, documentId))
+        )
+      );
+      const rejections = results
+        .filter(result => result.status === 'rejected')
+        .map(result => result.reason);
+      if (rejections.length > 0) {
+        const error = rejections[0];
+        error.rejections = rejections;
+        throw error;
+      }
+      return results.map(result => result.value);
+    },
+    onSettled: (_data, _error, { documentId, entrances }) =>
+      Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: documentKeys.detail(documentId)
+        }),
+        ...entrances.map(entrance =>
+          queryClient.invalidateQueries({
+            queryKey: entranceKeys.detail(entrance.id)
+          })
+        )
+      ])
+  });
+};
+
 export const useLinkDocumentsToEntrance = () => {
   const queryClient = useQueryClient();
   return useMutation({
