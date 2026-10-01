@@ -7,12 +7,16 @@ import {
   getDataQualityValue,
   getDataQualityLabelKey
 } from '../../../../../../utils/dataQuality';
-import { getInterestLabelKeys } from '../../../../../../utils/interest';
+import {
+  getInterestLabelKeys,
+  getInterestLevel
+} from '../../../../../../utils/interest';
 import { Information } from './utils';
 
 export const EntrancePopup = ({ entrance }) => {
   const { formatMessage } = useIntl();
   const dataQualityValue = getDataQualityValue(entrance.dataQuality);
+  const interestLevel = getInterestLevel(entrance.aestheticism);
 
   return (
     <>
@@ -54,7 +58,7 @@ export const EntrancePopup = ({ entrance }) => {
           })}
         />
       )}
-      {entrance.aestheticism > 0 && (
+      {interestLevel != null && (
         <Information
           icon={<InterestStars value={entrance.aestheticism} size={20} />}
           value={getInterestLabelKeys(entrance.aestheticism)

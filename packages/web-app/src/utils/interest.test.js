@@ -81,8 +81,8 @@ describe('meetsMinimumInterest', () => {
     fc.assert(
       fc.property(
         fc.double({ min: 0, max: 10, noNaN: true }),
-        fc.integer({ min: 0, max: 10 }),
-        fc.integer({ min: 0, max: 10 }),
+        fc.integer({ min: 0, max: 10 }).map(halfStars => halfStars / 2),
+        fc.integer({ min: 0, max: 10 }).map(halfStars => halfStars / 2),
         (value, first, second) => {
           const lower = Math.min(first, second);
           const higher = Math.max(first, second);
