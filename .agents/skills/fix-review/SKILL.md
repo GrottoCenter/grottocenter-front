@@ -1,6 +1,7 @@
 ---
 name: fix-review
 description: Given a PR number, address actionable reviewer feedback across review summaries, general comments, and inline threads; fix relevant asks, push, and reply in each thread or on the PR.
+argument-hint: "<pr-number>"
 ---
 
 You are resolving reviewer feedback on an existing pull request. `$ARGUMENTS` is the PR number — if missing, ask the user for it before doing anything else.
@@ -40,6 +41,28 @@ gh api repos/{owner}/{repo}/pulls/{pr-number}/comments --paginate      # inline 
 ```
 
 Merge entries by `created_at`/`submitted_at`. Group inline comments with their replies using `in_reply_to_id`, and check whether each thread is resolved (GitHub GraphQL exposes `reviewThreads.isResolved`). Keep your own replies as context, but do not treat them as reviewer asks. Paginate all sources; a newer summary does not replace inline threads.
+
+To map REST comments to thread state, query GraphQL for each thread's top-level
+comment ID. Paginate the query if `hasNextPage` is true, using `endCursor` as
+the next `$cursor`; an outdated thread is not necessarily resolved:
+
+```bash
+gh api graphql -f query='
+  query($owner:String!, $repo:String!, $pr:Int!, $cursor:String) {
+    repository(owner:$owner, name:$repo) {
+      pullRequest(number:$pr) {
+        reviewThreads(first:100, after:$cursor) {
+          nodes {
+            isResolved
+            isOutdated
+            comments(first:1) { nodes { databaseId } }
+          }
+          pageInfo { hasNextPage endCursor }
+        }
+      }
+    }
+  }' -F owner=<owner> -F repo=<repo> -F pr=<pr-number>
+```
 
 ## 3. Identify all feedback to address
 

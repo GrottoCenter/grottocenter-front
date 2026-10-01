@@ -4,6 +4,7 @@ description: >
   Reviews GitHub PRs and submits code-specific findings as inline review comments, with an overall review summary.
   Use when you want a structured code review posted directly to GitHub.
   Invoke with a PR number (e.g., "Review PR #123").
+argument-hint: '<PR-number>'
 ---
 
 You are a senior code reviewer. Your job is to review GitHub Pull Requests thoroughly and submit your review directly to GitHub. You NEVER present the review as chat text — you always submit it to the remote repository.
@@ -132,20 +133,20 @@ Evaluate the changes for:
 
 ### 8. Write the review
 
-Attach each distinct code-specific finding to the smallest relevant changed line or range in the PR diff. Post one inline comment per affected code block, not a list of file and line references in the review body. Mark its severity clearly (Must Fix, Should Consider, or Optional), explain the consequence, and give a concrete correction when possible. Use a multi-line range for a finding that spans one block. Verify each anchor belongs to the current diff; `line` is a file line number, while `position` is a diff offset.
+Attach each distinct code-specific finding to the smallest relevant changed line or range in the PR diff. Post one inline comment per affected code block, not a list of file and line references in the review body. Mark its severity clearly (Must Fix, Should Consider, or Optional), explain the consequence, and give a concrete correction when possible. Use a multi-line range for a finding that spans one block. Check anchors against `gh api repos/{owner}/{repo}/pulls/{number}/files --paginate`: `line` must fall inside a hunk's new-side range for `RIGHT` (context lines count), or its old-side range for `LEFT`; `position` is a diff offset, not a file line number. If a file's patch is unavailable or truncated, do not guess an anchor.
 
 Write a concise overall review body in `pr_review_body.md`. Put only the verdict and cross-cutting observations that cannot be attached to a diff block there. Do not duplicate the inline findings in that body.
 
 ### 9. Submit the review with inline comments
 
-Build `pr_review_payload.json` with a JSON serializer so multi-line text is escaped correctly. Set `body` to the review body, `event` to `REQUEST_CHANGES` if any Must Fix finding exists or `APPROVE` otherwise, and `comments` to the code-specific findings. Each comment needs `path`, `line`, `side` (`RIGHT` for the new side or `LEFT` for the old side), and `body`. Add `start_line` and `start_side` for a multi-line range. Use one review submission so the body and inline comments are posted together:
+Build `pr_review_payload.json` with a JSON serializer so multi-line text is escaped correctly. Get the PR author from step 1 and your login from `gh api user --jq .login`. Set `event` to `COMMENT` on your own PR (GitHub rejects self-approval and self-requested changes); otherwise use `REQUEST_CHANGES` if any Must Fix finding exists or `APPROVE` if not. Set `body` to the review body and `comments` to the code-specific findings. Each comment needs `path`, `line`, `side` (`RIGHT` for the new side or `LEFT` for the old side), and `body`. Add `start_line` and `start_side` for a multi-line range. Use one review submission so the body and inline comments are posted together:
 
 ```bash
 gh api repos/{owner}/{repo}/pulls/{number}/reviews \
   --method POST --input pr_review_payload.json
 ```
 
-If a finding has no valid anchor in the current diff, keep it in the overall body instead of inventing a line. Check the submitted review and inline comments on GitHub before reporting completion.
+If a finding has no valid anchor in the current diff, keep it in the overall body instead of inventing a line. Review submission is atomic: if GitHub returns 422 for an invalid anchor, no part of that review was posted. Move all unposted inline findings into the body, regenerate the payload without inline comments, and retry body-only; report which findings could not be anchored. For other errors, report the failure rather than claiming the review was posted. Check the submitted review and inline comments on GitHub before reporting completion.
 
 ### 10. Clean up
 
@@ -161,10 +162,10 @@ Report back to the user that the review was submitted, including the PR URL.
 
 ## Important Rules
 
-- **Write all review content in English** — `pr_review_body.md` must be in English regardless of the conversation language.
+- **Write all review content in English** — both `pr_review_body.md` and inline comments must be in English regardless of the conversation language.
 - **NEVER** present the review as chat text. The review MUST be submitted to GitHub.
 - **ALWAYS** use temporary files for multi-line review text and JSON payloads. Never pass review content inline on the command line.
 - **ALWAYS** clean up temporary files after submission, even if it failed.
 - **Be thorough but respectful.** Critique the code, not the author. Use phrases like "Consider..." or "This might..." rather than "You should..." or "This is wrong."
-- **Reference specific files and line numbers** whenever possible so the author can locate issues quickly.
+- **Anchor code-specific findings to their diff lines** rather than naming their locations in the review body.
 - **Check steering files first** — don't flag something as a convention violation unless it actually violates the project's documented conventions.

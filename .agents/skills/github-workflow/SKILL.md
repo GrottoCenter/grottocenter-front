@@ -20,9 +20,10 @@ gh auth status
   > - Windows: `winget install --id GitHub.cli`
   > - Linux: https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 
-- On Windows, credentials may be hidden inside the sandbox. Run authenticated
-  `gh` commands and Git network operations with escalated permissions. If a
-  sandboxed auth check fails, retry with escalated permissions before asking.
+- On Windows, credentials may be hidden inside the sandbox. Run commands
+  sandboxed first; if an authenticated `gh` command or Git network operation
+  fails due to an auth or credential error, retry that command with escalated
+  permissions before asking.
 - If `gh` is still **not authenticated**, stop and tell the user to run
   `gh auth login`.
 - Do not print remote URLs: `git remote -v` and
@@ -69,16 +70,21 @@ The file must already exist on disk before asking for confirmation.
 
 ```bash
 git push origin <branch-name>
-gh pr create --title "<type(scope): description>" --body-file pr_body.md --base develop --repo <repo> --reviewer ClemRz,urien --assignee "@me"
+me=$(gh api user --jq .login)
+reviewers=$(printf '%s\n' ClemRz urien | grep -vix "$me" | paste -sd, -)
+reviewer_args=()
+if [ -n "$reviewers" ]; then reviewer_args=(--reviewer "$reviewers"); fi
+gh pr create --title "<type(scope): description>" --body-file pr_body.md --base develop --repo <repo> "${reviewer_args[@]}" --assignee "@me"
 ```
 
 Where `<repo>` is detected via `gh repo view --json nameWithOwner -q .nameWithOwner`.
 
 Request reviews from [ClemRz](https://github.com/ClemRz) and
-[urien](https://github.com/urien), and assign the PR to the authenticated
-account. For an existing PR, add only missing reviewers with `gh pr edit
-<pr-number> --add-reviewer <login> --add-assignee "@me"`; avoid re-requesting
-a review from someone already requested. Verify the result with
+[urien](https://github.com/urien), excluding the PR author, and assign the PR
+to the authenticated account. For an existing PR, add only missing reviewers
+other than the PR author with `gh pr edit <pr-number> --add-reviewer <login>
+--add-assignee "@me"`; avoid re-requesting a review from someone already
+requested. Verify the result with
 `gh pr view <pr-number> --repo <repo> --json reviewRequests,assignees`.
 Report any GitHub rejection instead of silently leaving the PR unassigned.
 
