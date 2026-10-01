@@ -91,7 +91,7 @@ describe('InterestSummary', () => {
     expect(screen.getByText('5 min – 30 min').textContent).toBe(
       '5\u00a0min\u00a0– 30\u00a0min'
     );
-    expect(screen.getByText('Temps passé sous terre')).toBeVisible();
+    expect(screen.getByText('TPST')).toBeVisible();
     expect(screen.getByText('1 h 30 min – 5 h').textContent).toBe(
       '1\u00a0h\u00a030\u00a0min\u00a0– 5\u00a0h'
     );
