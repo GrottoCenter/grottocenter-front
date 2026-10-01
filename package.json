@@ -35,7 +35,7 @@
     "@eslint/eslintrc": "3.3.7",
     "@eslint/js": "9.39.5",
     "@grotto-front/eslint-config": "workspace:*",
-    "baseline-browser-mapping": "^2.11.20",
+    "baseline-browser-mapping": "^2.11.26",
     "cross-env": "10.1.0",
     "eslint": "9.39.5",
     "eslint-config-airbnb": "19.0.4",
@@ -53,7 +53,7 @@
     "html-entities": "^2.6.0",
     "husky": "^9.1.7",
     "lint-staged": "16.4.0",
-    "prettier": "3.9.6",
+    "prettier": "3.9.9",
     "typescript": "5.9.3"
   },
   "engines": {
