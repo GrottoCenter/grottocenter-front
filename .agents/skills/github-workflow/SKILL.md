@@ -90,9 +90,7 @@ gh pr edit <pr-number> --repo <repo> --add-reviewer urien
 
 Where `<repo>` is detected via `gh repo view --json nameWithOwner -q .nameWithOwner`.
 
-Request reviews from [ClemRz](https://github.com/ClemRz) and
-[urien](https://github.com/urien), excluding the PR author, and assign the PR
-to the authenticated account. For an existing PR, add only missing reviewers
+For an existing PR, add only missing reviewers
 other than the PR author with `gh pr edit <pr-number> --add-reviewer <login>
 --add-assignee "@me"`; avoid re-requesting a review from someone already
 requested. Verify the result with
