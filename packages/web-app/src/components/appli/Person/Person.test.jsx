@@ -75,7 +75,7 @@ describe('Person permanent deletion', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Confirm deletion' }));
 
     expect(state.mutate).toHaveBeenCalledWith(
-      { id: 42, entityId: 43 },
+      { id: 42, entityId: 43, isPermanent: true },
       expect.objectContaining({ onSuccess: expect.any(Function) })
     );
     expect(state.navigate).not.toHaveBeenCalled();

@@ -331,6 +331,7 @@
   "An article from a source": "出典からの記事",
   "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "{email} にメールが送信されました。メール内のリンクをクリックしてアカウントを有効化してください。",
   "An email will be sent to:": "メールが送信されます:",
+  "An entity cannot redirect to itself.": "エンティティをそれ自身にリダイレクトすることはできません。",
   "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.": "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.",
   "An error occurred when creating a massif.": "マシフの作成中にエラーが発生しました。",
   "An error occurred when creating a network.": "ネットワークの作成中にエラーが発生しました。",

@@ -331,6 +331,7 @@
   "An article from a source": "An article from a source",
   "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.",
   "An email will be sent to:": "An email will be sent to:",
+  "An entity cannot redirect to itself.": "An entity cannot redirect to itself.",
   "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.": "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.",
   "An error occurred when creating a massif.": "An error occurred when creating a massif.",
   "An error occurred when creating a network.": "An error occurred when creating a network.",

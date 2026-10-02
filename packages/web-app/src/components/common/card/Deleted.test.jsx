@@ -54,7 +54,8 @@ const messages = {
   'Search for a {entityFmt}': 'Search for a {entityFmt}',
   'delete-permanent-confirmation-dialog': 'Delete {entityFmt}?',
   'delete-permanent-merge-mandatory': 'Merge into another {entityFmt}',
-  remove: 'remove'
+  remove: 'remove',
+  'An entity cannot redirect to itself.': 'An entity cannot redirect to itself.'
 };
 
 describe('DeleteConfirmationDialog replacement selection', () => {
@@ -92,6 +93,9 @@ describe('DeleteConfirmationDialog replacement selection', () => {
       screen.getByRole('button', { name: 'Select stale current result' })
     );
     expect(confirmButton).toBeDisabled();
+    expect(
+      screen.getByText('An entity cannot redirect to itself.')
+    ).toHaveClass('Mui-error');
 
     fireEvent.click(screen.getByRole('button', { name: 'Other massif' }));
     expect(confirmButton).toBeEnabled();

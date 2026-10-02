@@ -331,6 +331,7 @@
   "An article from a source": "Un artículo de una fuente",
   "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "Se ha enviado un correo electrónico a {email} para verificar tu cuenta. Haz clic en el enlace del correo electrónico para activar tu cuenta.",
   "An email will be sent to:": "Se enviará un email a:",
+  "An entity cannot redirect to itself.": "Una entidad no puede redirigir a sí misma.",
   "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.": "Ya existe una entrada con un nombre similar. Compruebe si se trata de la misma cavidad antes de crear una nueva.",
   "An error occurred when creating a massif.": "Se ha producido un error al crear un macizo.",
   "An error occurred when creating a network.": "Ocurrió un error al crear una red.",

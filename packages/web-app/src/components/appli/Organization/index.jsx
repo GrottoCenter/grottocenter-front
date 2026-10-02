@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { useQueryClient } from '@tanstack/react-query';
@@ -14,7 +14,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShareIcon from '@mui/icons-material/Share';
-import { getPostDeletionUrl } from '@/utils/deletedEntityRedirect';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 import AppLink from '../../common/AppLink';
 import StandardDialog from '../../common/StandardDialog';
 import PageContainer from '../../common/Layouts/PageContainer';
@@ -64,7 +64,13 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+  const { onDeletePress, wantedDeletedState, setWantedDeletedState } =
+    usePostDeletion({
+      entityType: DELETED_ENTITIES.organization,
+      id: organizationId,
+      entity: organization,
+      deleteMutation: deleteOrganizationMutation
+    });
   const [isJoining, setIsJoining] = useState(false);
   const [joinLeaveError, setJoinLeaveError] = useState(null);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
@@ -80,10 +86,6 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
   );
   const canManageCaves = isAdmin || isModerator || isMember;
 
-  useEffect(() => {
-    if (organization) setWantedDeletedState(organization.isDeleted);
-  }, [organization]);
-
   let onEdit = null;
   let onDelete = null;
   if (isAuth && !organization?.isDeleted) {
@@ -98,27 +100,6 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
     }
   }
 
-  const onDeletePress = (entityId, isPermanent) => {
-    setWantedDeletedState(true);
-    deleteOrganizationMutation.mutate(
-      { id: organizationId, entityId, isPermanent },
-      {
-        onSuccess: () => {
-          if (isPermanent) {
-            navigate(
-              getPostDeletionUrl(
-                DELETED_ENTITIES.organization,
-                entityId,
-                organization?.redirectTo
-              ),
-              { replace: true }
-            );
-          }
-        },
-        onError: () => setWantedDeletedState(organization?.isDeleted ?? false)
-      }
-    );
-  };
   const onRestorePress = () => {
     setWantedDeletedState(false);
     restoreOrganizationMutation.mutate({ id: organizationId });

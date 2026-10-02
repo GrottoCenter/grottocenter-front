@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
@@ -12,7 +12,7 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ShareIcon from '@mui/icons-material/Share';
 import { useReactToPrint } from 'react-to-print';
-import { getPostDeletionUrl } from '@/utils/deletedEntityRedirect';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
@@ -72,13 +72,15 @@ const Massif = ({
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+  const { onDeletePress, wantedDeletedState, setWantedDeletedState } =
+    usePostDeletion({
+      entityType: DELETED_ENTITIES.massif,
+      id: massifId,
+      entity: massif,
+      deleteMutation
+    });
   const handleShare = useSharePage();
   const handlePrint = useReactToPrint({ contentRef: componentRef });
-
-  useEffect(() => {
-    if (massif) setWantedDeletedState(massif.isDeleted);
-  }, [massif]);
 
   const { data: dataMassif } = useStatisticsMassif(massifIdInt);
   useScrollToHashOnLoad(dataMassif);
@@ -97,27 +99,6 @@ const Massif = ({
     }
   }
 
-  const onDeletePress = (entityId, isPermanent) => {
-    setWantedDeletedState(true);
-    deleteMutation.mutate(
-      { id: massifId, entityId, isPermanent },
-      {
-        onSuccess: () => {
-          if (isPermanent) {
-            navigate(
-              getPostDeletionUrl(
-                DELETED_ENTITIES.massif,
-                entityId,
-                massif?.redirectTo
-              ),
-              { replace: true }
-            );
-          }
-        },
-        onError: () => setWantedDeletedState(massif?.isDeleted ?? false)
-      }
-    );
-  };
   const onRestorePress = () => {
     setWantedDeletedState(false);
     restoreMutation.mutate({ id: massifId });
