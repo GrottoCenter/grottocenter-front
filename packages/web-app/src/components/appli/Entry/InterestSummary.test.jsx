@@ -88,7 +88,10 @@ describe('InterestSummary', () => {
     );
 
     expect(screen.getByText("Temps d'accès")).toBeVisible();
-    expect(screen.getByRole('img', { name: "Temps d'accès" })).toBeVisible();
+    expect(screen.getByRole('presentation')).toHaveAttribute('alt', '');
+    expect(
+      screen.queryByRole('img', { name: "Temps d'accès" })
+    ).not.toBeInTheDocument();
     expect(screen.getByText('5 min – 30 min').textContent).toBe(
       '5\u00a0min\u00a0– 30\u00a0min'
     );
