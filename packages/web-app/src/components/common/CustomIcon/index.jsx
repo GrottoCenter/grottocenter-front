@@ -128,20 +128,16 @@ const altTexts = {
   underground_time: 'Underground time'
 };
 
-const CustomIcon = ({ type, size = 35 }) => (
+const CustomIcon = ({ type, size = 35, alt = altTexts[type] ?? type }) => (
   <Icon size={size}>
-    <Img
-      src={iconSources[type]}
-      alt={altTexts[type] ?? type}
-      height={size}
-      width={size}
-    />
+    <Img src={iconSources[type]} alt={alt} height={size} width={size} />
   </Icon>
 );
 
 CustomIcon.propTypes = {
   type: PropTypes.oneOf(Object.keys(iconSources)).isRequired,
-  size: PropTypes.number
+  size: PropTypes.number,
+  alt: PropTypes.string
 };
 
 export default CustomIcon;

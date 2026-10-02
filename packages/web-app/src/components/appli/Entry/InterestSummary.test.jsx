@@ -1,9 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
-import Duration from '@/components/common/Properties/Duration';
 import messages from '../../../../public/lang/en.json';
 import frMessages from '../../../../public/lang/fr.json';
 import InterestSummary from './InterestSummary';
@@ -89,6 +88,7 @@ describe('InterestSummary', () => {
     );
 
     expect(screen.getByText("Temps d'accès")).toBeVisible();
+    expect(screen.getByRole('img', { name: "Temps d'accès" })).toBeVisible();
     expect(screen.getByText('5 min – 30 min').textContent).toBe(
       '5\u00a0min\u00a0– 30\u00a0min'
     );
@@ -110,30 +110,20 @@ describe('InterestSummary', () => {
     );
     expect(screen.queryByText('Time to go')).not.toBeInTheDocument();
     expect(screen.getByText('Underground')).toBeVisible();
+    expect(screen.getByRole('img', { name: 'Underground time' })).toBeVisible();
     expect(screen.getByText('Not rated')).toBeVisible();
   });
 
-  it('keeps the French duration icon explicit beside the compact summary', async () => {
+  it('labels the summary icon with the full French underground time', () => {
     renderSummary([{ eTUnderground: '1:00:00' }], false, 'fr');
-    render(
-      <IntlProvider locale="fr" messages={frMessages}>
-        <Duration
-          image="underground-time.svg"
-          durationStr="1:00:00"
-          title="Underground time"
-        />
-      </IntlProvider>
-    );
 
     expect(screen.getByText('TPST')).toBeVisible();
-    const durationIcon = screen.getByRole('img', {
-      name: 'Temps passé sous terre'
-    });
-    expect(durationIcon).toBeVisible();
-    fireEvent.mouseOver(durationIcon);
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'Temps passé sous terre'
-    );
+    expect(
+      screen.getByRole('img', { name: 'Temps passé sous terre' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('img', { name: 'Underground time' })
+    ).not.toBeInTheDocument();
   });
 
   it('keeps the range dash with the lower bound', () => {
