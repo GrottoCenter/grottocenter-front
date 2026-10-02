@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
+import Duration from '@/components/common/Properties/Duration';
 import messages from '../../../../public/lang/en.json';
 import frMessages from '../../../../public/lang/fr.json';
 import InterestSummary from './InterestSummary';
@@ -108,7 +109,31 @@ describe('InterestSummary', () => {
       '1\u00a0hr\u00a005\u00a0min'
     );
     expect(screen.queryByText('Time to go')).not.toBeInTheDocument();
+    expect(screen.getByText('Underground')).toBeVisible();
     expect(screen.getByText('Not rated')).toBeVisible();
+  });
+
+  it('keeps the French duration icon explicit beside the compact summary', async () => {
+    renderSummary([{ eTUnderground: '1:00:00' }], false, 'fr');
+    render(
+      <IntlProvider locale="fr" messages={frMessages}>
+        <Duration
+          image="underground-time.svg"
+          durationStr="1:00:00"
+          title="Underground time"
+        />
+      </IntlProvider>
+    );
+
+    expect(screen.getByText('TPST')).toBeVisible();
+    const durationIcon = screen.getByRole('img', {
+      name: 'Temps passé sous terre'
+    });
+    expect(durationIcon).toBeVisible();
+    fireEvent.mouseOver(durationIcon);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'Temps passé sous terre'
+    );
   });
 
   it('keeps the range dash with the lower bound', () => {

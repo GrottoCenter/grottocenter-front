@@ -129,7 +129,7 @@ const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {
             )}
             {undergroundTime && (
               <Property
-                label={formatMessage({ id: 'Underground time' })}
+                label={formatMessage({ id: 'Underground time (short)' })}
                 value={undergroundTime}
                 icon={<CustomIcon type="underground_time" />}
               />
