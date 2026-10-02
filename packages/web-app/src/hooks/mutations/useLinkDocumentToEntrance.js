@@ -16,14 +16,12 @@ const invalidateEntranceDocuments = (queryClient, entranceId, documentIds) =>
     )
   ]);
 
-const linkDocuments = async (entranceId, documents) => {
+const associateAll = async (entities, urlFor) => {
   // Wait for every request before invalidating. Promise.all would reject on the
   // first failure while the remaining writes were still running, allowing a
   // refetch to observe only part of the final server state.
   const results = await Promise.allSettled(
-    documents.map(document =>
-      apiPut(associateDocumentToEntranceUrl(entranceId, document.id))
-    )
+    entities.map(entity => apiPut(urlFor(entity)))
   );
   const rejections = results
     .filter(result => result.status === 'rejected')
@@ -48,11 +46,34 @@ export const useLinkDocumentToEntrance = () => {
   });
 };
 
+export const useLinkDocumentToEntrances = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ documentId, entrances }) =>
+      associateAll(entrances, entrance =>
+        associateDocumentToEntranceUrl(entrance.id, documentId)
+      ),
+    onSettled: (_data, _error, { documentId, entrances }) =>
+      Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: documentKeys.detail(documentId)
+        }),
+        ...entrances.map(entrance =>
+          queryClient.invalidateQueries({
+            queryKey: entranceKeys.detail(entrance.id)
+          })
+        )
+      ])
+  });
+};
+
 export const useLinkDocumentsToEntrance = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ entranceId, documents }) =>
-      linkDocuments(entranceId, documents),
+      associateAll(documents, document =>
+        associateDocumentToEntranceUrl(entranceId, document.id)
+      ),
     onSettled: (_data, _error, { entranceId, documents }) =>
       invalidateEntranceDocuments(
         queryClient,

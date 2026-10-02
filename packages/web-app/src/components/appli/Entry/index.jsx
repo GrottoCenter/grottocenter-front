@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -18,6 +18,7 @@ import BiotechIcon from '@mui/icons-material/Biotech';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import { useReactToPrint } from 'react-to-print';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 import AppLink from '../../common/AppLink';
 
 import PageContainer from '../../common/Layouts/PageContainer';
@@ -91,17 +92,19 @@ export const Entry = ({
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+  const { onDeletePress, wantedDeletedState, setWantedDeletedState } =
+    usePostDeletion({
+      entityType: DELETED_ENTITIES.entrance,
+      id: entranceId,
+      entity: entrance,
+      deleteMutation
+    });
   const userId = useUserProperties()?.id ?? null;
   const { isExplored, isExploredLoading, handleToggleExplored } = useExplored({
     entranceId: entrance?.id,
     userId
   });
   const mapPositions = useMemo(() => (entrance ? [entrance] : []), [entrance]);
-
-  useEffect(() => {
-    if (entrance) setWantedDeletedState(entrance.isDeleted);
-  }, [entrance]);
 
   const isActionLoading = wantedDeletedState !== entrance?.isDeleted;
 
@@ -112,12 +115,6 @@ export const Entry = ({
       setIsDeleteConfirmationOpen(true);
     };
   }
-
-  const onDeletePress = (entityId, isPermanent) => {
-    setWantedDeletedState(true);
-    deleteMutation.mutate({ id: entranceId, entityId, isPermanent });
-    if (isPermanent) navigate('/', { replace: true });
-  };
 
   const onRestorePress = () => {
     setWantedDeletedState(false);
@@ -352,6 +349,7 @@ export const Entry = ({
                 )}
                 <DeleteConfirmationDialog
                   entityType={DELETED_ENTITIES.entrance}
+                  entityId={entrance.id}
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
                   isPermanent={isDeleteConfirmationPermanent}

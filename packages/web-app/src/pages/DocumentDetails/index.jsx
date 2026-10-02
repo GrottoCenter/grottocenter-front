@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Breadcrumbs, Skeleton, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Divider, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -10,7 +10,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ShareIcon from '@mui/icons-material/Share';
+import LinkIcon from '@mui/icons-material/Link';
 import { NavigateNext } from '@mui/icons-material';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { LicenseBadge } from '@/components/common/LicenseTag';
 import {
   DEFAULT_COLLECTION_SORT_ORDER,
@@ -20,6 +22,9 @@ import {
 import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
 import { formatDocumentReference } from '@/utils/documentReference';
 import LinkedEntityCards from '@/components/common/entitiesList/LinkedEntityCards';
+import SearchEntranceForm from '@/components/appli/SearchEntranceForm';
+import SectionCreateButton from '@/components/common/SectionCreateButton';
+import { EntityIcon } from '@/pages/EntityCreation/entityConfig';
 import AppLink from '../../components/common/AppLink';
 import BibliographicReference from './BibliographicReference';
 
@@ -50,6 +55,7 @@ import {
   useDocumentChildren,
   useDeleteDocument,
   useRestoreDocument,
+  useLinkDocumentToEntrances,
   useLanguages,
   useLicenses,
   findLicenseByName,
@@ -150,6 +156,8 @@ const Document = ({
   const permissions = usePermissions();
   const deleteMutation = useDeleteDocument();
   const restoreMutation = useRestoreDocument();
+  const linkEntranceMutation = useLinkDocumentToEntrances();
+  const [isEntranceSearchVisible, setIsEntranceSearchVisible] = useState(false);
   const { data: languages = [] } = useLanguages();
   const { locale } = useSelector(state => state.intl);
   const { data: licenses } = useLicenses();
@@ -168,12 +176,22 @@ const Document = ({
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+  const { onDeletePress, wantedDeletedState, setWantedDeletedState } =
+    usePostDeletion({
+      entityType: DELETED_ENTITIES.document,
+      id: documentData?.id,
+      entity: documentData,
+      deleteMutation
+    });
   const handleShare = useSharePage();
 
-  useEffect(() => {
-    if (documentData) setWantedDeletedState(documentData.isDeleted);
-  }, [documentData]);
+  const canAssociateEntrances =
+    permissions.isAuth &&
+    !!documentData &&
+    !documentData.isDeleted &&
+    !wantedDeletedState &&
+    !hideActions;
+  const isEntranceSearchOpen = canAssociateEntrances && isEntranceSearchVisible;
 
   // The document detail only carries the license name; resolve the full license
   // object (for its deed URL) from the licenses list.
@@ -204,11 +222,6 @@ const Document = ({
     }
   }
 
-  const onDeletePress = (entityId, isPermanent) => {
-    setWantedDeletedState(true);
-    deleteMutation.mutate({ id: documentData.id, entityId, isPermanent });
-    if (isPermanent) navigate('/', { replace: true });
-  };
   const onRestorePress = () => {
     setWantedDeletedState(false);
     restoreMutation.mutate({ id: documentData.id });
@@ -355,6 +368,7 @@ const Document = ({
   }, [documentData, formatMessage]);
 
   const { isCollection, isEvent } = documentTypeHelpers;
+  const hasLinkedEntities = linkedEntities.length > 0;
   const docType = documentData?.type;
 
   const isActionLoading = wantedDeletedState !== documentData?.isDeleted;
@@ -497,6 +511,7 @@ const Document = ({
       />
       <DeleteConfirmationDialog
         entityType={DELETED_ENTITIES.document}
+        entityId={documentData?.id}
         isOpen={isDeleteConfirmationOpen}
         isLoading={isActionLoading}
         isPermanent={isDeleteConfirmationPermanent}
@@ -773,11 +788,61 @@ const Document = ({
               }
             />
 
-            {linkedEntities.length > 0 && (
+            {(hasLinkedEntities || canAssociateEntrances) && (
               <ScrollableContent
                 dense
                 title={formatMessage({ id: 'Linked entities' })}
-                content={<LinkedEntityCards entities={linkedEntities} />}
+                icon={
+                  canAssociateEntrances ? (
+                    <SectionCreateButton
+                      isOpen={isEntranceSearchOpen}
+                      onToggle={() =>
+                        setIsEntranceSearchVisible(value => !value)
+                      }
+                      label={formatMessage({ id: 'Associate' })}
+                      tooltip={formatMessage({
+                        id: 'Associate to an entrance'
+                      })}
+                      openTooltip={formatMessage({ id: 'Cancel this search' })}
+                      testId="associate-entrances-button"
+                      icon={
+                        <EntityIcon
+                          iconType="entrance"
+                          size={24}
+                          BadgeIcon={LinkIcon}
+                        />
+                      }
+                    />
+                  ) : undefined
+                }
+                content={
+                  <>
+                    {isEntranceSearchOpen && (
+                      <>
+                        <SearchEntranceForm
+                          onSubmit={entrances =>
+                            linkEntranceMutation.mutateAsync({
+                              documentId: documentData.id,
+                              entrances
+                            })
+                          }
+                          onSuccess={() => setIsEntranceSearchVisible(false)}
+                        />
+                        {hasLinkedEntities && <Divider />}
+                      </>
+                    )}
+                    {hasLinkedEntities ? (
+                      <LinkedEntityCards entities={linkedEntities} />
+                    ) : (
+                      !isEntranceSearchOpen && (
+                        <Alert
+                          severity="info"
+                          content={formatMessage({ id: 'No linked entities.' })}
+                        />
+                      )
+                    )}
+                  </>
+                }
               />
             )}
 

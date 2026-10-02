@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Box, Button } from '@mui/material';
+import { Box, Button, CircularProgress, useMediaQuery } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import OfflineDisabled from '@/components/common/OfflineDisabled';
+import StandardDialog from '@/components/common/StandardDialog';
 import { useOnlineStatus, resetAdvancedSearch } from '@/hooks';
 import DocumentSearch from '../AdvancedSearch/DocumentSearch';
 import SearchResults from '../AdvancedSearch/SearchResults';
 import Alert from '../../common/Alert';
+
+const DocumentDetails = lazy(() => import('@/pages/DocumentDetails'));
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
@@ -18,8 +21,10 @@ const SpacedButton = styled(Button)`
 const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
+  const isNarrowViewport = useMediaQuery(theme => theme.breakpoints.down('sm'));
   const [selectedDocuments, setSelectedDocuments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewedDocumentId, setPreviewedDocumentId] = useState(null);
 
   const resetForm = () => {
     resetAdvancedSearch();
@@ -56,48 +61,69 @@ const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
   }
 
   return (
-    <Box textAlign="center">
-      <DocumentSearch />
-      <br />
-      <SearchResults
-        onSelected={(ids, results) => {
-          const resultIds = results.map(e => e.id);
-          setSelectedDocuments([
-            ...selectedDocuments.filter(e => !resultIds.includes(e.id)),
-            ...results.filter(e => ids.includes(e.id))
-          ]);
-        }}
-      />
-      {selectedDocuments.length === 0 && (
-        <Alert
-          severity="info"
-          content={formatMessage({
-            id: 'Select document(s) by clicking on the result table above.'
-          })}
+    <>
+      <Box textAlign="center">
+        <DocumentSearch />
+        <br />
+        <SearchResults
+          onRowClick={document => {
+            setPreviewedDocumentId(document.id);
+            return false;
+          }}
+          onSelected={(ids, results) => {
+            const resultIds = results.map(e => e.id);
+            setSelectedDocuments([
+              ...selectedDocuments.filter(e => !resultIds.includes(e.id)),
+              ...results.filter(e => ids.includes(e.id))
+            ]);
+          }}
         />
-      )}
-      <Box my={3}>
-        {closeForm && (
-          <SpacedButton onClick={closeForm}>
-            {formatMessage({ id: 'Cancel' })}
-          </SpacedButton>
+        {selectedDocuments.length === 0 && (
+          <Alert
+            severity="info"
+            content={formatMessage({
+              id: 'Select documents with the checkboxes. Preview any document before associating it.'
+            })}
+          />
         )}
-        <SpacedButton variant="outlined" onClick={resetForm}>
-          {formatMessage({ id: 'Reset' })}
-        </SpacedButton>
-        <OfflineDisabled>
-          <SpacedButton
-            disabled={
-              selectedDocuments.length === 0 || !isOnline || isSubmitting
-            }
-            color="primary"
-            type="submit"
-            onClick={handleOnSubmit}>
-            {associateMessage}
+        <Box my={3}>
+          {closeForm && (
+            <SpacedButton onClick={closeForm}>
+              {formatMessage({ id: 'Cancel' })}
+            </SpacedButton>
+          )}
+          <SpacedButton variant="outlined" onClick={resetForm}>
+            {formatMessage({ id: 'Reset' })}
           </SpacedButton>
-        </OfflineDisabled>
+          <OfflineDisabled>
+            <SpacedButton
+              disabled={
+                selectedDocuments.length === 0 || !isOnline || isSubmitting
+              }
+              color="primary"
+              type="submit"
+              onClick={handleOnSubmit}>
+              {associateMessage}
+            </SpacedButton>
+          </OfflineDisabled>
+        </Box>
       </Box>
-    </Box>
+      <StandardDialog
+        maxWidth="lg"
+        fullScreen={isNarrowViewport}
+        dense={isNarrowViewport}
+        fullWidth
+        scrollable
+        open={previewedDocumentId !== null}
+        onClose={() => setPreviewedDocumentId(null)}
+        title={formatMessage({ id: 'Detailed document view' })}>
+        {previewedDocumentId !== null && (
+          <Suspense fallback={<CircularProgress />}>
+            <DocumentDetails id={previewedDocumentId} hideActions />
+          </Suspense>
+        )}
+      </StandardDialog>
+    </>
   );
 };
 

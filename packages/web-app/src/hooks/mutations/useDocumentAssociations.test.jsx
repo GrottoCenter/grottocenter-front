@@ -11,6 +11,7 @@ import {
 import { createTestQueryClient } from '@/test/renderWithProviders';
 import {
   useLinkDocumentToEntrance,
+  useLinkDocumentToEntrances,
   useLinkDocumentsToEntrance,
   useUnlinkDocumentToEntrance
 } from './useLinkDocumentToEntrance';
@@ -70,6 +71,72 @@ describe('document association mutations', () => {
     expect(invalidateQueries).toHaveBeenCalledWith({
       queryKey: documentKeys.detail('234218')
     });
+  });
+
+  it('links one document to multiple entrances and refreshes both sides', async () => {
+    apiPut.mockResolvedValue(null);
+    const { result } = renderHook(() => useLinkDocumentToEntrances(), {
+      wrapper: makeWrapper(queryClient)
+    });
+
+    await act(async () => {
+      await result.current.mutateAsync({
+        documentId: 234218,
+        entrances: [{ id: 42 }, { id: 43 }]
+      });
+    });
+
+    expect(apiPut).toHaveBeenCalledTimes(2);
+    expect(apiPut).toHaveBeenCalledWith(
+      associateDocumentToEntranceUrl(42, 234218)
+    );
+    expect(apiPut).toHaveBeenCalledWith(
+      associateDocumentToEntranceUrl(43, 234218)
+    );
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: documentKeys.detail(234218)
+    });
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: entranceKeys.detail(42)
+    });
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: entranceKeys.detail(43)
+    });
+  });
+
+  it('waits for all entrance links and refreshes after a partial failure', async () => {
+    const failure = new Error('second entrance failed');
+    apiPut
+      .mockResolvedValueOnce(null)
+      .mockRejectedValueOnce(failure)
+      .mockResolvedValueOnce(null);
+    const { result } = renderHook(() => useLinkDocumentToEntrances(), {
+      wrapper: makeWrapper(queryClient)
+    });
+    let caughtError;
+
+    await act(async () => {
+      try {
+        await result.current.mutateAsync({
+          documentId: 7,
+          entrances: [{ id: 1 }, { id: 2 }, { id: 3 }]
+        });
+      } catch (error) {
+        caughtError = error;
+      }
+    });
+
+    expect(caughtError).toBe(failure);
+    expect(caughtError.rejections).toEqual([failure]);
+    expect(apiPut).toHaveBeenCalledTimes(3);
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: documentKeys.detail(7)
+    });
+    [1, 2, 3].forEach(id =>
+      expect(invalidateQueries).toHaveBeenCalledWith({
+        queryKey: entranceKeys.detail(id)
+      })
+    );
   });
 
   it('waits for every entrance link and refreshes the final state on partial failure', async () => {

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { isMobileOnly } from 'react-device-detect';
+import { useMediaQuery } from '@mui/material';
 
 import { useDocuments, usePermissions } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
@@ -15,6 +15,10 @@ import EntityTable from '../../components/common/EntityTable';
 const DocumentValidationPage = () => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
+  // Viewport-based rather than UA-based so DevTools emulation, tablets and
+  // narrow desktop windows all get the fullscreen dialog. Matches the
+  // `max-width: 600px` media queries used by StandardDialog itself.
+  const isNarrowViewport = useMediaQuery(theme => theme.breakpoints.down('sm'));
   const [selectedIds, setSelectedIds] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -94,7 +98,8 @@ const DocumentValidationPage = () => {
       />
       <StandardDialog
         maxWidth="lg"
-        fullScreen={isMobileOnly}
+        fullScreen={isNarrowViewport}
+        dense={isNarrowViewport}
         fullWidth
         scrollable
         open={!!detailedView}
@@ -104,7 +109,7 @@ const DocumentValidationPage = () => {
       </StandardDialog>
       <StandardDialog
         maxWidth="lg"
-        fullScreen={isMobileOnly}
+        fullScreen={isNarrowViewport}
         fullWidth
         scrollable
         open={!!editView}

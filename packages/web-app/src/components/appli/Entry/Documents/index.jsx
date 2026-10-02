@@ -30,6 +30,8 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
   const linkMutation = useLinkDocumentsToEntrance();
   const unlinkMutation = useUnlinkDocumentToEntrance();
+  const canAssociateDocuments = permissions.isAuth && isEditAllowed;
+  const isDocumentSearchOpen = canAssociateDocuments && isDocumentSearchVisible;
 
   const onSubmitForm = async newDocuments => {
     await linkMutation.mutateAsync({ entranceId, documents: newDocuments });
@@ -42,11 +44,11 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
       anchorId="documents"
       title={formatMessage({ id: 'Documents' })}
       icon={
-        permissions.isAuth &&
-        isEditAllowed && (
+        canAssociateDocuments ? (
           <Box display="flex" gap={0.5}>
             <SectionCreateButton
-              isOpen={isDocumentSearchVisible}
+              isOpen={isDocumentSearchOpen}
+              testId="associate-documents-button"
               onToggle={() =>
                 setIsDocumentSearchVisible(!isDocumentSearchVisible)
               }
@@ -73,11 +75,11 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
               }
             />
           </Box>
-        )
+        ) : undefined
       }
       content={
         <>
-          {isDocumentSearchVisible && (
+          {isDocumentSearchOpen && (
             <>
               <SearchDocumentForm
                 onSubmit={onSubmitForm}
