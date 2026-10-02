@@ -379,6 +379,15 @@ yarn translations:sync-with-en         # Do or check sync with en.json
 yarn outdated                           # Check outdated dependencies
 ```
 
+On Windows PowerShell, use `yarn.cmd` if execution policy blocks `yarn.ps1`.
+If Node reports `EPERM` while reading the user profile inside the sandbox,
+retry the same verification outside the sandbox before treating it as a code
+failure. If Vitest reaches its default timeout on a slow machine, rerun the
+affected test first; for a loaded full suite, limit workers and raise the
+timeout explicitly, for example with
+`yarn.cmd test --run --maxWorkers=2 --testTimeout=15000`. Report the command
+used so a longer timeout does not hide a failing test.
+
 ---
 
 ## 🤖 AI Agent Checklist

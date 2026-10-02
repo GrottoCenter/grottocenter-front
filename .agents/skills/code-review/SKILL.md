@@ -1,8 +1,8 @@
 ---
 name: code-review
 description: >
-  Performs thorough code reviews on GitHub PRs and submits the review directly to GitHub via the gh CLI.
-  Use this agent when you want an automated, structured code review submitted as a PR comment.
+  Reviews GitHub PRs and submits code-specific findings as inline review comments, with an overall review summary.
+  Use when you want a structured code review posted directly to GitHub.
   Invoke with a PR number (e.g., "Review PR #123").
 argument-hint: '<PR-number>'
 ---
@@ -60,13 +60,15 @@ Parse the output to understand the scope, author, and target branch.
 - Also fetch existing comments and review threads on the PR itself:
   ```
   gh pr view <number> --repo <repo> --json comments,reviews
+  gh api repos/{owner}/{repo}/pulls/{number}/comments --paginate
   ```
-- Use this context to understand the original requirements, prior discussion, decisions already made, and any concerns raised by other reviewers. Avoid repeating feedback that has already been addressed.
+- Use this context to understand the original requirements, prior discussion, decisions already made, and any concerns raised by other reviewers. Avoid repeating feedback that has already been addressed in inline threads.
 
 ### 3. Read project conventions
 
 Look for project convention files in common locations and read whatever exists:
 
+- `AGENTS.md` (root and relevant package directories)
 - `CLAUDE.md` (root)
 - `.claude/` directory (settings, skills, hooks)
 - `docs/` or `docs/conventions.md`
@@ -131,46 +133,28 @@ Evaluate the changes for:
 
 ### 8. Write the review
 
-Write the review body to a file called `pr_review_body.md` at the project root. Use this format:
+Attach each distinct code-specific finding to the smallest relevant changed line or range in the PR diff. Post one inline comment per affected code block, not a list of file and line references in the review body. Mark its severity clearly (Must Fix, Should Consider, or Optional), explain the consequence, and give a concrete correction when possible. Use a multi-line range for a finding that spans one block. Check anchors against `gh api repos/{owner}/{repo}/pulls/{number}/files --paginate`: `line` must fall inside a hunk's new-side range for `RIGHT` (context lines count), or its old-side range for `LEFT`; `position` is a diff offset, not a file line number. If a file's patch is unavailable or truncated, do not guess an anchor.
 
-```markdown
-### Issues (Must Fix)
+Write a concise overall review body in `pr_review_body.md`. Put only the verdict and cross-cutting observations that cannot be attached to a diff block there. Do not duplicate the inline findings in that body.
 
-1. **[File:Line]** Description of the bug/security issue/breaking change
-2. **[File:Line]** …
+### 9. Submit the review with inline comments
 
-### Suggestions (Should Consider)
+Build `pr_review_payload.json` with a JSON serializer so multi-line text is escaped correctly. Get the PR author from step 1 and your login from `gh api user --jq .login`. Set `event` to `COMMENT` on your own PR (GitHub rejects self-approval and self-requested changes); otherwise use `REQUEST_CHANGES` if any Must Fix finding exists or `APPROVE` if not. Set `body` to the review body and `comments` to the code-specific findings. Each comment needs `path`, `line`, `side` (`RIGHT` for the new side or `LEFT` for the old side), and `body`. Add `start_line` and `start_side` for a multi-line range. Use one review submission so the body and inline comments are posted together:
 
-3. **[File:Line]** Description of the improvement opportunity
-4. **[File:Line]** …
-
-### Nitpicks (Optional)
-
-5. **[File:Line]** Minor style or preference notes
+```bash
+gh api repos/{owner}/{repo}/pulls/{number}/reviews \
+  --method POST --input pr_review_payload.json
 ```
 
-Number items **continuously across all sections** — do not restart at 1 for each section.
-Omit any section that has no items (e.g., if there are no Issues, skip that section entirely).
-
-### 9. Submit the review
-
-Choose the appropriate flag based on the review outcome:
-
-- If there are **no Issues (Must Fix)** items → approve:
-  ```
-  gh pr review <number> --repo <repo> --approve --body-file pr_review_body.md
-  ```
-- If there are **any Issues (Must Fix)** items → request changes:
-  ```
-  gh pr review <number> --repo <repo> --request-changes --body-file pr_review_body.md
-  ```
+If a finding has no valid anchor in the current diff, keep it in the overall body instead of inventing a line. Review submission is atomic: if GitHub returns 422 for an invalid anchor, no part of that review was posted. Move all unposted inline findings into the body, regenerate the payload without inline comments, and retry body-only; report which findings could not be anchored. For other errors, report the failure rather than claiming the review was posted. Check the submitted review and inline comments on GitHub before reporting completion.
 
 ### 10. Clean up
 
-Delete both temporary files, whether the submission succeeded or failed:
+Delete all temporary files, whether submission succeeded or failed:
 
 - `tmp_pr_diff.txt`
 - `pr_review_body.md`
+- `pr_review_payload.json`
 
 ### 11. Confirm
 
@@ -178,10 +162,10 @@ Report back to the user that the review was submitted, including the PR URL.
 
 ## Important Rules
 
-- **Write all review content in English** — `pr_review_body.md` must be in English regardless of the conversation language.
+- **Write all review content in English** — both `pr_review_body.md` and inline comments must be in English regardless of the conversation language.
 - **NEVER** present the review as chat text. The review MUST be submitted to GitHub.
-- **ALWAYS** use temporary files for multi-line CLI content (the `--body-file` pattern). Never pass review content inline.
+- **ALWAYS** use temporary files for multi-line review text and JSON payloads. Never pass review content inline on the command line.
 - **ALWAYS** clean up temporary files after submission, even if it failed.
 - **Be thorough but respectful.** Critique the code, not the author. Use phrases like "Consider..." or "This might..." rather than "You should..." or "This is wrong."
-- **Reference specific files and line numbers** whenever possible so the author can locate issues quickly.
+- **Anchor code-specific findings to their diff lines** rather than naming their locations in the review body.
 - **Check steering files first** — don't flag something as a convention violation unless it actually violates the project's documented conventions.

@@ -20,7 +20,15 @@ gh auth status
   > - Windows: `winget install --id GitHub.cli`
   > - Linux: https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 
-- If `gh` is **not authenticated**, stop and tell the user to run `gh auth login`.
+- On Windows, credentials may be hidden inside the sandbox. Run commands
+  sandboxed first; if an authenticated `gh` command or Git network operation
+  fails due to an auth or credential error, retry that command with escalated
+  permissions before asking.
+- If `gh` is still **not authenticated**, stop and tell the user to run
+  `gh auth login`.
+- Do not print remote URLs: `git remote -v` and
+  `git config --get remote.origin.url` may expose an embedded token.
+  Use `gh repo view` to identify the repository.
 
 ## Language
 
@@ -30,9 +38,9 @@ All generated content (PR titles, PR bodies, issue comments) must be written in 
 
 Format: `type(scope): description`
 
-Types: `feat` `fix` `refactor` `test` `docs` `chore` `style` `ci`
-Scope: domain area — `cave`, `entrance`, `massif`, `auth`, `search`, `deps`, …
-Example: `feat(massif): add area validation`
+Use the types and scope casing in the repository's `AGENTS.md`.
+
+Example: `feat(Massif): add area validation`
 
 ## Branching
 
@@ -53,18 +61,43 @@ In the `## 🧪 Testing` section, write every test or verification as a GitHub
 checklist item. Use `- [x]` only for checks that were actually run and passed,
 and `- [ ]` for checks that are pending or were not run.
 
-**2. Show and confirm** — display the title and the **actual content of `pr_body.md`** to the user and **wait for explicit approval before proceeding**. Do not push or create the PR until the user confirms. The file must already exist on disk before asking for confirmation.
+**2. Show and confirm** — display the title and the **actual content of
+`pr_body.md`** to the user. If the user has already explicitly authorized
+pushing and creating the PR, proceed. Otherwise wait for explicit approval.
+The file must already exist on disk before asking for confirmation.
 
 **3. Push and create:**
 
+Identify the authenticated account with `gh api user --jq .login` before
+creating the PR or requesting reviews. If the command fails or returns an
+empty login, stop after the authentication recovery above; do not continue
+with an unknown author. Compare reviewer logins to the author
+case-insensitively.
+
+The commands below work in bash and PowerShell. Create and assign the PR
+first, then request each eligible reviewer separately. Omit a reviewer
+command if that login is the PR author or already has a pending request.
+If creation fails, stop; if it succeeds, use the returned PR number for
+the review requests. If a reviewer request fails, report it and continue
+with the other eligible reviewer and the verification below.
+
 ```bash
 git push origin <branch-name>
-gh pr create --title "<type(scope): description>" --body-file pr_body.md --base develop --repo <repo>
+gh pr create --title "<type(scope): description>" --body-file pr_body.md --base develop --repo <repo> --assignee "@me"
+gh pr edit <pr-number> --repo <repo> --add-reviewer ClemRz
+gh pr edit <pr-number> --repo <repo> --add-reviewer urien
 ```
 
 Where `<repo>` is detected via `gh repo view --json nameWithOwner -q .nameWithOwner`.
 
-**3. Clean up:**
+For an existing PR, add only missing reviewers
+other than the PR author with `gh pr edit <pr-number> --add-reviewer <login>
+--add-assignee "@me"`; avoid re-requesting a review from someone already
+requested. Verify the result with
+`gh pr view <pr-number> --repo <repo> --json reviewRequests,assignees`.
+Report any GitHub rejection instead of silently leaving the PR unassigned.
+
+**4. Clean up:**
 
 ```bash
 # bash/zsh
