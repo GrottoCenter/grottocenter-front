@@ -68,13 +68,24 @@ The file must already exist on disk before asking for confirmation.
 
 **3. Push and create:**
 
+Identify the authenticated account with `gh api user --jq .login` before
+creating the PR or requesting reviews. If the command fails or returns an
+empty login, stop after the authentication recovery above; do not continue
+with an unknown author. Compare reviewer logins to the author
+case-insensitively.
+
+The commands below work in bash and PowerShell. Create and assign the PR
+first, then request each eligible reviewer separately. Omit a reviewer
+command if that login is the PR author or already has a pending request.
+If creation fails, stop; if it succeeds, use the returned PR number for
+the review requests. If a reviewer request fails, report it and continue
+with the other eligible reviewer and the verification below.
+
 ```bash
 git push origin <branch-name>
-me=$(gh api user --jq .login)
-reviewers=$(printf '%s\n' ClemRz urien | grep -vix "$me" | paste -sd, -)
-reviewer_args=()
-if [ -n "$reviewers" ]; then reviewer_args=(--reviewer "$reviewers"); fi
-gh pr create --title "<type(scope): description>" --body-file pr_body.md --base develop --repo <repo> "${reviewer_args[@]}" --assignee "@me"
+gh pr create --title "<type(scope): description>" --body-file pr_body.md --base develop --repo <repo> --assignee "@me"
+gh pr edit <pr-number> --repo <repo> --add-reviewer ClemRz
+gh pr edit <pr-number> --repo <repo> --add-reviewer urien
 ```
 
 Where `<repo>` is detected via `gh repo view --json nameWithOwner -q .nameWithOwner`.
