@@ -88,10 +88,14 @@ describe('InterestSummary', () => {
     );
 
     expect(screen.getByText("Temps d'accès")).toBeVisible();
+    expect(screen.getByRole('presentation')).toHaveAttribute('alt', '');
+    expect(
+      screen.queryByRole('img', { name: "Temps d'accès" })
+    ).not.toBeInTheDocument();
     expect(screen.getByText('5 min – 30 min').textContent).toBe(
       '5\u00a0min\u00a0– 30\u00a0min'
     );
-    expect(screen.getByText('Temps passé sous terre')).toBeVisible();
+    expect(screen.getByText('TPST')).toBeVisible();
     expect(screen.getByText('1 h 30 min – 5 h').textContent).toBe(
       '1\u00a0h\u00a030\u00a0min\u00a0– 5\u00a0h'
     );
@@ -108,7 +112,21 @@ describe('InterestSummary', () => {
       '1\u00a0hr\u00a005\u00a0min'
     );
     expect(screen.queryByText('Time to go')).not.toBeInTheDocument();
+    expect(screen.getByText('Underground')).toBeVisible();
+    expect(screen.getByRole('img', { name: 'Underground time' })).toBeVisible();
     expect(screen.getByText('Not rated')).toBeVisible();
+  });
+
+  it('labels the summary icon with the full French underground time', () => {
+    renderSummary([{ eTUnderground: '1:00:00' }], false, 'fr');
+
+    expect(screen.getByText('TPST')).toBeVisible();
+    expect(
+      screen.getByRole('img', { name: 'Temps passé sous terre' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('img', { name: 'Underground time' })
+    ).not.toBeInTheDocument();
   });
 
   it('keeps the range dash with the lower bound', () => {

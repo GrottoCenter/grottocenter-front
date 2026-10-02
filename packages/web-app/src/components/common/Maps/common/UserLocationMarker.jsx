@@ -10,6 +10,10 @@ import {
   USER_LOCATION_COLOR,
   ACCURACY_CIRCLE_STYLE
 } from './userLocationStyle';
+import {
+  MAP_MARKER_OUTLINE_COLOR,
+  CSS_MARKER_OUTLINE_WIDTH
+} from './mapMarkerOutline';
 
 // The blue location dot with a direction cone fanning out in the heading the
 // device faces. The cone lives in a wrapper rotated by the raw heading; the
@@ -28,7 +32,7 @@ const buildIcon = () => {
       </div>
       <div style="position:absolute;left:50%;top:50%;width:16px;height:16px;
                   margin:-8px 0 0 -8px;border-radius:50%;background:${USER_LOCATION_COLOR};
-                  border:2.5px solid #fff;box-shadow:0 0 3px rgba(0,0,0,0.5);"></div>
+                  border:${CSS_MARKER_OUTLINE_WIDTH}px solid ${MAP_MARKER_OUTLINE_COLOR};box-shadow:0 0 3px rgba(0,0,0,0.5);"></div>
     </div>`;
   return L.divIcon({
     className: '',

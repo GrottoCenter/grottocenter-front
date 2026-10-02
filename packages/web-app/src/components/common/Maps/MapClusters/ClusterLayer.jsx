@@ -3,6 +3,11 @@ import PropTypes from 'prop-types';
 import { useMap, useMapEvent } from 'react-leaflet';
 import L from 'leaflet';
 import { GlobalStyles } from '@mui/material';
+import {
+  MAP_MARKER_OUTLINE_COLOR,
+  MAP_MARKER_OUTLINE_WIDTH,
+  CSS_MARKER_OUTLINE_WIDTH
+} from '../common/mapMarkerOutline';
 import useCluster from './useCluster';
 
 // Bubble size buckets (px diameter). Chosen so labels fit and the visual
@@ -47,30 +52,23 @@ export const ClusterGlobalCss = (
       /* Entrance — circle */
       .cluster-bubble[data-type="entrance"] {
         background: rgba(139, 69, 19, 0.85);
-        border: 2px solid rgba(255, 255, 255, 0.85);
+        border: ${CSS_MARKER_OUTLINE_WIDTH}px solid ${MAP_MARKER_OUTLINE_COLOR};
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         border-radius: 50%;
       }
-      /* Organization — rounded square. Amber like the organization SVG marker
-         (MUI amber[500]); dark text for legibility since amber is too light
-         for white labels. */
+      /* Organization — rounded square. Amber needs dark text for legibility. */
       .cluster-bubble[data-type="organization"] {
         background: rgba(255, 193, 7, 0.9);
         color: #3E2723;
-        border: 2px solid rgba(255, 255, 255, 0.85);
+        border: ${CSS_MARKER_OUTLINE_WIDTH}px solid ${MAP_MARKER_OUTLINE_COLOR};
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         border-radius: 22%;
       }
-      /* Massif — rounded diamond. Achieved by rotating a rounded square 45°.
-         scale(0.88) gives the diamond a diagonal of ~1.25×D so its visible
-         AREA matches a circle of diameter D (a rotated square only fills
-         50% of its bounding box, vs ~78% for a circle — so matching bounding
-         boxes would leave the diamond looking undersized). Slight overflow
-         beyond the icon bounding box is fine; TYPE_OFFSET keeps stacked
-         layers from colliding. Label is counter-rotated to read upright. */
+      /* Massif — rounded square rotated 45°, with a border compensated for
+         the scale so its visible width remains 2 CSS pixels. */
       .cluster-bubble[data-type="massif"] {
         background: rgba(56, 142, 60, 0.85);
-        border: 2px solid rgba(255, 255, 255, 0.85);
+        border: ${CSS_MARKER_OUTLINE_WIDTH / 0.88}px solid ${MAP_MARKER_OUTLINE_COLOR};
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         border-radius: 22%;
         transform: rotate(45deg) scale(0.88);
@@ -79,14 +77,8 @@ export const ClusterGlobalCss = (
         display: inline-block;
         transform: rotate(-45deg);
       }
-      /* Network — regular flat-top hexagon. Rendered via inline SVG rather
-         than clip-path so we can draw a real white stroke (clip-path would
-         eat the border). Vertices at y=6.7% / 93.3% keep the sides equal
-         (regular hexagon fits a rect of ratio 2:√3, so it can't fill both
-         dimensions of a square). vector-effect keeps the stroke at 2 CSS
-         pixels regardless of the bubble's diameter. */
+      /* Network — SVG hexagon with the zoomed marker's proportions. */
       .cluster-bubble[data-type="network"] {
-        background: transparent;
         position: relative;
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
       }
@@ -101,7 +93,6 @@ export const ClusterGlobalCss = (
         position: relative;
         z-index: 1;
       }
-
       .cluster-bubble[data-type="entrance"]:hover,
       .cluster-bubble[data-type="organization"]:hover {
         transform: scale(1.08);
@@ -109,6 +100,7 @@ export const ClusterGlobalCss = (
       }
       .cluster-bubble[data-type="massif"]:hover {
         transform: rotate(45deg) scale(0.95);
+        border-width: ${CSS_MARKER_OUTLINE_WIDTH / 0.95}px;
         filter: brightness(1.15);
       }
       .cluster-bubble[data-type="network"]:hover {
@@ -125,14 +117,13 @@ const formatCount = count => {
   return `${Math.round(count / 1000)}k`;
 };
 
-// Regular flat-top hexagon inscribed in a 100×100 viewBox. Sides all equal
-// 50 units (see CSS comment for the geometric derivation).
+// Same hexagon vertices and viewBox as NetworkMarker's zoomed icon.
 const NETWORK_HEX_SVG =
-  '<svg class="cluster-bubble-svg" viewBox="0 0 100 100" preserveAspectRatio="none">' +
-  '<polygon points="25,6.7 75,6.7 100,50 75,93.3 25,93.3 0,50" ' +
+  '<svg class="cluster-bubble-svg" viewBox="0 0 106.667 106.667" preserveAspectRatio="none">' +
+  '<polygon points="53.33,3.33 96.63,28.33 96.63,78.33 53.33,103.33 10.03,78.33 10.03,28.33" ' +
   'fill="rgba(25,118,210,0.85)" ' +
-  'stroke="rgba(255,255,255,0.85)" ' +
-  'stroke-width="2" ' +
+  `stroke="${MAP_MARKER_OUTLINE_COLOR}" ` +
+  `stroke-width="${MAP_MARKER_OUTLINE_WIDTH}" ` +
   'vector-effect="non-scaling-stroke" ' +
   'stroke-linejoin="round" />' +
   '</svg>';
@@ -140,10 +131,8 @@ const NETWORK_HEX_SVG =
 // Build an L.divIcon for one bubble. The per-type offset (used to nudge
 // stacked layers apart at the same geo point) is baked into iconAnchor
 // rather than an inline transform, keeping the CSS transform slot free for
-// per-type shape rotations (see the massif rotated-diamond rule). The label
-// is wrapped in a span so it can be counter-rotated inside a rotated shape.
-// Network uses an inline SVG hexagon (see NETWORK_HEX_SVG) because clip-path
-// can't render a stroke; all other types get shape via CSS on the div itself.
+// the massif rotation. The label is counter-rotated inside that shape.
+// Only networks need an inline SVG to retain a visible hexagon stroke.
 // Leaves (isolated points) render the same as clusters with count=1 so users
 // always see a labeled, clickable dot.
 const buildIcon = (count, type) => {

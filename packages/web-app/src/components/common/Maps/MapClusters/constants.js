@@ -1,5 +1,9 @@
 import { blue, green } from '@mui/material/colors';
 import {
+  MAP_MARKER_OUTLINE_COLOR,
+  MAP_MARKER_OUTLINE_WIDTH
+} from '../common/mapMarkerOutline';
+import {
   DATA_QUALITY_LEVELS,
   DATA_QUALITY_LABEL_KEYS,
   DATA_QUALITY_THRESHOLDS,
@@ -20,22 +24,22 @@ export const CAVE_SIZE = {
 export const CAVE_SIZE_STYLE = {
   [CAVE_SIZE.SMALL]: {
     radius: 8,
-    color: '#FFFFFF',
-    weight: 1,
+    color: MAP_MARKER_OUTLINE_COLOR,
+    weight: MAP_MARKER_OUTLINE_WIDTH,
     fillColor: '#D2691E',
     fillOpacity: 0.9
   },
   [CAVE_SIZE.MEDIUM]: {
     radius: 11,
-    color: '#FFFFFF',
-    weight: 1,
+    color: MAP_MARKER_OUTLINE_COLOR,
+    weight: MAP_MARKER_OUTLINE_WIDTH,
     fillColor: '#8B4513',
     fillOpacity: 0.9
   },
   [CAVE_SIZE.LARGE]: {
     radius: 15,
-    color: '#FFFFFF',
-    weight: 1,
+    color: MAP_MARKER_OUTLINE_COLOR,
+    weight: MAP_MARKER_OUTLINE_WIDTH,
     fillColor: '#2C0F00',
     fillOpacity: 0.9
   }
@@ -71,6 +75,12 @@ export const ENTRANCE_MARKER_FILTERS = [
   { id: CAVE_SIZE.LARGE, labelKey: 'Large caves' }
 ];
 
+// "All categories on" — the default and also the reset target. Same object
+// shape used by the LocalStorage seed and by resetAllFilters, so a single
+// constant keeps the two in step.
+const allOn = keys => Object.fromEntries(keys.map(k => [k, true]));
+export const DEFAULT_ENTRANCE_FILTERS = allOn(Object.values(CAVE_SIZE));
+
 // Alias — keeps map code readable without re-importing from utils directly.
 export const CAVE_QUALITY = DATA_QUALITY_LEVELS;
 
@@ -91,6 +101,15 @@ export const ENTRANCE_QUALITY_FILTERS = [
   DATA_QUALITY_LEVELS.SATISFACTORY,
   DATA_QUALITY_LEVELS.GOOD
 ].map(id => ({ id, labelKey: DATA_QUALITY_LABEL_KEYS[id] }));
+
+export const DEFAULT_QUALITY_FILTERS = allOn(Object.values(CAVE_QUALITY));
+
+// Interest filter — the backend `aestheticism` field is a 0–10 average, but
+// the app always displays it as N/5 with the MUI Rating component (see
+// Entry/Ratings.jsx and the api PR #1825 review note). The filter picks a
+// minimum on the 1★–5★ scale and stores it on the same 0–10 scale as the
+// backend value. The filter compares displayed star levels after rounding.
+export const DEFAULT_MIN_INTEREST = 0;
 
 export const MARKERS_LIMIT = 13;
 // Zoom level at which massif polygons are fetched and displayed
@@ -130,8 +149,8 @@ export const NETWORK_ENTRANCE_HALO_STYLE = {
 };
 export const NETWORK_ENTRANCE_GHOST_STYLE = {
   radius: 5,
-  color: '#FFFFFF',
-  weight: 2,
+  color: MAP_MARKER_OUTLINE_COLOR,
+  weight: MAP_MARKER_OUTLINE_WIDTH,
   fillColor: NETWORK_HIGHLIGHT_ACCENT,
   fillOpacity: 1,
   interactive: false

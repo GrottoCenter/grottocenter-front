@@ -1,6 +1,10 @@
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
 import { blue } from '@mui/material/colors';
+import {
+  MAP_MARKER_OUTLINE_COLOR,
+  MAP_MARKER_OUTLINE_WIDTH
+} from '@/components/common/Maps/common/mapMarkerOutline';
 
 // Dedicated network marker: a blue hexagon (blue is the network semantic
 // everywhere else on the map — heatmap, highlight overlay) with a white outline
@@ -23,8 +27,9 @@ const NetworkIcon = () => (
     <polygon
       points="53.33,3.33 96.63,28.33 96.63,78.33 53.33,103.33 10.03,78.33 10.03,28.33"
       fill={blue[700]}
-      stroke="#fff"
-      strokeWidth="4"
+      stroke={MAP_MARKER_OUTLINE_COLOR}
+      strokeWidth={MAP_MARKER_OUTLINE_WIDTH}
+      vectorEffect="non-scaling-stroke"
       strokeLinejoin="round"
     />
     <g transform="translate(20 21) scale(.66)">

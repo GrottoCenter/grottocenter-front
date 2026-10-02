@@ -8,6 +8,10 @@ import { useIntl } from 'react-intl';
 
 import { formatDistance } from '@/utils/geo';
 import CustomControl from './CustomControl';
+import {
+  MAP_MARKER_OUTLINE_COLOR,
+  CSS_MARKER_OUTLINE_WIDTH
+} from './mapMarkerOutline';
 
 const STATES = {
   IDLE: 'IDLE',
@@ -47,7 +51,7 @@ const finishBtnStyle = {
 const makeDotIcon = color =>
   L.divIcon({
     className: '',
-    html: `<div style="width:10px;height:10px;border-radius:50%;background:${color};border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,0.4)"></div>`,
+    html: `<div style="width:10px;height:10px;border-radius:50%;background:${color};border:${CSS_MARKER_OUTLINE_WIDTH}px solid ${MAP_MARKER_OUTLINE_COLOR};box-shadow:0 0 3px rgba(0,0,0,0.4)"></div>`,
     iconSize: [10, 10],
     iconAnchor: [5, 5]
   });

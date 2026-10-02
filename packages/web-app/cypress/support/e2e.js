@@ -20,7 +20,7 @@ import './commands';
 // Tours read localStorage on mount — pre-setting the key prevents them from auto-launching
 // and avoids overlay interference with Cypress selectors.
 beforeEach(() => {
-  localStorage.setItem('mapTourSeen_v1', 'true');
+  localStorage.setItem('mapTourSeen_v2', 'true');
 });
 
 // Alternatively you can use CommonJS syntax:

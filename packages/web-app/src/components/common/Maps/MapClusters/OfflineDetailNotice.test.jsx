@@ -1,6 +1,6 @@
 import { shouldShowOfflineDetailNotice } from './OfflineDetailNotice';
 
-// Layer ids as index.jsx passes them (layerTypes from DataControl). Hardcoded
+// Layer ids as index.jsx passes them (layerTypes from DataDisplayControl). Hardcoded
 // rather than imported: the predicate is layer-agnostic by design, so binding
 // the test to the real ids would assert something it does not promise.
 const ENTRANCES = 'entrances';

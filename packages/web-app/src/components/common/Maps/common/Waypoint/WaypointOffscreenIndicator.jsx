@@ -10,6 +10,10 @@ import {
   WAYPOINT_ICON_SIZE,
   WAYPOINT_ICON_ANCHOR
 } from './waypointIcon';
+import {
+  MAP_MARKER_OUTLINE_COLOR,
+  CSS_MARKER_OUTLINE_WIDTH
+} from '../mapMarkerOutline';
 
 // Inset (px) from the container border so the round badge isn't clipped.
 const EDGE_MARGIN = 26;
@@ -116,7 +120,7 @@ const WaypointOffscreenIndicator = ({ waypoint }) => {
         color: 'common.white',
         boxShadow: 3,
         pointerEvents: 'auto',
-        border: '2px solid #ffffff',
+        border: `${CSS_MARKER_OUTLINE_WIDTH}px solid ${MAP_MARKER_OUTLINE_COLOR}`,
         '&:hover': { bgcolor: WAYPOINT_COLOR }
       }}>
       <NavigationIcon
