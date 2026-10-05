@@ -1,4 +1,4 @@
-describe('Simple pages loader to check all major pages load correctly', () => {
+describe('All major pages render their shell without crashing', () => {
   // Intercept every API call so this suite can't leak traffic to the
   // production API from CI (see issue #1554). The catch-all returns {},
   // which is enough for this smoke test: `checkPageLoaded` only asserts
@@ -50,18 +50,12 @@ describe('Simple pages loader to check all major pages load correctly', () => {
   });
 
   it('entrance page', () => {
-    cy.visit('/entrances/35120'); // Entrance with a lot of data
-    cy.checkPageLoaded();
-
-    cy.visit('/entrances/6085'); // Entrance with almost no data
+    cy.visit('/entrances/35120');
     cy.checkPageLoaded();
   });
 
   it('cave page', () => {
-    cy.visit('/caves/75363'); // Cave with lot of entrances
-    cy.checkPageLoaded();
-
-    cy.visit('/caves/6085'); // Cave with almost no data
+    cy.visit('/caves/75363');
     cy.checkPageLoaded();
   });
 
@@ -71,11 +65,7 @@ describe('Simple pages loader to check all major pages load correctly', () => {
   });
 
   it('document page', () => {
-    cy.visit('/documents/22695'); // Collection
-    cy.checkPageLoaded();
-    cy.visit('/documents/58048'); // Issue
-    cy.checkPageLoaded();
-    cy.visit('/documents/73936'); // Article
+    cy.visit('/documents/22695');
     cy.checkPageLoaded();
   });
 
@@ -108,8 +98,6 @@ describe('Simple pages loader to check all major pages load correctly', () => {
   });
 
   it('api page', () => {
-    cy.visit('/api');
-    cy.checkPageLoaded();
     // SwaggerUI fetches swagger.yaml to render the spec. The catch-all mock
     // above returns `{}`, which SwaggerUI parses as an empty spec and never
     // produces an `.info .title`. Override with a minimal valid OpenAPI
@@ -127,6 +115,8 @@ paths: {}
 `
       }
     );
+    cy.visit('/api');
+    cy.checkPageLoaded();
     cy.visit('/api/1');
     // Wait for SwaggerUI to fully load and render
     cy.get('.swagger-ui', { timeout: 30000 }).should('be.visible');

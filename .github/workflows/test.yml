@@ -53,10 +53,14 @@ jobs:
           CYPRESS_INSTALL_BINARY: 0
       - name: Build app for E2E
         # Bake a non-routable API URL into the E2E bundle so any spec that
-        # forgets `cy.mockApiCatchAll()` fails fast with ECONNREFUSED instead
-        # of silently calling production and burning the 200 req / 10 min / IP
-        # budget (issue #1554). Cypress intercepts match by pathname, so the
-        # explicit mocks keep working regardless of the host.
+        # forgets `cy.mockApiCatchAll()` can't reach production and burn the
+        # 200 req / 10 min / IP budget (issue #1554). Cypress intercepts match
+        # by pathname, so the explicit mocks keep working regardless of host.
+        #
+        # The unmocked *request* fails fast with ECONNREFUSED, but the *spec*
+        # only fails if an assertion actually depends on that response — a
+        # fire-and-forget thunk just dispatches a failure and the test stays
+        # green. The production-traffic guarantee still holds either way.
         #
         # The port must NOT be on the WHATWG Fetch "bad ports" list
         # (https://fetch.spec.whatwg.org/#port-blocking) — Chrome and Firefox
