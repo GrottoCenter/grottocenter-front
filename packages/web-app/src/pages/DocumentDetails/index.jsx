@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Breadcrumbs, Skeleton, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Divider, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -10,6 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ShareIcon from '@mui/icons-material/Share';
+import LinkIcon from '@mui/icons-material/Link';
 import { NavigateNext } from '@mui/icons-material';
 import { getPostDeletionUrl } from '@/utils/deletedEntityRedirect';
 import { LicenseBadge } from '@/components/common/LicenseTag';
@@ -21,6 +22,9 @@ import {
 import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
 import { formatDocumentReference } from '@/utils/documentReference';
 import LinkedEntityCards from '@/components/common/entitiesList/LinkedEntityCards';
+import SearchEntranceForm from '@/components/appli/SearchEntranceForm';
+import SectionCreateButton from '@/components/common/SectionCreateButton';
+import { EntityIcon } from '@/pages/EntityCreation/entityConfig';
 import AppLink from '../../components/common/AppLink';
 import BibliographicReference from './BibliographicReference';
 
@@ -51,6 +55,7 @@ import {
   useDocumentChildren,
   useDeleteDocument,
   useRestoreDocument,
+  useLinkDocumentToEntrances,
   useLanguages,
   useLicenses,
   findLicenseByName,
@@ -151,6 +156,8 @@ const Document = ({
   const permissions = usePermissions();
   const deleteMutation = useDeleteDocument();
   const restoreMutation = useRestoreDocument();
+  const linkEntranceMutation = useLinkDocumentToEntrances();
+  const [isEntranceSearchVisible, setIsEntranceSearchVisible] = useState(false);
   const { data: languages = [] } = useLanguages();
   const { locale } = useSelector(state => state.intl);
   const { data: licenses } = useLicenses();
@@ -791,11 +798,66 @@ const Document = ({
               }
             />
 
-            {linkedEntities.length > 0 && (
+            {(linkedEntities.length > 0 ||
+              (permissions.isAuth &&
+                !documentData.isDeleted &&
+                !hideActions)) && (
               <ScrollableContent
                 dense
                 title={formatMessage({ id: 'Linked entities' })}
-                content={<LinkedEntityCards entities={linkedEntities} />}
+                icon={
+                  permissions.isAuth &&
+                  !documentData.isDeleted &&
+                  !hideActions && (
+                    <SectionCreateButton
+                      isOpen={isEntranceSearchVisible}
+                      onToggle={() =>
+                        setIsEntranceSearchVisible(value => !value)
+                      }
+                      label={formatMessage({ id: 'Associate' })}
+                      tooltip={formatMessage({
+                        id: 'Associate to an entrance'
+                      })}
+                      openTooltip={formatMessage({ id: 'Cancel this search' })}
+                      testId="associate-entrances-button"
+                      icon={
+                        <EntityIcon
+                          iconType="entrance"
+                          size={24}
+                          BadgeIcon={LinkIcon}
+                        />
+                      }
+                    />
+                  )
+                }
+                content={
+                  <>
+                    {isEntranceSearchVisible && (
+                      <>
+                        <SearchEntranceForm
+                          onSubmit={entrances =>
+                            linkEntranceMutation.mutateAsync({
+                              documentId: documentData.id,
+                              entrances
+                            })
+                          }
+                          onSuccess={() => setIsEntranceSearchVisible(false)}
+                        />
+                        {linkedEntities.length > 0 && <Divider />}
+                      </>
+                    )}
+                    {linkedEntities.length > 0 ? (
+                      <LinkedEntityCards entities={linkedEntities} />
+                    ) : (
+                      !isEntranceSearchVisible && (
+                        <Alert
+                          severity="info"
+                          content={formatMessage({ id: 'No linked entities.' })}
+                        />
+                      )
+                    )}
+                  </>
+                }
               />
             )}
 
