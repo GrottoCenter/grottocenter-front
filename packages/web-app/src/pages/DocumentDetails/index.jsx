@@ -195,9 +195,8 @@ const Document = ({
     !documentData.isDeleted &&
     !wantedDeletedState &&
     !hideActions;
-  // Unlink is moderator-only in the backend (see entrance/unlink-document.js
-  // in grottocenter-api), so the gating here is intentionally narrower than
-  // the Associate side above — don't align them.
+  // Both entrance/unlink-document.js and massif/unlink-document.js in
+  // grottocenter-api require a moderator to unlink a document.
   const canUnlinkLinkedEntities =
     permissions.isModerator && canAssociateEntrances;
   const isEntranceSearchOpen = canAssociateEntrances && isEntranceSearchVisible;
@@ -861,7 +860,9 @@ const Document = ({
                                     documentId: documentData.id
                                   });
                                 }
-                                return null;
+                                throw new Error(
+                                  `Unsupported document unlink type: ${entity.type}`
+                                );
                               }
                             : undefined
                         }
