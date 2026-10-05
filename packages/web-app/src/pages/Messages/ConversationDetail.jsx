@@ -596,12 +596,17 @@ const ConversationDetail = () => {
         body: replyText.trim()
       });
       setReplyText('');
-      // Reset pagination so the freshly-sent message is visible: sending
-      // shifts every message down by one, so refetching the current skip>0
-      // page would overlap the previous page and hide the new message at
-      // skip=0. Snapping back to skip=0 reloads the head of the thread.
-      setSkip(0);
-      setAccumulated([]);
+      // Snap back to the head of the thread only when the user had scrolled
+      // older pages in: at skip>0, refetching the current page would overlap
+      // the previous page and hide the new message. At skip=0 the mutation's
+      // invalidation has already repopulated pageData, so wiping accumulated
+      // here would leave an empty list with a dead "Load more" button (the
+      // useEffect that refills accumulated is keyed on pageData/skip/isSuccess
+      // and none of them changes afterwards — see issue #1535).
+      if (skip !== 0) {
+        setSkip(0);
+        setAccumulated([]);
+      }
     } catch (err) {
       console.error('Failed to send reply:', err);
       onError(formatMessage({ id: 'Failed to send message.' }));
