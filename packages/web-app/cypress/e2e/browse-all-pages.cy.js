@@ -91,6 +91,13 @@ describe('Simple pages loader to check all major pages load correctly', () => {
   });
 
   it('region page', () => {
+    // Region's PageTitle renders '' (empty h1) when the fetched region has no
+    // name — the catch-all's `{}` triggers that branch. Return a minimal shape
+    // with a name so the h1 is non-empty.
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/countries/US/regions/TN' },
+      { statusCode: 200, body: { id: 'TN', name: 'Tennessee' } }
+    );
     cy.visit('/countries/US/regions/TN');
     cy.checkPageLoaded();
   });
