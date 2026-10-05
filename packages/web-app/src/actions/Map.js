@@ -69,19 +69,33 @@ export const LOADINGS = {
 // (and answers on the first attempt) or it doesn't, and no amount of waiting
 // will bring the network back. Skipping the backoff saves 7 s of dead time
 // before the failure surfaces in the UI.
+//
+// Only transient failures retry: no-response errors (network/offline mid-call)
+// and 5xx. A 4xx is a deterministic server answer — replaying it will not
+// change it, and on 429 the extra calls make the rate-limit bucket worse.
+// With 4 bulk coordinate endpoints each previously retrying 3 times, a single
+// rate-limited map load could emit up to 16 requests against the same IP
+// bucket (grottocenter-api#1848); the 4xx short-circuit caps it at 4.
 const fetchWithRetry = (url, maxRetries = 3) => {
   const attempts =
     typeof navigator !== 'undefined' && navigator.onLine === false
       ? 0
       : maxRetries;
+  const isRetryable = error => !(error?.status >= 400 && error?.status < 500);
   const attempt = (retriesLeft, delay) =>
     fetch(url)
       .then(response => {
-        if (response.status >= 400) throw new Error(response.status);
+        if (response.status >= 400) {
+          // Carry the HTTP status on the error so the retry filter can read a
+          // number instead of parsing error.message.
+          const error = new Error(String(response.status));
+          error.status = response.status;
+          throw error;
+        }
         return response.text();
       })
       .catch(error => {
-        if (retriesLeft === 0) throw error;
+        if (retriesLeft === 0 || !isRetryable(error)) throw error;
         return new Promise(resolve => {
           setTimeout(resolve, delay);
         }).then(() => attempt(retriesLeft - 1, delay * 2));
