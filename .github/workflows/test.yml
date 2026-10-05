@@ -52,7 +52,14 @@ jobs:
         env:
           CYPRESS_INSTALL_BINARY: 0
       - name: Build app for E2E
+        # Bake a non-routable API URL into the E2E bundle so any spec that
+        # forgets `cy.mockApiCatchAll()` fails fast with ECONNREFUSED instead
+        # of silently calling production and burning the 200 req / 10 min / IP
+        # budget (issue #1554). Cypress intercepts match by pathname, so the
+        # explicit mocks keep working regardless of the host.
         run: yarn build
+        env:
+          VITE_API_URL: http://127.0.0.1:1
       - name: Share built app
         uses: actions/upload-artifact@v4
         with:

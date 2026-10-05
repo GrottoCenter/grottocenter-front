@@ -1,4 +1,13 @@
 describe('Simple pages loader to check all major pages load correctly', () => {
+  // Intercept every API call so this suite can't leak traffic to the
+  // production API from CI (see issue #1554). The catch-all returns {},
+  // which is enough for this smoke test: `checkPageLoaded` only asserts
+  // that the page shell rendered an h1 — PageTitle shows a Skeleton while
+  // data is missing, which keeps h1 non-empty.
+  beforeEach(() => {
+    cy.mockApiCatchAll();
+  });
+
   it('home page', () => {
     cy.visit('/');
     cy.checkPageLoaded();
