@@ -331,6 +331,7 @@
   "An article from a source": "Un article d'una font",
   "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "S'ha enviat un correu a {email} per verificar el teu compte. Fes clic a l'enllaç del correu per activar el teu compte.",
   "An email will be sent to:": "S'enviarà un correu electrònic a:",
+  "An entity cannot redirect to itself.": "Una entitat no pot redirigir a si mateixa.",
   "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.": "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.",
   "An error occurred when creating a massif.": "S'ha produït un error en crear un massís.",
   "An error occurred when creating a network.": "S'ha produït un error en crear una xarxa.",

@@ -31,7 +31,7 @@ import {
   DeleteConfirmationDialog,
   DELETED_ENTITIES
 } from '@/components/common/card/Deleted';
-import { getPostDeletionUrl } from '@/utils/deletedEntityRedirect';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 import AuthorBody from './AuthorBody';
 import CaverBody from './CaverBody';
 
@@ -105,18 +105,12 @@ const Person = ({
   if (person && (permissions.isAdmin || permissions.isModerator)) {
     onDelete = () => setIsDeleteConfirmationOpen(true);
   }
-  const onDeletePress = entityId => {
-    deleteMutation.mutate(
-      { id: person?.id, entityId },
-      {
-        onSuccess: () => {
-          navigate(getPostDeletionUrl(DELETED_ENTITIES.person, entityId), {
-            replace: true
-          });
-        }
-      }
-    );
-  };
+  const { onDeletePress } = usePostDeletion({
+    entityType: DELETED_ENTITIES.person,
+    id: person?.id,
+    entity: person,
+    deleteMutation
+  });
 
   let title = '';
   if (person) {

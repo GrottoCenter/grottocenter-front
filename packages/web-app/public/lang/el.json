@@ -331,6 +331,7 @@
   "An article from a source": "Άρθρο από πηγή",
   "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "Ένα email αποστάλη στο {email} για την επαλήθευση του λογαριασμού σας. Παρακαλώ κάντε κλικ στο σύνδεσμο στο email για να ενεργοποιήσετε τον λογαριασμό σας.",
   "An email will be sent to:": "Θα σταλεί email στο:",
+  "An entity cannot redirect to itself.": "Μια οντότητα δεν μπορεί να ανακατευθύνει στον εαυτό της.",
   "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.": "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.",
   "An error occurred when creating a massif.": "Παρουσιάστηκε σφάλμα κατά τη δημιουργία μαζικής περιοχής.",
   "An error occurred when creating a network.": "Παρουσιάστηκε σφάλμα κατά τη δημιουργία δικτύου.",

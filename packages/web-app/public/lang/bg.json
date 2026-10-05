@@ -331,6 +331,7 @@
   "An article from a source": "Статия от източник",
   "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "На {email} е изпратен имейл за проверка на вашия акаунт. Моля, щракнете на връзката в имейла, за да активирате вашия акаунт.",
   "An email will be sent to:": "Ще бъде изпратен имейл до:",
+  "An entity cannot redirect to itself.": "Обектът не може да пренасочва към себе си.",
   "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.": "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.",
   "An error occurred when creating a massif.": "Възникна грешка при създаването на масив.",
   "An error occurred when creating a network.": "Възникна грешка при създаването на мрежа.",

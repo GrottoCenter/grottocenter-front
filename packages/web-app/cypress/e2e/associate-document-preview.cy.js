@@ -1,5 +1,5 @@
 describe('Previewing a document before association', () => {
-  it('keeps preview and selection separate in table and card views', () => {
+  beforeEach(() => {
     cy.mockApiCatchAll();
     cy.intercept(
       { method: 'GET', pathname: '/api/v1/entrances/42' },
@@ -82,7 +82,9 @@ describe('Previewing a document before association', () => {
         body: { documents: [] }
       }
     );
+  });
 
+  it('keeps preview and selection separate in table and card views', () => {
     cy.loginAs();
     cy.visit('/entrances/42?tab=documents', {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
@@ -125,7 +127,73 @@ describe('Previewing a document before association', () => {
     );
     cy.contains('button', 'Associate 0 documents').should('be.disabled');
 
+    cy.clock(null, ['setTimeout', 'clearTimeout']);
+    cy.contains('button', 'Preview document')
+      .find('input[type="checkbox"]')
+      .trigger('touchstart', {
+        force: true,
+        touches: [{ clientX: 10, clientY: 10 }]
+      });
+    cy.tick(600);
+    cy.contains('[role="dialog"]', 'Detailed document view').should(
+      'not.exist'
+    );
+    cy.contains('button', 'Preview document')
+      .find('input[type="checkbox"]')
+      .trigger('touchend', { force: true });
+    cy.contains('button', 'Preview document')
+      .find('input[type="checkbox"]')
+      .click({ force: true });
+    cy.contains('button', 'Associate 1 document').should('be.enabled');
+    cy.contains('button', 'Preview document')
+      .find('input[type="checkbox"]')
+      .click({ force: true });
+    cy.clock().invoke('restore');
+
     cy.contains('Preview document').click();
     cy.contains('button', 'Associate 1 document').should('be.enabled');
+  });
+
+  it('closes entrance association when a document is soft-deleted', () => {
+    let isDeleted = false;
+    cy.intercept({ method: 'GET', pathname: '/api/v1/documents/7' }, request =>
+      request.reply({
+        id: 7,
+        title: 'Preview document',
+        type: 'Article',
+        files: [],
+        authors: [],
+        authorsOrganization: [],
+        massifs: [],
+        entrances: [{ id: 42, name: 'Test entrance' }],
+        isDeleted,
+        isValidated: true
+      })
+    );
+    cy.intercept(
+      { method: 'DELETE', pathname: '/api/v1/documents/7' },
+      request => {
+        isDeleted = true;
+        request.reply({ statusCode: 200, body: {} });
+      }
+    ).as('deleteDocument');
+    cy.loginAs({ groups: ['User', 'Moderator'] });
+    cy.visit('/documents/7', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.get('[data-testid="associate-entrances-button"]', {
+      timeout: 30000
+    }).click();
+    cy.get('input[placeholder="Entrance name"]').should('exist');
+
+    cy.get('[aria-label="Delete"]').click();
+    cy.contains('[role="dialog"]', 'Deletion confirmation')
+      .contains('button', /^Delete$/)
+      .click();
+    cy.wait('@deleteDocument');
+
+    cy.get('[data-testid="associate-entrances-button"]').should('not.exist');
+    cy.get('input[placeholder="Entrance name"]').should('not.exist');
+    cy.contains('Test entrance').should('exist');
   });
 });

@@ -331,6 +331,7 @@
   "An article from a source": "مقالة من مصدر",
   "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "تم إرسال بريد إلكتروني إلى {email} للتحقق من حسابك. يرجى النقر على الرابط الموجود في البريد الإلكتروني لتفعيل حسابك.",
   "An email will be sent to:": "سيتم إرسال بريد إلكتروني إلى:",
+  "An entity cannot redirect to itself.": "لا يمكن إعادة التوجيه من كيان إلى نفسه.",
   "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.": "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.",
   "An error occurred when creating a massif.": "حدث خطأ عند إنشاء كتلة جبلية.",
   "An error occurred when creating a network.": "حدث خطأ عند إنشاء شبكة.",

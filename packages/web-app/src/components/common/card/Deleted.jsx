@@ -8,6 +8,7 @@ import {
   Card,
   Stack,
   IconButton,
+  FormHelperText,
   Typography,
   CircularProgress
 } from '@mui/material';
@@ -213,6 +214,7 @@ export const DeleteConfirmationDialog = ({
   const canSelectRedirect = Boolean(entityType.searchType);
   const [inputValue, setInputValue] = useState('');
   const [selectedEntity, setSelectedEntity] = useState(null);
+  const [hasSelfSelectionError, setHasSelfSelectionError] = useState(false);
   const debouncedInput = useDebounce(inputValue);
   const {
     data,
@@ -232,11 +234,19 @@ export const DeleteConfirmationDialog = ({
   );
 
   useEffect(() => {
-    if (!isOpen) setSelectedEntity(null);
+    if (!isOpen) {
+      setSelectedEntity(null);
+      setHasSelfSelectionError(false);
+    }
   }, [isOpen, setSelectedEntity]);
 
   const handleSelection = selection => {
-    if (selection && !isCurrentEntity(selection, entityId)) {
+    if (isCurrentEntity(selection, entityId)) {
+      setHasSelfSelectionError(true);
+      return;
+    }
+    setHasSelfSelectionError(false);
+    if (selection) {
       setSelectedEntity(nomelizeSearchEntity(selection));
     }
     setInputValue('');
@@ -301,10 +311,7 @@ export const DeleteConfirmationDialog = ({
               variant="contained"
               color="error"
               startIcon={<DeleteForeverIcon />}
-              disabled={
-                isCurrentEntity(selectedEntity, entityId) ||
-                (isSearchMandatory && !selectedEntity)
-              }
+              disabled={isSearchMandatory && !selectedEntity}
               onClick={() => {
                 onConfirmation(selectedEntity);
                 onClose();
@@ -340,21 +347,33 @@ export const DeleteConfirmationDialog = ({
           <>
             <Typography>{searchTitle}</Typography>
             {!selectedEntity && (
-              <AutoCompleteSearch
-                onInputChange={setInputValue}
-                onSelection={handleSelection}
-                hasError={!!error}
-                isLoading={isQuickSearchLoading}
-                label={formatMessage(
-                  {
-                    id: `Search for a {entityFmt}`,
-                    defaultMessage: `Search for a {entityFmt}`
-                  },
-                  { entityFmt }
-                )}
-                inputValue={inputValue}
-                suggestions={suggestions}
-              />
+              <>
+                <AutoCompleteSearch
+                  onInputChange={value => {
+                    setInputValue(value);
+                    setHasSelfSelectionError(false);
+                  }}
+                  onSelection={handleSelection}
+                  hasError={!!error || hasSelfSelectionError}
+                  isLoading={isQuickSearchLoading}
+                  label={formatMessage(
+                    {
+                      id: `Search for a {entityFmt}`,
+                      defaultMessage: `Search for a {entityFmt}`
+                    },
+                    { entityFmt }
+                  )}
+                  inputValue={inputValue}
+                  suggestions={suggestions}
+                />
+                <FormHelperText
+                  error={hasSelfSelectionError}
+                  aria-live="polite">
+                  {formatMessage({
+                    id: 'An entity cannot redirect to itself.'
+                  })}
+                </FormHelperText>
+              </>
             )}
 
             {selectedEntity && (

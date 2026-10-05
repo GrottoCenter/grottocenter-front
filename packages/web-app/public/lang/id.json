@@ -331,6 +331,7 @@
   "An article from a source": "Artikel dari sumber",
   "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "Email telah dikirim ke {email} untuk memverifikasi akun Anda. Silakan klik tautan di email untuk mengaktifkan akun Anda.",
   "An email will be sent to:": "Email akan dikirim ke:",
+  "An entity cannot redirect to itself.": "Entitas tidak dapat mengalihkan ke dirinya sendiri.",
   "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.": "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.",
   "An error occurred when creating a massif.": "Terjadi kesalahan saat membuat massif.",
   "An error occurred when creating a network.": "Terjadi kesalahan saat membuat jaringan.",

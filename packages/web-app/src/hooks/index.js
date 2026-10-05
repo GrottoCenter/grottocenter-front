@@ -262,6 +262,7 @@ export { default as useDeviceOrientation } from './useDeviceOrientation';
 export { useMeasuredHeight } from './useMeasuredHeight';
 export { useMeasuredWidth } from './useMeasuredWidth';
 export { useLongPress } from './useLongPress';
+export { usePostDeletion } from './usePostDeletion';
 export { useOnlineStatus } from './useOnlineStatus';
 // Non-RQ reconnect paths: map viewport, intl catalogue and Leaflet tile redraw.
 export { useRefetchOnReconnect } from './useRefetchOnReconnect';

@@ -331,6 +331,7 @@
   "An article from a source": "Een artikel uit een bron",
   "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "Er is een e-mail verzonden naar {email} om uw account te verifiëren. Klik op de link in de e-mail om uw account te activeren.",
   "An email will be sent to:": "Er wordt een e-mail gestuurd naar:",
+  "An entity cannot redirect to itself.": "Een entiteit kan niet naar zichzelf doorverwijzen.",
   "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.": "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.",
   "An error occurred when creating a massif.": "Er is een fout opgetreden bij het aanmaken van een massief.",
   "An error occurred when creating a network.": "Er is een fout opgetreden bij het aanmaken van een netwerk.",

@@ -331,6 +331,7 @@
   "An article from a source": "מאמר ממקור",
   "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "נשלח אימייל אל {email} לאימות החשבון שלך. אנא לחץ על הקישור באימייל כדי להפעיל את החשבון שלך.",
   "An email will be sent to:": "יישלח דוא\"ל אל:",
+  "An entity cannot redirect to itself.": "ישות אינה יכולה להפנות אל עצמה.",
   "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.": "An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.",
   "An error occurred when creating a massif.": "אירעה שגיאה בעת יצירת מסיב.",
   "An error occurred when creating a network.": "אירעה שגיאה בעת יצירת רשת.",
