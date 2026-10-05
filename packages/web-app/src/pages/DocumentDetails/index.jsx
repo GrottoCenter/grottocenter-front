@@ -56,6 +56,7 @@ import {
   useDeleteDocument,
   useRestoreDocument,
   useLinkDocumentToEntrances,
+  useUnlinkDocumentToEntrance,
   useLanguages,
   useLicenses,
   findLicenseByName,
@@ -157,6 +158,7 @@ const Document = ({
   const deleteMutation = useDeleteDocument();
   const restoreMutation = useRestoreDocument();
   const linkEntranceMutation = useLinkDocumentToEntrances();
+  const unlinkEntranceMutation = useUnlinkDocumentToEntrance();
   const [isEntranceSearchVisible, setIsEntranceSearchVisible] = useState(false);
   const { data: languages = [] } = useLanguages();
   const { locale } = useSelector(state => state.intl);
@@ -191,6 +193,10 @@ const Document = ({
     !documentData.isDeleted &&
     !wantedDeletedState &&
     !hideActions;
+  // Unlink is moderator-only in the backend (see entrance/unlink-document.js
+  // in grottocenter-api), so the gating here is intentionally narrower than
+  // the Associate side above — don't align them.
+  const canUnlinkEntrances = permissions.isModerator && canAssociateEntrances;
   const isEntranceSearchOpen = canAssociateEntrances && isEntranceSearchVisible;
 
   // The document detail only carries the license name; resolve the full license
@@ -362,7 +368,8 @@ const Document = ({
         iconType: 'entrance',
         label: entity.name,
         secondary: formatMessage({ id: 'Entrance' }),
-        url: `/ui/entrances/${entity.id}`
+        url: `/ui/entrances/${entity.id}`,
+        canUnlink: true
       }))
     ];
   }, [documentData, formatMessage]);
@@ -832,7 +839,19 @@ const Document = ({
                       </>
                     )}
                     {hasLinkedEntities ? (
-                      <LinkedEntityCards entities={linkedEntities} />
+                      <LinkedEntityCards
+                        entities={linkedEntities}
+                        onUnlink={
+                          canUnlinkEntrances
+                            ? entity =>
+                                unlinkEntranceMutation.mutateAsync({
+                                  entranceId: entity.id,
+                                  documentId: documentData.id
+                                })
+                            : undefined
+                        }
+                        isUnlinking={unlinkEntranceMutation.isPending}
+                      />
                     ) : (
                       !isEntranceSearchOpen && (
                         <Alert
