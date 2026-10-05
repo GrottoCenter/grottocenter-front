@@ -1,3 +1,4 @@
+import { isClientError } from '@/utils/httpErrors';
 import {
   getMapCavesUrl,
   getMapCavesCoordinatesUrl,
@@ -63,12 +64,19 @@ export const LOADINGS = {
 // One-time cost on page load vs. a bounded API call on every pan/zoom.
 
 // Retries the fetch up to maxRetries times with exponential backoff (1 s, 2 s, 4 s…).
-// Rejects only after all attempts are exhausted.
+// Rejects client errors immediately and other failures after all attempts.
 //
 // Offline, retrying is pointless: the service worker either has a cached copy
 // (and answers on the first attempt) or it doesn't, and no amount of waiting
 // will bring the network back. Skipping the backoff saves 7 s of dead time
 // before the failure surfaces in the UI.
+//
+// Only transient failures retry: no-response errors (network/offline mid-call)
+// and 5xx. A 4xx is a deterministic server answer — replaying it will not
+// change it, and on 429 the extra calls make the rate-limit bucket worse.
+// With 4 bulk coordinate endpoints each previously retrying 3 times, a single
+// rate-limited map load could emit up to 16 requests against the same IP
+// bucket (grottocenter-api#1848); the 4xx short-circuit caps it at 4.
 const fetchWithRetry = (url, maxRetries = 3) => {
   const attempts =
     typeof navigator !== 'undefined' && navigator.onLine === false
@@ -77,11 +85,17 @@ const fetchWithRetry = (url, maxRetries = 3) => {
   const attempt = (retriesLeft, delay) =>
     fetch(url)
       .then(response => {
-        if (response.status >= 400) throw new Error(response.status);
+        if (response.status >= 400) {
+          // Carry the HTTP status on the error so the retry filter can read a
+          // number instead of parsing error.message.
+          const error = new Error(String(response.status));
+          error.status = response.status;
+          throw error;
+        }
         return response.text();
       })
       .catch(error => {
-        if (retriesLeft === 0) throw error;
+        if (retriesLeft === 0 || isClientError(error)) throw error;
         return new Promise(resolve => {
           setTimeout(resolve, delay);
         }).then(() => attempt(retriesLeft - 1, delay * 2));

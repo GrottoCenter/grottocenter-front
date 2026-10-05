@@ -1,6 +1,7 @@
 import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { enqueueSnackbar } from 'notistack';
 
+import { isClientError } from '@/utils/httpErrors';
 import store from '../store';
 import { postLogout } from '../actions/Login';
 
@@ -50,6 +51,17 @@ const notifyError = (error, meta) => {
     }
     return;
   }
+  // Use the same translated "Too many requests" message as the legacy Redux
+  // ErrorHandler on 429 rather than the generic fallback. The API's
+  // body.code is not standardized across endpoints for rate-limiting, so
+  // key off the HTTP status.
+  if (error?.status === 429) {
+    enqueueSnackbar(translate('Too many requests', 'Too many requests'), {
+      variant: 'error',
+      preventDuplicate: true
+    });
+    return;
+  }
   const fallback = translate(
     'unexpected error',
     'An unexpected error occurred'
@@ -90,7 +102,18 @@ const queryClient = new QueryClient({
       // The default (3 attempts, exponential backoff) compounds with the service
       // worker's 5s networkTimeoutSeconds: a genuinely dead request would take
       // ~25s to surface, against a single attempt today.
-      retry: 1,
+      //
+      // Skip the retry for any 4xx: these are deterministic server answers
+      // (401/403/404/409/422/429/…) and replaying them cannot change the
+      // outcome. 429 specifically — now that the API buckets requests per
+      // client IP (grottocenter-api#1848) — would see the retry attempt
+      // count against the same bucket and prolong the rate-limit window.
+      // 5xx and no-response errors (network / offline mid-call) still get
+      // one retry, matching the previous behavior for transient failures.
+      retry: (failureCount, error) => {
+        if (isClientError(error)) return false;
+        return failureCount < 1;
+      },
 
       // Explicit, not inherited: the app never refetched on focus, and turning
       // that on by accident would multiply real API calls across the board.
