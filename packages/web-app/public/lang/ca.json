@@ -2353,7 +2353,7 @@
   "Select an authorization document": "Seleccioneu un document d'autorització",
   "Select an existing organization from the list, or a new one named \"{name}\" will be created.": "Seleccioneu una organització existent de la llista; en cas contrari, se'n crearà una de nova anomenada «{name}».",
   "Select an identifier type": "Selecciona un tipus d'identificador",
-  "Select document(s) by clicking on the result table above.": "Seleccioneu els documents fent clic a la taula de resultats de dalt.",
+  "Select documents with the checkboxes. Preview any document before associating it.": "Seleccioneu els documents amb les caselles de selecció. Previsualitzeu qualsevol document abans d'associar-lo.",
   "Select the attributes that apply to this entrance": "Seleccioneu els atributs que s'apliquen a aquesta entrada",
   "Selected": "Escollit",
   "Semi-major radius: ": "Semieix major :",

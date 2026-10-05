@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { resetAdvancedSearch } from '@/hooks';
 import SearchDocumentForm from './index';
@@ -18,12 +19,25 @@ vi.mock('../AdvancedSearch/DocumentSearch', () => ({
 }));
 
 vi.mock('../AdvancedSearch/SearchResults', () => ({
-  default: ({ onSelected }) => (
-    <button
-      type="button"
-      onClick={() => onSelected([1], [{ id: 1, title: 'Document' }])}>
-      Select result
-    </button>
+  default: ({ onSelected, onRowClick }) => (
+    <>
+      <button
+        type="button"
+        onClick={() => onSelected([1], [{ id: 1, title: 'Document' }])}>
+        Select result
+      </button>
+      <button type="button" onClick={() => onRowClick({ id: 1 })}>
+        Preview result
+      </button>
+    </>
+  )
+}));
+
+vi.mock('@/pages/DocumentDetails', () => ({
+  default: ({ id, hideActions }) => (
+    <div data-testid="document-preview">
+      Document {id}, actions hidden: {String(hideActions)}
+    </div>
   )
 }));
 
@@ -31,15 +45,20 @@ const messages = {
   Associate: 'Associate',
   'Associate 1 document': 'Associate 1 document',
   'Associate {nb} documents': 'Associate {nb} documents',
+  'Detailed document view': 'Detailed document view',
   Reset: 'Reset',
-  'Select document(s) by clicking on the result table above.':
-    'Select documents'
+  'Select documents with the checkboxes. Preview any document before associating it.':
+    'Select documents',
+  close: 'close'
 };
+const theme = createTheme();
 
 const renderForm = ({ onSubmit, onSuccess }) =>
   render(
     <IntlProvider locale="en" messages={messages}>
-      <SearchDocumentForm onSubmit={onSubmit} onSuccess={onSuccess} />
+      <ThemeProvider theme={theme}>
+        <SearchDocumentForm onSubmit={onSubmit} onSuccess={onSuccess} />
+      </ThemeProvider>
     </IntlProvider>
   );
 
@@ -83,5 +102,53 @@ describe('SearchDocumentForm submission', () => {
     expect(
       screen.getByRole('button', { name: 'Associate 1 document' })
     ).toBeEnabled();
+  });
+
+  it('previews a document without changing the pending association', async () => {
+    const onSubmit = vi.fn().mockResolvedValue();
+    renderForm({ onSubmit });
+    selectDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Preview result' }));
+
+    expect(await screen.findByTestId('document-preview')).toHaveTextContent(
+      'Document 1, actions hidden: true'
+    );
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'close' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    );
+    expect(
+      screen.getByRole('button', { name: 'Associate 1 document' })
+    ).toBeEnabled();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Associate 1 document' })
+    );
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith([{ id: 1, title: 'Document' }])
+    );
+  });
+
+  it('allows preview before selecting a document', async () => {
+    const onSubmit = vi.fn();
+    renderForm({ onSubmit });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Preview result' }));
+
+    expect(await screen.findByTestId('document-preview')).toHaveTextContent(
+      'Document 1, actions hidden: true'
+    );
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'close' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    );
+    expect(
+      screen.getByRole('button', { name: 'Associate 0 documents' })
+    ).toBeDisabled();
   });
 });

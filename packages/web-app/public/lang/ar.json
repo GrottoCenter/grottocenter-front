@@ -2353,7 +2353,7 @@
   "Select an authorization document": "حدد مستند التخويل",
   "Select an existing organization from the list, or a new one named \"{name}\" will be created.": "اختر منظمة موجودة من القائمة، وإلا فسيتم إنشاء منظمة جديدة باسم «{name}».",
   "Select an identifier type": "حدد نوع المعرف",
-  "Select document(s) by clicking on the result table above.": "حدد المستند(ات) بالنقر على جدول النتائج أعلاه.",
+  "Select documents with the checkboxes. Preview any document before associating it.": "حدّد المستندات باستخدام مربعات الاختيار. عاين أي مستند قبل ربطه.",
   "Select the attributes that apply to this entrance": "حدد الخصائص التي تنطبق على هذا المدخل",
   "Selected": "محدد",
   "Semi-major radius: ": "نصف القطر شبه الرئيسي: ",

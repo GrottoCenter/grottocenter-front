@@ -2353,7 +2353,7 @@
   "Select an authorization document": "Select an authorization document",
   "Select an existing organization from the list, or a new one named \"{name}\" will be created.": "Select an existing organization from the list, or a new one named \"{name}\" will be created.",
   "Select an identifier type": "Select an identifier type",
-  "Select document(s) by clicking on the result table above.": "Select document(s) by clicking on the result table above.",
+  "Select documents with the checkboxes. Preview any document before associating it.": "Select documents with the checkboxes. Preview any document before associating it.",
   "Select the attributes that apply to this entrance": "Select the attributes that apply to this entrance",
   "Selected": "Selected",
   "Semi-major radius: ": "Semi-major radius: ",
