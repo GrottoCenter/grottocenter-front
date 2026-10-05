@@ -65,6 +65,11 @@ export const DELETED_ENTITIES = {
   }
 };
 
+const isCurrentEntity = (candidate, entityId) =>
+  candidate?.id != null &&
+  entityId != null &&
+  String(candidate.id) === String(entityId);
+
 const StyledEntityIcon = styled(EntityIcon)`
   float: left;
 `;
@@ -194,6 +199,7 @@ export const DeletedCard = ({
 
 export const DeleteConfirmationDialog = ({
   entityType,
+  entityId,
   isOpen,
   isLoading,
   isPermanent,
@@ -219,14 +225,16 @@ export const DeleteConfirmationDialog = ({
     // character earlier than the pre-migration behavior of this dialog.
     minChars: 3
   });
-  const suggestions = data?.results ?? [];
+  const suggestions = (data?.results ?? []).filter(
+    suggestion => !isCurrentEntity(suggestion, entityId)
+  );
 
   useEffect(() => {
     if (!isOpen) setSelectedEntity(null);
   }, [isOpen, setSelectedEntity]);
 
   const handleSelection = selection => {
-    if (selection) {
+    if (selection && !isCurrentEntity(selection, entityId)) {
       setSelectedEntity(nomelizeSearchEntity(selection));
     }
     setInputValue('');
@@ -291,7 +299,10 @@ export const DeleteConfirmationDialog = ({
               variant="contained"
               color="error"
               startIcon={<DeleteForeverIcon />}
-              disabled={isSearchMandatory && !selectedEntity}
+              disabled={
+                isCurrentEntity(selectedEntity, entityId) ||
+                (isSearchMandatory && !selectedEntity)
+              }
               onClick={() => {
                 onConfirmation(selectedEntity);
                 onClose();
@@ -417,6 +428,7 @@ Deleted.propTypes = {
 
 DeleteConfirmationDialog.propTypes = {
   entityType: DeletedCard.propTypes.entityType.isRequired,
+  entityId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   isOpen: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isPermanent: PropTypes.bool.isRequired,
