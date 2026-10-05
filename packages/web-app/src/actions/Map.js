@@ -1,3 +1,4 @@
+import { isClientError } from '@/utils/httpErrors';
 import {
   getMapCavesUrl,
   getMapCavesCoordinatesUrl,
@@ -63,7 +64,7 @@ export const LOADINGS = {
 // One-time cost on page load vs. a bounded API call on every pan/zoom.
 
 // Retries the fetch up to maxRetries times with exponential backoff (1 s, 2 s, 4 s…).
-// Rejects only after all attempts are exhausted.
+// Rejects client errors immediately and other failures after all attempts.
 //
 // Offline, retrying is pointless: the service worker either has a cached copy
 // (and answers on the first attempt) or it doesn't, and no amount of waiting
@@ -81,7 +82,6 @@ const fetchWithRetry = (url, maxRetries = 3) => {
     typeof navigator !== 'undefined' && navigator.onLine === false
       ? 0
       : maxRetries;
-  const isRetryable = error => !(error?.status >= 400 && error?.status < 500);
   const attempt = (retriesLeft, delay) =>
     fetch(url)
       .then(response => {
@@ -95,7 +95,7 @@ const fetchWithRetry = (url, maxRetries = 3) => {
         return response.text();
       })
       .catch(error => {
-        if (retriesLeft === 0 || !isRetryable(error)) throw error;
+        if (retriesLeft === 0 || isClientError(error)) throw error;
         return new Promise(resolve => {
           setTimeout(resolve, delay);
         }).then(() => attempt(retriesLeft - 1, delay * 2));

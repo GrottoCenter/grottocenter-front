@@ -1,6 +1,7 @@
 import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { enqueueSnackbar } from 'notistack';
 
+import { isClientError } from '@/utils/httpErrors';
 import store from '../store';
 import { postLogout } from '../actions/Login';
 
@@ -50,13 +51,14 @@ const notifyError = (error, meta) => {
     }
     return;
   }
-  // Mirror the legacy Redux ErrorHandler on 429: show the translated
-  // "Too many requests" toast rather than the generic fallback. The API's
+  // Use the same translated "Too many requests" message as the legacy Redux
+  // ErrorHandler on 429 rather than the generic fallback. The API's
   // body.code is not standardized across endpoints for rate-limiting, so
   // key off the HTTP status.
   if (error?.status === 429) {
     enqueueSnackbar(translate('Too many requests', 'Too many requests'), {
-      variant: 'error'
+      variant: 'error',
+      preventDuplicate: true
     });
     return;
   }
@@ -109,7 +111,7 @@ const queryClient = new QueryClient({
       // 5xx and no-response errors (network / offline mid-call) still get
       // one retry, matching the previous behavior for transient failures.
       retry: (failureCount, error) => {
-        if (error?.status >= 400 && error?.status < 500) return false;
+        if (isClientError(error)) return false;
         return failureCount < 1;
       },
 
