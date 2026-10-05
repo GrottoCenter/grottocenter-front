@@ -387,7 +387,10 @@ const ConversationDetail = () => {
   // maps to a distinct queryKey, so RQ caches every page independently and
   // switching threads keeps their scroll history warm.
   const [skip, setSkip] = useState(0);
+  const skipRef = useRef(skip);
+  skipRef.current = skip;
   const [accumulated, setAccumulated] = useState([]);
+  const isSendingRef = useRef(false);
 
   // Reset accumulation when navigating to a different conversation.
   useEffect(() => {
@@ -589,22 +592,30 @@ const ConversationDetail = () => {
   }
 
   const handleSend = async () => {
-    if (!replyText.trim() || replyText.length > 5000) return;
+    if (isSendingRef.current || !replyText.trim() || replyText.length > 5000)
+      return;
+    // Lock synchronously: repeated Enter events can arrive before the
+    // mutation's isPending state renders and disables the Send button.
+    isSendingRef.current = true;
     try {
       await sendMessageMutation.mutateAsync({
         conversationId,
         body: replyText.trim()
       });
       setReplyText('');
-      // Reset pagination so the freshly-sent message is visible: sending
-      // shifts every message down by one, so refetching the current skip>0
-      // page would overlap the previous page and hide the new message at
-      // skip=0. Snapping back to skip=0 reloads the head of the thread.
-      setSkip(0);
-      setAccumulated([]);
+      // At the head, the accumulation effect replaces messages when pageData
+      // changes. Preserve that list: an unchanged refetch can keep the same
+      // dependency reference and cannot refill a wipe (see issue #1535).
+      // Read the current skip because pagination can advance during the POST.
+      if (skipRef.current !== 0) {
+        setSkip(0);
+        setAccumulated([]);
+      }
     } catch (err) {
       console.error('Failed to send reply:', err);
       onError(formatMessage({ id: 'Failed to send message.' }));
+    } finally {
+      isSendingRef.current = false;
     }
   };
 
@@ -766,6 +777,7 @@ Message Body: ${body}`;
               size="small"
             />
             <SendButton
+              aria-label={formatMessage({ id: 'Send' })}
               onClick={handleSend}
               onMouseDown={e => e.preventDefault()}
               disabled={
