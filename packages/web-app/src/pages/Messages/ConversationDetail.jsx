@@ -387,7 +387,10 @@ const ConversationDetail = () => {
   // maps to a distinct queryKey, so RQ caches every page independently and
   // switching threads keeps their scroll history warm.
   const [skip, setSkip] = useState(0);
+  const skipRef = useRef(skip);
+  skipRef.current = skip;
   const [accumulated, setAccumulated] = useState([]);
+  const isSendingRef = useRef(false);
 
   // Reset accumulation when navigating to a different conversation.
   useEffect(() => {
@@ -589,27 +592,30 @@ const ConversationDetail = () => {
   }
 
   const handleSend = async () => {
-    if (!replyText.trim() || replyText.length > 5000) return;
+    if (isSendingRef.current || !replyText.trim() || replyText.length > 5000)
+      return;
+    // Lock synchronously: repeated Enter events can arrive before the
+    // mutation's isPending state renders and disables the Send button.
+    isSendingRef.current = true;
     try {
       await sendMessageMutation.mutateAsync({
         conversationId,
         body: replyText.trim()
       });
       setReplyText('');
-      // Snap back to the head of the thread only when the user had scrolled
-      // older pages in: at skip>0, refetching the current page would overlap
-      // the previous page and hide the new message. At skip=0 the mutation's
-      // invalidation has already repopulated pageData, so wiping accumulated
-      // here would leave an empty list with a dead "Load more" button (the
-      // useEffect that refills accumulated is keyed on pageData/skip/isSuccess
-      // and none of them changes afterwards — see issue #1535).
-      if (skip !== 0) {
+      // At the head, the accumulation effect replaces messages when pageData
+      // changes. Preserve that list: an unchanged refetch can keep the same
+      // dependency reference and cannot refill a wipe (see issue #1535).
+      // Read the current skip because pagination can advance during the POST.
+      if (skipRef.current !== 0) {
         setSkip(0);
         setAccumulated([]);
       }
     } catch (err) {
       console.error('Failed to send reply:', err);
       onError(formatMessage({ id: 'Failed to send message.' }));
+    } finally {
+      isSendingRef.current = false;
     }
   };
 
@@ -771,6 +777,7 @@ Message Body: ${body}`;
               size="small"
             />
             <SendButton
+              aria-label={formatMessage({ id: 'Send' })}
               onClick={handleSend}
               onMouseDown={e => e.preventDefault()}
               disabled={
