@@ -50,6 +50,16 @@ const notifyError = (error, meta) => {
     }
     return;
   }
+  // Mirror the legacy Redux ErrorHandler on 429: show the translated
+  // "Too many requests" toast rather than the generic fallback. The API's
+  // body.code is not standardized across endpoints for rate-limiting, so
+  // key off the HTTP status.
+  if (error?.status === 429) {
+    enqueueSnackbar(translate('Too many requests', 'Too many requests'), {
+      variant: 'error'
+    });
+    return;
+  }
   const fallback = translate(
     'unexpected error',
     'An unexpected error occurred'
@@ -90,7 +100,18 @@ const queryClient = new QueryClient({
       // The default (3 attempts, exponential backoff) compounds with the service
       // worker's 5s networkTimeoutSeconds: a genuinely dead request would take
       // ~25s to surface, against a single attempt today.
-      retry: 1,
+      //
+      // Skip the retry for any 4xx: these are deterministic server answers
+      // (401/403/404/409/422/429/…) and replaying them cannot change the
+      // outcome. 429 specifically — now that the API buckets requests per
+      // client IP (grottocenter-api#1848) — would see the retry attempt
+      // count against the same bucket and prolong the rate-limit window.
+      // 5xx and no-response errors (network / offline mid-call) still get
+      // one retry, matching the previous behavior for transient failures.
+      retry: (failureCount, error) => {
+        if (error?.status >= 400 && error?.status < 500) return false;
+        return failureCount < 1;
+      },
 
       // Explicit, not inherited: the app never refetched on focus, and turning
       // that on by accident would multiply real API calls across the board.
