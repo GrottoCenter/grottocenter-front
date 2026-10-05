@@ -103,6 +103,23 @@ describe('Simple pages loader to check all major pages load correctly', () => {
   it('api page', () => {
     cy.visit('/api');
     cy.checkPageLoaded();
+    // SwaggerUI fetches swagger.yaml to render the spec. The catch-all mock
+    // above returns `{}`, which SwaggerUI parses as an empty spec and never
+    // produces an `.info .title`. Override with a minimal valid OpenAPI
+    // document so the UI has something to render.
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/swagger.yaml' },
+      {
+        statusCode: 200,
+        headers: { 'content-type': 'application/yaml' },
+        body: `openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+paths: {}
+`
+      }
+    );
     cy.visit('/api/1');
     // Wait for SwaggerUI to fully load and render
     cy.get('.swagger-ui', { timeout: 30000 }).should('be.visible');
