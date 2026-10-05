@@ -348,7 +348,8 @@ const Document = ({
         iconType: 'massif',
         label: entity.name,
         secondary: formatMessage({ id: 'Massif' }),
-        url: `/ui/massifs/${entity.id}`
+        url: `/ui/massifs/${entity.id}`,
+        canUnlink: false
       })),
       ...(documentData.cave
         ? [
@@ -358,7 +359,8 @@ const Document = ({
               iconType: 'network',
               label: documentData.cave.name,
               secondary: formatMessage({ id: 'Cave' }),
-              url: `/ui/caves/${documentData.cave.id}`
+              url: `/ui/caves/${documentData.cave.id}`,
+              canUnlink: false
             }
           ]
         : []),
@@ -843,11 +845,13 @@ const Document = ({
                         entities={linkedEntities}
                         onUnlink={
                           canUnlinkEntrances
-                            ? entity =>
-                                unlinkEntranceMutation.mutateAsync({
+                            ? entity => {
+                                if (entity.type !== 'entrance') return null;
+                                return unlinkEntranceMutation.mutateAsync({
                                   entranceId: entity.id,
                                   documentId: documentData.id
-                                })
+                                });
+                              }
                             : undefined
                         }
                         isUnlinking={unlinkEntranceMutation.isPending}
