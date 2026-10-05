@@ -214,7 +214,6 @@ export const DeleteConfirmationDialog = ({
   const canSelectRedirect = Boolean(entityType.searchType);
   const [inputValue, setInputValue] = useState('');
   const [selectedEntity, setSelectedEntity] = useState(null);
-  const [hasSelfSelectionError, setHasSelfSelectionError] = useState(false);
   const debouncedInput = useDebounce(inputValue);
   const {
     data,
@@ -234,18 +233,11 @@ export const DeleteConfirmationDialog = ({
   );
 
   useEffect(() => {
-    if (!isOpen) {
-      setSelectedEntity(null);
-      setHasSelfSelectionError(false);
-    }
+    if (!isOpen) setSelectedEntity(null);
   }, [isOpen, setSelectedEntity]);
 
   const handleSelection = selection => {
-    if (isCurrentEntity(selection, entityId)) {
-      setHasSelfSelectionError(true);
-      return;
-    }
-    setHasSelfSelectionError(false);
+    if (isCurrentEntity(selection, entityId)) return;
     if (selection) {
       setSelectedEntity(nomelizeSearchEntity(selection));
     }
@@ -349,12 +341,9 @@ export const DeleteConfirmationDialog = ({
             {!selectedEntity && (
               <>
                 <AutoCompleteSearch
-                  onInputChange={value => {
-                    setInputValue(value);
-                    setHasSelfSelectionError(false);
-                  }}
+                  onInputChange={setInputValue}
                   onSelection={handleSelection}
-                  hasError={!!error || hasSelfSelectionError}
+                  hasError={!!error}
                   isLoading={isQuickSearchLoading}
                   label={formatMessage(
                     {
@@ -366,13 +355,18 @@ export const DeleteConfirmationDialog = ({
                   inputValue={inputValue}
                   suggestions={suggestions}
                 />
-                <FormHelperText
-                  error={hasSelfSelectionError}
-                  aria-live="polite">
+                <FormHelperText>
                   {formatMessage({
                     id: 'An entity cannot redirect to itself.'
                   })}
                 </FormHelperText>
+                {!!error && (
+                  <FormHelperText error role="alert">
+                    {formatMessage({
+                      id: 'Unable to search for a replacement. Please try again.'
+                    })}
+                  </FormHelperText>
+                )}
               </>
             )}
 
