@@ -11,6 +11,7 @@ import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ShareIcon from '@mui/icons-material/Share';
 import { NavigateNext } from '@mui/icons-material';
+import { getPostDeletionUrl } from '@/utils/deletedEntityRedirect';
 import { LicenseBadge } from '@/components/common/LicenseTag';
 import {
   DEFAULT_COLLECTION_SORT_ORDER,
@@ -206,8 +207,24 @@ const Document = ({
 
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
-    deleteMutation.mutate({ id: documentData.id, entityId, isPermanent });
-    if (isPermanent) navigate('/', { replace: true });
+    deleteMutation.mutate(
+      { id: documentData.id, entityId, isPermanent },
+      {
+        onSuccess: () => {
+          if (isPermanent) {
+            navigate(
+              getPostDeletionUrl(
+                DELETED_ENTITIES.document,
+                entityId,
+                documentData.redirectTo
+              ),
+              { replace: true }
+            );
+          }
+        },
+        onError: () => setWantedDeletedState(documentData?.isDeleted ?? false)
+      }
+    );
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
