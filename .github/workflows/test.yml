@@ -57,9 +57,15 @@ jobs:
         # of silently calling production and burning the 200 req / 10 min / IP
         # budget (issue #1554). Cypress intercepts match by pathname, so the
         # explicit mocks keep working regardless of the host.
+        #
+        # The port must NOT be on the WHATWG Fetch "bad ports" list
+        # (https://fetch.spec.whatwg.org/#port-blocking) — Chrome and Firefox
+        # refuse those requests at the browser layer, before CDP/proxy
+        # intercepts can see them, so every `cy.wait('@alias')` would time
+        # out. 9999 is high, unassigned, and not on the list.
         run: yarn build
         env:
-          VITE_API_URL: http://127.0.0.1:1
+          VITE_API_URL: http://127.0.0.1:9999
       - name: Share built app
         uses: actions/upload-artifact@v4
         with:
