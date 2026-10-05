@@ -1,4 +1,13 @@
-describe('Simple pages loader to check all major pages load correctly', () => {
+describe('All major pages render their shell without crashing', () => {
+  // Intercept every API call so this suite can't leak traffic to the
+  // production API from CI (see issue #1554). The catch-all returns {},
+  // which is enough for this smoke test: `checkPageLoaded` only asserts
+  // that the page shell rendered an h1 — PageTitle shows a Skeleton while
+  // data is missing, which keeps h1 non-empty.
+  beforeEach(() => {
+    cy.mockApiCatchAll();
+  });
+
   it('home page', () => {
     cy.visit('/');
     cy.checkPageLoaded();
@@ -41,18 +50,12 @@ describe('Simple pages loader to check all major pages load correctly', () => {
   });
 
   it('entrance page', () => {
-    cy.visit('/entrances/35120'); // Entrance with a lot of data
-    cy.checkPageLoaded();
-
-    cy.visit('/entrances/6085'); // Entrance with almost no data
+    cy.visit('/entrances/35120');
     cy.checkPageLoaded();
   });
 
   it('cave page', () => {
-    cy.visit('/caves/75363'); // Cave with lot of entrances
-    cy.checkPageLoaded();
-
-    cy.visit('/caves/6085'); // Cave with almost no data
+    cy.visit('/caves/75363');
     cy.checkPageLoaded();
   });
 
@@ -62,11 +65,7 @@ describe('Simple pages loader to check all major pages load correctly', () => {
   });
 
   it('document page', () => {
-    cy.visit('/documents/22695'); // Collection
-    cy.checkPageLoaded();
-    cy.visit('/documents/58048'); // Issue
-    cy.checkPageLoaded();
-    cy.visit('/documents/73936'); // Article
+    cy.visit('/documents/22695');
     cy.checkPageLoaded();
   });
 
@@ -82,6 +81,13 @@ describe('Simple pages loader to check all major pages load correctly', () => {
   });
 
   it('region page', () => {
+    // Region's PageTitle renders '' (empty h1) when the fetched region has no
+    // name — the catch-all's `{}` triggers that branch. Return a minimal shape
+    // with a name so the h1 is non-empty.
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/countries/US/regions/TN' },
+      { statusCode: 200, body: { id: 'TN', name: 'Tennessee' } }
+    );
     cy.visit('/countries/US/regions/TN');
     cy.checkPageLoaded();
   });
@@ -92,6 +98,23 @@ describe('Simple pages loader to check all major pages load correctly', () => {
   });
 
   it('api page', () => {
+    // SwaggerUI fetches swagger.yaml to render the spec. The catch-all mock
+    // above returns `{}`, which SwaggerUI parses as an empty spec and never
+    // produces an `.info .title`. Override with a minimal valid OpenAPI
+    // document so the UI has something to render.
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/swagger.yaml' },
+      {
+        statusCode: 200,
+        headers: { 'content-type': 'application/yaml' },
+        body: `openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+paths: {}
+`
+      }
+    );
     cy.visit('/api');
     cy.checkPageLoaded();
     cy.visit('/api/1');

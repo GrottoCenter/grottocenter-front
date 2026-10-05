@@ -25,7 +25,11 @@ const selectObservationsFile = () =>
 describe('Import Observations Wizard', () => {
   describe('Unauthenticated user', () => {
     it('shows authentication error when navigating to import page', () => {
-      // Requirement 16.1, 16.2: PrivateRoute protects the import page
+      // Requirement 16.1, 16.2: PrivateRoute protects the import page.
+      // The "Happy path" sibling block already mocks the API in its own
+      // beforeEach; this block hit production because the bootstrap fetches
+      // on page load ran before the auth guard redirected (issue #1554).
+      cy.mockApiCatchAll();
       cy.visit(IMPORT_URL);
 
       // The wizard should not render — auth guard blocks access

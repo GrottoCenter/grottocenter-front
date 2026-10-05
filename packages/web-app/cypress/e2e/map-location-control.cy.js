@@ -58,6 +58,11 @@ const stubOrientation = win => {
 };
 
 const visitMap = () => {
+  // The map triggers bulk-coordinate fetches on every pan/zoom. The suite
+  // under test is the location/orientation control, not the map data — mock
+  // the API out so CI doesn't hit the production bulk-coordinate endpoint
+  // three times per run (see issue #1554).
+  cy.mockApiCatchAll();
   cy.visit('/map', {
     onBeforeLoad: win => {
       stubGeolocation(win);
