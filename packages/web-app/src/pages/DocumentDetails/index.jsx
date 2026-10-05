@@ -57,6 +57,7 @@ import {
   useRestoreDocument,
   useLinkDocumentToEntrances,
   useUnlinkDocumentToEntrance,
+  useUnlinkDocumentToMassif,
   useLanguages,
   useLicenses,
   findLicenseByName,
@@ -159,6 +160,7 @@ const Document = ({
   const restoreMutation = useRestoreDocument();
   const linkEntranceMutation = useLinkDocumentToEntrances();
   const unlinkEntranceMutation = useUnlinkDocumentToEntrance();
+  const unlinkMassifMutation = useUnlinkDocumentToMassif();
   const [isEntranceSearchVisible, setIsEntranceSearchVisible] = useState(false);
   const { data: languages = [] } = useLanguages();
   const { locale } = useSelector(state => state.intl);
@@ -196,7 +198,8 @@ const Document = ({
   // Unlink is moderator-only in the backend (see entrance/unlink-document.js
   // in grottocenter-api), so the gating here is intentionally narrower than
   // the Associate side above — don't align them.
-  const canUnlinkEntrances = permissions.isModerator && canAssociateEntrances;
+  const canUnlinkLinkedEntities =
+    permissions.isModerator && canAssociateEntrances;
   const isEntranceSearchOpen = canAssociateEntrances && isEntranceSearchVisible;
 
   // The document detail only carries the license name; resolve the full license
@@ -349,7 +352,7 @@ const Document = ({
         label: entity.name,
         secondary: formatMessage({ id: 'Massif' }),
         url: `/ui/massifs/${entity.id}`,
-        canUnlink: false
+        canUnlink: true
       })),
       ...(documentData.cave
         ? [
@@ -844,17 +847,28 @@ const Document = ({
                       <LinkedEntityCards
                         entities={linkedEntities}
                         onUnlink={
-                          canUnlinkEntrances
+                          canUnlinkLinkedEntities
                             ? entity => {
-                                if (entity.type !== 'entrance') return null;
-                                return unlinkEntranceMutation.mutateAsync({
-                                  entranceId: entity.id,
-                                  documentId: documentData.id
-                                });
+                                if (entity.type === 'entrance') {
+                                  return unlinkEntranceMutation.mutateAsync({
+                                    entranceId: entity.id,
+                                    documentId: documentData.id
+                                  });
+                                }
+                                if (entity.type === 'massif') {
+                                  return unlinkMassifMutation.mutateAsync({
+                                    massifId: entity.id,
+                                    documentId: documentData.id
+                                  });
+                                }
+                                return null;
                               }
                             : undefined
                         }
-                        isUnlinking={unlinkEntranceMutation.isPending}
+                        isUnlinking={
+                          unlinkEntranceMutation.isPending ||
+                          unlinkMassifMutation.isPending
+                        }
                       />
                     ) : (
                       !isEntranceSearchOpen && (
