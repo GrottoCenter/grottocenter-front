@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 import HistoryIcon from '@mui/icons-material/History';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteRounded';
-import DeleteForeverIcon from '@mui/icons-material/RemoveCircleRounded';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForeverRounded';
 import RestoreIcon from '@mui/icons-material/RestoreFromTrashRounded';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
@@ -60,6 +60,10 @@ const ActionButtons = ({
       icon: <RestoreIcon />,
       label: formatMessage({ id: 'Restore' }),
       onClick: onRestorePress,
+      // Secondary so restore reads as the discreet counterpart to the
+      // red "Permanently delete" sitting next to it on a deleted item,
+      // matching the hierarchy used by the entity-level DeletedCard.
+      color: 'secondary',
       hidden: !(!isUpdating && canDelete && isDeleted)
     },
     {

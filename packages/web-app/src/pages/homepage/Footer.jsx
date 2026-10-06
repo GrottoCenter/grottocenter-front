@@ -68,10 +68,6 @@ const LicenseBadgeFrame = styled(Box)({
 
 const FOOTER_BADGE_SIZE = 36;
 
-// Injected at build time by CI from the version being tagged; falls back to the
-// .env placeholder in local development.
-const appVersion = import.meta.env.VITE_APP_VERSION;
-
 const LicenseBar = styled(Box)({
   borderTop: '1px solid rgba(255,255,255,0.1)',
   padding: '14px 24px',
@@ -131,6 +127,8 @@ const PlainButton = styled('button')({
 const Footer = () => {
   const { formatMessage } = useIntl();
   const { openBi, isOpening } = useOpenBi();
+  const appVersion = import.meta.env.VITE_APP_VERSION;
+  const isPublishedVersion = /^\d+\.\d+\.\d+$/.test(appVersion ?? '');
 
   return (
     <FooterRoot>
@@ -364,7 +362,18 @@ const Footer = () => {
               display: 'block',
               textAlign: 'center'
             }}>
-            Grottocenter web v{appVersion}
+            {isPublishedVersion ? (
+              <AppLink
+                href={`https://github.com/GrottoCenter/grottocenter-front/releases/tag/${appVersion}`}
+                sx={{
+                  color: 'rgba(255,255,255,0.75)',
+                  '&:hover': { color: 'white' }
+                }}>
+                Grottocenter web v{appVersion}
+              </AppLink>
+            ) : (
+              `Grottocenter web v${appVersion}`
+            )}
           </Typography>
         )}
       </LicenseBar>

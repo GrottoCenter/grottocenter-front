@@ -67,6 +67,48 @@ it('confirms an optional unlink action', async () => {
   expect(onUnlink).toHaveBeenCalledWith(entities[0]);
 });
 
+it('hides the unlink button on entities that opt out', async () => {
+  const onUnlink = vi.fn();
+  renderCards({
+    linkedEntities: [
+      {
+        id: 7,
+        type: 'massif',
+        iconType: 'massif',
+        label: 'Vercors',
+        secondary: 'Massif',
+        url: '/ui/massifs/7',
+        canUnlink: false
+      },
+      {
+        id: 11,
+        type: 'cave',
+        iconType: 'network',
+        label: 'Reseau',
+        secondary: 'Cave',
+        url: '/ui/caves/11',
+        canUnlink: false
+      },
+      {
+        id: 42,
+        type: 'entrance',
+        iconType: 'entrance',
+        label: 'Grotte exemple',
+        secondary: 'Entrance',
+        url: '/ui/entrances/42',
+        canUnlink: true
+      }
+    ],
+    onUnlink
+  });
+
+  expect(screen.queryByRole('button', { name: 'unlink Vercors' })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'unlink Reseau' })).toBeNull();
+  expect(
+    screen.getByRole('button', { name: 'unlink Grotte exemple' })
+  ).toBeInTheDocument();
+});
+
 it('closes the unlink dialog when its entity is removed', async () => {
   const user = userEvent.setup();
   const onUnlink = vi.fn();

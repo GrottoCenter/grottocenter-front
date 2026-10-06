@@ -1,7 +1,7 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import { Box, Breadcrumbs, Card } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -12,6 +12,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import BiotechIcon from '@mui/icons-material/Biotech';
 import { useReactToPrint } from 'react-to-print';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 import AppLink from '../../common/AppLink';
 
 import {
@@ -64,7 +65,6 @@ export const Network = ({
   cave
 }) => {
   const { formatMessage } = useIntl();
-  const navigate = useNavigate();
   const { caveId } = useParams();
   const { isAuth, isAdmin, isModerator } = usePermissions();
   const deleteMutation = useDeleteCave();
@@ -76,13 +76,15 @@ export const Network = ({
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+  const { onDeletePress, wantedDeletedState, setWantedDeletedState } =
+    usePostDeletion({
+      entityType: DELETED_ENTITIES.network,
+      id: caveId,
+      entity: cave,
+      deleteMutation
+    });
   const handleShare = useSharePage();
   const handlePrint = useReactToPrint({ contentRef: componentRef });
-
-  useEffect(() => {
-    if (cave) setWantedDeletedState(cave.isDeleted);
-  }, [cave]);
 
   const isActionLoading = wantedDeletedState !== cave?.isDeleted;
   const country = cave?.entrances?.[0]?.country;
@@ -95,11 +97,6 @@ export const Network = ({
     };
   }
 
-  const onDeletePress = (entityId, isPermanent) => {
-    setWantedDeletedState(true);
-    deleteMutation.mutate({ id: caveId, entityId, isPermanent });
-    if (isPermanent) navigate('/', { replace: true });
-  };
   const onRestorePress = () => {
     setWantedDeletedState(false);
     restoreMutation.mutate({ id: caveId });
@@ -263,6 +260,7 @@ export const Network = ({
                 )}
                 <DeleteConfirmationDialog
                   entityType={DELETED_ENTITIES.network}
+                  entityId={cave.id}
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
                   isPermanent={isDeleteConfirmationPermanent}

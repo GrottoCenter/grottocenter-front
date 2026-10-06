@@ -55,24 +55,29 @@ const LinkedEntityCards = ({
           const unlinkLabel = `${formatMessage({ id: 'unlink' })} ${
             entity.label
           }`;
-          const itemActionButton = onUnlink ? (
-            <OfflineDisabled disabled={!isOnline}>
-              <Tooltip
-                title={formatMessage({ id: 'unlink' })}
-                disableTouchListener>
-                <span>
-                  <IconButton
-                    aria-label={unlinkLabel}
-                    color="error"
-                    disabled={!isOnline || isBusy}
-                    onClick={() => setEntityToUnlink(entity)}
-                    sx={{ touchAction: 'manipulation' }}>
-                    <LinkOffIcon />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </OfflineDisabled>
-          ) : null;
+          // Entities default to unlinkable so existing callers (massifs, caves)
+          // keep their behaviour; opt out per entity when the entity's own
+          // endpoint doesn't support it or isn't wired up yet.
+          const canUnlinkEntity = entity.canUnlink !== false;
+          const itemActionButton =
+            onUnlink && canUnlinkEntity ? (
+              <OfflineDisabled disabled={!isOnline}>
+                <Tooltip
+                  title={formatMessage({ id: 'unlink' })}
+                  disableTouchListener>
+                  <span>
+                    <IconButton
+                      aria-label={unlinkLabel}
+                      color="error"
+                      disabled={!isOnline || isBusy}
+                      onClick={() => setEntityToUnlink(entity)}
+                      sx={{ touchAction: 'manipulation' }}>
+                      <LinkOffIcon />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </OfflineDisabled>
+            ) : null;
 
           return (
             <EntityCard
@@ -150,7 +155,8 @@ LinkedEntityCards.propTypes = {
       iconType: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
       secondary: PropTypes.string,
-      url: PropTypes.string.isRequired
+      url: PropTypes.string.isRequired,
+      canUnlink: PropTypes.bool
     })
   ),
   emptyMessage: PropTypes.node,

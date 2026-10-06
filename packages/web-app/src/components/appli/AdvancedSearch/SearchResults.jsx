@@ -3,7 +3,13 @@ import { useAdvancedSearch, refineAdvancedSearch } from '../../../hooks';
 import { downloadAdvancedSearchResults } from '../../../actions/Advancedsearch';
 import EntityTable from '../../common/EntityTable';
 
-const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
+const SearchResults = ({
+  onSelected,
+  onRowClick,
+  hideExport,
+  entityType,
+  compact
+}) => {
   const { data, isFetching, isNewQuery, params } = useAdvancedSearch();
   const results = data?.results;
   const totalResults = data?.totalResults ?? 0;
@@ -43,6 +49,7 @@ const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
             }
       }
       onSelected={!onSelected ? null : ids => onSelected(ids, results)}
+      onRowClick={onRowClick}
       compact={compact}
     />
   );
@@ -50,6 +57,7 @@ const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
 
 SearchResults.propTypes = {
   onSelected: PropTypes.func,
+  onRowClick: PropTypes.func,
   hideExport: PropTypes.bool,
   entityType: PropTypes.string,
   compact: PropTypes.bool

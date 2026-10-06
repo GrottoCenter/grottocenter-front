@@ -8,6 +8,7 @@ import {
   Card,
   Stack,
   IconButton,
+  FormHelperText,
   Typography,
   CircularProgress
 } from '@mui/material';
@@ -15,6 +16,7 @@ import RestoreIcon from '@mui/icons-material/RestoreFromTrashRounded';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForeverRounded';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import { getDeletedEntityRedirectUrl } from '@/utils/deletedEntityRedirect';
 
 import StandardDialog from '../StandardDialog';
 import Alert from '../Alert';
@@ -65,6 +67,11 @@ export const DELETED_ENTITIES = {
   }
 };
 
+const isCurrentEntity = (candidate, entityId) =>
+  candidate?.id != null &&
+  entityId != null &&
+  String(candidate.id) === String(entityId);
+
 const StyledEntityIcon = styled(EntityIcon)`
   float: left;
 `;
@@ -88,9 +95,10 @@ export const DeletedCard = ({
 }) => {
   const { formatMessage } = useIntl();
   const entityI18n = formatMessage({ id: entityType.str });
-  const redirectToUrl = entity.redirectTo
-    ? entityType.url + entity.redirectTo
-    : null;
+  const redirectToUrl = getDeletedEntityRedirectUrl(
+    entityType,
+    entity.redirectTo
+  );
 
   const hasActions =
     !!redirectToUrl ||
@@ -194,6 +202,7 @@ export const DeletedCard = ({
 
 export const DeleteConfirmationDialog = ({
   entityType,
+  entityId,
   isOpen,
   isLoading,
   isPermanent,
@@ -219,13 +228,16 @@ export const DeleteConfirmationDialog = ({
     // character earlier than the pre-migration behavior of this dialog.
     minChars: 3
   });
-  const suggestions = data?.results ?? [];
+  const suggestions = (data?.results ?? []).filter(
+    suggestion => !isCurrentEntity(suggestion, entityId)
+  );
 
   useEffect(() => {
     if (!isOpen) setSelectedEntity(null);
   }, [isOpen, setSelectedEntity]);
 
   const handleSelection = selection => {
+    if (isCurrentEntity(selection, entityId)) return;
     if (selection) {
       setSelectedEntity(nomelizeSearchEntity(selection));
     }
@@ -327,21 +339,35 @@ export const DeleteConfirmationDialog = ({
           <>
             <Typography>{searchTitle}</Typography>
             {!selectedEntity && (
-              <AutoCompleteSearch
-                onInputChange={setInputValue}
-                onSelection={handleSelection}
-                hasError={!!error}
-                isLoading={isQuickSearchLoading}
-                label={formatMessage(
-                  {
-                    id: `Search for a {entityFmt}`,
-                    defaultMessage: `Search for a {entityFmt}`
-                  },
-                  { entityFmt }
+              <>
+                <AutoCompleteSearch
+                  onInputChange={setInputValue}
+                  onSelection={handleSelection}
+                  hasError={!!error}
+                  isLoading={isQuickSearchLoading}
+                  label={formatMessage(
+                    {
+                      id: `Search for a {entityFmt}`,
+                      defaultMessage: `Search for a {entityFmt}`
+                    },
+                    { entityFmt }
+                  )}
+                  inputValue={inputValue}
+                  suggestions={suggestions}
+                />
+                <FormHelperText>
+                  {formatMessage({
+                    id: 'An entity cannot redirect to itself.'
+                  })}
+                </FormHelperText>
+                {!!error && (
+                  <FormHelperText error role="alert">
+                    {formatMessage({
+                      id: 'Unable to search for a replacement. Please try again.'
+                    })}
+                  </FormHelperText>
                 )}
-                inputValue={inputValue}
-                suggestions={suggestions}
-              />
+              </>
             )}
 
             {selectedEntity && (
@@ -417,6 +443,7 @@ Deleted.propTypes = {
 
 DeleteConfirmationDialog.propTypes = {
   entityType: DeletedCard.propTypes.entityType.isRequired,
+  entityId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   isOpen: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isPermanent: PropTypes.bool.isRequired,

@@ -52,11 +52,11 @@ const SectionTitle = ({
       </Typography>
       <Typography
         variant="h4"
-        noWrap
         sx={{
           fontStyle: 'italic',
           textDecoration: 'line-through',
-          display: 'inline-block',
+          display: 'inline',
+          overflowWrap: 'anywhere',
           fontWeight: 'normal'
         }}>
         {heading}
