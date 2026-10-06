@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import js from '@eslint/js';
+import { fixupConfigRules } from '@eslint/compat';
 import { FlatCompat } from '@eslint/eslintrc';
 import cypress from 'eslint-plugin-cypress';
 import prettier from 'eslint-plugin-prettier';
@@ -9,8 +10,8 @@ import storybook from 'eslint-plugin-storybook';
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
 
-// eslint-config-airbnb has no flat build and is no longer released, so it is
-// converted on the fly. Everything else below is a native flat config.
+// Airbnb has no flat build, and its plugins still use rule APIs removed in
+// ESLint 10. Convert its preset and adapt those plugins without changing rules.
 const compat = new FlatCompat({ baseDirectory: currentDir });
 
 export const files = ['**/*.{js,jsx,mjs,cjs,ts,tsx}'];
@@ -21,12 +22,14 @@ export default [
   // airbnb ships `no-nested-ternary`, `consistent-return`, `react/prop-types`
   // and the a11y set at `error`. AGENTS.md commits to keeping them there:
   // any override in the block below must state why explicitly.
-  ...compat.extends(
-    'airbnb',
-    'airbnb/hooks',
-    // Disables react/react-in-jsx-scope: React 17+ automatic JSX runtime
-    'plugin:react/jsx-runtime',
-    'prettier'
+  ...fixupConfigRules(
+    compat.extends(
+      'airbnb',
+      'airbnb/hooks',
+      // Disables react/react-in-jsx-scope: React 17+ automatic JSX runtime
+      'plugin:react/jsx-runtime',
+      'prettier'
+    )
   ),
   ...storybook.configs['flat/recommended'],
   {

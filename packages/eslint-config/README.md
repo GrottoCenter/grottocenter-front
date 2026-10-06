@@ -2,7 +2,7 @@
 
 These are settings for [ESLint](https://eslint.org/), in the
 [flat config](https://eslint.org/docs/latest/use/configure/configuration-files)
-format (ESLint 9+). Legacy `.eslintrc` files are not supported.
+format (ESLint 10+). Legacy `.eslintrc` files are not supported.
 
 ## What it does
 
@@ -11,8 +11,15 @@ React, React Hooks, import, jsx-a11y, Cypress and Storybook rules. Check
 [index.mjs](index.mjs) to see what is included and why each rule deviates.
 
 `eslint-config-airbnb` has no flat build and is no longer released, so it is
-converted at load time through `FlatCompat`. Everything else is wired through
-its own flat export.
+converted at load time through `FlatCompat`. `fixupConfigRules` from
+`@eslint/compat` adapts its plugins to the rule APIs used by ESLint 10 while
+preserving the Airbnb rules. Everything else uses its own flat export.
+
+Yarn's `YN0060` peer warning about ESLint 10 and Airbnb is known and accepted:
+Airbnb still declares ESLint `^7.32.0 || ^8.2.0`, which excludes ESLint 10.
+The compatibility layer above lets us retain the Airbnb rules with ESLint 10;
+do not downgrade ESLint to satisfy this outdated peer range. Full repository
+lint verifies the adapted configuration.
 
 ## Installing
 
@@ -23,7 +30,7 @@ yarn install --dev @grotto-front/eslint-config
 ```
 
 Then install the peer dependencies listed in `package.json` — ESLint itself,
-`@eslint/js`, `@eslint/eslintrc`, and the shared plugins.
+`@eslint/js`, `@eslint/eslintrc`, `@eslint/compat`, and the shared plugins.
 
 ## Usage
 

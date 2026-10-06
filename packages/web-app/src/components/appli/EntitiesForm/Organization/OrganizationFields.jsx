@@ -1,10 +1,5 @@
 import { useIntl } from 'react-intl';
-// import { useWatch } from 'react-hook-form'; // To uncomment when API will accept phone number
 import PropTypes from 'prop-types';
-// import PhoneInput from 'react-phone-input-2'; // To uncomment when API will accept phone number
-
-// import { useDebounce } from '../../../../hooks'; // To uncomment when API will accept phone number
-// import 'react-phone-input-2/lib/style.css'; // To uncomment when API will accept phone number
 
 import InputText from '../utils/InputText';
 import InputCountry from '../utils/InputCountry';
@@ -15,11 +10,6 @@ import { FormRow, FormSectionLabel } from '../utils/FormContainers';
 const OrganizationFields = ({ control, errors, isNewOrganization }) => {
   const { formatMessage } = useIntl();
   return (
-    /* const debouncedPhone = useDebounce(  // To uncomment when API will accept phone number
-    useWatch({ control, name: 'organization.phone' }),
-    300
-  ); */
-
     <>
       <FormSectionLabel label={formatMessage({ id: 'Basic Information' })} />
       <FormRow>
@@ -72,22 +62,6 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
         label={formatMessage({ id: 'Additional information' })}
       />
       <FormRow>
-        {/* To uncomment when API will accept phone number
-        <Controller
-          name="organization.phone"
-          control={control}
-          render={({ field: { onChange } }) => (
-            <FormControl error={!!errors?.organization?.phone}>
-              <PhoneInput
-                value={debouncedPhone || ''}
-                country=""
-                onChange={onChange}
-              />
-            </FormControl>
-          )}
-        />
-        */}
-
         <InputText
           formKey="organization.mail"
           labelName="Email"
@@ -169,7 +143,6 @@ OrganizationFields.propTypes = {
       addressLine2: PropTypes.shape({ message: PropTypes.string }),
       zipCode: PropTypes.shape({ message: PropTypes.string }),
       city: PropTypes.shape({ message: PropTypes.string }),
-      phone: PropTypes.shape({ message: PropTypes.string }),
       mail: PropTypes.shape({ message: PropTypes.string }),
       url: PropTypes.shape({ message: PropTypes.string }),
       latitude: PropTypes.shape({ message: PropTypes.string }),

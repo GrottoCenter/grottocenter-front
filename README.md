@@ -15,6 +15,7 @@ This project uses [Yarn](https://yarnpkg.com/) & [Yarn workspaces](https://yarnp
 ## 🚀 Getting Started
 
 - Install [Node.js](https://nodejs.org) (v24.15 minimum, v24.20.0 recommended) and [Yarn](https://yarnpkg.com/getting-started/install)
+- Install [Git](https://git-scm.com/downloads) (v2.32.0 minimum for the commit hooks)
 - Run `yarn` to install dependencies
 - Run `yarn start` to launch the app
 
@@ -118,6 +119,11 @@ Copy-Item -Recurse -Force .agents\skills\* .claude\skills\
 #### Hooks
 
 To prevent bad commits, we use [Husky](https://github.com/typicode/husky) Git hooks.
+
+`yarn install` installs the hooks through the `postinstall` script (Yarn 4 does
+not run `prepare`). To reinstall them manually, run `yarn postinstall`.
+The pre-commit hook hides unstaged edits while running ESLint and sorting the
+staged translation files, then restores those edits after the tasks finish.
 
 #### Commit type
 

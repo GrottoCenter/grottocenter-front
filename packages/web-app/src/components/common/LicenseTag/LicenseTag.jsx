@@ -17,7 +17,7 @@ const LicenseTag = ({ license, size = 34, recommended = false }) => {
   const { name, text, isCc, clauses, badgeSrc } = getLicenseParts(license);
   if (!name) return null;
 
-  let description = null;
+  let description;
   if (isCc) {
     description =
       clauses.length > 0

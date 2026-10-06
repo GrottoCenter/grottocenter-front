@@ -1,5 +1,4 @@
 import { useTheme, styled } from '@mui/material/styles';
-import makeStyles from '@mui/styles/makeStyles';
 import { useIntl } from 'react-intl';
 import {
   Table,
@@ -11,15 +10,6 @@ import {
   TableFooter,
   Paper
 } from '@mui/material';
-
-const useStyles = makeStyles({
-  table: {
-    minWidth: 400
-  },
-  ul: {
-    display: 'flex'
-  }
-});
 
 const StyledCell = styled(TableCell)({
   component: 'th',
@@ -79,7 +69,6 @@ const getTotal = () => {
 };
 
 const DataQualityComputeTable = () => {
-  const classes = useStyles();
   const { formatMessage } = useIntl();
   const theme = useTheme();
   const total = getTotal();
@@ -92,7 +81,7 @@ const DataQualityComputeTable = () => {
         width: 'auto',
         maxWidth: 'calc(100% - 20px)'
       }}>
-      <Table className={classes.table} size="small">
+      <Table sx={{ minWidth: 400 }} size="small">
         <TableHead>
           <TableRow>
             <TableCell colSpan={1} />

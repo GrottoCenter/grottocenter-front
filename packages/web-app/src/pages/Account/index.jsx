@@ -394,6 +394,161 @@ PersonalInfoSection.propTypes = {
   onSaved: PropTypes.func.isRequired
 };
 
+// ─── MFA section (admins only) ────────────────────────────────────────────────
+
+const MfaSection = () => {
+  const dispatch = useDispatch();
+  const { formatMessage } = useIntl();
+  const { onSuccess } = useNotification();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const mfaResetMutation = useMfaReset();
+  const { data: mfaAccount } = useAccount();
+  const isMfaEnabled = mfaAccount?.mfaEnabled ?? false;
+
+  const {
+    control,
+    handleSubmit,
+    reset: resetForm,
+    formState: { errors, isValid }
+  } = useForm({ defaultValues: { password: '' }, mode: 'onChange' });
+
+  const handleOpen = () => {
+    mfaResetMutation.reset();
+    setIsDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    resetForm({ password: '' });
+    setIsDialogOpen(false);
+    mfaResetMutation.reset();
+  };
+
+  const isResetSuccess = mfaResetMutation.isSuccess;
+  useEffect(() => {
+    if (!isResetSuccess) return undefined;
+    onSuccess(formatMessage({ id: 'mfaResetSuccess' }));
+    const timer = setTimeout(() => dispatch(postLogout()), 1500);
+    return () => clearTimeout(timer);
+    // onSuccess, formatMessage, dispatch are stable — only isSuccess matters here
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isResetSuccess]);
+
+  const onSubmit = async data => {
+    try {
+      await mfaResetMutation.mutateAsync(data.password);
+    } catch {
+      /* error surfaced via mfaResetMutation.error below */
+    }
+  };
+
+  const viewContent = (
+    <InfoRow>
+      <InfoLabel variant="body2">
+        {formatMessage({ id: 'mfaStatus' })}
+      </InfoLabel>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          flexWrap: 'wrap'
+        }}>
+        {isMfaEnabled ? (
+          <>
+            <Chip
+              size="small"
+              variant="outlined"
+              color="success"
+              icon={<CheckCircleOutlineIcon />}
+              label={formatMessage({ id: 'mfaStatusActive' })}
+            />
+            <Button
+              size="small"
+              variant="outlined"
+              color="error"
+              onClick={handleOpen}>
+              {formatMessage({ id: 'mfaResetButton' })}
+            </Button>
+          </>
+        ) : (
+          <Chip
+            size="small"
+            variant="outlined"
+            color="warning"
+            icon={<ErrorOutlineIcon />}
+            label={formatMessage({ id: 'mfaStatusInactive' })}
+          />
+        )}
+      </Box>
+    </InfoRow>
+  );
+
+  return (
+    <>
+      {viewContent}
+      <StandardDialog
+        open={isDialogOpen}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="xs"
+        title={formatMessage({ id: 'mfaResetTitle' })}
+        actions={
+          <>
+            <Button
+              onClick={handleClose}
+              variant="text"
+              disabled={mfaResetMutation.isPending}>
+              {formatMessage({ id: 'Cancel' })}
+            </Button>
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              color="error"
+              variant="contained"
+              disabled={!isValid || mfaResetMutation.isPending}
+              startIcon={
+                mfaResetMutation.isPending ? (
+                  <CircularProgress size={16} color="inherit" />
+                ) : null
+              }>
+              {formatMessage({ id: 'mfaResetButton' })}
+            </Button>
+          </>
+        }>
+        <Box display="flex" flexDirection="column" gap={1}>
+          <Alert
+            severity="warning"
+            content={formatMessage({ id: 'mfaResetWarning' })}
+          />
+          <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+            <InputPassword
+              formKey="password"
+              labelName="mfaResetPasswordLabel"
+              isPasswordVisible={isPasswordVisible}
+              onShowPassword={() => setIsPasswordVisible(v => !v)}
+              control={control}
+              isError={!!errors.password}
+              isRequired
+              autoComplete="current-password"
+            />
+          </form>
+          {mfaResetMutation.error && (
+            <Alert
+              severity="error"
+              content={formatMessage({
+                id:
+                  mfaResetMutation.error?.body?.status === 'Mismatch'
+                    ? 'currentPasswordIncorrect'
+                    : 'genericError'
+              })}
+            />
+          )}
+        </Box>
+      </StandardDialog>
+    </>
+  );
+};
+
 // ─── Email & security section ─────────────────────────────────────────────────
 
 const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
@@ -666,161 +821,6 @@ EmailSecuritySection.propTypes = {
   account: accountShape.isRequired,
   onSaved: PropTypes.func.isRequired,
   isAdmin: PropTypes.bool
-};
-
-// ─── MFA section (admins only) ────────────────────────────────────────────────
-
-const MfaSection = () => {
-  const dispatch = useDispatch();
-  const { formatMessage } = useIntl();
-  const { onSuccess } = useNotification();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const mfaResetMutation = useMfaReset();
-  const { data: mfaAccount } = useAccount();
-  const isMfaEnabled = mfaAccount?.mfaEnabled ?? false;
-
-  const {
-    control,
-    handleSubmit,
-    reset: resetForm,
-    formState: { errors, isValid }
-  } = useForm({ defaultValues: { password: '' }, mode: 'onChange' });
-
-  const handleOpen = () => {
-    mfaResetMutation.reset();
-    setIsDialogOpen(true);
-  };
-
-  const handleClose = () => {
-    resetForm({ password: '' });
-    setIsDialogOpen(false);
-    mfaResetMutation.reset();
-  };
-
-  const isResetSuccess = mfaResetMutation.isSuccess;
-  useEffect(() => {
-    if (!isResetSuccess) return undefined;
-    onSuccess(formatMessage({ id: 'mfaResetSuccess' }));
-    const timer = setTimeout(() => dispatch(postLogout()), 1500);
-    return () => clearTimeout(timer);
-    // onSuccess, formatMessage, dispatch are stable — only isSuccess matters here
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isResetSuccess]);
-
-  const onSubmit = async data => {
-    try {
-      await mfaResetMutation.mutateAsync(data.password);
-    } catch {
-      /* error surfaced via mfaResetMutation.error below */
-    }
-  };
-
-  const viewContent = (
-    <InfoRow>
-      <InfoLabel variant="body2">
-        {formatMessage({ id: 'mfaStatus' })}
-      </InfoLabel>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.5,
-          flexWrap: 'wrap'
-        }}>
-        {isMfaEnabled ? (
-          <>
-            <Chip
-              size="small"
-              variant="outlined"
-              color="success"
-              icon={<CheckCircleOutlineIcon />}
-              label={formatMessage({ id: 'mfaStatusActive' })}
-            />
-            <Button
-              size="small"
-              variant="outlined"
-              color="error"
-              onClick={handleOpen}>
-              {formatMessage({ id: 'mfaResetButton' })}
-            </Button>
-          </>
-        ) : (
-          <Chip
-            size="small"
-            variant="outlined"
-            color="warning"
-            icon={<ErrorOutlineIcon />}
-            label={formatMessage({ id: 'mfaStatusInactive' })}
-          />
-        )}
-      </Box>
-    </InfoRow>
-  );
-
-  return (
-    <>
-      {viewContent}
-      <StandardDialog
-        open={isDialogOpen}
-        onClose={handleClose}
-        fullWidth
-        maxWidth="xs"
-        title={formatMessage({ id: 'mfaResetTitle' })}
-        actions={
-          <>
-            <Button
-              onClick={handleClose}
-              variant="text"
-              disabled={mfaResetMutation.isPending}>
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-            <Button
-              onClick={handleSubmit(onSubmit)}
-              color="error"
-              variant="contained"
-              disabled={!isValid || mfaResetMutation.isPending}
-              startIcon={
-                mfaResetMutation.isPending ? (
-                  <CircularProgress size={16} color="inherit" />
-                ) : null
-              }>
-              {formatMessage({ id: 'mfaResetButton' })}
-            </Button>
-          </>
-        }>
-        <Box display="flex" flexDirection="column" gap={1}>
-          <Alert
-            severity="warning"
-            content={formatMessage({ id: 'mfaResetWarning' })}
-          />
-          <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-            <InputPassword
-              formKey="password"
-              labelName="mfaResetPasswordLabel"
-              isPasswordVisible={isPasswordVisible}
-              onShowPassword={() => setIsPasswordVisible(v => !v)}
-              control={control}
-              isError={!!errors.password}
-              isRequired
-              autoComplete="current-password"
-            />
-          </form>
-          {mfaResetMutation.error && (
-            <Alert
-              severity="error"
-              content={formatMessage({
-                id:
-                  mfaResetMutation.error?.body?.status === 'Mismatch'
-                    ? 'currentPasswordIncorrect'
-                    : 'genericError'
-              })}
-            />
-          )}
-        </Box>
-      </StandardDialog>
-    </>
-  );
 };
 
 // ─── Preferences section ──────────────────────────────────────────────────────

@@ -47,18 +47,16 @@ const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
     }
   };
 
-  let associateMessage = formatMessage({ id: 'Associate' });
-  if (selectedDocuments.length === 1) {
-    associateMessage = formatMessage({ id: 'Associate 1 document' });
-  } else {
-    associateMessage = formatMessage(
-      {
-        id: 'Associate {nb} documents',
-        defaultMessage: 'Associate {nb} documents'
-      },
-      { nb: selectedDocuments.length }
-    );
-  }
+  const associateMessage =
+    selectedDocuments.length === 1
+      ? formatMessage({ id: 'Associate 1 document' })
+      : formatMessage(
+          {
+            id: 'Associate {nb} documents',
+            defaultMessage: 'Associate {nb} documents'
+          },
+          { nb: selectedDocuments.length }
+        );
 
   return (
     <>

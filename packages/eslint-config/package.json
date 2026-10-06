@@ -9,18 +9,19 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
+    "@eslint/compat": ">=2",
     "@eslint/eslintrc": ">=3",
-    "@eslint/js": ">=9",
-    "eslint": ">=9",
+    "@eslint/js": ">=10",
+    "eslint": ">=10",
     "eslint-config-airbnb": ">=19",
     "eslint-config-prettier": ">=8",
-    "eslint-plugin-cypress": ">=6",
+    "eslint-plugin-cypress": ">=7",
     "eslint-plugin-import": ">=2",
     "eslint-plugin-jsx-a11y": ">=6",
     "eslint-plugin-prettier": ">=5",
     "eslint-plugin-react": ">=7",
     "eslint-plugin-react-hooks": ">=4",
-    "eslint-plugin-storybook": ">=0.12",
+    "eslint-plugin-storybook": ">=10",
     "prettier": ">=3"
   }
 }
