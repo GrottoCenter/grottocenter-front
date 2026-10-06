@@ -1,7 +1,6 @@
 {
   "extends": "../ts-config/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
