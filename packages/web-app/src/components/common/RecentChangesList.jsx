@@ -156,7 +156,12 @@ const ChangeItem = ({ changeInfo }) => {
         {authorEl} {changeType}{' '}
         {entityFmt(changeInfo.mainEntityType, formatMessage)} {entityEl}
         {subText && (
-          <Typography variant="body2" component="span" color="text.secondary">
+          <Typography
+            variant="body2"
+            component="span"
+            sx={{
+              color: 'text.secondary'
+            }}>
             {subText}
           </Typography>
         )}
@@ -166,7 +171,12 @@ const ChangeItem = ({ changeInfo }) => {
     sentence = (
       <>
         {authorEl} {changeType}{' '}
-        <Typography variant="body2" component="span" color="text.secondary">
+        <Typography
+          variant="body2"
+          component="span"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {subEntityGroupFmt(changeInfo.subEntityTypes, formatMessage)}{' '}
           {formatMessage({ id: 'on' })}{' '}
         </Typography>
@@ -198,8 +208,11 @@ const ChangeItem = ({ changeInfo }) => {
           </Typography>
           <Typography
             variant="caption"
-            color="text.secondary"
-            sx={{ flexShrink: 0, mt: 0.25 }}>
+            sx={{
+              color: 'text.secondary',
+              flexShrink: 0,
+              mt: 0.25
+            }}>
             <FormattedRelativeTime
               value={relTime.value}
               unit={relTime.unit}
@@ -260,7 +273,11 @@ const RecentChangesList = ({
         <HistoryOutlinedIcon
           sx={{ fontSize: theme => theme.spacing(6), mb: 0.5 }}
         />
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {formatMessage({ id: 'No recent changes' })}
         </Typography>
       </Box>

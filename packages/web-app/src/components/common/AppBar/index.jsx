@@ -165,6 +165,7 @@ const AppBar = () => {
                 color="inherit"
                 aria-label={menuButtonLabel}
                 edge="start"
+                data-testid="mobile-menu-button"
                 onClick={handleMenuButtonClick}
                 size="large">
                 <MenuIcon sx={{ fontSize: APP_BAR_ICON_SIZE }} />

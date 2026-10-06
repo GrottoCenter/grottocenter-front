@@ -72,7 +72,11 @@ const Step5 = () => {
           data-testid="csv-import-progress"
           sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {hasTotal && (
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary'
+              }}>
               {formatMessage(
                 {
                   id: 'csvImport.processing',

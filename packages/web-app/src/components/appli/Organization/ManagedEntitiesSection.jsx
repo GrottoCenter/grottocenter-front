@@ -42,8 +42,11 @@ const ManagedEntitiesSection = ({ organization }) => {
         <Box sx={{ mb: 1 }}>
           <Typography
             variant="subtitle2"
-            color="text.secondary"
-            sx={{ textTransform: 'uppercase', mb: 0.5 }}>
+            sx={{
+              color: 'text.secondary',
+              textTransform: 'uppercase',
+              mb: 0.5
+            }}>
             {formatMessage({ id: 'Countries' })}
           </Typography>
           {renderList(
@@ -56,8 +59,11 @@ const ManagedEntitiesSection = ({ organization }) => {
         <Box sx={{ mb: 1 }}>
           <Typography
             variant="subtitle2"
-            color="text.secondary"
-            sx={{ textTransform: 'uppercase', mb: 0.5 }}>
+            sx={{
+              color: 'text.secondary',
+              textTransform: 'uppercase',
+              mb: 0.5
+            }}>
             {formatMessage({ id: 'Regions' })}
           </Typography>
           {renderList(sortedRegions, region => {
@@ -97,8 +103,11 @@ const ManagedEntitiesSection = ({ organization }) => {
         <Box sx={{ mb: 1 }}>
           <Typography
             variant="subtitle2"
-            color="text.secondary"
-            sx={{ textTransform: 'uppercase', mb: 0.5 }}>
+            sx={{
+              color: 'text.secondary',
+              textTransform: 'uppercase',
+              mb: 0.5
+            }}>
             {formatMessage({ id: 'Massifs' })}
           </Typography>
           {renderList(sortedMassifs, massif => `/ui/massifs/${massif.id}`)}

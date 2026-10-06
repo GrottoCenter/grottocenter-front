@@ -62,7 +62,10 @@ const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {
           }}>
           {average === null ? (
             <>
-              <Typography color="text.secondary">
+              <Typography
+                sx={{
+                  color: 'text.secondary'
+                }}>
                 {formatMessage({ id: 'Interest not rated yet' })}
               </Typography>
               {canComment && (
@@ -95,7 +98,11 @@ const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {
                   )
                 }
               />
-              <Typography component="span" fontWeight={600}>
+              <Typography
+                component="span"
+                sx={{
+                  fontWeight: 600
+                }}>
                 {formatMessage(
                   { id: '{rating} / 5' },
                   {

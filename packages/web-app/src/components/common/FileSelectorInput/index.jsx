@@ -176,20 +176,24 @@ const FileSelectorInput = ({
   const extensionsLabel = displayedExtensions.length > 0 && (
     <Typography
       variant="caption"
-      color="text.disabled"
-      display="block"
-      onClick={e => e.stopPropagation()}>
+      onClick={e => e.stopPropagation()}
+      sx={{
+        color: 'text.disabled',
+        display: 'block'
+      }}>
       {[...displayedExtensions].sort().join(', ')}
     </Typography>
   );
 
   const fileChips = files.length > 0 && (
     <Box
-      display="flex"
-      flexWrap="wrap"
-      gap={0.5}
-      mt={1}
-      onClick={e => e.stopPropagation()}>
+      onClick={e => e.stopPropagation()}
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 0.5,
+        mt: 1
+      }}>
       {files.map(f => (
         <Chip
           key={f.fileName}
@@ -254,10 +258,17 @@ const FileSelectorInput = ({
       <Typography
         variant="body2"
         color={isDragActive ? 'primary' : 'text.secondary'}
-        fontWeight={500}>
+        sx={{
+          fontWeight: 500
+        }}>
         {t('Drag and drop files here', 'Drag and drop a file here')}
       </Typography>
-      <Typography variant="caption" color="text.disabled" display="block">
+      <Typography
+        variant="caption"
+        sx={{
+          color: 'text.disabled',
+          display: 'block'
+        }}>
         {formatMessage({ id: 'or' })}
       </Typography>
       <Button

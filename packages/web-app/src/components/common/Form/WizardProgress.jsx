@@ -59,8 +59,10 @@ const WizardProgress = ({ activeStep, steps, sx = undefined }) => {
             </Typography>
             <Typography
               variant="body2"
-              color="text.secondary"
-              sx={{ flexShrink: 0 }}>
+              sx={{
+                color: 'text.secondary',
+                flexShrink: 0
+              }}>
               {progressLabel}
             </Typography>
           </Box>

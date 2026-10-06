@@ -98,7 +98,13 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
   };
 
   const filesIntro = (
-    <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 0.5 }}>
+    <Typography
+      variant="body2"
+      sx={{
+        color: 'text.secondary',
+        mt: 1,
+        mb: 0.5
+      }}>
       {formatMessage({
         id: 'You can create a document that contains one or several files at once.'
       })}
@@ -331,7 +337,11 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
               '&:before': { display: 'none' }
             }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary'
+                }}>
                 {formatMessage({ id: 'Advanced metadata' })}
               </Typography>
             </AccordionSummary>
@@ -435,9 +445,9 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
 
               <Typography
                 variant="caption"
-                color="text.secondary"
-                display="block"
                 sx={{
+                  color: 'text.secondary',
+                  display: 'block',
                   mt: 0.5
                 }}>
                 <InternationalizedLink links={wikiBBSLinks}>

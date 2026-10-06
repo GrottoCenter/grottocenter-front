@@ -22,11 +22,20 @@ const InfoBlock = ({ icon, numberData, text }) => {
       }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <StyledIcon>{icon}</StyledIcon>
-        <Typography variant="h3" color="secondary" fontWeight={700}>
+        <Typography
+          variant="h3"
+          color="secondary"
+          sx={{
+            fontWeight: 700
+          }}>
           {(Math.round(numberData * 10) / 10).toLocaleString(locale)} m
         </Typography>
       </Box>
-      <Typography variant="body2" textAlign="center">
+      <Typography
+        variant="body2"
+        sx={{
+          textAlign: 'center'
+        }}>
         {text}
       </Typography>
     </Box>

@@ -109,7 +109,11 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                     p: '12px'
                   }}>
                   <CircularProgress size={18} />
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary'
+                    }}>
                     {formatMessage({ id: 'Searching for similar entrances…' })}
                   </Typography>
                 </Box>
@@ -117,8 +121,12 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                 <>
                   <Typography
                     variant="caption"
-                    color="text.secondary"
-                    sx={{ display: 'block', px: '12px', pt: 0.5 }}>
+                    sx={{
+                      color: 'text.secondary',
+                      display: 'block',
+                      px: '12px',
+                      pt: 0.5
+                    }}>
                     {formatMessage({
                       id: 'Existing entrances with a similar name:'
                     })}
@@ -165,7 +173,12 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
           {formatMessage({ id: 'Is this the same cave?' })}
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              mb: 0.5
+            }}>
             {formatMessage({
               id: 'An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.'
             })}
@@ -176,7 +189,11 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                 {candidate.name}
               </Typography>
               {candidateLocation && (
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'text.secondary'
+                  }}>
                   {candidateLocation}
                 </Typography>
               )}

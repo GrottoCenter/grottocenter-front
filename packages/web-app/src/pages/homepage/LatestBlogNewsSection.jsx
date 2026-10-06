@@ -40,8 +40,10 @@ const LatestBlogNewsSection = () => {
           id="news-title"
           variant="h3"
           component="h2"
-          fontWeight={600}
-          color="primary">
+          color="primary"
+          sx={{
+            fontWeight: 600
+          }}>
           {formatMessage({ id: 'News' })}
         </Typography>
       </TitleRow>
@@ -55,8 +57,8 @@ const LatestBlogNewsSection = () => {
           <AppLink href={isFrench ? bloggerLinks.fr : bloggerLinks['*']}>
             <Typography
               variant="body2"
-              color="text.secondary"
               sx={{
+                color: 'text.secondary',
                 textDecoration: 'underline',
                 cursor: 'pointer',
                 '&:hover': { color: 'text.primary' }

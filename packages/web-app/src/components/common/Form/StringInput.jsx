@@ -32,7 +32,11 @@ const StringInput = ({
         width: fullWidth ? '100%' : undefined
       }}>
       {helperText && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {helperText}
         </Typography>
       )}

@@ -59,7 +59,12 @@ const AppPromoBanner = () => {
           sx={{ fontWeight: 600, m: 0, lineHeight: 1.2 }}>
           {formatMessage({ id: 'Grottocenter in your pocket' })}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+            mt: 0.5
+          }}>
           {formatMessage({
             id: 'Browse caves offline, right in the field.'
           })}

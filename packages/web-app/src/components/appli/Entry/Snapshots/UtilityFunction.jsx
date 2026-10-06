@@ -113,6 +113,7 @@ const SnapshotButton = ({
       <Button
         {...grpProps}
         component={AppLink}
+        nativeButton={false}
         to={url}
         startIcon={!!label && startIcon}>
         {!label && startIcon}

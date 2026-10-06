@@ -50,8 +50,10 @@ const RecentChanges = () => {
           id="recent-changes-title"
           variant="h3"
           component="h2"
-          fontWeight={600}
-          color="primary">
+          color="primary"
+          sx={{
+            fontWeight: 600
+          }}>
           {formatMessage({ id: 'Recent changes' })}
         </Typography>
       </TitleRow>

@@ -207,12 +207,19 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
       <Stack
         direction="row"
         divider={
-          <Typography component="span" color="text.secondary" sx={{ mx: 0.5 }}>
+          <Typography
+            component="span"
+            sx={{
+              color: 'text.secondary',
+              mx: 0.5
+            }}>
             ·
           </Typography>
         }
-        alignItems="center"
-        flexWrap="wrap">
+        sx={{
+          alignItems: 'center',
+          flexWrap: 'wrap'
+        }}>
         {organization.country && (
           <AppLink
             to={`/ui/countries/${organization.country}`}
@@ -490,7 +497,11 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
           },
           {
             name: (
-              <Typography component="span" fontWeight={700}>
+              <Typography
+                component="span"
+                sx={{
+                  fontWeight: 700
+                }}>
                 {pendingRemoveMember?.label ?? '?'}
               </Typography>
             )

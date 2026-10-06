@@ -94,11 +94,17 @@ const Faq = () => {
             variant="h4"
             component="h1"
             color="primary"
-            fontWeight={600}
-            gutterBottom>
+            gutterBottom
+            sx={{
+              fontWeight: 600
+            }}>
             {formatMessage({ id: 'Frequently asked questions' })}
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography
+            variant="body1"
+            sx={{
+              color: 'text.secondary'
+            }}>
             {formatMessage({
               id: 'Find answers to common questions about Grottocenter'
             })}
@@ -110,7 +116,12 @@ const Faq = () => {
             expanded={expanded === 'protection'}
             onChange={handleChange('protection')}>
             <StyledSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+              <Typography
+                component="h2"
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 500
+                }}>
                 {formatMessage({
                   id: 'I would like to share some of my work but some caves should remain protected. How are you planning to protect them?'
                 })}
@@ -129,7 +140,12 @@ const Faq = () => {
             expanded={expanded === 'quality'}
             onChange={handleChange('quality')}>
             <StyledSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+              <Typography
+                component="h2"
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 500
+                }}>
                 {formatMessage({
                   id: 'How can you guarantee the quality of the data on Grottocenter?'
                 })}
@@ -148,7 +164,12 @@ const Faq = () => {
             expanded={expanded === 'help'}
             onChange={handleChange('help')}>
             <StyledSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+              <Typography
+                component="h2"
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 500
+                }}>
                 {formatMessage({
                   id: 'I find your project interesting: How can I help?'
                 })}
@@ -170,7 +191,12 @@ const Faq = () => {
             expanded={expanded === 'buddy'}
             onChange={handleChange('buddy')}>
             <StyledSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+              <Typography
+                component="h2"
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 500
+                }}>
                 {formatMessage({
                   id: 'One of my caving buddies told me I should NOT post anything at all on Grottocenter. That sometimes makes it hard to contribute!'
                 })}
@@ -189,7 +215,12 @@ const Faq = () => {
             expanded={expanded === 'who'}
             onChange={handleChange('who')}>
             <StyledSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+              <Typography
+                component="h2"
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 500
+                }}>
                 {formatMessage({ id: 'Who is behind Grottocenter?' })}
               </Typography>
             </StyledSummary>
@@ -209,7 +240,12 @@ const Faq = () => {
             expanded={expanded === 'data-sharing'}
             onChange={handleChange('data-sharing')}>
             <StyledSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+              <Typography
+                component="h2"
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 500
+                }}>
                 {formatMessage({
                   id: 'I want to share my data only with fellow cavers. Is it possible on Grottocenter?'
                 })}

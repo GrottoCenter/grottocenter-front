@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Popover, Rating, Button } from '@mui/material';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { useIntl } from 'react-intl';
@@ -231,7 +231,7 @@ const FiltersControl = ({
               }>
               <ControlSectionTitle>
                 {formatMessage({ id: 'Filter by size' }).toUpperCase()}
-                <HelpOutlineIcon
+                <HelpOutlinedIcon
                   fontSize="small"
                   sx={{ cursor: 'pointer', color: 'text.secondary' }}
                   onClick={e => setSizeInfoAnchor(e.currentTarget)}
@@ -299,7 +299,7 @@ const FiltersControl = ({
 
               <ControlSectionTitle>
                 {formatMessage({ id: 'Filter by interest' }).toUpperCase()}
-                <HelpOutlineIcon
+                <HelpOutlinedIcon
                   fontSize="small"
                   sx={{ cursor: 'pointer', color: 'text.secondary' }}
                   onClick={e => setInterestInfoAnchor(e.currentTarget)}

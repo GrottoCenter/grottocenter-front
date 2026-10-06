@@ -67,7 +67,9 @@ const StandardDialog = ({
       maxWidth={maxWidth}
       open={open}
       onClose={onClose}
-      PaperProps={{ style: { overflow: 'visible' } }}>
+      slotProps={{
+        paper: { style: { overflow: 'visible' } }
+      }}>
       {onClose && (
         <CloseButton
           aria-label={formatMessage({ id: 'close' })}

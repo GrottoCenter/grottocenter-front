@@ -120,7 +120,11 @@ const CoordinateDisplay = ({
 
   if (compact) {
     return (
-      <Box display="flex" alignItems="center">
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center'
+        }}>
         <Typography variant="body2">{displayValue}</Typography>
         <Tooltip title={formatMessage({ id: 'Copy coordinates' })}>
           <IconButton
@@ -152,7 +156,13 @@ const CoordinateDisplay = ({
   }
 
   return (
-    <Box display="flex" alignItems="center" flexWrap="wrap" gap={0.5}>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: 0.5
+      }}>
       <Typography variant="body1">{displayValue}</Typography>
       {precisionText && (
         <Chip
@@ -197,6 +207,7 @@ const CoordinateDisplay = ({
             onClose={() => setMapLinksMenuAnchor(null)}>
             <MenuItem
               component={AppLink}
+              nativeButton={false}
               to={grottoMapUrl}
               openInNewTabDesktop
               onClick={() => setMapLinksMenuAnchor(null)}>

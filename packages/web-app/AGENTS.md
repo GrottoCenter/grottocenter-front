@@ -24,18 +24,20 @@ The alias also works in `vite.config.mjs` test configuration (Vitest resolves it
 
 ## 📌 Pinned dependencies
 
-`@mui/material` and `@mui/icons-material` are pinned to an exact **7.3.9** — do not
+`@mui/material` and `@mui/icons-material` are pinned to an exact **9.4.0** — do not
 restore the `^` range without testing a swipe-to-close of the mobile side menu.
 
-From 7.3.10, `Slide`'s `getTranslateValue` blanks the inline `transform` and calls
+In 7.3.10, `Slide`'s `getTranslateValue` blanks the inline `transform` and calls
 `getBoundingClientRect()` before restoring it. The forced reflow commits
 `transform: none` as the transition's before-change style, so a drawer released
 mid-swipe animates from the fully-open position instead of from the finger — the
 panel visibly snaps back open before sliding out. Only `SwipeableDrawer` is
 affected, since it is the only place a transform is applied outside `Slide`.
 
-`@mui/lab` still asks for `^7.3.11`; the mismatch is patch-level and the peer
-warning is expected.
+MUI 9.4.0 detects the gesture transform and preserves it during exit. Keep the
+partial-swipe regression covered by `cypress/e2e/mobile-side-menu.cy.js` when
+updating MUI again. `@mui/lab` is aligned to **9.0.0-beta.9**, and `@mui/system`
+to **9.4.0** to satisfy the date pickers' peer dependency.
 
 > ⚠️ After changing any dependency version, restart the dev server with
 > `yarn start --force` (or delete `node_modules/.vite`). A running server keeps

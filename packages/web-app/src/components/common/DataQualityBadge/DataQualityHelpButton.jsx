@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Box, Divider, IconButton, Popover, Typography } from '@mui/material';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import DataQualityComputeDetails from './DataQualityComputeDetails';
 
 const DataQualityHelpButton = () => {
@@ -14,7 +14,7 @@ const DataQualityHelpButton = () => {
         size="small"
         sx={{ color: 'text.secondary' }}
         onClick={e => setAnchor(e.currentTarget)}>
-        <HelpOutlineIcon fontSize="small" />
+        <HelpOutlinedIcon fontSize="small" />
       </IconButton>
       <Popover
         open={Boolean(anchor)}
@@ -22,7 +22,11 @@ const DataQualityHelpButton = () => {
         onClose={() => setAnchor(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         slotProps={{ paper: { sx: { maxWidth: 700, width: '90vw' } } }}>
-        <Box px={1} pt={1}>
+        <Box
+          sx={{
+            px: 1,
+            pt: 1
+          }}>
           <Typography variant="h4" component="h2">
             {formatMessage({ id: 'Data quality computation' })}
           </Typography>

@@ -43,23 +43,30 @@ const PersonProperties = ({ person, canEdit = false }) => {
         <Box sx={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
           <Typography
             variant="body2"
-            color="text.secondary"
-            sx={{ minWidth: '120px', flexShrink: 0 }}>
+            sx={{
+              color: 'text.secondary',
+              minWidth: '120px',
+              flexShrink: 0
+            }}>
             {formatMessage({ id: 'Nickname' })}
           </Typography>
           <Box>
             <Typography
               variant="h5"
-              fontWeight={700}
               color="primary"
-              lineHeight={1.2}>
+              sx={{
+                fontWeight: 700,
+                lineHeight: 1.2
+              }}>
               {person.nickname}
             </Typography>
             {canEdit && (
               <Typography
                 variant="body2"
-                color="text.secondary"
-                sx={{ mt: '2px' }}>
+                sx={{
+                  color: 'text.secondary',
+                  mt: '2px'
+                }}>
                 {formatMessage({
                   id: 'The nickname defines how other users see you.'
                 })}
@@ -73,11 +80,18 @@ const PersonProperties = ({ person, canEdit = false }) => {
             sx={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
             <Typography
               variant="body2"
-              color="text.secondary"
-              sx={{ minWidth: '120px', flexShrink: 0 }}>
+              sx={{
+                color: 'text.secondary',
+                minWidth: '120px',
+                flexShrink: 0
+              }}>
               {label}
             </Typography>
-            <Typography variant="body1" fontWeight={500}>
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 500
+              }}>
               {value}
             </Typography>
           </Box>

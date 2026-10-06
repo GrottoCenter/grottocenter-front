@@ -94,6 +94,7 @@ export const LinkedItem = ({
       sx={menuItemSx(isExpanded)}
       aria-label={label}
       component={AppLink}
+      nativeButton={false}
       to={href}
       onClick={onClick}>
       <ListItemIcon sx={menuItemIconSx(isExpanded)}>{icon}</ListItemIcon>

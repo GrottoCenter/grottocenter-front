@@ -59,7 +59,11 @@ const Welcome = () => {
                 sx={{ mb: { xs: '4px', sm: 0.5 } }}>
                 {formatMessage({ id: titleId })}
               </BlockTitle>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary'
+                }}>
                 {textIds.map(id => formatMessage({ id })).join(' ')}
               </Typography>
             </Grid>

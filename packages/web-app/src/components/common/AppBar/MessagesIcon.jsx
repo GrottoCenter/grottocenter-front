@@ -24,6 +24,7 @@ const MessagesIcon = () => {
     <IconButton
       aria-label={formatMessage({ id: 'My messages' })}
       component={AppLink}
+      nativeButton={false}
       to="/ui/messages"
       color="inherit"
       size="large">

@@ -110,7 +110,7 @@ A person can have 0, 1 or more roles (`t_group` table):
 
 | Technology                  | Usage             |
 | --------------------------- | ----------------- |
-| **MUI v7 (@mui/material)**  | Component library |
+| **MUI v9 (@mui/material)**  | Component library |
 | **@emotion/react & styled** | CSS-in-JS         |
 | **@mui/icons-material**     | Material icons    |
 | **@mui/x-date-pickers**     | Date pickers      |

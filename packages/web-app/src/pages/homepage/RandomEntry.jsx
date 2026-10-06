@@ -31,8 +31,10 @@ const RandomEntry = () => {
           id="random-entry-title"
           variant="h3"
           component="h2"
-          fontWeight={600}
-          color="white">
+          color="white"
+          sx={{
+            fontWeight: 600
+          }}>
           {formatMessage({ id: 'Discover a random cave' })}
         </Typography>
       </TitleRow>

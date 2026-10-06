@@ -95,8 +95,8 @@ const LinkedEntityCards = ({
                 }}>
                 <Typography
                   variant="body1"
-                  fontWeight={600}
                   sx={{
+                    fontWeight: 600,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap'
@@ -104,7 +104,11 @@ const LinkedEntityCards = ({
                   {entity.label}
                 </Typography>
                 {entity.secondary && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary'
+                    }}>
                     {entity.secondary}
                   </Typography>
                 )}

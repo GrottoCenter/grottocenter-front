@@ -231,6 +231,7 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
             variant="outlined"
             size="small"
             component={AppLink}
+            nativeButton={false}
             to={`/ui/entrances/${entry.id}`}
             sx={{
               color: 'white',

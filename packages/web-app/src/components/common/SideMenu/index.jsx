@@ -214,6 +214,7 @@ const SideMenuContent = memo(({ isExpanded, onNavigate }) => {
                 sx={menuItemSx(isExpanded)}
                 aria-label={userguideLabel}
                 component={AppLink}
+                nativeButton={false}
                 href={userguideUrl}>
                 <ListItemIcon sx={menuItemIconSx(isExpanded)}>
                   <MenuBook color="primary" sx={{ fontSize: MENU_ICON_SIZE }} />
@@ -315,12 +316,10 @@ const SideMenu = () => {
   // Stable identity so the two blocking renders SwipeableDrawer forces per
   // gesture (`flushSync` on the first touchmove and on touchend) don't make
   // emotion re-serialise these `sx` objects.
-  //
-  // `slotProps`, not the legacy PaperProps/SwipeAreaProps — MUI resolves them
-  // as `slotProps.paper ?? PaperProps`, so mixing the two silently drops one.
   const slotProps = useMemo(
     () => ({
       paper: {
+        'data-testid': 'mobile-side-menu',
         // `Content` is the only scroller — see the note there.
         sx: { width: theme.sideMenuWidth, overflow: 'hidden' }
       },

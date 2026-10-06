@@ -40,8 +40,10 @@ const PartnersSection = () => {
           <Typography
             variant="h3"
             component="h2"
-            fontWeight={600}
-            color="primary">
+            color="primary"
+            sx={{
+              fontWeight: 600
+            }}>
             {isPending ? (
               <Skeleton variant="text" width={120} />
             ) : (
@@ -52,7 +54,11 @@ const PartnersSection = () => {
             )}
           </Typography>
         </TitleRow>
-        <Description variant="body2" color="text.secondary">
+        <Description
+          variant="body2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {formatMessage({
             id: 'take part in the project by funding, providing data, communicating on the interest and benefits of cavers to share data.'
           })}

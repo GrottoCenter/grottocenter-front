@@ -85,12 +85,18 @@ const JoinCommunity = () => {
             id="join-community-title"
             variant="h3"
             component="h2"
-            fontWeight={600}
-            color="secondary">
+            color="secondary"
+            sx={{
+              fontWeight: 600
+            }}>
             {formatMessage({ id: 'Join the community' })}
           </Typography>
         </TitleRow>
-        <Subtitle variant="body1" color="text.secondary">
+        <Subtitle
+          variant="body1"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {formatMessage({
             id: 'Create a free account and unlock the full contribution power of Grottocenter.'
           })}

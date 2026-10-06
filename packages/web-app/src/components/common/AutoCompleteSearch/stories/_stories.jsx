@@ -116,8 +116,9 @@ const WithState = () => {
         checked={hasError}
         onChange={handleError}
         color="primary"
-        // name="checkedB"
-        inputProps={{ 'aria-label': 'primary checkbox' }}
+        slotProps={{
+          input: { 'aria-label': 'primary checkbox' }
+        }}
       />
       <Divider light />
       <Typography id="disable-switch" gutterBottom>
@@ -127,8 +128,9 @@ const WithState = () => {
         checked={isDisable}
         onChange={handleDisable}
         color="primary"
-        // name="checkedB"
-        inputProps={{ 'aria-label': 'primary checkbox' }}
+        slotProps={{
+          input: { 'aria-label': 'primary checkbox' }
+        }}
       />
       <Divider light />
       <SearchWrapper width={width}>

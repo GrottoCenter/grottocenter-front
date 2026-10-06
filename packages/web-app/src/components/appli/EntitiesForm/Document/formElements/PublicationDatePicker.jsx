@@ -110,7 +110,11 @@ const PublicationDatePicker = ({ required = false, label = null }) => {
   return (
     <Box sx={{ mt: 1 }}>
       <Box sx={{ mb: 0.5 }}>
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {label ?? (
             <Translate>
               Publication date (refer to the date indicated on the document if

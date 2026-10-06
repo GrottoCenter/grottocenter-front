@@ -16,7 +16,12 @@ const SpecificsCaves = ({ maxDepthCave, maxLengthCave, parentEntity }) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h4" textAlign="center" pb={1}>
+      <Typography
+        variant="h4"
+        sx={{
+          textAlign: 'center',
+          pb: 1
+        }}>
         {formatMessage({ id: 'Specifics caves' })}
       </Typography>
       <StyledBox>

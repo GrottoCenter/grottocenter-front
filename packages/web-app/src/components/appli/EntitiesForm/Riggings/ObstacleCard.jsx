@@ -42,7 +42,11 @@ const ObstacleCard = ({
           mb: 0.25
         }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="caption" fontWeight="medium">
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 'medium'
+            }}>
             {`${formatMessage({ id: 'Obstacle' })} ${index + 1}`}
           </Typography>
           {legendSections && (

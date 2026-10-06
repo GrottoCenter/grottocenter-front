@@ -10,7 +10,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HistoryIcon from '@mui/icons-material/History';
 import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ShareIcon from '@mui/icons-material/Share';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
@@ -128,7 +128,7 @@ export const Entry = ({
     ExploredIcon = isExplored ? (
       <CheckCircleIcon />
     ) : (
-      <CheckCircleOutlineIcon />
+      <CheckCircleOutlinedIcon />
     );
   }
 

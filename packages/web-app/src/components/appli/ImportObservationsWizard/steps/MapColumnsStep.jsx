@@ -869,7 +869,11 @@ const MapColumnsStep = () => {
           id: 'ImportObservationsWizard.MapColumnsStep.title'
         })}
       </Typography>
-      <Typography variant="body2" color="text.secondary">
+      <Typography
+        variant="body2"
+        sx={{
+          color: 'text.secondary'
+        }}>
         {formatMessage({
           id: 'ImportObservationsWizard.MapColumnsStep.description'
         })}

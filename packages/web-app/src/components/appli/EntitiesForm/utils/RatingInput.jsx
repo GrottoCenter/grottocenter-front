@@ -52,7 +52,11 @@ const RatingInput = ({
         columnGap: 2,
         minWidth: 0
       }}>
-      <Typography variant="body2" fontWeight={600}>
+      <Typography
+        variant="body2"
+        sx={{
+          fontWeight: 600
+        }}>
         {formatMessage({ id: labelId })}
       </Typography>
       <Box
@@ -93,9 +97,11 @@ const RatingInput = ({
         />
         <Typography
           variant="body2"
-          color="text.secondary"
           aria-live="polite"
-          sx={{ minWidth: 0 }}>
+          sx={{
+            color: 'text.secondary',
+            minWidth: 0
+          }}>
           {activeLabel}
         </Typography>
         {value != null && (

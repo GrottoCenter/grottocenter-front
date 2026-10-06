@@ -31,7 +31,12 @@ const SectionTitle = ({
 
   if (!isDeleted)
     return title ? (
-      <AnchorBox id={anchorId} mt={0.5} mb={marginBottom}>
+      <AnchorBox
+        id={anchorId}
+        sx={{
+          mt: 0.5,
+          mb: marginBottom
+        }}>
         <Typography variant="h4">{heading}</Typography>
       </AnchorBox>
     ) : (
@@ -39,7 +44,11 @@ const SectionTitle = ({
     );
 
   return (
-    <AnchorBox id={anchorId} mb={1}>
+    <AnchorBox
+      id={anchorId}
+      sx={{
+        mb: 1
+      }}>
       <Typography
         variant="h4"
         noWrap

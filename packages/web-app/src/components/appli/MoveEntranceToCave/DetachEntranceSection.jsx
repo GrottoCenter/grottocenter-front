@@ -33,7 +33,10 @@ const DetachEntranceSection = ({ entrance }) => {
 
   return (
     <Box>
-      <Box mb={3}>
+      <Box
+        sx={{
+          mb: 3
+        }}>
         <OperationSummary entrance={entrance} variant="detach" />
       </Box>
       {error && (

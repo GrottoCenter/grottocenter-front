@@ -166,10 +166,19 @@ const EmptyState = () => (
       color: 'text.disabled'
     }}>
     <SearchOffIcon sx={{ fontSize: 56 }} />
-    <Typography variant="subtitle1" component="p" color="text.secondary">
+    <Typography
+      variant="subtitle1"
+      component="p"
+      sx={{
+        color: 'text.secondary'
+      }}>
       <Translate>No results</Translate>
     </Typography>
-    <Typography variant="body2" color="text.disabled">
+    <Typography
+      variant="body2"
+      sx={{
+        color: 'text.disabled'
+      }}>
       <Translate>Try adjusting your search or filters</Translate>
     </Typography>
   </Box>
@@ -199,7 +208,12 @@ const JumpToPage = ({ page, totalPages, onPageChange, showLabel = true }) => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
       {showLabel && (
-        <Typography variant="body2" color="text.secondary" noWrap>
+        <Typography
+          variant="body2"
+          noWrap
+          sx={{
+            color: 'text.secondary'
+          }}>
           <Translate>Go to page</Translate>
         </Typography>
       )}
@@ -229,7 +243,12 @@ const JumpToPage = ({ page, totalPages, onPageChange, showLabel = true }) => {
           }
         }}
       />
-      <Typography variant="body2" color="text.secondary" noWrap>
+      <Typography
+        variant="body2"
+        noWrap
+        sx={{
+          color: 'text.secondary'
+        }}>
         / {totalPages}
       </Typography>
     </Box>
@@ -531,15 +550,16 @@ const DesktopEntityTable = ({
               // had just pressed moved out from under the cursor.
               <Typography
                 variant="body2"
-                color="text.secondary"
                 aria-live="polite"
                 sx={{
+                  color: 'text.secondary',
                   minWidth: 0,
                   flex: '1 1 0',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   opacity: isLoading ? 0.5 : 1,
+
                   transition: theme.transitions.create('opacity', {
                     duration: theme.transitions.duration.shortest
                   })

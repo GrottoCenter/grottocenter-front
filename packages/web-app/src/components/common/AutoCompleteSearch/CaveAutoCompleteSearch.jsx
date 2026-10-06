@@ -70,14 +70,18 @@ const CaveAutoCompleteSearch = ({
           placeholder={formatMessage({
             id: 'Search for an entrance or network'
           })}
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {isLoading && <CircularProgress color="inherit" size={20} />}
-                {params.InputProps.endAdornment}
-              </>
-            )
+          slotProps={{
+            ...params.slotProps,
+
+            input: {
+              ...params.slotProps.input,
+              endAdornment: (
+                <>
+                  {isLoading && <CircularProgress color="inherit" size={20} />}
+                  {params.slotProps.input.endAdornment}
+                </>
+              )
+            }
           }}
         />
       )}

@@ -263,7 +263,11 @@ const RelatedCaves = ({
           { id: 'Are you sure you want to unlink {name}?' },
           {
             name: (
-              <Typography component="span" fontWeight={700}>
+              <Typography
+                component="span"
+                sx={{
+                  fontWeight: 700
+                }}>
                 {pendingRemove?.label ?? '?'}
               </Typography>
             )

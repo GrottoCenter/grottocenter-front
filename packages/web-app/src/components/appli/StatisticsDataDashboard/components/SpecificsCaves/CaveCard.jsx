@@ -35,11 +35,21 @@ const CaveCard = ({ idCave, nameCave, numberData, text, backgroundColor }) => {
           justifyContent: 'space-between',
           gap: 0.5
         }}>
-        <Typography variant="h4" fontWeight={700} noWrap>
+        <Typography
+          variant="h4"
+          noWrap
+          sx={{
+            fontWeight: 700
+          }}>
           {numberData.toLocaleString(locale)} m
         </Typography>
       </Box>
-      <Typography variant="body2" fontWeight={600} noWrap>
+      <Typography
+        variant="body2"
+        noWrap
+        sx={{
+          fontWeight: 600
+        }}>
         {nameCave}
       </Typography>
       <Typography variant="caption" sx={{ opacity: 0.85 }}>

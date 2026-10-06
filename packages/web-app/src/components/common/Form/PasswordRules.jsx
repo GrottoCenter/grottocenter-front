@@ -7,7 +7,12 @@ import { checkPasswordRules, PASSWORD_MIN_LENGTH } from '../../../conf/config';
 const RuleItem = ({ satisfied, labelId, labelValues = undefined }) => {
   const { formatMessage } = useIntl();
   return (
-    <Box display="flex" alignItems="center" gap={0.5}>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 0.5
+      }}>
       <BoolIcon value={satisfied} />
       <Typography
         variant="caption"
@@ -32,7 +37,12 @@ const PasswordRules = ({ password }) => {
   const rules = checkPasswordRules(password);
 
   return (
-    <Box display="flex" flexDirection="column" mb={0.5}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        mb: 0.5
+      }}>
       <RuleItem
         satisfied={rules.minLength}
         labelId="password.rule.minLength"

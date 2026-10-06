@@ -43,7 +43,10 @@ const SearchEntranceForm = ({ onSubmit, onSuccess }) => {
         );
 
   return (
-    <Box textAlign="center">
+    <Box
+      sx={{
+        textAlign: 'center'
+      }}>
       <EntrancesSearch />
       <SearchResults
         entityType={ADVANCED_SEARCH_TYPES.ENTRANCES}

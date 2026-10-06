@@ -91,20 +91,25 @@ const AssociationForm = ({ onClose, onSubmit, status, error }) => {
           <TextField
             {...params}
             label={formatMessage({ id: 'Search or create organization' })}
-            inputProps={{
-              ...params.inputProps,
-              maxLength: ORGANIZATION_NAME_MAX_LENGTH
-            }}
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {isLoading ? (
-                    <CircularProgress color="inherit" size={20} />
-                  ) : null}
-                  {params.InputProps.endAdornment}
-                </>
-              )
+            slotProps={{
+              ...params.slotProps,
+
+              input: {
+                ...params.slotProps.input,
+                endAdornment: (
+                  <>
+                    {isLoading ? (
+                      <CircularProgress color="inherit" size={20} />
+                    ) : null}
+                    {params.slotProps.input.endAdornment}
+                  </>
+                )
+              },
+
+              htmlInput: {
+                ...params.slotProps.htmlInput,
+                maxLength: ORGANIZATION_NAME_MAX_LENGTH
+              }
             }}
           />
         )}

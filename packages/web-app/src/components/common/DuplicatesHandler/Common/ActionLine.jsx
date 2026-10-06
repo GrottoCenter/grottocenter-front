@@ -17,7 +17,12 @@ const ActionLine = ({
 }) => {
   const { formatMessage } = useIntl();
   return (
-    <StyledGrid container direction="row" justifyContent="space-evenly">
+    <StyledGrid
+      container
+      direction="row"
+      sx={{
+        justifyContent: 'space-evenly'
+      }}>
       <Grid>
         <ActionButton
           label={formatMessage({ id: 'They are not duplicates' })}

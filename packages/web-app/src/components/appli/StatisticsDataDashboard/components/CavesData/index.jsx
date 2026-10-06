@@ -15,7 +15,12 @@ const CavesData = ({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h4" textAlign="center" pb={1}>
+      <Typography
+        variant="h4"
+        sx={{
+          textAlign: 'center',
+          pb: 1
+        }}>
         {title}
       </Typography>
       <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>

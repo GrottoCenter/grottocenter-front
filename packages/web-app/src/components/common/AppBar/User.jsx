@@ -154,7 +154,11 @@ const UserMenu = ({
             display: 'flex',
             flexDirection: 'column'
           }}>
-          <Typography variant="body2" color="text.primary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.primary'
+            }}>
             <Translate
               id="Logged as {userNickname}"
               values={{
@@ -162,7 +166,11 @@ const UserMenu = ({
               }}
             />
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary'
+            }}>
             {formatMessage(
               {
                 id: 'Expiration Date: {expirationDate} at {expirationHourAndMinutes}',
@@ -180,6 +188,7 @@ const UserMenu = ({
         {/* Primary actions */}
         <MenuItem
           component={AppLink}
+          nativeButton={false}
           to="/ui/account"
           disabled={!userId}
           onClick={handleClose}>
@@ -190,6 +199,7 @@ const UserMenu = ({
         </MenuItem>
         <MenuItem
           component={AppLink}
+          nativeButton={false}
           to="/ui/contributions"
           onClick={handleClose}
           divider={!isSessionExpired}>
@@ -201,6 +211,7 @@ const UserMenu = ({
         {hasDashboardAccess && (
           <MenuItem
             component={AppLink}
+            nativeButton={false}
             to="/ui/dashboard"
             onClick={handleClose}
             divider={!isSessionExpired}>

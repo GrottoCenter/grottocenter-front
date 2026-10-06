@@ -87,7 +87,11 @@ const HeroStats = () => {
 
   return (
     <StatsStrip>
-      <Grid container justifyContent="center">
+      <Grid
+        container
+        sx={{
+          justifyContent: 'center'
+        }}>
         {STATS.map(({ key, iconType, labelId, href, staticValue }, idx) => {
           const stat = queries[idx];
           const number = stat?.data;
@@ -117,10 +121,11 @@ const HeroStats = () => {
                   </Box>
                   <Typography
                     variant="h5"
-                    fontWeight="bold"
                     color={theme.palette.primary.main}
                     sx={{
+                      fontWeight: 'bold',
                       mt: 0.5,
+
                       [theme.breakpoints.down('sm')]: {
                         fontSize: '0.9375rem',
                         mt: '0px'
@@ -128,7 +133,11 @@ const HeroStats = () => {
                     }}>
                     {statValue}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary'
+                    }}>
                     {formatMessage({ id: labelId })}
                   </Typography>
                 </Box>

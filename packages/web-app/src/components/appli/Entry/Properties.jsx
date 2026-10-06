@@ -90,7 +90,12 @@ const Properties = ({
         variant="outlined"
         sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
         <InfoSection component="h2" title={formatMessage({ id: 'Location' })}>
-          <Box display="flex" flexDirection="column" gap={0.5}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 0.5
+            }}>
             {entrance.latitude && entrance.longitude && (
               <Property
                 loading={isLoading}
@@ -296,8 +301,18 @@ const Properties = ({
           <InfoSection
             component="h2"
             title={formatMessage({ id: 'Data quality' })}>
-            <Box display="flex" flexDirection="column">
-              <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  flexWrap: 'wrap'
+                }}>
                 <DataQualityBadge value={dataQuality.total} size={32} />
                 <Typography variant="body2">
                   {formatMessage({
@@ -347,9 +362,11 @@ const Properties = ({
                       return (
                         <Box
                           key={key}
-                          display="flex"
-                          alignItems="center"
-                          gap={0.5}>
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5
+                          }}>
                           <Typography
                             variant="caption"
                             noWrap

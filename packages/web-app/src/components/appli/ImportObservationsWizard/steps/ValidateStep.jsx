@@ -301,7 +301,11 @@ const ValidateStep = () => {
       <Box
         sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
         data-testid="validate-step-loading">
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {formatMessage({
             id: 'ImportObservationsWizard.ValidateStep.validating'
           })}
@@ -366,8 +370,10 @@ const ValidateStep = () => {
       {blockingErrors.length > 0 && totalRows > 0 && (
         <Typography
           variant="body2"
-          color="text.secondary"
-          data-testid="row-count-summary">
+          data-testid="row-count-summary"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {formatMessage(
             { id: 'ImportObservationsWizard.ValidateStep.rowCountSummary' },
             { total: totalRows, valid: validRows }

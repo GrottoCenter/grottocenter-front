@@ -34,26 +34,29 @@ const NumberField = ({
           error={isError}
           helperText={helperText}
           inputRef={ref}
-          InputLabelProps={{ shrink: true }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment
-                position="start"
-                sx={
-                  disabled
-                    ? { '& img': { filter: 'grayscale(1)', opacity: 0.5 } }
-                    : undefined
-                }>
-                <CustomIcon type={icon} size={20} />
-              </InputAdornment>
-            ),
-            endAdornment: unit ? (
-              <InputAdornment position="end">{unit}</InputAdornment>
-            ) : undefined,
-            inputProps
-          }}
           value={value ?? ''}
           onChange={onChange}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment
+                  position="start"
+                  sx={
+                    disabled
+                      ? { '& img': { filter: 'grayscale(1)', opacity: 0.5 } }
+                      : undefined
+                  }>
+                  <CustomIcon type={icon} size={20} />
+                </InputAdornment>
+              ),
+              endAdornment: unit ? (
+                <InputAdornment position="end">{unit}</InputAdornment>
+              ) : undefined,
+              inputProps
+            },
+
+            inputLabel: { shrink: true }
+          }}
         />
       )}
     />

@@ -90,7 +90,12 @@ const NewsCard = ({
         <Typography variant="h4" component="h3" sx={{ mt: '4px', mb: 0.5 }}>
           {title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+            mb: 1
+          }}>
           {text}
         </Typography>
         {linkMore && (

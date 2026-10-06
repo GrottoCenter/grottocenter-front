@@ -276,7 +276,12 @@ const Login = () => {
         passwordError={fieldErrors.password}
         serverError={serverError}
       />
-      <Box display="flex" justifyContent="flex-end" mt={0.5}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          mt: 0.5
+        }}>
         <Button
           type="button"
           size="small"
@@ -288,8 +293,18 @@ const Login = () => {
       </Box>
       {LoginButton}
       <Divider sx={{ my: 1 }} />
-      <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
-        <Typography variant="body2" color="text.secondary">
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 0.5
+        }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           <Translate>No account yet?</Translate>
         </Typography>
         <Button
@@ -308,10 +323,12 @@ const Login = () => {
     DialogContent = (
       <>
         <Box
-          display="flex"
-          height={60}
-          alignItems="center"
-          justifyContent="center">
+          sx={{
+            display: 'flex',
+            height: 60,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
           <WarningRounded
             htmlColor="#f44336"
             style={{ fontSize: 80, paddingBottom: 20 }}
@@ -348,10 +365,12 @@ const Login = () => {
     DialogContent = (
       <>
         <Box
-          display="flex"
-          height={60}
-          alignItems="center"
-          justifyContent="center">
+          sx={{
+            display: 'flex',
+            height: 60,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
           <WarningRounded
             htmlColor="#ff9800"
             style={{ fontSize: 80, paddingBottom: 20 }}
@@ -396,7 +415,12 @@ const Login = () => {
       fullScreen={isMobile}
       centerContentMobile={isMobile}
       title={
-        <Typography variant="h5" component="span" fontWeight={600}>
+        <Typography
+          variant="h5"
+          component="span"
+          sx={{
+            fontWeight: 600
+          }}>
           <Translate>Log in</Translate>
         </Typography>
       }>

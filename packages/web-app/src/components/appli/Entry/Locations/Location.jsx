@@ -93,7 +93,10 @@ const Location = ({
         />
       </Box>
       {isUpdateFormVisible && permissions.isAuth ? (
-        <Box width="100%">
+        <Box
+          sx={{
+            width: '100%'
+          }}>
           <CreateLocationForm
             closeForm={() => setIsUpdateFormVisible(false)}
             isNewLocation={false}

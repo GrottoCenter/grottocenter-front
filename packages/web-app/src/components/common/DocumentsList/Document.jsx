@@ -140,7 +140,10 @@ const Document = ({
             here just eats vertical space. */}
         {document.description &&
           !document.files?.some(f => isImageFile(f.fileName)) && (
-            <Box mt={0.5}>
+            <Box
+              sx={{
+                mt: 0.5
+              }}>
               <Typography
                 ref={descriptionRef}
                 variant="body2"
@@ -186,7 +189,10 @@ const Document = ({
 
         {/* Files */}
         {document.files && (
-          <Box mt={0.5}>
+          <Box
+            sx={{
+              mt: 0.5
+            }}>
             <Files
               files={document.files}
               description={document.description}

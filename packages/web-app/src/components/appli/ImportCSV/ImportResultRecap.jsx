@@ -33,7 +33,11 @@ const RecapTile = ({ icon, color, count, label, reportUrl, downloadLabel }) => (
     <Typography variant="h5" sx={{ color, fontWeight: 'bold', lineHeight: 1 }}>
       {count}
     </Typography>
-    <Typography variant="body2" color="text.secondary">
+    <Typography
+      variant="body2"
+      sx={{
+        color: 'text.secondary'
+      }}>
       {label}
     </Typography>
     {reportUrl && (
@@ -109,7 +113,11 @@ const ImportResultRecap = ({ progress, status, reportUrls = null }) => {
               )}
             </Typography>
             {hasInconsistency && (
-              <Typography variant="caption" color="text.secondary">
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary'
+                }}>
                 {formatMessage({ id: 'csvImport.recapInconsistencyNote' })}
               </Typography>
             )}
@@ -152,7 +160,11 @@ const ImportResultRecap = ({ progress, status, reportUrls = null }) => {
       </Box>
 
       {reportUrls && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary'
+          }}>
           <FormattedMessage
             id="csvImport.postImportInfo"
             defaultMessage="A copy of this summary has been sent to your notifications, and by email if you enabled it in your {settingsLink}. Report download links expire after 7 days."

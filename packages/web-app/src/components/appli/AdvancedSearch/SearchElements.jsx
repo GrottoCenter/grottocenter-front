@@ -33,7 +33,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckIcon from '@mui/icons-material/Check';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import LockIcon from '@mui/icons-material/Lock';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -69,8 +69,12 @@ export const SearchForm = ({ children, onSubmit, title }) => (
     {!!title && (
       <Typography
         variant="overline"
-        color="text.secondary"
-        sx={{ width: '100%', display: 'block', mb: -0.5 }}>
+        sx={{
+          color: 'text.secondary',
+          width: '100%',
+          display: 'block',
+          mb: -0.5
+        }}>
         <Translate>{title}</Translate>
       </Typography>
     )}
@@ -107,8 +111,12 @@ export const SearchFieldset = ({
     {title && (
       <Typography
         variant="overline"
-        color="text.secondary"
-        sx={{ display: 'block', mb: '4px', lineHeight: 1.8 }}>
+        sx={{
+          color: 'text.secondary',
+          display: 'block',
+          mb: '4px',
+          lineHeight: 1.8
+        }}>
         <Translate>{title}</Translate>
       </Typography>
     )}
@@ -158,7 +166,6 @@ export const SearchText = ({
       size="small"
       variant="outlined"
       placeholder={translatedLabel}
-      inputProps={{ 'aria-label': translatedLabel }}
       onChange={event => onChange(event.target.value)}
       value={value}
       slotProps={{
@@ -171,7 +178,9 @@ export const SearchText = ({
                 )
               }
             : {})
-        }
+        },
+
+        htmlInput: { 'aria-label': translatedLabel }
       }}
     />
   );
@@ -329,7 +338,13 @@ export const SearchTextAutocomplete = ({
             size="small"
             variant="outlined"
             placeholder={translatedLabel}
-            inputProps={{ ...params.inputProps, 'aria-label': translatedLabel }}
+            slotProps={{
+              ...params.slotProps,
+              htmlInput: {
+                ...params.slotProps.htmlInput,
+                'aria-label': translatedLabel
+              }
+            }}
           />
         );
       }}
@@ -586,7 +601,11 @@ export const SearchSelect = ({
         renderValue={v => {
           if (!v)
             return (
-              <Typography component="span" color="text.secondary">
+              <Typography
+                component="span"
+                sx={{
+                  color: 'text.secondary'
+                }}>
                 {formatMessage({ id: label })}
               </Typography>
             );
@@ -643,7 +662,7 @@ export const SearchMatchAllFieldsToogle = ({ isChecked, onChange }) => {
             })}
             enterTouchDelay={0}
             leaveTouchDelay={3000}>
-            <HelpOutlineIcon
+            <HelpOutlinedIcon
               fontSize="small"
               color="action"
               sx={{ verticalAlign: 'middle' }}

@@ -93,7 +93,12 @@ const FilePreviewTable = ({
 
   if (dataRows.length === 0) {
     return (
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+      <Typography
+        variant="body2"
+        sx={{
+          color: 'text.secondary',
+          mt: 0.5
+        }}>
         {formatMessage({
           id: 'ImportObservationsWizard.UploadStep.noDataRows'
         })}
@@ -441,9 +446,11 @@ const UploadStep = () => {
         {file && (
           <Typography
             variant="body2"
-            color="text.secondary"
-            sx={{ mt: 0.5 }}
-            data-testid="file-info">
+            data-testid="file-info"
+            sx={{
+              color: 'text.secondary',
+              mt: 0.5
+            }}>
             {formatMessage(
               {
                 id: 'ImportObservationsWizard.UploadStep.dataRowCount'
@@ -466,8 +473,10 @@ const UploadStep = () => {
           {profileFileName && (
             <Typography
               variant="body2"
-              color="text.secondary"
-              data-testid="profile-file-info">
+              data-testid="profile-file-info"
+              sx={{
+                color: 'text.secondary'
+              }}>
               {profileFileName}
             </Typography>
           )}
@@ -544,8 +553,10 @@ const UploadStep = () => {
                 onChange={handleHeaderRowChange}
                 data-testid="header-row-select"
                 MenuProps={{
-                  PaperProps: {
-                    sx: { maxWidth: 400 }
+                  slotProps: {
+                    paper: {
+                      sx: { maxWidth: 400 }
+                    }
                   }
                 }}
                 sx={{
@@ -584,8 +595,10 @@ const UploadStep = () => {
               })}
               value={skipFirstRows}
               onChange={handleSkipFirstRowsChange}
-              inputProps={{ min: 0, 'data-testid': 'skip-first-rows-input' }}
               sx={{ width: 200 }}
+              slotProps={{
+                htmlInput: { min: 0, 'data-testid': 'skip-first-rows-input' }
+              }}
             />
 
             <TextField
@@ -596,8 +609,10 @@ const UploadStep = () => {
               })}
               value={skipLastRows}
               onChange={handleSkipLastRowsChange}
-              inputProps={{ min: 0, 'data-testid': 'skip-last-rows-input' }}
               sx={{ width: 200 }}
+              slotProps={{
+                htmlInput: { min: 0, 'data-testid': 'skip-last-rows-input' }
+              }}
             />
           </Box>
         </>

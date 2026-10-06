@@ -103,7 +103,10 @@ const Rigging = ({
         />
       </Box>
       {isUpdateFormVisible && permissions.isAuth ? (
-        <Box width="100%">
+        <Box
+          sx={{
+            width: '100%'
+          }}>
           <CreateRiggingsForm
             isNew={false}
             onSubmit={onSubmitUpdateForm}

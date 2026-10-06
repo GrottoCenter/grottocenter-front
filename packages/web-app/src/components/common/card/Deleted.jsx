@@ -144,14 +144,17 @@ export const DeletedCard = ({
           direction="row"
           spacing={2}
           useFlexGap
-          flexWrap="wrap"
-          alignItems="center"
-          sx={{ mt: 2 }}>
+          sx={{
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            mt: 2
+          }}>
           {!!redirectToUrl && (
             <Button
               variant="outlined"
               color="primary"
               component={AppLink}
+              nativeButton={false}
               to={redirectToUrl}
               startIcon={<ArrowForwardIcon />}>
               {formatMessage(

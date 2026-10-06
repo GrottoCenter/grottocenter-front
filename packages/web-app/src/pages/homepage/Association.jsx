@@ -108,8 +108,10 @@ const Association = () => {
             id="association-title"
             variant="h3"
             component="h2"
-            fontWeight={600}
-            sx={{ color: 'secondary.main' }}>
+            sx={{
+              fontWeight: 600,
+              color: 'secondary.main'
+            }}>
             {formatMessage({ id: 'Wikicaves association' })}
           </Typography>
         </Box>
@@ -152,8 +154,10 @@ const Association = () => {
                   <Icon sx={{ color: 'secondary.main', fontSize: 22 }} />
                   <Typography
                     variant="subtitle2"
-                    fontWeight={700}
-                    sx={{ color: 'white' }}>
+                    sx={{
+                      fontWeight: 700,
+                      color: 'white'
+                    }}>
                     {formatMessage({ id: wordId })}
                   </Typography>
                 </Box>

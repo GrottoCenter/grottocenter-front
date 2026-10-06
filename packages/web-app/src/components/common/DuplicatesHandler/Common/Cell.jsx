@@ -2,7 +2,7 @@ import { Fab, Grid, InputAdornment, useTheme } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import PropTypes from 'prop-types';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import StringInput from '../../Form/StringInput';
 import { MarginLeftDiv, MarginRightDiv } from './WrapperUtilities';
 import AdornementPlaceholder from './AdornementPlaceholder';
@@ -32,8 +32,10 @@ export const RightCell = ({
     <Grid
       container
       direction="row"
-      justifyContent="flex-end"
-      alignItems="center">
+      sx={{
+        justifyContent: 'flex-end',
+        alignItems: 'center'
+      }}>
       <MarginRightDiv>
         <Fab
           onClick={() => updateState(value)}
@@ -51,7 +53,7 @@ export const RightCell = ({
         endAdornment={
           showAdornment ? (
             <InputAdornment position="end">
-              <ErrorOutlineIcon style={{ color: iconColor }} />
+              <ErrorOutlinedIcon style={{ color: iconColor }} />
             </InputAdornment>
           ) : (
             <AdornementPlaceholder />
@@ -97,8 +99,10 @@ export const LeftCell = ({
     <Grid
       container
       direction="row"
-      justifyContent="flex-start"
-      alignItems="center">
+      sx={{
+        justifyContent: 'flex-start',
+        alignItems: 'center'
+      }}>
       <StringInput
         value={render(value)}
         valueName={label}
@@ -107,7 +111,7 @@ export const LeftCell = ({
         startAdornment={
           showAdornment ? (
             <InputAdornment position="start">
-              <ErrorOutlineIcon style={{ color: iconColor }} />
+              <ErrorOutlinedIcon style={{ color: iconColor }} />
             </InputAdornment>
           ) : (
             <AdornementPlaceholder />

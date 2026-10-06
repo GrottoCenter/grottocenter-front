@@ -28,8 +28,10 @@ const DataLine = props => {
       <Grid
         container
         direction="row"
-        justifyContent="center"
-        alignItems="center">
+        sx={{
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
         <>
           <Grid size={{ xs: 10, sm: 4 }}>
             <Box style={{ display: 'flex', justifyContent: 'center' }}>

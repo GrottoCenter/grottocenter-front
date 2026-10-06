@@ -119,7 +119,10 @@ const Comment = ({
         />
       </Box>
       {isUpdateFormVisible && permissions.isAuth ? (
-        <Box width="100%">
+        <Box
+          sx={{
+            width: '100%'
+          }}>
           <CreateCommentForm
             closeForm={() => setIsUpdateFormVisible(false)}
             isNewComment={false}

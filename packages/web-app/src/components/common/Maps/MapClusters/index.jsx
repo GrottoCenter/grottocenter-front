@@ -511,7 +511,7 @@ const HydratedMap = ({
         onClose={handleContextMenuClose}
         anchorReference="anchorPosition"
         anchorPosition={contextMenuAnchor}
-        PaperProps={{ sx: { minWidth: 260 } }}>
+        slotProps={{ paper: { sx: { minWidth: 260 } } }}>
         <ListSubheader
           disableSticky
           sx={{ lineHeight: '32px', fontWeight: 'bold' }}>

@@ -82,7 +82,11 @@ const CountryList = ({ countries = [] }) => {
       title={formatMessage({ id: 'Countries' })}
       icon={<CustomIcon type="country" />}
       subheader={
-        <Typography variant="subtitle2" color="text.secondary">
+        <Typography
+          variant="subtitle2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {formatMessage({
             id: 'Sovereign countries and autonomous territories (ISO 3166-1)'
           })}

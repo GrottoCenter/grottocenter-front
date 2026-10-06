@@ -68,8 +68,17 @@ const DocumentReferences = ({ documents }) => {
   const additional = references.slice(previewLimit);
 
   return (
-    <Box component="section" mt={2}>
-      <Typography variant="h5" component="h3" mb={0.5}>
+    <Box
+      component="section"
+      sx={{
+        mt: 2
+      }}>
+      <Typography
+        variant="h5"
+        component="h3"
+        sx={{
+          mb: 0.5
+        }}>
         {formatMessage({ id: 'Bibliographic references' })}
       </Typography>
       <ReferenceList references={preview} />

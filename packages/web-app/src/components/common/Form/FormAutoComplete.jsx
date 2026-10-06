@@ -60,7 +60,12 @@ const FormAutoComplete = ({
 }) => (
   <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
     {helperContent && (
-      <Typography variant="caption" color="text.secondary" display="block">
+      <Typography
+        variant="caption"
+        sx={{
+          color: 'text.secondary',
+          display: 'block'
+        }}>
         {helperContent}
       </Typography>
     )}

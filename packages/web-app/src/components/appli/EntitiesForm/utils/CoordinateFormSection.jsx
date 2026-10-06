@@ -266,7 +266,14 @@ const CoordinateFormSection = ({
         mapHeight={mapHeight}
       />
       {/* CRS selector + coordinate fields, below the map */}
-      <Box display="flex" alignItems="flex-start" gap={0.5} mt={0.5} mb={0.5}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 0.5,
+          mt: 0.5,
+          mb: 0.5
+        }}>
         <Tooltip title={formatMessage({ id: 'Change coordinate system' })}>
           <Button
             variant="outlined"
@@ -330,11 +337,13 @@ const CoordinateFormSection = ({
                 size="small"
                 value={localX}
                 onChange={e => setLocalX(e.target.value)}
-                inputProps={{
-                  inputMode: isDMS ? 'text' : 'decimal',
-                  placeholder: isDMS ? `48°31'24.2"N` : undefined
-                }}
                 error={conversionError}
+                slotProps={{
+                  htmlInput: {
+                    inputMode: isDMS ? 'text' : 'decimal',
+                    placeholder: isDMS ? `48°31'24.2"N` : undefined
+                  }
+                }}
               />
               <TextField
                 fullWidth
@@ -342,11 +351,13 @@ const CoordinateFormSection = ({
                 size="small"
                 value={localY}
                 onChange={e => setLocalY(e.target.value)}
-                inputProps={{
-                  inputMode: isDMS ? 'text' : 'decimal',
-                  placeholder: isDMS ? `2°09'24.1"E` : undefined
-                }}
                 error={conversionError}
+                slotProps={{
+                  htmlInput: {
+                    inputMode: isDMS ? 'text' : 'decimal',
+                    placeholder: isDMS ? `2°09'24.1"E` : undefined
+                  }
+                }}
               />
             </>
           )}
@@ -354,15 +365,22 @@ const CoordinateFormSection = ({
       </Box>
       {/* UTM zone/hemisphere — separate row, only when needed */}
       {!isWGS84 && isUTM && (
-        <Box display="flex" gap={0.5} mb={0.5}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 0.5,
+            mb: 0.5
+          }}>
           <TextField
             label={formatMessage({ id: 'Zone' })}
             type="number"
             size="small"
             value={utmZone}
             onChange={e => setUtmZone(Number(e.target.value))}
-            inputProps={{ min: 1, max: 60, inputMode: 'numeric' }}
             sx={{ width: 100 }}
+            slotProps={{
+              htmlInput: { min: 1, max: 60, inputMode: 'numeric' }
+            }}
           />
           <TextField
             label={formatMessage({ id: 'Hemisphere' })}
@@ -370,8 +388,10 @@ const CoordinateFormSection = ({
             size="small"
             value={utmHemisphere}
             onChange={e => setUtmHemisphere(e.target.value)}
-            SelectProps={{ native: true }}
-            sx={{ width: 140 }}>
+            sx={{ width: 140 }}
+            slotProps={{
+              select: { native: true }
+            }}>
             <option value="North">{formatMessage({ id: 'North' })}</option>
             <option value="South">{formatMessage({ id: 'South' })}</option>
           </TextField>
@@ -383,8 +403,18 @@ const CoordinateFormSection = ({
         </Alert>
       )}
       {!isWGS84 && preview && (
-        <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-          <Typography variant="caption" color="text.secondary">
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            mb: 0.5
+          }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary'
+            }}>
             ≈ WGS84 :
           </Typography>
           <Chip

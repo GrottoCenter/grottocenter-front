@@ -444,7 +444,11 @@ const ShapefileImport = ({ onImport }) => {
                   : { position: 'absolute', visibility: 'hidden' })
               }}>
               <CircularProgress size={20} />
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary'
+                }}>
                 {formatMessage({ id: 'Analyzing geometry...' })}
               </Typography>
             </Box>
@@ -465,16 +469,28 @@ const ShapefileImport = ({ onImport }) => {
                   />
                   <Box
                     sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'text.secondary'
+                      }}>
                       {formatMessage({ id: 'Precise' })}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'text.secondary'
+                      }}>
                       {formatMessage({ id: 'Simplified' })}
                     </Typography>
                   </Box>
                 </Box>
                 <Box>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary'
+                    }}>
                     {formatMessage({ id: 'Vertex count' })}: {vertexCount}
                   </Typography>
                   {vertexWarning && (

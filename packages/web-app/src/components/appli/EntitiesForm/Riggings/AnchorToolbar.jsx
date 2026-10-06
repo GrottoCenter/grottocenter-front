@@ -47,9 +47,11 @@ const AnchorToolbar = ({ onInsert }) => {
         <Box sx={{ pt: 1, px: 1, pb: 1 }}>
           <Typography
             variant="caption"
-            color="text.secondary"
-            display="block"
-            sx={{ mb: 0.5 }}>
+            sx={{
+              color: 'text.secondary',
+              display: 'block',
+              mb: 0.5
+            }}>
             {formatMessage({ id: 'Click to insert' })}
           </Typography>
           <Box sx={{ display: 'flex', gap: 0.5 }}>
