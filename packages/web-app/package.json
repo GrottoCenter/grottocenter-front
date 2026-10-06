@@ -60,7 +60,7 @@
     "react-dropzone": "^14.3.8",
     "react-error-boundary": "^6.1.6",
     "react-hook-form": "^7.89.0",
-    "react-intl": "^8.1.4",
+    "react-intl": "^12.1.4",
     "react-ios-pwa-prompt": "^2.0.6",
     "react-leaflet": "^5.0.0",
     "react-leaflet-draw": "^0.21.0",
