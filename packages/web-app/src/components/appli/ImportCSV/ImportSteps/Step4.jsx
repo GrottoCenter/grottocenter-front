@@ -160,7 +160,7 @@ const Step4 = () => {
       )}
 
       {somethingWillBeCreated && (
-        <Box textAlign="center">
+        <Box sx={{ textAlign: 'center' }}>
           <ActionButton
             data-testid="csv-import-submit-button"
             label={formatMessage({ id: 'Import' })}

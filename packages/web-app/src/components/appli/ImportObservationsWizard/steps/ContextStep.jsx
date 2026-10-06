@@ -20,7 +20,7 @@ import {
   Typography
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
-import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import LicenseTag from '@/components/common/LicenseTag';
 import CoordinateFormSection from '../../EntitiesForm/utils/CoordinateFormSection';
 import { coordinatesMarkerIcon } from '../../../../assets/icons';
@@ -634,7 +634,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
             id: 'ImportObservationsWizard.ContextStep.samplingIntervalHelper'
           })}
           placement="right">
-          <HelpOutlinedIcon fontSize="small" color="action" />
+          <HelpOutlineOutlinedIcon fontSize="small" color="action" />
         </Tooltip>
       </Box>
       {/* Optional fields */}

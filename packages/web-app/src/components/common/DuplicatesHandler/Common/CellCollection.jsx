@@ -12,7 +12,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import RemoveIcon from '@mui/icons-material/Remove';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import StringInput from '../../Form/StringInput';
 import ActionButton from '../../ActionButton';
 import { MarginLeftDiv, MarginRightDiv } from './WrapperUtilities';
@@ -84,7 +84,7 @@ export const RightCellCollection = ({
                 endAdornment={
                   showAdornment(value) ? (
                     <InputAdornment position="end">
-                      <ErrorOutlinedIcon
+                      <ErrorOutlineOutlinedIcon
                         style={{ color: getAdornementColor(value) }}
                       />
                     </InputAdornment>
@@ -200,7 +200,7 @@ export const LeftCellCollection = ({
                 startAdornment={
                   showAdornment(value) ? (
                     <InputAdornment position="start">
-                      <ErrorOutlinedIcon
+                      <ErrorOutlineOutlinedIcon
                         style={{ color: getAdornementColor(value) }}
                       />
                     </InputAdornment>

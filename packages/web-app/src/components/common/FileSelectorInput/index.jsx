@@ -257,8 +257,8 @@ const FileSelectorInput = ({
       />
       <Typography
         variant="body2"
-        color={isDragActive ? 'primary' : 'text.secondary'}
         sx={{
+          color: isDragActive ? 'primary.main' : 'text.secondary',
           fontWeight: 500
         }}>
         {t('Drag and drop files here', 'Drag and drop a file here')}

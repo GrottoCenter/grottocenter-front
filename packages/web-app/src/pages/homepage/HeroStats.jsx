@@ -121,8 +121,8 @@ const HeroStats = () => {
                   </Box>
                   <Typography
                     variant="h5"
-                    color={theme.palette.primary.main}
                     sx={{
+                      color: 'primary.main',
                       fontWeight: 'bold',
                       mt: 0.5,
 

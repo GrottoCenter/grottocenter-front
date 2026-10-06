@@ -196,8 +196,8 @@ const MobileEntityCard = React.memo(
                         </Typography>
                         <Typography
                           variant="body2"
-                          color={isMissing ? 'text.disabled' : 'text.primary'}
                           sx={{
+                            color: isMissing ? 'text.disabled' : 'text.primary',
                             fontWeight: isMissing ? 'normal' : 500
                           }}>
                           {value}

@@ -120,6 +120,7 @@ const JoinCommunity = () => {
         </Grid>
         <AttractiveButton
           component={AppLink}
+          nativeButton={false}
           to="/ui/signup"
           variant="contained"
           color="secondary"

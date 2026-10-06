@@ -243,6 +243,7 @@ const Step5 = () => {
           <ActionButton
             data-testid="csv-import-home-button"
             component={AppLink}
+            nativeButton={false}
             to="/"
             variant="contained"
             label={formatMessage({ id: 'Go to home page' })}

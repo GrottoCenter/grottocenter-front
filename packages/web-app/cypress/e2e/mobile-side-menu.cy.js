@@ -15,22 +15,26 @@ describe('Mobile side menu', () => {
       const win = paper.ownerDocument.defaultView;
       const startX = Math.min(paper.getBoundingClientRect().width - 25, 220);
       const dispatchTouch = (type, x) => {
-        const touch = new win.Touch({
+        // Firefox does not expose a constructible Touch. The drawer only
+        // reads the touch lists and coordinates, so use a DOM event with
+        // those properties in every browser.
+        const touch = {
           identifier: 1,
           target: paper,
           clientX: x,
           clientY: 32,
           pageX: x,
           pageY: 32
+        };
+        const event = new win.Event(type, {
+          bubbles: true,
+          cancelable: true
         });
-        paper.dispatchEvent(
-          new win.TouchEvent(type, {
-            bubbles: true,
-            cancelable: true,
-            touches: type === 'touchend' ? [] : [touch],
-            changedTouches: [touch]
-          })
-        );
+        Object.defineProperties(event, {
+          touches: { value: type === 'touchend' ? [] : [touch] },
+          changedTouches: { value: [touch] }
+        });
+        paper.dispatchEvent(event);
       };
 
       return new Cypress.Promise(resolve => {

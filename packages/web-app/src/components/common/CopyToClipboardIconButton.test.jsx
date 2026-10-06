@@ -72,7 +72,7 @@ describe('CopyToClipboardIconButton', () => {
     expect(
       await screen.findByRole('button', { name: 'Unable to copy text' })
     ).toBeVisible();
-    expect(screen.getByTestId('ErrorOutlinedIcon')).toHaveClass(
+    expect(screen.getByTestId('ErrorOutlineOutlinedIcon')).toHaveClass(
       'MuiSvgIcon-colorError'
     );
   });

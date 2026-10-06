@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import {
   Button,
   Divider,
@@ -302,11 +302,41 @@ const SideMenu = () => {
   // cares about its own flag, so neither re-renders for the other's.
   const isExpanded = useSelector(state => state.sideMenu.isExpanded);
   const isMobileOpen = useSelector(state => state.sideMenu.isMobileOpen);
+  const mobilePaperRef = useRef(null);
+  const swipeTransformRef = useRef(null);
 
-  const handleClose = useCallback(
-    () => dispatch(closeMobileSideMenu()),
-    [dispatch]
-  );
+  const handleEnter = useCallback(node => {
+    mobilePaperRef.current = node;
+  }, []);
+  const handleClose = useCallback(() => {
+    const transform = mobilePaperRef.current?.style.transform;
+    swipeTransformRef.current = transform?.startsWith('translate(')
+      ? transform
+      : null;
+    dispatch(closeMobileSideMenu());
+  }, [dispatch]);
+  const handleExit = useCallback(node => {
+    const swipeTransform = swipeTransformRef.current;
+    swipeTransformRef.current = null;
+    if (!swipeTransform) return;
+
+    // Slide preserves the inline gesture transform, but Firefox can still
+    // create its CSS transition from the fully open position. Preserve the
+    // gesture in the transition's keyframes as well, keeping MUI's timing.
+    // Wait until React has finished committing the exit styles.
+    node.ownerDocument.defaultView.queueMicrotask(() => {
+      node.getAnimations().forEach(animation => {
+        if (animation.transitionProperty === 'transform') {
+          const [firstKeyframe, ...remainingKeyframes] =
+            animation.effect.getKeyframes();
+          animation.effect.setKeyframes([
+            { ...firstKeyframe, transform: swipeTransform },
+            ...remainingKeyframes
+          ]);
+        }
+      });
+    });
+  }, []);
   const handleOpen = useCallback(
     () => dispatch(openMobileSideMenu()),
     [dispatch]
@@ -329,6 +359,8 @@ const SideMenu = () => {
       // default: a missing key falls through to `transitions.create`'s
       // easeInOut, not to Slide's.
       transition: {
+        onEnter: handleEnter,
+        onExit: handleExit,
         easing: {
           enter: theme.transitions.easing.easeOut,
           exit: theme.transitions.easing.easeOut
@@ -337,7 +369,7 @@ const SideMenu = () => {
       // Below the AppBar, so the edge-swipe strip can't swallow taps on it.
       swipeArea: { sx: { top: theme.appBarHeight } }
     }),
-    [theme]
+    [theme, handleEnter, handleExit]
   );
 
   if (isDesktop) {

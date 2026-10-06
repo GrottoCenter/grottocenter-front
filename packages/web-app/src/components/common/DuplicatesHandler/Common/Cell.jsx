@@ -2,7 +2,7 @@ import { Fab, Grid, InputAdornment, useTheme } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import PropTypes from 'prop-types';
-import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import StringInput from '../../Form/StringInput';
 import { MarginLeftDiv, MarginRightDiv } from './WrapperUtilities';
 import AdornementPlaceholder from './AdornementPlaceholder';
@@ -53,7 +53,7 @@ export const RightCell = ({
         endAdornment={
           showAdornment ? (
             <InputAdornment position="end">
-              <ErrorOutlinedIcon style={{ color: iconColor }} />
+              <ErrorOutlineOutlinedIcon style={{ color: iconColor }} />
             </InputAdornment>
           ) : (
             <AdornementPlaceholder />
@@ -111,7 +111,7 @@ export const LeftCell = ({
         startAdornment={
           showAdornment ? (
             <InputAdornment position="start">
-              <ErrorOutlinedIcon style={{ color: iconColor }} />
+              <ErrorOutlineOutlinedIcon style={{ color: iconColor }} />
             </InputAdornment>
           ) : (
             <AdornementPlaceholder />

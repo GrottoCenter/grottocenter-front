@@ -16,15 +16,23 @@ The reference is the [official v9 migration guide](https://mui.com/material-ui/m
 
 - System props on Box, Stack, Grid, Typography and Timeline components move
   into `sx`, including components wrapped with `styled()`.
+- Typography palette paths (`text.secondary`, `primary.main`, etc.)
+  and literal colors move into `sx.color`; its `color` prop now accepts
+  palette names such as `primary` and aliases such as `textSecondary`.
 - Deprecated field, checkbox, switch, dialog, menu and popover props move to
   `slots` or `slotProps`. Nested Select menu props are migrated as well.
 - Autocomplete's `renderInput` parameters now expose `slotProps.input` and
   `slotProps.htmlInput`. Custom fields preserve those refs and handlers when
   adding adornments or accessibility attributes. Author chips use `renderValue`.
-- Removed `*Outline` icon exports use their equivalent `*Outlined` exports.
+- Removed `*Outline` icon exports use the matching glyphs: `ErrorOutline`
+  becomes `ErrorOutlineOutlined`, and `HelpOutline` becomes
+  `HelpOutlineOutlined`. `ErrorOutlined` and `HelpOutlined` are solid discs
+  and do not preserve the old rings. `CheckCircleOutlined` and `DeleteOutlined`
+  preserve their previous glyphs.
   Other icon names, such as `DriveFileRenameOutline`, remain valid.
 - Vertical Grid containers become Stack; obsolete Grid `item` props are removed.
-- Buttons rendered through AppLink explicitly declare `nativeButton={false}`.
+- Buttons rendered through AppLink declare `nativeButton={false}` where needed;
+  ButtonBase also recognizes links through their `to` or `href` props.
 - StepConnector styles use the orientation class on the root rather than
   removed orientation-specific line classes.
 
@@ -40,11 +48,15 @@ looks unchanged.
 The old 7.3.9 pin avoided a Slide regression that reset the drawer to its fully
 open position when closing after a partial swipe. In 9.4.0, Slide recognizes
 SwipeableDrawer's gesture transform and preserves it during exit.
+Firefox can still create the CSS transition from the fully open position.
+The mobile side menu captures the gesture transform before closing and restores
+the first transition keyframe after React commits the exit styles. The remaining
+keyframes, easing and duration stay under MUI's control.
 
 `cypress/e2e/mobile-side-menu.cy.js` checks the drawer's position frame by frame
-after release, then verifies that it closes and can be reopened. A Chromium
-touch smoke test also exercised the real touch input path: the drawer continued
-from -140px to -240px without returning toward the open position.
+after release, then verifies that it closes and can be reopened. It dispatches
+DOM events with touch lists and coordinates so the same regression check runs
+in Chrome and Firefox, including browsers without a constructible `Touch`.
 
 Restart Vite with `yarn start --force` after changing dependencies so that the
 browser tests the new prebundled code.
@@ -58,15 +70,13 @@ browser tests the new prebundled code.
 - Autocomplete focus and keyboard selection: passed in a new unit test.
 - Tests for button/alert states and wizard progress were adapted to MUI 9's
   classes and ARIA precision, then passed on rerun.
-- The initial complete Vitest run passed 175 files. Its three assertion failures
-  were addressed above; eight other files hit worker startup timeouts on the
-  loaded Windows host. Rerunning those eight files alone with one worker passed
-  all 59 tests, with no worker errors.
+- The complete Vitest suite passed: 187 files and 1,280 tests.
 - Cypress: the partial-swipe test passed; all 17 page smoke tests passed with
   `defaultCommandTimeout=15000`. The first map check exceeded the default 4s
   while its lazy module was loading.
 
-Unit checks use `--maxWorkers=2 --testTimeout=15000` for the complete suite and
-`--maxWorkers=1 --testTimeout=15000` for targeted reruns. On Windows, Cypress
-was launched with `ELECTRON_RUN_AS_NODE` cleared in the child shell; the IDE
-environment sets it to `1`.
+On constrained machines, unit checks can use
+`--maxWorkers=2 --testTimeout=15000` for the complete suite and
+`--maxWorkers=1 --testTimeout=15000` for targeted reruns.
+If Vite's development-page warmup delays test startup, disable `server.warmup`
+in a temporary test configuration while preserving the app's test settings.

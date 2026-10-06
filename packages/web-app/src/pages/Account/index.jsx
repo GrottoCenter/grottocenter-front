@@ -27,7 +27,7 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
@@ -481,7 +481,7 @@ const MfaSection = () => {
             size="small"
             variant="outlined"
             color="warning"
-            icon={<ErrorOutlinedIcon />}
+            icon={<ErrorOutlineOutlinedIcon />}
             label={formatMessage({ id: 'mfaStatusInactive' })}
           />
         )}
@@ -690,7 +690,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
               size="small"
               variant="outlined"
               color="error"
-              icon={<ErrorOutlinedIcon />}
+              icon={<ErrorOutlineOutlinedIcon />}
               label={formatMessage({ id: 'Email not verified' })}
             />
           ))}

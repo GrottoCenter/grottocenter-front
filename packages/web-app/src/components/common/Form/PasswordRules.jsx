@@ -16,7 +16,7 @@ const RuleItem = ({ satisfied, labelId, labelValues = undefined }) => {
       <BoolIcon value={satisfied} />
       <Typography
         variant="caption"
-        color={satisfied ? 'success.main' : 'text.secondary'}>
+        sx={{ color: satisfied ? 'success.main' : 'text.secondary' }}>
         {formatMessage({ id: labelId }, labelValues)}
       </Typography>
     </Box>

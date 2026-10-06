@@ -147,8 +147,11 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
           <CustomIcon type={item.icon} size={16} />
           <Typography
             variant="body2"
-            color={item.accent ? 'primary' : 'text.primary'}
-            sx={{ minWidth: 0, fontWeight: item.accent ? 600 : 400 }}>
+            sx={{
+              color: item.accent ? 'primary.main' : 'text.primary',
+              minWidth: 0,
+              fontWeight: item.accent ? 600 : 400
+            }}>
             {item.name}
           </Typography>
         </Box>

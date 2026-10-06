@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { AREA_LIMIT_KM2 } from '../../../../utils/polygonValidation';
 
 const PolygonLayersList = ({
@@ -201,7 +201,7 @@ const PolygonLayersList = ({
                     }}>
                     {(layer.hasSelfIntersection || layer.tooFewPoints) && (
                       <Tooltip title={getErrorTooltip(layer)} arrow>
-                        <ErrorOutlinedIcon
+                        <ErrorOutlineOutlinedIcon
                           fontSize="small"
                           color="error"
                           sx={{ flexShrink: 0 }}

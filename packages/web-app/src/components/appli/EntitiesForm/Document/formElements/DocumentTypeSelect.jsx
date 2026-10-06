@@ -78,8 +78,8 @@ const FeaturedCard = ({ docType, selected, onClick }) => {
             </Box>
             <Typography
               variant="subtitle1"
-              color={selected ? 'primary.main' : 'text.primary'}
               sx={{
+                color: selected ? 'primary.main' : 'text.primary',
                 fontWeight: 600
               }}>
               {formatMessage({ id: docType.name })}
@@ -144,9 +144,9 @@ const SecondaryCard = ({ docType, selected, onClick }) => {
             </Box>
             <Typography
               variant="body2"
-              color={selected ? 'primary.main' : 'text.primary'}
               noWrap
               sx={{
+                color: selected ? 'primary.main' : 'text.primary',
                 fontWeight: selected ? 600 : 400
               }}>
               {formatMessage({ id: docType.name })}
@@ -272,8 +272,8 @@ const DocumentTypeSelect = () => {
               )}
               <Typography
                 variant="body2"
-                color={selectedOther ? 'primary.main' : 'text.primary'}
                 sx={{
+                  color: selectedOther ? 'primary.main' : 'text.primary',
                   fontWeight: 500,
                   flex: 1
                 }}>

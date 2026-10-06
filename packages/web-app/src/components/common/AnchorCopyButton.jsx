@@ -66,11 +66,7 @@ const AnchorCopyButton = ({ anchorId }) => {
         {copied ? (
           <CheckIcon fontSize="inherit" />
         ) : (
-          <LinkIcon
-            sx={{
-              fontSize: 'inherit'
-            }}
-          />
+          <LinkIcon fontSize="inherit" />
         )}
       </IconButton>
     </Tooltip>
