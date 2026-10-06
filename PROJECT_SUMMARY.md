@@ -16,7 +16,7 @@ Grottocenter is a web application frontend for the speleology (cave exploration)
 
 ### Development Tools
 - **Yarn 4.5** with workspaces - Package management
-- **ESLint 9** (flat config) + **Prettier 3** - Code quality
+- **ESLint 10** (flat config) + **Prettier 3** - Code quality
 - **Storybook 10** - Component development
 - **Cypress 15** - E2E testing
 - **Husky 9** - Git hooks
