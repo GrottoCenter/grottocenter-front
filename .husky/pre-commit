@@ -1,4 +1,4 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
 
-node_modules/.bin/lint-staged
+# Keep unstaged edits out of the commit when tasks modify other tracked files.
+lint-staged --hide-unstaged
