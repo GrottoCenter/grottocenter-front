@@ -2318,7 +2318,7 @@ __metadata:
     shpjs: "npm:^6.2.0"
     simplify-js: "npm:^1.2.4"
     storybook: "npm:^10.6.0"
-    supercluster: "npm:^8.0.1"
+    supercluster: "npm:^9.1.0"
     swagger-ui-react: "npm:^5.33.0"
     validator: "npm:^13.15.35"
     vite: "npm:^8.3.1"
@@ -5554,7 +5554,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/geojson@npm:^7946.0.10":
+"@types/geojson@npm:^7946.0.10, @types/geojson@npm:^7946.0.16":
   version: 7946.0.16
   resolution: "@types/geojson@npm:7946.0.16"
   checksum: 10/34d07421bdd60e7b99fa265441d17ac6e9aef48e3ce22d04324127d0de1daf7fbaa0bd3be1cece2092eb6995f21da84afa5231e24621a2910ff7340bc98f496f
@@ -10401,7 +10401,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kdbush@npm:^4.0.2":
+"kdbush@npm:^4.1.0":
   version: 4.1.0
   resolution: "kdbush@npm:4.1.0"
   checksum: 10/40d0a1a8e9928fabc3b5f7026b280573e718020c74438a4b5702400f8a6e4c38fb6110c456d6e592f56352da7011cc794ed47195c9c501647bcb16287c1d7dd2
@@ -13764,12 +13764,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supercluster@npm:^8.0.1":
-  version: 8.0.1
-  resolution: "supercluster@npm:8.0.1"
+"supercluster@npm:^9.1.0":
+  version: 9.1.0
+  resolution: "supercluster@npm:9.1.0"
   dependencies:
-    kdbush: "npm:^4.0.2"
-  checksum: 10/3e517e54087fe24efa274013a5c116b0083d140d3cd855c5004fef61b64dde83510d2a65cd6565349b693751936aede2305f76d84778e6107ae1b3ffa18a5bae
+    "@types/geojson": "npm:^7946.0.16"
+    kdbush: "npm:^4.1.0"
+  checksum: 10/c9332ef2ae9a7f056be53fc500ae1d8fc4f077ef2706b1998f6c72b4b1bd4986653b30116b1da24b1d32b275622ac948782d77bfa7cfc37fd932136d9d7812fc
   languageName: node
   linkType: hard
 
