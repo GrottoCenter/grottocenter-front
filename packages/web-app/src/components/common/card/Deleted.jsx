@@ -76,15 +76,6 @@ const StyledEntityIcon = styled(EntityIcon)`
   float: left;
 `;
 
-export const Deleted = ({ entityType, entity }) => (
-  <Layout
-    title={entity.name}
-    content={
-      <DeletedCard entityType={entityType} entity={entity} standalone={false} />
-    }
-  />
-);
-
 export const DeletedCard = ({
   entityType,
   entity,
@@ -199,6 +190,15 @@ export const DeletedCard = ({
 
   return <Card sx={{ p: 2 }}>{content}</Card>;
 };
+
+export const Deleted = ({ entityType, entity }) => (
+  <Layout
+    title={entity.name}
+    content={
+      <DeletedCard entityType={entityType} entity={entity} standalone={false} />
+    }
+  />
+);
 
 export const DeleteConfirmationDialog = ({
   entityType,

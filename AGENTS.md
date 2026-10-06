@@ -217,7 +217,7 @@ Existing `../` imports are left in place and migrated progressively (dedicated `
 
 ### ESLint & Prettier
 
-The project uses **ESLint 9 (flat config) + Airbnb config**. The whole setup lives in
+The project uses **ESLint 10 (flat config) + Airbnb config**. The whole setup lives in
 `eslint.config.mjs` at the repo root, composing `packages/eslint-config`. There are no
 `.eslintrc` files and flat config has no cascade: per-directory rules are `files`-scoped
 blocks in the root config.

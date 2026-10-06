@@ -118,7 +118,7 @@ const formatNotification = notification => {
   }
 
   // Verb
-  let verb = '';
+  let verb;
   switch (notificationType.name) {
     case 'CREATE':
       verb = 'created';

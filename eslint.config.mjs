@@ -83,6 +83,7 @@ export default [
   {
     files: [
       '*.{js,mjs,cjs}',
+      'packages/eslint-config/**/*.{js,mjs}',
       'scripts/**/*.js',
       'packages/web-app/scripts/**/*.js',
       '**/*.config.{js,mjs,cjs}',
