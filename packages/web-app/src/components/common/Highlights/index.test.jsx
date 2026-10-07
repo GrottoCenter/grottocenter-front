@@ -35,4 +35,18 @@ describe('Highlights', () => {
     rerender(<HighLightsChar oldText="Old text" />);
     expect(screen.getByText('Old text')).toBeInTheDocument();
   });
+
+  it('optionally identifies changed words without relying on colors or duplicating shared text', () => {
+    const { container } = render(
+      <HighLightsChar
+        oldText="north entrance"
+        newText="south entrance"
+        showChangeMarkers
+      />
+    );
+    expect(container.querySelector('del')).toHaveTextContent('− north');
+    expect(container.querySelector('ins')).toHaveTextContent('+ south');
+    expect(screen.getByText('entrance')).toBeInTheDocument();
+    expect(container.querySelectorAll('br')).toHaveLength(0);
+  });
 });

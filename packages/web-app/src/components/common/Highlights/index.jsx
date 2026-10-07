@@ -7,6 +7,7 @@ import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
 
 const AddedText = styled('span')`
+  text-decoration: none;
   background-color: rgb(70, 149, 74, 0.4);
   border-radius: 3px;
   padding: 0 2px;
@@ -21,7 +22,7 @@ const RemovedText = styled('span')`
 `;
 const UnchangedText = styled('span')``;
 
-const HighLightsChar = ({ oldText, newText }) => {
+const HighLightsChar = ({ oldText, newText, showChangeMarkers = false }) => {
   if (isNil(oldText)) {
     return <UnchangedText>{newText}</UnchangedText>;
   }
@@ -35,10 +36,20 @@ const HighLightsChar = ({ oldText, newText }) => {
   /* eslint-disable react/no-array-index-key */
   return result.map((change, index) => {
     if (change.added) {
-      return <AddedText key={index}>{change.value}</AddedText>;
+      return (
+        <AddedText key={index} as={showChangeMarkers ? 'ins' : 'span'}>
+          {showChangeMarkers && '+ '}
+          {change.value}
+        </AddedText>
+      );
     }
     if (change.removed) {
-      return <RemovedText key={index}>{change.value}</RemovedText>;
+      return (
+        <RemovedText key={index} as={showChangeMarkers ? 'del' : 'span'}>
+          {showChangeMarkers && '− '}
+          {change.value}
+        </RemovedText>
+      );
     }
     return <UnchangedText key={index}>{change.value}</UnchangedText>;
   });
@@ -79,7 +90,8 @@ const HighLightsLine = ({ oldText, newText }) => {
 
 HighLightsChar.propTypes = {
   newText: PropTypes.string,
-  oldText: PropTypes.string
+  oldText: PropTypes.string,
+  showChangeMarkers: PropTypes.bool
 };
 HighLightsLine.propTypes = {
   newText: PropTypes.string,

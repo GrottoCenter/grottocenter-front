@@ -18,12 +18,13 @@ const meta = {
 export default meta;
 
 export const Default = {
-  render: () => (
+  render: ({ actionsPosition = 'bottom' }) => (
     <StandardDialog
       maxWidth="lg"
       open
       onClose={action('onClose')}
       title="title"
+      actionsPosition={actionsPosition}
       actions={[
         <Button key={0} onClick={action('Action')} color="primary">
           <>
@@ -35,4 +36,9 @@ export const Default = {
       <Content />
     </StandardDialog>
   )
+};
+
+export const HeaderActions = {
+  ...Default,
+  args: { actionsPosition: 'top' }
 };
