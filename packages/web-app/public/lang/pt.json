@@ -922,7 +922,6 @@
   "documentModeration.changes": "Alterações propostas",
   "documentModeration.editUnavailable": "Edição indisponível: ficheiros a aguardar validação.",
   "documentModeration.legend": "Apenas os campos comparados. O texto removido está a vermelho (−); o texto adicionado está a verde (+).",
-  "documentModeration.modification": "Alteração proposta",
   "documentModeration.noChanges": "Nenhuma alteração detetada nos campos comparados.",
   "documentModeration.pendingFilesEdit": "Esta proposta adiciona ficheiros. Valide-a ou rejeite-a antes de editar para preservar os ficheiros pendentes.",
   "documentModeration.preview": "Documento após a validação",

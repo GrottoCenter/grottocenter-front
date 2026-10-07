@@ -922,7 +922,6 @@
   "documentModeration.changes": "Modifiche proposte",
   "documentModeration.editUnavailable": "Modifica non disponibile: file in attesa di convalida.",
   "documentModeration.legend": "Solo i campi confrontati. Il testo rimosso è rosso (−); il testo aggiunto è verde (+).",
-  "documentModeration.modification": "Modifica proposta",
   "documentModeration.noChanges": "Nessuna modifica rilevata nei campi confrontati.",
   "documentModeration.pendingFilesEdit": "Questa proposta aggiunge file. Convalidala o rifiutala prima di modificare per preservare i file in attesa.",
   "documentModeration.preview": "Documento dopo la convalida",

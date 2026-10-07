@@ -922,7 +922,6 @@
   "documentModeration.changes": "שינויים מוצעים",
   "documentModeration.editUnavailable": "העריכה אינה זמינה: קבצים ממתינים לאישור.",
   "documentModeration.legend": "רק השדות שהושוו. טקסט שהוסר מוצג באדום (−); טקסט שנוסף מוצג בירוק (+).",
-  "documentModeration.modification": "שינוי מוצע",
   "documentModeration.noChanges": "לא זוהו שינויים בשדות שהושוו.",
   "documentModeration.pendingFilesEdit": "הצעה זו מוסיפה קבצים. יש לאשר או לדחות אותה לפני העריכה כדי לשמור על הקבצים הממתינים.",
   "documentModeration.preview": "המסמך לאחר האישור",

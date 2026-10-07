@@ -922,7 +922,6 @@
   "documentModeration.changes": "Modificări propuse",
   "documentModeration.editUnavailable": "Editarea nu este disponibilă: fișiere în așteptarea validării.",
   "documentModeration.legend": "Doar câmpurile comparate. Textul eliminat este roșu (−), iar textul adăugat este verde (+).",
-  "documentModeration.modification": "Modificare propusă",
   "documentModeration.noChanges": "Nu s-au detectat modificări în câmpurile comparate.",
   "documentModeration.pendingFilesEdit": "Această propunere adaugă fișiere. Validați-o sau respingeți-o înainte de editare pentru a păstra fișierele în așteptare.",
   "documentModeration.preview": "Document după validare",

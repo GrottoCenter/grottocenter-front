@@ -922,7 +922,6 @@
   "documentModeration.changes": "Предложени промени",
   "documentModeration.editUnavailable": "Редактирането е недостъпно: файлове чакат одобрение.",
   "documentModeration.legend": "Само сравняваните полета. Премахнатият текст е в червено (−), а добавеният — в зелено (+).",
-  "documentModeration.modification": "Предложена промяна",
   "documentModeration.noChanges": "Не са открити промени в сравняваните полета.",
   "documentModeration.pendingFilesEdit": "Това предложение добавя файлове. Одобрете или отхвърлете го преди редактиране, за да запазите чакащите файлове.",
   "documentModeration.preview": "Документ след одобрение",

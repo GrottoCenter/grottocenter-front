@@ -922,7 +922,6 @@
   "documentModeration.changes": "التغييرات المقترحة",
   "documentModeration.editUnavailable": "التعديل غير متاح: ملفات بانتظار الموافقة.",
   "documentModeration.legend": "الحقول المقارنة فقط. النص المحذوف باللون الأحمر (−)؛ والنص المضاف باللون الأخضر (+).",
-  "documentModeration.modification": "تعديل مقترح",
   "documentModeration.noChanges": "لم تُكتشف تغييرات في الحقول المقارنة.",
   "documentModeration.pendingFilesEdit": "يضيف هذا المقترح ملفات. اقبله أو ارفضه قبل تعديل المستند للحفاظ على الملفات المعلقة.",
   "documentModeration.preview": "المستند بعد الموافقة",

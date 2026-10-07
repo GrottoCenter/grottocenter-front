@@ -29,14 +29,29 @@ const getProposedDocumentFiles = (current, proposed) => {
         item => String(item.id) === String(file.id)
       );
       return {
-        ...old,
         ...file,
-        // A rename only carries id/fileName; its download is still the old file.
-        completePath: old?.completePath ?? file.completePath
+        // toFile fills missing rename metadata with null or an undefined path.
+        // Keep the original download, thumbnails and metadata for this file.
+        ...old,
+        fileName: file.fileName
       };
     }),
     ...(proposed.newFiles ?? [])
   ];
+};
+
+const resolveOrganization = (organization, currentOrganizations) => {
+  if (!organization) return organization;
+  return {
+    ...organization,
+    // Pending TGrotto rows omit t_name. Reuse names only for matching ids.
+    name:
+      organization.name ||
+      currentOrganizations.find(
+        old => String(old.id) === String(organization.id)
+      )?.name ||
+      String(organization.id)
+  };
 };
 
 export const prepareDocumentPreview = (current, proposed) => ({
@@ -49,14 +64,21 @@ export const prepareDocumentPreview = (current, proposed) => ({
   dateReviewed: current.dateReviewed,
   entrances: current.entrances,
   cave: current.cave,
+  editor: resolveOrganization(
+    Object.hasOwn(proposed, 'editor') ? proposed.editor : current.editor,
+    [current.editor].filter(Boolean)
+  ),
+  library: resolveOrganization(
+    Object.hasOwn(proposed, 'library') ? proposed.library : current.library,
+    [current.library].filter(Boolean)
+  ),
   authors: (proposed.authors ?? []).map(author => ({
     ...author,
     nickname: author.nickname || String(author.id)
   })),
-  authorsOrganization: (proposed.authorsOrganization ?? []).map(author => ({
-    ...author,
-    name: author.name || String(author.id)
-  })),
+  authorsOrganization: (proposed.authorsOrganization ?? []).map(author =>
+    resolveOrganization(author, current.authorsOrganization ?? [])
+  ),
   files: getProposedDocumentFiles(current, proposed)
 });
 
@@ -87,6 +109,7 @@ export const prepareDocumentEdit = (current, proposed) => {
 const TEXT_FIELDS = [
   ['title', 'Title'],
   ['description', 'Description'],
+  ['creatorComment', 'Creator comment'],
   ['type', 'Document type'],
   ['datePublication', 'Publication Date'],
   ['identifier', 'Identifier'],
@@ -97,16 +120,42 @@ const TEXT_FIELDS = [
   ['mainLanguage', 'Title and description language']
 ];
 
-const sortedAuthors = authors =>
-  [...authors].sort((a, b) => String(a.id).localeCompare(String(b.id)));
+const authorName = author =>
+  author.nickname || author.name || String(author.id);
 
-const authorNames = authors =>
-  authors.map(author => author.nickname || author.name || String(author.id));
+const COLLECTION_FIELDS = [
+  ...['authors', 'authorsOrganization'].map(field => ({
+    field,
+    label: 'Authors',
+    identity: author => String(author.id),
+    text: authorName
+  })),
+  {
+    field: 'subjects',
+    label: 'Subjects',
+    identity: subject => String(subject.id),
+    text: subject => `${subject.id} ${subject.subject || ''}`.trim()
+  },
+  {
+    field: 'iso3166',
+    label: 'Geographic coverage',
+    identity: region => region.iso,
+    text: region =>
+      region.name ? `${region.name} (${region.iso})` : region.iso
+  },
+  {
+    field: 'languages',
+    label: 'Languages',
+    identity: language => language,
+    text: language => language
+  }
+];
 
 // Only compare the known, directly supplied fields. In particular, an empty
 // populated collection can also mean "omitted" in a partial API submission,
 // so do not report a whole author collection as deleted on that evidence.
 export const getDocumentChanges = (current, proposed) => {
+  const preview = prepareDocumentPreview(current, proposed);
   const changes = TEXT_FIELDS.flatMap(([field, label]) => {
     if (!Object.hasOwn(proposed, field)) return [];
     const oldText = String(current[field] ?? '');
@@ -114,20 +163,23 @@ export const getDocumentChanges = (current, proposed) => {
     return oldText === newText ? [] : [{ field, label, oldText, newText }];
   });
 
-  ['authors', 'authorsOrganization'].forEach(field => {
+  COLLECTION_FIELDS.forEach(({ field, label, identity, text }) => {
+    // As with authors, an empty populated relation can mean it was omitted.
     if (!proposed[field]?.length || !Array.isArray(current[field])) return;
-    const oldAuthors = sortedAuthors(current[field]);
-    const newAuthors = sortedAuthors(proposed[field]);
+    const sort = items =>
+      [...items].sort((a, b) => identity(a).localeCompare(identity(b)));
+    const oldItems = sort(current[field]);
+    const newItems = sort(preview[field]);
     if (
-      oldAuthors.map(author => String(author.id)).join(',') ===
-      newAuthors.map(author => String(author.id)).join(',')
+      JSON.stringify(oldItems.map(identity)) ===
+      JSON.stringify(newItems.map(identity))
     )
       return;
     changes.push({
       field,
-      label: 'Authors',
-      oldText: authorNames(oldAuthors).join(' · '),
-      newText: authorNames(newAuthors).join(' · ')
+      label,
+      oldText: oldItems.map(text).join(' · '),
+      newText: newItems.map(text).join(' · ')
     });
   });
 

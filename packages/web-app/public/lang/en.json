@@ -922,7 +922,6 @@
   "documentModeration.changes": "Proposed changes",
   "documentModeration.editUnavailable": "Editing unavailable: files awaiting validation.",
   "documentModeration.legend": "Compared fields only. Removed text is red (−); added text is green (+).",
-  "documentModeration.modification": "Proposed modification",
   "documentModeration.noChanges": "No changes detected in the compared fields.",
   "documentModeration.pendingFilesEdit": "This proposal adds files. Validate or decline it before editing to preserve the pending files.",
   "documentModeration.preview": "Document after validation",

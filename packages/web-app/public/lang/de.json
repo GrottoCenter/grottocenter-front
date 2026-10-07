@@ -922,7 +922,6 @@
   "documentModeration.changes": "Vorgeschlagene Änderungen",
   "documentModeration.editUnavailable": "Bearbeitung nicht verfügbar: Dateien warten auf Freigabe.",
   "documentModeration.legend": "Nur verglichene Felder. Entfernter Text ist rot (−), hinzugefügter Text grün (+).",
-  "documentModeration.modification": "Vorgeschlagene Änderung",
   "documentModeration.noChanges": "Keine Änderungen in den verglichenen Feldern erkannt.",
   "documentModeration.pendingFilesEdit": "Dieser Vorschlag fügt Dateien hinzu. Bestätigen oder verwerfen Sie ihn vor dem Bearbeiten, um die ausstehenden Dateien zu erhalten.",
   "documentModeration.preview": "Dokument nach der Freigabe",

@@ -922,7 +922,6 @@
   "documentModeration.changes": "Canvis proposats",
   "documentModeration.editUnavailable": "Edició no disponible: fitxers pendents de validació.",
   "documentModeration.legend": "Només els camps comparats. El text eliminat és vermell (−); el text afegit és verd (+).",
-  "documentModeration.modification": "Modificació proposada",
   "documentModeration.noChanges": "No s’han detectat canvis en els camps comparats.",
   "documentModeration.pendingFilesEdit": "Aquesta proposta afegeix fitxers. Valideu-la o rebutgeu-la abans d’editar per preservar els fitxers pendents.",
   "documentModeration.preview": "Document després de la validació",

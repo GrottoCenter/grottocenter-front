@@ -77,7 +77,9 @@ const DocumentPreview = ({ id, onClose, onEdit, onProcessed }) => {
                 !isReady || currentQuery.isFetching || proposedQuery.isFetching
               }
               isEditDisabled={hasPendingFiles}
-              editDescriptionId={editDescriptionId}
+              editDescriptionId={
+                isReady && hasPendingFiles ? editDescriptionId : undefined
+              }
               keepLabels
             />
             {isReady && hasPendingFiles && (

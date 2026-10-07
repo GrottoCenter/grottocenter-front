@@ -113,6 +113,92 @@ describe('Document moderation preview', () => {
     cy.wait('@documents');
   });
 
+  it('keeps organization names in the proposed detail, author diff and edit chips', () => {
+    const organizations = [{ id: 3714, name: 'Known organization' }];
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/documents/7' },
+      request => {
+        request.reply(
+          request.query.requireUpdate === 'true'
+            ? {
+                ...proposal,
+                authorsOrganization: [
+                  { id: 3714, name: null },
+                  { id: 4000, name: 'New organization' }
+                ],
+                editor: { id: 3715, name: null },
+                library: { id: 3716, name: null }
+              }
+            : {
+                ...current,
+                authorsOrganization: organizations,
+                editor: { id: 3715, name: 'Known editor' },
+                library: { id: 3716, name: 'Known library' }
+              }
+        );
+      }
+    );
+    openPreview();
+    cy.get('[data-testid="document-moderation-result"]')
+      .should('contain.text', 'Known organization')
+      .and('contain.text', 'Known editor')
+      .and('contain.text', 'Known library');
+    cy.get('[data-testid="document-diff-authorsOrganization"]')
+      .should('contain.text', 'Known organization')
+      .and('contain.text', 'New organization');
+    cy.get('[data-testid="preview-edit"]').click();
+    cy.contains('[role="dialog"]', 'Edit document').within(() => {
+      cy.contains('Known organization').scrollIntoView();
+      cy.contains('Known organization').should('be.visible');
+      cy.contains('New organization').scrollIntoView();
+      cy.contains('New organization').should('be.visible');
+    });
+  });
+
+  it('shows changes to subjects, geographic coverage, additional languages and comments', () => {
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/documents/7' },
+      request => {
+        request.reply(
+          request.query.requireUpdate === 'true'
+            ? {
+                ...proposal,
+                subjects: [{ id: '2', subject: 'Geology' }],
+                iso3166: [{ iso: 'ES', name: 'España' }],
+                languages: ['eng', 'spa'],
+                creatorComment: 'Updated comment'
+              }
+            : {
+                ...current,
+                subjects: [{ id: '1', subject: 'General' }],
+                iso3166: [{ iso: 'FR', name: 'France' }],
+                languages: ['eng', 'fra'],
+                creatorComment: 'Original comment'
+              }
+        );
+      }
+    );
+    openPreview();
+    cy.get('[data-testid="document-diff-subjects"]')
+      .should('contain.text', 'General')
+      .and('contain.text', 'Geology');
+    cy.get('[data-testid="document-diff-iso3166"]')
+      .should('contain.text', 'France')
+      .and('contain.text', 'España');
+    cy.get('[data-testid="document-diff-iso3166"]')
+      .find('del')
+      .should('contain.text', 'FR');
+    cy.get('[data-testid="document-diff-iso3166"]')
+      .find('ins')
+      .should('contain.text', 'ES');
+    cy.get('[data-testid="document-diff-languages"]')
+      .should('contain.text', 'fra')
+      .and('contain.text', 'spa');
+    cy.get('[data-testid="document-diff-creatorComment"]')
+      .should('contain.text', 'Original')
+      .and('contain.text', 'Updated');
+  });
+
   [
     [320, 640],
     [320, 640, 'fr'],

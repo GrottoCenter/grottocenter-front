@@ -174,4 +174,22 @@ describe('DocumentPreview', () => {
     fireEvent.click(screen.getByTestId('preview-edit'));
     expect(onEdit).not.toHaveBeenCalled();
   });
+
+  it('omits the edit description reference when the pending-files notice is hidden', () => {
+    useDocument.mockImplementation((_id, options) => ({
+      data: options?.requireUpdate
+        ? { ...proposed, newFiles: [{ id: 9, fileName: 'Pending survey.png' }] }
+        : current,
+      isPending: !!options?.requireUpdate,
+      refetch: vi.fn()
+    }));
+    renderPreview();
+    expect(screen.getByTestId('preview-edit')).toBeDisabled();
+    expect(screen.getByTestId('preview-edit')).not.toHaveAttribute(
+      'aria-describedby'
+    );
+    expect(
+      screen.queryByTestId('pending-files-edit-notice')
+    ).not.toBeInTheDocument();
+  });
 });
