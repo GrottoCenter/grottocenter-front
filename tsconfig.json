@@ -3,7 +3,7 @@
     "compilerOptions": {
         "moduleResolution": "bundler",
         "paths": {
-            "@grotto-front/web-app": ["packages/web-app/src"]
+            "@grotto-front/web-app": ["./packages/web-app/src"]
         },
         "rootDir": ".",
         "noEmit": true

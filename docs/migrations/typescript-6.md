@@ -12,6 +12,9 @@ deprecate `baseUrl`, the ES5 target and the legacy Node module resolver.
 - Remove `baseUrl` from both the shared and application tsconfig. The existing
   `@/*` mapping already uses `./src/*`, relative to the application tsconfig,
   and stays aligned with Vite's alias without a lookup root for bare imports.
+- Prefix the root tsconfig's `@grotto-front/web-app` target with `./` as well.
+  Cypress resolves that tsconfig during startup and rejects non-relative
+  `paths` targets when the shared `baseUrl` is removed.
 - Use `moduleResolution: bundler` in the shared configuration, matching the
   application's existing Vite configuration. Raise the shared package's
   minimum TypeScript peer to 5, which introduced this resolution mode.
@@ -74,6 +77,12 @@ future evaluation.
 - React Intl migration tests after the tsconfig changes: all five passed with
   `--maxWorkers=1 --testTimeout=15000 --reporter=verbose`.
 - `yarn.cmd install --immutable` and `git diff --check`: passed.
+- After correcting the root alias, TypeScript 6.0.3 parsed both tsconfigs
+  without diagnostics and checked the application project with `--noEmit`.
+  Cypress 15.19.0 verified startup; the complete E2E suite passed locally
+  against a production preview in Electron (7 specs, 32 tests). The original
+  PR run failed before tests in every E2E job because Cypress rejected the
+  root alias without `baseUrl`.
 
 The preceding React Intl batch passed the full Vitest suite (188 files and
 1,285 tests). This batch changes tooling and configuration; the targeted rerun,
