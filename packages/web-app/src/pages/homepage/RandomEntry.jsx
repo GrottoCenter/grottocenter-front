@@ -31,8 +31,8 @@ const RandomEntry = () => {
           id="random-entry-title"
           variant="h3"
           component="h2"
-          color="white"
           sx={{
+            color: 'common.white',
             fontWeight: 600
           }}>
           {formatMessage({ id: 'Discover a random cave' })}
