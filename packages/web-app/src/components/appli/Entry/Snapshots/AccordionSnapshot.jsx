@@ -134,8 +134,10 @@ const AccordionSnapshot = ({
                 {all && (
                   <Typography
                     variant="caption"
-                    color="text.secondary"
-                    display="block">
+                    sx={{
+                      color: 'text.secondary',
+                      display: 'block'
+                    }}>
                     <Translate>
                       {snapshotType === 'entrances'
                         ? 'Information'
@@ -145,8 +147,10 @@ const AccordionSnapshot = ({
                 )}
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  display="block">
+                  sx={{
+                    color: 'text.secondary',
+                    display: 'block'
+                  }}>
                   {displayDate
                     ? `${displayDate.toLocaleDateString()} - ${displayDate.toLocaleTimeString()}`
                     : ''}
@@ -171,7 +175,9 @@ const AccordionSnapshot = ({
                 <Typography
                   variant="body2"
                   component="span"
-                  fontWeight={isCurrent ? 'bold' : 'regular'}>
+                  sx={{
+                    fontWeight: isCurrent ? 'bold' : 'regular'
+                  }}>
                   {titleContent}
                 </Typography>
                 {isCurrent && (

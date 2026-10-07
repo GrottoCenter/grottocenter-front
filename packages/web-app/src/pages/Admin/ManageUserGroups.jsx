@@ -156,6 +156,7 @@ const ManageUserGroups = () => {
             sx={{ marginTop: 1, float: 'right' }}
             variant="outlined"
             component={AppLink}
+            nativeButton={false}
             to={`/ui/persons/${selectedUser?.id}`}
             openInNewTabDesktop>
             {formatMessage({ id: 'View detail' })}

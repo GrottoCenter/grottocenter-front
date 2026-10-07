@@ -1,11 +1,18 @@
 /* eslint-disable react/no-array-index-key */
-import { Fab, InputAdornment, Typography, useTheme, Grid } from '@mui/material';
+import {
+  Stack,
+  Fab,
+  InputAdornment,
+  Typography,
+  useTheme,
+  Grid
+} from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import RemoveIcon from '@mui/icons-material/Remove';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import StringInput from '../../Form/StringInput';
 import ActionButton from '../../ActionButton';
 import { MarginLeftDiv, MarginRightDiv } from './WrapperUtilities';
@@ -26,12 +33,17 @@ export const RightCellCollection = ({
   const getAdornementColor = value =>
     value && value.id ? theme.palette.success.main : theme.palette.error.main;
   return (
-    <Grid container direction="column" alignItems="flex-end">
+    <Stack
+      sx={{
+        alignItems: 'flex-end'
+      }}>
       <Grid
         container
         direction="row"
-        justifyContent="flex-end"
-        alignItems="center">
+        sx={{
+          justifyContent: 'flex-end',
+          alignItems: 'center'
+        }}>
         <ActionButton
           label={formatMessage(
             { id: 'take all', defaultMessage: `Take all {label}` },
@@ -49,8 +61,10 @@ export const RightCellCollection = ({
             key={index}
             container
             direction="row"
-            justifyContent="flex-end"
-            alignItems="center">
+            sx={{
+              justifyContent: 'flex-end',
+              alignItems: 'center'
+            }}>
             <MarginRightDiv>
               <Fab
                 onClick={() => updateState(value)}
@@ -70,7 +84,7 @@ export const RightCellCollection = ({
                 endAdornment={
                   showAdornment(value) ? (
                     <InputAdornment position="end">
-                      <ErrorOutlineIcon
+                      <ErrorOutlineOutlinedIcon
                         style={{ color: getAdornementColor(value) }}
                       />
                     </InputAdornment>
@@ -82,7 +96,7 @@ export const RightCellCollection = ({
             </MarginRightDiv>
           </Grid>
         ))}
-    </Grid>
+    </Stack>
   );
 };
 
@@ -93,13 +107,22 @@ export const MiddleCellCollection = ({
   render,
   disabled
 }) => (
-  <Grid container direction="column" alignItems="center">
+  <Stack
+    sx={{
+      alignItems: 'center'
+    }}>
     <Typography variant="h5" color="primary">
       {label}
     </Typography>
     {Array.isArray(values) &&
       values.map((state, index) => (
-        <Grid key={index} container direction="row" alignItems="center">
+        <Grid
+          key={index}
+          container
+          direction="row"
+          sx={{
+            alignItems: 'center'
+          }}>
           <Grid size={10}>
             <StringInput
               key={state}
@@ -121,7 +144,7 @@ export const MiddleCellCollection = ({
           </Grid>
         </Grid>
       ))}
-  </Grid>
+  </Stack>
 );
 
 export const LeftCellCollection = ({
@@ -139,12 +162,14 @@ export const LeftCellCollection = ({
   const getAdornementColor = value =>
     value.id ? theme.palette.success.main : theme.palette.error.main;
   return (
-    <Grid container direction="column">
+    <Stack>
       <Grid
         container
         direction="row"
-        justifyContent="flex-start"
-        alignItems="center">
+        sx={{
+          justifyContent: 'flex-start',
+          alignItems: 'center'
+        }}>
         <ActionButton
           label={formatMessage(
             { id: 'take all', defaultMessage: `Take all {label}` },
@@ -158,7 +183,13 @@ export const LeftCellCollection = ({
       </Grid>
       {Array.isArray(values) &&
         values.map((value, index) => (
-          <Grid key={index} container direction="row" alignItems="center">
+          <Grid
+            key={index}
+            container
+            direction="row"
+            sx={{
+              alignItems: 'center'
+            }}>
             <MarginLeftDiv>
               <StringInput
                 key={value}
@@ -169,7 +200,7 @@ export const LeftCellCollection = ({
                 startAdornment={
                   showAdornment(value) ? (
                     <InputAdornment position="start">
-                      <ErrorOutlineIcon
+                      <ErrorOutlineOutlinedIcon
                         style={{ color: getAdornementColor(value) }}
                       />
                     </InputAdornment>
@@ -190,7 +221,7 @@ export const LeftCellCollection = ({
             </MarginLeftDiv>
           </Grid>
         ))}
-    </Grid>
+    </Stack>
   );
 };
 

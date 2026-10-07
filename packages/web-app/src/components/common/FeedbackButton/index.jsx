@@ -67,15 +67,18 @@ const FeedbackButton = () => {
       <Box>
         <Typography
           variant="subtitle1"
-          fontWeight="bold"
-          lineHeight={1.3}
-          sx={{ whiteSpace: 'nowrap', color: '#fff' }}>
+          sx={{
+            fontWeight: 'bold',
+            lineHeight: 1.3,
+            whiteSpace: 'nowrap',
+            color: '#fff'
+          }}>
           <FormattedMessage id="Give feedback" />
         </Typography>
         <Typography
           variant="caption"
-          lineHeight={1.3}
           sx={{
+            lineHeight: 1.3,
             whiteSpace: 'nowrap',
             color: 'rgba(255,255,255,0.85)',
             display: { xs: 'none', sm: 'block' }

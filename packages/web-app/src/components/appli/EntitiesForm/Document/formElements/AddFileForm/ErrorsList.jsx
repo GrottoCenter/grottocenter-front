@@ -4,7 +4,10 @@ import { List, ListItemText } from '@mui/material';
 const ErrorsList = ({ errors }) => (
   <List>
     {errors.map(error => (
-      <ListItemText primaryTypographyProps={{ color: 'error' }}>
+      <ListItemText
+        slotProps={{
+          primary: { color: 'error' }
+        }}>
         {error}
       </ListItemText>
     ))}

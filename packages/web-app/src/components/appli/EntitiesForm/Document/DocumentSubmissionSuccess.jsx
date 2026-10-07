@@ -44,8 +44,10 @@ const DocumentSubmissionSuccess = ({
           {isArticle && (
             <Typography
               variant="body2"
-              color="text.secondary"
-              sx={{ maxWidth: 760 }}>
+              sx={{
+                color: 'text.secondary',
+                maxWidth: 760
+              }}>
               {formatMessage({
                 id: 'Adding another article will preserve the parent document, publication date, editor and library.'
               })}

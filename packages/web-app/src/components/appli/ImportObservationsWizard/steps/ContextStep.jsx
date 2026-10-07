@@ -20,7 +20,7 @@ import {
   Typography
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import LicenseTag from '@/components/common/LicenseTag';
 import CoordinateFormSection from '../../EntitiesForm/utils/CoordinateFormSection';
 import { coordinatesMarkerIcon } from '../../../../assets/icons';
@@ -624,15 +624,17 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           onChange={handleSamplingIntervalChange}
           size="small"
           sx={{ width: 200 }}
-          inputProps={{ min: 1 }}
           data-testid="sampling-interval-field"
+          slotProps={{
+            htmlInput: { min: 1 }
+          }}
         />
         <Tooltip
           title={formatMessage({
             id: 'ImportObservationsWizard.ContextStep.samplingIntervalHelper'
           })}
           placement="right">
-          <HelpOutlineIcon fontSize="small" color="action" />
+          <HelpOutlineOutlinedIcon fontSize="small" color="action" />
         </Tooltip>
       </Box>
       {/* Optional fields */}

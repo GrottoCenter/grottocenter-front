@@ -624,8 +624,10 @@ const GeocodingControl = ({ onLocationSelect }) => {
             placeholder={formatMessage({ id: 'Search on map...' })}
             onFocus={() => setIsOpen(true)}
             slotProps={{
+              ...params.slotProps,
+
               input: {
-                ...params.InputProps,
+                ...params.slotProps.input,
                 startAdornment: (
                   <InputAdornment position="start">
                     <SearchIcon fontSize="small" color="action" />
@@ -636,11 +638,12 @@ const GeocodingControl = ({ onLocationSelect }) => {
                     <CircularProgress size={20} />
                   </InputAdornment>
                 ) : (
-                  params.InputProps.endAdornment
+                  params.slotProps.input.endAdornment
                 )
               },
+
               htmlInput: {
-                ...params.inputProps,
+                ...params.slotProps.htmlInput,
                 'aria-label': formatMessage({ id: 'Search on map...' }),
                 'aria-busy': loading
               }

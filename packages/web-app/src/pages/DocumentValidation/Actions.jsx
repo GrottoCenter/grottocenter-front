@@ -100,7 +100,11 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
 
   return (
     <>
-      <Box display="flex" gap={0.5}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 0.5
+        }}>
         <ActionButton
           label={formatMessage({ id: ActionTypes.validate.name })}
           color="success"

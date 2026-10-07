@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { AREA_LIMIT_KM2 } from '../../../../utils/polygonValidation';
 
 const PolygonLayersList = ({
@@ -170,10 +170,12 @@ const PolygonLayersList = ({
                       }}
                       size="small"
                       sx={{ p: 0.25 }}
-                      inputProps={{
-                        'aria-label': formatMessage({
-                          id: 'Mark this polygon as a hole (inner ring) within another polygon'
-                        })
+                      slotProps={{
+                        input: {
+                          'aria-label': formatMessage({
+                            id: 'Mark this polygon as a hole (inner ring) within another polygon'
+                          })
+                        }
                       }}
                     />
                   </Tooltip>
@@ -199,7 +201,7 @@ const PolygonLayersList = ({
                     }}>
                     {(layer.hasSelfIntersection || layer.tooFewPoints) && (
                       <Tooltip title={getErrorTooltip(layer)} arrow>
-                        <ErrorOutlineIcon
+                        <ErrorOutlineOutlinedIcon
                           fontSize="small"
                           color="error"
                           sx={{ flexShrink: 0 }}

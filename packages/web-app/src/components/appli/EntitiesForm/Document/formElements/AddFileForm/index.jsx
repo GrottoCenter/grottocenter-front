@@ -69,14 +69,18 @@ const AuthDocSelect = ({ value, onChange, disabled = false }) => {
           variant="filled"
           required={!disabled}
           label={formatMessage({ id: 'Authorization from authors' })}
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {isLoading && <CircularProgress size={16} />}
-                {params.InputProps.endAdornment}
-              </>
-            )
+          slotProps={{
+            ...params.slotProps,
+
+            input: {
+              ...params.slotProps.input,
+              endAdornment: (
+                <>
+                  {isLoading && <CircularProgress size={16} />}
+                  {params.slotProps.input.endAdornment}
+                </>
+              )
+            }
           }}
         />
       )}

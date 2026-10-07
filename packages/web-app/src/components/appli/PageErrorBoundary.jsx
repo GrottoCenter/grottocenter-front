@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useIntl } from 'react-intl';
 import { useLocation, useNavigate } from 'react-router-dom';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { Box, Button, Card, CardContent, Typography } from '@mui/material';
 
 import {
@@ -69,7 +69,7 @@ export const PageError = ({ error = null }) => {
               sx={{ alignItems: 'center', display: 'flex', gap: 1 }}
               tabIndex={-1}
               variant="h1">
-              <ErrorOutlineIcon aria-hidden="true" fontSize="large" />
+              <ErrorOutlineOutlinedIcon aria-hidden="true" fontSize="large" />
               <Translate>An unexpected error occurred</Translate>
             </Typography>
             <Typography sx={{ mt: 2 }}>
@@ -99,6 +99,7 @@ export const PageError = ({ error = null }) => {
               </Button>
               <Button
                 component={AppLink}
+                nativeButton={false}
                 fullWidth
                 sx={{ order: { xs: 2, sm: 1 } }}
                 to="/"

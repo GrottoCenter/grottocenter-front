@@ -58,13 +58,21 @@ const ImpersonationLauncher = () => {
           }}>
           <VisibilityIcon />
         </Box>
-        <Typography variant="subtitle1" fontWeight={600}>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 600
+          }}>
           {formatMessage({
             id: 'Preview the site as another role',
             defaultMessage: 'Preview the site as another role'
           })}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {formatMessage({
             id: 'Impersonation launcher description',
             defaultMessage:

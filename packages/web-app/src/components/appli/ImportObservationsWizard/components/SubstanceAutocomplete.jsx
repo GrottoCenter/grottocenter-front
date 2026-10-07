@@ -70,7 +70,11 @@ const SubstanceAutocomplete = ({ value, onChange }) => {
                   : option.name}
               </Typography>
               {option.id === null && (
-                <Typography variant="caption" color="text.secondary">
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary'
+                  }}>
                   {formatMessage({
                     id: 'ImportObservationsWizard.DeviceSensorsStep.substanceViaPubChem'
                   })}
@@ -91,12 +95,14 @@ const SubstanceAutocomplete = ({ value, onChange }) => {
           })}
           size="small"
           slotProps={{
+            ...params.slotProps,
+
             input: {
-              ...params.InputProps,
+              ...params.slotProps.input,
               endAdornment: (
                 <>
                   {loading && <CircularProgress size={18} />}
-                  {params.InputProps.endAdornment}
+                  {params.slotProps.input.endAdornment}
                 </>
               )
             }

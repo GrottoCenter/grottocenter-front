@@ -38,7 +38,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { defaultCoord, defaultZoom, focusZoom } from '../../../../conf/config';
 
-// SVG from MUI ErrorOutline icon, rendered as a Leaflet DivIcon
+// SVG from MUI ErrorOutlineOutlined icon, rendered as a Leaflet DivIcon
 const KINK_ICON_SIZE = 24;
 const kinkIcon = L.divIcon({
   className: '',

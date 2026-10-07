@@ -9,7 +9,11 @@ import AppLink from '../AppLink';
 const StatBadge = ({ src, alt, value }) => (
   <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
     <img src={src} alt={alt} style={{ height: 24, width: 24 }} />
-    <Typography variant="body2" color="text.secondary">
+    <Typography
+      variant="body2"
+      sx={{
+        color: 'text.secondary'
+      }}>
       {value}
     </Typography>
   </Box>
@@ -25,8 +29,8 @@ const CardLabel = ({ children }) => (
   <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center' }}>
     <Typography
       variant="body1"
-      fontWeight={600}
       sx={{
+        fontWeight: 600,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap'
@@ -133,8 +137,8 @@ export const CaveCard = ({ cave, itemActionButton }) => {
         }}>
         <Typography
           variant="body1"
-          fontWeight={600}
           sx={{
+            fontWeight: 600,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -232,9 +236,9 @@ export const OrganizationCard = ({ organization, itemActionButton }) => {
           }}>
           <Typography
             variant="body1"
-            fontWeight={600}
-            color="text.disabled"
             sx={{
+              fontWeight: 600,
+              color: 'text.disabled',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',

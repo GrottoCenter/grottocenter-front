@@ -277,10 +277,12 @@ const DocumentsList = ({
       </DocumentsGrid>
       {totalPages > 1 && (
         <Box
-          mt={1}
-          display="flex"
-          justifyContent="center"
-          sx={{ '@media print': { display: 'none' } }}>
+          sx={{
+            mt: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            '@media print': { display: 'none' }
+          }}>
           <Pagination
             count={totalPages}
             page={currentPage}

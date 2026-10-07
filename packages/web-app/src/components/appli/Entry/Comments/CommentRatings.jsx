@@ -46,7 +46,11 @@ const CommentRatings = ({ interest, progression, access }) => {
               flex: '0 0 auto',
               maxWidth: '100%'
             }}>
-            <Typography variant="body2" fontWeight={600}>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 600
+              }}>
               {formatMessage({ id: labelId })}
             </Typography>
             <Rating
@@ -62,7 +66,11 @@ const CommentRatings = ({ interest, progression, access }) => {
               }
               emptyIcon={<StarBorderIcon fontSize="inherit" />}
             />
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary'
+              }}>
               {formatMessage(
                 { id: '{rating} / 5' },
                 {

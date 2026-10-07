@@ -174,7 +174,7 @@ describe('TimestampFormatInput', () => {
       const preview = screen.getByTestId('parsed-preview');
       expect(preview).toBeInTheDocument();
       expect(preview.textContent).toContain('2023-01-15');
-      expect(preview.textContent).toContain('→');
+      expect(preview.textContent).toContain('2023-01-15 → ');
     });
 
     it('does not display parsed preview when format is invalid', () => {

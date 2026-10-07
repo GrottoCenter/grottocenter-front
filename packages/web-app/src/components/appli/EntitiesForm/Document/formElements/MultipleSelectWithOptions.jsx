@@ -62,8 +62,10 @@ const MultipleSelectWithOptions = ({
       {helperText && (
         <Typography
           variant="caption"
-          color={hasError ? 'error' : 'text.secondary'}
-          display="block">
+          sx={{
+            color: hasError ? 'error.main' : 'text.secondary',
+            display: 'block'
+          }}>
           <Translate>{helperText}</Translate>
         </Typography>
       )}

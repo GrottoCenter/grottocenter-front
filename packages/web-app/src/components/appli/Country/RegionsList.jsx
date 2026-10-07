@@ -107,7 +107,11 @@ const RegionsList = ({ countryId }) => {
         <SearchInput value={search} onChange={setSearch} sx={{ mb: 0.5 }} />
       )}
       {filtered.length === 0 ? (
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {formatMessage({ id: 'No results' })}
         </Typography>
       ) : (

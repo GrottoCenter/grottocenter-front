@@ -25,11 +25,17 @@ import { depthIcon, lengthIcon } from '../../../assets/icons';
 
 const CARD_HEIGHT = 280;
 
-const BgCard = styled(Card)({
+const BgCard = styled(Card)(({ theme }) => ({
   position: 'relative',
   height: CARD_HEIGHT,
-  overflow: 'hidden'
-});
+  overflow: 'hidden',
+  [theme.breakpoints.down('sm')]: {
+    height: 'auto',
+    minHeight: CARD_HEIGHT,
+    display: 'flex',
+    flexDirection: 'column'
+  }
+}));
 
 const Overlay = styled(Box)({
   position: 'absolute',
@@ -38,14 +44,19 @@ const Overlay = styled(Box)({
     'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)'
 });
 
-const Content = styled(Box)({
+const Content = styled(Box)(({ theme }) => ({
   position: 'absolute',
   bottom: 0,
   left: 0,
   right: 0,
   padding: 16,
-  zIndex: 1
-});
+  zIndex: 1,
+  [theme.breakpoints.down('sm')]: {
+    position: 'relative',
+    marginTop: 'auto',
+    paddingTop: theme.spacing(8)
+  }
+}));
 
 const InfoImg = styled('img')({
   height: 14,
@@ -139,10 +150,11 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'flex-end',
             justifyContent: 'space-between',
             gap: 0.5,
-            mt: '4px'
+            mt: '4px',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'stretch', sm: 'flex-end' }
           }}>
           <Box
             sx={{
@@ -231,10 +243,12 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
             variant="outlined"
             size="small"
             component={AppLink}
+            nativeButton={false}
             to={`/ui/entrances/${entry.id}`}
             sx={{
               color: 'white',
               borderColor: 'rgba(255,255,255,0.6)',
+              width: { xs: '100%', sm: 'auto' },
               '&:hover': {
                 borderColor: 'white',
                 backgroundColor: 'rgba(255,255,255,0.1)'

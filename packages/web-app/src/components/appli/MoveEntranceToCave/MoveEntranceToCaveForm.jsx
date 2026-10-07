@@ -70,13 +70,19 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
 
   return (
     <Box>
-      <Box mb={marginBetweenComponents}>
+      <Box
+        sx={{
+          mb: marginBetweenComponents
+        }}>
         <Header entrance={entrance} />
 
         {/* Discreet switch to the other operation, offered right under the
             subject. Detaching only makes sense for a networked entrance. */}
         {(mode === MODE_DETACH || sourceInNetwork) && (
-          <Box mt={0.5}>
+          <Box
+            sx={{
+              mt: 0.5
+            }}>
             <Link
               component="button"
               type="button"
@@ -102,7 +108,10 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
             label={formatMessage({ id: 'Entrance or network to attach to' })}
           />
 
-          <Box mt={marginBetweenComponents}>
+          <Box
+            sx={{
+              mt: marginBetweenComponents
+            }}>
             <OperationSummary
               entrance={entrance}
               newCave={newCave}

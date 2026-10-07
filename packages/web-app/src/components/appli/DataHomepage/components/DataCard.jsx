@@ -30,7 +30,7 @@ const DataCard = props => {
           : '',
         border: isColored ? '' : '1px solid'
       }}
-      boxShadow={2}>
+      sx={{ boxShadow: 2 }}>
       <Box style={{ display: 'flex', justifyContent: 'center' }}>
         {icon}
         {isFetching || Number.isNaN(numberData) ? (

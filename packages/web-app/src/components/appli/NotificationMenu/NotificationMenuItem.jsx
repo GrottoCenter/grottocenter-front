@@ -65,6 +65,7 @@ const NotificationsMenuItem = ({ notification, onClick, divider = false }) => {
       dense
       $isRead={isRead}
       component={AppLink}
+      nativeButton={false}
       to={link}
       divider={divider}
       onClick={handleOnClick}>
@@ -97,7 +98,12 @@ const NotificationsMenuItem = ({ notification, onClick, divider = false }) => {
         </Typography>
       </Box>
       {!isRead && (
-        <Box display="flex" justifyContent="flex-end" flex={1}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            flex: 1
+          }}>
           <UnreadNotificationIcon color="secondary" fontSize="small" />
         </Box>
       )}

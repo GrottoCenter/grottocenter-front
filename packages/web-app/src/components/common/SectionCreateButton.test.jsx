@@ -49,7 +49,10 @@ describe('SectionCreateButton', () => {
   // text made it look like a neutral affordance.
   it('renders the open state in the error colour', () => {
     renderButton({ isOpen: true });
-    expect(screen.getByRole('button')).toHaveClass('MuiButton-outlinedError');
+    expect(screen.getByRole('button')).toHaveClass(
+      'MuiButton-outlined',
+      'MuiButton-colorError'
+    );
   });
 
   it('blocks opening the panel while offline', () => {

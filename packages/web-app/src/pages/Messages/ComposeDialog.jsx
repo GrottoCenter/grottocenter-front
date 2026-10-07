@@ -130,7 +130,11 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
             {option.nickname}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary'
+            }}>
             ID: {option.id}
           </Typography>
         </Box>
@@ -244,14 +248,18 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
                   defaultMessage: 'To'
                 })}
                 error={!!searchError}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {isSearchLoading && <CircularProgress size={16} />}
-                      {params.InputProps.endAdornment}
-                    </>
-                  )
+                slotProps={{
+                  ...params.slotProps,
+
+                  input: {
+                    ...params.slotProps.input,
+                    endAdornment: (
+                      <>
+                        {isSearchLoading && <CircularProgress size={16} />}
+                        {params.slotProps.input.endAdornment}
+                      </>
+                    )
+                  }
                 }}
               />
             )}

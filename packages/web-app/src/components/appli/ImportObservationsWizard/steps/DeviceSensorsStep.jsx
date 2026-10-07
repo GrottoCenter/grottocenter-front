@@ -198,17 +198,29 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
                 <Typography variant="body2">{option.name}</Typography>
                 <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
                   {option.brandName && (
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'text.secondary'
+                      }}>
                       {option.brandName}
                     </Typography>
                   )}
                   {option.serialNumber && (
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'text.secondary'
+                      }}>
                       {option.brandName ? '·' : ''} S/N: {option.serialNumber}
                     </Typography>
                   )}
                   {option.author && option.author.nickname && (
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'text.secondary'
+                      }}>
                       {option.brandName || option.serialNumber ? '·' : ''}{' '}
                       {formatMessage(
                         {
@@ -233,12 +245,14 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
               id: 'ImportObservationsWizard.DeviceSensorsStep.searchDevicePlaceholder'
             })}
             slotProps={{
+              ...params.slotProps,
+
               input: {
-                ...params.InputProps,
+                ...params.slotProps.input,
                 endAdornment: (
                   <>
                     {isSearching && <CircularProgress size={18} />}
-                    {params.InputProps.endAdornment}
+                    {params.slotProps.input.endAdornment}
                   </>
                 )
               }
@@ -321,8 +335,10 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
           onChange={setField('name')}
           required
           size="small"
-          inputProps={{ maxLength: 300 }}
           data-testid="new-device-name"
+          slotProps={{
+            htmlInput: { maxLength: 300 }
+          }}
         />
         <TextField
           label={formatMessage({
@@ -331,8 +347,10 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
           value={form.brandName}
           onChange={setField('brandName')}
           size="small"
-          inputProps={{ maxLength: 200 }}
           data-testid="new-device-brand"
+          slotProps={{
+            htmlInput: { maxLength: 200 }
+          }}
         />
         <TextField
           label={formatMessage({
@@ -341,8 +359,10 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
           value={form.serialNumber}
           onChange={setField('serialNumber')}
           size="small"
-          inputProps={{ maxLength: 200 }}
           data-testid="new-device-serial-number"
+          slotProps={{
+            htmlInput: { maxLength: 200 }
+          }}
         />
         <TextField
           label={formatMessage({
@@ -352,8 +372,10 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
           onChange={setField('productUrl')}
           size="small"
           type="url"
-          inputProps={{ maxLength: 500 }}
           data-testid="new-device-product-url"
+          slotProps={{
+            htmlInput: { maxLength: 500 }
+          }}
         />
         <TextField
           label={formatMessage({
@@ -363,8 +385,10 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
           onChange={setField('manufacturerUrl')}
           size="small"
           type="url"
-          inputProps={{ maxLength: 500 }}
           data-testid="new-device-manufacturer-url"
+          slotProps={{
+            htmlInput: { maxLength: 500 }
+          }}
         />
       </Box>
       {createError && (
@@ -423,12 +447,20 @@ const SelectedDeviceCard = ({ device, onChangeDevice }) => {
         <Box>
           <Typography variant="subtitle1">{device.name}</Typography>
           {device.brandName && (
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary'
+              }}>
               {device.brandName}
             </Typography>
           )}
           {device.serialNumber && (
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary'
+              }}>
               {formatMessage({
                 id: 'ImportObservationsWizard.DeviceSensorsStep.deviceSerialNumber'
               })}
@@ -544,7 +576,11 @@ const DeviceSensorsStep = () => {
           id: 'ImportObservationsWizard.DeviceSensorsStep.title'
         })}
       </Typography>
-      <Typography variant="body2" color="text.secondary">
+      <Typography
+        variant="body2"
+        sx={{
+          color: 'text.secondary'
+        }}>
         {formatMessage({
           id: 'ImportObservationsWizard.DeviceSensorsStep.description'
         })}

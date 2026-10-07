@@ -255,8 +255,10 @@ const SensorConfigForm = ({ deviceId }) => {
           value={form.label}
           onChange={handleFieldChange('label')}
           size="small"
-          inputProps={{ maxLength: 300 }}
           data-testid="sensor-config-label"
+          slotProps={{
+            htmlInput: { maxLength: 300 }
+          }}
         />
 
         {/* Quantity Kind and Unit dropdowns — side by side */}
@@ -270,15 +272,17 @@ const SensorConfigForm = ({ deviceId }) => {
             onChange={handleFieldChange('quantityKindId')}
             size="small"
             sx={{ flex: 1 }}
-            SelectProps={{
-              displayEmpty: true,
-              MenuProps: {
-                slotProps: {
-                  paper: { 'data-testid': 'sensor-config-quantity-kind-menu' }
+            data-testid="sensor-config-quantity-kind"
+            slotProps={{
+              select: {
+                displayEmpty: true,
+                MenuProps: {
+                  slotProps: {
+                    paper: { 'data-testid': 'sensor-config-quantity-kind-menu' }
+                  }
                 }
               }
-            }}
-            data-testid="sensor-config-quantity-kind">
+            }}>
             {sortedQuantityKinds.map(qk => (
               <MenuItem key={qk.id} value={qk.id}>
                 {formatMessage({ id: `quantityKind.${qk.code}` })}

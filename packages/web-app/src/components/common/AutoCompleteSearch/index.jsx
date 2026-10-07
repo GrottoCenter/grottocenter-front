@@ -80,7 +80,7 @@ const InputAdornments = ({ isLoading, hasError }) =>
   ) : null;
 
 // Two components declared once rather than one built from a prop at render
-// time: MUI takes this as `PopperComponent`, i.e. as a component *identity*, so
+// time: MUI takes `slots.popper` as a component identity, so
 // a factory called during render hands React a brand new type on every
 // keystroke and remounts the whole result panel with it.
 //
@@ -153,7 +153,6 @@ const AutoCompleteSearch = ({
       getOptionLabel={getOptionLabel ?? (e => e?.name ?? '')}
       renderOption={renderOption ?? entityOptionForSelector}
       loading={isLoading}
-      PopperComponent={hasFullWidthResults ? FullWidthResults : HuggingResults}
       color="inherit"
       // had to disable built-int filter
       // https://github.com/mui-org/material-ui/issues/20068
@@ -186,11 +185,11 @@ const AutoCompleteSearch = ({
               required={false}
               autoFocus={autoFocus}
               disabled={params.disabled}
-              ref={params.InputProps.ref}
+              ref={params.slotProps.input.ref}
               placeholder={label}
               error={hasError}
               inputProps={{
-                ...params.inputProps
+                ...params.slotProps.htmlInput
               }}
               endAdornment={
                 <InputAdornments isLoading={isLoading} hasError={hasError} />
@@ -200,6 +199,9 @@ const AutoCompleteSearch = ({
           </InputWrapper>
         </DisabledTooltip>
       )}
+      slots={{
+        popper: hasFullWidthResults ? FullWidthResults : HuggingResults
+      }}
     />
   );
 };

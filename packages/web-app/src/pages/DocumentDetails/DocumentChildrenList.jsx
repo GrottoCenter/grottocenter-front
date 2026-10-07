@@ -455,8 +455,10 @@ const DocumentChildRow = React.memo(({ doc }) => {
           <Description
             variant="body2"
             component="div"
-            color="text.secondary"
-            title={doc.description}>
+            title={doc.description}
+            sx={{
+              color: 'text.secondary'
+            }}>
             <Linkify options={linkifyOptions}>{doc.description}</Linkify>
           </Description>
         )}

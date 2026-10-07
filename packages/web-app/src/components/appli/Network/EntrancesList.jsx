@@ -87,6 +87,7 @@ const EntrancesList = ({
                 }>
                 <ListItemButton
                   component={RouterLink}
+                  nativeButton={false}
                   to={`/ui/entrances/${entrance.id}`}
                   selected={selectedEntrancesId.includes(entrance.id)}>
                   <ListItemIcon>

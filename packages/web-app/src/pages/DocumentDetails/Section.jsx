@@ -64,9 +64,18 @@ export const DetailsList = ({
       variant="outlined"
       sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
       {reference && (
-        <Box component="section" mb={items.length > 0 ? 1.5 : 0}>
+        <Box
+          component="section"
+          sx={{
+            mb: items.length > 0 ? 1.5 : 0
+          }}>
           {referenceTitle && (
-            <Typography variant="h5" component="h2" mb={0.5}>
+            <Typography
+              variant="h5"
+              component="h2"
+              sx={{
+                mb: 0.5
+              }}>
               {referenceTitle}
             </Typography>
           )}
@@ -76,7 +85,12 @@ export const DetailsList = ({
       {items.length > 0 && (
         <Box component={title ? 'section' : 'div'}>
           {title && (
-            <Typography variant="h5" component="h2" mb={1}>
+            <Typography
+              variant="h5"
+              component="h2"
+              sx={{
+                mb: 1
+              }}>
               {title}
             </Typography>
           )}
@@ -212,7 +226,12 @@ export const EventDateSection = ({ date }) => {
       }}>
       <EventAvailable sx={{ fontSize: 40, color: 'text.secondary' }} />
       <Box>
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary',
+            display: 'block'
+          }}>
           {formatMessage({ id: 'Event date' })}
         </Typography>
         <Typography variant="h5">{date}</Typography>

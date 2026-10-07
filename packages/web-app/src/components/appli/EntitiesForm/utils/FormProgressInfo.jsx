@@ -32,7 +32,12 @@ const FormProgressInfo = ({
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" flexDirection="column">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          flexDirection: 'column'
+        }}>
         <Typography> {formatMessage({ id: labelLoading })} </Typography>
         <CircularProgress />
       </Box>

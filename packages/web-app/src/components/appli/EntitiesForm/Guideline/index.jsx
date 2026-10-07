@@ -199,8 +199,10 @@ const GuidelineForm = ({
             <Stack spacing={1}>
               <Typography
                 variant="caption"
-                color="text.secondary"
-                display="block">
+                sx={{
+                  color: 'text.secondary',
+                  display: 'block'
+                }}>
                 {formatMessage({ id: 'guidelines.scope_required' })}
               </Typography>
               <Controller
@@ -259,16 +261,20 @@ const GuidelineForm = ({
                         {...params}
                         variant="filled"
                         label={formatMessage({ id: 'Regions' })}
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {isLoadingRegions && (
-                                <CircularProgress color="inherit" size={20} />
-                              )}
-                              {params.InputProps.endAdornment}
-                            </>
-                          )
+                        slotProps={{
+                          ...params.slotProps,
+
+                          input: {
+                            ...params.slotProps.input,
+                            endAdornment: (
+                              <>
+                                {isLoadingRegions && (
+                                  <CircularProgress color="inherit" size={20} />
+                                )}
+                                {params.slotProps.input.endAdornment}
+                              </>
+                            )
+                          }
                         }}
                       />
                     )}
@@ -304,16 +310,20 @@ const GuidelineForm = ({
                         {...params}
                         variant="filled"
                         label={formatMessage({ id: 'Massifs' })}
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {isLoadingMassifs && (
-                                <CircularProgress color="inherit" size={20} />
-                              )}
-                              {params.InputProps.endAdornment}
-                            </>
-                          )
+                        slotProps={{
+                          ...params.slotProps,
+
+                          input: {
+                            ...params.slotProps.input,
+                            endAdornment: (
+                              <>
+                                {isLoadingMassifs && (
+                                  <CircularProgress color="inherit" size={20} />
+                                )}
+                                {params.slotProps.input.endAdornment}
+                              </>
+                            )
+                          }
                         }}
                       />
                     )}

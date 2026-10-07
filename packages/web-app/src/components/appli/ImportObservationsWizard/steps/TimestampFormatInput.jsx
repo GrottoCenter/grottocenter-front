@@ -14,7 +14,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
@@ -124,12 +124,12 @@ const ParsedPreview = ({ sampleValue, parsedDate, timestampType }) => {
   return (
     <Typography
       variant="caption"
-      color="text.secondary"
+      data-testid="parsed-preview"
       sx={{
+        color: 'text.secondary',
         display: 'block'
-      }}
-      data-testid="parsed-preview">
-      {sampleValue} → {formatted}
+      }}>
+      {`${sampleValue} → ${formatted}`}
     </Typography>
   );
 };
@@ -207,8 +207,11 @@ const TokenReferenceContent = ({ tokens }) => {
       </Table>
       <Typography
         variant="caption"
-        color="text.secondary"
-        sx={{ mt: 0.5, display: 'block' }}>
+        sx={{
+          color: 'text.secondary',
+          mt: 0.5,
+          display: 'block'
+        }}>
         {formatMessage(
           { id: 'ImportObservationsWizard.FormatInput.separatorsHint' },
           {
@@ -287,7 +290,7 @@ const TimestampFormatInput = ({
                       aria-label={formatMessage({
                         id: 'ImportObservationsWizard.FormatInput.helpAriaLabel'
                       })}>
-                      <HelpOutlineIcon fontSize="small" />
+                      <HelpOutlineOutlinedIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 </InputAdornment>

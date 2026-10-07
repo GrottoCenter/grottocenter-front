@@ -45,7 +45,11 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
       title={formatMessage({ id: 'Documents' })}
       icon={
         canAssociateDocuments ? (
-          <Box display="flex" gap={0.5}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 0.5
+            }}>
             <SectionCreateButton
               isOpen={isDocumentSearchOpen}
               testId="associate-documents-button"

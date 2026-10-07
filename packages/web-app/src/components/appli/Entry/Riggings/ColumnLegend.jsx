@@ -37,7 +37,12 @@ const LegendSection = ({ titleKey, items }) => {
   const { formatMessage } = useIntl();
   return (
     <Box>
-      <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 0.5 }}>
+      <Typography
+        variant="subtitle2"
+        sx={{
+          fontWeight: 'bold',
+          mb: 0.5
+        }}>
         {formatMessage({ id: titleKey })}
       </Typography>
       <Divider sx={{ mb: 0.5 }} />
@@ -50,7 +55,12 @@ const LegendSection = ({ titleKey, items }) => {
                   border: 0,
                   pr: 2
                 }}>
-                <Typography variant="body2" fontWeight="bold" component="span">
+                <Typography
+                  variant="body2"
+                  component="span"
+                  sx={{
+                    fontWeight: 'bold'
+                  }}>
                   {formatMessage({ id: abbrevKey })}
                 </Typography>
               </TableCell>

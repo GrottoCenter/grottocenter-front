@@ -69,8 +69,18 @@ const TotpStep = ({
   const msg = errorMessage();
 
   return (
-    <Box display="flex" flexDirection="column" gap={1}>
-      <Typography variant="body2" color="text.secondary" textAlign="center">
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1
+      }}>
+      <Typography
+        variant="body2"
+        sx={{
+          color: 'text.secondary',
+          textAlign: 'center'
+        }}>
         {formatMessage({ id: 'mfaEnrollmentStep3Body' })}
       </Typography>
       <FormControl variant="filled">

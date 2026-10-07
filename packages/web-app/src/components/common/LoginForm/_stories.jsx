@@ -90,7 +90,9 @@ const DialogLoginForm = ({
           checked={isLoading}
           onChange={event => setIsLoading(event.target.checked)}
           color="primary"
-          inputProps={{ 'aria-label': 'primary checkbox' }}
+          slotProps={{
+            input: { 'aria-label': 'primary checkbox' }
+          }}
         />
         <span>Is loading</span>
 
@@ -98,7 +100,9 @@ const DialogLoginForm = ({
           checked={hasErrors}
           onChange={event => setHasErrors(event.target.checked)}
           color="primary"
-          inputProps={{ 'aria-label': 'primary checkbox' }}
+          slotProps={{
+            input: { 'aria-label': 'primary checkbox' }
+          }}
         />
         <span>Has errors</span>
       </StoryControlsWrapper>

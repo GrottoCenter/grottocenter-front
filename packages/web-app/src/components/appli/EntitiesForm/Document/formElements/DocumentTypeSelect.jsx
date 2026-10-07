@@ -78,8 +78,10 @@ const FeaturedCard = ({ docType, selected, onClick }) => {
             </Box>
             <Typography
               variant="subtitle1"
-              fontWeight={600}
-              color={selected ? 'primary.main' : 'text.primary'}>
+              sx={{
+                color: selected ? 'primary.main' : 'text.primary',
+                fontWeight: 600
+              }}>
               {formatMessage({ id: docType.name })}
             </Typography>
             {selected && (
@@ -142,9 +144,11 @@ const SecondaryCard = ({ docType, selected, onClick }) => {
             </Box>
             <Typography
               variant="body2"
-              fontWeight={selected ? 600 : 400}
-              color={selected ? 'primary.main' : 'text.primary'}
-              noWrap>
+              noWrap
+              sx={{
+                color: selected ? 'primary.main' : 'text.primary',
+                fontWeight: selected ? 600 : 400
+              }}>
               {formatMessage({ id: docType.name })}
             </Typography>
           </CardContent>
@@ -215,7 +219,12 @@ const DocumentTypeSelect = () => {
           *
         </Box>
       </Typography>
-      <Grid container spacing={1} alignItems="stretch">
+      <Grid
+        container
+        spacing={1}
+        sx={{
+          alignItems: 'stretch'
+        }}>
         {featured.map(dt => (
           <Grid size={4} key={dt.id}>
             <FeaturedCard
@@ -263,9 +272,11 @@ const DocumentTypeSelect = () => {
               )}
               <Typography
                 variant="body2"
-                fontWeight={500}
-                color={selectedOther ? 'primary.main' : 'text.primary'}
-                sx={{ flex: 1 }}>
+                sx={{
+                  color: selectedOther ? 'primary.main' : 'text.primary',
+                  fontWeight: 500,
+                  flex: 1
+                }}>
                 {selectedOther
                   ? formatMessage({ id: selectedOther.name })
                   : formatMessage({ id: 'Other types' })}

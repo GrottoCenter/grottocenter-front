@@ -4,7 +4,7 @@ import { IconButton, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CheckIcon from '@mui/icons-material/Check';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 
 import copyToClipboard from '@/utils/clipboard';
 
@@ -54,7 +54,7 @@ const CopyToClipboardIconButton = ({
     icon = <CheckIcon color="success" fontSize="small" />;
   } else if (copyStatus === 'error') {
     currentLabel = errorLabel;
-    icon = <ErrorOutlineIcon color="error" fontSize="small" />;
+    icon = <ErrorOutlineOutlinedIcon color="error" fontSize="small" />;
   }
 
   return (

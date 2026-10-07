@@ -58,7 +58,12 @@ const StatItem = ({ src, alt, count, label }) => (
         cursor: 'default'
       }}>
       <img src={src} alt={alt} style={{ height: 40, width: 40 }} />
-      <Typography variant="h5" fontWeight={700} lineHeight={1}>
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: 700,
+          lineHeight: 1
+        }}>
         {count}
       </Typography>
     </Box>

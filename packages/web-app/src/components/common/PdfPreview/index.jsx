@@ -218,7 +218,11 @@ const PdfJsViewer = ({ src }) => {
     return (
       <Frame>
         <Centered>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary'
+            }}>
             {formatMessage({ id: 'Unable to display this PDF.' })}
           </Typography>
           <Typography variant="body2">
@@ -263,7 +267,11 @@ const PdfJsViewer = ({ src }) => {
               aria-label={formatMessage({ id: 'Previous page' })}>
               <ChevronLeft />
             </IconButton>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary'
+              }}>
               {formatMessage(
                 { id: 'Page {current} of {total}' },
                 { current: pageNumber, total: pageCount }
@@ -285,7 +293,11 @@ const PdfJsViewer = ({ src }) => {
               aria-label={formatMessage({ id: 'Zoom out' })}>
               <ZoomOut />
             </IconButton>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary'
+              }}>
               {`${Math.round(zoom * 100)}%`}
             </Typography>
             <IconButton

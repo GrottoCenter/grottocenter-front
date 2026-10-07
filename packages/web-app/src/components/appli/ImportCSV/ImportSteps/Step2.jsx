@@ -116,7 +116,11 @@ const Step2 = () => {
       />
       {selectedFile && (
         <Box sx={{ mt: 1 }}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary'
+            }}>
             {formatBytes(selectedFile.size)}
           </Typography>
         </Box>

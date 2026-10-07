@@ -147,7 +147,11 @@ const Guidelines = ({ entityType, entityId, entityName, guidelines }) => {
       defaultExpanded={guidelines?.length > 0}
       icon={
         permissions.isAuth && (
-          <Box display="flex" gap={0.5}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 0.5
+            }}>
             <SectionCreateButton
               isOpen={isGuidelineSearchVisible}
               onToggle={() => {
@@ -177,7 +181,10 @@ const Guidelines = ({ entityType, entityId, entityName, guidelines }) => {
       content={
         <>
           {isGuidelineSearchVisible && (
-            <Box mb={1}>
+            <Box
+              sx={{
+                mb: 1
+              }}>
               <form autoComplete="off" onSubmit={handleAttachGuideline}>
                 {isLoadingGuidelines ? (
                   <Box
@@ -228,8 +235,8 @@ const Guidelines = ({ entityType, entityId, entityName, guidelines }) => {
                             {option.description && (
                               <Typography
                                 variant="caption"
-                                color="text.secondary"
                                 sx={{
+                                  color: 'text.secondary',
                                   display: '-webkit-box',
                                   WebkitLineClamp: 2,
                                   WebkitBoxOrient: 'vertical',

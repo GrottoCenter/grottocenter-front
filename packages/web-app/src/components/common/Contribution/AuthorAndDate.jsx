@@ -18,7 +18,12 @@ const AuthorAndDate = ({
       {date && (
         <>
           {' '}
-          <Typography component="span" variant="caption" color="inherit">
+          <Typography
+            component="span"
+            variant="caption"
+            sx={{
+              color: 'inherit'
+            }}>
             {formatDate(date, {
               year: '2-digit',
               month: 'numeric',

@@ -1,4 +1,4 @@
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import {
   useTheme,
   List,
@@ -23,7 +23,9 @@ const LabelAdornment = () => {
       <List dense disablePadding>
         <ListItem dense>
           <ListItemIcon>
-            <ErrorOutlineIcon style={{ color: theme.palette.success.main }} />
+            <ErrorOutlineOutlinedIcon
+              style={{ color: theme.palette.success.main }}
+            />
           </ListItemIcon>
           <ListItemText
             primary={formatMessage({
@@ -33,7 +35,9 @@ const LabelAdornment = () => {
         </ListItem>
         <ListItem>
           <ListItemIcon>
-            <ErrorOutlineIcon style={{ color: theme.palette.error.main }} />
+            <ErrorOutlineOutlinedIcon
+              style={{ color: theme.palette.error.main }}
+            />
           </ListItemIcon>
           <ListItemText
             primary={formatMessage({
@@ -43,7 +47,7 @@ const LabelAdornment = () => {
         </ListItem>
         <ListItem>
           <ListItemIcon>
-            <ErrorOutlineIcon
+            <ErrorOutlineOutlinedIcon
               style={{ color: theme.palette.secondary.light }}
             />
           </ListItemIcon>

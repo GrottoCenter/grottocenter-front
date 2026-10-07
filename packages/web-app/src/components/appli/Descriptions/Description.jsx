@@ -94,7 +94,10 @@ const Description = ({
         />
       </Box>
       {isUpdateFormVisible && permissions.isAuth ? (
-        <Box width="100%">
+        <Box
+          sx={{
+            width: '100%'
+          }}>
           <CreateDescriptionForm
             closeForm={() => setIsUpdateFormVisible(false)}
             isNewDescription={false}

@@ -115,8 +115,10 @@ const WaypointHud = ({ waypoint, userLocation }) => {
           </Typography>
           <Typography
             variant="body2"
-            color="text.secondary"
-            sx={{ lineHeight: 1.2 }}>
+            sx={{
+              color: 'text.secondary',
+              lineHeight: 1.2
+            }}>
             {`${Math.round(bearing)}° ${bearingToCardinal(bearing)}`}
           </Typography>
         </Box>

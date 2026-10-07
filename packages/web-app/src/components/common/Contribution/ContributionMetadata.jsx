@@ -41,8 +41,11 @@ const ContributionMetadata = ({
     <Typography
       component="div"
       variant="caption"
-      color="text.secondary"
-      sx={{ mt: 1, ...sx }}>
+      sx={{
+        color: 'text.secondary',
+        mt: 1,
+        ...sx
+      }}>
       {createdBy && (
         <AuthorAndDate
           author={createdBy}

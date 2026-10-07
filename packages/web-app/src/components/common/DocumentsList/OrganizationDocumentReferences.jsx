@@ -47,6 +47,7 @@ const OrganizationDocumentReferences = ({
           }}>
           <Button
             component={AppLink}
+            nativeButton={false}
             to={buildDocumentsSearchUrl(searchFilter)}
             endIcon={<ArrowForwardIcon />}
             variant="outlined"

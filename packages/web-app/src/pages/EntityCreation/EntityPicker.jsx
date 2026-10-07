@@ -39,13 +39,22 @@ const EntityPicker = () => {
               // iOS keeps :focus style after tap; blur on touchEnd removes the stale focus ring
               onTouchEnd={e => e.currentTarget.blur()}>
               <CardContent>
-                <Box display="flex" alignItems="center" gap={1}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
+                  }}>
                   <EntityIcon iconType={iconType} />
                   <Typography variant="h4" component="h2">
                     {formatMessage({ id: titleKey })}
                   </Typography>
                 </Box>
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'text.secondary'
+                  }}>
                   {formatMessage(descriptionKey)}
                 </Typography>
               </CardContent>

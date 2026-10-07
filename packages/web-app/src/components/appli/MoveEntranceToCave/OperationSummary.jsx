@@ -134,8 +134,10 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
           {typeof item.count === 'number' && (
             <Typography
               variant="caption"
-              color="text.secondary"
-              component="span">
+              component="span"
+              sx={{
+                color: 'text.secondary'
+              }}>
               {countLabel(item.count)}
             </Typography>
           )}
@@ -145,14 +147,22 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
           <CustomIcon type={item.icon} size={16} />
           <Typography
             variant="body2"
-            color={item.accent ? 'primary' : 'text.primary'}
-            sx={{ minWidth: 0, fontWeight: item.accent ? 600 : 400 }}>
+            sx={{
+              color: item.accent ? 'primary.main' : 'text.primary',
+              minWidth: 0,
+              fontWeight: item.accent ? 600 : 400
+            }}>
             {item.name}
           </Typography>
         </Box>
       )}
       {item.note && (
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary',
+            display: 'block'
+          }}>
           {item.note}
         </Typography>
       )}
@@ -163,9 +173,11 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
     <Box sx={{ flex: '1 1 0', minWidth: 0 }}>
       <Typography
         variant="overline"
-        color="text.secondary"
-        display="block"
-        sx={{ mb: 0.5 }}>
+        sx={{
+          color: 'text.secondary',
+          display: 'block',
+          mb: 0.5
+        }}>
         {label}
       </Typography>
       {items.length > 0 ? (
@@ -173,7 +185,11 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
           {items.map(renderItem)}
         </Box>
       ) : (
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {formatMessage({ id: 'To be selected' })}
         </Typography>
       )}

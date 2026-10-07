@@ -64,7 +64,13 @@ const ResponsiveActions = ({ items, loading = false, loadingLabel, size }) => {
         aria-busy={busy ? 'true' : undefined}
         aria-label={label}
         {...(href
-          ? { component: AppLink, to: href, target, rel: 'noopener noreferrer' }
+          ? {
+              component: AppLink,
+              nativeButton: false,
+              to: href,
+              target,
+              rel: 'noopener noreferrer'
+            }
           : {})}>
         {icon}
       </Button>
@@ -166,6 +172,7 @@ const ResponsiveActions = ({ items, loading = false, loadingLabel, size }) => {
         {...(href
           ? {
               component: AppLink,
+              nativeButton: false,
               to: href,
               target,
               rel: 'noopener noreferrer'

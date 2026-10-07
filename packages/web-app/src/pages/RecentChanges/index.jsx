@@ -27,7 +27,11 @@ const RecentChangesPage = () => {
     <Layout
       title={formatMessage({ id: 'Recent changes' })}
       subheader={
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {formatMessage({
             id: 'Changes from the last 7 days, limited to the latest 500 recorded operations'
           })}

@@ -149,8 +149,11 @@ const MobileEntityCard = React.memo(
                   <Typography
                     variant="subtitle1"
                     color="secondary"
-                    fontWeight="bold"
-                    sx={{ fontSize: '0.9375rem', lineHeight: 1.3 }}>
+                    sx={{
+                      fontWeight: 'bold',
+                      fontSize: '0.9375rem',
+                      lineHeight: 1.3
+                    }}>
                     {renderCellFn(doc, titleCol.field, titleCol.render)}
                   </Typography>
                 </Box>
@@ -184,14 +187,19 @@ const MobileEntityCard = React.memo(
                         }}>
                         <Typography
                           variant="caption"
-                          color="text.secondary"
-                          sx={{ minWidth: '35%', flexShrink: 0 }}>
+                          sx={{
+                            color: 'text.secondary',
+                            minWidth: '35%',
+                            flexShrink: 0
+                          }}>
                           <Translate>{col.label}</Translate>
                         </Typography>
                         <Typography
                           variant="body2"
-                          fontWeight={isMissing ? 'normal' : 500}
-                          color={isMissing ? 'text.disabled' : 'text.primary'}>
+                          sx={{
+                            color: isMissing ? 'text.disabled' : 'text.primary',
+                            fontWeight: isMissing ? 'normal' : 500
+                          }}>
                           {value}
                         </Typography>
                       </Box>
@@ -336,10 +344,18 @@ const MobileEntityList = ({
     return (
       <Box sx={{ py: 3, textAlign: 'center', color: 'text.disabled' }}>
         <SearchOffIcon sx={{ fontSize: 48, mb: 0.5 }} />
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           <Translate>No results</Translate>
         </Typography>
-        <Typography variant="caption" color="text.disabled">
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.disabled'
+          }}>
           <Translate>Try adjusting your search or filters</Translate>
         </Typography>
       </Box>
@@ -378,8 +394,12 @@ const MobileEntityList = ({
       {!hasMore && allRows.length >= MAX_ACCUMULATED_ROWS && (
         <Typography
           variant="caption"
-          color="text.secondary"
-          sx={{ display: 'block', textAlign: 'center', py: 0.5 }}>
+          sx={{
+            color: 'text.secondary',
+            display: 'block',
+            textAlign: 'center',
+            py: 0.5
+          }}>
           <Translate>Refine your search to see more results</Translate>
         </Typography>
       )}

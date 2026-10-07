@@ -26,7 +26,9 @@ const EntranceListItem = ({ entrance }) => {
             <i>{formatMessage({ id: 'no name' })}</i>
           )
         }
-        primaryTypographyProps={{ style: { whiteSpace: 'normal' } }} // Multiple lines text
+        slotProps={{
+          primary: { style: { whiteSpace: 'normal' } }
+        }}
       />
     </StyledListItem>
   );

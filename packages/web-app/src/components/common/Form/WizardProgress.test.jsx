@@ -51,5 +51,7 @@ it('renders only the active label and progress in the compact layout', () => {
   const progressbar = screen.getByRole('progressbar', {
     name: 'Step 2 of 3'
   });
-  expect(progressbar).toHaveAttribute('aria-valuenow', '67');
+  expect(Number(progressbar.getAttribute('aria-valuenow'))).toBeCloseTo(
+    (2 / 3) * 100
+  );
 });

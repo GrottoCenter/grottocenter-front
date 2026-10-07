@@ -95,6 +95,7 @@ const ToolCard = ({
     <Card variant="outlined">
       <CardActionArea
         component={AppLink}
+        nativeButton={false}
         to={to}
         aria-label={`${title} — ${roleLabel}`}>
         <CardContent sx={{ position: 'relative', p: 2, pt: 3 }}>
@@ -117,10 +118,18 @@ const ToolCard = ({
               iconNode
             )}
           </Box>
-          <Typography variant="subtitle1" fontWeight={600}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 600
+            }}>
             {title}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary'
+            }}>
             {description}
           </Typography>
         </CardContent>
@@ -169,23 +178,39 @@ const DBExportCard = ({ dbExport = null, isLoading = false }) => {
           }}>
           <ArchiveIcon />
         </Box>
-        <Typography variant="subtitle1" fontWeight={600}>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 600
+          }}>
           {formatMessage({ id: 'Database export' })}
         </Typography>
         {isLoading && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
             <CircularProgress size={14} />
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary'
+              }}>
               {formatMessage({ id: 'Loading ...' })}
             </Typography>
           </Box>
         )}
         {!isLoading && url && (
           <Box sx={{ mt: 1 }}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary'
+              }}>
               {formatMessage({ id: 'Last update' })} : {lastUpdate}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary'
+              }}>
               {formatMessage({ id: 'Size' })} : {sizeMo} Mo
             </Typography>
           </Box>
@@ -247,7 +272,11 @@ const Dashboard = () => {
     <Layout
       title={formatMessage({ id: 'Management tools' })}
       subheader={
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary'
+          }}>
           {formatMessage({ id: 'Management tools access restricted' })}
         </Typography>
       }

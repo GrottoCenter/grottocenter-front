@@ -136,7 +136,11 @@ const NotificationMenu = () => {
             borderBottom: 1,
             borderColor: 'divider'
           }}>
-          <Typography variant="body2" color="text.primary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.primary'
+            }}>
             {formatMessage({ id: 'Notifications' })}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

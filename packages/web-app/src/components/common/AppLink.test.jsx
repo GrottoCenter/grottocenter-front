@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { Button, ListItemButton } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -15,6 +16,34 @@ const renderLink = ui =>
   );
 
 describe('AppLink', () => {
+  it('renders MUI buttons as links without leaking nativeButton', () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    renderLink(
+      <>
+        <Button component={AppLink} nativeButton={false} to="/ui/entrances/42">
+          Discover
+        </Button>
+        <ListItemButton component={AppLink} nativeButton={false} to="/ui/map">
+          Map
+        </ListItemButton>
+      </>
+    );
+
+    expect(screen.getByRole('link', { name: 'Discover' })).toHaveAttribute(
+      'href',
+      '/ui/entrances/42'
+    );
+    expect(screen.getByRole('link', { name: 'Map' })).toHaveAttribute(
+      'href',
+      '/ui/map'
+    );
+    expect(consoleError).not.toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
   it('allows an unbroken link label to wrap within its container', () => {
     renderLink(
       <AppLink to="/ui/documents/42">

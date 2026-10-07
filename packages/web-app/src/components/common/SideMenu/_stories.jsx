@@ -60,13 +60,19 @@ const WithState = () => {
       </AppBar>
       <SideMenu />
       <MainWrapper $offset={offset} $transition={transition}>
-        <Typography paragraph>
+        <Typography
+          sx={{
+            mb: 2
+          }}>
           Resize the preview across 900px to switch between the permanent
           desktop rail and the temporary mobile overlay. Below that width the
           menu is an overlay opened by the burger; above it, the chevron folds
           the rail down to its icons instead of hiding it.
         </Typography>
-        <Typography paragraph>
+        <Typography
+          sx={{
+            mb: 2
+          }}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Rhoncus
           dolor purus non enim praesent elementum facilisis leo vel. Risus at

@@ -80,7 +80,12 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h4" textAlign="center" pb={1}>
+      <Typography
+        variant="h4"
+        sx={{
+          textAlign: 'center',
+          pb: 1
+        }}>
         {formatMessage({ id: 'Caves statistics' })}
       </Typography>
       <StyledBox sx={{ gridTemplateColumns: cols.join(' ') }}>

@@ -386,14 +386,11 @@ export const overridings = {
         line: {
           borderWidth: '1px'
         },
-        lineHorizontal: {
-          borderWidth: '1px'
-        },
-        lineVertical: {
-          borderWidth: 0,
-          borderLeftWidth: '1px'
-        },
         root: {
+          '&.MuiStepConnector-vertical .MuiStepConnector-line': {
+            borderWidth: 0,
+            borderLeftWidth: '1px'
+          },
           '&.Mui-active': {
             '& .MuiStepConnector-line': {
               borderColor: brown['300'],

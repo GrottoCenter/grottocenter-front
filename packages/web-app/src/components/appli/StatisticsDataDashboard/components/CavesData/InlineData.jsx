@@ -29,8 +29,10 @@ const InlineData = ({ icon, numberData, text }) => {
         <Typography
           variant="h3"
           color="secondary"
-          fontWeight={700}
-          sx={{ pl: 0.5 }}>
+          sx={{
+            fontWeight: 700,
+            pl: 0.5
+          }}>
           {numberData.toLocaleString(locale)}
         </Typography>
       </StyledLine>

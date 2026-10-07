@@ -79,7 +79,13 @@ const MapLine = ({
       container
       direction="row"
       style={{ paddingBottom: paddingVertical, paddingTop: paddingVertical }}>
-      <Grid container size={4} justifyContent="flex-start" alignItems="center">
+      <Grid
+        container
+        size={4}
+        sx={{
+          justifyContent: 'flex-start',
+          alignItems: 'center'
+        }}>
         <MapComponent position={position1} />
         <Fab
           onClick={() => onAddButtonClick(position1)}
@@ -89,13 +95,25 @@ const MapLine = ({
           <ArrowForwardIosIcon />
         </Fab>
       </Grid>
-      <Grid container size={4} justifyContent="center" alignItems="center">
+      <Grid
+        container
+        size={4}
+        sx={{
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
         <MapComponent
           position={positionState}
           updatePosition={updatePositionState}
         />
       </Grid>
-      <Grid container size={4} justifyContent="flex-end" alignItems="center">
+      <Grid
+        container
+        size={4}
+        sx={{
+          justifyContent: 'flex-end',
+          alignItems: 'center'
+        }}>
         <Fab
           onClick={() => onAddButtonClick(position2)}
           color="primary"
@@ -105,7 +123,13 @@ const MapLine = ({
         </Fab>
         <MapComponent position={position2} />
       </Grid>
-      <Grid container size={12} justifyContent="center" alignItems="center">
+      <Grid
+        container
+        size={12}
+        sx={{
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
         {formatMessage({ id: 'You can move this marker' })}
       </Grid>
     </Grid>

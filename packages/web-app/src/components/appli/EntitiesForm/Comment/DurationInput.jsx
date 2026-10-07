@@ -56,11 +56,19 @@ const DurationInput = ({ labelId, helperId, icon, value, onChange }) => {
             flexWrap: 'wrap',
             columnGap: 0.5
           }}>
-          <Typography variant="body2" fontWeight={600}>
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 600
+            }}>
             {label}
           </Typography>
           {helperId && (
-            <Typography variant="caption" color="text.secondary">
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary'
+              }}>
               ({formatMessage({ id: helperId })})
             </Typography>
           )}

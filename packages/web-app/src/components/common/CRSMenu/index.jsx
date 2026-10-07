@@ -97,14 +97,16 @@ const CRSMenu = ({
       anchorEl={anchorEl}
       open={Boolean(anchorEl)}
       onClose={handleClose}
-      PaperProps={{
-        sx: {
-          maxHeight: 480,
-          width: 320,
-          maxWidth: 'calc(100vw - 32px)',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden'
+      slotProps={{
+        paper: {
+          sx: {
+            maxHeight: 480,
+            width: 320,
+            maxWidth: 'calc(100vw - 32px)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
+          }
         }
       }}>
       <Box sx={{ p: 0.5, borderBottom: 1, borderColor: 'divider' }}>

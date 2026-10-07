@@ -22,7 +22,12 @@ const TitleLine = ({ title1, title2, handleAllClick1, handleAllClick2 }) => {
   const { formatMessage } = useIntl();
   return (
     <StyledGrid container direction="row">
-      <Grid container size={4} justifyContent="flex-start">
+      <Grid
+        container
+        size={4}
+        sx={{
+          justifyContent: 'flex-start'
+        }}>
         <Title>
           {formatMessage(
             {
@@ -40,10 +45,20 @@ const TitleLine = ({ title1, title2, handleAllClick1, handleAllClick2 }) => {
           style={{ marginLeft: margin }}
         />
       </Grid>
-      <Grid container size={4} justifyContent="center">
+      <Grid
+        container
+        size={4}
+        sx={{
+          justifyContent: 'center'
+        }}>
         <Title>{formatMessage({ id: 'Final result' })}</Title>
       </Grid>
-      <Grid container size={4} justifyContent="flex-end">
+      <Grid
+        container
+        size={4}
+        sx={{
+          justifyContent: 'flex-end'
+        }}>
         <Title>
           {formatMessage(
             {

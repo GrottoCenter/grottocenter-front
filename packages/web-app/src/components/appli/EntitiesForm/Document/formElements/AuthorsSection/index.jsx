@@ -137,9 +137,11 @@ const AuthorsSection = () => {
     <Box sx={{ mt: 2 }}>
       <Typography
         variant="caption"
-        color="text.secondary"
-        display="block"
-        sx={{ mb: 0.5 }}>
+        sx={{
+          color: 'text.secondary',
+          display: 'block',
+          mb: 0.5
+        }}>
         {formatMessage({
           id: 'AuthorsSection.helperText',
           defaultMessage:
@@ -165,10 +167,10 @@ const AuthorsSection = () => {
             }
             filterSelectedOptions
             filterOptions={options => options}
-            renderTags={(tagValue, getTagProps) =>
+            renderValue={(tagValue, getItemProps) =>
               tagValue.map((option, index) => (
                 <Chip
-                  {...getTagProps({ index })}
+                  {...getItemProps({ index })}
                   key={`${option._type}-${option.id}`}
                   color="primary"
                   label={
@@ -202,14 +204,18 @@ const AuthorsSection = () => {
                 label={formatMessage({ id: 'Authors' })}
                 required={value.length === 0}
                 error={hasError}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {isLoading && <CircularProgress size={16} />}
-                      {params.InputProps.endAdornment}
-                    </>
-                  )
+                slotProps={{
+                  ...params.slotProps,
+
+                  input: {
+                    ...params.slotProps.input,
+                    endAdornment: (
+                      <>
+                        {isLoading && <CircularProgress size={16} />}
+                        {params.slotProps.input.endAdornment}
+                      </>
+                    )
+                  }
                 }}
               />
             )}

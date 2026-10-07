@@ -44,7 +44,8 @@ describe('FetchErrorState', () => {
       renderState({ error: networkError });
 
       expect(screen.getByTestId('fetch-error-state')).toHaveClass(
-        'MuiAlert-standardInfo'
+        'MuiAlert-standard',
+        'MuiAlert-colorInfo'
       );
     });
 
@@ -66,7 +67,8 @@ describe('FetchErrorState', () => {
       ).toBeInTheDocument();
       expect(screen.queryByText('Unavailable offline')).not.toBeInTheDocument();
       expect(screen.getByTestId('fetch-error-state')).toHaveClass(
-        'MuiAlert-standardError'
+        'MuiAlert-standard',
+        'MuiAlert-colorError'
       );
       expect(screen.getByText('Retry')).toBeInTheDocument();
     });
@@ -82,7 +84,8 @@ describe('FetchErrorState', () => {
 
       expect(screen.getByText('Unavailable offline')).toBeInTheDocument();
       expect(screen.getByTestId('fetch-error-state')).toHaveClass(
-        'MuiAlert-standardInfo'
+        'MuiAlert-standard',
+        'MuiAlert-colorInfo'
       );
     });
 
@@ -104,7 +107,8 @@ describe('FetchErrorState', () => {
         screen.getByText('Error, the entrance data is not available.')
       ).toBeInTheDocument();
       expect(screen.getByTestId('fetch-error-state')).toHaveClass(
-        'MuiAlert-standardError'
+        'MuiAlert-standard',
+        'MuiAlert-colorError'
       );
     });
 

@@ -33,7 +33,12 @@ const EntranceNetworkSnapshots = information => {
   ${coordinatesValue[0].toFixed(4)}, ${coordinatesValue[1].toFixed(4)}`;
 
   return (
-    <Box display="flex" flexDirection="column" width="100%">
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%'
+      }}>
       {hasCoordinates && (
         <Property
           label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}

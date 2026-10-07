@@ -120,8 +120,10 @@ const SubmitStep = () => {
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             <Typography
               variant="body2"
-              color="text.secondary"
-              sx={{ minWidth: 160 }}>
+              sx={{
+                color: 'text.secondary',
+                minWidth: 160
+              }}>
               {formatMessage({
                 id: 'ImportObservationsWizard.SubmitStep.summary.fileName'
               })}
@@ -135,8 +137,10 @@ const SubmitStep = () => {
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             <Typography
               variant="body2"
-              color="text.secondary"
-              sx={{ minWidth: 160 }}>
+              sx={{
+                color: 'text.secondary',
+                minWidth: 160
+              }}>
               {formatMessage({
                 id: 'ImportObservationsWizard.SubmitStep.summary.caveId'
               })}
@@ -154,8 +158,10 @@ const SubmitStep = () => {
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             <Typography
               variant="body2"
-              color="text.secondary"
-              sx={{ minWidth: 160 }}>
+              sx={{
+                color: 'text.secondary',
+                minWidth: 160
+              }}>
               {formatMessage({
                 id: 'ImportObservationsWizard.SubmitStep.summary.pointLabel'
               })}
@@ -172,8 +178,10 @@ const SubmitStep = () => {
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             <Typography
               variant="body2"
-              color="text.secondary"
-              sx={{ minWidth: 160 }}>
+              sx={{
+                color: 'text.secondary',
+                minWidth: 160
+              }}>
               {formatMessage({
                 id: 'ImportObservationsWizard.SubmitStep.summary.sensorConfigs'
               })}
@@ -188,8 +196,10 @@ const SubmitStep = () => {
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               <Typography
                 variant="body2"
-                color="text.secondary"
-                sx={{ minWidth: 160 }}>
+                sx={{
+                  color: 'text.secondary',
+                  minWidth: 160
+                }}>
                 {formatMessage({
                   id: 'ImportObservationsWizard.SubmitStep.summary.validRows'
                 })}
@@ -220,8 +230,8 @@ const SubmitStep = () => {
                 {translatedMessage && (
                   <Typography
                     variant="body2"
-                    fontWeight="bold"
                     sx={{
+                      fontWeight: 'bold',
                       mb: showRaw || errorDetails.length > 0 ? 0.5 : 0.25
                     }}>
                     {translatedMessage}
@@ -252,7 +262,9 @@ const SubmitStep = () => {
                         ? `${detail.field}: ${detail.message || detail.value}`
                         : detail.message || detail.value
                     }
-                    primaryTypographyProps={{ variant: 'body2' }}
+                    slotProps={{
+                      primary: { variant: 'body2' }
+                    }}
                   />
                 </ListItem>
               ))}
@@ -270,8 +282,11 @@ const SubmitStep = () => {
           {submission.error.referenceId && (
             <Typography
               variant="caption"
-              color="text.secondary"
-              sx={{ mt: 0.5, display: 'block' }}>
+              sx={{
+                color: 'text.secondary',
+                mt: 0.5,
+                display: 'block'
+              }}>
               {formatMessage(
                 { id: 'ImportObservationsWizard.SubmitStep.referenceId' },
                 { id: submission.error.referenceId }

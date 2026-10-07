@@ -27,7 +27,12 @@ import { normalizeOtp } from '../../../utils/otpHelpers';
 const StepInstall = ({ onContinue, isLoading, error }) => {
   const { formatMessage } = useIntl();
   return (
-    <Box display="flex" flexDirection="column" gap={2}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2
+      }}>
       <Typography variant="body1">
         {formatMessage({ id: 'mfaEnrollmentStep1Body' })}
       </Typography>
@@ -43,7 +48,11 @@ const StepInstall = ({ onContinue, isLoading, error }) => {
           </div>
         </Fade>
       )}
-      <Box display="flex" justifyContent="flex-end">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end'
+        }}>
         <Button
           variant="contained"
           onClick={onContinue}
@@ -78,8 +87,19 @@ const StepScanQr = ({ otpauthUri, secret, onContinue, onBack }) => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" gap={2} alignItems="center">
-      <Typography variant="body2" color="text.secondary" textAlign="center">
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+        alignItems: 'center'
+      }}>
+      <Typography
+        variant="body2"
+        sx={{
+          color: 'text.secondary',
+          textAlign: 'center'
+        }}>
         {formatMessage({ id: 'mfaEnrollmentStep2Body' })}
       </Typography>
       <Box
@@ -95,8 +115,8 @@ const StepScanQr = ({ otpauthUri, secret, onContinue, onBack }) => {
       <Box sx={{ width: '100%' }}>
         <Typography
           variant="caption"
-          color="text.secondary"
           sx={{
+            color: 'text.secondary',
             display: 'block'
           }}>
           {formatMessage({ id: 'mfaSecretLabel' })}
@@ -128,7 +148,12 @@ const StepScanQr = ({ otpauthUri, secret, onContinue, onBack }) => {
           </Tooltip>
         </Box>
       </Box>
-      <Box display="flex" justifyContent="space-between" width="100%">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          width: '100%'
+        }}>
         <Button variant="text" onClick={onBack}>
           {formatMessage({ id: 'Back' })}
         </Button>
@@ -189,8 +214,17 @@ const StepVerify = ({
   const msg = errorMessage();
 
   return (
-    <Box display="flex" flexDirection="column" gap={1}>
-      <Typography variant="body2" color="text.secondary">
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1
+      }}>
+      <Typography
+        variant="body2"
+        sx={{
+          color: 'text.secondary'
+        }}>
         {formatMessage({ id: 'mfaEnrollmentStep3Body' })}
       </Typography>
       <FormControl variant="filled">
@@ -326,7 +360,12 @@ const MfaEnrollment = ({ onBack }) => {
   ];
 
   return (
-    <Box display="flex" flexDirection="column" gap={2}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2
+      }}>
       <WizardProgress activeStep={activeStep} steps={steps} />
       {stepContent[activeStep]}
     </Box>

@@ -88,7 +88,12 @@ const AuthorsSelect = ({
 
   return (
     <>
-      <Typography variant="caption" color="text.secondary" display="block">
+      <Typography
+        variant="caption"
+        sx={{
+          color: 'text.secondary',
+          display: 'block'
+        }}>
         {formatMessage({ id: HELPER_TEXT_KEY })}
       </Typography>
       <Wrapper>
@@ -134,14 +139,18 @@ const AuthorsSelect = ({
                 label={label}
                 required={required}
                 error={hasError}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {isLoading && <CircularProgress size={16} />}
-                      {params.InputProps.endAdornment}
-                    </>
-                  )
+                slotProps={{
+                  ...params.slotProps,
+
+                  input: {
+                    ...params.slotProps.input,
+                    endAdornment: (
+                      <>
+                        {isLoading && <CircularProgress size={16} />}
+                        {params.slotProps.input.endAdornment}
+                      </>
+                    )
+                  }
                 }}
               />
             )}

@@ -60,7 +60,10 @@ const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
 
   return (
     <>
-      <Box textAlign="center">
+      <Box
+        sx={{
+          textAlign: 'center'
+        }}>
         <DocumentSearch />
         <br />
         <SearchResults
@@ -84,7 +87,10 @@ const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
             })}
           />
         )}
-        <Box my={3}>
+        <Box
+          sx={{
+            my: 3
+          }}>
           {closeForm && (
             <SpacedButton onClick={closeForm}>
               {formatMessage({ id: 'Cancel' })}

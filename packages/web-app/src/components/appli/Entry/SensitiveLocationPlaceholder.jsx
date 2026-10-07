@@ -20,10 +20,20 @@ const SensitiveLocationPlaceholder = () => {
       <LockOutlinedIcon sx={{ fontSize: 48, color: 'secondary.main' }} />
       {/* Label of a status panel, not a section of the page: styled like a
           heading but kept out of the document outline. */}
-      <Typography variant="h4" component="p" color="secondary.main">
+      <Typography
+        variant="h4"
+        component="p"
+        sx={{
+          color: 'secondary.main'
+        }}>
         {formatMessage({ id: 'Sensitive location' })}
       </Typography>
-      <Typography variant="body2" textAlign="center" color="text.secondary">
+      <Typography
+        variant="body2"
+        sx={{
+          textAlign: 'center',
+          color: 'text.secondary'
+        }}>
         {formatMessage({
           id: 'This entrance requires special protection measures. We do not communicate its precise location on Grottocenter.'
         })}

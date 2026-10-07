@@ -8,7 +8,13 @@ const DataQualityComputeDetails = () => {
   const theme = useTheme();
 
   return (
-    <Box display="flex" flexDirection="column" gap={1} p={1}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1,
+        p: 1
+      }}>
       <Typography variant="body2">
         {formatMessage({
           id: 'The quality of the data is calculated from the information available on the cave, the number of people who provided information and the date of the last contributions. This allows us to build a value between 3 and 100.'

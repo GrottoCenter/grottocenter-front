@@ -1,6 +1,6 @@
 /* eslint-disable react/forbid-prop-types */
 import { useState, useCallback, useMemo } from 'react';
-import { Grid } from '@mui/material';
+import { Stack } from '@mui/material';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'ramda';
 import GridLine from './Common/GridLine';
@@ -215,7 +215,10 @@ const DocumentsHandler = ({
   );
 
   return (
-    <Grid container direction="column" alignItems="center">
+    <Stack
+      sx={{
+        alignItems: 'center'
+      }}>
       <ActionLine
         handleSubmit={onSubmit}
         handleNotDuplicatesSubmit={onNotDuplicatesSubmit}
@@ -266,7 +269,7 @@ const DocumentsHandler = ({
         handleNotDuplicatesSubmit={onNotDuplicatesSubmit}
         disableSubmit={!isSubmittable()}
       />
-    </Grid>
+    </Stack>
   );
 };
 

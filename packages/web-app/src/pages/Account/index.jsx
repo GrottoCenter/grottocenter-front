@@ -24,10 +24,10 @@ import {
 } from '@mui/material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
@@ -36,7 +36,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import TuneIcon from '@mui/icons-material/Tune';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import NoAccountsOutlinedIcon from '@mui/icons-material/NoAccountsOutlined';
 import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { styled } from '@mui/material/styles';
@@ -305,6 +305,7 @@ const PersonalInfoSection = ({ account, onSaved }) => {
               variant="outlined"
               endIcon={<OpenInNewIcon fontSize="small" />}
               component={AppLink}
+              nativeButton={false}
               to={`/ui/persons/${account.id}`}
               openInNewTabDesktop>
               {formatMessage({ id: 'My public page' })}
@@ -335,7 +336,11 @@ const PersonalInfoSection = ({ account, onSaved }) => {
 
   const editContent = (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-      <Typography variant="caption" color="text.secondary">
+      <Typography
+        variant="caption"
+        sx={{
+          color: 'text.secondary'
+        }}>
         <Translate>The nickname defines how other users see you.</Translate>
       </Typography>
       <FormRow>
@@ -460,7 +465,7 @@ const MfaSection = () => {
               size="small"
               variant="outlined"
               color="success"
-              icon={<CheckCircleOutlineIcon />}
+              icon={<CheckCircleOutlinedIcon />}
               label={formatMessage({ id: 'mfaStatusActive' })}
             />
             <Button
@@ -476,7 +481,7 @@ const MfaSection = () => {
             size="small"
             variant="outlined"
             color="warning"
-            icon={<ErrorOutlineIcon />}
+            icon={<ErrorOutlineOutlinedIcon />}
             label={formatMessage({ id: 'mfaStatusInactive' })}
           />
         )}
@@ -515,7 +520,12 @@ const MfaSection = () => {
             </Button>
           </>
         }>
-        <Box display="flex" flexDirection="column" gap={1}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1
+          }}>
           <Alert
             severity="warning"
             content={formatMessage({ id: 'mfaResetWarning' })}
@@ -672,7 +682,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
               size="small"
               variant="outlined"
               color="success"
-              icon={<CheckCircleOutlineIcon />}
+              icon={<CheckCircleOutlinedIcon />}
               label={formatMessage({ id: 'Email verified' })}
             />
           ) : (
@@ -680,7 +690,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
               size="small"
               variant="outlined"
               color="error"
-              icon={<ErrorOutlineIcon />}
+              icon={<ErrorOutlineOutlinedIcon />}
               label={formatMessage({ id: 'Email not verified' })}
             />
           ))}
@@ -1008,7 +1018,12 @@ const PreferencesSection = ({ account, onSaved }) => {
         />
       </FormRow>
       <Box sx={{ mt: 1 }}>
-        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
+        <Typography
+          variant="subtitle2"
+          sx={{
+            color: 'text.secondary',
+            mb: 0.5
+          }}>
           {formatMessage({ id: 'Notification Preferences' })}
         </Typography>
         <Controller
@@ -1187,13 +1202,18 @@ const OfflineDataSection = () => {
         </SectionHeader>
         <Divider />
         <SectionBody>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              mb: 2
+            }}>
             {formatMessage({ id: 'offlineDataDescription' })}
           </Typography>
           <Button
             variant="outlined"
             color="warning"
-            startIcon={<DeleteOutlineIcon />}
+            startIcon={<DeleteOutlinedIcon />}
             onClick={() => setIsDialogOpen(true)}>
             {formatMessage({ id: 'Clear offline data' })}
           </Button>
@@ -1253,7 +1273,12 @@ const AccountDeletionSection = () => {
         </SectionHeader>
         <Divider />
         <SectionBody>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              mb: 2
+            }}>
             {formatMessage({ id: 'accountDeletionDescription' })}
           </Typography>
           <Button
@@ -1277,6 +1302,7 @@ const AccountDeletionSection = () => {
             </Button>
             <Button
               component={AppLink}
+              nativeButton={false}
               href={contactUrl}
               onClick={() => setIsDialogOpen(false)}
               endIcon={<OpenInNewIcon fontSize="small" />}
@@ -1557,7 +1583,7 @@ const AccountPage = () => {
                     label={formatMessage({ id: 'Add' })}
                     tooltip={formatMessage({ id: 'Add an entrance' })}
                     openTooltip={formatMessage({ id: 'Cancel this search' })}
-                    icon={<CheckCircleOutlineIcon />}
+                    icon={<CheckCircleOutlinedIcon />}
                   />
                 }
                 content={
@@ -1658,7 +1684,11 @@ const AccountPage = () => {
           { id: 'Are you sure you want to leave {name}?' },
           {
             name: (
-              <Typography component="span" fontWeight={700}>
+              <Typography
+                component="span"
+                sx={{
+                  fontWeight: 700
+                }}>
                 {pendingLeaveOrg?.label ?? '?'}
               </Typography>
             )

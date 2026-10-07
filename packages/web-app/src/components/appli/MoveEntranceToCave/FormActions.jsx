@@ -31,8 +31,8 @@ const FormActions = ({
 
   return (
     <Box
-      mt={3}
       sx={{
+        mt: 3,
         display: 'flex',
         flexDirection: { xs: 'column-reverse', sm: 'row' },
         justifyContent: { sm: 'flex-end' },
