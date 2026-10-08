@@ -63,6 +63,14 @@ const AssociationForm = ({ onClose, onSubmit, status, error }) => {
   const isNameNearLimit =
     !selectedOrg &&
     trimmedInput.length >= Math.ceil(TEXT_LENGTH_LIMITS.ENTITY_NAME * 0.8);
+  const isNameTooLong =
+    !selectedOrg && trimmedInput.length > TEXT_LENGTH_LIMITS.ENTITY_NAME;
+  const nameLengthFeedback = isNameTooLong
+    ? formatMessage(
+        { id: 'form.maxLength' },
+        { limit: TEXT_LENGTH_LIMITS.ENTITY_NAME, count: trimmedInput.length }
+      )
+    : `${trimmedInput.length} / ${TEXT_LENGTH_LIMITS.ENTITY_NAME}`;
   const hasExactMatch = results.some(
     r => r.name?.toLowerCase() === trimmedInput.toLowerCase()
   );
@@ -99,23 +107,17 @@ const AssociationForm = ({ onClose, onSubmit, status, error }) => {
           <TextField
             {...params}
             label={formatMessage({ id: 'Search or create organization' })}
-            error={
-              !selectedOrg &&
-              trimmedInput.length > TEXT_LENGTH_LIMITS.ENTITY_NAME
-            }
-            helperText={
-              isNameNearLimit
-                ? formatMessage(
-                    { id: 'form.maxLength' },
-                    {
-                      limit: TEXT_LENGTH_LIMITS.ENTITY_NAME,
-                      count: trimmedInput.length
-                    }
-                  )
-                : undefined
-            }
+            error={isNameTooLong}
+            helperText={isNameNearLimit ? nameLengthFeedback : undefined}
             slotProps={{
               ...params.slotProps,
+
+              formHelperText: {
+                sx: {
+                  textAlign: 'right',
+                  color: isNameTooLong ? 'error.main' : 'text.secondary'
+                }
+              },
 
               input: {
                 ...params.slotProps.input,

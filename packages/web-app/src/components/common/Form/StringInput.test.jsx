@@ -51,15 +51,19 @@ describe('StringInput length limits', () => {
     ).toContain(counter.id);
   });
 
-  it('only displays the short-field limit near the maximum', () => {
-    renderInput({ maxLength: 10, value: '12345678' });
+  it.each([8, 10])('shows only a neutral counter at %i characters', count => {
+    renderInput({ maxLength: 10, value: 'x'.repeat(count) });
 
-    expect(
-      screen.getByText('Maximum 10 characters (8 entered).')
-    ).toBeInTheDocument();
+    expect(screen.getByText(`${count} / 10`)).toBeInTheDocument();
+    expect(screen.queryByText(/Maximum/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Title' })).toHaveAttribute(
+      'aria-invalid',
+      'false'
+    );
   });
 
-  it('associates existing help text and a near-limit hint with the input', () => {
+  it('associates existing help text and the near-limit counter with the input', () => {
     renderInput({
       maxLength: 10,
       value: '12345678',
@@ -67,9 +71,9 @@ describe('StringInput length limits', () => {
     });
 
     const input = screen.getByRole('textbox', { name: 'Title' });
-    const hint = screen.getByText('Maximum 10 characters (8 entered).');
+    const counter = screen.getByText('8 / 10');
     const help = screen.getByText('An optional title.');
-    expect(input.getAttribute('aria-describedby')).toContain(hint.id);
+    expect(input.getAttribute('aria-describedby')).toContain(counter.id);
     expect(input.getAttribute('aria-describedby')).toContain(help.id);
   });
 });

@@ -32,6 +32,8 @@ const InputText = ({
       }}
       render={({ field: { ref, value, onChange }, fieldState }) => {
         const characterCount = String(value ?? '').length;
+        const limit = characterLimit ?? maxLength;
+        const isTooLong = limit !== undefined && characterCount > limit;
         const lengthError =
           fieldState.error?.type === 'maxLength' && !helperText
             ? formatMessage(
@@ -42,14 +44,11 @@ const InputText = ({
                 }
               )
             : null;
-        const lengthHint =
-          maxLength && characterCount >= Math.ceil(maxLength * 0.8)
-            ? formatMessage(
-                { id: 'form.maxLength' },
-                { limit: maxLength, count: characterCount }
-              )
-            : null;
-        const displayedHelperText = characterLimit ? (
+        const shouldShowCounter =
+          characterLimit !== undefined ||
+          (maxLength !== undefined &&
+            characterCount >= Math.ceil(maxLength * 0.8));
+        const displayedHelperText = shouldShowCounter ? (
           <Box
             component="span"
             sx={{
@@ -58,12 +57,14 @@ const InputText = ({
               width: '100%'
             }}>
             <span>{helperText || lengthError}</span>
-            <span>
-              {characterCount} / {characterLimit}
-            </span>
+            <Box
+              component="span"
+              sx={{ color: isTooLong ? 'error.main' : 'text.secondary' }}>
+              {characterCount} / {limit}
+            </Box>
           </Box>
         ) : (
-          lengthError || lengthHint || helperText
+          lengthError || helperText
         );
 
         return (
@@ -71,7 +72,7 @@ const InputText = ({
             fullWidth
             label={formatMessage({ id: labelName })}
             type={type}
-            error={isError}
+            error={isError || isTooLong}
             required={isRequired}
             helperText={displayedHelperText}
             disabled={isDisabled ? true : undefined}

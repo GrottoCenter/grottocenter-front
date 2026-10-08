@@ -31,11 +31,12 @@ const StringInput = ({
   const isTooLong = limit !== undefined && count > limit;
   const isNearLimit =
     maxLength !== undefined && count >= Math.ceil(maxLength * 0.8);
+  const shouldShowCounter = characterLimit !== undefined || isNearLimit;
   const describedBy =
     [
       helperText && `${inputId}-help`,
-      (isTooLong || isNearLimit) && `${inputId}-limit`,
-      characterLimit !== undefined && `${inputId}-count`
+      isTooLong && `${inputId}-limit`,
+      shouldShowCounter && `${inputId}-count`
     ]
       .filter(Boolean)
       .join(' ') || undefined;
@@ -81,21 +82,25 @@ const StringInput = ({
           {...props}
         />
       </FormControl>
-      {(isTooLong || isNearLimit) && (
+      {isTooLong && (
         <Typography
           id={`${inputId}-limit`}
-          role={isTooLong ? 'alert' : undefined}
+          role="alert"
           variant="caption"
-          color={isTooLong ? 'error' : 'text.secondary'}>
+          color="error"
+          sx={{ textAlign: 'right' }}>
           {formatMessage({ id: 'form.maxLength' }, { count, limit })}
         </Typography>
       )}
-      {characterLimit !== undefined && (
+      {shouldShowCounter && (
         <Typography
           id={`${inputId}-count`}
           variant="caption"
-          sx={{ alignSelf: 'flex-end' }}>
-          {count} / {characterLimit}
+          sx={{
+            alignSelf: 'flex-end',
+            color: isTooLong ? 'error.main' : 'text.secondary'
+          }}>
+          {count} / {limit}
         </Typography>
       )}
     </Box>

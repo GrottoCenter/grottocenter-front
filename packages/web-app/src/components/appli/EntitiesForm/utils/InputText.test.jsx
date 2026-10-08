@@ -32,7 +32,7 @@ const TestForm = ({ initialValue = '', onSubmit, ...props }) => {
 };
 
 describe('InputText length limits', () => {
-  it('does not display a counter for a short field and rejects oversized values', async () => {
+  it('shows a counter near the limit and rejects oversized values', async () => {
     const onSubmit = vi.fn();
     render(<TestForm maxLength={10} onSubmit={onSubmit} />);
     const input = screen.getByRole('textbox', { name: 'Title' });
@@ -40,9 +40,9 @@ describe('InputText length limits', () => {
     expect(input).toHaveAttribute('maxLength', '10');
     expect(screen.queryByText('0 / 10')).not.toBeInTheDocument();
     fireEvent.change(input, { target: { value: '12345678' } });
-    expect(
-      await screen.findByText('Maximum 10 characters (8 entered).')
-    ).toBeInTheDocument();
+    expect(await screen.findByText('8 / 10')).toBeInTheDocument();
+    expect(input).toHaveAttribute('aria-invalid', 'false');
+    expect(screen.queryByText(/Maximum/)).not.toBeInTheDocument();
     fireEvent.change(input, { target: { value: '12345678901' } });
     fireEvent.click(screen.getByText('Save'));
 
@@ -65,6 +65,10 @@ describe('InputText length limits', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Title' }), {
       target: { value: 'x'.repeat(length) }
     });
+    expect(screen.getByRole('textbox', { name: 'Title' })).toHaveAttribute(
+      'aria-invalid',
+      'false'
+    );
     fireEvent.click(screen.getByText('Save'));
 
     await waitFor(() =>

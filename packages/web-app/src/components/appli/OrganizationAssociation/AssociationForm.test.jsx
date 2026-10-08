@@ -53,6 +53,11 @@ describe('organization name length', () => {
     const onSubmit = vi.fn();
     const { container } = renderForm(onSubmit);
 
+    const input = screen.getByRole('combobox');
+    expect(input).toHaveAttribute('maxLength', '200');
+    expect(input).toHaveAttribute('aria-invalid', 'false');
+    expect(screen.getByText('200 / 200')).toBeInTheDocument();
+    expect(screen.queryByText(/Maximum/)).not.toBeInTheDocument();
     fireEvent.submit(container.querySelector('form'));
 
     expect(onSubmit).toHaveBeenCalledWith({ name: 'x'.repeat(200) });

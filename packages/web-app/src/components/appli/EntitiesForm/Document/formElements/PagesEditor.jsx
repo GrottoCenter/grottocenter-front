@@ -64,11 +64,17 @@ const PagesEditor = () => {
         pages.length >= Math.ceil(TEXT_LENGTH_LIMITS.DOCUMENT_PAGES * 0.8)) && (
         <Typography
           variant="caption"
-          color={isTooLong ? 'error' : 'text.secondary'}>
-          {formatMessage(
-            { id: 'form.maxLength' },
-            { count: pages.length, limit: TEXT_LENGTH_LIMITS.DOCUMENT_PAGES }
-          )}
+          color={isTooLong ? 'error' : 'text.secondary'}
+          sx={{ display: 'block', textAlign: 'right' }}>
+          {isTooLong
+            ? formatMessage(
+                { id: 'form.maxLength' },
+                {
+                  count: pages.length,
+                  limit: TEXT_LENGTH_LIMITS.DOCUMENT_PAGES
+                }
+              )
+            : `${pages.length} / ${TEXT_LENGTH_LIMITS.DOCUMENT_PAGES}`}
         </Typography>
       )}
     </>
