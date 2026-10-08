@@ -2,6 +2,7 @@ import {
   IS_DELETED,
   IS_MODIFIED
 } from '@/components/appli/EntitiesForm/Document/formElements/AddFileForm/FileHelpers';
+import { getSubjectCode } from './subjectHelpers';
 
 // UI convention: a document is new until its first moderation decision.
 // Corrections before that decision remain a creation, reviewed in full.
@@ -133,8 +134,9 @@ const COLLECTION_FIELDS = [
   {
     field: 'subjects',
     label: 'Subjects',
-    identity: subject => String(subject.id),
-    text: subject => `${subject.id} ${subject.subject || ''}`.trim()
+    identity: getSubjectCode,
+    text: subject =>
+      `${getSubjectCode(subject)} ${subject.subject || ''}`.trim()
   },
   {
     field: 'iso3166',

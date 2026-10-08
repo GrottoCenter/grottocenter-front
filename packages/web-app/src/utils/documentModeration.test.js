@@ -246,6 +246,42 @@ describe('document moderation', () => {
     ).toEqual([]);
   });
 
+  it('ignores subject id padding and ordering when membership is unchanged', () => {
+    const base = {
+      subjects: [
+        { id: '2       ', subject: 'Regional speleology' },
+        { id: '1       ', subject: 'General' }
+      ]
+    };
+    const proposed = {
+      subjects: [
+        { id: '1', subject: 'General' },
+        { id: '2', subject: 'Regional speleology' }
+      ]
+    };
+    expect(getDocumentChanges(base, proposed)).toEqual([]);
+    expect(getDocumentChanges(proposed, base)).toEqual([]);
+  });
+
+  it('trims subject ids in both sides of a membership change without mutating the payloads', () => {
+    const base = {
+      subjects: [{ id: '2       ', subject: 'Regional speleology' }]
+    };
+    const proposed = {
+      subjects: [{ id: '3       ', subject: 'Geology' }]
+    };
+    const before = JSON.stringify({ base, proposed });
+    expect(getDocumentChanges(base, proposed)).toEqual([
+      {
+        field: 'subjects',
+        label: 'Subjects',
+        oldText: '2 Regional speleology',
+        newText: '3 Geology'
+      }
+    ]);
+    expect(JSON.stringify({ base, proposed })).toBe(before);
+  });
+
   it('reconstructs arbitrary disjoint kept, renamed, deleted and new file sets', () => {
     fc.assert(
       fc.property(
