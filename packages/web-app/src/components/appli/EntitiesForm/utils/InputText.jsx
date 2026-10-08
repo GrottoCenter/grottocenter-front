@@ -14,6 +14,7 @@ const InputText = ({
   type = 'text',
   helperText,
   minRows,
+  testId,
   maxLength = undefined,
   characterLimit = undefined,
   characterLimitOverflow = 0,
@@ -36,7 +37,7 @@ const InputText = ({
         const limit = characterLimit ?? maxLength;
         const isTooLong = limit !== undefined && characterCount > limit;
         const lengthError =
-          fieldState.error?.type === 'maxLength' && !helperText
+          isTooLong || fieldState.error?.type === 'maxLength'
             ? formatMessage(
                 { id: 'form.maxLength' },
                 {
@@ -56,7 +57,11 @@ const InputText = ({
               justifyContent: 'space-between',
               width: '100%'
             }}>
-            <span>{helperText || lengthError}</span>
+            <span>
+              {helperText && <span>{helperText}</span>}
+              {helperText && lengthError && <br />}
+              {lengthError && <span>{lengthError}</span>}
+            </span>
             <Box
               component="span"
               sx={{ color: isTooLong ? 'error.main' : 'text.secondary' }}>
@@ -69,6 +74,7 @@ const InputText = ({
 
         return (
           <TextField
+            data-testid={testId}
             fullWidth
             label={formatMessage({ id: labelName })}
             type={type}
@@ -112,6 +118,7 @@ InputText.propTypes = {
   type: PropTypes.string,
   helperText: PropTypes.node,
   minRows: PropTypes.number,
+  testId: PropTypes.string,
   maxLength: PropTypes.number,
   characterLimit: PropTypes.number,
   characterLimitOverflow: PropTypes.number,

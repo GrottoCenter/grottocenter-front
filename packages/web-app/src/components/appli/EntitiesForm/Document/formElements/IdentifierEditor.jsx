@@ -81,6 +81,7 @@ const IdentifierEditor = () => {
       <InlineWrapper>
         <IdentifierContainer>
           <StringInput
+            data-testid="document-identifier"
             helperText={formatMessage({
               id: 'Code for designating a document in a unique way. This can be a DOI, URL, ISBN or ISSN.'
             })}

@@ -2913,8 +2913,6 @@
   "Your password has been successfully updated!": "パスワードが正常に更新されました！",
   "Your password must be at least {passwordMinLength} characters.": "パスワードは少なくとも{passwordMinLength}文字必要です。",
   "Your password will be changed": "パスワードが変更されます",
-  "Your real name (optional).": "本名（任意）。",
-  "Your real surname (optional).": "本名の姓（任意）。",
   "Your session has expired: please log in again.": "セッションが期限切れです：再度ログインしてください。",
   "YU": "ユーゴスラビア",
   "YU04": "モンテネグロ",

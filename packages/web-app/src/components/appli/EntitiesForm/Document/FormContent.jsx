@@ -80,6 +80,13 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
   const locale = useSelector(state => state.intl.locale);
   const { data: languages = [] } = useLanguages();
   const userLanguageId = languages.find(l => l.part1 === locale)?.id ?? '000';
+  const hasAdditionalInfoLengthError = lengthErrors.some(({ field }) =>
+    ['identifier', 'issue', 'creatorComment'].includes(field)
+  );
+
+  useEffect(() => {
+    if (hasAdditionalInfoLengthError) setIsAdditionalInfoExpanded(true);
+  }, [hasAdditionalInfoLengthError]);
 
   useEffect(() => {
     if (document.mainLanguage === '000' && userLanguageId !== '000')
@@ -157,6 +164,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
+              data-testid="document-title"
               value={document.title}
               maxLength={TEXT_LENGTH_LIMITS.TITLE}
               valueName={formatMessage({ id: 'Title' })}
@@ -190,6 +198,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
+              data-testid="document-title"
               value={document.title}
               maxLength={TEXT_LENGTH_LIMITS.TITLE}
               valueName={formatMessage({ id: 'Title' })}
@@ -241,6 +250,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
+              data-testid="document-title"
               value={document.title}
               maxLength={TEXT_LENGTH_LIMITS.TITLE}
               valueName={formatMessage({ id: 'Title' })}
@@ -285,6 +295,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
           <Box sx={{ mt: 1 }}>
             <FormRow>
               <StringInput
+                data-testid="document-title"
                 helperText={formatMessage({
                   id: 'Copy the title of the text as it is. In its absence, put a fictitious title between [].'
                 })}
@@ -351,12 +362,8 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
         !isEvent(docType) &&
         !isAuthorizationToPublish(docType) && (
           <Accordion
-            expanded={
-              isAdditionalInfoExpanded ||
-              lengthErrors.some(({ field }) =>
-                ['identifier', 'issue', 'creatorComment'].includes(field)
-              )
-            }
+            data-testid="document-advanced-metadata"
+            expanded={isAdditionalInfoExpanded || hasAdditionalInfoLengthError}
             onChange={(_event, expanded) =>
               setIsAdditionalInfoExpanded(expanded)
             }

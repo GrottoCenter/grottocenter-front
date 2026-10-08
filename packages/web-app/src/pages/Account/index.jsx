@@ -347,6 +347,7 @@ const PersonalInfoSection = ({ account, onSaved }) => {
       <FormRow>
         <InputText
           formKey="nickname"
+          testId="account-nickname"
           maxLength={TEXT_LENGTH_LIMITS.NICKNAME}
           labelName="Nickname"
           control={control}
@@ -357,6 +358,7 @@ const PersonalInfoSection = ({ account, onSaved }) => {
       <FormRow>
         <InputText
           formKey="name"
+          testId="account-first-name"
           maxLength={TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME}
           labelName="First name"
           control={control}
@@ -364,6 +366,7 @@ const PersonalInfoSection = ({ account, onSaved }) => {
         />
         <InputText
           formKey="surname"
+          testId="account-last-name"
           maxLength={TEXT_LENGTH_LIMITS.PERSON_LAST_NAME}
           labelName="Last name"
           control={control}

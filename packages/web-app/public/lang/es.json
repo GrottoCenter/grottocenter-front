@@ -2913,8 +2913,6 @@
   "Your password has been successfully updated!": "¡Su contraseña ha sido actualizada exitosamente!",
   "Your password must be at least {passwordMinLength} characters.": "Su contraseña debe tener al menos {passwordMinLength} caracteres.",
   "Your password will be changed": "Su contraseña será cambiada.",
-  "Your real name (optional).": "Su verdadero nombre (opcional).",
-  "Your real surname (optional).": "Su verdadero apellido (opcional).",
   "Your session has expired: please log in again.": "Su sesión ha expirado: por favor, vuelva a conectarse.",
   "YU": "Yugoslavia",
   "YU04": "Montenegro",

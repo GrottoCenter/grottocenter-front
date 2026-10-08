@@ -32,6 +32,38 @@ const TestForm = ({ initialValue = '', onSubmit, ...props }) => {
 };
 
 describe('InputText length limits', () => {
+  it('explains an oversized API value before submission and allows correction', async () => {
+    const onSubmit = vi.fn();
+    render(
+      <TestForm
+        maxLength={10}
+        initialValue="12345678901"
+        helperText="An optional title."
+        onSubmit={onSubmit}
+      />
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Title' });
+    expect(screen.getByText('An optional title.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Maximum 10 characters (11 entered).')
+    ).toBeInTheDocument();
+    expect(input).toHaveAccessibleDescription(
+      /Maximum 10 characters \(11 entered\)/
+    );
+    fireEvent.click(screen.getByText('Save'));
+    await waitFor(() => expect(input).toHaveAttribute('aria-invalid', 'true'));
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    fireEvent.change(input, { target: { value: '1234567890' } });
+    await waitFor(() =>
+      expect(screen.queryByText(/Maximum/)).not.toBeInTheDocument()
+    );
+    expect(screen.getByText('An optional title.')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Save'));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
+  });
+
   it('keeps helper text visible alongside the near-limit counter', () => {
     render(
       <TestForm

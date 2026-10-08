@@ -20,6 +20,7 @@ const MassifFields = ({ control, errors, geoJson, onValidationChange }) => {
       <FormRow>
         <InputText
           formKey="massif.name"
+          testId="massif-name"
           labelName="Massif name"
           control={control}
           isError={!!errors?.massif?.name}
