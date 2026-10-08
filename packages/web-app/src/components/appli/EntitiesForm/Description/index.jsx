@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { useForm } from 'react-hook-form';
 
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
@@ -36,6 +37,7 @@ const CreateDescriptionForm = ({
         <FormRow>
           <InputText
             formKey="title"
+            maxLength={TEXT_LENGTH_LIMITS.TITLE}
             labelName="Title"
             control={control}
             isError={!!errors?.title}

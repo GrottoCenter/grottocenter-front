@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { isPasswordValid, isValidEmail } from '../../conf/config';
 import { localeToLanguageId } from '../../utils/languageMapping';
 import { useNotification, usePermissions, useSignUp } from '../../hooks';
@@ -37,6 +38,23 @@ const SignUp = () => {
    */
   const checkIfValuesAreValid = () => {
     const errors = [];
+    const limitedFields = [
+      [nickname, TEXT_LENGTH_LIMITS.NICKNAME],
+      [name, TEXT_LENGTH_LIMITS.PERSON_NAME],
+      [surname, TEXT_LENGTH_LIMITS.PERSON_NAME],
+      [email, TEXT_LENGTH_LIMITS.EMAIL]
+    ];
+    const exceeded = limitedFields.find(
+      ([value, limit]) => value.length > limit
+    );
+    if (exceeded) {
+      errors.push(
+        formatMessage(
+          { id: 'form.maxLength' },
+          { count: exceeded[0].length, limit: exceeded[1] }
+        )
+      );
+    }
     if (password !== passwordConfirmation) {
       errors.push(formatMessage({ id: 'The passwords must match.' }));
     }

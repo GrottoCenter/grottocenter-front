@@ -1165,6 +1165,8 @@
   "For security reasons please create a new password.": "Per motivi di sicurezza, crea una nuova password.",
   "For somerc projection: ": "Per la proiezione somerc: ",
   "Forgot password?": "Password dimenticata?",
+  "form.fileNameTooLong": "Il nome del file {file} supera il limite di {limit} caratteri.",
+  "form.maxLength": "Massimo {limit} caratteri ({count} inseriti).",
   "France": "Francia",
   "Free access": "Accesso libero",
   "French": "Francese",

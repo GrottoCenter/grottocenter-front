@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 
 import { useUpdatePerson } from '../../../../hooks';
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
@@ -56,6 +57,7 @@ export const PersonForm = ({ personValues, onCancel }) => {
         <FormRow>
           <InputText
             formKey="person.nickname"
+            maxLength={TEXT_LENGTH_LIMITS.NICKNAME}
             labelName="Nickname"
             control={control}
             isError={!!errors?.person?.nickname}
@@ -65,12 +67,14 @@ export const PersonForm = ({ personValues, onCancel }) => {
         <FormRow>
           <InputText
             formKey="person.name"
+            maxLength={TEXT_LENGTH_LIMITS.PERSON_NAME}
             labelName="First name"
             control={control}
             isError={!!errors?.person?.name}
           />
           <InputText
             formKey="person.surname"
+            maxLength={TEXT_LENGTH_LIMITS.PERSON_NAME}
             labelName="Last name"
             control={control}
             isError={!!errors?.person?.surname}

@@ -1165,6 +1165,8 @@
   "For security reasons please create a new password.": "Untuk alasan keamanan, buat kata sandi baru.",
   "For somerc projection: ": "Untuk proyeksi somerc: ",
   "Forgot password?": "Lupa kata sandi?",
+  "form.fileNameTooLong": "Nama berkas {file} melebihi batas {limit} karakter.",
+  "form.maxLength": "Maksimal {limit} karakter ({count} dimasukkan).",
   "France": "Prancis",
   "Free access": "Akses gratis",
   "French": "Bahasa Prancis",

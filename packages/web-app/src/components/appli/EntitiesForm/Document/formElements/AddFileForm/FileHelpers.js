@@ -1,4 +1,5 @@
 import { isNil } from 'ramda';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 
 // Those constants represent the state of the file.
 // The actions performed depend on them.
@@ -16,8 +17,8 @@ export const DOCUMENT_AUTHORIZE_TO_PUBLISH =
  * Validates and converts a File[] into the internal file entry format.
  * Size and type are enforced upstream by FileSelectorInput (maxSize / accept);
  * this function keeps only the domain rules FileSelectorInput cannot know
- * about — filenames without an extension and same-name collisions with a
- * pending entry.
+ * about — filenames without an extension, oversized filenames and same-name
+ * collisions with a pending entry.
  */
 export const validateAndBuildFileEntries = (
   newFiles,
@@ -29,6 +30,15 @@ export const validateAndBuildFileEntries = (
   const entries = filesArray
     .filter(file => {
       if (file.name) {
+        if (file.name.length > TEXT_LENGTH_LIMITS.FILE_NAME) {
+          errors.push(
+            formatMessage(
+              { id: 'form.fileNameTooLong' },
+              { file: file.name, limit: TEXT_LENGTH_LIMITS.FILE_NAME }
+            )
+          );
+          return false;
+        }
         const dotIndex = file.name.lastIndexOf('.');
         if (dotIndex <= 0) {
           errors.push(

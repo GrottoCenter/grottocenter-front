@@ -12,6 +12,7 @@ import {
   TableRow,
   TableBody,
   Table,
+  Typography,
   useMediaQuery
 } from '@mui/material';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
@@ -19,6 +20,12 @@ import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { useTheme } from '@mui/material/styles';
 
 import { OBSTACLE_LEGEND, ANCHOR_LEGEND } from '@/utils/riggingLegends';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import {
+  RIGGING_COLUMNS,
+  getRiggingColumnLengths,
+  hasOversizedRiggingColumn
+} from '@/utils/riggingColumnLengths';
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
 import InputText from '../utils/InputText';
 import InputLanguage from '../utils/InputLanguage';
@@ -29,7 +36,6 @@ import ColumnLegend, { LegendHeader } from '../../Entry/Riggings/ColumnLegend';
 
 import { RiggingPropTypes } from '../../../../types/entrance.type';
 
-const FIELDS = ['obstacle', 'rope', 'anchor', 'observation'];
 const COLUMN_WIDTHS = {
   obstacle: '25%',
   rope: '13%',
@@ -93,9 +99,12 @@ const CreateRiggingsForm = ({
   // obstacle (the only required cell) — matching the inline field-level error.
   const watchedTitle = useWatch({ control, name: 'title' });
   const watchedObstacles = useWatch({ control, name: 'obstacles' });
+  const columnLengths = getRiggingColumnLengths(watchedObstacles);
   const isFormInvalid =
     !watchedTitle?.trim() ||
-    (watchedObstacles ?? []).some(row => !row?.obstacle?.trim());
+    (watchedTitle?.length ?? 0) > TEXT_LENGTH_LIMITS.TITLE ||
+    (watchedObstacles ?? []).some(row => !row?.obstacle?.trim()) ||
+    hasOversizedRiggingColumn(columnLengths);
 
   // Index of the last appended row, so its obstacle field gets focused.
   const [focusIndex, setFocusIndex] = useState(-1);
@@ -113,6 +122,12 @@ const CreateRiggingsForm = ({
     append(getDefaultObstacle());
   };
 
+  const handleValidSubmit = data => {
+    if (!hasOversizedRiggingColumn(getRiggingColumnLengths(data.obstacles)))
+      return onSubmit(data);
+    return undefined;
+  };
+
   const rowActions = index => (
     <ObstacleRowActions
       isFirst={index === 0}
@@ -124,9 +139,22 @@ const CreateRiggingsForm = ({
     />
   );
 
+  const columnCount = (field, showLabel = false) => (
+    <Typography
+      variant="caption"
+      color={
+        columnLengths[field] > TEXT_LENGTH_LIMITS.RIGGING_COLUMN
+          ? 'error'
+          : 'text.secondary'
+      }>
+      {showLabel && `${formatMessage({ id: HEADER_KEYS[field] })}: `}
+      {columnLengths[field]} / {TEXT_LENGTH_LIMITS.RIGGING_COLUMN}
+    </Typography>
+  );
+
   return (
     <FormContainer sx={{ marginTop: 1 }}>
-      <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+      <form autoComplete="off" onSubmit={handleSubmit(handleValidSubmit)}>
         <FormRow>
           <InputText
             formKey="title"
@@ -134,6 +162,7 @@ const CreateRiggingsForm = ({
             control={control}
             isError={!!errors?.title}
             isRequired
+            maxLength={TEXT_LENGTH_LIMITS.TITLE}
           />
 
           <InputLanguage
@@ -145,6 +174,11 @@ const CreateRiggingsForm = ({
         {fields.length > 0 &&
           (isMobile ? (
             <Stack spacing={1} sx={{ mt: 1 }}>
+              <Stack direction="row" flexWrap="wrap" gap={1}>
+                {RIGGING_COLUMNS.map(field => (
+                  <Box key={field}>{columnCount(field, true)}</Box>
+                ))}
+              </Stack>
               {fields.map((item, index) => (
                 <ObstacleCard
                   key={item.id}
@@ -157,6 +191,10 @@ const CreateRiggingsForm = ({
                   onDelete={() => remove(index)}
                   autoFocus={index === focusIndex}
                   legendSections={LEGEND_SECTIONS}
+                  oversizedColumns={RIGGING_COLUMNS.filter(
+                    field =>
+                      columnLengths[field] > TEXT_LENGTH_LIMITS.RIGGING_COLUMN
+                  )}
                 />
               ))}
             </Stack>
@@ -168,10 +206,11 @@ const CreateRiggingsForm = ({
                 sx={{ mb: 0 }}>
                 <TableHead sx={{ '& th': { textTransform: 'capitalize' } }}>
                   <TableRow>
-                    {FIELDS.map(field => (
+                    {RIGGING_COLUMNS.map(field => (
                       <TableCell key={field} width={COLUMN_WIDTHS[field]}>
                         <LegendHeader>
                           {formatMessage({ id: HEADER_KEYS[field] })}
+                          {columnCount(field)}
                           {HEADER_LEGENDS[field] && (
                             <ColumnLegend
                               titleKey={HEADER_LEGENDS[field].titleKey}
@@ -187,7 +226,7 @@ const CreateRiggingsForm = ({
                 <TableBody>
                   {fields.map((item, index) => (
                     <TableRow key={item.id}>
-                      {FIELDS.map(field => (
+                      {RIGGING_COLUMNS.map(field => (
                         <TableCell
                           key={field}
                           sx={{ px: '4px', py: '6px', verticalAlign: 'top' }}>
@@ -195,6 +234,10 @@ const CreateRiggingsForm = ({
                             control={control}
                             index={index}
                             field={field}
+                            isColumnTooLong={
+                              columnLengths[field] >
+                              TEXT_LENGTH_LIMITS.RIGGING_COLUMN
+                            }
                             autoFocus={
                               index === focusIndex && field === 'obstacle'
                             }

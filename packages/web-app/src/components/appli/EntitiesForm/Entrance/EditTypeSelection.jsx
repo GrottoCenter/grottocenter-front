@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useController } from 'react-hook-form';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 
 import { FormRow } from '../utils/FormContainers';
@@ -38,6 +39,7 @@ const EditTypeSelection = ({
                 control={control}
                 isError={!!errors?.cave?.name}
                 isRequired
+                maxLength={TEXT_LENGTH_LIMITS.ENTITY_NAME}
                 onChangeAdditionalFn={onNameChange}
               />
             </NameSuggestionDropdown>
@@ -64,6 +66,7 @@ const EditTypeSelection = ({
                 control={control}
                 isError={!!errors?.entrance?.name}
                 isRequired
+                maxLength={TEXT_LENGTH_LIMITS.ENTITY_NAME}
               />
             </NameSuggestionDropdown>
           </Box>

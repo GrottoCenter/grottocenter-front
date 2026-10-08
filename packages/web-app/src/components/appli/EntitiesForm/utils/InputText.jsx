@@ -13,6 +13,7 @@ const InputText = ({
   type = 'text',
   helperText,
   minRows,
+  maxLength = undefined,
   characterLimit = undefined,
   characterLimitOverflow = 0,
   isRequired = false,
@@ -25,12 +26,29 @@ const InputText = ({
       control={control}
       rules={{
         required: isRequired,
-        maxLength: characterLimit,
+        maxLength: characterLimit ?? maxLength,
         validate: value =>
           validatorFn ? validatorFn(value, formatMessage) : undefined
       }}
-      render={({ field: { ref, value, onChange } }) => {
+      render={({ field: { ref, value, onChange }, fieldState }) => {
         const characterCount = String(value ?? '').length;
+        const lengthError =
+          fieldState.error?.type === 'maxLength' && !helperText
+            ? formatMessage(
+                { id: 'form.maxLength' },
+                {
+                  limit: characterLimit ?? maxLength,
+                  count: characterCount
+                }
+              )
+            : null;
+        const lengthHint =
+          maxLength && characterCount >= Math.ceil(maxLength * 0.8)
+            ? formatMessage(
+                { id: 'form.maxLength' },
+                { limit: maxLength, count: characterCount }
+              )
+            : null;
         const displayedHelperText = characterLimit ? (
           <Box
             component="span"
@@ -39,13 +57,13 @@ const InputText = ({
               justifyContent: 'space-between',
               width: '100%'
             }}>
-            <span>{helperText}</span>
+            <span>{helperText || lengthError}</span>
             <span>
               {characterCount} / {characterLimit}
             </span>
           </Box>
         ) : (
-          helperText
+          lengthError || lengthHint || helperText
         );
 
         return (
@@ -60,10 +78,12 @@ const InputText = ({
             multiline={minRows ? true : undefined}
             minRows={minRows || undefined}
             slotProps={
-              characterLimit
+              characterLimit || maxLength
                 ? {
                     htmlInput: {
-                      maxLength: characterLimit + characterLimitOverflow
+                      maxLength: characterLimit
+                        ? characterLimit + characterLimitOverflow
+                        : maxLength
                     }
                   }
                 : undefined
@@ -91,6 +111,7 @@ InputText.propTypes = {
   type: PropTypes.string,
   helperText: PropTypes.node,
   minRows: PropTypes.number,
+  maxLength: PropTypes.number,
   characterLimit: PropTypes.number,
   characterLimitOverflow: PropTypes.number,
   isRequired: PropTypes.bool,

@@ -62,6 +62,7 @@ const DocumentSubmission = ({ onCancel, onSuccess }) => {
   const [searchParams] = useSearchParams();
   const {
     document,
+    isFormValid,
     isNewDocument,
     resetContext,
     setLinkedEntrance,
@@ -99,12 +100,14 @@ const DocumentSubmission = ({ onCancel, onSuccess }) => {
   }, [linkedEntranceData, entranceIdParam, linkedEntrance, setLinkedEntrance]);
 
   const submitDocument = () => {
+    if (!isFormValid) return;
     if (isNewDocument) createMutation.mutate(document);
     else updateMutation.mutate(document);
   };
 
   const onFormSubmit = event => {
     event.preventDefault();
+    if (!isFormValid) return;
 
     // A file is expected for this type but none is attached: ask for
     // confirmation so the user does not forget (they cannot add a file after

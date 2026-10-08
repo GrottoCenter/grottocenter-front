@@ -1165,6 +1165,8 @@
   "For security reasons please create a new password.": "Per raons de seguretat, creeu una nova contrasenya.",
   "For somerc projection: ": "Per la projecció de l'el·lipsoide Somerc :",
   "Forgot password?": "Has oblidat el mot de pas (contrasenya)?",
+  "form.fileNameTooLong": "El nom del fitxer {file} supera el límit de {limit} caràcters.",
+  "form.maxLength": "Màxim {limit} caràcters ({count} introduïts).",
   "France": "França",
   "Free access": "Accés lliure",
   "French": "francès",

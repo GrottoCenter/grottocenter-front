@@ -1165,6 +1165,8 @@
   "For security reasons please create a new password.": "Din motive de securitate, creați o nouă parolă.",
   "For somerc projection: ": "Pentru proiecție somerc:",
   "Forgot password?": "Ați uitat parola?",
+  "form.fileNameTooLong": "Numele fișierului {file} depășește limita de {limit} caractere.",
+  "form.maxLength": "Maximum {limit} caractere ({count} introduse).",
   "France": "Franța",
   "Free access": "Acces liber",
   "French": "Franceză",

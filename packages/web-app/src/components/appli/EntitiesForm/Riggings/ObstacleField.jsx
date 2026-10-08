@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box, TextField } from '@mui/material';
 import { useController } from 'react-hook-form';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import AnchorToolbar from './AnchorToolbar';
 
 const LABEL_KEYS = {
@@ -17,7 +18,8 @@ const ObstacleField = ({
   index,
   field,
   showLabel = false,
-  autoFocus = false
+  autoFocus = false,
+  isColumnTooLong = false
 }) => {
   const { formatMessage } = useIntl();
   const label = formatMessage({ id: LABEL_KEYS[field] });
@@ -70,7 +72,7 @@ const ObstacleField = ({
       hiddenLabel={!showLabel}
       autoFocus={autoFocus}
       required={isObstacle}
-      error={!!error}
+      error={!!error || isColumnTooLong}
       helperText={
         error
           ? formatMessage({
@@ -80,7 +82,13 @@ const ObstacleField = ({
       }
       label={showLabel ? label : undefined}
       inputRef={isAnchor ? inputRef : undefined}
-      slotProps={{ htmlInput: { 'aria-label': label, style: inputPadding } }}
+      slotProps={{
+        htmlInput: {
+          'aria-label': label,
+          style: inputPadding,
+          maxLength: TEXT_LENGTH_LIMITS.RIGGING_COLUMN
+        }
+      }}
     />
   );
 
@@ -100,7 +108,8 @@ ObstacleField.propTypes = {
   index: PropTypes.number.isRequired,
   field: PropTypes.oneOf(Object.keys(LABEL_KEYS)).isRequired,
   showLabel: PropTypes.bool,
-  autoFocus: PropTypes.bool
+  autoFocus: PropTypes.bool,
+  isColumnTooLong: PropTypes.bool
 };
 
 export default ObstacleField;

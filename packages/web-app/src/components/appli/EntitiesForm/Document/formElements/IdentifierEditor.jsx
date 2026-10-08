@@ -9,6 +9,7 @@ import {
   Typography
 } from '@mui/material';
 import { useIntl } from 'react-intl';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 
 import Translate from '../../../../common/Translate';
 import { DocumentFormContext } from '../Provider';
@@ -85,6 +86,7 @@ const IdentifierEditor = () => {
             })}
             onValueChange={handleIdentifierChange}
             value={document.identifier ?? ''}
+            maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_IDENTIFIER}
             valueName={formatMessage({ id: 'Identifier' })}
             required={identifierType !== null}
             hasError={identifierType !== null && !isRegexpValid}

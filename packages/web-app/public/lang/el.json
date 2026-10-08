@@ -1165,6 +1165,8 @@
   "For security reasons please create a new password.": "Για λόγους ασφαλείας δημιουργήστε νέο κωδικό.",
   "For somerc projection: ": "Για προβολή somerc: ",
   "Forgot password?": "Ξεχάσατε τον κωδικό;",
+  "form.fileNameTooLong": "Το όνομα αρχείου {file} υπερβαίνει το όριο των {limit} χαρακτήρων.",
+  "form.maxLength": "Μέγιστο {limit} χαρακτήρες ({count} καταχωρίστηκαν).",
   "France": "Γαλλία ",
   "Free access": "Ελεύθερη πρόσβαση",
   "French": "Γαλλικά",

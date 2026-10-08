@@ -1165,6 +1165,8 @@
   "For security reasons please create a new password.": "Maak om veiligheidsredenen een nieuw wachtwoord.",
   "For somerc projection: ": "Voor de SOMERC projectie: ",
   "Forgot password?": "Wachtwoord vergeten?",
+  "form.fileNameTooLong": "De bestandsnaam {file} overschrijdt de limiet van {limit} tekens.",
+  "form.maxLength": "Maximaal {limit} tekens ({count} ingevoerd).",
   "France": "Frankrijk",
   "Free access": "Vrije toegang",
   "French": "Frans",

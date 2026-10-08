@@ -12,6 +12,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { styled } from '@mui/material/styles';
 import { Turnstile } from '@marsidev/react-turnstile';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { isPasswordValid, isValidEmail } from '../../conf/config';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StringInput from '../../components/common/Form/StringInput';
@@ -81,9 +82,16 @@ const SignUpForm = ({
   const checkIfHasError = fieldName => {
     switch (fieldName) {
       case 'nickname':
-        return nickname.trim() === '';
+        return (
+          nickname.trim() === '' ||
+          nickname.length > TEXT_LENGTH_LIMITS.NICKNAME
+        );
       case 'email':
-        return !isValidEmail(email);
+        return !isValidEmail(email) || email.length > TEXT_LENGTH_LIMITS.EMAIL;
+      case 'name':
+        return name.length > TEXT_LENGTH_LIMITS.PERSON_NAME;
+      case 'surname':
+        return surname.length > TEXT_LENGTH_LIMITS.PERSON_NAME;
       case 'password':
         return !isPasswordValid(password);
       case 'passwordConfirmation':
@@ -122,6 +130,7 @@ const SignUpForm = ({
               onValueChange={onNicknameChange}
               required
               value={nickname}
+              maxLength={TEXT_LENGTH_LIMITS.NICKNAME}
               valueName={formatMessage({ id: 'Nickname' })}
             />
             <StringInput
@@ -131,6 +140,8 @@ const SignUpForm = ({
               })}
               onValueChange={onNameChange}
               value={name}
+              maxLength={TEXT_LENGTH_LIMITS.PERSON_NAME}
+              hasError={checkIfHasError('name')}
               valueName={formatMessage({ id: 'Caver.Name' })}
             />
             <StringInput
@@ -140,6 +151,8 @@ const SignUpForm = ({
               })}
               onValueChange={onSurnameChange}
               value={surname}
+              maxLength={TEXT_LENGTH_LIMITS.PERSON_NAME}
+              hasError={checkIfHasError('surname')}
               valueName={formatMessage({ id: 'Surname' })}
             />
 
@@ -149,6 +162,7 @@ const SignUpForm = ({
               onValueChange={onEmailChange}
               required
               value={email}
+              maxLength={TEXT_LENGTH_LIMITS.EMAIL}
               valueName={formatMessage({ id: 'Email' })}
             />
 

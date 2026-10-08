@@ -24,7 +24,8 @@ const ObstacleCard = ({
   onMoveDown,
   onDelete,
   autoFocus = false,
-  legendSections
+  legendSections,
+  oversizedColumns = []
 }) => {
   const { formatMessage } = useIntl();
 
@@ -69,6 +70,7 @@ const ObstacleCard = ({
               control={control}
               index={index}
               field="obstacle"
+              isColumnTooLong={oversizedColumns.includes('obstacle')}
               showLabel
               autoFocus={autoFocus}
             />
@@ -78,6 +80,7 @@ const ObstacleCard = ({
               control={control}
               index={index}
               field="rope"
+              isColumnTooLong={oversizedColumns.includes('rope')}
               showLabel
             />
           </Box>
@@ -86,12 +89,14 @@ const ObstacleCard = ({
           control={control}
           index={index}
           field="anchor"
+          isColumnTooLong={oversizedColumns.includes('anchor')}
           showLabel
         />
         <ObstacleField
           control={control}
           index={index}
           field="observation"
+          isColumnTooLong={oversizedColumns.includes('observation')}
           showLabel
         />
       </Stack>
@@ -108,7 +113,8 @@ ObstacleCard.propTypes = {
   onMoveDown: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   autoFocus: PropTypes.bool,
-  legendSections: LegendSectionsShape
+  legendSections: LegendSectionsShape,
+  oversizedColumns: PropTypes.arrayOf(PropTypes.string)
 };
 
 export default ObstacleCard;

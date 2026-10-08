@@ -1165,6 +1165,8 @@
   "For security reasons please create a new password.": "От съображения за сигурност, моля, създайте нова парола.",
   "For somerc projection: ": "За somerc проекция:",
   "Forgot password?": "Забравена парола?",
+  "form.fileNameTooLong": "Името на файла {file} надвишава ограничението от {limit} знака.",
+  "form.maxLength": "Максимум {limit} знака (въведени: {count}).",
   "France": "Франция",
   "Free access": "Свободен достъп",
   "French": "Френски",

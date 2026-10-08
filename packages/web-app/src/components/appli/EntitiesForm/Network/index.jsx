@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { useUpdateCave } from '../../../../hooks';
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
 import InputText from '../utils/InputText';
@@ -71,6 +72,7 @@ export const NetworkForm = ({ networkValues, onCancel }) => {
             control={control}
             isError={!!errors?.cave?.name}
             isRequired
+            maxLength={TEXT_LENGTH_LIMITS.ENTITY_NAME}
           />
 
           <InputLanguage

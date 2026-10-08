@@ -14,6 +14,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 
 import { useLanguages } from '../../../../hooks';
 
@@ -50,6 +51,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
   const {
     document,
     isFormValid,
+    lengthErrors,
     isNewDocument,
     updateAttribute,
     linkedEntrance
@@ -131,6 +133,16 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
         </Alert>
       )}
       <DocumentTypeSelect />
+      {lengthErrors.length > 0 && (
+        <Alert severity="error" sx={{ mt: 1 }}>
+          {lengthErrors.map(({ field, label, limit, count }) => (
+            <Box key={field}>
+              {formatMessage({ id: label })}:{' '}
+              {formatMessage({ id: 'form.maxLength' }, { limit, count })}
+            </Box>
+          ))}
+        </Alert>
+      )}
       {!isUnknown(docType) && simple && (
         /* Simplified layout for Image / Topographic Drawing — no sections */
         <Box sx={{ mt: 1 }}>
@@ -138,6 +150,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
               value={document.title}
+              maxLength={TEXT_LENGTH_LIMITS.TITLE}
               valueName={formatMessage({ id: 'Title' })}
               required
             />
@@ -170,6 +183,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
               value={document.title}
+              maxLength={TEXT_LENGTH_LIMITS.TITLE}
               valueName={formatMessage({ id: 'Title' })}
               required
             />
@@ -220,6 +234,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
               value={document.title}
+              maxLength={TEXT_LENGTH_LIMITS.TITLE}
               valueName={formatMessage({ id: 'Title' })}
               required
             />
@@ -267,6 +282,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
                 })}
                 onValueChange={value => updateAttribute('title', value)}
                 value={document.title}
+                maxLength={TEXT_LENGTH_LIMITS.TITLE}
                 valueName={formatMessage({ id: 'Title' })}
                 required
               />
@@ -327,6 +343,9 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
         !isEvent(docType) &&
         !isAuthorizationToPublish(docType) && (
           <Accordion
+            defaultExpanded={lengthErrors.some(({ field }) =>
+              ['identifier', 'issue', 'creatorComment'].includes(field)
+            )}
             disableGutters
             elevation={0}
             sx={{
@@ -429,6 +448,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
                   multiline={false}
                   onValueChange={newValue => updateAttribute('issue', newValue)}
                   value={document.issue ?? ''}
+                  maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_ISSUE}
                   valueName={formatMessage({ id: 'Periodical issue' })}
                 />
               )}
@@ -481,6 +501,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
                   updateAttribute('creatorComment', newValue)
                 }
                 value={document.creatorComment ?? ''}
+                maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT}
                 valueName={formatMessage({ id: 'Comment' })}
               />
             </AccordionDetails>
