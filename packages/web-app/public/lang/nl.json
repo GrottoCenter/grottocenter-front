@@ -238,6 +238,8 @@
   "accountDeletionDescription": "Het verwijderen van een account gebeurt handmatig. Klik hieronder om te zien hoe je dit aanvraagt.",
   "accountDeletionInstructions": "Klik hieronder op ‘Contactformulier openen’. Vraag in het formulier om verwijdering van je account en vermeld het bijbehorende e-mailadres. Door dit venster te openen wordt nog geen verzoek verzonden.",
   "accountDeletionOutcome": "Nadat een beheerder je account heeft verwijderd, verdwijnt je profiel en kun je niet meer inloggen. Je gepubliceerde bijdragen blijven zichtbaar, maar zijn niet meer gekoppeld aan je profiel.",
+  "Accuracy": "Nauwkeurigheid",
+  "Accuracy must be a whole number between 1 and {max} m.": "De nauwkeurigheid moet een geheel getal tussen 1 en {max} m zijn.",
   "Açores": "Azoren",
   "Action": "Actie",
   "Active": "Actief",

@@ -238,6 +238,8 @@
   "accountDeletionDescription": "A eliminação da conta é tratada manualmente. Clique abaixo para saber como a pedir.",
   "accountDeletionInstructions": "Clique em «Abrir o formulário de contacto» abaixo. No formulário, peça a eliminação da sua conta e indique o endereço de e-mail associado. Abrir esta janela não envia nenhum pedido.",
   "accountDeletionOutcome": "Depois de um administrador eliminar a sua conta, o seu perfil é removido e deixa de poder iniciar sessão. As suas contribuições publicadas continuam visíveis, mas deixam de estar associadas ao seu perfil.",
+  "Accuracy": "Precisão",
+  "Accuracy must be a whole number between 1 and {max} m.": "A precisão deve ser um número inteiro entre 1 e {max} m.",
   "Açores": "Açores",
   "Action": "Ação",
   "Active": "Ativo",

@@ -238,6 +238,8 @@
   "accountDeletionDescription": "La suppression du compte est traitée manuellement. Cliquez ci-dessous pour savoir comment la demander.",
   "accountDeletionInstructions": "Cliquez sur « Ouvrir le formulaire de contact » ci-dessous. Dans le formulaire, demandez la suppression de votre compte et indiquez l’adresse e-mail qui lui est associée. L’ouverture de cette fenêtre n’envoie aucune demande.",
   "accountDeletionOutcome": "Une fois votre compte supprimé par un administrateur, votre profil est effacé et vous ne pouvez plus vous connecter. Vos contributions publiées restent visibles, mais ne sont plus rattachées à votre profil.",
+  "Accuracy": "Précision",
+  "Accuracy must be a whole number between 1 and {max} m.": "La précision doit être un entier compris entre 1 et {max} m.",
   "Açores": "Açores",
   "Action": "Action",
   "Active": "Actives",

@@ -10,10 +10,14 @@ import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormSection } from '../utils/FormContainers';
 import NumberField from '../utils/NumberField';
 
+// The existing API precision column is a signed smallint, in meters.
+const MAX_PRECISION_METERS = 32767;
+
 const EntranceDetail = ({
   control,
   errors,
   getValues,
+  onLocationAccuracyChange,
   isNewEntrance = false
 }) => {
   const permissions = usePermissions();
@@ -87,6 +91,7 @@ const EntranceDetail = ({
           control={control}
           formLatitudeKey="entrance.latitude"
           formLongitudeKey="entrance.longitude"
+          formAccuracyKey="entrance.precision"
           required
           latitudeError={errors?.entrance?.latitude?.message}
           longitudeError={errors?.entrance?.longitude?.message}
@@ -95,6 +100,41 @@ const EntranceDetail = ({
             id: 'Existing nearby entrances'
           })}
           onZoomChange={setMapZoom}
+          onLocationAccuracyChange={onLocationAccuracyChange}
+          accuracyField={
+            <NumberField
+              name="entrance.precision"
+              control={control}
+              label="Accuracy"
+              icon="coordinates"
+              prefix="±"
+              sx={{ flex: 'none', width: '100%' }}
+              unit="m"
+              isError={!!errors.entrance?.precision}
+              helperText={errors.entrance?.precision?.message}
+              rules={{
+                validate: value =>
+                  value == null ||
+                  value === '' ||
+                  (Number.isInteger(Number(value)) &&
+                    Number(value) >= 1 &&
+                    Number(value) <= MAX_PRECISION_METERS) ||
+                  formatMessage(
+                    {
+                      id: 'Accuracy must be a whole number between 1 and {max} m.'
+                    },
+                    { max: MAX_PRECISION_METERS }
+                  )
+              }}
+              inputProps={{
+                min: 1,
+                max: MAX_PRECISION_METERS,
+                step: 1,
+                inputMode: 'numeric',
+                'data-testid': 'entrance-precision'
+              }}
+            />
+          }
         />
       )}
       <Box
@@ -150,11 +190,13 @@ EntranceDetail.propTypes = {
       language: PropTypes.shape({ message: PropTypes.string }),
       name: PropTypes.shape({ message: PropTypes.string }),
       altitude: PropTypes.shape({ message: PropTypes.string }),
+      precision: PropTypes.shape({ message: PropTypes.string }),
       yearDiscovery: PropTypes.shape({ message: PropTypes.string })
     })
   }),
   control: PropTypes.shape({}),
   getValues: PropTypes.func.isRequired, // React-hook-form getValues() function
+  onLocationAccuracyChange: PropTypes.func,
   isNewEntrance: PropTypes.bool
 };
 

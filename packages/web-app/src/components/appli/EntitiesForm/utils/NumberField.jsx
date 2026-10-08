@@ -14,6 +14,7 @@ const NumberField = ({
   control,
   label,
   icon,
+  prefix,
   unit,
   disabled = false,
   isError = false,
@@ -21,7 +22,8 @@ const NumberField = ({
   min,
   max,
   rules = { valueAsNumber: true },
-  inputProps
+  inputProps,
+  sx
 }) => {
   const { formatMessage } = useIntl();
   const inputRef = useRef(null);
@@ -62,7 +64,7 @@ const NumberField = ({
         const errorMessage = fieldState.error?.message;
         return (
           <TextField
-            sx={{ flex: '1 1 200px' }}
+            sx={{ flex: '1 1 200px', ...sx }}
             disabled={disabled}
             name={name}
             label={formatMessage({ id: label })}
@@ -89,7 +91,7 @@ const NumberField = ({
                         ? { '& img': { filter: 'grayscale(1)', opacity: 0.5 } }
                         : undefined
                     }>
-                    <CustomIcon type={icon} size={20} />
+                    {prefix ?? <CustomIcon type={icon} size={20} />}
                   </InputAdornment>
                 ),
                 endAdornment: unit ? (
@@ -111,6 +113,7 @@ NumberField.propTypes = {
   control: PropTypes.shape({}),
   label: PropTypes.string.isRequired,
   icon: PropTypes.string.isRequired,
+  prefix: PropTypes.string,
   unit: PropTypes.string,
   disabled: PropTypes.bool,
   isError: PropTypes.bool,
@@ -118,7 +121,8 @@ NumberField.propTypes = {
   min: PropTypes.number,
   max: PropTypes.number,
   rules: PropTypes.shape({}),
-  inputProps: PropTypes.shape({})
+  inputProps: PropTypes.shape({}),
+  sx: PropTypes.shape({})
 };
 
 export default NumberField;

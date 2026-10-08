@@ -238,6 +238,8 @@
   "accountDeletionDescription": "Ștergerea contului este gestionată manual. Apasă mai jos pentru a afla cum o poți solicita.",
   "accountDeletionInstructions": "Apasă pe „Deschide formularul de contact” de mai jos. În formular, solicită ștergerea contului și introdu adresa de e-mail asociată acestuia. Deschiderea acestei ferestre nu trimite nicio solicitare.",
   "accountDeletionOutcome": "După ce un administrator îți șterge contul, profilul tău este eliminat și nu te mai poți conecta. Contribuțiile tale publicate rămân vizibile, dar nu mai sunt asociate profilului tău.",
+  "Accuracy": "Precizie",
+  "Accuracy must be a whole number between 1 and {max} m.": "Precizia trebuie să fie un număr întreg între 1 și {max} m.",
   "Açores": "Azore",
   "Action": "Acțiune",
   "Active": "Activ",

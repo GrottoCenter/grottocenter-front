@@ -238,6 +238,8 @@
   "accountDeletionDescription": "Penghapusan akun ditangani secara manual. Klik di bawah untuk mengetahui cara memintanya.",
   "accountDeletionInstructions": "Klik “Buka formulir kontak” di bawah. Di formulir tersebut, minta penghapusan akun Anda dan masukkan alamat email yang terhubung dengannya. Membuka jendela ini tidak mengirimkan permintaan.",
   "accountDeletionOutcome": "Setelah administrator menghapus akun Anda, profil Anda dihapus dan Anda tidak dapat masuk lagi. Kontribusi Anda yang telah diterbitkan tetap terlihat, tetapi tidak lagi terhubung dengan profil Anda.",
+  "Accuracy": "Akurasi",
+  "Accuracy must be a whole number between 1 and {max} m.": "Akurasi harus berupa bilangan bulat antara 1 dan {max} m.",
   "Açores": "Azores",
   "Action": "Tindakan",
   "Active": "Aktif",

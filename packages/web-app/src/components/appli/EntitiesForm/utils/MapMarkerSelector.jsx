@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
+import { useIntl } from 'react-intl';
 import {
   Circle,
   MapContainer,
@@ -9,8 +10,10 @@ import {
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
-import { styled } from '@mui/material/styles';
+import { alpha, styled } from '@mui/material/styles';
+import { orange } from '@mui/material/colors';
 import { Box } from '@mui/material';
+import { ACCURACY_CIRCLE_STYLE } from '@/components/common/Maps/common/userLocationStyle';
 import { entranceMarkerIcon } from '../../../../assets/icons';
 import useMarkers from '../../../common/Maps/common/Markers/useMarkers';
 import { EntrancePopup } from '../../../common/Maps/common/Markers/Components';
@@ -174,11 +177,11 @@ const LOCATE_ZOOM = 18;
 const MAP_WRITE_GUARD_MS = 400;
 const hasGeolocation =
   typeof navigator !== 'undefined' && Boolean(navigator.geolocation);
-const ACCURACY_CIRCLE_STYLE = {
-  color: '#1976d2',
-  fillColor: '#1976d2',
-  fillOpacity: 0.1,
-  weight: 1
+const ENTRANCE_ACCURACY_COLOR = orange[700];
+const ENTRANCE_ACCURACY_CIRCLE_STYLE = {
+  ...ACCURACY_CIRCLE_STYLE,
+  color: ENTRANCE_ACCURACY_COLOR,
+  fillColor: ENTRANCE_ACCURACY_COLOR
 };
 
 const MapMarkerSelector = ({
@@ -187,12 +190,15 @@ const MapMarkerSelector = ({
   formLongitudeKey,
   onLatitudeChange: setFormLatitude,
   onLongitudeChange: setFormLongitude,
+  formAccuracyKey,
   additionalPositions = [],
   additionalMarkersLabel,
   onZoomChange,
+  onLocationAccuracyChange,
   markerIcon,
   mapHeight = '40svh'
 }) => {
+  const { formatMessage } = useIntl();
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState(null);
   const [initialized, setInitialized] = useState(false);
@@ -203,6 +209,11 @@ const MapMarkerSelector = ({
 
   const rawLatitude = useWatch({ control, name: formLatitudeKey });
   const rawLongitude = useWatch({ control, name: formLongitudeKey });
+  const formAccuracy = useWatch({
+    control,
+    name: formAccuracyKey,
+    disabled: !formAccuracyKey
+  });
 
   const validLatitude = boundMinMax(-90, 90, toFloat(rawLatitude));
   const validLongitude = boundMinMax(-180, 180, toFloat(rawLongitude));
@@ -251,6 +262,14 @@ const MapMarkerSelector = ({
         setFormLongitude(loc.lng.toFixed(6));
         setCurrentPosition(loc);
         setLocationAccuracy(pos.coords.accuracy);
+        // The API stores whole meters; round up rather than understate the
+        // device estimate. Zero is reserved for restricted coordinates.
+        const { accuracy } = pos.coords;
+        onLocationAccuracyChange?.(
+          Number.isFinite(accuracy) && accuracy >= 0
+            ? Math.max(1, Math.ceil(accuracy))
+            : null
+        );
         setZoomLevel(LOCATE_ZOOM);
         setLocating(false);
       },
@@ -258,11 +277,23 @@ const MapMarkerSelector = ({
         setLocateError(err.code);
         setLocating(false);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
+      // Repeated taps may reuse a fix for up to half a second, keeping both
+      // coordinates and accuracy current while avoiding immediate reacquisition.
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 500 }
     );
   };
 
-  const showLegend = additionalMarkersLabel && additionalPositions.length > 0;
+  const accuracyRadius = Number(
+    formAccuracyKey ? formAccuracy : locationAccuracy
+  );
+  const hasAccuracyCircle =
+    Number.isFinite(accuracyRadius) &&
+    accuracyRadius > 0 &&
+    !Number.isNaN(validLatitude) &&
+    !Number.isNaN(validLongitude);
+  const showAccuracyLegend = Boolean(formAccuracyKey) && hasAccuracyCircle;
+  const showNearbyLegend =
+    additionalMarkersLabel && additionalPositions.length > 0;
 
   return (
     <Box sx={{ position: 'relative' }}>
@@ -297,11 +328,16 @@ const MapMarkerSelector = ({
 
         {onZoomChange && <ZoomReporter onZoomChange={onZoomChange} />}
 
-        {locationAccuracy && (
+        {hasAccuracyCircle && (
           <Circle
-            center={currentPosition}
-            radius={locationAccuracy}
-            pathOptions={ACCURACY_CIRCLE_STYLE}
+            center={{ lat: validLatitude, lng: validLongitude }}
+            radius={accuracyRadius}
+            interactive={false}
+            pathOptions={
+              formAccuracyKey
+                ? ENTRANCE_ACCURACY_CIRCLE_STYLE
+                : ACCURACY_CIRCLE_STYLE
+            }
           />
         )}
 
@@ -323,7 +359,7 @@ const MapMarkerSelector = ({
 
         {/* Rendered inside the map container so it stays visible in fullscreen
             mode (only the map element enters fullscreen). */}
-        {showLegend && (
+        {(showNearbyLegend || showAccuracyLegend) && (
           <Box
             sx={{
               position: 'absolute',
@@ -331,10 +367,11 @@ const MapMarkerSelector = ({
               left: 12,
               zIndex: 1000,
               display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 0.5,
               px: 0.5,
-              py: '4px',
+              py: 0.5,
               borderRadius: 1,
               boxShadow: 1,
               fontSize: 12,
@@ -342,18 +379,47 @@ const MapMarkerSelector = ({
               bgcolor: 'rgba(255, 255, 255, 0.9)',
               pointerEvents: 'none'
             }}>
-            <Box
-              component="span"
-              sx={{
-                width: 10,
-                height: 10,
-                flexShrink: 0,
-                borderRadius: '50%',
-                border: `2px solid ${NEARBY_ENTRANCE_MARKER_STYLE.color}`,
-                bgcolor: NEARBY_ENTRANCE_MARKER_STYLE.fillColor
-              }}
-            />
-            {additionalMarkersLabel}
+            {showNearbyLegend && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Box
+                  component="span"
+                  sx={{
+                    width: 10,
+                    height: 10,
+                    flexShrink: 0,
+                    borderRadius: '50%',
+                    border: `2px solid ${NEARBY_ENTRANCE_MARKER_STYLE.color}`,
+                    bgcolor: NEARBY_ENTRANCE_MARKER_STYLE.fillColor
+                  }}
+                />
+                {additionalMarkersLabel}
+              </Box>
+            )}
+            {showAccuracyLegend && (
+              <Box
+                data-testid="entrance-precision-legend"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.75
+                }}>
+                <Box
+                  component="span"
+                  sx={{
+                    width: 10,
+                    height: 10,
+                    flexShrink: 0,
+                    borderRadius: '50%',
+                    border: `1px solid ${ENTRANCE_ACCURACY_CIRCLE_STYLE.color}`,
+                    bgcolor: alpha(
+                      ENTRANCE_ACCURACY_CIRCLE_STYLE.fillColor,
+                      0.1
+                    )
+                  }}
+                />
+                {formatMessage({ id: 'Accuracy' })}
+              </Box>
+            )}
           </Box>
         )}
       </StyledMapContainer>
@@ -367,9 +433,11 @@ MapMarkerSelector.propTypes = {
   formLongitudeKey: PropTypes.string,
   onLatitudeChange: PropTypes.func.isRequired,
   onLongitudeChange: PropTypes.func.isRequired,
+  formAccuracyKey: PropTypes.string,
   additionalPositions: PropTypes.arrayOf(PropTypes.shape({})),
   additionalMarkersLabel: PropTypes.string,
   onZoomChange: PropTypes.func,
+  onLocationAccuracyChange: PropTypes.func,
   markerIcon: PropTypes.string,
   mapHeight: PropTypes.string
 };

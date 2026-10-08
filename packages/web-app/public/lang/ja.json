@@ -238,6 +238,8 @@
   "accountDeletionDescription": "アカウントの削除は担当者が手動で対応します。依頼方法を確認するには、以下をクリックしてください。",
   "accountDeletionInstructions": "以下の「お問い合わせフォームを開く」をクリックしてください。フォームでアカウントの削除を依頼し、登録済みのメールアドレスを入力してください。この画面を開いただけでは依頼は送信されません。",
   "accountDeletionOutcome": "管理者がアカウントを削除すると、プロフィールは削除され、ログインできなくなります。公開済みの投稿は引き続き表示されますが、プロフィールとの関連付けは解除されます。",
+  "Accuracy": "精度",
+  "Accuracy must be a whole number between 1 and {max} m.": "精度は1から{max} mまでの整数で指定してください。",
   "Açores": "アゾレス諸島",
   "Action": "アクション",
   "Active": "有効",

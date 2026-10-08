@@ -1,124 +1,138 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
 import { IntlProvider } from 'react-intl';
-import messages from '@/../public/lang/en.json';
-import CoordinateFormSection from './CoordinateFormSection';
+import MapMarkerSelector from './MapMarkerSelector';
 
-const mapState = vi.hoisted(() => ({
-  map: null
+const { map, mapHandlers } = vi.hoisted(() => ({
+  map: {
+    setView: vi.fn(),
+    getCenter: vi.fn(),
+    getZoom: vi.fn(() => 18)
+  },
+  mapHandlers: {}
 }));
 
-vi.mock('react-leaflet', async importOriginal => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    useMap: () => {
-      const map = actual.useMap();
-      mapState.map = map;
-      return map;
-    }
-  };
-});
-vi.mock('../../../common/Maps/common/Markers/useMarkers', () => ({
+vi.mock('react-leaflet', () => ({
+  MapContainer: ({ children, className }) => (
+    <div className={className}>{children}</div>
+  ),
+  Circle: ({ center, radius, pathOptions }) => (
+    <div
+      data-testid="accuracy-circle"
+      data-center={JSON.stringify(center)}
+      data-radius={radius}
+      style={{ color: pathOptions.color }}
+    />
+  ),
+  ScaleControl: () => null,
+  useMap: () => map,
+  useMapEvent: (type, handler) => {
+    mapHandlers[type] = handler;
+  }
+}));
+
+vi.mock('@/components/common/Maps/common/Markers/useMarkers', () => ({
   default: () => vi.fn()
 }));
-vi.mock('../../../common/Maps/common/Markers/Components', () => ({
+vi.mock('@/components/common/Maps/common/Markers/Components', () => ({
   EntrancePopup: () => null
 }));
-vi.mock('../../../common/Maps/common/LayersControl', () => ({
+vi.mock('@/components/common/Maps/common/LayersControl', () => ({
   default: () => null
 }));
-vi.mock('../../../common/Maps/common/LocateMeControl', () => ({
+vi.mock('@/components/common/Maps/common/LocateMeControl', () => ({
   default: () => null
 }));
-vi.mock('../../../common/Maps/common/GeocodingControl', () => ({
+vi.mock('@/components/common/Maps/common/GeocodingControl', () => ({
   default: () => null
 }));
-vi.mock('../../../common/Maps/common/FullscreenControl', () => ({
+vi.mock('@/components/common/Maps/common/FullscreenControl', () => ({
   default: () => null
 }));
-vi.mock('../../../common/Maps/common/TileReloader', () => ({
+vi.mock('@/components/common/Maps/common/TileReloader', () => ({
   default: () => null
-}));
-vi.mock('../../../common/CRSMenu', () => ({ default: () => null }));
-vi.mock('../../../../hooks', () => ({
-  useProjections: () => [],
-  WGS84_DD: 'WGS84',
-  DMS_CODE: 'DMS'
 }));
 
-const Harness = () => {
-  const {
-    control,
-    formState: { errors }
-  } = useForm({
-    defaultValues: { latitude: '', longitude: '' }
+const MapHarness = ({ latitude = 45, longitude = 5 }) => {
+  const { control, register } = useForm({
+    defaultValues: { entrance: { latitude, longitude, precision: 12 } }
   });
   return (
-    <IntlProvider locale="en" messages={messages}>
-      <CoordinateFormSection
+    <IntlProvider locale="en" messages={{ Accuracy: 'Accuracy' }}>
+      <input aria-label="Accuracy" {...register('entrance.precision')} />
+      <MapMarkerSelector
         control={control}
-        formLatitudeKey="latitude"
-        formLongitudeKey="longitude"
-        latitudeError={errors.latitude?.message}
-        longitudeError={errors.longitude?.message}
-        required
+        formLatitudeKey="entrance.latitude"
+        formLongitudeKey="entrance.longitude"
+        formAccuracyKey="entrance.precision"
       />
     </IntlProvider>
   );
 };
 
-it('writes coordinates on successive map pans and retains manual editing', () => {
-  let now = 10000;
-  const clock = vi.spyOn(Date, 'now').mockImplementation(() => now);
-  render(<Harness />);
-  const pan = (lat, lng) => {
-    now += 1000;
-    act(() => mapState.map.panTo([lat, lng], { animate: false }));
-  };
-  pan(45, 6);
-  expect(screen.getByRole('textbox', { name: /Latitude/ })).toHaveValue(
-    '45.000000'
-  );
-  expect(screen.getByRole('textbox', { name: /Longitude/ })).toHaveValue(
-    '6.000000'
-  );
-  pan(46, 7);
-  expect(screen.getByRole('textbox', { name: /Latitude/ })).toHaveValue(
-    '46.000000'
-  );
-  expect(screen.getByRole('textbox', { name: /Longitude/ })).toHaveValue(
-    '7.000000'
-  );
-  now += 1000;
-  fireEvent.change(screen.getByRole('textbox', { name: /Latitude/ }), {
-    target: { value: '47' }
+describe('MapMarkerSelector entrance accuracy', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    map.getCenter.mockReturnValue({ lat: 45.2, lng: 5.3 });
   });
-  expect(mapState.map.getCenter().lat).toBeCloseTo(47, 5);
-  expect(mapState.map.getCenter().lng).toBeCloseTo(7, 5);
-  pan(48, 8);
-  expect(screen.getByRole('textbox', { name: /Latitude/ })).toHaveValue(
-    '48.000000'
-  );
-  expect(screen.getByRole('textbox', { name: /Longitude/ })).toHaveValue(
-    '8.000000'
-  );
-  act(() => {
-    mapState.map.fire('resize');
-    mapState.map.panTo([49, 9], { animate: false });
+
+  afterEach(() => vi.useRealTimers());
+
+  it('previews saved and manually edited accuracy, then removes it when cleared', () => {
+    render(<MapHarness />);
+    expect(screen.getByTestId('accuracy-circle')).toHaveAttribute(
+      'data-radius',
+      '12'
+    );
+    expect(screen.getByTestId('entrance-precision-legend')).toHaveTextContent(
+      'Accuracy'
+    );
+    expect(screen.getByTestId('accuracy-circle')).toHaveStyle({
+      color: '#f57c00'
+    });
+    expect(screen.getByTestId('entrance-precision-legend')).not.toHaveStyle({
+      color: '#f57c00'
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: 'Accuracy' }), {
+      target: { value: '250' }
+    });
+    expect(screen.getByTestId('accuracy-circle')).toHaveAttribute(
+      'data-radius',
+      '250'
+    );
+    expect(screen.getByTestId('entrance-precision-legend')).toHaveTextContent(
+      'Accuracy'
+    );
+    fireEvent.change(screen.getByRole('textbox', { name: 'Accuracy' }), {
+      target: { value: '' }
+    });
+    expect(screen.queryByTestId('accuracy-circle')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('entrance-precision-legend')
+    ).not.toBeInTheDocument();
   });
-  expect(screen.getByRole('textbox', { name: /Latitude/ })).toHaveValue(
-    '48.000000'
-  );
-  act(() => {
-    mapState.map.fire('dragstart');
-    mapState.map.panTo([50, 10], { animate: false });
+
+  it('keeps the circle around the entrance when the map moves, preserving its radius', () => {
+    render(<MapHarness />);
+    act(() => {
+      vi.advanceTimersByTime(501);
+      mapHandlers.moveend();
+    });
+    expect(screen.getByTestId('accuracy-circle')).toHaveAttribute(
+      'data-center',
+      JSON.stringify({ lat: 45.2, lng: 5.3 })
+    );
+    expect(screen.getByTestId('accuracy-circle')).toHaveAttribute(
+      'data-radius',
+      '12'
+    );
   });
-  expect(screen.getByRole('textbox', { name: /Latitude/ })).toHaveValue(
-    '50.000000'
-  );
-  expect(screen.getByRole('textbox', { name: /Longitude/ })).toHaveValue(
-    '10.000000'
-  );
-  clock.mockRestore();
+
+  it('waits for valid coordinates before showing a circle or legend', () => {
+    render(<MapHarness latitude="" longitude="" />);
+    expect(screen.queryByTestId('accuracy-circle')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('entrance-precision-legend')
+    ).not.toBeInTheDocument();
+  });
 });

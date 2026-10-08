@@ -37,6 +37,13 @@ const FIELDS = [
     ...NUMERIC_FIELD_LIMITS.ALTITUDE
   },
   {
+    name: 'precision',
+    label: 'Accuracy',
+    icon: 'coordinates',
+    prefix: '±',
+    unit: 'm'
+  },
+  {
     name: 'yearDiscovery',
     label: 'Year of discovery',
     icon: 'discovery_date',
@@ -51,12 +58,13 @@ const NumberFieldsGroup = ({ disabled = false }) => {
   });
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-      {FIELDS.map(({ name, label, icon, unit, min, max }) => (
+      {FIELDS.map(({ name, label, icon, prefix, unit, min, max }) => (
         <NumberField
           key={name}
           name={name}
           label={label}
           icon={icon}
+          prefix={prefix}
           unit={unit}
           control={control}
           disabled={disabled}

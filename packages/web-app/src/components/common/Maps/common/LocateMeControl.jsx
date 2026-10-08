@@ -26,6 +26,8 @@ const LocateMeControl = ({ onClick, loading = false, error = null }) => {
         arrow>
         <span>
           <IconButton
+            aria-label={formatMessage({ id: 'Use my location' })}
+            data-testid="locate-me"
             onClick={onClick}
             disabled={loading}
             sx={{
