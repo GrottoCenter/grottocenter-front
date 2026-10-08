@@ -45,7 +45,15 @@ const getProcessErrorMessage = (error, formatMessage) => {
   }
 };
 
-const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
+const Actions = ({
+  selectedIds,
+  onEdit,
+  onProcessed = null,
+  disabled = false,
+  isEditDisabled = false,
+  editDescriptionId,
+  keepLabels = false
+}) => {
   const { formatMessage } = useIntl();
   const processMutation = useProcessDocuments();
   const { onSuccess, onError } = useNotification();
@@ -60,7 +68,7 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
   const [actionType, setActionType] = useState(null);
   const [comment, setComment] = useState('');
 
-  const hasNoSelectedIds = !selectedIds || selectedIds.length === 0;
+  const hasNoSelectedIds = disabled || !selectedIds || selectedIds.length === 0;
 
   const handleActionConfirmation = selectedType => () => {
     setActionType(selectedType);
@@ -103,7 +111,27 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
       <Box
         sx={{
           display: 'flex',
-          gap: 0.5
+          gap: 0.5,
+          flexWrap: keepLabels ? 'nowrap' : 'wrap',
+          ...(keepLabels && {
+            display: { xs: 'grid', sm: 'flex' },
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+            width: '100%',
+            justifyContent: 'flex-end',
+            pb: { xs: 'env(safe-area-inset-bottom)', sm: 0 },
+            '& button': {
+              minWidth: 0,
+              minHeight: 44,
+              px: { xs: 0.25, sm: 2 },
+              whiteSpace: 'normal',
+              overflowWrap: 'anywhere'
+            },
+            '& .MuiButton-startIcon': {
+              ml: { xs: 0, sm: -0.5 },
+              mr: { xs: 0.25, sm: 1 },
+              flexShrink: 0
+            }
+          })
         }}>
         <ActionButton
           label={formatMessage({ id: ActionTypes.validate.name })}
@@ -111,18 +139,26 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
           disabled={hasNoSelectedIds || isLoading}
           onClick={handleActionConfirmation(ActionTypes.validate)}
           icon={<VerifiedIcon />}
-          shouldHideLabelOnMobile
+          data-testid={keepLabels ? 'preview-validate' : 'batch-validate'}
+          shouldHideLabelOnMobile={!keepLabels}
         />
         <ActionButton
           label={formatMessage({ id: ActionTypes.edit.name })}
           variant="outlined"
           color="secondary"
-          disabled={hasNoSelectedIds || isLoading || selectedIds.length > 1}
+          disabled={
+            hasNoSelectedIds ||
+            isLoading ||
+            isEditDisabled ||
+            selectedIds.length > 1
+          }
           onClick={() => {
             if (selectedIds[0]) onEdit(selectedIds[0]);
           }}
           icon={<EditIcon />}
-          shouldHideLabelOnMobile
+          data-testid={keepLabels ? 'preview-edit' : 'batch-edit'}
+          aria-describedby={isEditDisabled ? editDescriptionId : undefined}
+          shouldHideLabelOnMobile={!keepLabels}
         />
         <ActionButton
           label={formatMessage({ id: ActionTypes.decline.name })}
@@ -130,7 +166,8 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
           disabled={hasNoSelectedIds || isLoading}
           onClick={handleActionConfirmation(ActionTypes.decline)}
           icon={<DeclineIcon />}
-          shouldHideLabelOnMobile
+          data-testid={keepLabels ? 'preview-decline' : 'batch-decline'}
+          shouldHideLabelOnMobile={!keepLabels}
         />
       </Box>
       <StandardDialog
@@ -162,7 +199,11 @@ const Actions = ({ selectedIds, onEdit, onProcessed = null }) => {
               )
             }
             loading={isLoading}
-            disabled={actionType === ActionTypes.decline && !comment}
+            data-testid="confirm-process-documents"
+            disabled={
+              hasNoSelectedIds ||
+              (actionType === ActionTypes.decline && !comment.trim())
+            }
           />
         ]}>
         <StringInput
@@ -189,5 +230,9 @@ export default Actions;
 Actions.propTypes = {
   selectedIds: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
   onEdit: PropTypes.func.isRequired,
-  onProcessed: PropTypes.func
+  onProcessed: PropTypes.func,
+  disabled: PropTypes.bool,
+  isEditDisabled: PropTypes.bool,
+  editDescriptionId: PropTypes.string,
+  keepLabels: PropTypes.bool
 };

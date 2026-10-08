@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
-import { CircularProgress } from '@mui/material';
+import { Alert, Button, CircularProgress, Stack } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
+import FetchErrorState from '@/components/common/FetchErrorState';
+import { prepareDocumentEdit } from '@/utils/documentModeration';
 import DocumentSubmission from '../../components/appli/EntitiesForm/Document';
 import { useDocument } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
@@ -19,8 +21,11 @@ const DocumentEdit = ({
   const {
     data: details,
     isPending,
-    error
+    error,
+    isPaused,
+    refetch
   } = useDocument(documentId, { requireUpdate });
+  const currentQuery = useDocument(documentId);
 
   // Either the parent (DocumentValidation modal) handles the success — closing
   // the modal — or we navigate to the freshly saved document. DocumentSubmission
@@ -30,14 +35,50 @@ const DocumentEdit = ({
     else navigate(`/ui/documents/${documentId}`);
   };
 
-  return isPending || error || !details?.id ? (
-    <CircularProgress />
-  ) : (
+  if (
+    error ||
+    isPaused ||
+    (requireUpdate && (currentQuery.error || currentQuery.isPaused))
+  ) {
+    return (
+      <FetchErrorState
+        error={error || currentQuery.error}
+        isPaused={isPaused || currentQuery.isPaused}
+        messageId="Error, the document data you are looking for is not available."
+        onRetry={() => {
+          refetch();
+          currentQuery.refetch();
+        }}
+      />
+    );
+  }
+  if (isPending || !details?.id || (requireUpdate && currentQuery.isPending)) {
+    return <CircularProgress />;
+  }
+  // PUT replaces the entire pending snapshot and only accepts new files as
+  // uploads. Re-saving stored newFiles would silently drop them. Keep this
+  // exceptional case read-only rather than introducing download/reupload here.
+  if (requireUpdate && details.newFiles?.length) {
+    return (
+      <Stack spacing={1}>
+        <Alert severity="info">
+          {formatMessage({ id: 'documentModeration.pendingFilesEdit' })}
+        </Alert>
+        <Button onClick={onCancel}>{formatMessage({ id: 'Cancel' })}</Button>
+      </Stack>
+    );
+  }
+
+  return (
     <Layout
       title={formatMessage({ id: 'BBS document submission form' })}
       content={
         <DocumentSubmission
-          initialValues={details}
+          initialValues={
+            requireUpdate
+              ? prepareDocumentEdit(currentQuery.data, details)
+              : details
+          }
           onCancel={onCancel}
           onSuccess={handleSuccess}
         />

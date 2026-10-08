@@ -128,7 +128,7 @@ const normalizeInitialValues = values => {
   return {
     ...rest,
     selectOptionAuthorizationDocument: option ?? null,
-    files: (files ?? []).map(f => ({ ...f, state: IS_INTACT })),
+    files: (files ?? []).map(f => ({ ...f, state: f.state ?? IS_INTACT })),
     authorsOrganization: authorsOrganization ?? []
   };
 };

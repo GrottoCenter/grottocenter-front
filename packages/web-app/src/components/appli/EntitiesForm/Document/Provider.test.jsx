@@ -9,6 +9,11 @@ const ValidationState = () => {
   return <span>{isFormValid ? 'valid' : 'invalid'}</span>;
 };
 
+const FileStates = () => {
+  const { document } = useContext(DocumentFormContext);
+  return <span>{document.files.map(file => file.state).join(',')}</span>;
+};
+
 const validDocument = {
   id: 42,
   type: DocumentTypes.ISSUE,
@@ -26,6 +31,24 @@ const renderValidation = initialValues =>
   );
 
 describe('DocumentFormProvider parent validation', () => {
+  it('preserves pending file states when a moderator reopens a proposal', () => {
+    render(
+      <DocumentFormProvider
+        initialValues={{
+          ...validDocument,
+          files: [
+            { fileName: 'renamed.pdf', state: 'IS_MODIFIED' },
+            { fileName: 'deleted.pdf', state: 'IS_DELETED' },
+            { fileName: 'intact.pdf' }
+          ]
+        }}>
+        <FileStates />
+      </DocumentFormProvider>
+    );
+    expect(
+      screen.getByText('IS_MODIFIED,IS_DELETED,IS_INTACT')
+    ).toBeInTheDocument();
+  });
   it('accepts a distinct parent for a document type that requires one', async () => {
     renderValidation(validDocument);
 

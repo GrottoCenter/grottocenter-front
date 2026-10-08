@@ -6,7 +6,7 @@ import { useDocuments, usePermissions } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StandardDialog from '../../components/common/StandardDialog';
 import Actions from './Actions';
-import DocumentDetails from '../DocumentDetails';
+import DocumentPreview from './DocumentPreview';
 import DocumentEdit from '../DocumentEdit';
 import AuthChecker from '../../components/appli/AuthChecker';
 
@@ -53,17 +53,12 @@ const DocumentValidationPage = () => {
     closeEditView();
   };
 
-  const isUpdatedDocRequired = () => {
-    if (!editView || documents.length === 0) return false;
-    return documents.find(doc => doc.id === editView).modifiedDocJson !== null;
-  };
-
   return (
     <>
       <Layout
         title={formatMessage({ id: 'Documents awaiting validation' })}
         action={
-          permissions.isAuth ? (
+          permissions.isModerator ? (
             <Actions
               selectedIds={selectedIds}
               onEdit={setEditView}
@@ -96,17 +91,15 @@ const DocumentValidationPage = () => {
           />
         }
       />
-      <StandardDialog
-        maxWidth="lg"
-        fullScreen={isNarrowViewport}
-        dense={isNarrowViewport}
-        fullWidth
-        scrollable
-        open={!!detailedView}
-        onClose={closeDetailedView}
-        title={formatMessage({ id: 'Detailed document view' })}>
-        {detailedView && <DocumentDetails id={detailedView} hideActions />}
-      </StandardDialog>
+      {detailedView && (
+        <DocumentPreview
+          key={detailedView}
+          id={detailedView}
+          onClose={closeDetailedView}
+          onEdit={setEditView}
+          onProcessed={handleProcessed}
+        />
+      )}
       <StandardDialog
         maxWidth="lg"
         fullScreen={isNarrowViewport}
@@ -115,12 +108,15 @@ const DocumentValidationPage = () => {
         open={!!editView}
         onClose={closeEditView}
         title={formatMessage({ id: 'Edit document' })}>
-        <DocumentEdit
-          onSuccessfulUpdate={handleSuccessfulUpdate}
-          onCancel={closeEditView}
-          id={editView}
-          requireUpdate={isUpdatedDocRequired()}
-        />
+        {editView && (
+          <DocumentEdit
+            key={editView}
+            onSuccessfulUpdate={handleSuccessfulUpdate}
+            onCancel={closeEditView}
+            id={editView}
+            requireUpdate
+          />
+        )}
       </StandardDialog>
     </>
   );

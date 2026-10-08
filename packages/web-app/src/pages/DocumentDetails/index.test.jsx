@@ -74,11 +74,16 @@ const document = {
   entrances: [{ id: 7, name: 'Survey entrance' }]
 };
 
-const renderPage = () =>
+const renderPage = (hideActions = false, isPreview = false) =>
   renderWithProviders(
     <MemoryRouter initialEntries={['/ui/documents/123']}>
       <Routes>
-        <Route path="/ui/documents/:documentId" element={<DocumentDetails />} />
+        <Route
+          path="/ui/documents/:documentId"
+          element={
+            <DocumentDetails hideActions={hideActions} isPreview={isPreview} />
+          }
+        />
       </Routes>
     </MemoryRouter>,
     { messages }
@@ -106,6 +111,9 @@ beforeEach(() => {
 
 it('offers unlink actions for massifs and entrances, but not caves', () => {
   renderPage();
+  expect(
+    screen.getByRole('heading', { level: 1, name: 'Cave survey' })
+  ).toBeVisible();
 
   expect(screen.getByRole('link', { name: /Survey network/ })).toHaveAttribute(
     'href',
@@ -119,6 +127,17 @@ it('offers unlink actions for massifs and entrances, but not caves', () => {
     screen.getByRole('button', { name: 'unlink Survey entrance' })
   ).toBeEnabled();
   expect(screen.getAllByRole('button', { name: /^unlink / })).toHaveLength(2);
+});
+
+it('renders the document title as a smaller heading when embedded in the moderation result', () => {
+  renderPage(false, true);
+  expect(
+    screen.getByRole('heading', { level: 3, name: 'Cave survey' })
+  ).toBeVisible();
+  expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole('button', { name: /^unlink / })
+  ).not.toBeInTheDocument();
 });
 
 it.each([
@@ -156,6 +175,25 @@ it.each([
       documentId: document.id
     });
     expect(otherMutation).not.toHaveBeenCalled();
+  }
+);
+
+it.each([false, true])(
+  'shows the pending validation notice only when editing actions are shown (hidden: %s)',
+  hideActions => {
+    useDocument.mockReturnValue({
+      data: { ...document, isValidated: false },
+      isPending: false,
+      refetch: vi.fn()
+    });
+    renderPage(hideActions);
+    const notice = screen.queryByText(
+      messages[
+        'A moderator needs to validate the last modification before being able to edit the document again.'
+      ]
+    );
+    if (hideActions) expect(notice).not.toBeInTheDocument();
+    else expect(notice).toBeVisible();
   }
 );
 

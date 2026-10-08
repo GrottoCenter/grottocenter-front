@@ -10,6 +10,7 @@ export const ThumbnailsPropTypes = PropTypes.shape({
 });
 
 export const FilePropTypes = PropTypes.shape({
+  id: PropTypes.number,
   fileName: PropTypes.string,
   completePath: PropTypes.string,
   thumbnails: ThumbnailsPropTypes
@@ -85,6 +86,7 @@ export const DocumentPropTypes = PropTypes.shape({
   dateValidation: PropTypes.string,
   datePublication: PropTypes.string,
   creator: authorType,
+  creatorComment: PropTypes.string,
   reviewer: authorType,
   validator: authorType,
   authors: PropTypes.arrayOf(authorType),
@@ -92,6 +94,7 @@ export const DocumentPropTypes = PropTypes.shape({
   title: PropTypes.string,
   description: PropTypes.string,
   mainLanguage: PropTypes.string,
+  languages: PropTypes.arrayOf(PropTypes.string),
   identifier: PropTypes.string,
   identifierType: PropTypes.string,
   library: idNameType,
@@ -122,5 +125,8 @@ export const DocumentPropTypes = PropTypes.shape({
     publicationOther: PropTypes.string,
     publicationFascicule: PropTypes.string
   }),
-  files: PropTypes.arrayOf(FilePropTypes)
+  files: PropTypes.arrayOf(FilePropTypes),
+  newFiles: PropTypes.arrayOf(FilePropTypes),
+  modifiedFiles: PropTypes.arrayOf(FilePropTypes),
+  deletedFiles: PropTypes.arrayOf(FilePropTypes)
 });

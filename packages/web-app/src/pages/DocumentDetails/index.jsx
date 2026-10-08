@@ -143,6 +143,21 @@ const SideColumn = styled('aside')`
   gap: ${({ theme }) => theme.spacing(1)};
 `;
 
+// The preview supplies its own section card. Flatten only this page's outer
+// cards; metadata and file panels keep their own presentation and stack spacing.
+const PreviewSections = styled(SectionStack)`
+  & > .MuiCard-root {
+    box-shadow: none;
+    border-radius: 0;
+  }
+  & > .MuiCard-root .MuiCardContent-root {
+    padding: 0;
+  }
+  & > .MuiCard-root > .MuiCardHeader-root {
+    padding-inline: 0;
+  }
+`;
+
 const Document = ({
   isLoading = true,
   error,
@@ -150,7 +165,8 @@ const Document = ({
   onRetry = null,
   documentData,
   documentChildren,
-  hideActions = false
+  hideActions = false,
+  isPreview = false
 }) => {
   const { formatMessage } = useIntl();
   const openLink = useOpenLink();
@@ -389,6 +405,7 @@ const Document = ({
     : null;
 
   const needsValidation =
+    !hideActions &&
     !isLoading &&
     documentData &&
     permissions.isAuth &&
@@ -512,14 +529,32 @@ const Document = ({
     bodySection = <EventDateSection date={documentData.datePublication} />;
   }
 
+  const DocumentContainer = isPreview ? Box : PageContainer;
+  const DocumentSections = isPreview ? PreviewSections : SectionStack;
+
   return (
-    <PageContainer>
-      <PageHeader
-        title={documentData?.title ?? (isLoading ? undefined : '')}
-        icon={<CustomIcon type="bibliography" />}
-        subheader={breadcrumb ?? coverage}
-        actions={actions}
-      />
+    <DocumentContainer>
+      {isPreview ? (
+        <Box sx={{ mb: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+            <CustomIcon type="bibliography" size={24} />
+            <Typography
+              variant="h3"
+              color="secondary"
+              sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
+              {documentData?.title ?? (isLoading ? <Skeleton /> : '')}
+            </Typography>
+          </Box>
+          {breadcrumb ?? coverage}
+        </Box>
+      ) : (
+        <PageHeader
+          title={documentData?.title ?? (isLoading ? undefined : '')}
+          icon={<CustomIcon type="bibliography" />}
+          subheader={breadcrumb ?? coverage}
+          actions={actions}
+        />
+      )}
       <DeleteConfirmationDialog
         entityType={DELETED_ENTITIES.document}
         entityId={documentData?.id}
@@ -534,7 +569,8 @@ const Document = ({
       {/* One stack for the whole body rather than one per branch: a deleted
           document still renders its sections underneath the notice, and an
           error can arrive while the children are still loading. */}
-      <SectionStack>
+      <DocumentSections
+        data-testid={isPreview ? 'document-preview-sections' : undefined}>
         {documentData?.isDeleted && (
           <ScrollableContent
             content={
@@ -939,12 +975,17 @@ const Document = ({
             )}
           </>
         )}
-      </SectionStack>
-    </PageContainer>
+      </DocumentSections>
+    </DocumentContainer>
   );
 };
 
-const DocumentDetails = ({ id, hideActions = false }) => {
+const DocumentDetails = ({
+  id,
+  hideActions = false,
+  documentData = null,
+  isPreview = false
+}) => {
   const permissions = usePermissions();
   const { documentId: documentIdFromRoute } = useParams();
   const documentId = parseInt(documentIdFromRoute ?? id, 10);
@@ -995,9 +1036,10 @@ const DocumentDetails = ({ id, hideActions = false }) => {
       error={fetchError}
       isPaused={isDetailsPaused}
       onRetry={onRetry}
-      documentData={details}
+      documentData={documentData ?? details}
       documentChildren={children}
-      hideActions={hideActions}
+      hideActions={hideActions || isPreview}
+      isPreview={isPreview}
     />
   );
 };
@@ -1011,10 +1053,13 @@ Document.propTypes = {
   onRetry: PropTypes.func,
   documentData: DocumentPropTypes,
   documentChildren: PropTypes.arrayOf(DocumentChildPropTypes),
-  hideActions: PropTypes.bool
+  hideActions: PropTypes.bool,
+  isPreview: PropTypes.bool
 };
 
 DocumentDetails.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  hideActions: PropTypes.bool
+  hideActions: PropTypes.bool,
+  documentData: DocumentPropTypes,
+  isPreview: PropTypes.bool
 };
