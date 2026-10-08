@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import {
+  TEXT_LENGTH_LIMITS,
+  isNearLengthLimit
+} from '@/utils/textLengthLimits';
 import {
   Box,
   TextField,
@@ -62,7 +65,7 @@ const AssociationForm = ({ onClose, onSubmit, status, error }) => {
   // is when a submit would take the create path.
   const isNameNearLimit =
     !selectedOrg &&
-    trimmedInput.length >= Math.ceil(TEXT_LENGTH_LIMITS.ENTITY_NAME * 0.8);
+    isNearLengthLimit(trimmedInput.length, TEXT_LENGTH_LIMITS.ENTITY_NAME);
   const isNameTooLong =
     !selectedOrg && trimmedInput.length > TEXT_LENGTH_LIMITS.ENTITY_NAME;
   const nameLengthFeedback = isNameTooLong

@@ -85,7 +85,7 @@ describe('DocumentFormProvider length validation', () => {
   it.each([
     ['title', 300],
     ['identifier', 250],
-    ['pages', 100],
+    ['pages', 20],
     ['issue', 100],
     ['creatorComment', 300]
   ])(
@@ -105,6 +105,16 @@ describe('DocumentFormProvider length validation', () => {
 
   it.each([299, 300])('accepts a title of %i characters', async length => {
     renderValidation({ ...validDocument, title: 'x'.repeat(length) });
+
+    await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
+  });
+
+  it.each([19, 20])('accepts pages of %i characters', async length => {
+    renderValidation({
+      ...validDocument,
+      type: DocumentTypes.ARTICLE,
+      pages: '1'.repeat(length)
+    });
 
     await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
   });

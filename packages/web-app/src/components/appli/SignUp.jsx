@@ -39,22 +39,21 @@ const SignUp = () => {
   const checkIfValuesAreValid = () => {
     const errors = [];
     const limitedFields = [
-      [nickname, TEXT_LENGTH_LIMITS.NICKNAME],
-      [name, TEXT_LENGTH_LIMITS.PERSON_NAME],
-      [surname, TEXT_LENGTH_LIMITS.PERSON_NAME],
-      [email, TEXT_LENGTH_LIMITS.EMAIL]
+      [nickname, TEXT_LENGTH_LIMITS.NICKNAME, 'Nickname'],
+      [name, TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME, 'Caver.Name'],
+      [surname, TEXT_LENGTH_LIMITS.PERSON_LAST_NAME, 'Surname'],
+      [email, TEXT_LENGTH_LIMITS.EMAIL, 'Email']
     ];
-    const exceeded = limitedFields.find(
-      ([value, limit]) => value.length > limit
-    );
-    if (exceeded) {
-      errors.push(
-        formatMessage(
-          { id: 'form.maxLength' },
-          { count: exceeded[0].length, limit: exceeded[1] }
-        )
-      );
-    }
+    limitedFields.forEach(([value, limit, label]) => {
+      if (value.length > limit) {
+        errors.push(
+          `${formatMessage({ id: label })}: ${formatMessage(
+            { id: 'form.maxLength' },
+            { count: value.length, limit }
+          )}`
+        );
+      }
+    });
     if (password !== passwordConfirmation) {
       errors.push(formatMessage({ id: 'The passwords must match.' }));
     }

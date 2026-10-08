@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, Suspense } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  Suspense
+} from 'react';
 import PropTypes from 'prop-types';
 import {
   Accordion,
@@ -48,6 +54,8 @@ const PublicationDatePicker = React.lazy(
 );
 
 const FormContent = ({ onCancel, isSubmitting = false }) => {
+  const [isAdditionalInfoExpanded, setIsAdditionalInfoExpanded] =
+    useState(false);
   const {
     document,
     isFormValid,
@@ -343,9 +351,15 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
         !isEvent(docType) &&
         !isAuthorizationToPublish(docType) && (
           <Accordion
-            defaultExpanded={lengthErrors.some(({ field }) =>
-              ['identifier', 'issue', 'creatorComment'].includes(field)
-            )}
+            expanded={
+              isAdditionalInfoExpanded ||
+              lengthErrors.some(({ field }) =>
+                ['identifier', 'issue', 'creatorComment'].includes(field)
+              )
+            }
+            onChange={(_event, expanded) =>
+              setIsAdditionalInfoExpanded(expanded)
+            }
             disableGutters
             elevation={0}
             sx={{

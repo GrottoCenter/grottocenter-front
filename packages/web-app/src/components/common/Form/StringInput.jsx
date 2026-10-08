@@ -8,6 +8,7 @@ import {
   InputLabel,
   Typography
 } from '@mui/material';
+import { isNearLengthLimit } from '@/utils/textLengthLimits';
 
 const StringInput = ({
   characterLimit,
@@ -27,10 +28,10 @@ const StringInput = ({
   const inputId = useId();
   const { formatMessage } = useIntl();
   const limit = characterLimit ?? maxLength;
-  const count = value.length;
+  const inputValue = value ?? '';
+  const count = inputValue.length;
   const isTooLong = limit !== undefined && count > limit;
-  const isNearLimit =
-    maxLength !== undefined && count >= Math.ceil(maxLength * 0.8);
+  const isNearLimit = isNearLengthLimit(count, maxLength);
   const shouldShowCounter = characterLimit !== undefined || isNearLimit;
   const describedBy =
     [
@@ -76,7 +77,7 @@ const StringInput = ({
           onChange={handleValueChange}
           required={required}
           type={type}
-          value={value}
+          value={inputValue}
           error={hasError || isTooLong}
           inputProps={limit === undefined ? undefined : { maxLength: limit }}
           {...props}
@@ -118,7 +119,7 @@ StringInput.propTypes = {
   onValueChange: PropTypes.func,
   required: PropTypes.bool,
   type: PropTypes.oneOf(['text', 'email', 'password']),
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string,
   valueName: PropTypes.string.isRequired,
   disabled: PropTypes.bool
 };

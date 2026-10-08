@@ -67,14 +67,14 @@ export const PersonForm = ({ personValues, onCancel }) => {
         <FormRow>
           <InputText
             formKey="person.name"
-            maxLength={TEXT_LENGTH_LIMITS.PERSON_NAME}
+            maxLength={TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME}
             labelName="First name"
             control={control}
             isError={!!errors?.person?.name}
           />
           <InputText
             formKey="person.surname"
-            maxLength={TEXT_LENGTH_LIMITS.PERSON_NAME}
+            maxLength={TEXT_LENGTH_LIMITS.PERSON_LAST_NAME}
             labelName="Last name"
             control={control}
             isError={!!errors?.person?.surname}

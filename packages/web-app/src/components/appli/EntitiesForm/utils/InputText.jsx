@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { Box, TextField } from '@mui/material';
+import { isNearLengthLimit } from '@/utils/textLengthLimits';
 
 const InputText = ({
   control,
@@ -46,8 +47,7 @@ const InputText = ({
             : null;
         const shouldShowCounter =
           characterLimit !== undefined ||
-          (maxLength !== undefined &&
-            characterCount >= Math.ceil(maxLength * 0.8));
+          isNearLengthLimit(characterCount, maxLength);
         const displayedHelperText = shouldShowCounter ? (
           <Box
             component="span"

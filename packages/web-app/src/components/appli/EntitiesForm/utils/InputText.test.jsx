@@ -32,6 +32,20 @@ const TestForm = ({ initialValue = '', onSubmit, ...props }) => {
 };
 
 describe('InputText length limits', () => {
+  it('keeps helper text visible alongside the near-limit counter', () => {
+    render(
+      <TestForm
+        maxLength={10}
+        initialValue="12345678"
+        helperText="An optional title."
+        onSubmit={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText('An optional title.')).toBeInTheDocument();
+    expect(screen.getByText('8 / 10')).toBeInTheDocument();
+  });
+
   it('shows a counter near the limit and rejects oversized values', async () => {
     const onSubmit = vi.fn();
     render(<TestForm maxLength={10} onSubmit={onSubmit} />);

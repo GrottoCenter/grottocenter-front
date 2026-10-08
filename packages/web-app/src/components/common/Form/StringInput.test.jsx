@@ -19,6 +19,13 @@ const renderInput = props =>
   );
 
 describe('StringInput length limits', () => {
+  it.each([null, undefined])('renders an empty API value (%s)', value => {
+    renderInput({ value });
+
+    expect(screen.getByRole('textbox', { name: 'Title' })).toHaveValue('');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
   it('limits a short input without showing a counter', () => {
     renderInput({ maxLength: 10 });
 

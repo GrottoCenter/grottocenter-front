@@ -89,9 +89,9 @@ const SignUpForm = ({
       case 'email':
         return !isValidEmail(email) || email.length > TEXT_LENGTH_LIMITS.EMAIL;
       case 'name':
-        return name.length > TEXT_LENGTH_LIMITS.PERSON_NAME;
+        return name.length > TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME;
       case 'surname':
-        return surname.length > TEXT_LENGTH_LIMITS.PERSON_NAME;
+        return surname.length > TEXT_LENGTH_LIMITS.PERSON_LAST_NAME;
       case 'password':
         return !isPasswordValid(password);
       case 'passwordConfirmation':
@@ -140,7 +140,7 @@ const SignUpForm = ({
               })}
               onValueChange={onNameChange}
               value={name}
-              maxLength={TEXT_LENGTH_LIMITS.PERSON_NAME}
+              maxLength={TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME}
               hasError={checkIfHasError('name')}
               valueName={formatMessage({ id: 'Caver.Name' })}
             />
@@ -151,7 +151,7 @@ const SignUpForm = ({
               })}
               onValueChange={onSurnameChange}
               value={surname}
-              maxLength={TEXT_LENGTH_LIMITS.PERSON_NAME}
+              maxLength={TEXT_LENGTH_LIMITS.PERSON_LAST_NAME}
               hasError={checkIfHasError('surname')}
               valueName={formatMessage({ id: 'Surname' })}
             />
