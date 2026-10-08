@@ -26,10 +26,6 @@ const FormWrapper = styled('form')`
   max-width: 500px;
 `;
 
-const SpacedCenteredButton = styled(Button)`
-  margin: ${({ theme }) => theme.spacing(0.5)} auto;
-`;
-
 const HoneypotWrapper = styled('div')`
   position: absolute;
   left: -9999px;
@@ -120,8 +116,9 @@ const SignUpForm = ({
             )}
           </Typography>
         ) : (
-          <FormWrapper onSubmit={onSignUp}>
+          <FormWrapper onSubmit={onSignUp} data-testid="signup-form">
             <StringInput
+              data-testid="signup-nickname"
               fullWidth
               hasError={checkIfHasError('nickname')}
               helperText={formatMessage({
@@ -134,9 +131,10 @@ const SignUpForm = ({
               valueName={formatMessage({ id: 'Nickname' })}
             />
             <StringInput
+              data-testid="signup-name"
               fullWidth
               helperText={formatMessage({
-                id: 'Your real name (optional).'
+                id: 'signup.namesHelp'
               })}
               onValueChange={onNameChange}
               value={name}
@@ -145,10 +143,8 @@ const SignUpForm = ({
               valueName={formatMessage({ id: 'Caver.Name' })}
             />
             <StringInput
+              data-testid="signup-surname"
               fullWidth
-              helperText={formatMessage({
-                id: 'Your real surname (optional).'
-              })}
               onValueChange={onSurnameChange}
               value={surname}
               maxLength={TEXT_LENGTH_LIMITS.PERSON_LAST_NAME}
@@ -247,17 +243,25 @@ const SignUpForm = ({
               </CaptchaWrapper>
             )}
 
-            <SpacedCenteredButton
+            <Button
+              data-testid="signup-submit"
               type="submit"
-              size="large"
+              variant="contained"
+              size="medium"
               disabled={loading || isSubmitDisabled}
-              color={loading ? 'inherit' : 'primary'}>
+              color={loading ? 'inherit' : 'primary'}
+              sx={{
+                mt: 1,
+                alignSelf: 'center',
+                width: { xs: '100%', sm: 'auto' },
+                minHeight: { xs: 48, sm: 0 }
+              }}>
               {loading ? (
                 <CircularProgress size="1.75rem" />
               ) : (
                 formatMessage({ id: 'Sign up' })
               )}
-            </SpacedCenteredButton>
+            </Button>
           </FormWrapper>
         )
       }
