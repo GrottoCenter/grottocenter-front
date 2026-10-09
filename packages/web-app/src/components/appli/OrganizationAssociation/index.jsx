@@ -189,6 +189,7 @@ const AssociationSection = ({
                   : undefined
               }
               toolTipTitle={formatMessage({ id: 'Remove association' })}
+              removeIcon={<LinkOffIcon />}
               emptyMessage={
                 <Alert
                   severity="info"
