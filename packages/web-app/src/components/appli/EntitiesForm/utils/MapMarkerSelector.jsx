@@ -12,13 +12,17 @@ import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import { alpha, styled } from '@mui/material/styles';
 import { orange } from '@mui/material/colors';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { ACCURACY_CIRCLE_STYLE } from '@/components/common/Maps/common/userLocationStyle';
+import usePreciseGeolocation from '@/hooks/usePreciseGeolocation';
+import useIsFullscreen from '@/components/common/Maps/common/useIsFullscreen';
 import { entranceMarkerIcon } from '../../../../assets/icons';
 import useMarkers from '../../../common/Maps/common/Markers/useMarkers';
 import { EntrancePopup } from '../../../common/Maps/common/Markers/Components';
 import LayersControl from '../../../common/Maps/common/LayersControl';
-import LocateMeControl from '../../../common/Maps/common/LocateMeControl';
+import LocateMeControl, {
+  LOCATE_ERRORS
+} from '../../../common/Maps/common/LocateMeControl';
 import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
 import FullscreenControl from '../../../common/Maps/common/FullscreenControl';
 import TileReloader from '../../../common/Maps/common/TileReloader';
@@ -50,22 +54,47 @@ const StyledMapContainer = styled(MapContainer)`
 // height uses `svh` (stable across toolbar show/hide) to avoid the scroll case.
 const RESIZE_GUARD_MS = 500;
 
-const MapBind = ({ center, zoom, onMoveEnd }) => {
+const MapBind = ({
+  center,
+  zoom,
+  onMoveEnd,
+  onInteractionStart,
+  onFullscreenChange
+}) => {
   const lastValidCenter = useRef({});
   const lastSetViewTs = useRef(0);
   const lastResizeTs = useRef(0);
   const isUserDragging = useRef(false);
   const map = useMap();
+  const lastMapSize = useRef(map.getSize());
+  const isFullscreen = useIsFullscreen();
 
+  useEffect(() => {
+    onFullscreenChange(isFullscreen);
+  }, [isFullscreen, onFullscreenChange]);
+
+  // Stop GPS as soon as a user starts dragging, before a fix can recenter the
+  // map mid-gesture. Programmatic setView does not emit dragstart.
   useMapEvent('dragstart', () => {
     isUserDragging.current = true;
+    onInteractionStart();
   });
 
   useMapEvent('resize', () => {
     lastResizeTs.current = Date.now();
+    lastMapSize.current = map.getSize();
   });
 
   useMapEvent('moveend', () => {
+    // invalidateSize emits moveend BEFORE resize. Detect the new dimensions
+    // here so fullscreen transitions cannot be mistaken for manual placement.
+    const size = map.getSize();
+    const previousSize = lastMapSize.current;
+    lastMapSize.current = size;
+    if (size.x !== previousSize.x || size.y !== previousSize.y) {
+      lastResizeTs.current = Date.now();
+      return;
+    }
     // Ignore moveend events not initiated by the user: those triggered by the
     // programmatic setView below, and those triggered by a container resize.
     const timeSinceSetViewMs = Date.now() - lastSetViewTs.current;
@@ -100,7 +129,9 @@ const MapBind = ({ center, zoom, onMoveEnd }) => {
 MapBind.propTypes = {
   center: PropTypes.shape({}),
   zoom: PropTypes.number,
-  onMoveEnd: PropTypes.func
+  onMoveEnd: PropTypes.func,
+  onInteractionStart: PropTypes.func.isRequired,
+  onFullscreenChange: PropTypes.func.isRequired
 };
 
 // Reports the map zoom upward so the parent can hide the duplicate-detection
@@ -139,6 +170,16 @@ const toFloat = value => {
   return parseFloat(v);
 };
 
+// Ignore formatting and the rounding already used when writing coordinates.
+// An empty/invalid coordinate still counts as a change during manual editing.
+const isSameCoordinate = (first, second) => {
+  const firstNumber = toFloat(first);
+  const secondNumber = toFloat(second);
+  return Number.isFinite(firstNumber) && Number.isFinite(secondNumber)
+    ? firstNumber.toFixed(6) === secondNumber.toFixed(6)
+    : first === second;
+};
+
 // Existing nearby entrances are drawn as distinctly-coloured circles so they
 // are not mistaken for the user's new entrance (the large central pin).
 const NEARBY_ENTRANCE_MARKER_STYLE = {
@@ -175,8 +216,6 @@ const LOCATE_ZOOM = 18;
 // How long after the map writes to the form before we allow form→map updates.
 // Prevents the map pan → form update → map recenter loop.
 const MAP_WRITE_GUARD_MS = 400;
-const hasGeolocation =
-  typeof navigator !== 'undefined' && Boolean(navigator.geolocation);
 const ENTRANCE_ACCURACY_COLOR = orange[700];
 const ENTRANCE_ACCURACY_CIRCLE_STYLE = {
   ...ACCURACY_CIRCLE_STYLE,
@@ -199,13 +238,23 @@ const MapMarkerSelector = ({
   mapHeight = '40svh'
 }) => {
   const { formatMessage } = useIntl();
-  const [locating, setLocating] = useState(false);
-  const [locateError, setLocateError] = useState(null);
+  const hasGeolocation =
+    typeof navigator !== 'undefined' && Boolean(navigator.geolocation);
+  const {
+    locate,
+    cancel: cancelLocate,
+    isLocating: locating,
+    error: locateError,
+    hasTimedOut
+  } = usePreciseGeolocation();
   const [initialized, setInitialized] = useState(false);
   const [currentPosition, setCurrentPosition] = useState(defaultCoord);
   const [zoomLevel, setZoomLevel] = useState(defaultZoom);
-  const [locationAccuracy, setLocationAccuracy] = useState(null);
+  const [deviceFix, setDeviceFix] = useState(null);
+  const [accuracyHint, setAccuracyHint] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const lastSetFormTs = useRef(0);
+  const locationValuesRef = useRef(null);
 
   const rawLatitude = useWatch({ control, name: formLatitudeKey });
   const rawLongitude = useWatch({ control, name: formLongitudeKey });
@@ -214,6 +263,64 @@ const MapMarkerSelector = ({
     name: formAccuracyKey,
     disabled: !formAccuracyKey
   });
+
+  // Remember the point associated with the estimate. Recognize GPS writes
+  // from the fix rendered with the form, avoiding stale effects during updates.
+  // A value explicitly typed in this session remains a contributor's estimate.
+  useEffect(() => {
+    const previous = locationValuesRef.current;
+    const isDeviceUpdate =
+      deviceFix &&
+      isSameCoordinate(rawLatitude, deviceFix.location.lat) &&
+      isSameCoordinate(rawLongitude, deviceFix.location.lng) &&
+      (!formAccuracyKey ||
+        !onLocationAccuracyChange ||
+        Number(formAccuracy) === Math.max(1, Math.ceil(deviceFix.accuracy)));
+    const hasMoved =
+      previous &&
+      (!isSameCoordinate(rawLatitude, previous.latitude) ||
+        !isSameCoordinate(rawLongitude, previous.longitude));
+    const hasEditedAccuracy = previous && formAccuracy !== previous.accuracy;
+    const isManual =
+      !isDeviceUpdate && (hasEditedAccuracy || previous?.isManual || false);
+    locationValuesRef.current = {
+      latitude: rawLatitude,
+      longitude: rawLongitude,
+      accuracy: formAccuracy,
+      isManual
+    };
+    if (isDeviceUpdate) return;
+    if (hasMoved || hasEditedAccuracy) {
+      if (locating) cancelLocate();
+      if (formAccuracyKey) setDeviceFix(null);
+    }
+    if (hasEditedAccuracy) setAccuracyHint(null);
+    if (
+      hasMoved &&
+      formAccuracyKey &&
+      formAccuracy != null &&
+      formAccuracy !== '' &&
+      Number(formAccuracy) !== 0
+    ) {
+      if (isManual) {
+        setAccuracyHint('location.accuracy.checkDeclared');
+      } else {
+        // Zero is a legacy restricted-location marker, never an estimate.
+        locationValuesRef.current.accuracy = null;
+        onLocationAccuracyChange?.(null);
+        setAccuracyHint('location.accuracy.cleared');
+      }
+    }
+  }, [
+    rawLatitude,
+    rawLongitude,
+    formAccuracy,
+    formAccuracyKey,
+    deviceFix,
+    locating,
+    cancelLocate,
+    onLocationAccuracyChange
+  ]);
 
   const validLatitude = boundMinMax(-90, 90, toFloat(rawLatitude));
   const validLongitude = boundMinMax(-180, 180, toFloat(rawLongitude));
@@ -247,53 +354,86 @@ const MapMarkerSelector = ({
 
   // map → form (only direction after initialization)
   const onMoveEnd = newLocation => {
+    cancelLocate();
     lastSetFormTs.current = Date.now();
     setFormLatitude(newLocation.lat.toFixed(6));
     setFormLongitude(newLocation.lng.toFixed(6));
   };
 
   const handleLocateMe = () => {
-    setLocating(true);
-    setLocateError(null);
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        setFormLatitude(loc.lat.toFixed(6));
-        setFormLongitude(loc.lng.toFixed(6));
-        setCurrentPosition(loc);
-        setLocationAccuracy(pos.coords.accuracy);
-        // The API stores whole meters; round up rather than understate the
-        // device estimate. Zero is reserved for restricted coordinates.
-        const { accuracy } = pos.coords;
-        onLocationAccuracyChange?.(
-          Number.isFinite(accuracy) && accuracy >= 0
-            ? Math.max(1, Math.ceil(accuracy))
-            : null
-        );
-        setZoomLevel(LOCATE_ZOOM);
-        setLocating(false);
-      },
-      err => {
-        setLocateError(err.code);
-        setLocating(false);
-      },
-      // Repeated taps may reuse a fix for up to half a second, keeping both
-      // coordinates and accuracy current while avoiding immediate reacquisition.
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 500 }
-    );
+    if (locating) {
+      cancelLocate();
+      return;
+    }
+    setDeviceFix(null);
+    locate(pos => {
+      const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      const latitude = loc.lat.toFixed(6);
+      const longitude = loc.lng.toFixed(6);
+      // The API stores whole meters; round up rather than understate the
+      // device estimate. Zero is reserved for restricted coordinates.
+      const accuracy = Math.max(1, Math.ceil(pos.coords.accuracy));
+      lastSetFormTs.current = Date.now();
+      setFormLatitude(latitude);
+      setFormLongitude(longitude);
+      setCurrentPosition(loc);
+      setDeviceFix({
+        location: loc,
+        accuracy: pos.coords.accuracy,
+        timestamp: pos.timestamp
+      });
+      setAccuracyHint(null);
+      onLocationAccuracyChange?.(accuracy);
+      setZoomLevel(LOCATE_ZOOM);
+    });
   };
 
   const accuracyRadius = Number(
-    formAccuracyKey ? formAccuracy : locationAccuracy
+    formAccuracyKey ? formAccuracy : deviceFix?.accuracy
   );
+  const accuracyCenter = formAccuracyKey
+    ? { lat: validLatitude, lng: validLongitude }
+    : deviceFix?.location;
   const hasAccuracyCircle =
     Number.isFinite(accuracyRadius) &&
     accuracyRadius > 0 &&
-    !Number.isNaN(validLatitude) &&
-    !Number.isNaN(validLongitude);
+    Number.isFinite(accuracyCenter?.lat) &&
+    Number.isFinite(accuracyCenter?.lng);
   const showAccuracyLegend = Boolean(formAccuracyKey) && hasAccuracyCircle;
   const showNearbyLegend =
     additionalMarkersLabel && additionalPositions.length > 0;
+  const shouldMergeAccuracyStatus =
+    isFullscreen && showAccuracyLegend && Boolean(deviceFix) && !locateError;
+
+  let statusId = accuracyHint;
+  if (locateError) statusId = LOCATE_ERRORS[locateError];
+  else if (locating) {
+    statusId = deviceFix
+      ? 'location.acquisition.improving'
+      : 'location.acquisition.searching';
+  } else if (deviceFix) {
+    statusId = hasTimedOut
+      ? 'location.acquisition.limited'
+      : 'location.acquisition.estimated';
+  }
+
+  const locationStatus = statusId && (
+    <Typography
+      variant="caption"
+      component="p"
+      role="status"
+      data-testid="location-status"
+      sx={{
+        m: 0,
+        mt: isFullscreen ? 0 : 0.5,
+        color: locateError ? 'error.main' : 'text.secondary'
+      }}>
+      {formatMessage(
+        { id: statusId },
+        { accuracy: Math.max(1, Math.ceil(deviceFix?.accuracy ?? 0)) }
+      )}
+    </Typography>
+  );
 
   return (
     <Box sx={{ position: 'relative' }}>
@@ -309,6 +449,7 @@ const MapMarkerSelector = ({
         preferCanvas>
         <GeocodingControl
           onLocationSelect={newLocation => {
+            cancelLocate();
             setFormLatitude(newLocation.lat.toFixed(6));
             setFormLongitude(newLocation.lng.toFixed(6));
             setCurrentPosition({ lat: newLocation.lat, lng: newLocation.lng });
@@ -324,13 +465,15 @@ const MapMarkerSelector = ({
           center={currentPosition}
           zoom={zoomLevel}
           onMoveEnd={onMoveEnd}
+          onInteractionStart={cancelLocate}
+          onFullscreenChange={setIsFullscreen}
         />
 
         {onZoomChange && <ZoomReporter onZoomChange={onZoomChange} />}
 
         {hasAccuracyCircle && (
           <Circle
-            center={{ lat: validLatitude, lng: validLongitude }}
+            center={accuracyCenter}
             radius={accuracyRadius}
             interactive={false}
             pathOptions={
@@ -346,6 +489,7 @@ const MapMarkerSelector = ({
             onClick={handleLocateMe}
             loading={locating}
             error={locateError}
+            retry={Boolean(locateError || (hasTimedOut && deviceFix))}
           />
         )}
 
@@ -359,12 +503,15 @@ const MapMarkerSelector = ({
 
         {/* Rendered inside the map container so it stays visible in fullscreen
             mode (only the map element enters fullscreen). */}
-        {(showNearbyLegend || showAccuracyLegend) && (
+        {(showNearbyLegend ||
+          showAccuracyLegend ||
+          (isFullscreen && statusId)) && (
           <Box
             sx={{
               position: 'absolute',
-              bottom: 10,
-              left: 12,
+              bottom: 1.25,
+              left: 1.5,
+              maxWidth: theme => `calc(100% - ${theme.spacing(10)})`,
               zIndex: 1000,
               display: 'flex',
               flexDirection: 'column',
@@ -374,9 +521,9 @@ const MapMarkerSelector = ({
               py: 0.5,
               borderRadius: 1,
               boxShadow: 1,
-              fontSize: 12,
               color: 'text.primary',
               bgcolor: 'rgba(255, 255, 255, 0.9)',
+              typography: 'caption',
               pointerEvents: 'none'
             }}>
             {showNearbyLegend && (
@@ -417,12 +564,16 @@ const MapMarkerSelector = ({
                     )
                   }}
                 />
-                {formatMessage({ id: 'Accuracy' })}
+                {shouldMergeAccuracyStatus
+                  ? locationStatus
+                  : formatMessage({ id: 'Accuracy' })}
               </Box>
             )}
+            {isFullscreen && !shouldMergeAccuracyStatus && locationStatus}
           </Box>
         )}
       </StyledMapContainer>
+      {!isFullscreen && locationStatus}
     </Box>
   );
 };

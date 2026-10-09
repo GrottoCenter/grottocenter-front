@@ -39,7 +39,6 @@ const FIELDS = [
   {
     name: 'precision',
     label: 'Accuracy',
-    icon: 'coordinates',
     prefix: '±',
     unit: 'm'
   },

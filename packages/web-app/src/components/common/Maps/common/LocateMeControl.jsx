@@ -1,35 +1,42 @@
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { CircularProgress, IconButton, Tooltip } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
+import StopIcon from '@mui/icons-material/Stop';
 import CustomControl from './CustomControl';
+import useMapOverlayContainer from './useMapOverlayContainer';
 
-const LOCATE_ERRORS = {
+export const LOCATE_ERRORS = {
   1: 'Location access denied. Enable it in your browser settings.',
   2: 'Your position could not be determined.',
   3: 'Location request timed out. Please try again.'
 };
 
-const LocateMeControl = ({ onClick, loading = false, error = null }) => {
+const LocateMeControl = ({
+  onClick,
+  loading = false,
+  error = null,
+  retry = false
+}) => {
   const { formatMessage } = useIntl();
+  const overlayContainer = useMapOverlayContainer();
+  let labelId = 'Use my location';
+  if (loading) labelId = 'location.acquisition.stop';
+  else if (retry) labelId = 'location.acquisition.retry';
+  const label = formatMessage({ id: labelId });
 
   return (
     <CustomControl position="bottomright" useLeafletControl>
       <Tooltip
-        title={
-          error
-            ? formatMessage({ id: LOCATE_ERRORS[error] })
-            : formatMessage({ id: 'Use my location' })
-        }
-        open={error ? true : undefined}
+        title={error ? formatMessage({ id: LOCATE_ERRORS[error] }) : label}
         placement="left"
+        slotProps={{ popper: { container: overlayContainer } }}
         arrow>
         <span>
           <IconButton
-            aria-label={formatMessage({ id: 'Use my location' })}
+            aria-label={label}
             data-testid="locate-me"
             onClick={onClick}
-            disabled={loading}
             sx={{
               bgcolor: error ? 'error.main' : 'background.paper',
               borderRadius: '4px',
@@ -40,7 +47,7 @@ const LocateMeControl = ({ onClick, loading = false, error = null }) => {
               '&.Mui-disabled': { bgcolor: 'background.paper', opacity: 0.6 }
             }}>
             {loading ? (
-              <CircularProgress size={20} color="inherit" />
+              <StopIcon sx={{ fontSize: 28 }} />
             ) : (
               <MyLocationIcon sx={{ fontSize: 28 }} />
             )}
@@ -54,6 +61,7 @@ const LocateMeControl = ({ onClick, loading = false, error = null }) => {
 LocateMeControl.propTypes = {
   error: PropTypes.number,
   loading: PropTypes.bool,
+  retry: PropTypes.bool,
   onClick: PropTypes.func.isRequired
 };
 

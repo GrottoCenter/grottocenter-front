@@ -3,7 +3,10 @@ import { useRef, useState } from 'react';
 import { useController, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { NUMERIC_FIELD_LIMITS } from '@/utils/numericFieldLimits';
+import {
+  NUMERIC_FIELD_LIMITS,
+  validateNumericRange
+} from '@/utils/numericFieldLimits';
 import { usePermissions, useNearbyEntrances } from '../../../../hooks';
 import SensitivitySection from '../../../common/SensitivitySection';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
@@ -41,6 +44,7 @@ const EntranceDetail = ({
   to allow the user to mark and unmark it freely before submitting the form
   */
   const values = getValues();
+  const initialPrecision = useRef(values.entrance.precision).current;
   const initialIsSensitive = useRef(values.entrance.isSensitive).current;
 
   // useController rather than a render-prop Controller: the panel needs both
@@ -106,7 +110,6 @@ const EntranceDetail = ({
               name="entrance.precision"
               control={control}
               label="Accuracy"
-              icon="coordinates"
               prefix="±"
               sx={{ flex: 'none', width: '100%' }}
               unit="m"
@@ -116,9 +119,15 @@ const EntranceDetail = ({
                 validate: value =>
                   value == null ||
                   value === '' ||
-                  (Number.isInteger(Number(value)) &&
-                    Number(value) >= 1 &&
-                    Number(value) <= MAX_PRECISION_METERS) ||
+                  // Preserve the legacy restriction marker when editing a row
+                  // that already has it; contributors cannot create new ones.
+                  (Number(value) === 0 && initialPrecision === 0) ||
+                  validateNumericRange(
+                    value,
+                    1,
+                    MAX_PRECISION_METERS,
+                    formatMessage
+                  ) === true ||
                   formatMessage(
                     {
                       id: 'Accuracy must be a whole number between 1 and {max} m.'

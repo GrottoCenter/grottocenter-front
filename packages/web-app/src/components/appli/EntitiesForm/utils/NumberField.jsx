@@ -54,7 +54,10 @@ const NumberField = ({
                 ...(typeof rangeRules.validate === 'function'
                   ? { custom: rangeRules.validate }
                   : rangeRules.validate),
-                numericInput: () =>
+                // A derived write can precede the DOM render. Native badInput
+                // only applies when the form receives an empty input value.
+                numericInput: value =>
+                  (value !== '' && value != null) ||
                   !inputRef.current?.validity.badInput ||
                   formatMessage({ id: 'form.integerRequired' })
               }
@@ -91,7 +94,7 @@ const NumberField = ({
                         ? { '& img': { filter: 'grayscale(1)', opacity: 0.5 } }
                         : undefined
                     }>
-                    {prefix ?? <CustomIcon type={icon} size={20} />}
+                    {prefix ?? (icon && <CustomIcon type={icon} size={20} />)}
                   </InputAdornment>
                 ),
                 endAdornment: unit ? (
@@ -112,7 +115,7 @@ NumberField.propTypes = {
   name: PropTypes.string.isRequired,
   control: PropTypes.shape({}),
   label: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.string,
   prefix: PropTypes.string,
   unit: PropTypes.string,
   disabled: PropTypes.bool,

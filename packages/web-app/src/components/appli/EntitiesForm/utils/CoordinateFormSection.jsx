@@ -118,13 +118,18 @@ const CoordinateFormSection = ({
   // Track the last WGS84 values we wrote ourselves, so we can ignore those
   // re-renders and only re-sync display fields on external changes (e.g. map drag)
   const selfSetRef = useRef({ lat: null, lng: null });
+  const prefilledValuesRef = useRef(null);
 
   const prefillFromWGS84 = useCallback((crs, lat, lng) => {
     if (Number.isNaN(lat) || Number.isNaN(lng)) return;
     if (crs.code === WGS84_DD) return;
     if (crs.code === DMS_CODE) {
-      setLocalX(decimalToDMS(lat, true));
-      setLocalY(decimalToDMS(lng, false));
+      const x = decimalToDMS(lat, true);
+      const y = decimalToDMS(lng, false);
+      prefilledValuesRef.current = { x, y, crs: crs.code };
+      setLocalX(x);
+      setLocalY(y);
+      setPreview({ lat, lng });
       return;
     }
     try {
@@ -133,8 +138,20 @@ const CoordinateFormSection = ({
         lng,
         crs
       );
-      setLocalX(crs.units === 'm' ? Math.round(x).toString() : x.toFixed(6));
-      setLocalY(crs.units === 'm' ? Math.round(y).toString() : y.toFixed(6));
+      const displayX =
+        crs.units === 'm' ? Math.round(x).toString() : x.toFixed(6);
+      const displayY =
+        crs.units === 'm' ? Math.round(y).toString() : y.toFixed(6);
+      prefilledValuesRef.current = {
+        x: displayX,
+        y: displayY,
+        crs: crs.code,
+        zone,
+        hemisphere: hemisphere ?? 'North'
+      };
+      setLocalX(displayX);
+      setLocalY(displayY);
+      setPreview({ lat, lng });
       if (crs.proj === 'utm' && zone) {
         setUtmZone(zone);
         setUtmHemisphere(hemisphere ?? 'North');
@@ -184,6 +201,21 @@ const CoordinateFormSection = ({
   // Whenever local X/Y change, convert to WGS84 and update form fields
   useEffect(() => {
     if (selectedCRS.code === WGS84_DD) return;
+
+    // Display conversions may round to whole meters. They must not move the
+    // saved point or invalidate its accuracy until a contributor edits a field.
+    const prefilled = prefilledValuesRef.current;
+    if (
+      prefilled &&
+      prefilled.crs === selectedCRS.code &&
+      prefilled.x === localX &&
+      prefilled.y === localY &&
+      (selectedCRS.proj !== 'utm' ||
+        (prefilled.zone === utmZone && prefilled.hemisphere === utmHemisphere))
+    ) {
+      return;
+    }
+    prefilledValuesRef.current = null;
 
     if (selectedCRS.code === DMS_CODE) {
       const lat = parseDMS(localX);

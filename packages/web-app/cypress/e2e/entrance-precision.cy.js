@@ -64,24 +64,36 @@ const visitForm = (
     onBeforeLoad: win => {
       win.localStorage.setItem('selectedLanguage', 'en');
       let requestCount = 0;
+      const watches = new Map();
       Object.defineProperty(win.navigator, 'geolocation', {
         configurable: true,
         value: {
-          getCurrentPosition: (success, error) => {
-            if (isLocationDenied) error({ code: 1 });
-            else {
-              const coords =
-                positions[Math.min(requestCount, positions.length - 1)];
-              requestCount += 1;
+          watchPosition: (success, error) => {
+            const watchId = requestCount;
+            const position =
+              positions[Math.min(requestCount, positions.length - 1)];
+            requestCount += 1;
+            const fixes = Array.isArray(position) ? position : [position];
+            const timers = fixes.map((coords, index) =>
               win.setTimeout(
-                () => success({ coords, timestamp: Date.now() }),
-                100
-              );
-            }
+                () => {
+                  if (isLocationDenied) error({ code: 1 });
+                  else success({ coords, timestamp: Date.now() });
+                },
+                100 + index * 500
+              )
+            );
+            watches.set(watchId, timers);
+            return watchId;
+          },
+          clearWatch: watchId => {
+            watches.get(watchId)?.forEach(timer => win.clearTimeout(timer));
+            watches.delete(watchId);
           }
         }
       });
-      cy.spy(win.navigator.geolocation, 'getCurrentPosition').as('getPosition');
+      cy.spy(win.navigator.geolocation, 'watchPosition').as('watchPosition');
+      cy.spy(win.navigator.geolocation, 'clearWatch').as('clearWatch');
     }
   });
   accuracyInput().should('be.visible');
@@ -99,28 +111,27 @@ describe('Entrance accuracy', () => {
       .find('span')
       .should('have.css', 'border-top-color', 'rgb(245, 124, 0)');
     accuracyLegend().scrollIntoView({ offset: { top: -200, left: 0 } });
-    cy.screenshot('entrance-precision-circle', { capture: 'viewport' });
     accuracyInput().clear();
     accuracyLegend().should('not.exist');
   });
 
-  it('refreshes position and accuracy with a cache limited to 500 ms', () => {
+  it('refreshes position and accuracy using fresh high accuracy fixes', () => {
     const movedPosition = {
       latitude: 45.13,
       longitude: 5.26,
-      accuracy: 11.2
+      accuracy: 8.2
     };
     visitForm('/entrances/1/edit', {
       positions: [POSITION, movedPosition, { ...movedPosition, accuracy: 4.1 }]
     });
-    cy.get('@getPosition').should('not.have.been.called');
+    cy.get('@watchPosition').should('not.have.been.called');
     cy.get('[data-testid="locate-me"]').click();
     accuracyInput().should('have.value', '7');
     accuracyLegend().should('have.text', 'Accuracy');
     inputByLabel('Latitude').should('have.value', '45.125000');
     inputByLabel('Longitude').should('have.value', '5.250000');
     cy.get('[data-testid="locate-me"]').click();
-    accuracyInput().should('have.value', '12');
+    accuracyInput().should('have.value', '9');
     accuracyLegend().should('have.text', 'Accuracy');
     inputByLabel('Latitude').should('have.value', '45.130000');
     inputByLabel('Longitude').should('have.value', '5.260000');
@@ -130,16 +141,71 @@ describe('Entrance accuracy', () => {
     accuracyLegend().should('have.text', 'Accuracy');
     inputByLabel('Latitude').should('have.value', '45.130000');
     inputByLabel('Longitude').should('have.value', '5.260000');
-    cy.get('@getPosition').should('have.been.calledThrice');
-    cy.get('@getPosition').then(getPosition => {
-      getPosition.getCalls().forEach(call => {
+    cy.get('@watchPosition').should('have.been.calledThrice');
+    cy.get('@watchPosition').then(watchPosition => {
+      watchPosition.getCalls().forEach(call => {
         expect(call.args[2]).to.deep.equal({
           enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 500
+          timeout: 60000,
+          maximumAge: 0
         });
       });
     });
+  });
+
+  it('improves a coarse first fix and releases GPS once precise enough', () => {
+    visitForm('/entrances/1/edit', {
+      positions: [
+        [
+          { latitude: 45.1, longitude: 5.1, accuracy: 100 },
+          { latitude: 45.2, longitude: 5.2, accuracy: 25 },
+          { latitude: 45.3, longitude: 5.3, accuracy: 80 },
+          POSITION
+        ]
+      ]
+    });
+    cy.clock();
+    cy.get('[data-testid="locate-me"]').click();
+    cy.tick(100);
+    accuracyInput().should('have.value', '100');
+    cy.get('[data-testid="locate-me"]').should(
+      'have.attr',
+      'aria-label',
+      'Stop searching'
+    );
+    cy.get('[data-testid="location-status"]').should('contain.text', '±100 m');
+    cy.tick(500);
+    accuracyInput().should('have.value', '25');
+    cy.tick(500);
+    accuracyInput().should('have.value', '25');
+    cy.tick(500);
+    accuracyInput().should('have.value', '7');
+    inputByLabel('Latitude').should('have.value', '45.125000');
+    inputByLabel('Longitude').should('have.value', '5.250000');
+    cy.get('[data-testid="locate-me"]').should('not.be.disabled');
+    cy.get('@clearWatch').should('have.been.calledOnce');
+  });
+
+  it('gives manual coordinate edits priority over GPS updates', () => {
+    visitForm('/entrances/1/edit', {
+      positions: [[{ ...POSITION, accuracy: 100 }, POSITION]]
+    });
+    cy.clock();
+    cy.get('[data-testid="locate-me"]').click();
+    cy.tick(100);
+    accuracyInput().should('have.value', '100');
+    inputByLabel('Latitude').clear().type('45.9');
+    cy.get('@clearWatch').should('have.been.calledOnce');
+    cy.get('@watchPosition').then(watchPosition => {
+      // A fix already queued by the browser can arrive even after clearWatch.
+      watchPosition.firstCall.args[0]({
+        coords: POSITION,
+        timestamp: Date.now()
+      });
+    });
+    inputByLabel('Latitude').should('have.value', '45.9');
+    accuracyInput().should('have.value', '');
+    cy.get('[data-testid="locate-me"]').should('not.be.disabled');
   });
 
   it('prefills device accuracy and saves a manual correction at creation', () => {
@@ -147,7 +213,6 @@ describe('Entrance accuracy', () => {
     accuracyInput().should('have.value', '');
     inputByLabel('Entrance name').type('Test entrance');
     cy.get('[data-testid="locate-me"]').click();
-    cy.screenshot('entrance-precision-desktop', { capture: 'viewport' });
     accuracyInput().should('have.value', '7').clear().type('250');
     inputByLabel('Latitude').clear().type('45.2');
     accuracyInput().should('have.value', '250');
@@ -197,8 +262,9 @@ describe('Entrance accuracy', () => {
         expect(buttonBox.bottom).to.be.closeTo(latitudeBox.bottom, 1);
       });
       inputByLabel('Longitude').then(longitude => {
-        expect(longitude[0].getBoundingClientRect().left).to.equal(
-          latitude[0].getBoundingClientRect().left
+        expect(longitude[0].getBoundingClientRect().left).to.be.closeTo(
+          latitude[0].getBoundingClientRect().left,
+          1
         );
         expect(longitude[0].getBoundingClientRect().top).to.be.greaterThan(
           latitude[0].getBoundingClientRect().bottom
@@ -220,6 +286,159 @@ describe('Entrance accuracy', () => {
         );
       });
     });
-    cy.screenshot('entrance-precision-mobile', { capture: 'viewport' });
+  });
+
+  it('can stop searching and retain the measurement without applying queued fixes', () => {
+    cy.viewport(375, 812);
+    visitForm('/entrances/1/edit', {
+      positions: [[{ ...POSITION, accuracy: 100 }, POSITION]]
+    });
+    cy.clock();
+    cy.get('[data-testid="locate-me"]').click();
+    cy.tick(100);
+    accuracyInput().should('have.value', '100');
+    cy.get('button[aria-label="Stop searching"]').should('have.length', 1);
+    cy.get('[data-testid="location-status"]').then(status => {
+      const mapElement = status[0].previousElementSibling;
+      const mapBox = mapElement.getBoundingClientRect();
+      const statusBox = status[0].getBoundingClientRect();
+      expect(statusBox.top).to.be.at.least(mapBox.bottom);
+      cy.get('[data-testid="locate-me"]').then(button => {
+        expect(mapElement.contains(button[0])).to.equal(true);
+      });
+    });
+    cy.get('[data-testid="locate-me"]').click();
+    cy.tick(500);
+    accuracyInput().should('have.value', '100');
+    cy.get('[data-testid="location-status"]').should(
+      'contain.text',
+      'Estimated device accuracy'
+    );
+    cy.get('@clearWatch').should('have.been.calledOnce');
+  });
+
+  it('preserves the best estimate at the deadline and offers retry', () => {
+    visitForm('/entrances/1/edit', {
+      positions: [{ ...POSITION, accuracy: 100 }]
+    });
+    cy.clock();
+    cy.get('[data-testid="locate-me"]').click();
+    cy.tick(60000);
+    accuracyInput().should('have.value', '100');
+    cy.get('[data-testid="location-status"]').should(
+      'contain.text',
+      'Best accuracy received'
+    );
+    cy.get('[data-testid="locate-me"]')
+      .should('have.attr', 'aria-label', 'Try again')
+      .click();
+    cy.get('@watchPosition').should('have.been.calledTwice');
+  });
+
+  it('keeps GPS and its status working when entering and leaving fullscreen', () => {
+    cy.viewport(375, 812);
+    visitForm('/entrances/1/edit', {
+      positions: [{ ...POSITION, accuracy: 100 }]
+    });
+    cy.clock();
+    cy.get('[data-testid="locate-me"]').click();
+    cy.tick(100);
+    accuracyInput().should('have.value', '100');
+    cy.get('[data-testid="location-status"]')
+      .prev()
+      .as('selectorMap', { type: 'static' });
+    cy.tick(1000);
+    cy.get('[role="button"][aria-label="Full Screen"]').click();
+    cy.get('[role="button"][aria-label="Exit Full Screen"]').should(
+      'be.visible'
+    );
+    cy.get('@selectorMap')
+      .find('[data-testid="location-status"]')
+      // This overlay lets pointer events reach the map. Cypress's fixed-element
+      // visibility check treats the canvas returned by hit-testing as cover.
+      .should('have.css', 'visibility', 'visible')
+      .and('contain.text', '±100 m')
+      .then(status => {
+        cy.get('@selectorMap').then(map => {
+          const mapBox = map[0].getBoundingClientRect();
+          const statusBox = status[0].getBoundingClientRect();
+          expect(statusBox.height).to.be.greaterThan(0);
+          expect(statusBox.top).to.be.at.least(mapBox.top);
+          expect(statusBox.bottom).to.be.at.most(mapBox.bottom);
+          expect(statusBox.left).to.be.at.least(mapBox.left);
+          expect(statusBox.right).to.be.at.most(mapBox.right);
+        });
+      });
+    cy.get('button[aria-label="Stop searching"]').should('have.length', 1);
+    cy.get('@clearWatch').should('not.have.been.called');
+    accuracyLegend()
+      .invoke('text')
+      .then(text => {
+        cy.get('[data-testid="location-status"]')
+          .invoke('text')
+          .should('eq', text);
+      });
+    cy.get('@watchPosition').then(watchPosition => {
+      watchPosition.firstCall.args[0]({
+        coords: { ...POSITION, accuracy: 25 },
+        timestamp: Date.now()
+      });
+    });
+    cy.get('[data-testid="location-status"]').should('contain.text', '±25 m');
+    cy.tick(1000);
+    cy.get('[role="button"][aria-label="Exit Full Screen"]').click();
+    cy.get('[role="button"][aria-label="Full Screen"]').should('be.visible');
+    cy.get('@selectorMap')
+      .find('[data-testid="location-status"]')
+      .should('not.exist');
+    cy.get('[data-testid="location-status"]').should('be.visible');
+    cy.get('@clearWatch').should('not.have.been.called');
+    cy.get('@watchPosition').then(watchPosition => {
+      watchPosition.firstCall.args[0]({
+        coords: POSITION,
+        timestamp: Date.now()
+      });
+    });
+    accuracyInput().should('have.value', '7');
+    inputByLabel('Latitude').should('have.value', '45.125000');
+    cy.get('@clearWatch').should('have.been.calledOnce');
+  });
+
+  it('invalidates a device estimate when coordinates are edited after acquisition', () => {
+    visitForm('/entrances/1/edit');
+    cy.get('[data-testid="locate-me"]').click();
+    accuracyInput().should('have.value', '7');
+    inputByLabel('Latitude').clear().type('45.9');
+    accuracyInput().should('have.value', '');
+    accuracyLegend().should('not.exist');
+    cy.get('[data-testid="location-status"]').should(
+      'contain.text',
+      'Position changed'
+    );
+  });
+
+  it('rejects malformed accuracy without silently clearing the stored value', () => {
+    visitForm('/entrances/1/edit');
+    accuracyInput().clear().focus();
+    // Native number editing can expose an empty value for incomplete text.
+    // Use browser input: Cypress .type() sanitizes '-' before dispatching it.
+    cy.then(() =>
+      Cypress.automation('remote:debugger:protocol', {
+        command: 'Input.insertText',
+        params: { text: '-' }
+      })
+    );
+    accuracyInput().should(input => {
+      expect(input[0].validity.badInput).to.equal(true);
+    });
+    submitForm();
+    cy.contains('Enter a whole number.').should('be.visible');
+    cy.get('@updateEntrance.all').should('have.length', 0);
+    cy.get('[data-testid="locate-me"]').click();
+    accuracyInput()
+      .should('have.value', '7')
+      .and('have.attr', 'aria-invalid', 'false');
+    submitForm();
+    cy.wait('@updateEntrance').its('request.body.precision').should('eq', 7);
   });
 });
