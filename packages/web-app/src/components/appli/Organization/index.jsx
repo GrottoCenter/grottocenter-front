@@ -298,6 +298,9 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
             entityType={DELETED_ENTITIES.organization}
             entityId={organization.id}
             entityName={organization.name}
+            existingRedirectId={
+              organization.isDeleted ? organization.redirectTo : null
+            }
             isOpen={isDeleteConfirmationOpen}
             isLoading={isActionLoading}
             isPermanent={isDeleteConfirmationPermanent}

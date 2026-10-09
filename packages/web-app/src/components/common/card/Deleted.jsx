@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import {
   Button,
   Box,
@@ -17,7 +17,9 @@ import DeleteIcon from '@mui/icons-material/DeleteRounded';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForeverRounded';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { getDeletedEntityRedirectUrl } from '@/utils/deletedEntityRedirect';
+import { useDeletedEntityRedirectTarget } from '@/hooks/useDeletedEntityRedirectTarget';
 
 import StandardDialog from '../StandardDialog';
 import CustomIcon from '../CustomIcon';
@@ -84,6 +86,49 @@ const isCurrentEntity = (candidate, entityId) =>
 const StyledEntityIcon = styled(EntityIcon)`
   float: left;
 `;
+
+const RedirectTargetLoader = ({
+  entityType,
+  entityId,
+  redirectId,
+  onResolved
+}) => {
+  const query = useDeletedEntityRedirectTarget(entityType.str, redirectId);
+  useEffect(() => {
+    if (!query?.isPaused && (query?.isPending || query?.isFetching)) return;
+    const target = query?.data;
+    const isValid =
+      !query?.error &&
+      !query?.isPaused &&
+      target?.id != null &&
+      String(target.id) === String(redirectId) &&
+      !isCurrentEntity(target, entityId) &&
+      !target.isDeleted &&
+      !target.redirectTo &&
+      Boolean(entityType.str === 'Document' ? target.title : target.name);
+    onResolved(
+      isValid
+        ? nomelizeSearchEntity({
+            ...target,
+            _type: entityType.searchType,
+            type: target.type?.name ?? target.type
+          })
+        : null
+    );
+  }, [
+    query?.data,
+    query?.error,
+    query?.isPending,
+    query?.isFetching,
+    query?.isPaused,
+    entityType.searchType,
+    entityType.str,
+    entityId,
+    redirectId,
+    onResolved
+  ]);
+  return <CircularProgress size={24} />;
+};
 
 export const DeletedCard = ({
   entityType,
@@ -212,7 +257,7 @@ export const Deleted = ({ entityType, entity }) => (
   />
 );
 
-export const DeleteConfirmationDialog = ({
+const DeleteConfirmationDialogContent = ({
   entityType,
   entityId,
   entityName,
@@ -220,14 +265,36 @@ export const DeleteConfirmationDialog = ({
   isOpen,
   isLoading,
   isPermanent,
+  existingRedirectId,
   onClose,
   onConfirmation,
   isSearchMandatory = false
 }) => {
   const { formatMessage } = useIntl();
+  const theme = useTheme();
+  const isNarrowViewport = useMediaQuery(theme.breakpoints.down('sm'));
   const canSelectRedirect = Boolean(entityType.searchType);
   const [inputValue, setInputValue] = useState('');
   const [selectedEntity, setSelectedEntity] = useState(null);
+  const [hasEditedSelection, setHasEditedSelection] = useState(false);
+  const [hasResolvedRedirect, setHasResolvedRedirect] = useState(false);
+  const [hasRedirectError, setHasRedirectError] = useState(false);
+  const supportsPrefill = [
+    'Document',
+    'Entrance',
+    'Network',
+    'Massif',
+    'Organization'
+  ].includes(entityType.str);
+  const shouldPrefill =
+    isOpen &&
+    isPermanent &&
+    supportsPrefill &&
+    existingRedirectId != null &&
+    existingRedirectId !== '';
+  const isResolvingRedirect =
+    shouldPrefill && !hasEditedSelection && !hasResolvedRedirect;
+
   const debouncedInput = useDebounce(inputValue);
   const {
     data,
@@ -246,13 +313,11 @@ export const DeleteConfirmationDialog = ({
     suggestion => !isCurrentEntity(suggestion, entityId)
   );
 
-  useEffect(() => {
-    if (!isOpen) setSelectedEntity(null);
-  }, [isOpen, setSelectedEntity]);
-
   const handleSelection = selection => {
     if (isCurrentEntity(selection, entityId)) return;
     if (selection) {
+      setHasEditedSelection(true);
+      setHasRedirectError(false);
       setSelectedEntity(nomelizeSearchEntity(selection));
     }
     setInputValue('');
@@ -307,6 +372,8 @@ export const DeleteConfirmationDialog = ({
 
   return (
     <StandardDialog
+      fullScreen={isNarrowViewport}
+      scrollable
       open={isOpen}
       onClose={onClose}
       title={
@@ -325,21 +392,37 @@ export const DeleteConfirmationDialog = ({
         </Typography>
       }
       actions={
-        <>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column-reverse', sm: 'row' },
+            justifyContent: 'flex-end',
+            gap: 1,
+            width: '100%'
+          }}>
           {isLoading && (
             <Box sx={{ margin: 1 }}>
               <CircularProgress />
             </Box>
           )}
-          <Button variant="outlined" onClick={onClose} disabled={isLoading}>
+          <Button
+            variant="outlined"
+            onClick={onClose}
+            disabled={isLoading}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}>
             {formatMessage({ id: 'Cancel' })}
           </Button>
           {!isLoading && (
             <Button
               variant="contained"
               color="error"
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
               startIcon={isPermanent ? <DeleteForeverIcon /> : <DeleteIcon />}
-              disabled={isSearchMandatory && !selectedEntity}
+              disabled={
+                isResolvingRedirect ||
+                hasRedirectError ||
+                (isSearchMandatory && !selectedEntity)
+              }
               onClick={() => {
                 onConfirmation(selectedEntity);
                 onClose();
@@ -347,7 +430,7 @@ export const DeleteConfirmationDialog = ({
               {actionButtonTitle}
             </Button>
           )}
-        </>
+        </Box>
       }>
       <Stack spacing={2}>
         {entityName && (
@@ -398,10 +481,50 @@ export const DeleteConfirmationDialog = ({
             <Typography variant="body2" color="text.secondary">
               {searchTitle}
             </Typography>
+            {isResolvingRedirect && (
+              <RedirectTargetLoader
+                entityType={entityType}
+                entityId={entityId}
+                redirectId={existingRedirectId}
+                onResolved={target => {
+                  setSelectedEntity(target);
+                  setHasRedirectError(!target);
+                  setHasResolvedRedirect(true);
+                }}
+              />
+            )}
+            {hasRedirectError && (
+              <Stack spacing={1}>
+                <FormHelperText error role="alert">
+                  {formatMessage({
+                    id: 'delete-confirmation-redirect-unavailable'
+                  })}
+                </FormHelperText>
+                {!isSearchMandatory && (
+                  <Button
+                    onClick={() => {
+                      setHasEditedSelection(true);
+                      setHasRedirectError(false);
+                    }}>
+                    {formatMessage({ id: 'delete-confirmation-change-target' })}
+                  </Button>
+                )}
+              </Stack>
+            )}
+            {shouldPrefill && selectedEntity && !hasEditedSelection && (
+              <Typography variant="body2" color="text.secondary">
+                {formatMessage({ id: 'delete-confirmation-existing-redirect' })}
+              </Typography>
+            )}
             {!selectedEntity && (
               <>
                 <AutoCompleteSearch
-                  onInputChange={setInputValue}
+                  onInputChange={value => {
+                    if (value) {
+                      setHasEditedSelection(true);
+                    }
+                    setInputValue(value);
+                  }}
                   onSelection={handleSelection}
                   hasError={!!error}
                   isLoading={isQuickSearchLoading}
@@ -444,6 +567,7 @@ export const DeleteConfirmationDialog = ({
                     padding: selectedEntity?.subtitle ? 1 : 0.25
                   }}
                   onClick={() => {
+                    setHasEditedSelection(true);
                     setSelectedEntity(null);
                   }}>
                   <CloseRoundedIcon />
@@ -504,7 +628,20 @@ Deleted.propTypes = {
   entity: DeletedCard.propTypes.entity
 };
 
-DeleteConfirmationDialog.propTypes = {
+export const DeleteConfirmationDialog = props => {
+  const { isOpen, entityType, entityId, isPermanent } = props;
+  if (!isOpen) return null;
+  // A new opening/source/mode starts a new selection session. Late query
+  // responses from a previous session cannot restore a discarded selection.
+  return (
+    <DeleteConfirmationDialogContent
+      key={`${entityType.str}:${entityId}:${isPermanent}`}
+      {...props}
+    />
+  );
+};
+
+DeleteConfirmationDialogContent.propTypes = {
   entityType: DeletedCard.propTypes.entityType.isRequired,
   entityId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   entityName: PropTypes.string,
@@ -512,7 +649,18 @@ DeleteConfirmationDialog.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isPermanent: PropTypes.bool.isRequired,
+  existingRedirectId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   onClose: PropTypes.func.isRequired,
   onConfirmation: PropTypes.func.isRequired,
   isSearchMandatory: PropTypes.bool
+};
+
+DeleteConfirmationDialog.propTypes = DeleteConfirmationDialogContent.propTypes;
+
+RedirectTargetLoader.propTypes = {
+  entityType: DeletedCard.propTypes.entityType.isRequired,
+  entityId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  redirectId: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+    .isRequired,
+  onResolved: PropTypes.func.isRequired
 };

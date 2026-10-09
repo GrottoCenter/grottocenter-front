@@ -5,6 +5,22 @@ import frenchMessages from '@/../public/lang/fr.json';
 import { DeleteConfirmationDialog, DELETED_ENTITIES } from './Deleted';
 
 const searchState = vi.hoisted(() => ({ results: [], error: null }));
+const viewportState = vi.hoisted(() => ({ isNarrow: false }));
+
+vi.mock('@mui/material/useMediaQuery', () => ({
+  default: () => viewportState.isNarrow
+}));
+const redirectState = vi.hoisted(() => ({
+  data: null,
+  isPending: false,
+  isFetching: false,
+  isPaused: false,
+  error: null
+}));
+
+vi.mock('@/hooks/useDeletedEntityRedirectTarget', () => ({
+  useDeletedEntityRedirectTarget: () => redirectState
+}));
 
 vi.mock('@/hooks', () => ({
   useDebounce: value => value,
@@ -16,9 +32,12 @@ vi.mock('@/hooks', () => ({
 }));
 
 vi.mock('../StandardDialog', () => ({
-  default: ({ open, title, children, actions }) =>
+  default: ({ open, title, children, actions, fullScreen, scrollable }) =>
     open ? (
-      <div>
+      <div
+        data-testid="deletion-dialog"
+        data-fullscreen={fullScreen}
+        data-scrollable={scrollable}>
         <h2>{title}</h2>
         {children}
         {actions}
@@ -62,6 +81,14 @@ const renderDialog = (entityId = 42, onConfirmation = vi.fn()) => (
 
 describe('DeleteConfirmationDialog replacement selection', () => {
   beforeEach(() => {
+    viewportState.isNarrow = false;
+    Object.assign(redirectState, {
+      data: null,
+      isPending: false,
+      isFetching: false,
+      isPaused: false,
+      error: null
+    });
     searchState.error = null;
     searchState.results = [
       { id: '42', name: 'Current massif', _type: 'massifs' },
@@ -196,6 +223,203 @@ describe('DeleteConfirmationDialog replacement selection', () => {
     expect(
       screen.getByRole('button', {
         name: 'Merge and permanently delete'
+      })
+    ).toBeDisabled();
+  });
+
+  it('uses a fullscreen scrollable dialog only on narrow viewports', () => {
+    viewportState.isNarrow = true;
+    const { rerender } = render(renderDialog());
+    expect(screen.getByTestId('deletion-dialog')).toHaveAttribute(
+      'data-fullscreen',
+      'true'
+    );
+    expect(screen.getByTestId('deletion-dialog')).toHaveAttribute(
+      'data-scrollable',
+      'true'
+    );
+    viewportState.isNarrow = false;
+    rerender(renderDialog());
+    expect(screen.getByTestId('deletion-dialog')).toHaveAttribute(
+      'data-fullscreen',
+      'false'
+    );
+  });
+
+  const prefilledDialog = (props = {}) => (
+    <IntlProvider locale="fr" messages={frenchMessages}>
+      <DeleteConfirmationDialog
+        entityType={DELETED_ENTITIES.massif}
+        entityId={42}
+        existingRedirectId={43}
+        isOpen
+        isLoading={false}
+        isPermanent
+        onClose={() => {}}
+        onConfirmation={() => {}}
+        {...props}
+      />
+    </IntlProvider>
+  );
+
+  it('prefills the existing target and submits its id', () => {
+    redirectState.data = { id: 43, name: 'Destination' };
+    const onConfirmation = vi.fn();
+    render(prefilledDialog({ onConfirmation }));
+    expect(screen.getByText('Destination')).toBeVisible();
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Fusionner et supprimer définitivement'
+      })
+    );
+    expect(onConfirmation).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 43, title: 'Destination' })
+    );
+  });
+
+  it('blocks deletion during loading, lets users clear the target and resets on reopening', () => {
+    redirectState.isPending = true;
+    const { rerender } = render(prefilledDialog());
+    expect(
+      screen.getByRole('button', {
+        name: 'Supprimer définitivement'
+      })
+    ).toBeDisabled();
+    redirectState.isPending = false;
+    redirectState.data = { id: 43, name: 'Destination' };
+    rerender(prefilledDialog());
+    fireEvent.click(screen.getByRole('button', { name: 'supprimer' }));
+    rerender(prefilledDialog());
+    expect(screen.queryByText('Destination')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: 'Supprimer définitivement'
+      })
+    ).toBeEnabled();
+    rerender(prefilledDialog({ isOpen: false }));
+    rerender(prefilledDialog());
+    expect(screen.getByText('Destination')).toBeVisible();
+  });
+
+  it.each([
+    { id: 42, name: 'Self' },
+    { id: 43, name: 'Deleted', isDeleted: true },
+    { id: 43, name: 'Redirected', redirectTo: 44 },
+    null
+  ])('rejects an invalid existing target: %j', data => {
+    redirectState.data = data;
+    render(prefilledDialog());
+    expect(screen.getByRole('alert')).toBeVisible();
+    expect(
+      screen.getByRole('button', {
+        name: 'Supprimer définitivement'
+      })
+    ).toBeDisabled();
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Changer de destination ou continuer sans fusion'
+      })
+    );
+    expect(
+      screen.getByRole('button', {
+        name: 'Supprimer définitivement'
+      })
+    ).toBeEnabled();
+  });
+
+  it('does not restore a late target after the user starts choosing another one', async () => {
+    redirectState.isPending = true;
+    const onConfirmation = vi.fn();
+    const { rerender } = render(prefilledDialog({ onConfirmation }));
+    fireEvent.focus(screen.getByRole('combobox'));
+    fireEvent.change(screen.getByRole('combobox'), {
+      target: { value: 'massif' }
+    });
+    fireEvent.click(
+      await screen.findByRole('option', { name: /Other massif/ })
+    );
+    redirectState.isPending = false;
+    redirectState.data = { id: 43, name: 'Late destination' };
+    rerender(prefilledDialog({ onConfirmation }));
+    expect(screen.queryByText('Late destination')).not.toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Fusionner et supprimer définitivement'
+      })
+    );
+    expect(onConfirmation).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Other massif' })
+    );
+  });
+
+  it('keeps mandatory merging disabled after clearing the prefilled target', () => {
+    redirectState.data = { id: 43, name: 'Destination' };
+    render(prefilledDialog({ isSearchMandatory: true }));
+    fireEvent.click(screen.getByRole('button', { name: 'supprimer' }));
+    expect(
+      screen.getByRole('button', {
+        name: 'Fusionner et supprimer définitivement'
+      })
+    ).toBeDisabled();
+  });
+
+  it('does not prefill a soft deletion or an entity without a redirect', () => {
+    redirectState.data = { id: 43, name: 'Destination' };
+    const { rerender } = render(prefilledDialog({ isPermanent: false }));
+    expect(screen.queryByText('Destination')).not.toBeInTheDocument();
+    rerender(prefilledDialog({ existingRedirectId: null }));
+    expect(screen.queryByText('Destination')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: 'Supprimer définitivement'
+      })
+    ).toBeEnabled();
+  });
+
+  it('discards the old selection when switching source entities', () => {
+    redirectState.data = { id: 43, name: 'Destination' };
+    const { rerender } = render(prefilledDialog());
+    rerender(prefilledDialog({ entityId: 50, existingRedirectId: null }));
+    expect(screen.queryByText('Destination')).not.toBeInTheDocument();
+  });
+
+  it('keeps an unavailable target blocked while typing until a replacement is selected', async () => {
+    redirectState.error = new Error('Not found');
+    render(prefilledDialog());
+    fireEvent.focus(screen.getByRole('combobox'));
+    fireEvent.change(screen.getByRole('combobox'), {
+      target: { value: 'massif' }
+    });
+    expect(
+      screen.getByRole('button', {
+        name: 'Supprimer définitivement'
+      })
+    ).toBeDisabled();
+    fireEvent.click(
+      await screen.findByRole('option', { name: /Other massif/ })
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: 'Fusionner et supprimer définitivement'
+      })
+    ).toBeEnabled();
+  });
+
+  it('uses the document detail title and type for the prefilled card', () => {
+    redirectState.data = { id: 43, title: 'Bibliographie', type: 'Book' };
+    render(prefilledDialog({ entityType: DELETED_ENTITIES.document }));
+    expect(screen.getByText('[Book] Bibliographie')).toBeVisible();
+  });
+
+  it('surfaces an offline target resolution instead of allowing deletion', () => {
+    redirectState.isPaused = true;
+    redirectState.isPending = true;
+    render(prefilledDialog());
+    expect(screen.getByRole('alert')).toBeVisible();
+    expect(
+      screen.getByRole('button', {
+        name: 'Supprimer définitivement'
       })
     ).toBeDisabled();
   });

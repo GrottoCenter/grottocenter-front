@@ -136,6 +136,21 @@ Use ICU message format for dynamic values:
 
 ## 🎯 Server state — React Query
 
+### Existing deletion redirects
+
+The shared `DeleteConfirmationDialog` accepts `existingRedirectId` only from
+an already soft-deleted source. Permanent deletion resolves and preselects that
+destination through existing detail queries for documents, entrances, networks,
+massifs and organizations. The selection is a **merge target**, not merely a
+navigation destination; removing or replacing it must never be undone by a late
+query response. Confirmation is blocked while resolving or when resolution fails
+until a valid replacement is selected or the user explicitly continues without
+merging (only when merging is optional). Closing or changing source/mode resets
+the selection. Post-deletion navigation retains its existing redirect fallback.
+Below the `sm` breakpoint, the dialog is fullscreen with scrollable content and
+full-width bottom actions (primary above Cancel); desktop keeps a compact dialog
+with right-aligned actions.
+
 All server reads (GET) and writes (POST/PUT/PATCH/DELETE) live in **TanStack
 Query**. Redux is kept for genuine client/session state only —
 see the [🎯 Redux Patterns](#-redux-patterns) section below for the

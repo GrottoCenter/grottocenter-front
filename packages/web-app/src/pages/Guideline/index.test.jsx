@@ -1,9 +1,4 @@
-import {
-  render,
-  screen,
-  waitForElementToBeRemoved,
-  within
-} from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -295,7 +290,9 @@ it('keeps a deleted guideline available for moderators to restore', async () => 
   expect(
     await screen.findByText('This Guideline has been deleted')
   ).toBeVisible();
-  await waitForElementToBeRemoved(() => screen.queryByRole('dialog'));
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  );
   expect(screen.queryByRole('link', { name: 'Edit' })).not.toBeInTheDocument();
   expect(
     within(screen.getByRole('banner')).queryByRole('button', {
