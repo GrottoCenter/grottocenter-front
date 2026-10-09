@@ -535,26 +535,75 @@ and network forms. Disabled shared characteristics do not block unrelated edits.
 This validation does not change the API's existing handling of empty cave
 characteristics.
 
-Entrance and network forms use RHF `mode: 'onTouched'`: errors appear on blur
-and update while correcting the field. Their submit button remains enabled
-until submission (or while offline); `handleSubmit` validates all editable
-fields and focuses the first invalid field without sending a mutation.
-The forms use `noValidate` to avoid competing browser validation messages.
-Numeric fields display only RHF errors. Auxiliary map and network-selection
-components must not register a second controller for a validated field.
+**Validation and submission — use the entrance/network forms as prior art:**
 
-**Rule — RHF vs Redux:**
+- For new or reworked RHF forms, use `mode: 'onTouched'` and
+  `reValidateMode: 'onChange'`: validate on first blur, then during correction.
+  Submit must validate untouched fields too. Do not change unrelated legacy
+  forms solely to standardize their timing.
+- Route submission through `handleSubmit`; call the mutation only from its
+  valid callback. Keep submit available when values are missing or invalid.
+  Disable it during `isSubmitting`, the active mutation's `isPending`, or
+  offline operation; reuse `FormActionRow` where applicable. Do not duplicate
+  validation in button conditions or gate it with `isValid`.
+- Use `<form noValidate>` when RHF owns submission validation, so native
+  browser popups do not preempt localized inline errors. Keep native field
+  semantics and constraints; `noValidate` does not filter numeric typing.
+- Show localized errors beside the field and preserve useful helper text.
+  Forward `name`, `onBlur`, and the RHF input `ref` through wrappers and
+  autocomplete controls so touched state and first-error focus work.
+  Reveal any hidden section containing an error before attempting focus.
+- Numeric errors must come from RHF, not an independent immediate range
+  check. Retain `type="number"` with `min`/`max`/`step`; `maxLength` does not
+  constrain numbers. Reuse `NumberField` and the shared finite/integer/range
+  validator. Check native `validity.badInput`: browsers can display invalid
+  editing text while exposing an empty value. Accept genuinely empty optional
+  fields, not invalid numeric text disguised as empty.
+- Reuse `TEXT_LENGTH_LIMITS` and the shared text inputs for API character
+  limits. Keep HTML constraints and submission validation aligned, including
+  oversized prefilled API values. Preserve the existing counter policy:
+  short fields at the shared 80% threshold, long fields throughout editing.
+  Do not invent character caps for unrestricted descriptions/abstracts or
+  treat byte-based request limits as character limits.
+- Exclude non-editable shared characteristics from validation when preserving
+  historical values is intended. Do not discard those values or accidentally
+  relax rules when the field becomes editable again. Preserve numeric zero
+  during serialization; distinguish `0` from `''`, `null`, and `undefined`,
+  and respect the API's existing clearing semantics.
+
+**Field ownership and synchronization:**
+
+- Register each field once, in the component that owns its validation.
+  Auxiliary map, projection, and network-selection components must reuse
+  its callbacks or public `setValue`, never register a competing Controller.
+  A later registration without rules can overwrite the authoritative rules.
+- For derived writes via `setValue`, choose `shouldValidate`, `shouldDirty`,
+  and `shouldTouch` explicitly according to the interaction. Do not mark a
+  field touched merely because an API value was loaded.
+- Preserve map-to-input and input-to-map updates. Distinguish explicit user
+  drags from automatic resize/recenter movements; feedback-loop guards must
+  not swallow user actions. Do not enable global `shouldUnregister` as a
+  shortcut: conditional forms may need to retain derived or hidden values.
+- Test the actual form's submission path: invalid values send no mutation,
+  the first error receives focus, correction allows submission, and valid
+  boundaries/zero/optional blanks are preserved. Cover conditional modes and
+  locked historical values. For map changes, include real Leaflet events and
+  both update directions; mocked setters alone do not verify synchronization.
+  Do not claim browser-specific behavior is verified by JSDOM tests.
+
+**Rule — form, server, and client state:**
 
 | Concern                                  | Tool                                               |
 | ---------------------------------------- | -------------------------------------------------- |
 | Field values, validation, errors         | **React Hook Form** (`useForm`)                    |
-| API loading state, submit error          | **Redux**                                          |
-| Pre-fill data loaded from API            | **Redux** → passed as `defaultValues` to `useForm` |
-| State shared across unrelated components | **Redux**                                          |
+| API loading state, submit error          | **TanStack Query** (`useQuery` / `useMutation`)     |
+| Pre-fill data loaded from API            | **TanStack Query** → `defaultValues` / deliberate `reset` |
+| Shared client/session state              | **Redux**                                          |
 
 > ❌ Never store field values in Redux state.  
 > ❌ Never use React Hook Form for state that must survive navigation.  
-> ⚠️ Some existing forms (e.g. `Document/FormContent.jsx`) mix both — this is tech debt to fix progressively, not reproduce.
+> ⚠️ Keep legacy mixed-state forms scoped; do not reproduce their patterns.
+> Follow the server-state conventions above for query and mutation lifecycle.
 
 ```javascript
 import { useForm } from 'react-hook-form';
@@ -564,9 +613,12 @@ const CaveForm = ({ onSubmit }) => {
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm();
+  } = useForm({
+    mode: 'onTouched',
+    reValidateMode: 'onChange'
+  });
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <input {...register('name', { required: 'Name is required' })} />
       {errors.name && <span>{errors.name.message}</span>}
       <button type="submit">Save</button>
