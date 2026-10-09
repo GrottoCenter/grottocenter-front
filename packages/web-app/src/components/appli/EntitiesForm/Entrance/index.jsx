@@ -12,7 +12,6 @@ import {
   useUpdateEntrance,
   useCreateCaveAndEntrance,
   useUpdateCaveAndEntrance,
-  usePermissions,
   useNotification
 } from '../../../../hooks';
 import FormProgressInfo from '../utils/FormProgressInfo';
@@ -41,8 +40,6 @@ const defaultCaveValues = {
   temperature: '',
   massif: ''
 };
-
-const isCoordEmpty = v => v === '' || v === null || v === undefined;
 
 const defaultEntranceValues = {
   name: '',
@@ -99,9 +96,6 @@ export const EntranceForm = ({
   // mode already knows it statically from caveValues). Not a form value: used
   // only to render a named link to that network in CaveDetail.
   const [selectedCave, setSelectedCave] = useState(null);
-  const { isAdmin } = usePermissions();
-  const isSensitiveDisabled =
-    !isAdmin && (entranceValues?.isSensitive ?? false);
 
   const defaultFormValues = useMemo(
     () => ({
@@ -117,33 +111,16 @@ export const EntranceForm = ({
     reset,
     control,
     getValues,
+    setValue,
     watch,
     formState: { errors, isSubmitting, isSubmitSuccessful }
-  } = useForm({ defaultValues: defaultFormValues });
+  } = useForm({
+    defaultValues: defaultFormValues,
+    mode: 'onTouched',
+    reValidateMode: 'onChange'
+  });
 
-  const [
-    lat,
-    lng,
-    caveName,
-    caveLanguage,
-    entranceName,
-    entranceLanguage,
-    caveId
-  ] = watch([
-    'entrance.latitude',
-    'entrance.longitude',
-    'cave.name',
-    'cave.language',
-    'entrance.name',
-    'entrance.language',
-    'cave.id'
-  ]);
-
-  const isSubmitDisabled =
-    (!isSensitiveDisabled && (isCoordEmpty(lat) || isCoordEmpty(lng))) ||
-    (entityType === ENTRANCE_AND_CAVE
-      ? !caveName || !caveLanguage
-      : !caveId || !entranceName || !entranceLanguage);
+  const caveId = watch('cave.id');
 
   const handleUpdateEntityType = type => {
     setEntityType(type);
@@ -257,12 +234,13 @@ export const EntranceForm = ({
 
   return (
     <FormContainer>
-      <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+      <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <EditTypeSelection
           control={control}
           errors={errors}
           entityType={entityType}
           isNewEntrance={isNewEntrance}
+          setValue={setValue}
         />
         <EntranceDetail
           control={control}
@@ -278,6 +256,7 @@ export const EntranceForm = ({
             updateEntityType={handleUpdateEntityType}
             selectedCave={selectedCave}
             onSelectedCaveChange={setSelectedCave}
+            setValue={setValue}
           />
         ) : (
           <NetworkMembershipSection
@@ -299,8 +278,8 @@ export const EntranceForm = ({
         <EntranceAttributes control={control} />
         <FormActionRow
           isNew={isNewEntrance}
-          isSubmitting={isSubmitting}
-          disabled={isSubmitDisabled}
+          isSubmitting={isSubmitting || activeMutation.isPending}
+          disabled={isSubmitting || activeMutation.isPending}
           onCancel={onCancel}
         />
       </form>

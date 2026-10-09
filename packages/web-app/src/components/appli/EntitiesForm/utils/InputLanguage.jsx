@@ -7,10 +7,13 @@ const InputLanguage = ({ formKey, control, isError, isDisabled = false }) => (
     name={formKey}
     control={control}
     rules={{ required: true }}
-    render={({ field: { value, onChange } }) => (
+    render={({ field: { value, onChange, onBlur, ref }, fieldState }) => (
       <LanguageSelect
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
+        inputRef={ref}
+        helperText={fieldState.error ? 'Required' : undefined}
         required
         error={isError}
         disabled={isDisabled}

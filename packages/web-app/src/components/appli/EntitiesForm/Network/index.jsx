@@ -26,6 +26,8 @@ export const NetworkForm = ({ networkValues, onCancel }) => {
     control,
     formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
     defaultValues: {
       cave: defaultNetworkValue.current
     }
@@ -64,7 +66,7 @@ export const NetworkForm = ({ networkValues, onCancel }) => {
 
   return (
     <FormContainer>
-      <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+      <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <FormRow>
           <InputText
             formKey="cave.name"
@@ -90,7 +92,8 @@ export const NetworkForm = ({ networkValues, onCancel }) => {
 
         <FormActionRow
           isNew={false}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting || updateCaveMutation.isPending}
+          disabled={isSubmitting || updateCaveMutation.isPending}
           onCancel={onCancel}
         />
       </form>

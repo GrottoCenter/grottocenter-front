@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useWatch, useController } from 'react-hook-form';
+import { useWatch } from 'react-hook-form';
 import {
   Circle,
   MapContainer,
@@ -51,7 +51,12 @@ const MapBind = ({ center, zoom, onMoveEnd }) => {
   const lastValidCenter = useRef({});
   const lastSetViewTs = useRef(0);
   const lastResizeTs = useRef(0);
+  const isUserDragging = useRef(false);
   const map = useMap();
+
+  useMapEvent('dragstart', () => {
+    isUserDragging.current = true;
+  });
 
   useMapEvent('resize', () => {
     lastResizeTs.current = Date.now();
@@ -62,7 +67,11 @@ const MapBind = ({ center, zoom, onMoveEnd }) => {
     // programmatic setView below, and those triggered by a container resize.
     const timeSinceSetViewMs = Date.now() - lastSetViewTs.current;
     const timeSinceResizeMs = Date.now() - lastResizeTs.current;
-    if (timeSinceSetViewMs > 50 && timeSinceResizeMs > RESIZE_GUARD_MS) {
+    if (
+      isUserDragging.current ||
+      (timeSinceSetViewMs > 50 && timeSinceResizeMs > RESIZE_GUARD_MS)
+    ) {
+      isUserDragging.current = false;
       const mapCenter = map.getCenter();
       lastValidCenter.current = { lat: mapCenter.lat, lng: mapCenter.lng };
       onMoveEnd(mapCenter);
@@ -176,6 +185,8 @@ const MapMarkerSelector = ({
   control,
   formLatitudeKey,
   formLongitudeKey,
+  onLatitudeChange: setFormLatitude,
+  onLongitudeChange: setFormLongitude,
   additionalPositions = [],
   additionalMarkersLabel,
   onZoomChange,
@@ -192,13 +203,6 @@ const MapMarkerSelector = ({
 
   const rawLatitude = useWatch({ control, name: formLatitudeKey });
   const rawLongitude = useWatch({ control, name: formLongitudeKey });
-
-  const {
-    field: { onChange: setFormLatitude }
-  } = useController({ control, name: formLatitudeKey });
-  const {
-    field: { onChange: setFormLongitude }
-  } = useController({ control, name: formLongitudeKey });
 
   const validLatitude = boundMinMax(-90, 90, toFloat(rawLatitude));
   const validLongitude = boundMinMax(-180, 180, toFloat(rawLongitude));
@@ -361,6 +365,8 @@ MapMarkerSelector.propTypes = {
   control: PropTypes.shape({}),
   formLatitudeKey: PropTypes.string,
   formLongitudeKey: PropTypes.string,
+  onLatitudeChange: PropTypes.func.isRequired,
+  onLongitudeChange: PropTypes.func.isRequired,
   additionalPositions: PropTypes.arrayOf(PropTypes.shape({})),
   additionalMarkersLabel: PropTypes.string,
   onZoomChange: PropTypes.func,

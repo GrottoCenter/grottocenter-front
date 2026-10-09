@@ -21,10 +21,14 @@ export const makeEntranceData = (data, entityType) => {
     needStayOnTrail: data.entrance.needStayOnTrail,
     hasRules: data.entrance.hasRules,
     isTouristic: data.entrance.isTouristic,
-    altitude: data.entrance.altitude ? Number(data.entrance.altitude) : null,
-    yearDiscovery: data.entrance.yearDiscovery
-      ? Number(data.entrance.yearDiscovery)
-      : null
+    altitude:
+      data.entrance.altitude !== '' && data.entrance.altitude != null
+        ? Number(data.entrance.altitude)
+        : null,
+    yearDiscovery:
+      data.entrance.yearDiscovery !== '' && data.entrance.yearDiscovery != null
+        ? Number(data.entrance.yearDiscovery)
+        : null
   };
 
   // Only administrators edit the sensitivity lock: leave the key out entirely

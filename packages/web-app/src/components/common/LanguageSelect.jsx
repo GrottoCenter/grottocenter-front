@@ -1,5 +1,11 @@
 import PropTypes from 'prop-types';
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import {
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select
+} from '@mui/material';
 import Translate from './Translate';
 import { useLanguages } from '../../hooks';
 
@@ -9,7 +15,10 @@ const LanguageSelect = ({
   label,
   required = false,
   disabled = false,
-  error = false
+  error = false,
+  onBlur,
+  inputRef,
+  helperText
 }) => {
   const { data: languages = [], isSuccess: isLoaded } = useLanguages();
 
@@ -19,6 +28,8 @@ const LanguageSelect = ({
       <Select
         value={isLoaded ? (value ?? '000') : '000'}
         onChange={e => onChange(e.target.value)}
+        onBlur={onBlur}
+        inputRef={inputRef}
         disabled={disabled}>
         <MenuItem value="000" disabled>
           <i>
@@ -33,6 +44,11 @@ const LanguageSelect = ({
           </MenuItem>
         ))}
       </Select>
+      {helperText && (
+        <FormHelperText>
+          <Translate>{helperText}</Translate>
+        </FormHelperText>
+      )}
     </FormControl>
   );
 };
@@ -43,7 +59,10 @@ LanguageSelect.propTypes = {
   label: PropTypes.string,
   required: PropTypes.bool,
   disabled: PropTypes.bool,
-  error: PropTypes.bool
+  error: PropTypes.bool,
+  onBlur: PropTypes.func,
+  inputRef: PropTypes.func,
+  helperText: PropTypes.string
 };
 
 export default LanguageSelect;

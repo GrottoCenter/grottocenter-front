@@ -50,10 +50,31 @@ const CoordinateFormSection = ({
   const { formatMessage } = useIntl();
   const projections = useProjections();
 
-  const { field: latField } = useController({ control, name: formLatitudeKey });
+  const { field: latField } = useController({
+    control,
+    name: formLatitudeKey,
+    rules: {
+      required: required && formatMessage({ id: 'Required' }),
+      validate: value =>
+        value === '' ||
+        value == null ||
+        (Number.isFinite(toFloat(value))
+          ? validateLatitude(toFloat(value), formatMessage)
+          : formatMessage({ id: 'Invalid coordinates' }))
+    }
+  });
   const { field: lngField } = useController({
     control,
-    name: formLongitudeKey
+    name: formLongitudeKey,
+    rules: {
+      required: required && formatMessage({ id: 'Required' }),
+      validate: value =>
+        value === '' ||
+        value == null ||
+        (Number.isFinite(toFloat(value))
+          ? validateLongitude(toFloat(value), formatMessage)
+          : formatMessage({ id: 'Invalid coordinates' }))
+    }
   });
   const watchedLat = useWatch({ control, name: formLatitudeKey });
   const watchedLng = useWatch({ control, name: formLongitudeKey });
@@ -259,6 +280,8 @@ const CoordinateFormSection = ({
         control={control}
         formLatitudeKey={formLatitudeKey}
         formLongitudeKey={formLongitudeKey}
+        onLatitudeChange={latField.onChange}
+        onLongitudeChange={lngField.onChange}
         additionalPositions={additionalPositions}
         additionalMarkersLabel={additionalMarkersLabel}
         onZoomChange={onZoomChange}
@@ -308,10 +331,8 @@ const CoordinateFormSection = ({
             <>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <InputCoordinate
-                  formKey={formLatitudeKey}
+                  field={latField}
                   labelName="Latitude"
-                  control={control}
-                  validatorFn={validateLatitude}
                   isError={!!latitudeError}
                   helperText={latitudeError}
                   isRequired={required}
@@ -319,10 +340,8 @@ const CoordinateFormSection = ({
               </Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <InputCoordinate
-                  formKey={formLongitudeKey}
+                  field={lngField}
                   labelName="Longitude"
-                  control={control}
-                  validatorFn={validateLongitude}
                   isError={!!longitudeError}
                   helperText={longitudeError}
                   isRequired={required}

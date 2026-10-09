@@ -525,6 +525,24 @@ const CaveMap = React.lazy(() => import('./components/CaveMap'));
 
 ### Form Management (React Hook Form)
 
+Entity integer bounds live in `src/utils/numericFieldLimits.js`: altitude
+−9999–9999 m, depth 0–20000 m, development 0–100000000 m, and discovery year
+−9999 through the current year. `NumberField` keeps `type="number"` and mirrors
+these bounds in HTML (`min`, `max`, `step=1`) and RHF validation. Optional empty
+values are accepted; invalid values get localized errors, not character counters
+or near-limit warnings. Cave characteristics use the same bounds in entrance
+and network forms. Disabled shared characteristics do not block unrelated edits.
+This validation does not change the API's existing handling of empty cave
+characteristics.
+
+Entrance and network forms use RHF `mode: 'onTouched'`: errors appear on blur
+and update while correcting the field. Their submit button remains enabled
+until submission (or while offline); `handleSubmit` validates all editable
+fields and focuses the first invalid field without sending a mutation.
+The forms use `noValidate` to avoid competing browser validation messages.
+Numeric fields display only RHF errors. Auxiliary map and network-selection
+components must not register a second controller for a validated field.
+
 **Rule — RHF vs Redux:**
 
 | Concern                                  | Tool                                               |
