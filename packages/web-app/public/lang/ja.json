@@ -896,8 +896,6 @@
   "Discover the numbers about this massif and its caves.": "このマッシーフとその洞窟に関する統計を見る。",
   "Discover the numbers about this region and its caves.": "この地域とその洞窟に関する統計を見る。",
   "Display format": "表示形式",
-  "Distance must be an integer (in m)": "距離は整数でなければなりません（m単位）",
-  "Distance must be superior or equal to 0": "距離は0以上でなければなりません",
   "diveable_caves": "潜水可能洞窟",
   "Diving cave": "ダイビングケーブ",
   "Djibouti": "ジブチ",

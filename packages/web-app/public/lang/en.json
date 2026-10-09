@@ -896,8 +896,6 @@
   "Discover the numbers about this massif and its caves.": "Discover the numbers about this massif and its caves.",
   "Discover the numbers about this region and its caves.": "Discover the numbers about this region and its caves.",
   "Display format": "Display format",
-  "Distance must be an integer (in m)": "Distance must be an integer (in m)",
-  "Distance must be superior or equal to 0": "Distance must be superior or equal to 0",
   "diveable_caves": "{count, plural, one {cave is diveable} other {caves are diveable}}",
   "Diving cave": "Diving cave",
   "Djibouti": "Djibouti",

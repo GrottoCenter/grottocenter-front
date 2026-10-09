@@ -896,8 +896,6 @@
   "Discover the numbers about this massif and its caves.": "Découvrez les chiffres clés concernant ce massif et ses cavités.",
   "Discover the numbers about this region and its caves.": "Découvrez les chiffres clés concernant cette région et ses cavités.",
   "Display format": "Format d'affichage",
-  "Distance must be an integer (in m)": "La distance doit être un entier (en m)",
-  "Distance must be superior or equal to 0": "La distance doit être supérieure ou égale à 0",
   "diveable_caves": "{count, plural, one {cavité permet de faire de la plongée} other {cavités permettent de faire de la plongée}}",
   "Diving cave": "Plongée possible",
   "Djibouti": "Djibouti",
