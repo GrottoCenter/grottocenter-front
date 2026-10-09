@@ -1,3 +1,4 @@
+import { DELETED_ENTITY_REDIRECT_KINDS } from '@/utils/deletedEntityRedirect';
 import { useDocument } from './queries/useDocument';
 import { useEntrance } from './queries/useEntrance';
 import { useCave } from './queries/useCave';
@@ -6,24 +7,36 @@ import { useOrganization } from './queries/useOrganization';
 
 export const useDeletedEntityRedirectTarget = (entityKind, redirectId) => {
   const document = useDocument(
-    entityKind === 'Document' ? redirectId : undefined
+    entityKind === DELETED_ENTITY_REDIRECT_KINDS.DOCUMENT
+      ? redirectId
+      : undefined
   );
   const entrance = useEntrance(
-    entityKind === 'Entrance' ? redirectId : undefined
+    entityKind === DELETED_ENTITY_REDIRECT_KINDS.ENTRANCE
+      ? redirectId
+      : undefined
   );
-  const cave = useCave(entityKind === 'Network' ? redirectId : undefined);
-  const massif = useMassif(entityKind === 'Massif' ? redirectId : undefined);
+  const cave = useCave(
+    entityKind === DELETED_ENTITY_REDIRECT_KINDS.NETWORK
+      ? redirectId
+      : undefined
+  );
+  const massif = useMassif(
+    entityKind === DELETED_ENTITY_REDIRECT_KINDS.MASSIF ? redirectId : undefined
+  );
   const organization = useOrganization(
-    entityKind === 'Organization' ? redirectId : undefined
+    entityKind === DELETED_ENTITY_REDIRECT_KINDS.ORGANIZATION
+      ? redirectId
+      : undefined
   );
 
   return (
     {
-      Document: document,
-      Entrance: entrance,
-      Network: cave,
-      Massif: massif,
-      Organization: organization
+      [DELETED_ENTITY_REDIRECT_KINDS.DOCUMENT]: document,
+      [DELETED_ENTITY_REDIRECT_KINDS.ENTRANCE]: entrance,
+      [DELETED_ENTITY_REDIRECT_KINDS.NETWORK]: cave,
+      [DELETED_ENTITY_REDIRECT_KINDS.MASSIF]: massif,
+      [DELETED_ENTITY_REDIRECT_KINDS.ORGANIZATION]: organization
     }[entityKind] ?? null
   );
 };

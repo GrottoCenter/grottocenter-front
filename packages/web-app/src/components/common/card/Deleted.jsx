@@ -18,7 +18,10 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForeverRounded';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { getDeletedEntityRedirectUrl } from '@/utils/deletedEntityRedirect';
+import {
+  DELETED_ENTITY_REDIRECT_KINDS,
+  getDeletedEntityRedirectUrl
+} from '@/utils/deletedEntityRedirect';
 import { useDeletedEntityRedirectTarget } from '@/hooks/useDeletedEntityRedirectTarget';
 
 import StandardDialog from '../StandardDialog';
@@ -111,6 +114,7 @@ const RedirectTargetLoader = ({
         ? nomelizeSearchEntity({
             ...target,
             _type: entityType.searchType,
+            nbEntrances: target.nbEntrances ?? target.entrances?.length,
             type: target.type?.name ?? target.type
           })
         : null
@@ -278,13 +282,9 @@ const DeleteConfirmationDialogContent = ({
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [hasEditedSelection, setHasEditedSelection] = useState(false);
   const [redirectStatus, setRedirectStatus] = useState('unresolved');
-  const supportsPrefill = [
-    'Document',
-    'Entrance',
-    'Network',
-    'Massif',
-    'Organization'
-  ].includes(entityType.str);
+  const supportsPrefill = Object.values(DELETED_ENTITY_REDIRECT_KINDS).includes(
+    entityType.str
+  );
   const shouldPrefill =
     isOpen &&
     isPermanent &&
@@ -294,6 +294,8 @@ const DeleteConfirmationDialogContent = ({
   const isResolvingRedirect =
     shouldPrefill && !hasEditedSelection && redirectStatus === 'unresolved';
   const hasRedirectError = redirectStatus === 'error';
+  const isRedirectInterrupted = redirectStatus === 'abandoned';
+  const needsRedirectDecision = hasRedirectError || isRedirectInterrupted;
 
   const debouncedInput = useDebounce(inputValue);
   const {
@@ -303,7 +305,7 @@ const DeleteConfirmationDialogContent = ({
   } = useQuickSearch({
     query: debouncedInput,
     entities: canSelectRedirect ? [entityType.searchType] : [],
-    enabled: canSelectRedirect,
+    enabled: canSelectRedirect && isOpen,
     // Preserve the legacy `debouncedInput.length > 2` threshold — the hook
     // defaults to AUTOCOMPLETE_MIN_CHARACTERS (2), which would fire one
     // character earlier than the pre-migration behavior of this dialog.
@@ -420,7 +422,7 @@ const DeleteConfirmationDialogContent = ({
               startIcon={isPermanent ? <DeleteForeverIcon /> : <DeleteIcon />}
               disabled={
                 isResolvingRedirect ||
-                hasRedirectError ||
+                needsRedirectDecision ||
                 (isSearchMandatory && !selectedEntity)
               }
               onClick={() => {
@@ -492,11 +494,13 @@ const DeleteConfirmationDialogContent = ({
                 }}
               />
             )}
-            {hasRedirectError && (
+            {needsRedirectDecision && (
               <Stack spacing={1}>
                 <FormHelperText error role="alert">
                   {formatMessage({
-                    id: 'delete-confirmation-redirect-unavailable'
+                    id: isRedirectInterrupted
+                      ? 'delete-confirmation-redirect-interrupted'
+                      : 'delete-confirmation-redirect-unavailable'
                   })}
                 </FormHelperText>
                 {!isSearchMandatory && (
@@ -522,7 +526,7 @@ const DeleteConfirmationDialogContent = ({
                     if (value) {
                       // Abandoning hydration must not silently authorize
                       // deletion without the existing merge destination.
-                      if (isResolvingRedirect) setRedirectStatus('error');
+                      if (isResolvingRedirect) setRedirectStatus('abandoned');
                       setHasEditedSelection(true);
                     }
                     setInputValue(value);
@@ -632,12 +636,17 @@ Deleted.propTypes = {
 
 export const DeleteConfirmationDialog = props => {
   const { isOpen, entityType, entityId, isPermanent } = props;
-  if (!isOpen) return null;
+  const [session, setSession] = useState({ isOpen, opening: 0 });
+  // Track reopening before rendering children so a previous selection is never
+  // actionable in the new session. Keep the dialog mounted during its exit.
+  if (session.isOpen !== isOpen) {
+    setSession({ isOpen, opening: session.opening + (isOpen ? 1 : 0) });
+  }
   // A new opening/source/mode starts a new selection session. Late query
   // responses from a previous session cannot restore a discarded selection.
   return (
     <DeleteConfirmationDialogContent
-      key={`${entityType.str}:${entityId}:${isPermanent}`}
+      key={`${entityType.str}:${entityId}:${isPermanent}:${session.opening}`}
       {...props}
     />
   );
