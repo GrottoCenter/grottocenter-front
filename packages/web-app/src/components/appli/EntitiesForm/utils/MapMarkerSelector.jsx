@@ -235,7 +235,7 @@ const MapMarkerSelector = ({
   onZoomChange,
   onLocationAccuracyChange,
   markerIcon,
-  mapHeight = '40svh'
+  mapHeight
 }) => {
   const { formatMessage } = useIntl();
   const hasGeolocation =
@@ -438,7 +438,10 @@ const MapMarkerSelector = ({
   return (
     <Box sx={{ position: 'relative' }}>
       <StyledMapContainer
-        style={{ height: mapHeight, width: '100%' }}
+        sx={{
+          height: mapHeight ?? { xs: '50svh', sm: '40svh' },
+          width: '100%'
+        }}
         center={currentPosition}
         zoom={zoomLevel}
         dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
