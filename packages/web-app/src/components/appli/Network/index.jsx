@@ -262,6 +262,7 @@ export const Network = ({
                   entityType={DELETED_ENTITIES.network}
                   entityId={cave.id}
                   entityName={cave.name}
+                  existingRedirectId={cave.isDeleted ? cave.redirectTo : null}
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
                   isPermanent={isDeleteConfirmationPermanent}

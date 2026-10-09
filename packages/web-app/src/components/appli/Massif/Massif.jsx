@@ -242,6 +242,9 @@ const Massif = ({
                   entityType={DELETED_ENTITIES.massif}
                   entityId={massif.id}
                   entityName={massif.name}
+                  existingRedirectId={
+                    massif.isDeleted ? massif.redirectTo : null
+                  }
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
                   isPermanent={isDeleteConfirmationPermanent}
