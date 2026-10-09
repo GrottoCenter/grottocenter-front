@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const TARGET_ACCURACY_METERS = 10;
+const TARGET_ACCURACY_METERS = 3;
 const ACQUISITION_TIMEOUT_MS = 60000;
 
 // Placement needs a bounded acquisition that keeps the best fix, unlike

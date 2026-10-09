@@ -304,6 +304,16 @@ describe('MapMarkerSelector entrance accuracy', () => {
       'data-radius',
       '7'
     );
+    expect(button).toHaveAccessibleName('Stop searching');
+    expect(geolocation.clearWatch).not.toHaveBeenCalled();
+    act(() =>
+      onFix({ coords: { latitude: 45.2, longitude: 5.2, accuracy: 3 } })
+    );
+    expect(screen.getByRole('textbox', { name: 'Accuracy' })).toHaveValue('3');
+    expect(screen.getByTestId('accuracy-circle')).toHaveAttribute(
+      'data-radius',
+      '3'
+    );
     expect(geolocation.clearWatch).toHaveBeenCalledWith(42);
   });
 
@@ -413,7 +423,7 @@ describe('MapMarkerSelector entrance accuracy', () => {
       fireEvent.click(screen.getByTestId('locate-me'));
       const [onFix] = geolocation.watchPosition.mock.calls[0];
       act(() =>
-        onFix({ coords: { latitude: 45.1, longitude: 5.1, accuracy: 5 } })
+        onFix({ coords: { latitude: 45.1, longitude: 5.1, accuracy: 3 } })
       );
       if (action === 'Latitude') {
         fireEvent.change(screen.getByRole('textbox', { name: action }), {

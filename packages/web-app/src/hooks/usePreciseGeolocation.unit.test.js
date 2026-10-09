@@ -43,10 +43,15 @@ describe('usePreciseGeolocation', () => {
     expect(geolocation.clearWatch).not.toHaveBeenCalled();
 
     act(() => onFix(makePosition(6.4, 45.3)));
+    expect(result.current.isLocating).toBe(true);
+    expect(geolocation.clearWatch).not.toHaveBeenCalled();
+    act(() => onFix(makePosition(3.01, 45.4)));
+    expect(result.current.isLocating).toBe(true);
+    act(() => onFix(makePosition(3, 45.5)));
     expect(result.current.isLocating).toBe(false);
     expect(geolocation.clearWatch).toHaveBeenCalledWith(42);
-    act(() => onFix(makePosition(4, 45.4)));
-    expect(onPosition).toHaveBeenCalledTimes(3);
+    act(() => onFix(makePosition(2, 45.6)));
+    expect(onPosition).toHaveBeenCalledTimes(5);
     expect(vi.getTimerCount()).toBe(0);
   });
 
@@ -56,12 +61,13 @@ describe('usePreciseGeolocation', () => {
     act(() => result.current.locate(onPosition));
     const [onFix] = geolocation.watchPosition.mock.calls[0];
     act(() => onFix(makePosition(100)));
-    act(() => onFix(makePosition(20, 45.1)));
+    act(() => onFix(makePosition(6.4, 45.1)));
+    expect(result.current.isLocating).toBe(true);
     act(() => vi.advanceTimersByTime(60000));
     expect(result.current.isLocating).toBe(false);
     expect(result.current.error).toBeNull();
     expect(result.current.hasTimedOut).toBe(true);
-    expect(onPosition).toHaveBeenLastCalledWith(makePosition(20, 45.1));
+    expect(onPosition).toHaveBeenLastCalledWith(makePosition(6.4, 45.1));
     expect(geolocation.clearWatch).toHaveBeenCalledWith(42);
   });
 
@@ -133,7 +139,7 @@ describe('usePreciseGeolocation', () => {
 
   it('clears the watch even when the provider calls back synchronously', () => {
     geolocation.watchPosition.mockImplementation(onFix => {
-      onFix(makePosition(5));
+      onFix(makePosition(3));
       return 7;
     });
     const { result } = renderHook(() => usePreciseGeolocation());

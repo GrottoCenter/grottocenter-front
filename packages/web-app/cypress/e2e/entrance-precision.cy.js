@@ -142,7 +142,11 @@ describe('Entrance accuracy', () => {
       accuracy: 8.2
     };
     visitForm('/entrances/1/edit', {
-      positions: [POSITION, movedPosition, { ...movedPosition, accuracy: 4.1 }]
+      positions: [
+        [POSITION, { ...POSITION, accuracy: 3 }],
+        [movedPosition, { ...movedPosition, accuracy: 3 }],
+        { ...movedPosition, accuracy: 2.1 }
+      ]
     });
     cy.get('@watchPosition').should('not.have.been.called');
     cy.get('[data-testid="locate-me"]').click();
@@ -151,16 +155,20 @@ describe('Entrance accuracy', () => {
     accuracyLegend().should('have.text', 'Accuracy');
     inputByLabel('Latitude').should('have.value', '45.125000');
     inputByLabel('Longitude').should('have.value', '5.250000');
+    emitLocation();
+    accuracyInput().should('have.value', '3');
     cy.get('[data-testid="locate-me"]').click();
     emitLocation();
     accuracyInput().should('have.value', '9');
     accuracyLegend().should('have.text', 'Accuracy');
     inputByLabel('Latitude').should('have.value', '45.130000');
     inputByLabel('Longitude').should('have.value', '5.260000');
+    emitLocation();
+    accuracyInput().should('have.value', '3');
     accuracyInput().clear().type('250');
     cy.get('[data-testid="locate-me"]').click();
     emitLocation();
-    accuracyInput().should('have.value', '5');
+    accuracyInput().should('have.value', '3');
     accuracyLegend().should('have.text', 'Accuracy');
     inputByLabel('Latitude').should('have.value', '45.130000');
     inputByLabel('Longitude').should('have.value', '5.260000');
@@ -183,7 +191,7 @@ describe('Entrance accuracy', () => {
           { latitude: 45.1, longitude: 5.1, accuracy: 100 },
           { latitude: 45.2, longitude: 5.2, accuracy: 25 },
           { latitude: 45.3, longitude: 5.3, accuracy: 80 },
-          POSITION
+          { ...POSITION, accuracy: 3 }
         ]
       ]
     });
@@ -206,7 +214,7 @@ describe('Entrance accuracy', () => {
     accuracyInput().should('have.value', '25');
     cy.tick(500);
     emitLocation();
-    accuracyInput().should('have.value', '7');
+    accuracyInput().should('have.value', '3');
     inputByLabel('Latitude').should('have.value', '45.125000');
     inputByLabel('Longitude').should('have.value', '5.250000');
     cy.get('[data-testid="locate-me"]').should('not.be.disabled');
@@ -437,20 +445,22 @@ describe('Entrance accuracy', () => {
     cy.get('@clearWatch').should('not.have.been.called');
     cy.get('@watchPosition').then(watchPosition => {
       watchPosition.firstCall.args[0]({
-        coords: POSITION,
+        coords: { ...POSITION, accuracy: 3 },
         timestamp: Date.now()
       });
     });
-    accuracyInput().should('have.value', '7');
+    accuracyInput().should('have.value', '3');
     inputByLabel('Latitude').should('have.value', '45.125000');
     cy.get('@clearWatch').should('have.been.calledOnce');
   });
 
   it('invalidates a device estimate when coordinates are edited after acquisition', () => {
-    visitForm('/entrances/1/edit');
+    visitForm('/entrances/1/edit', {
+      positions: [{ ...POSITION, accuracy: 3 }]
+    });
     cy.get('[data-testid="locate-me"]').click();
     emitLocation();
-    accuracyInput().should('have.value', '7');
+    accuracyInput().should('have.value', '3');
     inputByLabel('Latitude').clear().type('45.9');
     accuracyInput().should('have.value', '');
     accuracyLegend().should('not.exist');
