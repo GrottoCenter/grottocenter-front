@@ -101,7 +101,6 @@ const messages = {
   'delete-confirmation-dialog': 'Delete this {entityFmt}?',
   'delete-permanent-confirmation-dialog':
     'Permanently delete this {entityFmt}?',
-  'Deletion confirmation': 'Deletion confirmation',
   'delete-confirmation-soft-effect':
     'This item will be marked as deleted. It can be restored.',
   'delete-confirmation-permanent-effect': 'This action is irreversible.',

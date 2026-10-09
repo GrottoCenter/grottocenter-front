@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import frenchMessages from '@/../public/lang/fr.json';
+import { entranceIcon, networkIcon } from '@/assets/icons';
 
 import { DeleteConfirmationDialog, DELETED_ENTITIES } from './Deleted';
 
@@ -47,7 +48,6 @@ vi.mock('../StandardDialog', () => ({
 
 const messages = {
   Massif: 'Massif',
-  'Deletion confirmation': 'Deletion confirmation',
   'Merge and permanently delete': 'Merge and permanently delete',
   Cancel: 'Cancel',
   Delete: 'Delete',
@@ -335,6 +335,12 @@ describe('DeleteConfirmationDialog replacement selection', () => {
     fireEvent.change(screen.getByRole('combobox'), {
       target: { value: 'massif' }
     });
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Le chargement de la destination existante a été interrompu.'
+    );
+    expect(screen.getByRole('alert')).not.toHaveTextContent(
+      frenchMessages['delete-confirmation-redirect-unavailable']
+    );
     expect(
       screen.getByRole('button', {
         name: 'Supprimer définitivement'
@@ -379,6 +385,27 @@ describe('DeleteConfirmationDialog replacement selection', () => {
       })
     );
     expect(onConfirmation).toHaveBeenCalledWith(null);
+  });
+
+  it('does not allow bypassing a mandatory merge after interrupted loading', () => {
+    redirectState.isPending = true;
+    render(prefilledDialog({ isSearchMandatory: true }));
+    fireEvent.change(screen.getByRole('combobox'), {
+      target: { value: 'massif' }
+    });
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Le chargement de la destination existante a été interrompu.'
+    );
+    expect(
+      screen.queryByRole('button', {
+        name: 'Changer de destination ou continuer sans fusion'
+      })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: 'Fusionner et supprimer définitivement'
+      })
+    ).toBeDisabled();
   });
 
   it('keeps mandatory merging disabled after clearing the prefilled target', () => {
@@ -439,6 +466,18 @@ describe('DeleteConfirmationDialog replacement selection', () => {
     redirectState.data = { id: 43, title: 'Bibliographie', type: 'Book' };
     render(prefilledDialog({ entityType: DELETED_ENTITIES.document }));
     expect(screen.getByText('[Book] Bibliographie')).toBeVisible();
+  });
+
+  it.each([
+    { entrances: [{ id: 1 }], icon: entranceIcon },
+    { entrances: [{ id: 1 }, { id: 2 }], icon: networkIcon },
+    { entrances: [{ id: 1 }], nbEntrances: 2, icon: networkIcon }
+  ])('uses the entrance count for the prefilled cave icon: %j', target => {
+    redirectState.data = { id: 43, name: 'Destination', ...target };
+    render(prefilledDialog({ entityType: DELETED_ENTITIES.network }));
+    expect(
+      screen.getByText('Destination').parentElement.querySelector('img')
+    ).toHaveAttribute('src', target.icon);
   });
 
   it('surfaces an offline target resolution instead of allowing deletion', () => {
