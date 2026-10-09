@@ -34,6 +34,7 @@ const NorthResetControl = ({ bearing, onClick }) => {
         <IconButton
           onClick={onClick}
           aria-label={label}
+          data-testid="map-north-reset"
           sx={{
             bgcolor: 'background.paper',
             borderRadius: '50%',
