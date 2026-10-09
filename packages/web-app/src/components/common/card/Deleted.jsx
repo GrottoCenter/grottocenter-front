@@ -277,8 +277,7 @@ const DeleteConfirmationDialogContent = ({
   const [inputValue, setInputValue] = useState('');
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [hasEditedSelection, setHasEditedSelection] = useState(false);
-  const [hasResolvedRedirect, setHasResolvedRedirect] = useState(false);
-  const [hasRedirectError, setHasRedirectError] = useState(false);
+  const [redirectStatus, setRedirectStatus] = useState('unresolved');
   const supportsPrefill = [
     'Document',
     'Entrance',
@@ -293,7 +292,8 @@ const DeleteConfirmationDialogContent = ({
     existingRedirectId != null &&
     existingRedirectId !== '';
   const isResolvingRedirect =
-    shouldPrefill && !hasEditedSelection && !hasResolvedRedirect;
+    shouldPrefill && !hasEditedSelection && redirectStatus === 'unresolved';
+  const hasRedirectError = redirectStatus === 'error';
 
   const debouncedInput = useDebounce(inputValue);
   const {
@@ -317,7 +317,7 @@ const DeleteConfirmationDialogContent = ({
     if (isCurrentEntity(selection, entityId)) return;
     if (selection) {
       setHasEditedSelection(true);
-      setHasRedirectError(false);
+      setRedirectStatus('resolved');
       setSelectedEntity(nomelizeSearchEntity(selection));
     }
     setInputValue('');
@@ -488,8 +488,7 @@ const DeleteConfirmationDialogContent = ({
                 redirectId={existingRedirectId}
                 onResolved={target => {
                   setSelectedEntity(target);
-                  setHasRedirectError(!target);
-                  setHasResolvedRedirect(true);
+                  setRedirectStatus(target ? 'resolved' : 'error');
                 }}
               />
             )}
@@ -504,7 +503,7 @@ const DeleteConfirmationDialogContent = ({
                   <Button
                     onClick={() => {
                       setHasEditedSelection(true);
-                      setHasRedirectError(false);
+                      setRedirectStatus('resolved');
                     }}>
                     {formatMessage({ id: 'delete-confirmation-change-target' })}
                   </Button>
@@ -521,6 +520,9 @@ const DeleteConfirmationDialogContent = ({
                 <AutoCompleteSearch
                   onInputChange={value => {
                     if (value) {
+                      // Abandoning hydration must not silently authorize
+                      // deletion without the existing merge destination.
+                      if (isResolvingRedirect) setRedirectStatus('error');
                       setHasEditedSelection(true);
                     }
                     setInputValue(value);
