@@ -29,6 +29,10 @@ const inputByLabel = label =>
     .then(id => cy.get('input').filter((_index, input) => input.id === id));
 const submitForm = () =>
   accuracyInput().closest('form').find('button[type="submit"]').click();
+const emitLocation = () =>
+  cy.get('@emitLocation').then(emit => {
+    emit();
+  });
 
 const visitForm = (
   path,
@@ -77,6 +81,19 @@ const visitForm = (
       }
       let requestCount = 0;
       const watches = new Map();
+      // Drive fixes from Cypress commands so restoring a fake clock or a
+      // delayed browser timer cannot change which measurement a test receives.
+      cy.stub()
+        .callsFake(() => {
+          const watch = Array.from(watches.values()).at(-1);
+          expect(watch, 'active GPS watch').to.be.an('object');
+          const coords = watch.fixes[watch.nextFix];
+          expect(coords, 'queued GPS fix').to.be.an('object');
+          watch.nextFix += 1;
+          if (isLocationDenied) watch.error({ code: 1 });
+          else watch.success({ coords, timestamp: win.Date.now() });
+        })
+        .as('emitLocation');
       Object.defineProperty(win.navigator, 'geolocation', {
         configurable: true,
         value: {
@@ -86,20 +103,10 @@ const visitForm = (
               positions[Math.min(requestCount, positions.length - 1)];
             requestCount += 1;
             const fixes = Array.isArray(position) ? position : [position];
-            const timers = fixes.map((coords, index) =>
-              win.setTimeout(
-                () => {
-                  if (isLocationDenied) error({ code: 1 });
-                  else success({ coords, timestamp: Date.now() });
-                },
-                100 + index * 500
-              )
-            );
-            watches.set(watchId, timers);
+            watches.set(watchId, { success, error, fixes, nextFix: 0 });
             return watchId;
           },
           clearWatch: watchId => {
-            watches.get(watchId)?.forEach(timer => win.clearTimeout(timer));
             watches.delete(watchId);
           }
         }
@@ -138,17 +145,20 @@ describe('Entrance accuracy', () => {
     });
     cy.get('@watchPosition').should('not.have.been.called');
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
     accuracyInput().should('have.value', '7');
     accuracyLegend().should('have.text', 'Accuracy');
     inputByLabel('Latitude').should('have.value', '45.125000');
     inputByLabel('Longitude').should('have.value', '5.250000');
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
     accuracyInput().should('have.value', '9');
     accuracyLegend().should('have.text', 'Accuracy');
     inputByLabel('Latitude').should('have.value', '45.130000');
     inputByLabel('Longitude').should('have.value', '5.260000');
     accuracyInput().clear().type('250');
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
     accuracyInput().should('have.value', '5');
     accuracyLegend().should('have.text', 'Accuracy');
     inputByLabel('Latitude').should('have.value', '45.130000');
@@ -178,6 +188,7 @@ describe('Entrance accuracy', () => {
     });
     cy.clock();
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
     cy.tick(100);
     accuracyInput().should('have.value', '100');
     cy.get('[data-testid="locate-me"]').should(
@@ -187,10 +198,13 @@ describe('Entrance accuracy', () => {
     );
     cy.get('[data-testid="location-status"]').should('contain.text', '±100 m');
     cy.tick(500);
+    emitLocation();
     accuracyInput().should('have.value', '25');
     cy.tick(500);
+    emitLocation();
     accuracyInput().should('have.value', '25');
     cy.tick(500);
+    emitLocation();
     accuracyInput().should('have.value', '7');
     inputByLabel('Latitude').should('have.value', '45.125000');
     inputByLabel('Longitude').should('have.value', '5.250000');
@@ -204,6 +218,7 @@ describe('Entrance accuracy', () => {
     });
     cy.clock();
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
     cy.tick(100);
     accuracyInput().should('have.value', '100');
     inputByLabel('Latitude').clear().type('45.9');
@@ -225,6 +240,7 @@ describe('Entrance accuracy', () => {
     accuracyInput().should('have.value', '');
     inputByLabel('Entrance name').type('Test entrance');
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
     accuracyInput().should('have.value', '7').clear().type('250');
     inputByLabel('Latitude').clear().type('45.2');
     accuracyInput().should('have.value', '250');
@@ -257,6 +273,7 @@ describe('Entrance accuracy', () => {
   it('preserves existing values when location access is denied', () => {
     visitForm('/entrances/1/edit', { isLocationDenied: true });
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
     accuracyInput().should('have.value', '12');
     inputByLabel('Latitude').should('have.value', '45');
     inputByLabel('Longitude').should('have.value', '5');
@@ -307,6 +324,7 @@ describe('Entrance accuracy', () => {
     });
     cy.clock();
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
     cy.tick(100);
     accuracyInput().should('have.value', '100');
     cy.get('button[aria-label="Stop searching"]').should('have.length', 1);
@@ -321,6 +339,13 @@ describe('Entrance accuracy', () => {
     });
     cy.get('[data-testid="locate-me"]').click();
     cy.tick(500);
+    cy.get('@watchPosition').then(watchPosition => {
+      // Even a callback already queued by the browser must be ignored.
+      watchPosition.firstCall.args[0]({
+        coords: POSITION,
+        timestamp: Date.now()
+      });
+    });
     accuracyInput().should('have.value', '100');
     cy.get('[data-testid="location-status"]').should(
       'contain.text',
@@ -335,6 +360,8 @@ describe('Entrance accuracy', () => {
     });
     cy.clock();
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
+    accuracyInput().should('have.value', '100');
     cy.tick(60000);
     accuracyInput().should('have.value', '100');
     cy.get('[data-testid="location-status"]').should(
@@ -355,6 +382,7 @@ describe('Entrance accuracy', () => {
     });
     cy.clock();
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
     cy.tick(100);
     accuracyInput().should('have.value', '100');
     cy.get('[data-testid="location-status"]')
@@ -420,6 +448,7 @@ describe('Entrance accuracy', () => {
   it('invalidates a device estimate when coordinates are edited after acquisition', () => {
     visitForm('/entrances/1/edit');
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
     accuracyInput().should('have.value', '7');
     inputByLabel('Latitude').clear().type('45.9');
     accuracyInput().should('have.value', '');
@@ -449,6 +478,7 @@ describe('Entrance accuracy', () => {
       delete validity.badInput;
     });
     cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
     accuracyInput()
       .should('have.value', '7')
       .and('have.attr', 'aria-invalid', 'false');
