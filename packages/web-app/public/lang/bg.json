@@ -1726,6 +1726,7 @@
   "Management tools": "Инструменти за управление",
   "Management tools access restricted": "Достъпът е запазен за администратори, модератори и отговорници.",
   "Map": "Карта",
+  "mapFiltersRequireUpdatedCoordinates": "Свържете се с интернет, за да обновите данните за входовете и да активирате филтрите при това увеличение.",
   "Mark all as read": "Маркиране на всички като прочетени",
   "Mark as explored": "Маркирай като изследвана",
   "Mark this polygon as a hole (inner ring) within another polygon": "Маркирайте този полигон като дупка (вътрешен пръстен) в друг полигон",

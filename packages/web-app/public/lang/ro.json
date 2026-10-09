@@ -1726,6 +1726,7 @@
   "Management tools": "Instrumente de gestionare",
   "Management tools access restricted": "Acces rezervat administratorilor, moderatorilor și responsabililor.",
   "Map": "Hartă",
+  "mapFiltersRequireUpdatedCoordinates": "Conectați-vă la internet pentru a actualiza datele intrărilor și a activa filtrele la acest nivel de zoom.",
   "Mark all as read": "Marcați tot ca citit",
   "Mark as explored": "Marchează ca explorată",
   "Mark this polygon as a hole (inner ring) within another polygon": "Marcați acest poligon ca un decupaj (inel interior) în interiorul altui poligon",

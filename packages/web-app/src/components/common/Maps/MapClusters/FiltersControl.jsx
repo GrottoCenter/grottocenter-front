@@ -139,7 +139,7 @@ const FiltersControl = ({
   setActiveQualityFilters,
   minInterest,
   setMinInterest,
-  isMarkersMode,
+  hasFilterData,
   isEntrancesLayerOn,
   hasActiveFilters,
   resetAllFilters,
@@ -155,11 +155,11 @@ const FiltersControl = ({
   // anchor element goes away and MUI would otherwise reopen the popover with a
   // stale reference on next mount.
   useEffect(() => {
-    if (!isMarkersMode || !isEntrancesLayerOn) {
+    if (!hasFilterData || !isEntrancesLayerOn) {
       setSizeInfoAnchor(null);
       setInterestInfoAnchor(null);
     }
-  }, [isMarkersMode, isEntrancesLayerOn]);
+  }, [hasFilterData, isEntrancesLayerOn]);
 
   const toggleExpanded = useCallback(expanded => {
     const container = wrapperRef.current?.closest('.leaflet-control-layers');
@@ -181,12 +181,10 @@ const FiltersControl = ({
       document.removeEventListener('pointerdown', handleClickOutside);
   }, [toggleExpanded]);
 
-  const filtersDisabled = !isMarkersMode || !isEntrancesLayerOn;
+  const filtersDisabled = !hasFilterData || !isEntrancesLayerOn;
   let disabledReasonKey;
-  if (!isMarkersMode) {
-    disabledReasonKey = hasActiveFilters
-      ? 'Zoom in to apply saved filters'
-      : 'Zoom in to enable filters';
+  if (!hasFilterData) {
+    disabledReasonKey = 'mapFiltersRequireUpdatedCoordinates';
   } else {
     disabledReasonKey = hasActiveFilters
       ? 'Turn on entrances to apply saved filters'
@@ -218,7 +216,7 @@ const FiltersControl = ({
         <section className="leaflet-control-layers-list">
           <div className="leaflet-control-layers-overlays">
             {filtersDisabled && (
-              <DisabledOverlayHint>
+              <DisabledOverlayHint data-testid="entrance-filters-unavailable">
                 {formatMessage({ id: disabledReasonKey })}
               </DisabledOverlayHint>
             )}
@@ -258,6 +256,8 @@ const FiltersControl = ({
                 <ControlOptionLabel key={filter.id}>
                   <input
                     type="checkbox"
+                    disabled={filtersDisabled}
+                    data-testid={`entrance-size-${filter.id}`}
                     name={filter.id}
                     checked={activeEntranceFilters[filter.id] ?? false}
                     onChange={() =>
@@ -280,6 +280,8 @@ const FiltersControl = ({
                 <ControlOptionLabel key={filter.id}>
                   <input
                     type="checkbox"
+                    disabled={filtersDisabled}
+                    data-testid={`entrance-quality-${filter.id}`}
                     name={filter.id}
                     checked={activeQualityFilters[filter.id] ?? false}
                     onChange={() =>
@@ -317,6 +319,8 @@ const FiltersControl = ({
               </Popover>
               <InterestRow>
                 <Rating
+                  disabled={filtersDisabled}
+                  data-testid="entrance-interest-filter"
                   max={MAX_STARS}
                   precision={0.5}
                   value={interestToStars(minInterest)}
@@ -353,6 +357,7 @@ const FiltersControl = ({
             {hasActiveFilters && (
               <ResetAllRow>
                 <Button
+                  data-testid="reset-entrance-filters"
                   size="small"
                   variant="text"
                   startIcon={<RestartAltIcon />}
@@ -390,7 +395,7 @@ FiltersControl.propTypes = {
   setActiveQualityFilters: PropTypes.func.isRequired,
   minInterest: PropTypes.number.isRequired,
   setMinInterest: PropTypes.func.isRequired,
-  isMarkersMode: PropTypes.bool.isRequired,
+  hasFilterData: PropTypes.bool.isRequired,
   isEntrancesLayerOn: PropTypes.bool.isRequired,
   hasActiveFilters: PropTypes.bool.isRequired,
   resetAllFilters: PropTypes.func.isRequired,

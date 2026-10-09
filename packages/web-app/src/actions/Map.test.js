@@ -1,5 +1,7 @@
 import {
   fetchAllNetworksCoordinates,
+  fetchAllEntrancesCoordinates,
+  FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
   FETCH_MAP_START_LOADING,
   FETCH_MAP_END_LOADING,
   FETCH_MAP_NETWORKS_COORDINATES_SUCCESS,
@@ -133,5 +135,49 @@ describe('fetchAllNetworksCoordinates retry policy', () => {
     expect(dispatch.mock.calls.map(([action]) => action.type)).not.toContain(
       FETCH_MAP_NETWORKS_COORDINATES_FAILURE
     );
+  });
+});
+
+describe('entrance coordinate cache migration', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('versions the worldwide URL and preserves the enriched payload', async () => {
+    const data = [[5.5, 45.5, 3, 70, null]];
+    const fetch = vi.fn().mockResolvedValue({
+      status: 200,
+      text: async () => JSON.stringify(data)
+    });
+    vi.stubGlobal('fetch', fetch);
+    const dispatch = vi.fn();
+    await fetchAllEntrancesCoordinates()(dispatch);
+    expect(fetch.mock.calls[0][0]).toContain('criteriaVersion=1');
+    expect(dispatch).toHaveBeenCalledWith({
+      type: FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
+      data
+    });
+  });
+
+  it('falls back to the legacy cached URL only when offline', async () => {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    const data = [[5.5, 45.5]];
+    const fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockResolvedValue({
+        status: 200,
+        text: async () => JSON.stringify(data)
+      });
+    vi.stubGlobal('fetch', fetch);
+    const dispatch = vi.fn();
+    await fetchAllEntrancesCoordinates()(dispatch);
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(fetch.mock.calls[1][0]).not.toContain('criteriaVersion');
+    expect(dispatch).toHaveBeenCalledWith({
+      type: FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
+      data
+    });
   });
 });

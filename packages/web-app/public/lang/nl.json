@@ -1726,6 +1726,7 @@
   "Management tools": "Beheertools",
   "Management tools access restricted": "Toegang voorbehouden aan beheerders, moderators en verantwoordelijken.",
   "Map": "Kaart",
+  "mapFiltersRequireUpdatedCoordinates": "Maak verbinding met internet om de gegevens van de ingangen bij te werken en de filters op dit zoomniveau in te schakelen.",
   "Mark all as read": "Alles als gelezen markeren",
   "Mark as explored": "Markeren als verkend",
   "Mark this polygon as a hole (inner ring) within another polygon": "Markeer dit polygoon als een gat (binnenste ring) in een ander polygoon",

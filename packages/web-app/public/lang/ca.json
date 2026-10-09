@@ -1726,6 +1726,7 @@
   "Management tools": "Eines de gestió",
   "Management tools access restricted": "Accés reservat als administradors, moderadors i responsables.",
   "Map": "Mapa",
+  "mapFiltersRequireUpdatedCoordinates": "Connecteu-vos a internet per actualitzar les dades de les entrades i activar els filtres en aquest nivell de zoom.",
   "Mark all as read": "Marcar tot com a llegit",
   "Mark as explored": "Marcar com a explorada",
   "Mark this polygon as a hole (inner ring) within another polygon": "Marcar aquest polígon com un forat (anell interior) dins d'un altre polígon",

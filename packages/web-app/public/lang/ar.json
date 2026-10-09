@@ -1726,6 +1726,7 @@
   "Management tools": "أدوات الإدارة",
   "Management tools access restricted": "الوصول مقصور على المسؤولين والمشرفين والمنسقين.",
   "Map": "خريطة",
+  "mapFiltersRequireUpdatedCoordinates": "اتصل بالإنترنت لتحديث بيانات المداخل وتفعيل المرشحات عند مستوى التكبير هذا.",
   "Mark all as read": "تحديد الكل كمقروء",
   "Mark as explored": "وضع علامة كمستكشفة",
   "Mark this polygon as a hole (inner ring) within another polygon": "تمييز هذا المضلع كفتحة (حلقة داخلية) داخل مضلع آخر",

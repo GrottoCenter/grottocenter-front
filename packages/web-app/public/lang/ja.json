@@ -1726,6 +1726,7 @@
   "Management tools": "管理ツール",
   "Management tools access restricted": "管理者、モデレーター、責任者のみがアクセスできます。",
   "Map": "地図",
+  "mapFiltersRequireUpdatedCoordinates": "インターネットに接続して入口のデータを更新すると、このズームレベルでフィルターを使用できます。",
   "Mark all as read": "すべて既読にする",
   "Mark as explored": "探索済みとしてマーク",
   "Mark this polygon as a hole (inner ring) within another polygon": "このポリゴンを別のポリゴン内の穴（内側リング）としてマーク",
