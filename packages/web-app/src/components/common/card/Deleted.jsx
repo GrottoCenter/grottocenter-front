@@ -13,12 +13,14 @@ import {
   CircularProgress
 } from '@mui/material';
 import RestoreIcon from '@mui/icons-material/RestoreFromTrashRounded';
+import DeleteIcon from '@mui/icons-material/DeleteRounded';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForeverRounded';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { getDeletedEntityRedirectUrl } from '@/utils/deletedEntityRedirect';
 
 import StandardDialog from '../StandardDialog';
+import CustomIcon from '../CustomIcon';
 import Alert from '../Alert';
 import AppLink from '../AppLink';
 import AuthorAndDate from '../Contribution/AuthorAndDate';
@@ -32,35 +34,42 @@ import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 
 export const DELETED_ENTITIES = {
   entrance: {
+    iconType: 'entrance',
     str: 'Entrance',
     url: '/ui/entrances/',
     searchType: ADVANCED_SEARCH_TYPES.ENTRANCES
   },
   massif: {
+    iconType: 'massif',
     str: 'Massif',
     url: '/ui/massifs/',
     searchType: ADVANCED_SEARCH_TYPES.MASSIFS
   },
   organization: {
+    iconType: 'organization',
     str: 'Organization',
     url: '/ui/organizations/',
     searchType: ADVANCED_SEARCH_TYPES.ORGANIZATIONS
   },
   document: {
+    iconType: 'bibliography',
     str: 'Document',
     url: '/ui/documents/',
     searchType: ADVANCED_SEARCH_TYPES.DOCUMENTS
   },
   guideline: {
+    iconType: 'guidelines',
     str: 'Guideline',
     url: '/ui/guidelines/'
   },
   network: {
+    iconType: 'network',
     str: 'Network',
     url: '/ui/caves/',
     searchType: ADVANCED_SEARCH_TYPES.CAVES
   },
   person: {
+    iconType: 'caver',
     str: 'Person',
     url: '/ui/persons/',
     searchType: 'persons'
@@ -206,6 +215,8 @@ export const Deleted = ({ entityType, entity }) => (
 export const DeleteConfirmationDialog = ({
   entityType,
   entityId,
+  entityName,
+  entityIconType = entityType.iconType,
   isOpen,
   isLoading,
   isPermanent,
@@ -248,6 +259,7 @@ export const DeleteConfirmationDialog = ({
   };
 
   const entityFmt = formatMessage({ id: entityType.str });
+  const entityValues = { entityFmt, entityKind: entityType.str };
   let actionButtonTitle = formatMessage({ id: 'Delete' });
   if (isPermanent) {
     actionButtonTitle =
@@ -264,7 +276,7 @@ export const DeleteConfirmationDialog = ({
         defaultMessage:
           'Optionally, select another {entityFmt} where visitors will be redirected to:'
       },
-      { entityFmt }
+      entityValues
     );
   } else {
     searchTitle = isSearchMandatory
@@ -274,7 +286,7 @@ export const DeleteConfirmationDialog = ({
             defaultMessage:
               'Select another {entityFmt} where linked entities will be merged in:'
           },
-          { entityFmt }
+          entityValues
         )
       : formatMessage(
           {
@@ -282,15 +294,36 @@ export const DeleteConfirmationDialog = ({
             defaultMessage:
               'Optionally, select another {entityFmt} where linked entities will be merged in:'
           },
-          { entityFmt }
+          entityValues
         );
+  }
+
+  let searchSectionId = 'delete-confirmation-redirect-label';
+  if (isPermanent) {
+    searchSectionId = isSearchMandatory
+      ? 'delete-confirmation-merge-required-label'
+      : 'delete-confirmation-merge-optional-label';
   }
 
   return (
     <StandardDialog
       open={isOpen}
       onClose={onClose}
-      title={formatMessage({ id: 'Deletion confirmation' })}
+      title={
+        <Typography variant="h3" component="span">
+          {formatMessage(
+            {
+              id: isPermanent
+                ? 'delete-permanent-confirmation-dialog'
+                : 'delete-confirmation-dialog',
+              defaultMessage: isPermanent
+                ? 'Permanently delete this {entityFmt}?'
+                : 'Delete this {entityFmt}?'
+            },
+            entityValues
+          )}
+        </Typography>
+      }
       actions={
         <>
           {isLoading && (
@@ -305,7 +338,7 @@ export const DeleteConfirmationDialog = ({
             <Button
               variant="contained"
               color="error"
-              startIcon={<DeleteForeverIcon />}
+              startIcon={isPermanent ? <DeleteForeverIcon /> : <DeleteIcon />}
               disabled={isSearchMandatory && !selectedEntity}
               onClick={() => {
                 onConfirmation(selectedEntity);
@@ -316,31 +349,55 @@ export const DeleteConfirmationDialog = ({
           )}
         </>
       }>
-      <Box>
+      <Stack spacing={2}>
+        {entityName && (
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              alignItems: 'center',
+              p: 1.5,
+              border: 1,
+              borderColor: 'divider',
+              borderRadius: 1,
+              bgcolor: 'background.paper'
+            }}>
+            {entityIconType && (
+              <Box aria-hidden="true" sx={{ flexShrink: 0 }}>
+                <CustomIcon type={entityIconType} size={28} alt="" />
+              </Box>
+            )}
+            <Typography
+              variant="h5"
+              component="p"
+              sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
+              {entityName}
+            </Typography>
+          </Stack>
+        )}
         <Typography>
-          {isPermanent
-            ? formatMessage(
-                {
-                  id: 'delete-permanent-confirmation-dialog',
-                  defaultMessage:
-                    'Are you sure you want to permanently delete this {entityFmt} ?'
-                },
-                { entityFmt }
-              )
-            : formatMessage(
-                {
-                  id: 'delete-confirmation-dialog',
-                  defaultMessage:
-                    'Are you sure you want to delete this {entityFmt} ?'
-                },
-                { entityFmt }
-              )}
+          {formatMessage(
+            {
+              id: isPermanent
+                ? 'delete-confirmation-permanent-effect'
+                : 'delete-confirmation-soft-effect',
+              defaultMessage: isPermanent
+                ? 'This action is irreversible.'
+                : 'This item will be marked as deleted. It can be restored.'
+            },
+            entityValues
+          )}
         </Typography>
-        <br />
-        <br />
         {canSelectRedirect && (
-          <>
-            <Typography>{searchTitle}</Typography>
+          <Stack
+            spacing={1}
+            sx={{ pt: 2, borderTop: 1, borderColor: 'divider' }}>
+            <Typography variant="h5" component="p">
+              {formatMessage({ id: searchSectionId })}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {searchTitle}
+            </Typography>
             {!selectedEntity && (
               <>
                 <AutoCompleteSearch
@@ -353,16 +410,11 @@ export const DeleteConfirmationDialog = ({
                       id: `Search for a {entityFmt}`,
                       defaultMessage: `Search for a {entityFmt}`
                     },
-                    { entityFmt }
+                    entityValues
                   )}
                   inputValue={inputValue}
                   suggestions={suggestions}
                 />
-                <FormHelperText>
-                  {formatMessage({
-                    id: 'An entity cannot redirect to itself.'
-                  })}
-                </FormHelperText>
                 {!!error && (
                   <FormHelperText error role="alert">
                     {formatMessage({
@@ -374,7 +426,14 @@ export const DeleteConfirmationDialog = ({
             )}
 
             {selectedEntity && (
-              <Box sx={{ padding: 1, background: 'white' }}>
+              <Box
+                sx={{
+                  p: 1,
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  borderRadius: 1
+                }}>
                 {selectedEntity.iconSrc && (
                   <StyledEntityIcon src={selectedEntity.iconSrc} />
                 )}
@@ -397,9 +456,9 @@ export const DeleteConfirmationDialog = ({
                 </Typography>
               </Box>
             )}
-          </>
+          </Stack>
         )}
-      </Box>
+      </Stack>
     </StandardDialog>
   );
 };
@@ -407,6 +466,7 @@ export const DeleteConfirmationDialog = ({
 DeletedCard.propTypes = {
   entityType: PropTypes.shape({
     str: PropTypes.string,
+    iconType: PropTypes.string,
     url: PropTypes.string,
     searchType: PropTypes.string
   }),
@@ -447,6 +507,8 @@ Deleted.propTypes = {
 DeleteConfirmationDialog.propTypes = {
   entityType: DeletedCard.propTypes.entityType.isRequired,
   entityId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  entityName: PropTypes.string,
+  entityIconType: PropTypes.string,
   isOpen: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isPermanent: PropTypes.bool.isRequired,

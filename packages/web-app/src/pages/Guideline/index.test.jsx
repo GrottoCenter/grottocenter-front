@@ -107,6 +107,10 @@ const messages = {
   'delete-permanent-confirmation-dialog':
     'Permanently delete this {entityFmt}?',
   'Deletion confirmation': 'Deletion confirmation',
+  'delete-confirmation-soft-effect':
+    'This item will be marked as deleted. It can be restored.',
+  'delete-confirmation-permanent-effect': 'This action is irreversible.',
+  'delete-confirmation-merge-optional-label': 'Merge — optional',
   unlink: 'unlink',
   Unlink: 'Unlink',
   No: 'No',
@@ -336,7 +340,7 @@ it('permanently deletes an already soft-deleted guideline', async () => {
 
   await user.click(screen.getByRole('button', { name: 'Permanently delete' }));
   const dialog = screen.getByRole('dialog', {
-    name: 'Deletion confirmation'
+    name: 'Permanently delete this Guideline?'
   });
   expect(
     within(dialog).getByText('Permanently delete this Guideline?')

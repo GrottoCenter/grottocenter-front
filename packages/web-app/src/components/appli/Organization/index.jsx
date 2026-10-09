@@ -297,6 +297,7 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
           <DeleteConfirmationDialog
             entityType={DELETED_ENTITIES.organization}
             entityId={organization.id}
+            entityName={organization.name}
             isOpen={isDeleteConfirmationOpen}
             isLoading={isActionLoading}
             isPermanent={isDeleteConfirmationPermanent}

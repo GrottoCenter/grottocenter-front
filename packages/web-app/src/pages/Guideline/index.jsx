@@ -212,6 +212,7 @@ const GuidelinePage = () => {
       />
       <DeleteConfirmationDialog
         entityType={DELETED_ENTITIES.guideline}
+        entityName={data?.title}
         isOpen={isDeleteDialogOpen}
         isLoading={deleteMutation.isPending}
         isPermanent={isDeletePermanent}
