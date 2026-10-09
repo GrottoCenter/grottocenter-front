@@ -512,8 +512,8 @@ const MapMarkerSelector = ({
           <Box
             sx={{
               position: 'absolute',
-              bottom: 1.25,
-              left: 1.5,
+              bottom: theme => theme.spacing(1.25),
+              left: theme => theme.spacing(1.5),
               maxWidth: theme => `calc(100% - ${theme.spacing(10)})`,
               zIndex: 1000,
               display: 'flex',
