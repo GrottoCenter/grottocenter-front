@@ -116,6 +116,7 @@ const visitForm = (
     }
   });
   accuracyInput().should('be.visible');
+  cy.get('@watchPosition').should('not.have.been.called');
 };
 
 describe('Entrance accuracy', () => {
