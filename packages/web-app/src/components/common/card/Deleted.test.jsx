@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
+import frenchMessages from '@/../public/lang/fr.json';
 
 import { DeleteConfirmationDialog, DELETED_ENTITIES } from './Deleted';
 
@@ -15,9 +16,10 @@ vi.mock('@/hooks', () => ({
 }));
 
 vi.mock('../StandardDialog', () => ({
-  default: ({ open, children, actions }) =>
+  default: ({ open, title, children, actions }) =>
     open ? (
       <div>
+        <h2>{title}</h2>
         {children}
         {actions}
       </div>
@@ -34,9 +36,9 @@ const messages = {
   'Search for a {entityFmt}': 'Search for a {entityFmt}',
   'delete-permanent-confirmation-dialog': 'Delete {entityFmt}?',
   'delete-permanent-merge-mandatory': 'Merge into another {entityFmt}',
+  'delete-confirmation-permanent-effect': 'This action is irreversible.',
+  'delete-confirmation-merge-required-label': 'Merge — required',
   remove: 'remove',
-  'An entity cannot redirect to itself.':
-    'An entity cannot redirect to itself.',
   'Unable to search for a replacement. Please try again.':
     'Unable to search for a replacement. Please try again.',
   'No result (enter at least {count} characters)':
@@ -99,13 +101,11 @@ describe('DeleteConfirmationDialog replacement selection', () => {
     }
   );
 
-  it('shows a separate search error and clears it after recovery', () => {
+  it('omits the self-redirection hint and shows search errors only on failure', () => {
     const { rerender } = render(renderDialog());
-    const constraintHint = screen.getByText(
-      'An entity cannot redirect to itself.'
-    );
-    expect(constraintHint).not.toHaveAttribute('aria-live');
-    expect(constraintHint).not.toHaveClass('Mui-error');
+    expect(
+      screen.queryByText('An entity cannot redirect to itself.')
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 
     fireEvent.focus(screen.getByRole('combobox'));
@@ -123,7 +123,6 @@ describe('DeleteConfirmationDialog replacement selection', () => {
       'aria-invalid',
       'true'
     );
-    expect(constraintHint).not.toHaveClass('Mui-error');
 
     searchState.error = null;
     rerender(renderDialog());
@@ -132,5 +131,72 @@ describe('DeleteConfirmationDialog replacement selection', () => {
       'aria-invalid',
       'false'
     );
+  });
+
+  it.each([
+    [
+      'document',
+      'ce document',
+      'un document',
+      'Ce document sera marqué comme supprimé. Il pourra être restauré.'
+    ],
+    [
+      'entrance',
+      'cette entrée',
+      'une entrée',
+      'Cette entrée sera marquée comme supprimée. Elle pourra être restaurée.'
+    ]
+  ])(
+    'renders a compact French soft-delete confirmation for a %s',
+    (type, description, searchLabel, effect) => {
+      const onConfirmation = vi.fn();
+      const onClose = vi.fn();
+      const { container } = render(
+        <IntlProvider locale="fr" messages={frenchMessages}>
+          <DeleteConfirmationDialog
+            entityType={DELETED_ENTITIES[type]}
+            entityId={42}
+            entityName="Exemple"
+            isOpen
+            isLoading={false}
+            isPermanent={false}
+            onClose={onClose}
+            onConfirmation={onConfirmation}
+          />
+        </IntlProvider>
+      );
+      expect(
+        screen.getByRole('heading', { name: `Supprimer ${description} ?` })
+      ).toBeVisible();
+      expect(screen.getByText('Exemple')).toBeVisible();
+      const entityIcon = container.querySelector('img[alt=""]');
+      expect(entityIcon).toHaveAttribute('width', '28');
+      expect(entityIcon.closest('[aria-hidden="true"]')).not.toBeNull();
+      expect(screen.getByText(effect)).toBeVisible();
+      expect(screen.getByText('Redirection — facultatif')).toBeVisible();
+      expect(screen.getByRole('combobox')).toHaveAttribute(
+        'placeholder',
+        `Rechercher ${searchLabel}`
+      );
+      expect(container.querySelector('br')).toBeNull();
+      expect(screen.getByTestId('DeleteRoundedIcon')).toBeVisible();
+      expect(screen.queryByTestId('DeleteForeverRoundedIcon')).toBeNull();
+      expect(screen.queryByText('Cette action est irréversible.')).toBeNull();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Supprimer' }));
+      expect(onConfirmation).toHaveBeenCalledWith(null);
+      expect(onClose).toHaveBeenCalledOnce();
+    }
+  );
+
+  it('keeps permanent deletion distinct from soft deletion', () => {
+    render(renderDialog());
+    expect(screen.getByText('This action is irreversible.')).toBeVisible();
+    expect(screen.getByTestId('DeleteForeverRoundedIcon')).toBeVisible();
+    expect(
+      screen.getByRole('button', {
+        name: 'Merge and permanently delete'
+      })
+    ).toBeDisabled();
   });
 });
