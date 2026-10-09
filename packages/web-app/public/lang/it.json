@@ -1726,7 +1726,7 @@
   "Management tools": "Strumenti di gestione",
   "Management tools access restricted": "Accesso riservato ad amministratori, moderatori e responsabili.",
   "Map": "Mappa",
-  "mapFiltersRequireUpdatedCoordinates": "Connettiti a Internet per aggiornare i dati degli ingressi e attivare i filtri a questo livello di zoom.",
+  "mapFiltersRequireUpdatedCoordinates": "Connettiti a Internet per usare i filtri a questo livello di zoom.",
   "Mark all as read": "Segna tutto come letto",
   "Mark as explored": "Segna come esplorata",
   "Mark this polygon as a hole (inner ring) within another polygon": "Contrassegna questo poligono come un foro (anello interno) all'interno di un altro poligono",

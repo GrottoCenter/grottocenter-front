@@ -51,6 +51,8 @@ const SIZE_BY_CODE = {
   3: CAVE_SIZE.LARGE
 };
 
+// Legacy cache compatibility: old offline responses contain only [lng, lat].
+// The Worker validates each new dataset once before applying any filters.
 export const hasEntranceCoordinateCriteria = tuple =>
   Array.isArray(tuple) &&
   tuple.length === 5 &&
@@ -75,9 +77,6 @@ export const matchesEntranceMarker = (entrance, filters) =>
     filters
   );
 
-export const matchesEntranceCoordinate = (tuple, filters) => {
-  // Legacy offline pairs can still draw an unfiltered map. The UI disables
-  // low-zoom filters for this dataset rather than inventing missing criteria.
-  if (!hasEntranceCoordinateCriteria(tuple)) return true;
-  return matchesCriteria(SIZE_BY_CODE[tuple[2]], tuple[3], tuple[4], filters);
-};
+// Receives enriched tuples already validated by the Worker.
+export const matchesEntranceCoordinate = (tuple, filters) =>
+  matchesCriteria(SIZE_BY_CODE[tuple[2]], tuple[3], tuple[4], filters);

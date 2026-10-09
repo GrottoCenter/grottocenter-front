@@ -38,22 +38,25 @@ describe('useEntranceClusters lifecycle', () => {
     act(() =>
       workers[0].dispatchEvent(
         new MessageEvent('message', {
-          data: { type: 'ready', revision: 1 }
+          data: { type: 'ready', revision: 1, hasCriteria: false }
         })
       )
     );
     expect(result.current.source).toBeNull();
+    expect(result.current.hasCriteria).toBeNull();
     act(() =>
       workers[1].dispatchEvent(
         new MessageEvent('message', {
-          data: { type: 'ready', revision: 1 }
+          data: { type: 'ready', revision: 1, hasCriteria: true }
         })
       )
     );
     expect(result.current.source).not.toBeNull();
+    expect(result.current.hasCriteria).toBe(true);
     rerender({ filters: { minInterest: 8 } });
     expect(workers).toHaveLength(2);
     expect(result.current.source).toBeNull();
+    expect(result.current.hasCriteria).toBe(true);
     expect(workers[1].postMessage).toHaveBeenLastCalledWith({
       type: 'build',
       revision: 2,
@@ -68,5 +71,27 @@ describe('useEntranceClusters lifecycle', () => {
     const { result } = renderHook(() => useEntranceClusters([], {}));
     expect(result.current.error.message).toBe('Worker unavailable');
     expect(result.current.isPending).toBe(false);
+  });
+
+  it('refreshes cache compatibility when coordinates are replaced, not when filters change', () => {
+    const filters = { minInterest: 0 };
+    const { result, rerender } = renderHook(
+      ({ data }) => useEntranceClusters(data, filters),
+      { initialProps: { data: [[5.5, 45.5]] } }
+    );
+    const ready = (revision, hasCriteria) =>
+      act(() =>
+        workers[0].dispatchEvent(
+          new MessageEvent('message', {
+            data: { type: 'ready', revision, hasCriteria }
+          })
+        )
+      );
+    ready(1, false);
+    expect(result.current.hasCriteria).toBe(false);
+    rerender({ data: [[5.5, 45.5, 1, 0, null]] });
+    expect(result.current.hasCriteria).toBeNull();
+    ready(2, true);
+    expect(result.current.hasCriteria).toBe(true);
   });
 });

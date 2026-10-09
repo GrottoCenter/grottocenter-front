@@ -32,3 +32,29 @@ Validation completed:
 - Modified-file ESLint, translation synchronization/sorting, and production
   build passed. The entrance Worker is bundled separately and precached by
   the service worker for offline use.
+
+## Simplification follow-up
+
+Baseline implementation committed as `62fcd512` before this follow-up.
+
+- [x] Centralize preferences, normalization, toggles and reset in
+  `useEntranceFilters`, preserving all existing storage keys.
+- [x] Pass one filter object to the control; import fixed choices directly and
+  provide a single disabled-reason key.
+- [x] Validate coordinate criteria once per dataset in the Worker and report
+  compatibility to the UI. Comment the legacy-cache fallback and bypasses.
+- [x] Derive marker/polygon visibility from one zoom state and selected layers.
+  Keep actual Leaflet zoom checks when requesting viewport data.
+- [x] Shorten the offline-cache hint in all 15 languages.
+- [x] Verify preferences, compatibility metadata, zoom/layer transitions,
+  translations, modified-file lint and production bundling.
+
+Follow-up validation: 83 unit tests across ten files passed using
+`--pool=forks --maxWorkers=1 --testTimeout=15000`. Seven headless Electron
+scenarios passed, covering combined filters/reset, a small viewport with
+cluster/marker transitions and popup opening, saved interest, legacy data at
+both zoom modes, layer toggles and the massif polygon threshold. In the small
+viewport, popup closing uses a targeted DOM click while it pans the map;
+bubble, marker and zoom-control interactions use pointer clicks.
+Modified-file ESLint, translation checks and the production build passed.
+The bundled Worker is included in the service worker precache.

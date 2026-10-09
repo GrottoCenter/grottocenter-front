@@ -59,12 +59,15 @@ export const createEntranceClusterClient = (worker, { onReady, onError }) => {
         if (message.revision === revision) {
           if (message.type === 'ready') {
             const sourceRevision = revision;
-            onReady({
-              getClusters: (bounds, zoom) =>
-                query('clusters', { bounds, zoom }, sourceRevision),
-              getClusterExpansionZoom: clusterId =>
-                query('expansion', { clusterId }, sourceRevision)
-            });
+            onReady(
+              {
+                getClusters: (bounds, zoom) =>
+                  query('clusters', { bounds, zoom }, sourceRevision),
+                getClusterExpansionZoom: clusterId =>
+                  query('expansion', { clusterId }, sourceRevision)
+              },
+              message.hasCriteria
+            );
           } else {
             onError(new Error(message.message));
           }

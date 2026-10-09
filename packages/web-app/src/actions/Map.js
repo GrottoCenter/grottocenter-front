@@ -158,20 +158,21 @@ export const fetchAllEntrancesCoordinates = () => dispatch => {
     type: FETCH_MAP_START_LOADING,
     key: LOADINGS.ENTRANCES_COORDINATES
   });
-  const legacyUrl = makeUrl(getMapEntrancesCoordinatesUrl, MAX_BOUNDS);
-  // A different URL separates old pairs from enriched tuples in both HTTP
-  // and service-worker caches, without purging other layers or massif maps.
+  // Legacy cache compatibility: version the URL to separate pairs from tuples
+  // in both HTTP and service-worker caches. The old URL is used only offline.
   const criteriaUrl = makeUrl(getMapEntrancesCoordinatesUrl, {
     ...MAX_BOUNDS,
     criteriaVersion: 1
   });
   return fetchWithRetry(criteriaUrl)
     .catch(error => {
-      // Before the first online visit after upgrading, only the old URL may
-      // be cached. Keep those coordinates usable offline; the filter UI checks
-      // their shape and explains why low-zoom filters need an update.
+      // Legacy cache compatibility: before the first online visit after
+      // upgrading, only the old URL may be cached. Preserve the offline map;
+      // the Worker reports missing criteria so low-zoom filters stay disabled.
       if (typeof navigator !== 'undefined' && navigator.onLine === false)
-        return fetchWithRetry(legacyUrl);
+        return fetchWithRetry(
+          makeUrl(getMapEntrancesCoordinatesUrl, MAX_BOUNDS)
+        );
       throw error;
     })
     .then(text => {

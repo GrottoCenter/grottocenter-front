@@ -19,6 +19,8 @@ export const createEntranceClusterEngine = () => {
     if (message.type === 'build') {
       if (message.data) {
         coordinates = message.data;
+        // Legacy cache compatibility: check once per dataset. Old pairs (or a
+        // mixed dataset) remain visible without filtering until refreshed.
         hasCriteria = coordinates.every(hasEntranceCoordinateCriteria);
       }
       const points = [];
@@ -37,7 +39,7 @@ export const createEntranceClusterEngine = () => {
         maxZoom: ENTRANCE_CLUSTER_MAX_ZOOM
       }).load(points);
       revision = message.revision;
-      return { type: 'ready', revision };
+      return { type: 'ready', revision, hasCriteria };
     }
 
     let result = null;
