@@ -158,11 +158,28 @@ export const fetchAllEntrancesCoordinates = () => dispatch => {
     type: FETCH_MAP_START_LOADING,
     key: LOADINGS.ENTRANCES_COORDINATES
   });
-  return fetchWithRetry(makeUrl(getMapEntrancesCoordinatesUrl, MAX_BOUNDS))
+  const legacyUrl = makeUrl(getMapEntrancesCoordinatesUrl, MAX_BOUNDS);
+  // A different URL separates old pairs from enriched tuples in both HTTP
+  // and service-worker caches, without purging other layers or massif maps.
+  const criteriaUrl = makeUrl(getMapEntrancesCoordinatesUrl, {
+    ...MAX_BOUNDS,
+    criteriaVersion: 1
+  });
+  return fetchWithRetry(criteriaUrl)
+    .catch(error => {
+      // Before the first online visit after upgrading, only the old URL may
+      // be cached. Keep those coordinates usable offline; the filter UI checks
+      // their shape and explains why low-zoom filters need an update.
+      if (typeof navigator !== 'undefined' && navigator.onLine === false)
+        return fetchWithRetry(legacyUrl);
+      throw error;
+    })
     .then(text => {
+      const data = JSON.parse(text);
+      if (!Array.isArray(data)) throw new Error('Invalid entrance coordinates');
       dispatch({
         type: FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
-        data: JSON.parse(text)
+        data
       });
     })
     .catch(error => {

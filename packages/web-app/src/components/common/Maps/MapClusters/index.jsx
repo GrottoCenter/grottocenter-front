@@ -15,17 +15,19 @@ import {
   MenuItem,
   Tooltip,
   Typography,
+  LinearProgress,
   useMediaQuery
 } from '@mui/material';
 import { ContentCopy, LocationOn, Tune } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import copyToClipboard from '@/utils/clipboard';
+import { interestToStars, starsToInterest } from '@/utils/interest';
 import {
-  interestToStars,
-  meetsMinimumInterest,
-  starsToInterest
-} from '@/utils/interest';
+  hasEntranceCoordinateCriteria,
+  matchesEntranceMarker
+} from '@/utils/entranceMapFilters';
+import useEntranceClusters from '@/hooks/useEntranceClusters';
 import GeocodingControl from '../common/GeocodingControl';
 import MapTour from './MapTour';
 import DataDisplayControl, { layerTypes } from './DataDisplayControl';
@@ -65,8 +67,6 @@ import {
   MASSIFS_POLYGON_LIMIT,
   ENTRANCE_MARKER_FILTERS,
   ENTRANCE_QUALITY_FILTERS,
-  getCaveSize,
-  getCaveQuality,
   DEFAULT_ENTRANCE_FILTERS,
   DEFAULT_QUALITY_FILTERS,
   DEFAULT_MIN_INTEREST
@@ -111,7 +111,7 @@ const HydratedMap = ({
 }) => {
   const map = useMap();
   const { formatMessage } = useIntl();
-  const { onSuccess } = useNotification();
+  const { onSuccess, onError } = useNotification();
   const { isAuth } = usePermissions();
   const isOnline = useOnlineStatus();
   const navigate = useNavigate();
@@ -177,23 +177,30 @@ const HydratedMap = ({
   );
   const effectiveMinInterest = starsToInterest(interestToStars(minInterest));
 
+  const entranceFilters = useMemo(
+    () => ({
+      sizes: activeEntranceFilters,
+      qualities: activeQualityFilters,
+      minInterest: effectiveMinInterest
+    }),
+    [activeEntranceFilters, activeQualityFilters, effectiveMinInterest]
+  );
+  const hasCoordinateCriteria = useMemo(
+    () => (entrances ?? []).every(hasEntranceCoordinateCriteria),
+    [entrances]
+  );
+  const entranceClusters = useEntranceClusters(entrances, entranceFilters);
+
+  useEffect(() => {
+    if (entranceClusters.error) {
+      onError(formatMessage({ id: 'unexpected error' }));
+    }
+  }, [entranceClusters.error, onError, formatMessage]);
+
   const filteredEntranceMarkers = useMemo(
     () =>
-      entranceMarkers.filter(e => {
-        if (!activeEntranceFilters[getCaveSize(e)]) return false;
-        const quality = getCaveQuality(e);
-        // Entrances without quality data are always shown by the quality filter.
-        if (quality !== null && !activeQualityFilters[quality]) return false;
-        // Compare the displayed star level so an entrance shown with two stars
-        // is included when the user selects a two-star minimum.
-        return meetsMinimumInterest(e.aestheticism, effectiveMinInterest);
-      }),
-    [
-      entranceMarkers,
-      activeEntranceFilters,
-      activeQualityFilters,
-      effectiveMinInterest
-    ]
+      entranceMarkers.filter(e => matchesEntranceMarker(e, entranceFilters)),
+    [entranceMarkers, entranceFilters]
   );
 
   const hasActiveFilters = useMemo(
@@ -416,7 +423,7 @@ const HydratedMap = ({
     isMarkersMode,
     visibleMarkers,
     markerCounts: {
-      [layerTypes.ENTRANCES]: filteredEntranceMarkers.length,
+      [layerTypes.ENTRANCES]: entranceMarkers.length,
       [layerTypes.NETWORKS]: networkMarkers.length,
       [layerTypes.ORGANIZATIONS]: organizationMarkers.length
     }
@@ -472,7 +479,7 @@ const HydratedMap = ({
         setActiveQualityFilters={setActiveQualityFilters}
         minInterest={effectiveMinInterest}
         setMinInterest={setMinInterest}
-        isMarkersMode={isMarkersMode}
+        hasFilterData={isMarkersMode || hasCoordinateCriteria}
         isEntrancesLayerOn={!!selectedLayers[layerTypes.ENTRANCES]}
         hasActiveFilters={hasActiveFilters}
         resetAllFilters={resetAllFilters}
@@ -485,9 +492,26 @@ const HydratedMap = ({
           key={type}
           data={data}
           type={type}
+          clusterSource={
+            type === 'entrance' ? entranceClusters.source : undefined
+          }
           enabled={!!selectedLayers[layer] && !off}
         />
       ))}
+      {selectedLayers[layerTypes.ENTRANCES] &&
+        !isMarkersMode &&
+        entranceClusters.isPending && (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 500
+            }}>
+            <LinearProgress aria-label={formatMessage({ id: 'Loading ...' })} />
+          </Box>
+        )}
       <Markers
         visibleMarkers={visibleMarkers}
         organizations={organizationMarkers}

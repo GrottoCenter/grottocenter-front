@@ -141,7 +141,7 @@ const buildIcon = (count, type) => {
   const label = `<span class="cluster-bubble-label">${formatCount(count)}</span>`;
   const inner = type === 'network' ? `${NETWORK_HEX_SVG}${label}` : label;
   return L.divIcon({
-    html: `<div class="cluster-bubble" data-type="${type}" style="width:${diameter}px;height:${diameter}px;">${inner}</div>`,
+    html: `<div class="cluster-bubble" data-testid="${type}-cluster" data-count="${count}" data-type="${type}" style="width:${diameter}px;height:${diameter}px;">${inner}</div>`,
     className: '',
     iconSize: [diameter, diameter],
     iconAnchor: [diameter / 2 - ox, diameter / 2 - oy]
@@ -166,7 +166,8 @@ const ClusterLayer = ({
   type,
   enabled = true,
   pane = null,
-  onLeafClick = null
+  onLeafClick = null,
+  clusterSource = undefined
 }) => {
   const map = useMap();
   // Build the supercluster kd-tree as soon as data arrives, not on `enabled`.
@@ -174,12 +175,35 @@ const ClusterLayer = ({
   // zoom-in/out through MARKERS_LIMIT; gating the index on `enabled` would
   // rebuild that kd-tree synchronously during render on each zoom-out,
   // freezing the UI for hundreds of ms.
-  const supercluster = useCluster(data);
+  // undefined selects the existing synchronous path; null means that the
+  // entrance worker is rebuilding. Never build its large index on this thread.
+  const synchronousIndex = useCluster(
+    clusterSource === undefined ? data : null
+  );
+  const supercluster =
+    clusterSource === undefined ? synchronousIndex : clusterSource;
   // key ("c:<id>" | "l:<pointId>") → L.Marker, for O(1) diff
   const markersRef = useRef(new Map());
+  const indexRef = useRef(null);
+  const refreshVersionRef = useRef(0);
+  const clearMarkers = useCallback(() => {
+    refreshVersionRef.current++;
+    indexRef.current = null;
+    for (const marker of markersRef.current.values()) marker.remove();
+    markersRef.current.clear();
+  }, []);
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback(async () => {
     const currentMap = markersRef.current;
+    const requestVersion = ++refreshVersionRef.current;
+
+    // Cluster ids can repeat across indexes. Renew positions and click handlers
+    // together rather than retaining a bubble from a different filtered tree.
+    if (indexRef.current !== supercluster) {
+      for (const marker of currentMap.values()) marker.remove();
+      currentMap.clear();
+      indexRef.current = supercluster;
+    }
 
     if (!enabled || !supercluster) {
       for (const m of currentMap.values()) m.remove();
@@ -195,7 +219,8 @@ const ClusterLayer = ({
       bounds.getNorth()
     ];
     const zoom = Math.round(map.getZoom());
-    const clusters = supercluster.getClusters(bbox, zoom);
+    const clusters = await supercluster.getClusters(bbox, zoom);
+    if (requestVersion !== refreshVersionRef.current || !clusters) return;
 
     const nextKeys = new Set();
     for (const feature of clusters) {
@@ -235,7 +260,7 @@ const ClusterLayer = ({
       const marker = L.marker([lat, lng], markerOptions);
       marker._count = displayCount;
 
-      marker.on('click', () => {
+      marker.on('click', async () => {
         // Every branch below moves the view, so release the location control's
         // follow — it would otherwise recenter on the user right after.
         map.fire('followdetach');
@@ -246,7 +271,14 @@ const ClusterLayer = ({
           // map's max zoom. Intentional: from just under MARKERS_LIMIT the +3
           // floor jumps straight past the threshold into real-marker territory
           // — a click on a cluster should always resolve it, never re-cluster.
-          const expansion = supercluster.getClusterExpansionZoom(clusterId);
+          const expansion =
+            await supercluster.getClusterExpansionZoom(clusterId);
+          if (
+            expansion == null ||
+            indexRef.current !== supercluster ||
+            currentMap.get(key) !== marker
+          )
+            return;
           const targetZoom = Math.min(
             map.getMaxZoom(),
             Math.max(expansion + 2, map.getZoom() + 3)
@@ -288,13 +320,7 @@ const ClusterLayer = ({
   }, [refresh]);
 
   // Cleanup all markers on unmount
-  useEffect(() => {
-    const currentMarkers = markersRef.current;
-    return () => {
-      for (const m of currentMarkers.values()) m.remove();
-      currentMarkers.clear();
-    };
-  }, []);
+  useEffect(() => clearMarkers, [clearMarkers]);
 
   return null;
 };
@@ -308,7 +334,11 @@ ClusterLayer.propTypes = {
   // Part of the `refresh` callback's dependency array — callers must memoize
   // this (useCallback) to avoid rebuilding every cluster marker on each
   // parent render.
-  onLeafClick: PropTypes.func
+  onLeafClick: PropTypes.func,
+  clusterSource: PropTypes.shape({
+    getClusters: PropTypes.func.isRequired,
+    getClusterExpansionZoom: PropTypes.func.isRequired
+  })
 };
 
 export default ClusterLayer;

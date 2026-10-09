@@ -1,21 +1,26 @@
 import { blue, green } from '@mui/material/colors';
 import {
+  CAVE_SIZE,
+  getCaveSize,
+  CAVE_QUALITY
+} from '@/utils/entranceMapFilters';
+import {
   MAP_MARKER_OUTLINE_COLOR,
   MAP_MARKER_OUTLINE_WIDTH
 } from '../common/mapMarkerOutline';
 import {
-  DATA_QUALITY_LEVELS,
   DATA_QUALITY_LABEL_KEYS,
-  DATA_QUALITY_THRESHOLDS,
-  getDataQualityLevel,
-  getDataQualityValue
+  DATA_QUALITY_THRESHOLDS
 } from '../../../../utils/dataQuality';
 
-export const CAVE_SIZE = {
-  SMALL: 'small',
-  MEDIUM: 'medium',
-  LARGE: 'large'
-};
+export { CAVE_SIZE, getCaveSize, CAVE_QUALITY };
+export {
+  CAVE_SIZE_THRESHOLDS,
+  getCaveQuality,
+  DEFAULT_ENTRANCE_FILTERS,
+  DEFAULT_QUALITY_FILTERS,
+  DEFAULT_MIN_INTEREST
+} from '@/utils/entranceMapFilters';
 
 // Circle marker styles per cave size category (radius in px).
 // Hardcoded hex instead of brown[] palette — the palette shades (brown[400/700/900])
@@ -45,27 +50,6 @@ export const CAVE_SIZE_STYLE = {
   }
 };
 
-export const CAVE_SIZE_THRESHOLDS = {
-  LARGE: { depth: 100, length: 1000 },
-  MEDIUM: { depth: 30, length: 200 }
-};
-
-export const getCaveSize = entrance => {
-  const depth = entrance.depth ?? 0;
-  const length = entrance.length ?? 0;
-  if (
-    depth >= CAVE_SIZE_THRESHOLDS.LARGE.depth ||
-    length >= CAVE_SIZE_THRESHOLDS.LARGE.length
-  )
-    return CAVE_SIZE.LARGE;
-  if (
-    depth >= CAVE_SIZE_THRESHOLDS.MEDIUM.depth ||
-    length >= CAVE_SIZE_THRESHOLDS.MEDIUM.length
-  )
-    return CAVE_SIZE.MEDIUM;
-  return CAVE_SIZE.SMALL;
-};
-
 export const getEntranceCircleStyle = entrance =>
   CAVE_SIZE_STYLE[getCaveSize(entrance)];
 
@@ -75,20 +59,6 @@ export const ENTRANCE_MARKER_FILTERS = [
   { id: CAVE_SIZE.LARGE, labelKey: 'Large caves' }
 ];
 
-// "All categories on" — the default and also the reset target. Same object
-// shape used by the LocalStorage seed and by resetAllFilters, so a single
-// constant keeps the two in step.
-const allOn = keys => Object.fromEntries(keys.map(k => [k, true]));
-export const DEFAULT_ENTRANCE_FILTERS = allOn(Object.values(CAVE_SIZE));
-
-// Alias — keeps map code readable without re-importing from utils directly.
-export const CAVE_QUALITY = DATA_QUALITY_LEVELS;
-
-export const getCaveQuality = entrance => {
-  const value = getDataQualityValue(entrance.dataQuality);
-  return value == null ? null : getDataQualityLevel(value);
-};
-
 // Minimum score for each category — shown in the filter UI dot (0 for insufficient).
 export const CAVE_QUALITY_BADGE_VALUE = {
   [CAVE_QUALITY.GOOD]: DATA_QUALITY_THRESHOLDS.GOOD,
@@ -97,20 +67,16 @@ export const CAVE_QUALITY_BADGE_VALUE = {
 };
 
 export const ENTRANCE_QUALITY_FILTERS = [
-  DATA_QUALITY_LEVELS.INSUFFICIENT,
-  DATA_QUALITY_LEVELS.SATISFACTORY,
-  DATA_QUALITY_LEVELS.GOOD
+  CAVE_QUALITY.INSUFFICIENT,
+  CAVE_QUALITY.SATISFACTORY,
+  CAVE_QUALITY.GOOD
 ].map(id => ({ id, labelKey: DATA_QUALITY_LABEL_KEYS[id] }));
-
-export const DEFAULT_QUALITY_FILTERS = allOn(Object.values(CAVE_QUALITY));
 
 // Interest filter — the backend `aestheticism` field is a 0–10 average, but
 // the app always displays it as N/5 with the MUI Rating component (see
 // Entry/Ratings.jsx and the api PR #1825 review note). The filter picks a
 // minimum on the 1★–5★ scale and stores it on the same 0–10 scale as the
 // backend value. The filter compares displayed star levels after rounding.
-export const DEFAULT_MIN_INTEREST = 0;
-
 export const MARKERS_LIMIT = 13;
 // Zoom level at which massif polygons are fetched and displayed
 export const MASSIFS_POLYGON_LIMIT = 8;
