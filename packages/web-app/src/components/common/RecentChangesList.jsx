@@ -203,7 +203,10 @@ const ChangeItem = ({ changeInfo }) => {
             gap: 0.5,
             flexWrap: 'wrap'
           }}>
-          <Typography variant="body2" component="span" sx={{ flex: 1 }}>
+          <Typography
+            variant="body2"
+            component="span"
+            sx={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>
             {sentence}
           </Typography>
           <Typography
