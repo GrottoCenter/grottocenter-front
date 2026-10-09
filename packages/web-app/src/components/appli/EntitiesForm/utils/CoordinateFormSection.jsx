@@ -38,12 +38,15 @@ const CoordinateFormSection = ({
   control,
   formLatitudeKey,
   formLongitudeKey,
+  formAccuracyKey,
   required = false,
   latitudeError,
   longitudeError,
   additionalPositions = [],
   additionalMarkersLabel,
   onZoomChange,
+  onLocationAccuracyChange,
+  accuracyField,
   markerIcon,
   mapHeight
 }) => {
@@ -115,13 +118,18 @@ const CoordinateFormSection = ({
   // Track the last WGS84 values we wrote ourselves, so we can ignore those
   // re-renders and only re-sync display fields on external changes (e.g. map drag)
   const selfSetRef = useRef({ lat: null, lng: null });
+  const prefilledValuesRef = useRef(null);
 
   const prefillFromWGS84 = useCallback((crs, lat, lng) => {
     if (Number.isNaN(lat) || Number.isNaN(lng)) return;
     if (crs.code === WGS84_DD) return;
     if (crs.code === DMS_CODE) {
-      setLocalX(decimalToDMS(lat, true));
-      setLocalY(decimalToDMS(lng, false));
+      const x = decimalToDMS(lat, true);
+      const y = decimalToDMS(lng, false);
+      prefilledValuesRef.current = { x, y, crs: crs.code };
+      setLocalX(x);
+      setLocalY(y);
+      setPreview({ lat, lng });
       return;
     }
     try {
@@ -130,8 +138,20 @@ const CoordinateFormSection = ({
         lng,
         crs
       );
-      setLocalX(crs.units === 'm' ? Math.round(x).toString() : x.toFixed(6));
-      setLocalY(crs.units === 'm' ? Math.round(y).toString() : y.toFixed(6));
+      const displayX =
+        crs.units === 'm' ? Math.round(x).toString() : x.toFixed(6);
+      const displayY =
+        crs.units === 'm' ? Math.round(y).toString() : y.toFixed(6);
+      prefilledValuesRef.current = {
+        x: displayX,
+        y: displayY,
+        crs: crs.code,
+        zone,
+        hemisphere: hemisphere ?? 'North'
+      };
+      setLocalX(displayX);
+      setLocalY(displayY);
+      setPreview({ lat, lng });
       if (crs.proj === 'utm' && zone) {
         setUtmZone(zone);
         setUtmHemisphere(hemisphere ?? 'North');
@@ -181,6 +201,21 @@ const CoordinateFormSection = ({
   // Whenever local X/Y change, convert to WGS84 and update form fields
   useEffect(() => {
     if (selectedCRS.code === WGS84_DD) return;
+
+    // Display conversions may round to whole meters. They must not move the
+    // saved point or invalidate its accuracy until a contributor edits a field.
+    const prefilled = prefilledValuesRef.current;
+    if (
+      prefilled &&
+      prefilled.crs === selectedCRS.code &&
+      prefilled.x === localX &&
+      prefilled.y === localY &&
+      (selectedCRS.proj !== 'utm' ||
+        (prefilled.zone === utmZone && prefilled.hemisphere === utmHemisphere))
+    ) {
+      return;
+    }
+    prefilledValuesRef.current = null;
 
     if (selectedCRS.code === DMS_CODE) {
       const lat = parseDMS(localX);
@@ -282,16 +317,20 @@ const CoordinateFormSection = ({
         formLongitudeKey={formLongitudeKey}
         onLatitudeChange={latField.onChange}
         onLongitudeChange={lngField.onChange}
+        formAccuracyKey={formAccuracyKey}
         additionalPositions={additionalPositions}
         additionalMarkersLabel={additionalMarkersLabel}
         onZoomChange={onZoomChange}
+        onLocationAccuracyChange={onLocationAccuracyChange}
         markerIcon={markerIcon}
         mapHeight={mapHeight}
       />
       {/* CRS selector + coordinate fields, below the map */}
       <Box
         sx={{
-          display: 'flex',
+          display: { xs: accuracyField ? 'grid' : 'flex', sm: 'flex' },
+          gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.5fr)',
+          gridTemplateAreas: '"crs latitude" "accuracy longitude"',
           alignItems: 'flex-start',
           gap: 0.5,
           mt: 0.5,
@@ -301,6 +340,7 @@ const CoordinateFormSection = ({
           <Button
             variant="outlined"
             size="small"
+            data-testid="coordinate-system-selector"
             onClick={e => setCrsMenuAnchor(e.currentTarget)}
             startIcon={<Tune fontSize="small" />}
             sx={{
@@ -309,11 +349,12 @@ const CoordinateFormSection = ({
               whiteSpace: 'nowrap',
               flexShrink: 0,
               alignSelf: 'stretch',
+              gridArea: 'crs',
               // Each field is a MuiFormControl with 4px vertical padding (theme),
               // insetting its grey box. Matching that margin makes the stretched
-              // button line up exactly with the fields — on desktop (one field's
-              // height) and on mobile (spanning both stacked lat/lng fields).
-              my: '4px'
+              // button line up with the fields. On mobile, latitude and the
+              // button share a grid row so their heights stay aligned.
+              my: 0.5
             }}>
             {crsButtonLabel}
           </Button>
@@ -323,13 +364,13 @@ const CoordinateFormSection = ({
           sx={{
             flex: 1,
             minWidth: 0,
-            display: 'flex',
+            display: { xs: accuracyField ? 'contents' : 'flex', sm: 'flex' },
             flexDirection: { xs: 'column', sm: 'row' },
             gap: 0.5
           }}>
           {isWGS84 ? (
             <>
-              <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Box sx={{ flex: 1, minWidth: 0, gridArea: 'latitude' }}>
                 <InputCoordinate
                   field={latField}
                   labelName="Latitude"
@@ -338,7 +379,7 @@ const CoordinateFormSection = ({
                   isRequired={required}
                 />
               </Box>
-              <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Box sx={{ flex: 1, minWidth: 0, gridArea: 'longitude' }}>
                 <InputCoordinate
                   field={lngField}
                   labelName="Longitude"
@@ -354,6 +395,7 @@ const CoordinateFormSection = ({
                 fullWidth
                 label={xLabel}
                 size="small"
+                sx={{ gridArea: 'latitude' }}
                 value={localX}
                 onChange={e => setLocalX(e.target.value)}
                 error={conversionError}
@@ -368,6 +410,7 @@ const CoordinateFormSection = ({
                 fullWidth
                 label={yLabel}
                 size="small"
+                sx={{ gridArea: 'longitude' }}
                 value={localY}
                 onChange={e => setLocalY(e.target.value)}
                 error={conversionError}
@@ -381,6 +424,17 @@ const CoordinateFormSection = ({
             </>
           )}
         </Box>
+        {accuracyField && (
+          <Box
+            sx={{
+              width: { xs: '100%', sm: 136 },
+              flexShrink: 0,
+              gridArea: 'accuracy',
+              alignSelf: 'flex-start'
+            }}>
+            {accuracyField}
+          </Box>
+        )}
       </Box>
       {/* UTM zone/hemisphere — separate row, only when needed */}
       {!isWGS84 && isUTM && (
@@ -459,12 +513,15 @@ CoordinateFormSection.propTypes = {
   control: PropTypes.shape({}).isRequired,
   formLatitudeKey: PropTypes.string.isRequired,
   formLongitudeKey: PropTypes.string.isRequired,
+  formAccuracyKey: PropTypes.string,
   required: PropTypes.bool,
   latitudeError: PropTypes.string,
   longitudeError: PropTypes.string,
   additionalPositions: PropTypes.arrayOf(PropTypes.shape({})),
   additionalMarkersLabel: PropTypes.string,
   onZoomChange: PropTypes.func,
+  onLocationAccuracyChange: PropTypes.func,
+  accuracyField: PropTypes.node,
   markerIcon: PropTypes.string,
   mapHeight: PropTypes.string
 };

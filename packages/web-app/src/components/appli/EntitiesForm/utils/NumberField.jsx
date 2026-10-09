@@ -14,6 +14,7 @@ const NumberField = ({
   control,
   label,
   icon,
+  prefix,
   unit,
   disabled = false,
   isError = false,
@@ -21,7 +22,8 @@ const NumberField = ({
   min,
   max,
   rules = { valueAsNumber: true },
-  inputProps
+  inputProps,
+  sx
 }) => {
   const { formatMessage } = useIntl();
   const inputRef = useRef(null);
@@ -52,7 +54,10 @@ const NumberField = ({
                 ...(typeof rangeRules.validate === 'function'
                   ? { custom: rangeRules.validate }
                   : rangeRules.validate),
-                numericInput: () =>
+                // A derived write can precede the DOM render. Native badInput
+                // only applies when the form receives an empty input value.
+                numericInput: value =>
+                  (value !== '' && value != null) ||
                   !inputRef.current?.validity.badInput ||
                   formatMessage({ id: 'form.integerRequired' })
               }
@@ -62,7 +67,7 @@ const NumberField = ({
         const errorMessage = fieldState.error?.message;
         return (
           <TextField
-            sx={{ flex: '1 1 200px' }}
+            sx={{ flex: '1 1 200px', ...sx }}
             disabled={disabled}
             name={name}
             label={formatMessage({ id: label })}
@@ -89,7 +94,7 @@ const NumberField = ({
                         ? { '& img': { filter: 'grayscale(1)', opacity: 0.5 } }
                         : undefined
                     }>
-                    <CustomIcon type={icon} size={20} />
+                    {prefix ?? (icon && <CustomIcon type={icon} size={20} />)}
                   </InputAdornment>
                 ),
                 endAdornment: unit ? (
@@ -110,7 +115,8 @@ NumberField.propTypes = {
   name: PropTypes.string.isRequired,
   control: PropTypes.shape({}),
   label: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.string,
+  prefix: PropTypes.string,
   unit: PropTypes.string,
   disabled: PropTypes.bool,
   isError: PropTypes.bool,
@@ -118,7 +124,8 @@ NumberField.propTypes = {
   min: PropTypes.number,
   max: PropTypes.number,
   rules: PropTypes.shape({}),
-  inputProps: PropTypes.shape({})
+  inputProps: PropTypes.shape({}),
+  sx: PropTypes.shape({})
 };
 
 export default NumberField;

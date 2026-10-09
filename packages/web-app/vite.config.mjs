@@ -11,6 +11,7 @@ import serviceWorkerBuildGuard from './vite/serviceWorkerBuildGuard.mjs';
 const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export default defineConfig(({ mode }) => {
+  const isE2eBuild = mode === 'e2e';
   // Pull VITE_API_URL out of the env file so the SW's runtimeCaching pattern
   // matches whichever backend this build targets (prod, staging, local).
   const env = loadEnv(mode, process.cwd(), '');
@@ -105,6 +106,9 @@ export default defineConfig(({ mode }) => {
       // app as an Android TWA. The SW is registered by <UpdatePrompt>
       // (src/components/appli/UpdatePrompt.jsx), which also drives the update UI.
       VitePWA({
+        // Cached navigation responses bypass Cypress's HTML instrumentation,
+        // so onBeforeLoad and its browser stubs stop running after activation.
+        disable: isE2eBuild,
         // 'prompt': a new SW installs, then WAITS until the user accepts the
         // update. Deliberate choice, on two counts:
         //  - the running page keeps the precache its own hashed chunks live in,
@@ -717,7 +721,7 @@ export default defineConfig(({ mode }) => {
         // No SW in dev — avoids confusing cache behaviour while developing.
         devOptions: { enabled: false }
       }),
-      serviceWorkerBuildGuard()
+      !isE2eBuild && serviceWorkerBuildGuard()
     ],
     resolve: {
       alias: [
