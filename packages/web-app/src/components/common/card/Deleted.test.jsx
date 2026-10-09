@@ -335,6 +335,11 @@ describe('DeleteConfirmationDialog replacement selection', () => {
     fireEvent.change(screen.getByRole('combobox'), {
       target: { value: 'massif' }
     });
+    expect(
+      screen.getByRole('button', {
+        name: 'Supprimer définitivement'
+      })
+    ).toBeDisabled();
     fireEvent.click(
       await screen.findByRole('option', { name: /Other massif/ })
     );
@@ -350,6 +355,30 @@ describe('DeleteConfirmationDialog replacement selection', () => {
     expect(onConfirmation).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'Other massif' })
     );
+  });
+
+  it('allows explicitly abandoning hydration without accepting its late result', () => {
+    redirectState.isPending = true;
+    const onConfirmation = vi.fn();
+    const { rerender } = render(prefilledDialog({ onConfirmation }));
+    fireEvent.change(screen.getByRole('combobox'), {
+      target: { value: 'destination' }
+    });
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Changer de destination ou continuer sans fusion'
+      })
+    );
+    redirectState.isPending = false;
+    redirectState.data = { id: 43, name: 'Late destination' };
+    rerender(prefilledDialog({ onConfirmation }));
+    expect(screen.queryByText('Late destination')).not.toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Supprimer définitivement'
+      })
+    );
+    expect(onConfirmation).toHaveBeenCalledWith(null);
   });
 
   it('keeps mandatory merging disabled after clearing the prefilled target', () => {
