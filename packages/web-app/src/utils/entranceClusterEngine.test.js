@@ -19,7 +19,9 @@ const coordinates = [
 describe('entrance cluster engine', () => {
   it('rebuilds counts and expansion from filtered points without resending data', () => {
     const engine = createEntranceClusterEngine();
-    engine({ type: 'build', revision: 1, data: coordinates, filters });
+    expect(
+      engine({ type: 'build', revision: 1, data: coordinates, filters })
+    ).toEqual({ type: 'ready', revision: 1, hasCriteria: true });
     const all = engine({
       type: 'clusters',
       revision: 1,
@@ -90,12 +92,13 @@ describe('entrance cluster engine', () => {
   it('keeps legacy pairs unfiltered, including mixed legacy/enriched datasets', () => {
     const engine = createEntranceClusterEngine();
     const legacy = [[5.5, 45.5], coordinates[1]];
-    engine({
+    const ready = engine({
       type: 'build',
       revision: 1,
       data: legacy,
       filters: { ...filters, minInterest: 10 }
     });
+    expect(ready.hasCriteria).toBe(false);
     expect(
       engine({ type: 'clusters', revision: 1, bounds: WORLD, zoom: 0 })
         .result[0].properties.point_count

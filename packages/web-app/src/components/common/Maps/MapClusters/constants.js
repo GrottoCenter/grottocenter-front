@@ -53,7 +53,7 @@ export const CAVE_SIZE_STYLE = {
 export const getEntranceCircleStyle = entrance =>
   CAVE_SIZE_STYLE[getCaveSize(entrance)];
 
-export const ENTRANCE_MARKER_FILTERS = [
+export const ENTRANCE_SIZE_FILTERS = [
   { id: CAVE_SIZE.SMALL, labelKey: 'Small caves' },
   { id: CAVE_SIZE.MEDIUM, labelKey: 'Medium caves' },
   { id: CAVE_SIZE.LARGE, labelKey: 'Large caves' }

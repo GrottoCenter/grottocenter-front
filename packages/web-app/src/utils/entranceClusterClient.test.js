@@ -30,8 +30,9 @@ describe('entrance cluster client', () => {
       revision: 3,
       filters: { minInterest: 8 }
     });
-    emit({ type: 'ready', revision: 3 });
+    emit({ type: 'ready', revision: 3, hasCriteria: true });
     expect(onReady).toHaveBeenCalledTimes(1);
+    expect(onReady.mock.lastCall[1]).toBe(true);
   });
 
   it('sends the latest replacement dataset after an in-flight build', () => {

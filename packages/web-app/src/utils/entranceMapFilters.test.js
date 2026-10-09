@@ -64,15 +64,19 @@ describe('entrance map filters', () => {
     );
   });
 
-  it('preserves missing quality for markers and legacy coordinates', () => {
+  it('preserves missing quality for detailed markers', () => {
     const filters = {
       ...defaultFilters,
       qualities: { insufficient: false, satisfactory: false, good: false }
     };
     expect(matchesEntranceMarker({ dataQuality: null }, filters)).toBe(true);
-    expect(matchesEntranceCoordinate([0, 0], filters)).toBe(true);
+  });
+
+  it('distinguishes legacy pairs from enriched criteria before filtering', () => {
     expect(hasEntranceCoordinateCriteria([0, 0])).toBe(false);
     expect(hasEntranceCoordinateCriteria([0, 0, 1, 0, null])).toBe(true);
+    expect(hasEntranceCoordinateCriteria([0, 0, 4, 0, null])).toBe(false);
+    expect(hasEntranceCoordinateCriteria([0, 0, 1, null, null])).toBe(false);
   });
 
   it('gives tuples and corresponding markers the same result', () => {
