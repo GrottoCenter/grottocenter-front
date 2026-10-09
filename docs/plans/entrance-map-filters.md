@@ -58,3 +58,16 @@ viewport, popup closing uses a targeted DOM click while it pans the map;
 bubble, marker and zoom-control interactions use pointer clicks.
 Modified-file ESLint, translation checks and the production build passed.
 The bundled Worker is included in the service worker precache.
+
+## CI browser follow-up
+
+The CI production build exposed service-worker cache interference between
+mocked scenarios, stale MUI rating hover during simulated clicks, and rapid
+checkbox clicks being interpreted as Leaflet touch double taps. Reuse one
+service-worker isolation command for map and document-moderation scenarios.
+Select preferences with native keyboard activation and assert their state;
+keep pointer clicks for cluster activation, popup opening and zoom controls.
+
+Validation against the downloaded CI production artifact: all seven map
+scenarios passed in headless Chrome and Firefox; all 17 document-moderation
+scenarios passed in Chrome. Modified-file ESLint and `git diff --check` passed.

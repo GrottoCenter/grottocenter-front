@@ -22,11 +22,32 @@ const ENTRANCES = COORDINATES.map(
 const openFilters = () =>
   cy.get('[data-tour="filters-control-toggle"]').click();
 const bubbles = () => cy.get('[data-testid="entrance-cluster"]');
-const selectInterest = stars =>
-  cy
-    .get(`[data-testid="entrance-interest-filter"] input[value="${stars}"]`)
-    .invoke('attr', 'id')
-    .then(id => cy.get(`label[for="${id}"]`).click('right'));
+const toggleCheckbox = (selector, checked) => {
+  // Native keyboard activation has no synthetic touch click. Rapid Cypress
+  // mouse clicks on controls can also trigger Leaflet's double-tap zoom.
+  cy.get(selector)
+    .should(checked ? 'not.be.checked' : 'be.checked')
+    .focus();
+  cy.press(Cypress.Keyboard.Keys.SPACE);
+  cy.get(selector).should(checked ? 'be.checked' : 'not.be.checked');
+};
+const selectInterest = stars => {
+  // MUI prioritizes mouse hover over a radio's value. Use native keyboard
+  // selection to avoid a stale hover during Firefox's simulated label click.
+  cy.get('[data-testid="entrance-interest-filter"]').trigger('mouseleave');
+  cy.get(
+    `[data-testid="entrance-interest-filter"] input[value="${stars}"]`
+  ).focus();
+  cy.press(Cypress.Keyboard.Keys.SPACE);
+  cy.get(
+    `[data-testid="entrance-interest-filter"] input[value="${stars}"]`
+  ).should('be.checked');
+  cy.window().should(win => {
+    expect(
+      JSON.parse(win.localStorage.getItem('grottocenter_minInterest'))
+    ).to.eq(stars * 2);
+  });
+};
 const expectCount = count =>
   bubbles().should(elements => {
     const total = elements
@@ -99,17 +120,18 @@ const visitMap = ({
 };
 
 describe('Entrance filters at every zoom', () => {
+  beforeEach(() => cy.disableServiceWorker());
+
   it('filters worker clusters by size, quality and interest, including empty/reset results', () => {
     visitMap();
     expectCount(4);
     openFilters();
-    cy.get('[data-testid="entrance-size-small"]')
-      .should('be.enabled')
-      .uncheck();
+    cy.get('[data-testid="entrance-size-small"]').should('be.enabled');
+    toggleCheckbox('[data-testid="entrance-size-small"]', false);
     expectCount(3);
-    cy.get('[data-testid="entrance-size-medium"]').uncheck();
+    toggleCheckbox('[data-testid="entrance-size-medium"]', false);
     expectCount(2);
-    cy.get('[data-testid="entrance-quality-satisfactory"]').uncheck();
+    toggleCheckbox('[data-testid="entrance-quality-satisfactory"]', false);
     expectCount(1);
     selectInterest(4);
     expectCount(1); // 7.5/10 is displayed as four stars.
@@ -124,10 +146,13 @@ describe('Entrance filters at every zoom', () => {
     visitMap();
     expectCount(4);
     openFilters();
-    cy.get('[data-testid="entrance-size-small"]').parent().click();
-    cy.get('[data-testid="entrance-size-medium"]').parent().click();
-    cy.get('[data-testid="entrance-quality-satisfactory"]').parent().click();
+    toggleCheckbox('[data-testid="entrance-size-small"]', false);
+    expectCount(3);
+    toggleCheckbox('[data-testid="entrance-size-medium"]', false);
+    expectCount(2);
+    toggleCheckbox('[data-testid="entrance-quality-satisfactory"]', false);
     expectCount(1);
+    expectZoom(10);
     cy.get('[data-tour="filters-control-toggle"]')
       .parent()
       .trigger('mouseout', { relatedTarget: null });
@@ -205,16 +230,13 @@ describe('Entrance filters at every zoom', () => {
     visitMap();
     expectCount(4);
     openFilters();
-    cy.get('[data-testid="entrance-size-small"]').uncheck();
+    toggleCheckbox('[data-testid="entrance-size-small"]', false);
     expectCount(3);
     cy.get('[data-tour="filters-control-toggle"]')
       .parent()
       .trigger('mouseout', { relatedTarget: null });
     cy.get('[data-tour="data-control-toggle"]').click();
-    cy.get('[data-tour="data-control-toggle"]')
-      .parent()
-      .find('input[name="entrances"]')
-      .uncheck();
+    toggleCheckbox('input[name="entrances"]', false);
     bubbles().should('not.exist');
     cy.get('[data-tour="data-control-toggle"]')
       .parent()
@@ -227,10 +249,7 @@ describe('Entrance filters at every zoom', () => {
       .parent()
       .trigger('mouseout', { relatedTarget: null });
     cy.get('[data-tour="data-control-toggle"]').click();
-    cy.get('[data-tour="data-control-toggle"]')
-      .parent()
-      .find('input[name="entrances"]')
-      .check();
+    toggleCheckbox('input[name="entrances"]', true);
     expectCount(3);
   });
 

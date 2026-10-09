@@ -37,21 +37,8 @@ const openPreview = () => {
 describe('Document moderation preview', () => {
   beforeEach(() => {
     cy.viewport(1280, 900);
-    // Production previews register a service worker. Keep each mocked scenario
-    // independent of response caches and of cached HTML's locale bootstrap.
-    cy.then(async () => {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(
-        registrations.map(registration => registration.unregister())
-      );
-      const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map(name => caches.delete(name)));
-    });
+    cy.disableServiceWorker();
     cy.mockApiCatchAll();
-    cy.intercept(
-      { method: 'GET', pathname: '/sw.js' },
-      { statusCode: 404, body: '' }
-    );
     cy.intercept(
       { method: 'GET', pathname: '/api/v1/account' },
       { body: { id: 1, nickname: 'TestCaver', language: 'eng' } }
