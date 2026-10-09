@@ -32,7 +32,11 @@ const submitForm = () =>
 
 const visitForm = (
   path,
-  { isLocationDenied = false, positions = [POSITION] } = {}
+  {
+    isLocationDenied = false,
+    positions = [POSITION],
+    usePseudoFullscreen = false
+  } = {}
 ) => {
   cy.mockApiCatchAll();
   cy.intercept(
@@ -63,6 +67,14 @@ const visitForm = (
   cy.visit(path, {
     onBeforeLoad: win => {
       win.localStorage.setItem('selectedLanguage', 'en');
+      if (usePseudoFullscreen) {
+        // Cypress clicks do not grant the activation required by native
+        // fullscreen in Firefox. Exercise Leaflet's supported fallback.
+        Object.defineProperty(win.document, 'fullscreenEnabled', {
+          configurable: true,
+          value: false
+        });
+      }
       let requestCount = 0;
       const watches = new Map();
       Object.defineProperty(win.navigator, 'geolocation', {
@@ -338,7 +350,8 @@ describe('Entrance accuracy', () => {
   it('keeps GPS and its status working when entering and leaving fullscreen', () => {
     cy.viewport(375, 812);
     visitForm('/entrances/1/edit', {
-      positions: [{ ...POSITION, accuracy: 100 }]
+      positions: [{ ...POSITION, accuracy: 100 }],
+      usePseudoFullscreen: true
     });
     cy.clock();
     cy.get('[data-testid="locate-me"]').click();
@@ -420,20 +433,21 @@ describe('Entrance accuracy', () => {
   it('rejects malformed accuracy without silently clearing the stored value', () => {
     visitForm('/entrances/1/edit');
     accuracyInput().clear().focus();
-    // Native number editing can expose an empty value for incomplete text.
-    // Use browser input: Cypress .type() sanitizes '-' before dispatching it.
-    cy.then(() =>
-      Cypress.automation('remote:debugger:protocol', {
-        command: 'Input.insertText',
-        params: { text: '-' }
-      })
-    );
+    // Cypress .type() sanitizes incomplete number input. Simulate the native
+    // validity flag without the Chromium-only debugger protocol.
+    accuracyInput().then(input => {
+      cy.stub(input[0].validity, 'badInput').get(() => true);
+    });
     accuracyInput().should(input => {
       expect(input[0].validity.badInput).to.equal(true);
     });
     submitForm();
     cy.contains('Enter a whole number.').should('be.visible');
     cy.get('@updateEntrance.all').should('have.length', 0);
+    accuracyInput().then(input => {
+      const { validity } = input[0];
+      delete validity.badInput;
+    });
     cy.get('[data-testid="locate-me"]').click();
     accuracyInput()
       .should('have.value', '7')
