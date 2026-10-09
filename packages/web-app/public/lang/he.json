@@ -1691,6 +1691,7 @@
   "location.accuracy.checkDeclared": "המיקום השתנה. יש לבדוק את הדיוק שהוזן.",
   "location.accuracy.cleared": "המיקום השתנה. יש להזין את הדיוק המשוער שלו, אם הוא ידוע.",
   "location.acquisition.estimated": "דיוק משוער של המכשיר: ±{accuracy} מ׳.",
+  "location.acquisition.firefoxLimited": "מיקום משוער — דיוק מוגבל ב־Firefox.",
   "location.acquisition.improving": "דיוק משוער: ±{accuracy} מ׳ — משתפר…",
   "location.acquisition.limited": "הדיוק הטוב ביותר שהתקבל: ±{accuracy} מ׳. יש לנסות שוב לקבלת הערכה טובה יותר.",
   "location.acquisition.retry": "ניסיון נוסף",

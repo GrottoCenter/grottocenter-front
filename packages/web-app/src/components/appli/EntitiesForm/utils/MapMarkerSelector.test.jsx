@@ -4,15 +4,18 @@ import { IntlProvider } from 'react-intl';
 import messages from '@/../public/lang/en.json';
 import MapMarkerSelector from './MapMarkerSelector';
 
-const { map, mapHandlers } = vi.hoisted(() => ({
+const { map, mapHandlers, browser } = vi.hoisted(() => ({
   map: {
     setView: vi.fn(),
     getCenter: vi.fn(),
     getSize: vi.fn(() => ({ x: 400, y: 300 })),
     getZoom: vi.fn(() => 18)
   },
-  mapHandlers: {}
+  mapHandlers: {},
+  browser: { isMobile: false, isAndroid: false, isFirefox: false }
 }));
+
+vi.mock('react-device-detect', () => browser);
 
 vi.mock('react-leaflet', () => ({
   MapContainer: ({ children, className }) => (
@@ -137,6 +140,8 @@ describe('MapMarkerSelector entrance accuracy', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
+    browser.isAndroid = false;
+    browser.isFirefox = false;
     geolocation = {
       watchPosition: vi.fn().mockReturnValue(42),
       clearWatch: vi.fn()
@@ -150,6 +155,68 @@ describe('MapMarkerSelector entrance accuracy', () => {
   });
 
   afterEach(() => vi.useRealTimers());
+
+  it.each([
+    [true, true, 100, true],
+    [true, false, 100, false],
+    [false, true, 100, false],
+    [true, true, 99.9, false],
+    [true, true, 100.1, false]
+  ])(
+    'reports limited accuracy for Android=%s, Firefox=%s and accuracy=%s',
+    (isAndroid, isFirefox, accuracy, shouldWarn) => {
+      browser.isAndroid = isAndroid;
+      browser.isFirefox = isFirefox;
+      render(<MapHarness />);
+      fireEvent.click(screen.getByTestId('locate-me'));
+      const [onFix] = geolocation.watchPosition.mock.calls[0];
+      act(() =>
+        onFix({ coords: { latitude: 45.1, longitude: 5.1, accuracy } })
+      );
+      const message = 'Approximate position — limited accuracy on Firefox.';
+      if (shouldWarn) {
+        expect(screen.getByRole('status')).toHaveTextContent(message);
+      } else {
+        expect(screen.getByRole('status')).not.toHaveTextContent(message);
+      }
+      expect(screen.getByTestId('locate-me')).toHaveAccessibleName(
+        'Stop searching'
+      );
+      expect(geolocation.clearWatch).not.toHaveBeenCalled();
+    }
+  );
+
+  it('restores normal status as Firefox Android receives a better fix', () => {
+    browser.isAndroid = true;
+    browser.isFirefox = true;
+    render(<MapHarness />);
+    fireEvent.click(screen.getByTestId('locate-me'));
+    const [onFix] = geolocation.watchPosition.mock.calls[0];
+    act(() =>
+      onFix({ coords: { latitude: 45.1, longitude: 5.1, accuracy: 100 } })
+    );
+    act(() => mapHandlers.enterFullscreen());
+    expect(screen.getByTestId('entrance-precision-legend')).toHaveTextContent(
+      'Approximate position — limited accuracy on Firefox.'
+    );
+    act(() =>
+      onFix({ coords: { latitude: 45.2, longitude: 5.2, accuracy: 6.4 } })
+    );
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Estimated accuracy: ±7 m — improving'
+    );
+    expect(geolocation.clearWatch).not.toHaveBeenCalled();
+  });
+
+  it('does not attribute manually declared accuracy to Firefox', () => {
+    browser.isAndroid = true;
+    browser.isFirefox = true;
+    render(<MapHarness />);
+    fireEvent.change(screen.getByRole('textbox', { name: 'Accuracy' }), {
+      target: { value: '100' }
+    });
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
 
   it('previews saved and manually edited accuracy, then removes it when cleared', () => {
     render(<MapHarness />);

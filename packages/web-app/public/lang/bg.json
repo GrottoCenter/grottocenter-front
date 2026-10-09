@@ -1691,6 +1691,7 @@
   "location.accuracy.checkDeclared": "Местоположението е променено. Проверете въведената точност.",
   "location.accuracy.cleared": "Местоположението е променено. Въведете очакваната му точност, ако я знаете.",
   "location.acquisition.estimated": "Очаквана точност на устройството: ±{accuracy} м.",
+  "location.acquisition.firefoxLimited": "Приблизително местоположение — ограничена точност във Firefox.",
   "location.acquisition.improving": "Очаквана точност: ±{accuracy} м — подобрява се…",
   "location.acquisition.limited": "Най-добра получена точност: ±{accuracy} м. Опитайте отново за по-добра оценка.",
   "location.acquisition.retry": "Опитайте отново",

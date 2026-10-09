@@ -1691,6 +1691,7 @@
   "location.accuracy.checkDeclared": "Posisi berubah. Periksa akurasi yang Anda masukkan.",
   "location.accuracy.cleared": "Posisi berubah. Masukkan perkiraan akurasinya jika diketahui.",
   "location.acquisition.estimated": "Perkiraan akurasi perangkat: ±{accuracy} m.",
+  "location.acquisition.firefoxLimited": "Posisi perkiraan — akurasi terbatas di Firefox.",
   "location.acquisition.improving": "Perkiraan akurasi: ±{accuracy} m — sedang ditingkatkan…",
   "location.acquisition.limited": "Akurasi terbaik yang diterima: ±{accuracy} m. Coba lagi untuk perkiraan yang lebih baik.",
   "location.acquisition.retry": "Coba lagi",

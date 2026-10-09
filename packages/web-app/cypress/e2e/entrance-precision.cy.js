@@ -39,7 +39,8 @@ const visitForm = (
   {
     isLocationDenied = false,
     positions = [POSITION],
-    usePseudoFullscreen = false
+    usePseudoFullscreen = false,
+    userAgent
   } = {}
 ) => {
   cy.mockApiCatchAll();
@@ -71,6 +72,12 @@ const visitForm = (
   cy.visit(path, {
     onBeforeLoad: win => {
       win.localStorage.setItem('selectedLanguage', 'en');
+      if (userAgent) {
+        Object.defineProperty(win.navigator, 'userAgent', {
+          configurable: true,
+          value: userAgent
+        });
+      }
       if (usePseudoFullscreen) {
         // Cypress clicks do not grant the activation required by native
         // fullscreen in Firefox. Exercise Leaflet's supported fallback.
@@ -120,6 +127,29 @@ const visitForm = (
 };
 
 describe('Entrance accuracy', () => {
+  it('immediately explains Firefox Android accuracy and clears the message on improvement', () => {
+    visitForm('/entrances/1/edit', {
+      userAgent:
+        'Mozilla/5.0 (Android 14; Mobile; rv:135.0) Gecko/135.0 Firefox/135.0',
+      positions: [[{ ...POSITION, accuracy: 100 }, POSITION]]
+    });
+    cy.get('[data-testid="locate-me"]').click();
+    emitLocation();
+    accuracyInput().should('have.value', '100');
+    cy.get('[data-testid="location-status"]').should(
+      'have.text',
+      'Approximate position — limited accuracy on Firefox.'
+    );
+    cy.get('@clearWatch').should('not.have.been.called');
+    emitLocation();
+    accuracyInput().should('have.value', '7');
+    cy.get('[data-testid="location-status"]').should(
+      'contain.text',
+      'Estimated accuracy: ±7 m — improving'
+    );
+    cy.get('@clearWatch').should('not.have.been.called');
+  });
+
   it('shows an accuracy legend with an orange symbol and removes it when cleared', () => {
     visitForm('/entrances/1/edit');
     accuracyLegend().should('have.text', 'Accuracy');

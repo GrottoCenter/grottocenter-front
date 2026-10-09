@@ -1691,6 +1691,7 @@
   "location.accuracy.checkDeclared": "Positie gewijzigd. Controleer de ingevulde nauwkeurigheid.",
   "location.accuracy.cleared": "Positie gewijzigd. Vul de geschatte nauwkeurigheid in als u die kent.",
   "location.acquisition.estimated": "Geschatte nauwkeurigheid van het apparaat: ±{accuracy} m.",
+  "location.acquisition.firefoxLimited": "Geschatte positie — beperkte nauwkeurigheid in Firefox.",
   "location.acquisition.improving": "Geschatte nauwkeurigheid: ±{accuracy} m — wordt verbeterd…",
   "location.acquisition.limited": "Beste ontvangen nauwkeurigheid: ±{accuracy} m. Probeer opnieuw voor een betere schatting.",
   "location.acquisition.retry": "Opnieuw proberen",

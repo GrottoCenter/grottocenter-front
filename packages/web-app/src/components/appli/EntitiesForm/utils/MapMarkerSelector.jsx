@@ -9,7 +9,7 @@ import {
   ScaleControl
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
-import { isMobile } from 'react-device-detect';
+import { isAndroid, isFirefox, isMobile } from 'react-device-detect';
 import { alpha, styled } from '@mui/material/styles';
 import { orange } from '@mui/material/colors';
 import { Box, Typography } from '@mui/material';
@@ -407,7 +407,11 @@ const MapMarkerSelector = ({
 
   let statusId = accuracyHint;
   if (locateError) statusId = LOCATE_ERRORS[locateError];
-  else if (locating) {
+  else if (isAndroid && isFirefox && deviceFix?.accuracy === 100) {
+    // The exact device estimate is a hint of Mozilla bug 1946736, not proof.
+    // Keep acquiring: a better fix automatically restores the usual status.
+    statusId = 'location.acquisition.firefoxLimited';
+  } else if (locating) {
     statusId = deviceFix
       ? 'location.acquisition.improving'
       : 'location.acquisition.searching';

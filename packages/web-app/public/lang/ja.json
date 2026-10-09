@@ -1691,6 +1691,7 @@
   "location.accuracy.checkDeclared": "位置が変更されました。入力した精度を確認してください。",
   "location.accuracy.cleared": "位置が変更されました。推定精度が分かる場合は入力してください。",
   "location.acquisition.estimated": "端末の推定精度：±{accuracy} m。",
+  "location.acquisition.firefoxLimited": "位置は概算です — Firefoxでは精度が制限されます。",
   "location.acquisition.improving": "推定精度：±{accuracy} m — 精度を改善中…",
   "location.acquisition.limited": "取得できた最高精度：±{accuracy} m。より良い推定値を得るには再試行してください。",
   "location.acquisition.retry": "再試行",

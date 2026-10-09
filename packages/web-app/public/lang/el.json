@@ -1691,6 +1691,7 @@
   "location.accuracy.checkDeclared": "Η θέση άλλαξε. Ελέγξτε την ακρίβεια που εισαγάγατε.",
   "location.accuracy.cleared": "Η θέση άλλαξε. Εισαγάγετε την εκτιμώμενη ακρίβειά της, αν τη γνωρίζετε.",
   "location.acquisition.estimated": "Εκτιμώμενη ακρίβεια της συσκευής: ±{accuracy} μ.",
+  "location.acquisition.firefoxLimited": "Κατά προσέγγιση θέση — περιορισμένη ακρίβεια στον Firefox.",
   "location.acquisition.improving": "Εκτιμώμενη ακρίβεια: ±{accuracy} μ. — βελτιώνεται…",
   "location.acquisition.limited": "Καλύτερη ακρίβεια που λήφθηκε: ±{accuracy} μ. Δοκιμάστε ξανά για καλύτερη εκτίμηση.",
   "location.acquisition.retry": "Δοκιμάστε ξανά",

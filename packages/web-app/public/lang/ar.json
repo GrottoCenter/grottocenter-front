@@ -1691,6 +1691,7 @@
   "location.accuracy.checkDeclared": "تغيّر الموقع. تحقّق من الدقة التي أدخلتها.",
   "location.accuracy.cleared": "تغيّر الموقع. أدخل دقته المقدّرة إذا كنت تعرفها.",
   "location.acquisition.estimated": "دقة موقع الجهاز المقدّرة: ±{accuracy} م.",
+  "location.acquisition.firefoxLimited": "موقع تقريبي — دقة محدودة في Firefox.",
   "location.acquisition.improving": "الدقة المقدّرة: ±{accuracy} م — جارٍ تحسينها…",
   "location.acquisition.limited": "أفضل دقة تم الحصول عليها: ±{accuracy} م. أعد المحاولة للحصول على تقدير أفضل.",
   "location.acquisition.retry": "إعادة المحاولة",

@@ -1691,6 +1691,7 @@
   "location.accuracy.checkDeclared": "Position modifiée. Vérifiez la précision que vous avez saisie.",
   "location.accuracy.cleared": "Position modifiée. Renseignez sa précision estimée si vous la connaissez.",
   "location.acquisition.estimated": "Précision estimée de l’appareil : ±{accuracy} m.",
+  "location.acquisition.firefoxLimited": "Position approximative — précision limitée sur Firefox.",
   "location.acquisition.improving": "Précision estimée : ±{accuracy} m — amélioration en cours…",
   "location.acquisition.limited": "Meilleure précision reçue : ±{accuracy} m. Réessayez pour obtenir une meilleure estimation.",
   "location.acquisition.retry": "Réessayer",

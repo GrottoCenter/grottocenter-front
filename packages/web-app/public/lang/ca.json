@@ -1691,6 +1691,7 @@
   "location.accuracy.checkDeclared": "La posició ha canviat. Comproveu la precisió que heu introduït.",
   "location.accuracy.cleared": "La posició ha canviat. Introduïu-ne la precisió estimada si la coneixeu.",
   "location.acquisition.estimated": "Precisió estimada del dispositiu: ±{accuracy} m.",
+  "location.acquisition.firefoxLimited": "Posició aproximada — precisió limitada al Firefox.",
   "location.acquisition.improving": "Precisió estimada: ±{accuracy} m — s’està millorant…",
   "location.acquisition.limited": "Millor precisió rebuda: ±{accuracy} m. Torneu-ho a provar per obtenir una estimació millor.",
   "location.acquisition.retry": "Torna-ho a provar",
