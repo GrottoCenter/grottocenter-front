@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { useController, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import { NUMERIC_FIELD_LIMITS } from '@/utils/numericFieldLimits';
 import { usePermissions, useNearbyEntrances } from '../../../../hooks';
 import SensitivitySection from '../../../common/SensitivitySection';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
@@ -111,6 +112,8 @@ const EntranceDetail = ({
           icon="altitude"
           unit="m"
           isError={!!errors.entrance?.altitude}
+          min={NUMERIC_FIELD_LIMITS.ALTITUDE.min}
+          max={NUMERIC_FIELD_LIMITS.ALTITUDE.max}
         />
       </Box>
       {/* Same panel as the massif form: the rules are identical, so the two
@@ -146,8 +149,8 @@ EntranceDetail.propTypes = {
       longitude: PropTypes.shape({ message: PropTypes.string }),
       language: PropTypes.shape({ message: PropTypes.string }),
       name: PropTypes.shape({ message: PropTypes.string }),
-      altitude: PropTypes.shape({ message: PropTypes.number }),
-      yearDiscovery: PropTypes.shape({ message: PropTypes.number })
+      altitude: PropTypes.shape({ message: PropTypes.string }),
+      yearDiscovery: PropTypes.shape({ message: PropTypes.string })
     })
   }),
   control: PropTypes.shape({}),

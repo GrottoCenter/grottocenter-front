@@ -3,6 +3,7 @@ import React, { Suspense } from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 
 import InputLanguage from '../utils/InputLanguage';
 import InputText from '../utils/InputText';
@@ -19,10 +20,12 @@ const MassifFields = ({ control, errors, geoJson, onValidationChange }) => {
       <FormRow>
         <InputText
           formKey="massif.name"
+          testId="massif-name"
           labelName="Massif name"
           control={control}
           isError={!!errors?.massif?.name}
           isRequired
+          maxLength={TEXT_LENGTH_LIMITS.ENTITY_NAME}
         />
 
         <InputLanguage

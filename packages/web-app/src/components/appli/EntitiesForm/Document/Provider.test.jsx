@@ -2,7 +2,11 @@ import { useContext } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { DocumentTypes } from '@/utils/documentTypeHelpers';
-import DocumentFormProvider, { DocumentFormContext } from './Provider';
+import { IS_NEW } from './formElements/AddFileForm/FileHelpers';
+import DocumentFormProvider, {
+  DocumentFormContext,
+  getDocumentLengthErrors
+} from './Provider';
 
 const ValidationState = () => {
   const { isFormValid } = useContext(DocumentFormContext);
@@ -71,6 +75,89 @@ describe('DocumentFormProvider parent validation', () => {
       ...validDocument,
       type: DocumentTypes.COLLECTION,
       parent: { id: '42', title: 'Current document' }
+    });
+
+    await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
+  });
+});
+
+describe('DocumentFormProvider length validation', () => {
+  it.each([
+    ['title', 300],
+    ['identifier', 250],
+    ['pages', 20],
+    ['issue', 100],
+    ['creatorComment', 300]
+  ])(
+    'rejects a preloaded %s longer than %i characters',
+    async (field, limit) => {
+      renderValidation({
+        ...validDocument,
+        type: field === 'pages' ? DocumentTypes.ARTICLE : validDocument.type,
+        [field]: 'x'.repeat(limit + 1)
+      });
+
+      await waitFor(() =>
+        expect(screen.getByText('invalid')).toBeInTheDocument()
+      );
+    }
+  );
+
+  it.each([299, 300])('accepts a title of %i characters', async length => {
+    renderValidation({ ...validDocument, title: 'x'.repeat(length) });
+
+    await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
+  });
+
+  it.each([19, 20])('accepts pages of %i characters', async length => {
+    renderValidation({
+      ...validDocument,
+      type: DocumentTypes.ARTICLE,
+      pages: '1'.repeat(length)
+    });
+
+    await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
+  });
+
+  it('rejects an oversized new file even when its display name is empty', async () => {
+    renderValidation({
+      ...validDocument,
+      files: [
+        {
+          state: IS_NEW,
+          fileName: '',
+          file: { name: `${'a'.repeat(197)}.png` }
+        }
+      ]
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('invalid')).toBeInTheDocument()
+    );
+  });
+
+  it('identifies the oversized field so the form can explain the blocked save', () => {
+    expect(
+      getDocumentLengthErrors({
+        ...validDocument,
+        identifier: 'x'.repeat(251)
+      })
+    ).toEqual([
+      {
+        field: 'identifier',
+        label: 'Identifier',
+        limit: 250,
+        count: 251
+      }
+    ]);
+  });
+
+  it('ignores stale metadata that the document type does not expose', async () => {
+    renderValidation({
+      ...validDocument,
+      type: DocumentTypes.IMAGE,
+      issue: 'x'.repeat(101),
+      pages: 'x'.repeat(101)
     });
 
     await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());

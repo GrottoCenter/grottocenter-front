@@ -42,6 +42,7 @@ import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { styled } from '@mui/material/styles';
 
 import { useQueryClient } from '@tanstack/react-query';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { postLogout } from '../../actions/Login';
 import {
   useAccount,
@@ -346,6 +347,8 @@ const PersonalInfoSection = ({ account, onSaved }) => {
       <FormRow>
         <InputText
           formKey="nickname"
+          testId="account-nickname"
+          maxLength={TEXT_LENGTH_LIMITS.NICKNAME}
           labelName="Nickname"
           control={control}
           isRequired
@@ -355,12 +358,16 @@ const PersonalInfoSection = ({ account, onSaved }) => {
       <FormRow>
         <InputText
           formKey="name"
+          testId="account-first-name"
+          maxLength={TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME}
           labelName="First name"
           control={control}
           isError={!!errors.name}
         />
         <InputText
           formKey="surname"
+          testId="account-last-name"
+          maxLength={TEXT_LENGTH_LIMITS.PERSON_LAST_NAME}
           labelName="Last name"
           control={control}
           isError={!!errors.surname}
@@ -703,6 +710,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
       <FormRow>
         <InputText
           formKey="email"
+          maxLength={TEXT_LENGTH_LIMITS.EMAIL}
           labelName="Email"
           control={emailControl}
           isRequired

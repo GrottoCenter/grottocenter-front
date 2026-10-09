@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useController } from 'react-hook-form';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 
 import { FormRow } from '../utils/FormContainers';
@@ -12,85 +12,80 @@ const EditTypeSelection = ({
   control,
   errors,
   entityType,
-  isNewEntrance = false
-}) => {
-  // Only used to mirror the cave name into the (hidden) entrance name field in
-  // ENTRANCE_AND_CAVE mode, where the entrance takes the cave's name. No
-  // `required` rule here on purpose: that field is hidden and derived in this
-  // mode, so requiring it would silently block submit. The visible name field
-  // carries its own `isRequired`, and submission is gated by isSubmitDisabled.
-  const {
-    field: { onChange: onNameChange }
-  } = useController({ control, name: 'entrance.name' });
-
-  return (
-    <FormRow>
-      {entityType === ENTRANCE_AND_CAVE ? (
-        <>
-          <Box sx={{ flex: { xs: '1 1 100%', sm: 2 }, minWidth: 0 }}>
-            <NameSuggestionDropdown
-              control={control}
+  isNewEntrance = false,
+  setValue
+}) => (
+  <FormRow>
+    {entityType === ENTRANCE_AND_CAVE ? (
+      <>
+        <Box sx={{ flex: { xs: '1 1 100%', sm: 2 }, minWidth: 0 }}>
+          <NameSuggestionDropdown
+            control={control}
+            formKey="cave.name"
+            enabled={isNewEntrance}>
+            <InputText
               formKey="cave.name"
-              enabled={isNewEntrance}>
-              <InputText
-                formKey="cave.name"
-                labelName="Entrance name"
-                control={control}
-                isError={!!errors?.cave?.name}
-                isRequired
-                onChangeAdditionalFn={onNameChange}
-              />
-            </NameSuggestionDropdown>
-          </Box>
-          <Box sx={{ flex: { xs: '1 1 100%', sm: 1 }, minWidth: 0 }}>
-            <InputLanguage
-              formKey="cave.language"
-              labelName="Cave name language"
+              labelName="Entrance name"
               control={control}
-              isError={!!errors?.cave?.language}
+              isError={!!errors?.cave?.name}
+              isRequired
+              maxLength={TEXT_LENGTH_LIMITS.ENTITY_NAME}
+              onChangeAdditionalFn={event =>
+                setValue('entrance.name', event.target.value)
+              }
             />
-          </Box>
-        </>
-      ) : (
-        <>
-          <Box sx={{ flex: { xs: '1 1 100%', sm: 2 }, minWidth: 0 }}>
-            <NameSuggestionDropdown
-              control={control}
+          </NameSuggestionDropdown>
+        </Box>
+        <Box sx={{ flex: { xs: '1 1 100%', sm: 1 }, minWidth: 0 }}>
+          <InputLanguage
+            formKey="cave.language"
+            labelName="Cave name language"
+            control={control}
+            isError={!!errors?.cave?.language}
+          />
+        </Box>
+      </>
+    ) : (
+      <>
+        <Box sx={{ flex: { xs: '1 1 100%', sm: 2 }, minWidth: 0 }}>
+          <NameSuggestionDropdown
+            control={control}
+            formKey="entrance.name"
+            enabled={isNewEntrance}>
+            <InputText
               formKey="entrance.name"
-              enabled={isNewEntrance}>
-              <InputText
-                formKey="entrance.name"
-                labelName="Entrance name"
-                control={control}
-                isError={!!errors?.entrance?.name}
-                isRequired
-              />
-            </NameSuggestionDropdown>
-          </Box>
-          <Box sx={{ flex: { xs: '1 1 100%', sm: 1 }, minWidth: 0 }}>
-            <InputLanguage
-              formKey="entrance.language"
-              labelName="Entrance name language"
+              labelName="Entrance name"
               control={control}
-              isError={!!errors?.entrance?.language}
+              isError={!!errors?.entrance?.name}
+              isRequired
+              maxLength={TEXT_LENGTH_LIMITS.ENTITY_NAME}
             />
-          </Box>
-        </>
-      )}
-    </FormRow>
-  );
-};
+          </NameSuggestionDropdown>
+        </Box>
+        <Box sx={{ flex: { xs: '1 1 100%', sm: 1 }, minWidth: 0 }}>
+          <InputLanguage
+            formKey="entrance.language"
+            labelName="Entrance name language"
+            control={control}
+            isError={!!errors?.entrance?.language}
+          />
+        </Box>
+      </>
+    )}
+  </FormRow>
+);
 
 EditTypeSelection.propTypes = {
   control: PropTypes.shape({}),
+  setValue: PropTypes.func.isRequired,
   errors: PropTypes.shape({
     cave: PropTypes.shape({
-      name: PropTypes.string,
-      language: PropTypes.string
+      name: PropTypes.shape({ message: PropTypes.string }),
+      language: PropTypes.shape({ message: PropTypes.string })
     }),
     entrance: PropTypes.shape({
-      name: PropTypes.string,
-      language: PropTypes.string
+      name: PropTypes.shape({ message: PropTypes.string }),
+      language: PropTypes.shape({ message: PropTypes.string })
     })
   }),
   entityType: PropTypes.oneOf([ENTRANCE_ONLY, ENTRANCE_AND_CAVE]),

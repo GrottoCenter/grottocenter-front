@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { Box } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -104,6 +105,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
         <FormRow>
           <InputText
             formKey="title"
+            maxLength={TEXT_LENGTH_LIMITS.TITLE}
             labelName="Title"
             control={control}
             isError={!!errors?.title}

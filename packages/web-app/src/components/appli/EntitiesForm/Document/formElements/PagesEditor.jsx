@@ -1,59 +1,28 @@
-import { useContext, useState, useEffect } from 'react';
-import {
-  FilledInput,
-  FormControl,
-  InputLabel,
-  Typography
-} from '@mui/material';
-import Translate from '../../../../common/Translate';
-
+import { useContext } from 'react';
+import { useIntl } from 'react-intl';
+import StringInput from '@/components/common/Form/StringInput';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { DocumentFormContext, isDocumentPagesFormatValid } from '../Provider';
 
 const PagesEditor = () => {
-  const [isFormatError, setIsFormatError] = useState(false);
+  const { formatMessage } = useIntl();
   const { document, updateAttribute } = useContext(DocumentFormContext);
-
   const pages = document.pages ?? '';
 
-  useEffect(() => {
-    setIsFormatError(!isDocumentPagesFormatValid(pages));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
-    <>
-      <Typography
-        variant="caption"
-        sx={{
-          color: 'text.secondary',
-          display: 'block'
-        }}>
-        <Translate>
-          The page or the pages interval (using format: start-end, e.g: 10-12)
-          where the article is.
-        </Translate>
-      </Typography>
-      <FormControl variant="filled" error={isFormatError} fullWidth>
-        <InputLabel>
-          <Translate>Pages</Translate>
-        </InputLabel>
-        <FilledInput
-          onChange={e => {
-            const reg = /^(\d+-?\d*)?$/;
-            const newV = e.target.value;
-            if (newV.match(reg)) {
-              updateAttribute('pages', newV);
-              setIsFormatError(!isDocumentPagesFormatValid(newV));
-            }
-          }}
-          type="text"
-          value={pages}
-        />
-      </FormControl>
-    </>
+    <StringInput
+      helperText={formatMessage({
+        id: 'The page or the pages interval (using format: start-end, e.g: 10-12) where the article is.'
+      })}
+      valueName={formatMessage({ id: 'Pages' })}
+      value={pages}
+      maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_PAGES}
+      hasError={!isDocumentPagesFormatValid(pages)}
+      onValueChange={value => {
+        if (/^(\d+-?\d*)?$/.test(value)) updateAttribute('pages', value);
+      }}
+    />
   );
 };
-
-PagesEditor.propTypes = {};
 
 export default PagesEditor;

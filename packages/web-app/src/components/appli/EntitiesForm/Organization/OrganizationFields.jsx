@@ -1,5 +1,6 @@
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 
 import InputText from '../utils/InputText';
 import InputCountry from '../utils/InputCountry';
@@ -19,6 +20,7 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
           control={control}
           isError={!!errors?.organization?.name}
           isRequired
+          maxLength={TEXT_LENGTH_LIMITS.ENTITY_NAME}
         />
 
         <InputLanguage
@@ -56,6 +58,7 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
         isError={!!errors?.organization?.customMessage}
         minRows={6}
         isRequired
+        characterLimit={TEXT_LENGTH_LIMITS.ORGANIZATION_MESSAGE}
       />
 
       <FormSectionLabel
@@ -68,6 +71,7 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
           control={control}
           isError={!!errors?.organization?.mail}
           type="email"
+          maxLength={TEXT_LENGTH_LIMITS.EMAIL}
         />
         <InputText
           formKey="organization.url"
@@ -75,6 +79,7 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
           control={control}
           isError={!!errors?.organization?.url}
           type="url"
+          maxLength={TEXT_LENGTH_LIMITS.URL}
         />
       </FormRow>
       <InputText
@@ -82,6 +87,7 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
         labelName="Address"
         control={control}
         isError={!!errors?.organization?.address}
+        maxLength={TEXT_LENGTH_LIMITS.ADDRESS}
       />
 
       {/* To uncomment when api will have addressLine2 field
@@ -107,12 +113,14 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
           labelName="Zip code"
           control={control}
           isError={!!errors?.organization?.zipCode}
+          maxLength={TEXT_LENGTH_LIMITS.POSTAL_CODE}
         />
         <InputText
           formKey="organization.city"
           labelName="City"
           control={control}
           isError={!!errors?.organization?.city}
+          maxLength={TEXT_LENGTH_LIMITS.CITY}
         />
         <InputCountry control={control} formKey="organization.country" />
       </FormRow>

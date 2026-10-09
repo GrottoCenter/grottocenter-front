@@ -20,7 +20,11 @@ const CaveAutoCompleteSearch = ({
   value = null,
   required = false,
   disabled = false,
-  label
+  label,
+  onBlur,
+  inputRef,
+  error = false,
+  helperText
 }) => {
   const { formatMessage } = useIntl();
   const { inputValue, setInputValue, results, isLoading, hasError } =
@@ -65,7 +69,10 @@ const CaveAutoCompleteSearch = ({
           {...params}
           variant="filled"
           required={required}
-          error={hasError}
+          error={hasError || error}
+          helperText={helperText}
+          inputRef={inputRef}
+          onBlur={onBlur}
           label={label ?? formatMessage({ id: 'Entrance or network' })}
           placeholder={formatMessage({
             id: 'Search for an entrance or network'
@@ -94,6 +101,10 @@ CaveAutoCompleteSearch.propTypes = {
   required: PropTypes.bool,
   disabled: PropTypes.bool,
   label: PropTypes.string,
+  onBlur: PropTypes.func,
+  inputRef: PropTypes.func,
+  error: PropTypes.bool,
+  helperText: PropTypes.string,
   value: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     name: PropTypes.string

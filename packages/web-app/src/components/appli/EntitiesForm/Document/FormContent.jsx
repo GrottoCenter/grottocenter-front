@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, Suspense } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  Suspense
+} from 'react';
 import PropTypes from 'prop-types';
 import {
   Accordion,
@@ -14,6 +20,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 
 import { useLanguages } from '../../../../hooks';
 
@@ -47,9 +54,12 @@ const PublicationDatePicker = React.lazy(
 );
 
 const FormContent = ({ onCancel, isSubmitting = false }) => {
+  const [isAdditionalInfoExpanded, setIsAdditionalInfoExpanded] =
+    useState(false);
   const {
     document,
     isFormValid,
+    lengthErrors,
     isNewDocument,
     updateAttribute,
     linkedEntrance
@@ -70,6 +80,13 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
   const locale = useSelector(state => state.intl.locale);
   const { data: languages = [] } = useLanguages();
   const userLanguageId = languages.find(l => l.part1 === locale)?.id ?? '000';
+  const hasAdditionalInfoLengthError = lengthErrors.some(({ field }) =>
+    ['identifier', 'issue', 'creatorComment'].includes(field)
+  );
+
+  useEffect(() => {
+    if (hasAdditionalInfoLengthError) setIsAdditionalInfoExpanded(true);
+  }, [hasAdditionalInfoLengthError]);
 
   useEffect(() => {
     if (document.mainLanguage === '000' && userLanguageId !== '000')
@@ -131,13 +148,25 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
         </Alert>
       )}
       <DocumentTypeSelect />
+      {lengthErrors.length > 0 && (
+        <Alert severity="error" sx={{ mt: 1 }}>
+          {lengthErrors.map(({ field, label, limit, count }) => (
+            <Box key={field}>
+              {formatMessage({ id: label })}:{' '}
+              {formatMessage({ id: 'form.maxLength' }, { limit, count })}
+            </Box>
+          ))}
+        </Alert>
+      )}
       {!isUnknown(docType) && simple && (
         /* Simplified layout for Image / Topographic Drawing — no sections */
         <Box sx={{ mt: 1 }}>
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
+              data-testid="document-title"
               value={document.title}
+              maxLength={TEXT_LENGTH_LIMITS.TITLE}
               valueName={formatMessage({ id: 'Title' })}
               required
             />
@@ -169,7 +198,9 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
+              data-testid="document-title"
               value={document.title}
+              maxLength={TEXT_LENGTH_LIMITS.TITLE}
               valueName={formatMessage({ id: 'Title' })}
               required
             />
@@ -219,7 +250,9 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
+              data-testid="document-title"
               value={document.title}
+              maxLength={TEXT_LENGTH_LIMITS.TITLE}
               valueName={formatMessage({ id: 'Title' })}
               required
             />
@@ -262,11 +295,13 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
           <Box sx={{ mt: 1 }}>
             <FormRow>
               <StringInput
+                data-testid="document-title"
                 helperText={formatMessage({
                   id: 'Copy the title of the text as it is. In its absence, put a fictitious title between [].'
                 })}
                 onValueChange={value => updateAttribute('title', value)}
                 value={document.title}
+                maxLength={TEXT_LENGTH_LIMITS.TITLE}
                 valueName={formatMessage({ id: 'Title' })}
                 required
               />
@@ -327,6 +362,11 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
         !isEvent(docType) &&
         !isAuthorizationToPublish(docType) && (
           <Accordion
+            data-testid="document-advanced-metadata"
+            expanded={isAdditionalInfoExpanded || hasAdditionalInfoLengthError}
+            onChange={(_event, expanded) =>
+              setIsAdditionalInfoExpanded(expanded)
+            }
             disableGutters
             elevation={0}
             sx={{
@@ -429,6 +469,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
                   multiline={false}
                   onValueChange={newValue => updateAttribute('issue', newValue)}
                   value={document.issue ?? ''}
+                  maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_ISSUE}
                   valueName={formatMessage({ id: 'Periodical issue' })}
                 />
               )}
@@ -481,6 +522,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
                   updateAttribute('creatorComment', newValue)
                 }
                 value={document.creatorComment ?? ''}
+                maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT}
                 valueName={formatMessage({ id: 'Comment' })}
               />
             </AccordionDetails>

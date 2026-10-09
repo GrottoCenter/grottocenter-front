@@ -1,0 +1,22 @@
+export const TEXT_LENGTH_LIMITS = {
+  ENTITY_NAME: 200,
+  TITLE: 300,
+  ORGANIZATION_MESSAGE: 2000,
+  EMAIL: 50,
+  URL: 200,
+  ADDRESS: 200,
+  POSTAL_CODE: 10,
+  CITY: 100,
+  DOCUMENT_IDENTIFIER: 250,
+  DOCUMENT_PAGES: 20,
+  DOCUMENT_ISSUE: 100,
+  DOCUMENT_COMMENT: 300,
+  FILE_NAME: 200,
+  NICKNAME: 68,
+  PERSON_FIRST_NAME: 36,
+  PERSON_LAST_NAME: 32,
+  RIGGING_COLUMN: 2000
+};
+
+export const isNearLengthLimit = (count, limit) =>
+  limit !== undefined && count >= Math.ceil(limit * 0.8);

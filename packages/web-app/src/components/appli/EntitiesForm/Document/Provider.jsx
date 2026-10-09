@@ -6,13 +6,16 @@ import {
   useMemo
 } from 'react';
 import PropTypes from 'prop-types';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import {
   DocumentTypes,
+  filterDocumentPayload,
   isDocumentSelfParent
 } from '../../../../utils/documentTypeHelpers';
 import {
   IS_INTACT,
   IS_DELETED,
+  IS_NEW,
   DOCUMENT_AUTHORIZE_TO_PUBLISH
 } from './formElements/AddFileForm/FileHelpers';
 import { defaultDocumentValuesTypes } from './types';
@@ -59,8 +62,38 @@ const DESCRIPTION_OPTIONAL_TYPES = [
   DocumentTypes.AUTHORIZATION_TO_PUBLISH
 ];
 
+export const getDocumentLengthErrors = document => {
+  const payload = filterDocumentPayload(document);
+  return [
+    ['title', 'Title', TEXT_LENGTH_LIMITS.TITLE],
+    ['identifier', 'Identifier', TEXT_LENGTH_LIMITS.DOCUMENT_IDENTIFIER],
+    ['pages', 'Pages', TEXT_LENGTH_LIMITS.DOCUMENT_PAGES],
+    ['issue', 'Periodical issue', TEXT_LENGTH_LIMITS.DOCUMENT_ISSUE],
+    ['creatorComment', 'Comment', TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT]
+  ]
+    .filter(([field, , limit]) => (payload[field]?.length ?? 0) > limit)
+    .map(([field, label, limit]) => ({
+      field,
+      label,
+      limit,
+      count: payload[field].length
+    }));
+};
+
 const checkFormValidation = document => {
   let isValid = true;
+
+  const payload = filterDocumentPayload(document);
+  if (getDocumentLengthErrors(document).length > 0) isValid = false;
+  if (
+    document.files.some(
+      file =>
+        file.state === IS_NEW &&
+        Math.max(file.fileName?.length ?? 0, file.file?.name?.length ?? 0) >
+          TEXT_LENGTH_LIMITS.FILE_NAME
+    )
+  )
+    isValid = false;
 
   if (!document.title) isValid = false;
   if (
@@ -86,11 +119,11 @@ const checkFormValidation = document => {
 
   if (document.authors.length + document.authorsOrganization.length === 0)
     isValid = false;
-  if (!isDocumentPagesFormatValid(document.pages)) isValid = false;
-  if (document.identifier && !document.identifierType) isValid = false;
-  if (isValid && document.identifierType?.regexp)
-    isValid = new RegExp(document.identifierType?.regexp).test(
-      document.identifier
+  if (!isDocumentPagesFormatValid(payload.pages)) isValid = false;
+  if (payload.identifier && !payload.identifierType) isValid = false;
+  if (isValid && payload.identifierType?.regexp)
+    isValid = new RegExp(payload.identifierType.regexp).test(
+      payload.identifier
     );
   // Files flagged as deleted still remain in the array but are no longer
   // visible, so the licensing/authorization fields are only required when at
@@ -116,6 +149,7 @@ export const DocumentFormContext = createContext({
   document: defaultDocAttributes,
   isNewDocument: true,
   isFormValid: true,
+  lengthErrors: [],
   updateAttribute: (attributeName, newValue) => {}, // eslint-disable-line no-unused-vars
   resetContext: () => {},
   linkedEntrance: null,
@@ -141,6 +175,10 @@ const Provider = ({ children, initialValues }) => {
 
   const [isFormValid, setIsFormValid] = useState(false);
   const [linkedEntrance, setLinkedEntrance] = useState(null);
+  const lengthErrors = useMemo(
+    () => getDocumentLengthErrors(document),
+    [document]
+  );
 
   const updateAttribute = useCallback(
     (attributeName, newValue) => {
@@ -168,6 +206,7 @@ const Provider = ({ children, initialValues }) => {
       document,
       isNewDocument: !initialValues,
       isFormValid,
+      lengthErrors,
       updateAttribute,
       resetContext,
       linkedEntrance,
@@ -177,6 +216,7 @@ const Provider = ({ children, initialValues }) => {
       document,
       initialValues,
       isFormValid,
+      lengthErrors,
       updateAttribute,
       resetContext,
       linkedEntrance

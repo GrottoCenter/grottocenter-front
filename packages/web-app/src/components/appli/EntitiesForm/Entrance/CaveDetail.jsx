@@ -2,6 +2,10 @@ import { Alert, Box } from '@mui/material';
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import {
+  NUMERIC_FIELD_LIMITS,
+  getDiscoveryYearLimits
+} from '@/utils/numericFieldLimits';
 
 import { FormSection } from '../utils/FormContainers';
 import BoolToggleChip from '../utils/BoolToggleChip';
@@ -34,19 +38,7 @@ const CaveDetail = ({
     },
     [formatMessage]
   );
-  const validateDistance = useCallback(
-    value => {
-      const numberValue = Number(value);
-      if (Number.isNaN(numberValue) || !Number.isInteger(numberValue)) {
-        return formatMessage({ id: 'Distance must be an integer (in m)' });
-      }
-      if (numberValue < 0) {
-        return formatMessage({ id: 'Distance must be superior or equal to 0' });
-      }
-      return true;
-    },
-    [formatMessage]
-  );
+  const discoveryYearLimits = getDiscoveryYearLimits();
 
   return (
     <FormSection title="Characteristics">
@@ -75,7 +67,8 @@ const CaveDetail = ({
           disabled={isReadonly}
           isError={!!errors.cave?.depth}
           helperText={errors.cave?.depth?.message}
-          rules={{ valueAsNumber: true, validate: validateDistance }}
+          min={NUMERIC_FIELD_LIMITS.DEPTH.min}
+          max={NUMERIC_FIELD_LIMITS.DEPTH.max}
         />
         <NumberField
           name="cave.length"
@@ -86,7 +79,8 @@ const CaveDetail = ({
           disabled={isReadonly}
           isError={!!errors.cave?.length}
           helperText={errors.cave?.length?.message}
-          rules={{ valueAsNumber: true, validate: validateDistance }}
+          min={NUMERIC_FIELD_LIMITS.DEVELOPMENT.min}
+          max={NUMERIC_FIELD_LIMITS.DEVELOPMENT.max}
         />
         <NumberField
           name="cave.temperature"
@@ -106,7 +100,8 @@ const CaveDetail = ({
             label="Year of discovery"
             icon="discovery_date"
             isError={!!errors.entrance?.yearDiscovery}
-            inputProps={{ max: new Date().getFullYear() }}
+            min={discoveryYearLimits.min}
+            max={discoveryYearLimits.max}
           />
         )}
       </Box>

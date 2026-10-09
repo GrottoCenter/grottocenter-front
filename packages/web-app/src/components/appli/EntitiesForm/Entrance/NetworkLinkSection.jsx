@@ -25,7 +25,8 @@ const NetworkLinkSection = ({
   entityType,
   updateEntityType,
   selectedCave,
-  onSelectedCaveChange
+  onSelectedCaveChange,
+  setValue
 }) => {
   const { formatMessage } = useIntl();
   // Selection-time hint, not a value the form submits.
@@ -58,6 +59,7 @@ const NetworkLinkSection = ({
         <>
           <CaveSelection
             control={control}
+            setValue={setValue}
             errors={errors}
             value={selectedCave}
             onSelectionChange={selection => {
@@ -84,6 +86,7 @@ const NetworkLinkSection = ({
 
 NetworkLinkSection.propTypes = {
   control: PropTypes.shape({}),
+  setValue: PropTypes.func.isRequired,
   errors: PropTypes.shape({
     caveName: PropTypes.string
   }),

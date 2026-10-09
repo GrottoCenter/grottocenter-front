@@ -12,6 +12,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { styled } from '@mui/material/styles';
 import { Turnstile } from '@marsidev/react-turnstile';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { isPasswordValid, isValidEmail } from '../../conf/config';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StringInput from '../../components/common/Form/StringInput';
@@ -23,10 +24,6 @@ const FormWrapper = styled('form')`
   margin: auto;
   margin-bottom: 0;
   max-width: 500px;
-`;
-
-const SpacedCenteredButton = styled(Button)`
-  margin: ${({ theme }) => theme.spacing(0.5)} auto;
 `;
 
 const HoneypotWrapper = styled('div')`
@@ -81,9 +78,16 @@ const SignUpForm = ({
   const checkIfHasError = fieldName => {
     switch (fieldName) {
       case 'nickname':
-        return nickname.trim() === '';
+        return (
+          nickname.trim() === '' ||
+          nickname.length > TEXT_LENGTH_LIMITS.NICKNAME
+        );
       case 'email':
-        return !isValidEmail(email);
+        return !isValidEmail(email) || email.length > TEXT_LENGTH_LIMITS.EMAIL;
+      case 'name':
+        return name.length > TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME;
+      case 'surname':
+        return surname.length > TEXT_LENGTH_LIMITS.PERSON_LAST_NAME;
       case 'password':
         return !isPasswordValid(password);
       case 'passwordConfirmation':
@@ -112,8 +116,9 @@ const SignUpForm = ({
             )}
           </Typography>
         ) : (
-          <FormWrapper onSubmit={onSignUp}>
+          <FormWrapper onSubmit={onSignUp} data-testid="signup-form">
             <StringInput
+              data-testid="signup-nickname"
               fullWidth
               hasError={checkIfHasError('nickname')}
               helperText={formatMessage({
@@ -122,24 +127,28 @@ const SignUpForm = ({
               onValueChange={onNicknameChange}
               required
               value={nickname}
+              maxLength={TEXT_LENGTH_LIMITS.NICKNAME}
               valueName={formatMessage({ id: 'Nickname' })}
             />
             <StringInput
+              data-testid="signup-name"
               fullWidth
               helperText={formatMessage({
-                id: 'Your real name (optional).'
+                id: 'signup.namesHelp'
               })}
               onValueChange={onNameChange}
               value={name}
+              maxLength={TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME}
+              hasError={checkIfHasError('name')}
               valueName={formatMessage({ id: 'Caver.Name' })}
             />
             <StringInput
+              data-testid="signup-surname"
               fullWidth
-              helperText={formatMessage({
-                id: 'Your real surname (optional).'
-              })}
               onValueChange={onSurnameChange}
               value={surname}
+              maxLength={TEXT_LENGTH_LIMITS.PERSON_LAST_NAME}
+              hasError={checkIfHasError('surname')}
               valueName={formatMessage({ id: 'Surname' })}
             />
 
@@ -149,6 +158,7 @@ const SignUpForm = ({
               onValueChange={onEmailChange}
               required
               value={email}
+              maxLength={TEXT_LENGTH_LIMITS.EMAIL}
               valueName={formatMessage({ id: 'Email' })}
             />
 
@@ -233,17 +243,25 @@ const SignUpForm = ({
               </CaptchaWrapper>
             )}
 
-            <SpacedCenteredButton
+            <Button
+              data-testid="signup-submit"
               type="submit"
-              size="large"
+              variant="contained"
+              size="medium"
               disabled={loading || isSubmitDisabled}
-              color={loading ? 'inherit' : 'primary'}>
+              color={loading ? 'inherit' : 'primary'}
+              sx={{
+                mt: 1,
+                alignSelf: 'center',
+                width: { xs: '100%', sm: 'auto' },
+                minHeight: { xs: 48, sm: 0 }
+              }}>
               {loading ? (
                 <CircularProgress size="1.75rem" />
               ) : (
                 formatMessage({ id: 'Sign up' })
               )}
-            </SpacedCenteredButton>
+            </Button>
           </FormWrapper>
         )
       }

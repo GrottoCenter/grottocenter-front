@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { TextField } from '@mui/material';
 
@@ -12,51 +11,45 @@ export function normelizeCoordinate(coordStr) {
 }
 
 const InputCoordinate = ({
-  formKey,
+  field: { ref, value, onChange, onBlur, name },
   labelName,
-  control,
-  validatorFn,
   isError,
   helperText,
   isRequired = false
 }) => {
   const { formatMessage } = useIntl();
   return (
-    <Controller
-      name={formKey}
-      control={control}
-      rules={{
-        required: isRequired,
-        validate: value => validatorFn(value, formatMessage)
+    <TextField
+      name={name}
+      onBlur={onBlur}
+      fullWidth
+      required={isRequired}
+      label={formatMessage({ id: labelName })}
+      type="text"
+      error={isError}
+      inputRef={ref}
+      helperText={helperText}
+      value={value ?? ''}
+      onChange={e => {
+        const reg = /^-?\d*(\.|,)?(\d+)?$/;
+        const oldV = value ?? '';
+        const newV = e.target.value;
+        const res = newV.match(reg) ? newV : oldV;
+        return onChange(res);
       }}
-      render={({ field: { ref, value, onChange } }) => (
-        <TextField
-          fullWidth
-          required={isRequired}
-          label={formatMessage({ id: labelName })}
-          type="text"
-          error={isError}
-          inputRef={ref}
-          helperText={helperText}
-          value={value ?? ''}
-          onChange={e => {
-            const reg = /^-?\d*(\.|,)?(\d+)?$/;
-            const oldV = value ?? '';
-            const newV = e.target.value;
-            const res = newV.match(reg) ? newV : oldV;
-            return onChange(res);
-          }}
-        />
-      )}
     />
   );
 };
 
 InputCoordinate.propTypes = {
-  formKey: PropTypes.string.isRequired,
+  field: PropTypes.shape({
+    ref: PropTypes.func,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    onChange: PropTypes.func.isRequired,
+    onBlur: PropTypes.func.isRequired,
+    name: PropTypes.string.isRequired
+  }).isRequired,
   labelName: PropTypes.string.isRequired,
-  control: PropTypes.shape({}),
-  validatorFn: PropTypes.func,
   isError: PropTypes.bool.isRequired,
   isRequired: PropTypes.bool,
   helperText: PropTypes.string

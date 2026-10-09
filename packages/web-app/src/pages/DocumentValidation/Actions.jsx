@@ -5,6 +5,7 @@ import { Box } from '@mui/material';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import DeclineIcon from '@mui/icons-material/NotInterested';
 import EditIcon from '@mui/icons-material/Edit';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { useNotification, useProcessDocuments } from '../../hooks';
 import ActionButton from '../../components/common/ActionButton';
 import StandardDialog from '../../components/common/StandardDialog';
@@ -185,6 +186,7 @@ const Actions = ({
             })} ${selectedIds.length} ${formatMessage({ id: 'document(s)' })}`}
             color={actionType === ActionTypes.validate ? 'success' : 'error'}
             onClick={() => {
+              if (comment.length > TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT) return;
               processMutation.mutate({
                 ids: selectedIds,
                 isValidated: actionType === ActionTypes.validate,
@@ -202,7 +204,8 @@ const Actions = ({
             data-testid="confirm-process-documents"
             disabled={
               hasNoSelectedIds ||
-              (actionType === ActionTypes.decline && !comment.trim())
+              (actionType === ActionTypes.decline && !comment.trim()) ||
+              comment.length > TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT
             }
           />
         ]}>
@@ -217,6 +220,7 @@ const Actions = ({
           multiline
           onValueChange={setComment}
           value={comment}
+          characterLimit={TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT}
           valueName={formatMessage({ id: 'Comment' })}
           required={actionType === ActionTypes.decline}
         />

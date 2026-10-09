@@ -1,5 +1,6 @@
 import { useController } from 'react-hook-form';
 import PropTypes from 'prop-types';
+import { useIntl } from 'react-intl';
 
 import CaveAutoCompleteSearch from '../../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
 
@@ -12,56 +13,32 @@ const CaveSelection = ({
   control,
   disabled = false,
   value,
-  onSelectionChange
+  onSelectionChange,
+  setValue
 }) => {
+  const { formatMessage } = useIntl();
   const {
-    field: { onChange: onIdChange }
+    field: { onChange: onIdChange, onBlur, ref },
+    fieldState: { error }
   } = useController({
     control,
     name: 'cave.id',
-    rules: { required: true }
-  });
-  const {
-    field: { onChange: onLengthChange }
-  } = useController({
-    control,
-    name: 'cave.length'
-  });
-  const {
-    field: { onChange: onDepthChange }
-  } = useController({
-    control,
-    name: 'cave.depth'
-  });
-  const {
-    field: { onChange: onIsDivingChange }
-  } = useController({
-    control,
-    name: 'cave.isDiving'
-  });
-  const {
-    field: { onChange: onTemperatureChange }
-  } = useController({
-    control,
-    name: 'cave.temperature'
+    rules: { required: formatMessage({ id: 'Required' }) }
   });
 
   const handleSelection = selection => {
     if (selection?.id) {
-      onLengthChange(selection.length ?? null);
-      onDepthChange(selection.depth ?? null);
-      onTemperatureChange(selection.temperature ?? null);
-      onIsDivingChange(Boolean(selection.isDiving));
       onIdChange(Number(selection.id));
     } else {
       // Cleared via the search's native clear button: drop the linked cave's
       // id and its shared characteristics so nothing stale lingers.
       onIdChange(null);
-      onLengthChange(null);
-      onDepthChange(null);
-      onTemperatureChange(null);
-      onIsDivingChange(false);
     }
+    const options = { shouldValidate: true, shouldDirty: true };
+    setValue('cave.length', selection?.length ?? null, options);
+    setValue('cave.depth', selection?.depth ?? null, options);
+    setValue('cave.temperature', selection?.temperature ?? null, options);
+    setValue('cave.isDiving', Boolean(selection?.isDiving), options);
     onSelectionChange?.(selection);
   };
 
@@ -71,6 +48,10 @@ const CaveSelection = ({
       required
       onSelection={handleSelection}
       value={value}
+      onBlur={onBlur}
+      inputRef={ref}
+      error={!!error}
+      helperText={error?.message}
     />
   );
 };
@@ -79,6 +60,7 @@ export default CaveSelection;
 
 CaveSelection.propTypes = {
   control: PropTypes.shape({}),
+  setValue: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
   errors: PropTypes.shape({
     caveName: PropTypes.string

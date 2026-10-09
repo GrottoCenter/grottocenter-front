@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { Box, TextField } from '@mui/material';
+import { isNearLengthLimit } from '@/utils/textLengthLimits';
 
 const InputText = ({
   control,
@@ -13,6 +14,8 @@ const InputText = ({
   type = 'text',
   helperText,
   minRows,
+  testId,
+  maxLength = undefined,
   characterLimit = undefined,
   characterLimitOverflow = 0,
   isRequired = false,
@@ -24,14 +27,29 @@ const InputText = ({
       name={formKey}
       control={control}
       rules={{
-        required: isRequired,
-        maxLength: characterLimit,
+        required: isRequired && formatMessage({ id: 'Required' }),
+        maxLength: characterLimit ?? maxLength,
         validate: value =>
           validatorFn ? validatorFn(value, formatMessage) : undefined
       }}
-      render={({ field: { ref, value, onChange } }) => {
+      render={({ field: { ref, value, onChange, onBlur }, fieldState }) => {
         const characterCount = String(value ?? '').length;
-        const displayedHelperText = characterLimit ? (
+        const limit = characterLimit ?? maxLength;
+        const isTooLong = limit !== undefined && characterCount > limit;
+        const lengthError =
+          isTooLong || fieldState.error?.type === 'maxLength'
+            ? formatMessage(
+                { id: 'form.maxLength' },
+                {
+                  limit: characterLimit ?? maxLength,
+                  count: characterCount
+                }
+              )
+            : null;
+        const shouldShowCounter =
+          characterLimit !== undefined ||
+          isNearLengthLimit(characterCount, maxLength);
+        const displayedHelperText = shouldShowCounter ? (
           <Box
             component="span"
             sx={{
@@ -39,36 +57,46 @@ const InputText = ({
               justifyContent: 'space-between',
               width: '100%'
             }}>
-            <span>{helperText}</span>
             <span>
-              {characterCount} / {characterLimit}
+              {helperText && <span>{helperText}</span>}
+              {helperText && lengthError && <br />}
+              {lengthError && <span>{lengthError}</span>}
             </span>
+            <Box
+              component="span"
+              sx={{ color: isTooLong ? 'error.main' : 'text.secondary' }}>
+              {characterCount} / {limit}
+            </Box>
           </Box>
         ) : (
-          helperText
+          lengthError || fieldState.error?.message || helperText
         );
 
         return (
           <TextField
+            data-testid={testId}
             fullWidth
             label={formatMessage({ id: labelName })}
             type={type}
-            error={isError}
+            error={isError || isTooLong}
             required={isRequired}
             helperText={displayedHelperText}
             disabled={isDisabled ? true : undefined}
             multiline={minRows ? true : undefined}
             minRows={minRows || undefined}
             slotProps={
-              characterLimit
+              characterLimit || maxLength
                 ? {
                     htmlInput: {
-                      maxLength: characterLimit + characterLimitOverflow
+                      maxLength: characterLimit
+                        ? characterLimit + characterLimitOverflow
+                        : maxLength
                     }
                   }
                 : undefined
             }
             inputRef={ref}
+            onBlur={onBlur}
             value={value}
             onChange={e => {
               onChange(e);
@@ -91,6 +119,8 @@ InputText.propTypes = {
   type: PropTypes.string,
   helperText: PropTypes.node,
   minRows: PropTypes.number,
+  testId: PropTypes.string,
+  maxLength: PropTypes.number,
   characterLimit: PropTypes.number,
   characterLimitOverflow: PropTypes.number,
   isRequired: PropTypes.bool,

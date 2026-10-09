@@ -289,9 +289,9 @@ export const filterDocumentPayload = docAttributes => {
       ...ADVANCED_PAYLOAD_FIELDS,
       'description',
       'library',
-      'pages',
       'parent',
-      'issue'
+      ...(isArticle(type) ? ['pages'] : []),
+      ...(isIssue(type) ? ['issue'] : [])
     ]);
   }
 
