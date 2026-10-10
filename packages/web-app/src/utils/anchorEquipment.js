@@ -23,13 +23,13 @@ const VECTORS = {
 const ALIASES = {
   S: 'spits?|spt|sp|s',
   B: 'broches?|br|quimics?|glue[ -]?in bolts?|resin anchors?|b',
-  G: 'goujons?|gj|eb|g',
+  G: 'goujons?|expansion bolts?|gj|eb|g',
   P: 'pitons?|p',
-  AS: 'amarrages? souples?|as|sa',
-  AF: 'amarrages? fores?|af|da',
-  AN: 'amarrages? naturels?|a\\.\\s*n\\.?|an|na|nat|naturels?',
+  AS: 'amarrages? souples?|soft anchors?|as|sa',
+  AF: 'amarrages? fores?|drilled anchors?|af|da',
+  AN: 'amarrages? naturels?|natural anchors?|a\\.\\s*n\\.?|an|na|nat|naturels?',
   DEV: 'deviations?|deviateurs?|devia|dev\\.?|redirects?|redir',
-  HANGER: 'plaquettes?|hangers?',
+  HANGER: 'plaquettes?|(?:bolt )?hangers?',
   CARABINER:
     'mousquetons?|mouskifs?|moschettoni|moschettone|mosquetones?|mosquetons?|carabiners?|karabiners?',
   SLING: 'sangles?|schlingen|schlinge|slings?|webbing|cinta tubular'
@@ -48,6 +48,11 @@ const PLURALS = new Set([
   'naturels',
   'plaquettes',
   'hangers',
+  'bolt hangers',
+  'expansion bolts',
+  'soft anchors',
+  'drilled anchors',
+  'natural anchors',
   'mousquetons',
   'mouskifs',
   'moschettoni',
@@ -107,6 +112,9 @@ const LANGUAGE_CODES = {
 };
 const zeroVector = () => EQUIPMENT_TYPES.map(() => 0);
 const scale = (kind, quantity) => VECTORS[kind].map(n => n * quantity);
+// Saturate corrupt inventories instead of displaying unsafe integer totals.
+const addQuantity = (sum, quantity) =>
+  Math.min(Number.MAX_SAFE_INTEGER, sum + quantity);
 
 const normalize = (text, language) => {
   let value = text
@@ -124,6 +132,7 @@ const normalize = (text, language) => {
   value = value
     .replace(/\b(\d+\s*)(as|af|an)s\b/g, '$1$2')
     .replace(/\b(\d+\s*)n\b/g, '$1an')
+    // Known misspelling of "déviation" in existing anchor cells.
     .replace(/\bdevintion\b/g, 'dev')
     .replace(
       new RegExp(
@@ -256,8 +265,13 @@ const groupNodes = (nodes, value) => {
         const count = node.kind === 'DEV' ? node.quantity : support.quantity;
         if (subset) {
           vector = scale(support.kind, support.quantity);
-          vector[4] += Number(subset[1]);
-          isUncertain ||= Number(subset[1]) > support.quantity;
+          const quantity = Number(subset[1]);
+          const isSafeQuantity = Number.isSafeInteger(quantity);
+          isUncertain ||=
+            !isSafeQuantity ||
+            quantity > support.quantity ||
+            !Number.isSafeInteger(vector[4] + quantity);
+          vector[4] = addQuantity(vector[4], isSafeQuantity ? quantity : 0);
         } else {
           vector = scale('DEV', count);
           if (support.kind === 'S' || support.kind === 'G') vector[0] = count;
@@ -285,6 +299,7 @@ const groupNodes = (nodes, value) => {
  * Known contributions from one anchor cell. Alternatives use component-wise
  * bounds; unknown systems/quantities contribute nothing. A partial result is
  * not a guaranteed inventory or upper bound. Always display it approximately.
+ * `status` is a regression diagnostic; the UI uses ~ for every equipment count.
  */
 export const parseAnchorEquipment = (text, language = 'fra') => {
   const empty = { min: zeroVector(), max: zeroVector() };
@@ -323,19 +338,23 @@ export const parseAnchorEquipment = (text, language = 'fra') => {
   const inventoryOverlap =
     (kinds.includes('CARABINER') &&
       kinds.some(kind => ['S', 'B', 'G', 'P', 'DEV'].includes(kind))) ||
-    (kinds.includes('HANGER') && kinds.includes('S')) ||
+    (kinds.includes('HANGER') &&
+      kinds.some(kind => ['S', 'G'].includes(kind))) ||
     (kinds.includes('SLING') &&
       kinds.some(kind => ['AN', 'AF', 'DEV'].includes(kind)));
-  const isUncertain =
+  let isUncertain =
     inventoryOverlap ||
     merged.some(group => group.isUncertain) ||
     hasResidual(characters.join(''));
-  const min = EQUIPMENT_TYPES.map((_kind, i) =>
-    merged.reduce((sum, group) => sum + group.min[i], 0)
-  );
-  const max = EQUIPMENT_TYPES.map((_kind, i) =>
-    merged.reduce((sum, group) => sum + group.max[i], 0)
-  );
+  const sumBound = bound =>
+    EQUIPMENT_TYPES.map((_kind, i) =>
+      merged.reduce((sum, group) => {
+        isUncertain ||= !Number.isSafeInteger(sum + group[bound][i]);
+        return addQuantity(sum, group[bound][i]);
+      }, 0)
+    );
+  const min = sumBound('min');
+  const max = sumBound('max');
   let status = 'unknown';
   if (max.some(n => n > 0)) status = isUncertain ? 'partial' : 'complete';
   return { min, max, status };
@@ -349,8 +368,8 @@ export const parseRiggingEquipment = (anchors, language) => {
   anchors.forEach(anchor => {
     const result = parseAnchorEquipment(anchor, language);
     EQUIPMENT_TYPES.forEach((kind, i) => {
-      totals[kind].min += result.min[i];
-      totals[kind].max += result.max[i];
+      totals[kind].min = addQuantity(totals[kind].min, result.min[i]);
+      totals[kind].max = addQuantity(totals[kind].max, result.max[i]);
     });
   });
   return totals;

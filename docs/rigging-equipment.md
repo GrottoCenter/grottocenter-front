@@ -1,59 +1,70 @@
-# Estimation du matériel d’une feuille d’équipement
+# Equipment estimates for a rigging sheet
 
-Le récapitulatif de chaque feuille affiche, à côté des cordes, les quantités
-estimées de plaquettes, mousquetons, goujons, AS et cordelettes. Les catégories sans
-quantité reconnue sont masquées. Chaque quantité porte `~` ; les alternatives
-donnent une fourchette min–max par catégorie, additionnée entre les lignes.
-Les minima et maxima de catégories différentes ne désignent pas nécessairement
-une même option d’équipement.
+Each sheet's summary displays estimated bolt hangers, carabiners, expansion
+bolts, soft anchors and accessory cords beside the rope total. Categories with
+no recognized quantity are hidden. Every quantity carries `~`; alternatives
+produce a minimum–maximum range per category, summed across anchor cells.
+Different categories' bounds do not necessarily describe the same alternative.
 
-Conversions utilisées pour un point :
+Conversions for one anchor:
 
-| Notation | Matériel |
+| Notation | Equipment contribution |
 | --- | --- |
-| S / spit | 1 plaquette + 1 mousqueton |
-| B / broche | 1 mousqueton |
-| G / goujon / EB | 1 goujon + 1 plaquette + 1 mousqueton |
-| P / piton | 1 mousqueton |
-| AS / SA | 1 AS |
-| AF / DA, AN / NA | 1 cordelette |
-| dev / redir | 1 cordelette + 1 mousqueton |
-| dev/S | 1 plaquette + 1 cordelette + 1 mousqueton |
-| dev/G | 1 goujon + 1 plaquette + 1 cordelette + 1 mousqueton |
+| S / spit | 1 bolt hanger + 1 carabiner |
+| B / broche / glue-in bolt | 1 carabiner |
+| G / goujon / expansion bolt / EB | 1 expansion bolt + 1 bolt hanger + 1 carabiner |
+| P / piton | 1 carabiner |
+| AS / SA / soft anchor | 1 soft anchor |
+| AF / DA / drilled anchor, AN / NA / natural anchor | 1 accessory cord |
+| dev / redir / redirect | 1 accessory cord + 1 carabiner |
+| dev/S | 1 bolt hanger + 1 accessory cord + 1 carabiner |
+| dev/G | 1 expansion bolt + 1 bolt hanger + 1 accessory cord + 1 carabiner |
 
-Les quantités explicites de matériel sont additionnées. Une relation directe
-comme `4 mousquetons sur 4 broches` évite de compter deux fois les mêmes
-connecteurs ; `3 mousquetons / 1 DEVIA` reste une addition de 4 mousquetons.
-Les points facultatifs sont inclus : `3 Spits (1 facultatif)` compte 3,
-`3S (+1S facultatif)` compte 4. Les déviations sont associées à leur support
-uniquement dans une expression locale, jamais entre deux lignes.
+Explicit material quantities are added. A direct relationship such as
+`4 mousquetons sur 4 broches` avoids counting the same connectors twice;
+`3 mousquetons / 1 DEVIA` still adds up to four carabiners. Without an explicit
+link, `2S + 2 plaquettes` remains additive and is flagged as partial because
+the hangers may overlap. The same applies to hangers beside G/EB.
+Optional points are included: `3 Spits (1 facultatif)` counts three,
+while `3S (+1S facultatif)` counts four. Deviations are paired with their support
+only within a local expression, never across separate lines.
 
-`2AF ou 2S` donne `~0–2` plaquettes, mousquetons et cordelettes. Trois mousquetons
-communs, indiqués sur une autre ligne, donnent `~3–5` mousquetons au total.
-Les alternatives locales `ou`, `or`, `oder`, les quantités répétées et les
-notations telles que `1AF (ou 2)` sont reconnues. La portée d’une alternative
-complexe rédigée en prose peut rester imparfaitement interprétée.
+`2AF ou 2S` contributes `~0–2` hangers, carabiners and accessory cords.
+Three additional carabiners in another cell give `~3–5` carabiners overall.
+Local alternatives (`ou`, `or`, `oder`), repeated quantities and expressions
+such as `1AF (ou 2)` are recognized. Complex alternatives written in prose may
+still be interpreted incompletely.
 
-Les compteurs affichent la quantité en premier, par exemple `~44 plaquettes`.
-Chaque infobulle nomme le matériel en toutes lettres et indique qu’il est
-estimé depuis les cases Ancrages, y compris les amarrages souples (AS).
-La catégorie nommée « cordelettes » conserve les notations sources de sangles.
+Counts display the quantity first, e.g. `~44 plaquettes` in French. Translated
+labels use the maximum count to choose their grammatical number, including
+ranges such as `~0–1 bolt hanger`. Each tooltip spells out the material and
+explains that it is estimated from the Anchors cells. The approximate marker
+also covers partial or unknown descriptions; there is no extra warning text.
+The accessory cord category retains source
+mentions of slings; its French label is “cordelettes”.
 
-Le parseur indépendant de React se trouve dans `src/utils/anchorEquipment.js`.
-Il lit uniquement la colonne des ancrages et utilise la langue de la feuille
-pour les nombres écrits en lettres. Les abréviations internationales et les
-termes reconnus ne dépendent pas de la langue de l’interface. Les unités de
-longueur/diamètre ne sont pas converties en quantités de matériel.
+The React-independent parser lives in `src/utils/anchorEquipment.js`.
+It reads only the anchor column, using the sheet language for spelled-out
+numbers. International abbreviations and recognized material names work
+independently of the interface language. Dimensions do not count as equipment
+quantities. Plural material names without a quantity contribute nothing.
+The known misspelling `devintion` is deliberately treated as `dev`.
 
-Les systèmes non reconnus ou sans quantité exploitable restent indéterminés.
-Un total partiel n’est pas un inventaire complet, ni un plafond garanti ; `~`
-exprime cette incertitude sans ajouter d’avertissements à chaque ligne.
-Les observations, qui peuvent répéter le matériel, ne sont pas additionnées.
-Chaque feuille est calculée séparément ; les comparaisons de versions n’ont
-pas de récapitulatif.
+Unsupported systems or unusable quantities remain unknown. A partial total is
+neither a complete inventory nor a guaranteed upper bound; every count retains
+`~`, even when all notation is recognized. Individual quantities outside the
+safe integer range are ignored; sums saturate at `Number.MAX_SAFE_INTEGER`.
+Cell-level `status` is a regression diagnostic rather than a UI flag.
+Observations are excluded because they may repeat
+the inventory. Each sheet is calculated independently and memoized by its
+obstacles and language; version comparisons have no summary.
 
-Les 82 cellules annotées de l’étude sont conservées avec leurs sources dans
-`src/utils/__fixtures__/anchorEquipment.json` pour les tests de régression.
-Les feuilles complètes, corpus et scripts exploratoires ne font pas partie
-du dépôt. Des tests supplémentaires couvrent les règles métier, les relations
-explicites et l’intégration du récapitulatif dans l’interface.
+Annotated anchor-cell excerpts and their source URLs are retained in
+`src/utils/__fixtures__/anchorEquipment.json` for offline regression tests.
+Full sheets, corpora and exploratory scripts are outside the repository.
+Additional tests cover the business rules, explicit relationships, localized
+summaries, approximate markers and browser integration. Fast-check
+properties exercise Unicode, emoji, line breaks, gigantic quantities and nested
+alternatives: parsing never throws, bounds remain ordered nonnegative safe
+integers, and sheet totals equal the component-wise sums of cell results
+(saturated only at the safe integer limit).

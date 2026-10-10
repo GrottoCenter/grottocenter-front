@@ -1,7 +1,12 @@
-import { parseAnchorEquipment, parseRiggingEquipment } from './anchorEquipment';
+import fc from 'fast-check';
+import {
+  EQUIPMENT_TYPES,
+  parseAnchorEquipment,
+  parseRiggingEquipment
+} from './anchorEquipment';
 import cases from './__fixtures__/anchorEquipment.json';
 
-describe('anchor equipment regressions from the research audit', () => {
+describe('anchor equipment notation regressions', () => {
   it.each(cases)('$id: $anchor', ({ anchor, language, expected }) => {
     expect(parseAnchorEquipment(anchor, language)).toMatchObject(expected);
   });
@@ -28,7 +33,13 @@ describe('parseAnchorEquipment', () => {
     ['2S\n1dev', 'fra', [2, 3, 0, 0, 1]],
     ['2S 1dev', 'fra', [2, 3, 0, 0, 1]],
     ['1dev/B + 1dev/P + 1dev/AF', 'fra', [0, 3, 0, 0, 3]],
-    ['2AS + 3AN + 4AF', 'eng', [0, 0, 0, 2, 7]]
+    ['2AS + 3AN + 4AF', 'eng', [0, 0, 0, 2, 7]],
+    ['2 expansion bolts', 'eng', [2, 2, 2, 0, 0]],
+    ['1 natural anchor', 'eng', [0, 0, 0, 0, 1]],
+    ['1 soft anchor', 'eng', [0, 0, 0, 1, 0]],
+    ['2 drilled anchors', 'eng', [0, 0, 0, 0, 2]],
+    ['2 bolt hangers', 'eng', [2, 0, 0, 0, 0]],
+    ['one bolt hanger + two expansion bolts', 'eng', [3, 2, 2, 0, 0]]
   ])('counts %s (%s)', (text, language, vector) => {
     expect(parseAnchorEquipment(text, language)).toMatchObject({
       min: vector,
@@ -53,6 +64,11 @@ describe('parseAnchorEquipment', () => {
     '10 mm',
     'M8',
     '2 bolts',
+    'bolt hangers',
+    'expansion bolts',
+    'natural anchors',
+    'soft anchors',
+    'drilled anchors',
     '99999999999999999999S'
   ])('does not invent a count for %s', text => {
     expect(parseAnchorEquipment(text).max).toEqual([0, 0, 0, 0, 0]);
@@ -70,6 +86,30 @@ describe('parseAnchorEquipment', () => {
     expect(parseAnchorEquipment('1AN ou 2S ou 3G')).toMatchObject({
       min: [0, 0, 0, 0, 0],
       max: [3, 3, 3, 0, 1]
+    });
+  });
+
+  it.each([
+    '2S + 2 plaquettes',
+    '2 spits + 2 hangers',
+    '1 S + plaquette',
+    '2G + 2 plaquettes'
+  ])('flags the possible inventory overlap in %s', text => {
+    expect(parseAnchorEquipment(text).status).toBe('partial');
+  });
+
+  it('saturates unsafe sums and ignores an unsafe deviation subset', () => {
+    expect(parseAnchorEquipment('9007199254740991S + 1S')).toEqual({
+      min: [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, 0, 0, 0],
+      max: [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, 0, 0, 0],
+      status: 'partial'
+    });
+    expect(
+      parseAnchorEquipment(`2G (dont ${'9'.repeat(400)} pour dev)`)
+    ).toEqual({
+      min: [2, 2, 2, 0, 0],
+      max: [2, 2, 2, 0, 0],
+      status: 'partial'
     });
   });
 });
@@ -101,5 +141,112 @@ describe('parseRiggingEquipment', () => {
     expect(second.hangers.max).toBe(0);
     expect(second.carabiners.max).toBe(1);
     expect(parseRiggingEquipment([]).carabiners.max).toBe(0);
+  });
+  it('saturates unsafe sheet totals', () => {
+    const result = parseRiggingEquipment(['9007199254740991S', '1S']);
+    expect(result.hangers).toEqual({
+      min: Number.MAX_SAFE_INTEGER,
+      max: Number.MAX_SAFE_INTEGER
+    });
+  });
+});
+
+describe('anchor equipment properties', () => {
+  const language = fc.oneof(
+    fc.constantFrom('fra', 'eng', 'deu', 'spa', 'ita', 'cat', 'ja', 'fr', 'en'),
+    fc.string({ unit: 'binary', maxLength: 30 })
+  );
+  const token = fc.constantFrom(
+    'S',
+    'G',
+    'AN',
+    'AS',
+    'AF',
+    'dev/G',
+    'bolt hangers',
+    'expansion bolts',
+    'soft anchors',
+    'natural anchors',
+    'drilled anchors',
+    'Pulse',
+    '9007199254740991S',
+    '9007199254740990G',
+    '😀',
+    '\n',
+    'é',
+    '三',
+    '(',
+    ')',
+    ' ou ',
+    ' or ',
+    ' oder ',
+    ' + ',
+    ' avec ',
+    ' (dont ',
+    ' pour dev)'
+  );
+  const hugeQuantity = fc
+    .integer({ min: 16, max: 400 })
+    .map(n => `${'9'.repeat(n)}S`);
+  const anchor = fc.oneof(
+    fc.string({ unit: 'binary', maxLength: 2000 }),
+    hugeQuantity,
+    fc
+      .array(fc.oneof(token, fc.nat({ max: 999 }).map(String)), {
+        maxLength: 40
+      })
+      .map(parts => parts.join('')),
+    fc
+      .tuple(fc.nat({ max: 999 }), fc.nat({ max: 999 }), fc.nat({ max: 999 }))
+      .map(([a, b, c]) => `(${a}S ou (${b}AF or ${c}G))`)
+  );
+  const assertBounds = (min, max) => {
+    expect(Number.isSafeInteger(min)).toBe(true);
+    expect(Number.isSafeInteger(max)).toBe(true);
+    expect(min).toBeGreaterThanOrEqual(0);
+    expect(min).toBeLessThanOrEqual(max);
+  };
+
+  it('never throws and keeps safe, nonnegative ordered bounds for arbitrary text and languages', () => {
+    fc.assert(
+      fc.property(anchor, language, (text, lang) => {
+        const result = parseAnchorEquipment(text, lang);
+        EQUIPMENT_TYPES.forEach((_kind, i) =>
+          assertBounds(result.min[i], result.max[i])
+        );
+      }),
+      { numRuns: 500 }
+    );
+  });
+
+  it('sums cell bounds component-wise without mutating the sheet', () => {
+    fc.assert(
+      fc.property(
+        fc.array(anchor, { maxLength: 12 }),
+        language,
+        (anchors, lang) => {
+          const original = [...anchors];
+          const cells = anchors.map(text => parseAnchorEquipment(text, lang));
+          const result = parseRiggingEquipment(anchors, lang);
+          EQUIPMENT_TYPES.forEach((kind, i) => {
+            const sum = bound =>
+              cells.reduce((total, cell) => total + BigInt(cell[bound][i]), 0n);
+            const capped = total =>
+              Number(
+                total > BigInt(Number.MAX_SAFE_INTEGER)
+                  ? BigInt(Number.MAX_SAFE_INTEGER)
+                  : total
+              );
+            expect(result[kind]).toEqual({
+              min: capped(sum('min')),
+              max: capped(sum('max'))
+            });
+            assertBounds(result[kind].min, result[kind].max);
+          });
+          expect(anchors).toEqual(original);
+        }
+      ),
+      { numRuns: 200 }
+    );
   });
 });
