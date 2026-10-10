@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Chip, Stack, Tooltip } from '@mui/material';
 import PropTypes from 'prop-types';
@@ -5,9 +6,9 @@ import {
   EQUIPMENT_TYPES,
   parseRiggingEquipment
 } from '@/utils/anchorEquipment';
-import { ObstaclePropTypes } from '../../../../types/entrance.type';
-import { parseRopeLengths } from '../../../../utils/ropeLength';
-import { ropeIcon } from '../../../../assets/icons';
+import { parseRopeLengths } from '@/utils/ropeLength';
+import { ObstaclePropTypes } from '@/types/entrance.type';
+import { ropeIcon } from '@/assets/icons';
 
 const EQUIPMENT_LABELS = {
   hangers: 'rigging.equipment.hangers',
@@ -28,9 +29,13 @@ const EQUIPMENT_TOOLTIPS = {
 const RiggingSummary = ({ obstacles, language }) => {
   const { formatMessage, formatNumber } = useIntl();
   const { total, unparsedCount } = parseRopeLengths(obstacles.map(o => o.rope));
-  const equipment = parseRiggingEquipment(
-    obstacles.map(o => o.anchor),
-    language
+  const equipment = useMemo(
+    () =>
+      parseRiggingEquipment(
+        obstacles.map(o => o.anchor),
+        language
+      ),
+    [obstacles, language]
   );
 
   return (
@@ -88,7 +93,10 @@ const RiggingSummary = ({ obstacles, language }) => {
               label={formatMessage(
                 { id: 'rigging.equipment.count' },
                 {
-                  equipment: formatMessage({ id: EQUIPMENT_LABELS[kind] }),
+                  equipment: formatMessage(
+                    { id: EQUIPMENT_LABELS[kind] },
+                    { count: max }
+                  ),
                   quantity
                 }
               )}

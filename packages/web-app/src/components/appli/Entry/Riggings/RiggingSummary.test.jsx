@@ -1,5 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
+import messages from '@/../public/lang/en.json';
+import frenchMessages from '@/../public/lang/fr.json';
 import RiggingSummary from './RiggingSummary';
 import RiggingTable from './RiggingTable';
 
@@ -11,33 +13,6 @@ vi.mock('../SectionTitle', () => ({
   default: ({ title }) => <h3>{title}</h3>
 }));
 
-const messages = {
-  'rigging.equipment.hangers': 'bolt hangers',
-  'rigging.equipment.carabiners': 'carabiners',
-  'rigging.equipment.expansionBolts': 'expansion bolts',
-  'rigging.equipment.softAnchors': 'soft anchors (SA)',
-  'rigging.equipment.slings': 'accessory cords',
-  'rigging.equipment.count': '~{quantity} {equipment}',
-  'rigging.equipment.estimate.hangers':
-    'Approximate quantity of bolt hangers, from the Anchors cells',
-  'rigging.equipment.estimate.carabiners':
-    'Approximate quantity of carabiners, from the Anchors cells',
-  'rigging.equipment.estimate.expansionBolts':
-    'Approximate quantity of expansion bolts, from the Anchors cells',
-  'rigging.equipment.estimate.softAnchors':
-    'Approximate quantity of soft anchors, from the Anchors cells',
-  'rigging.equipment.estimate.slings':
-    'Approximate quantity of accessory cords, from the Anchors cells',
-  '{count, plural, one {# obstacle} other {# obstacles}}':
-    '{count, plural, one {# obstacle} other {# obstacles}}',
-  'Approximate total rope length, automatically calculated from rope cells':
-    'Approximate total rope length',
-  riggings: 'riggings',
-  obstacles: 'obstacles',
-  ropes: 'ropes',
-  anchors: 'anchors',
-  observations: 'observations'
-};
 const row = (anchor, rope = '') => ({
   obstacle: 'P10',
   anchor,
@@ -64,7 +39,7 @@ describe('RiggingSummary', () => {
       '50 m',
       '~1–3 bolt hangers',
       '~4–6 carabiners',
-      '~1 expansion bolts',
+      '~1 expansion bolt',
       '~2 soft anchors (SA)',
       '~0–2 accessory cords'
     ].forEach(label => {
@@ -97,7 +72,7 @@ describe('RiggingSummary', () => {
     );
     expect(screen.getByText('~3 expansion bolts')).toBeInTheDocument();
     expect(screen.getByText('~3 carabiners')).toBeInTheDocument();
-    expect(screen.getByText('~1 accessory cords')).toBeInTheDocument();
+    expect(screen.getByText('~1 accessory cord')).toBeInTheDocument();
   });
 
   it('updates totals when the sheet changes and keeps different sheets independent', () => {
@@ -118,30 +93,12 @@ describe('RiggingSummary', () => {
         <RiggingSummary obstacles={[row('1dev/G')]} />
       </IntlProvider>
     );
-    expect(screen.getByText('~1 carabiners')).toBeInTheDocument();
-    expect(screen.getByText('~1 expansion bolts')).toBeInTheDocument();
-    expect(screen.getByText('~1 bolt hangers')).toBeInTheDocument();
+    expect(screen.getByText('~1 carabiner')).toBeInTheDocument();
+    expect(screen.getByText('~1 expansion bolt')).toBeInTheDocument();
+    expect(screen.getByText('~1 bolt hanger')).toBeInTheDocument();
   });
 
   it('names each material in full in its French tooltip', () => {
-    const frenchMessages = {
-      ...messages,
-      'rigging.equipment.hangers': 'plaquettes',
-      'rigging.equipment.carabiners': 'mousquetons',
-      'rigging.equipment.expansionBolts': 'goujons',
-      'rigging.equipment.softAnchors': 'AS',
-      'rigging.equipment.slings': 'cordelettes',
-      'rigging.equipment.estimate.hangers':
-        'Quantité approximative de plaquettes, depuis les cases Ancrages',
-      'rigging.equipment.estimate.carabiners':
-        'Quantité approximative de mousquetons, depuis les cases Ancrages',
-      'rigging.equipment.estimate.expansionBolts':
-        'Quantité approximative de goujons, depuis les cases Ancrages',
-      'rigging.equipment.estimate.softAnchors':
-        'Quantité approximative d’amarrages souples, depuis les cases Ancrages',
-      'rigging.equipment.estimate.slings':
-        'Quantité approximative de cordelettes, depuis les cases Ancrages'
-    };
     render(
       <IntlProvider locale="fr" messages={frenchMessages}>
         <RiggingSummary obstacles={[row('1G + 1AS + 1AF')]} />
@@ -159,9 +116,55 @@ describe('RiggingSummary', () => {
         frenchMessages[`rigging.equipment.estimate.${kind}`]
       );
     });
-    expect(screen.getByText('~1 plaquettes')).toBeInTheDocument();
-    expect(screen.getByText('~1 cordelettes')).toBeInTheDocument();
+    expect(screen.getByText('~1 plaquette')).toBeInTheDocument();
+    expect(screen.getByText('~1 cordelette')).toBeInTheDocument();
     expect(screen.getByText('~1 AS')).toBeInTheDocument();
+  });
+
+  it.each(['1 S + plaquette', '1G + 1 hanger', '?', '1 Pulse'])(
+    'keeps only the approximate marker when the sheet contains %s',
+    anchor => {
+      render(
+        <IntlProvider locale="en" messages={messages}>
+          <RiggingSummary obstacles={[row('1B'), row(anchor)]} />
+        </IntlProvider>
+      );
+      expect(
+        screen.getByTestId('rigging-equipment-carabiners')
+      ).toHaveAttribute(
+        'aria-label',
+        messages['rigging.equipment.estimate.carabiners']
+      );
+      expect(
+        screen.getByTestId('rigging-equipment-carabiners')
+      ).toHaveTextContent(/^~/);
+    }
+  );
+
+  it('uses the upper range bound for grammatical number', () => {
+    render(
+      <IntlProvider locale="en" messages={messages}>
+        <RiggingSummary obstacles={[row('1AS ou 1G')]} />
+      </IntlProvider>
+    );
+    expect(screen.getByText('~0–1 bolt hanger')).toBeInTheDocument();
+    expect(screen.getByText('~0–1 soft anchor (SA)')).toBeInTheDocument();
+  });
+
+  it('recalculates spelled-out quantities when only the sheet language changes', () => {
+    const obstacles = [row('two EB')];
+    const view = render(
+      <IntlProvider locale="en" messages={messages}>
+        <RiggingSummary obstacles={obstacles} language="eng" />
+      </IntlProvider>
+    );
+    expect(screen.getByText('~2 expansion bolts')).toBeInTheDocument();
+    view.rerender(
+      <IntlProvider locale="en" messages={messages}>
+        <RiggingSummary obstacles={obstacles} language="fra" />
+      </IntlProvider>
+    );
+    expect(screen.getByText('~1 expansion bolt')).toBeInTheDocument();
   });
 
   it('does not show a summary in snapshot comparison mode', () => {

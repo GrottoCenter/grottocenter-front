@@ -45,7 +45,7 @@ describe('Automatic rigging equipment estimates', () => {
                 {
                   obstacle: 'P10',
                   rope: 'C15',
-                  anchor: 'three EB + one NA',
+                  anchor: 'three expansion bolts + one natural anchor',
                   observation: ''
                 }
               ]
@@ -75,7 +75,7 @@ describe('Automatic rigging equipment estimates', () => {
         );
         cy.get('[data-testid="rigging-equipment-expansionBolts"]').should(
           'have.text',
-          '~1 expansion bolts'
+          '~1 expansion bolt'
         );
         cy.get('[data-testid="rigging-equipment-softAnchors"]').should(
           'have.text',
@@ -100,7 +100,7 @@ describe('Automatic rigging equipment estimates', () => {
         );
         cy.get('[data-testid="rigging-equipment-slings"]').should(
           'have.text',
-          '~1 accessory cords'
+          '~1 accessory cord'
         );
         cy.get('[data-testid="rigging-equipment-hangers"]').should(
           'have.text',
@@ -117,6 +117,48 @@ describe('Automatic rigging equipment estimates', () => {
         doc.documentElement.clientWidth
       );
     });
+  });
+
+  it('keeps only the approximate marker for ambiguous equipment inventories', () => {
+    cy.intercept({ method: 'GET', pathname: '/api/v1/entrances/42' }, req => {
+      req.reply({
+        id: 42,
+        name: 'Ambiguous inventory',
+        isDeleted: false,
+        documents: [],
+        massifs: [],
+        locations: [],
+        descriptions: [],
+        histories: [],
+        comments: [],
+        riggings: [
+          {
+            id: 1,
+            title: 'Overlapping inventory',
+            language: 'fra',
+            isDeleted: false,
+            obstacles: [
+              {
+                obstacle: 'P10',
+                rope: '',
+                anchor: '2S + 2 plaquettes',
+                observation: ''
+              }
+            ]
+          }
+        ]
+      });
+    });
+    cy.visit('/entrances/42', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.get('[data-testid="rigging-equipment-hangers"]')
+      .should('have.text', '~4 bolt hangers')
+      .trigger('mouseover');
+    cy.get('[role="tooltip"]').should(
+      'have.text',
+      'Approximate quantity of bolt hangers, from the Anchors cells'
+    );
   });
 
   it('shows quantities first and spells out soft anchors in the French tooltip', () => {
