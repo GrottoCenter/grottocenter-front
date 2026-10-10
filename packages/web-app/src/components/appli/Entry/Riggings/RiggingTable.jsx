@@ -97,7 +97,14 @@ HighlightedTableCell.propTypes = {
   oldData: PropTypes.string
 };
 
-const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
+const RiggingTable = ({
+  id,
+  obstacles,
+  title,
+  previous,
+  isDeleted,
+  language
+}) => {
   const { formatMessage } = useIntl();
   const previousObstacles = previous?.obstacles;
 
@@ -124,7 +131,9 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
           mb: 0.5
         }}>
         {titleEl}
-        {previous === undefined && <RiggingSummary obstacles={obstacles} />}
+        {previous === undefined && (
+          <RiggingSummary obstacles={obstacles} language={language} />
+        )}
       </Box>
       <StyledTableContainer>
         <StyledTable
@@ -167,6 +176,8 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
                 const isAdded =
                   previousObstacles !== undefined && oldRow === undefined;
                 return (
+                  // Rows have no IDs and identical rows are allowed; snapshots
+                  // also match old and new rows by their position.
                   // eslint-disable-next-line react/no-array-index-key
                   <StyledTableRow key={`${obstacle}${rope}${anchor}${index}`}>
                     <HighlightedTableCell
@@ -203,6 +214,7 @@ RiggingTable.propTypes = {
     obstacles: PropTypes.arrayOf(ObstaclePropTypes)
   }),
   title: PropTypes.string.isRequired,
+  language: PropTypes.string,
   isDeleted: PropTypes.bool
 };
 
