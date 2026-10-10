@@ -81,8 +81,10 @@ describe('Deletion with an existing redirect', () => {
       cy.wait('@source');
 
       if (path === 'organizations') {
-        cy.get('[data-testid="LinkOffIcon"]').should('have.length', 2);
-        cy.get('[data-testid="RemoveCircleIcon"]').should('not.exist');
+        // MUI's generated icon test IDs are omitted from production builds.
+        // Use the application-owned IDs so this also checks the CI bundle.
+        cy.get('[data-testid="unlink-network-icon"]').should('have.length', 1);
+        cy.get('[data-testid="unlink-entrance-icon"]').should('have.length', 1);
       }
 
       cy.get('button[aria-label="Delete"]').click();
