@@ -13,7 +13,9 @@ import {
   CAVE_SIZE,
   CAVE_SIZE_STYLE,
   CAVE_SIZE_THRESHOLDS,
-  CAVE_QUALITY_BADGE_VALUE
+  CAVE_QUALITY_BADGE_VALUE,
+  ENTRANCE_SIZE_FILTERS,
+  ENTRANCE_QUALITY_FILTERS
 } from './constants';
 import DataQualityBadge from '../../DataQualityBadge';
 import DataQualityHelpButton from '../../DataQualityBadge/DataQualityHelpButton';
@@ -131,18 +133,13 @@ CaveSizeDot.propTypes = {
 // matching the stars displayed in the popup and in comment ratings.
 const MAX_STARS = 5;
 const FiltersControl = ({
-  entranceFilters,
-  activeEntranceFilters,
-  setActiveEntranceFilters,
-  qualityFilters,
-  activeQualityFilters,
-  setActiveQualityFilters,
-  minInterest,
-  setMinInterest,
-  isMarkersMode,
-  isEntrancesLayerOn,
+  filters,
+  onSizeChange,
+  onQualityChange,
+  onInterestChange,
   hasActiveFilters,
-  resetAllFilters,
+  resetFilters,
+  disabledReasonKey = null,
   ...props
 }) => {
   const { fullScreen } = useFullScreen();
@@ -150,16 +147,18 @@ const FiltersControl = ({
   const wrapperRef = useRef(null);
   const [sizeInfoAnchor, setSizeInfoAnchor] = useState(null);
   const [interestInfoAnchor, setInterestInfoAnchor] = useState(null);
+  const { sizes, qualities, minInterest } = filters;
+  const filtersDisabled = disabledReasonKey !== null;
 
   // Close info popovers when the surrounding filters become inactive — the
   // anchor element goes away and MUI would otherwise reopen the popover with a
   // stale reference on next mount.
   useEffect(() => {
-    if (!isMarkersMode || !isEntrancesLayerOn) {
+    if (filtersDisabled) {
       setSizeInfoAnchor(null);
       setInterestInfoAnchor(null);
     }
-  }, [isMarkersMode, isEntrancesLayerOn]);
+  }, [filtersDisabled]);
 
   const toggleExpanded = useCallback(expanded => {
     const container = wrapperRef.current?.closest('.leaflet-control-layers');
@@ -180,18 +179,6 @@ const FiltersControl = ({
     return () =>
       document.removeEventListener('pointerdown', handleClickOutside);
   }, [toggleExpanded]);
-
-  const filtersDisabled = !isMarkersMode || !isEntrancesLayerOn;
-  let disabledReasonKey;
-  if (!isMarkersMode) {
-    disabledReasonKey = hasActiveFilters
-      ? 'Zoom in to apply saved filters'
-      : 'Zoom in to enable filters';
-  } else {
-    disabledReasonKey = hasActiveFilters
-      ? 'Turn on entrances to apply saved filters'
-      : 'Turn on entrances to enable filters';
-  }
 
   return (
     <CustomControl
@@ -218,7 +205,7 @@ const FiltersControl = ({
         <section className="leaflet-control-layers-list">
           <div className="leaflet-control-layers-overlays">
             {filtersDisabled && (
-              <DisabledOverlayHint>
+              <DisabledOverlayHint data-testid="entrance-filters-unavailable">
                 {formatMessage({ id: disabledReasonKey })}
               </DisabledOverlayHint>
             )}
@@ -254,18 +241,15 @@ const FiltersControl = ({
                   )}
                 </PopoverContent>
               </Popover>
-              {entranceFilters.map(filter => (
+              {ENTRANCE_SIZE_FILTERS.map(filter => (
                 <ControlOptionLabel key={filter.id}>
                   <input
                     type="checkbox"
+                    disabled={filtersDisabled}
+                    data-testid={`entrance-size-${filter.id}`}
                     name={filter.id}
-                    checked={activeEntranceFilters[filter.id] ?? false}
-                    onChange={() =>
-                      setActiveEntranceFilters(prev => ({
-                        ...prev,
-                        [filter.id]: !prev[filter.id]
-                      }))
-                    }
+                    checked={sizes[filter.id] ?? false}
+                    onChange={() => onSizeChange(filter.id)}
                   />
                   <CaveSizeDot caveSize={filter.id} />
                   <span>{formatMessage({ id: filter.labelKey })}</span>
@@ -276,18 +260,15 @@ const FiltersControl = ({
                 {formatMessage({ id: 'Filter by quality' }).toUpperCase()}
                 <DataQualityHelpButton />
               </ControlSectionTitle>
-              {qualityFilters.map(filter => (
+              {ENTRANCE_QUALITY_FILTERS.map(filter => (
                 <ControlOptionLabel key={filter.id}>
                   <input
                     type="checkbox"
+                    disabled={filtersDisabled}
+                    data-testid={`entrance-quality-${filter.id}`}
                     name={filter.id}
-                    checked={activeQualityFilters[filter.id] ?? false}
-                    onChange={() =>
-                      setActiveQualityFilters(prev => ({
-                        ...prev,
-                        [filter.id]: !prev[filter.id]
-                      }))
-                    }
+                    checked={qualities[filter.id] ?? false}
+                    onChange={() => onQualityChange(filter.id)}
                   />
                   <DataQualityBadge
                     value={CAVE_QUALITY_BADGE_VALUE[filter.id]}
@@ -317,6 +298,8 @@ const FiltersControl = ({
               </Popover>
               <InterestRow>
                 <Rating
+                  disabled={filtersDisabled}
+                  data-testid="entrance-interest-filter"
                   max={MAX_STARS}
                   precision={0.5}
                   value={interestToStars(minInterest)}
@@ -324,7 +307,7 @@ const FiltersControl = ({
                   // currently-active star (native "clear" gesture). That maps
                   // to "no min" — same effect as picking `Any rating`.
                   onChange={(_, newValue) =>
-                    setMinInterest(
+                    onInterestChange(
                       newValue == null ? 0 : starsToInterest(newValue)
                     )
                   }
@@ -353,10 +336,11 @@ const FiltersControl = ({
             {hasActiveFilters && (
               <ResetAllRow>
                 <Button
+                  data-testid="reset-entrance-filters"
                   size="small"
                   variant="text"
                   startIcon={<RestartAltIcon />}
-                  onClick={resetAllFilters}
+                  onClick={resetFilters}
                   sx={{ fontSize: 12 }}>
                   {formatMessage({ id: 'Reset all filters' })}
                 </Button>
@@ -372,28 +356,17 @@ const FiltersControl = ({
 const MemoizedFiltersControl = React.memo(FiltersControl);
 
 FiltersControl.propTypes = {
-  entranceFilters: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      labelKey: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  activeEntranceFilters: PropTypes.objectOf(PropTypes.bool).isRequired,
-  setActiveEntranceFilters: PropTypes.func.isRequired,
-  qualityFilters: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      labelKey: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  activeQualityFilters: PropTypes.objectOf(PropTypes.bool).isRequired,
-  setActiveQualityFilters: PropTypes.func.isRequired,
-  minInterest: PropTypes.number.isRequired,
-  setMinInterest: PropTypes.func.isRequired,
-  isMarkersMode: PropTypes.bool.isRequired,
-  isEntrancesLayerOn: PropTypes.bool.isRequired,
+  filters: PropTypes.shape({
+    sizes: PropTypes.objectOf(PropTypes.bool).isRequired,
+    qualities: PropTypes.objectOf(PropTypes.bool).isRequired,
+    minInterest: PropTypes.number.isRequired
+  }).isRequired,
+  onSizeChange: PropTypes.func.isRequired,
+  onQualityChange: PropTypes.func.isRequired,
+  onInterestChange: PropTypes.func.isRequired,
   hasActiveFilters: PropTypes.bool.isRequired,
-  resetAllFilters: PropTypes.func.isRequired,
+  resetFilters: PropTypes.func.isRequired,
+  disabledReasonKey: PropTypes.string,
   ...customControlProps
 };
 

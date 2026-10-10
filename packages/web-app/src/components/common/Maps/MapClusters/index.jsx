@@ -15,17 +15,16 @@ import {
   MenuItem,
   Tooltip,
   Typography,
+  LinearProgress,
   useMediaQuery
 } from '@mui/material';
 import { ContentCopy, LocationOn, Tune } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import copyToClipboard from '@/utils/clipboard';
-import {
-  interestToStars,
-  meetsMinimumInterest,
-  starsToInterest
-} from '@/utils/interest';
+import { matchesEntranceMarker } from '@/utils/entranceMapFilters';
+import useEntranceClusters from '@/hooks/useEntranceClusters';
+import useEntranceFilters from '@/hooks/useEntranceFilters';
 import GeocodingControl from '../common/GeocodingControl';
 import MapTour from './MapTour';
 import DataDisplayControl, { layerTypes } from './DataDisplayControl';
@@ -60,22 +59,7 @@ import PopupTargetHandler from './PopupTargetHandler';
 import WaypointNavigation from '../common/Waypoint/WaypointNavigation';
 import { WAYPOINT_COLOR } from '../common/Waypoint/waypointIcon';
 import CustomMapContainer from '../common/MapContainer';
-import {
-  MARKERS_LIMIT,
-  MASSIFS_POLYGON_LIMIT,
-  ENTRANCE_MARKER_FILTERS,
-  ENTRANCE_QUALITY_FILTERS,
-  getCaveSize,
-  getCaveQuality,
-  DEFAULT_ENTRANCE_FILTERS,
-  DEFAULT_QUALITY_FILTERS,
-  DEFAULT_MIN_INTEREST
-} from './constants';
-
-const ZOOM_STATE = {
-  MARKERS: 1,
-  CLUSTER: 2
-};
+import { MARKERS_LIMIT, MASSIFS_POLYGON_LIMIT } from './constants';
 
 // Types that render as real markers at high zoom (via <Markers>). Massifs
 // don't — they become polygons instead — so they never enter `visibleMarkers`.
@@ -96,6 +80,7 @@ const DEFAULT_SELECTED_LAYERS = {
 // would return a fresh reference each render and trip useSelector's Object.is
 // equality, forcing needless re-renders and a react-redux warning.
 const EMPTY_PROJECTIONS = [];
+const EMPTY_MARKER_LAYERS = [];
 
 const HydratedMap = ({
   entrances,
@@ -111,7 +96,7 @@ const HydratedMap = ({
 }) => {
   const map = useMap();
   const { formatMessage } = useIntl();
-  const { onSuccess } = useNotification();
+  const { onSuccess, onError } = useNotification();
   const { isAuth } = usePermissions();
   const isOnline = useOnlineStatus();
   const navigate = useNavigate();
@@ -142,8 +127,8 @@ const HydratedMap = ({
     enabled: showExplored && isAuth
   });
 
-  const initialZoom = useRef(map.getZoom()).current;
-  const isInitiallyZoomedIn = initialZoom >= MARKERS_LIMIT;
+  const [zoom, setZoom] = useState(() => map.getZoom());
+  const isMarkersMode = zoom >= MARKERS_LIMIT;
 
   // Single source of truth for which datasets the user wants visible on the
   // map. A layer being true → clusters at low zoom + real markers (or polygons
@@ -161,54 +146,39 @@ const HydratedMap = ({
     },
     [setSelectedLayers]
   );
-  const [activeEntranceFilters, setActiveEntranceFilters] = useLocalStorage(
-    'grottocenter_activeEntranceFilters',
-    DEFAULT_ENTRANCE_FILTERS,
-    { merge: true }
-  );
-  const [activeQualityFilters, setActiveQualityFilters] = useLocalStorage(
-    'grottocenter_activeQualityFilters',
-    DEFAULT_QUALITY_FILTERS,
-    { merge: true }
-  );
-  const [minInterest, setMinInterest] = useLocalStorage(
-    'grottocenter_minInterest',
-    DEFAULT_MIN_INTEREST
-  );
-  const effectiveMinInterest = starsToInterest(interestToStars(minInterest));
+  const {
+    filters: entranceFilters,
+    toggleSize,
+    toggleQuality,
+    setMinInterest,
+    hasActiveFilters,
+    resetFilters
+  } = useEntranceFilters();
+  const entranceClusters = useEntranceClusters(entrances, entranceFilters);
+
+  useEffect(() => {
+    if (entranceClusters.error) {
+      onError(formatMessage({ id: 'unexpected error' }));
+    }
+  }, [entranceClusters.error, onError, formatMessage]);
 
   const filteredEntranceMarkers = useMemo(
     () =>
-      entranceMarkers.filter(e => {
-        if (!activeEntranceFilters[getCaveSize(e)]) return false;
-        const quality = getCaveQuality(e);
-        // Entrances without quality data are always shown by the quality filter.
-        if (quality !== null && !activeQualityFilters[quality]) return false;
-        // Compare the displayed star level so an entrance shown with two stars
-        // is included when the user selects a two-star minimum.
-        return meetsMinimumInterest(e.aestheticism, effectiveMinInterest);
-      }),
-    [
-      entranceMarkers,
-      activeEntranceFilters,
-      activeQualityFilters,
-      effectiveMinInterest
-    ]
+      entranceMarkers.filter(e => matchesEntranceMarker(e, entranceFilters)),
+    [entranceMarkers, entranceFilters]
   );
 
-  const hasActiveFilters = useMemo(
-    () =>
-      Object.values(activeEntranceFilters).some(v => !v) ||
-      Object.values(activeQualityFilters).some(v => !v) ||
-      effectiveMinInterest !== DEFAULT_MIN_INTEREST,
-    [activeEntranceFilters, activeQualityFilters, effectiveMinInterest]
-  );
-
-  const resetAllFilters = useCallback(() => {
-    setActiveEntranceFilters(DEFAULT_ENTRANCE_FILTERS);
-    setActiveQualityFilters(DEFAULT_QUALITY_FILTERS);
-    setMinInterest(DEFAULT_MIN_INTEREST);
-  }, [setActiveEntranceFilters, setActiveQualityFilters, setMinInterest]);
+  let filterDisabledReasonKey = null;
+  // Legacy cache compatibility: pairs have no filtering criteria. Only this
+  // transitional dataset makes filter availability depend on display mode;
+  // detailed markers still have criteria, and enriched tuples work at any zoom.
+  if (!isMarkersMode && entranceClusters.hasCriteria === false) {
+    filterDisabledReasonKey = 'mapFiltersRequireUpdatedCoordinates';
+  } else if (!selectedLayers[layerTypes.ENTRANCES]) {
+    filterDisabledReasonKey = hasActiveFilters
+      ? 'Turn on entrances to apply saved filters'
+      : 'Turn on entrances to enable filters';
+  }
 
   // Marker-eligible layers currently selected — the set to fetch and render as
   // real markers whenever we're above MARKERS_LIMIT. Massifs never appear here
@@ -218,105 +188,35 @@ const HydratedMap = ({
     [selectedLayers]
   );
 
-  const [visibleMarkers, setVisibleMarkers] = useState(
-    isInitiallyZoomedIn ? enabledMarkerLayers : []
-  );
-  // Bail out if content is unchanged so React.memo on Markers stays effective.
-  // setVisibleMarkers(newArr) always creates a new reference even with the same items,
-  // which would bypass memo and trigger 3 marker-layer update cycles unnecessarily.
-  const setVisibleMarkersStable = useCallback(nextOrUpdater => {
-    setVisibleMarkers(prev => {
-      const next =
-        typeof nextOrUpdater === 'function'
-          ? nextOrUpdater(prev)
-          : nextOrUpdater;
-      if (prev.length === next.length && next.every(v => prev.includes(v)))
-        return prev;
-      return next;
-    });
-  }, []);
-  const [isMarkersMode, setIsMarkersMode] = useState(isInitiallyZoomedIn);
-  const [isMassifPolygonMode, setIsMassifPolygonMode] = useState(
-    initialZoom >= MASSIFS_POLYGON_LIMIT
-  );
-  const zoomState = useRef(
-    isInitiallyZoomedIn ? ZOOM_STATE.MARKERS : ZOOM_STATE.CLUSTER
-  );
-  const prevZoom = useRef(initialZoom);
-
-  const enabledMarkerLayersRef = useRef(enabledMarkerLayers);
-  enabledMarkerLayersRef.current = enabledMarkerLayers;
+  // Derived values stay stable on pan and on zooms within the same mode.
+  const visibleMarkers = isMarkersMode
+    ? enabledMarkerLayers
+    : EMPTY_MARKER_LAYERS;
 
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
 
-  const showMassifPolygons =
-    !!selectedLayers[layerTypes.MASSIFS] && isMassifPolygonMode;
+  const isMassifsLayerOn = !!selectedLayers[layerTypes.MASSIFS];
+  const showMassifPolygons = isMassifsLayerOn && zoom >= MASSIFS_POLYGON_LIMIT;
 
   const handleUpdate = useCallback(() => {
     const currentZoom = map.getZoom();
-    // Below MARKERS_LIMIT we're in cluster mode: entrances/networks/massifs
-    // are drawn from the bulk "all coordinates" fetch done once at page load,
-    // and per-tile marker fetches are pure waste. Gating here (using the live
-    // `map.getZoom()`, not the batched `visibleMarkers` state) also fixes the
-    // transitional burst on big zoom-outs where `zoomend` sets the new state
-    // but `moveend` fires with a stale closure and would otherwise request
-    // hundreds of marker tiles for the whole world in one moveend.
-    const markersToFetch = currentZoom >= MARKERS_LIMIT ? visibleMarkers : [];
+    // Read Leaflet's live zoom: React may not have rendered the zoomend update
+    // when moveend fires. Never fetch detail tiles for a low-zoom viewport.
+    const markersToFetch =
+      currentZoom >= MARKERS_LIMIT ? enabledMarkerLayers : EMPTY_MARKER_LAYERS;
     onUpdateRef.current({
       markers: markersToFetch,
-      showMassifPolygons,
+      showMassifPolygons:
+        isMassifsLayerOn && currentZoom >= MASSIFS_POLYGON_LIMIT,
       zoom: currentZoom,
       center: map.getCenter(),
       bounds: map.getBounds()
     });
-  }, [visibleMarkers, showMassifPolygons, map]);
+  }, [enabledMarkerLayers, isMassifsLayerOn, map]);
 
-  // Whenever the user toggles layers on/off, resync visibleMarkers so the
-  // marker layer picks up (or drops) that type immediately — but only when
-  // we're actually in markers mode. In cluster mode, visibleMarkers stays []
-  // and the ClusterLayer components pick up the change via their own props.
-  useEffect(() => {
-    if (zoomState.current === ZOOM_STATE.MARKERS) {
-      setVisibleMarkersStable(enabledMarkerLayers);
-    }
-  }, [enabledMarkerLayers, setVisibleMarkersStable]);
-
-  // zoomend: manages cluster ↔ markers visibility only.
-  // It does NOT call handleUpdate directly - moveend fires right after zoomend
-  // and handles that, ensuring the correct final position is always used.
-  useMapEvent('zoomend', () => {
-    const currentZoom = map.getZoom();
-    const isZoomingIn = prevZoom.current < currentZoom;
-
-    // --- MARKERS_LIMIT threshold: cluster bubbles ↔ real point markers ---
-    if (isZoomingIn && currentZoom >= MARKERS_LIMIT) {
-      if (zoomState.current !== ZOOM_STATE.MARKERS) {
-        setVisibleMarkersStable(enabledMarkerLayersRef.current);
-        setIsMarkersMode(true);
-        zoomState.current = ZOOM_STATE.MARKERS;
-      }
-    } else if (
-      !isZoomingIn &&
-      currentZoom < MARKERS_LIMIT &&
-      zoomState.current === ZOOM_STATE.MARKERS
-    ) {
-      // Empty visibleMarkers below the threshold — clusters take over, no
-      // real marker (entrance/network/organization) should linger.
-      zoomState.current = ZOOM_STATE.CLUSTER;
-      setIsMarkersMode(false);
-      setVisibleMarkersStable([]);
-    }
-
-    // --- Massif polygon mode threshold ---
-    const prevMassifMode = prevZoom.current >= MASSIFS_POLYGON_LIMIT;
-    const currMassifMode = currentZoom >= MASSIFS_POLYGON_LIMIT;
-    if (prevMassifMode !== currMassifMode) {
-      setIsMassifPolygonMode(currMassifMode);
-    }
-
-    prevZoom.current = currentZoom;
-  });
+  const handleZoomEnd = useCallback(() => setZoom(map.getZoom()), [map]);
+  useMapEvent('zoomend', handleZoomEnd);
 
   const contextDisplayValue = useMemo(() => {
     if (!contextCoords) return '';
@@ -416,7 +316,9 @@ const HydratedMap = ({
     isMarkersMode,
     visibleMarkers,
     markerCounts: {
-      [layerTypes.ENTRANCES]: filteredEntranceMarkers.length,
+      // Count cached data before filtering: an empty selection is available
+      // offline data, not a missing tile.
+      [layerTypes.ENTRANCES]: entranceMarkers.length,
       [layerTypes.NETWORKS]: networkMarkers.length,
       [layerTypes.ORGANIZATIONS]: organizationMarkers.length
     }
@@ -439,7 +341,7 @@ const HydratedMap = ({
       type: 'massif',
       layer: layerTypes.MASSIFS,
       data: massifs,
-      off: isMassifPolygonMode
+      off: zoom >= MASSIFS_POLYGON_LIMIT
     },
     {
       type: 'organization',
@@ -464,18 +366,13 @@ const HydratedMap = ({
         useLeafletControl
       />
       <FiltersControl
-        entranceFilters={ENTRANCE_MARKER_FILTERS}
-        activeEntranceFilters={activeEntranceFilters}
-        setActiveEntranceFilters={setActiveEntranceFilters}
-        qualityFilters={ENTRANCE_QUALITY_FILTERS}
-        activeQualityFilters={activeQualityFilters}
-        setActiveQualityFilters={setActiveQualityFilters}
-        minInterest={effectiveMinInterest}
-        setMinInterest={setMinInterest}
-        isMarkersMode={isMarkersMode}
-        isEntrancesLayerOn={!!selectedLayers[layerTypes.ENTRANCES]}
+        filters={entranceFilters}
+        onSizeChange={toggleSize}
+        onQualityChange={toggleQuality}
+        onInterestChange={setMinInterest}
+        disabledReasonKey={filterDisabledReasonKey}
         hasActiveFilters={hasActiveFilters}
-        resetAllFilters={resetAllFilters}
+        resetFilters={resetFilters}
         useLeafletControl
       />
       <ExploredOverlay points={showExplored && isAuth ? exploredPoints : []} />
@@ -485,9 +382,26 @@ const HydratedMap = ({
           key={type}
           data={data}
           type={type}
+          clusterSource={
+            type === 'entrance' ? entranceClusters.source : undefined
+          }
           enabled={!!selectedLayers[layer] && !off}
         />
       ))}
+      {selectedLayers[layerTypes.ENTRANCES] &&
+        !isMarkersMode &&
+        entranceClusters.isPending && (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 500
+            }}>
+            <LinearProgress aria-label={formatMessage({ id: 'Loading ...' })} />
+          </Box>
+        )}
       <Markers
         visibleMarkers={visibleMarkers}
         organizations={organizationMarkers}

@@ -1726,6 +1726,7 @@
   "Management tools": "Ferramentas de gestão",
   "Management tools access restricted": "Acesso reservado a administradores, moderadores e responsáveis.",
   "Map": "Mapa",
+  "mapFiltersRequireUpdatedCoordinates": "Ligue-se à Internet para utilizar os filtros neste nível de zoom.",
   "Mark all as read": "Marcar tudo como lido",
   "Mark as explored": "Marcar como explorada",
   "Mark this polygon as a hole (inner ring) within another polygon": "Marcar este polígono como um buraco (anel interno) dentro de outro polígono",
@@ -2925,7 +2926,5 @@
   "Zip code": "Código postal",
   "Zone": "Zona",
   "Zoom in": "Ampliar",
-  "Zoom in to apply saved filters": "Amplie o mapa para aplicar os filtros guardados",
-  "Zoom in to enable filters": "Aproxime o mapa para utilizar os filtros",
   "Zoom out": "Reduzir"
 }

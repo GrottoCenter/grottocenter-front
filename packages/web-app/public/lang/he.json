@@ -1726,6 +1726,7 @@
   "Management tools": "כלי ניהול",
   "Management tools access restricted": "הגישה שמורה למנהלים, מנחים ואחראים.",
   "Map": "מפה",
+  "mapFiltersRequireUpdatedCoordinates": "התחברו לאינטרנט כדי להשתמש במסננים ברמת התקרבות זו.",
   "Mark all as read": "סמן הכל כנקרא",
   "Mark as explored": "סמן כנחקר",
   "Mark this polygon as a hole (inner ring) within another polygon": "סמן פוליגון זה כחור (טבעת פנימית) בתוך פוליגון אחר",
@@ -2925,7 +2926,5 @@
   "Zip code": "מיקוד",
   "Zone": "אזור",
   "Zoom in": "הגדלה",
-  "Zoom in to apply saved filters": "התקרבו כדי להחיל מסננים שמורים",
-  "Zoom in to enable filters": "יש להתקרב במפה כדי להשתמש במסננים",
   "Zoom out": "הקטנה"
 }

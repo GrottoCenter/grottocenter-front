@@ -1726,6 +1726,7 @@
   "Management tools": "Εργαλεία διαχείρισης",
   "Management tools access restricted": "Η πρόσβαση επιτρέπεται μόνο σε διαχειριστές, συντονιστές και υπευθύνους.",
   "Map": "Χάρτης",
+  "mapFiltersRequireUpdatedCoordinates": "Συνδεθείτε στο Internet για να χρησιμοποιήσετε τα φίλτρα σε αυτό το επίπεδο ζουμ.",
   "Mark all as read": "Επισήμανση όλων ως αναγνωσμένων",
   "Mark as explored": "Σήμανση ως εξερευνημένη",
   "Mark this polygon as a hole (inner ring) within another polygon": "Επισήμανση αυτού του πολυγώνου ως οπή (εσωτερικός δακτύλιος) μέσα σε άλλο πολύγωνο",
@@ -2925,7 +2926,5 @@
   "Zip code": "Ταχυδρομικός κωδικός",
   "Zone": "Ζώνη",
   "Zoom in": "Μεγέθυνση",
-  "Zoom in to apply saved filters": "Κάντε μεγέθυνση για εφαρμογή των αποθηκευμένων φίλτρων",
-  "Zoom in to enable filters": "Μεγεθύνετε τον χάρτη για να χρησιμοποιήσετε τα φίλτρα",
   "Zoom out": "Σμίκρυνση"
 }

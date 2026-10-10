@@ -1726,6 +1726,7 @@
   "Management tools": "Management tools",
   "Management tools access restricted": "Access reserved for administrators, moderators, and leaders.",
   "Map": "Map",
+  "mapFiltersRequireUpdatedCoordinates": "Go online to use filters at this zoom level.",
   "Mark all as read": "Mark all as read",
   "Mark as explored": "Mark as explored",
   "Mark this polygon as a hole (inner ring) within another polygon": "Mark this polygon as a hole (inner ring) within another polygon",
@@ -2925,7 +2926,5 @@
   "Zip code": "Zip code",
   "Zone": "Zone",
   "Zoom in": "Zoom in",
-  "Zoom in to apply saved filters": "Zoom in to apply saved filters",
-  "Zoom in to enable filters": "Zoom in to enable filters",
   "Zoom out": "Zoom out"
 }

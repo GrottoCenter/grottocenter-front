@@ -1726,6 +1726,7 @@
   "Management tools": "管理ツール",
   "Management tools access restricted": "管理者、モデレーター、責任者のみがアクセスできます。",
   "Map": "地図",
+  "mapFiltersRequireUpdatedCoordinates": "このズームレベルでフィルターを使うには、インターネットに接続してください。",
   "Mark all as read": "すべて既読にする",
   "Mark as explored": "探索済みとしてマーク",
   "Mark this polygon as a hole (inner ring) within another polygon": "このポリゴンを別のポリゴン内の穴（内側リング）としてマーク",
@@ -2925,7 +2926,5 @@
   "Zip code": "郵便番号",
   "Zone": "ゾーン",
   "Zoom in": "拡大",
-  "Zoom in to apply saved filters": "保存したフィルターを適用するには拡大",
-  "Zoom in to enable filters": "フィルターを使うには地図を拡大してください",
   "Zoom out": "縮小"
 }

@@ -1726,6 +1726,7 @@
   "Management tools": "Alat manajemen",
   "Management tools access restricted": "Akses terbatas untuk administrator, moderator, dan penanggung jawab.",
   "Map": "Peta",
+  "mapFiltersRequireUpdatedCoordinates": "Hubungkan ke internet untuk menggunakan filter pada tingkat zoom ini.",
   "Mark all as read": "Tandai semua sebagai sudah dibaca",
   "Mark as explored": "Tandai sebagai telah dijelajahi",
   "Mark this polygon as a hole (inner ring) within another polygon": "Tandai poligon ini sebagai lubang (cincin dalam) di dalam poligon lain",
@@ -2925,7 +2926,5 @@
   "Zip code": "Kode pos",
   "Zone": "Zona",
   "Zoom in": "Perbesar",
-  "Zoom in to apply saved filters": "Perbesar peta untuk menerapkan filter tersimpan",
-  "Zoom in to enable filters": "Perbesar peta untuk menggunakan filter",
   "Zoom out": "Perkecil"
 }
