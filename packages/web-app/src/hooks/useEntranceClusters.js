@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { createEntranceClusterClient } from '@/utils/entranceClusterClient';
+import { createEntranceClusterEngine } from '@/utils/entranceClusterEngine';
 
 const EMPTY_COORDINATES = [];
 
@@ -69,7 +70,30 @@ const useEntranceClusters = (data, filters) => {
     }
   }, [data, filters]);
 
-  return state;
+  const hasWorkerError = Boolean(state.error);
+  const fallback = useMemo(() => {
+    if (!hasWorkerError) return null;
+    // Worker failures degrade responsiveness, not filter correctness. Reuse
+    // the same engine on the main thread, rebuilding only on data/filter changes.
+    const engine = createEntranceClusterEngine();
+    const { hasCriteria } = engine({
+      type: 'build',
+      revision: 1,
+      data: data ?? EMPTY_COORDINATES,
+      filters
+    });
+    return {
+      hasCriteria,
+      source: {
+        getClusters: (bounds, zoom) =>
+          engine({ type: 'clusters', revision: 1, bounds, zoom }).result,
+        getClusterExpansionZoom: clusterId =>
+          engine({ type: 'expansion', revision: 1, clusterId }).result
+      }
+    };
+  }, [hasWorkerError, data, filters]);
+
+  return fallback ? { ...state, ...fallback, isPending: false } : state;
 };
 
 export default useEntranceClusters;

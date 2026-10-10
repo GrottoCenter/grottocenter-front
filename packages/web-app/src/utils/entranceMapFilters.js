@@ -52,13 +52,9 @@ const SIZE_BY_CODE = {
 };
 
 // Legacy cache compatibility: old offline responses contain only [lng, lat].
-// The Worker validates each new dataset once before applying any filters.
+// Format detection is independent of individual missing or malformed criteria.
 export const hasEntranceCoordinateCriteria = tuple =>
-  Array.isArray(tuple) &&
-  tuple.length === 5 &&
-  SIZE_BY_CODE[tuple[2]] !== undefined &&
-  Number.isFinite(tuple[3]) &&
-  (tuple[4] === null || Number.isFinite(tuple[4]));
+  Array.isArray(tuple) && tuple.length === 5;
 
 const matchesCriteria = (size, dataQuality, interest, filters) => {
   if (!filters.sizes[size]) return false;
@@ -77,6 +73,17 @@ export const matchesEntranceMarker = (entrance, filters) =>
     filters
   );
 
-// Receives enriched tuples already validated by the Worker.
-export const matchesEntranceCoordinate = (tuple, filters) =>
-  matchesCriteria(SIZE_BY_CODE[tuple[2]], tuple[3], tuple[4], filters);
+export const matchesEntranceCoordinate = (tuple, filters) => {
+  // Legacy cache compatibility: an individual pair stays visible even when
+  // other tuples in the dataset have filtering criteria.
+  if (!hasEntranceCoordinateCriteria(tuple)) return true;
+  // A malformed entrance must not disable filtering for the whole dataset.
+  // Keep it visible; missing quality is supported just like detailed markers.
+  if (
+    SIZE_BY_CODE[tuple[2]] === undefined ||
+    (tuple[3] !== null && !Number.isFinite(tuple[3])) ||
+    (tuple[4] !== null && !Number.isFinite(tuple[4]))
+  )
+    return true;
+  return matchesCriteria(SIZE_BY_CODE[tuple[2]], tuple[3], tuple[4], filters);
+};

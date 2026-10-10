@@ -316,6 +316,8 @@ const HydratedMap = ({
     isMarkersMode,
     visibleMarkers,
     markerCounts: {
+      // Count cached data before filtering: an empty selection is available
+      // offline data, not a missing tile.
       [layerTypes.ENTRANCES]: entranceMarkers.length,
       [layerTypes.NETWORKS]: networkMarkers.length,
       [layerTypes.ORGANIZATIONS]: organizationMarkers.length

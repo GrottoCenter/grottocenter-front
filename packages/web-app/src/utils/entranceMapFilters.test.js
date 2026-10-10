@@ -75,9 +75,43 @@ describe('entrance map filters', () => {
   it('distinguishes legacy pairs from enriched criteria before filtering', () => {
     expect(hasEntranceCoordinateCriteria([0, 0])).toBe(false);
     expect(hasEntranceCoordinateCriteria([0, 0, 1, 0, null])).toBe(true);
-    expect(hasEntranceCoordinateCriteria([0, 0, 4, 0, null])).toBe(false);
-    expect(hasEntranceCoordinateCriteria([0, 0, 1, null, null])).toBe(false);
+    expect(hasEntranceCoordinateCriteria([0, 0, 4, 0, null])).toBe(true);
+    expect(hasEntranceCoordinateCriteria([0, 0, 1, null, null])).toBe(true);
   });
+
+  it('preserves missing quality for tuples just like detailed markers', () => {
+    const filters = {
+      ...defaultFilters,
+      qualities: { insufficient: false, satisfactory: false, good: false }
+    };
+    expect(matchesEntranceCoordinate([0, 0, 1, null, null], filters)).toBe(
+      true
+    );
+    expect(
+      matchesEntranceCoordinate([0, 0, 1, null, null], {
+        ...filters,
+        minInterest: 8
+      })
+    ).toBe(false);
+  });
+
+  it.each([
+    [0, 0],
+    [0, 0, 4, 0, null],
+    [0, 0, 1, 'unknown', null],
+    [0, 0, 1, 0, 'unknown']
+  ])(
+    'keeps an entrance with incomplete or malformed criteria visible: %j',
+    (...tuple) => {
+      expect(
+        matchesEntranceCoordinate(tuple, {
+          sizes: { small: false, medium: false, large: false },
+          qualities: { insufficient: false, satisfactory: false, good: false },
+          minInterest: 10
+        })
+      ).toBe(true);
+    }
+  );
 
   it('gives tuples and corresponding markers the same result', () => {
     fc.assert(

@@ -22,16 +22,19 @@ is running, publishes only the latest index, and queries viewport clusters
 and click expansion asynchronously. The index stops at zoom 12 because real
 markers take over at 13. Each new index renews Leaflet bubbles and their click
 handlers; viewport requests and unmounted workers cannot publish stale results.
+If the Worker fails, the same engine runs synchronously on the main thread;
+filters, cluster counts and click expansion keep working. This fallback can
+block the UI while rebuilding a large index.
 
 Legacy cache compatibility: the worldwide entrance URL includes
-`criteriaVersion=1` to separate enriched
-responses from cached coordinate pairs. An offline upgrade can fall back to
-the old URL: those pairs remain visible without filtering, with an explanatory
-hint until updated coordinates arrive. The Worker checks the format once per
-dataset and reports filter availability to the UI; ordinary filter predicates
-receive validated tuples and do not contain legacy-cache branches.
-Other layers and massif maps keep the
-synchronous clustering path and their existing request URLs.
+`criteriaVersion=1` to separate enriched responses from cached coordinate pairs.
+An offline upgrade can fall back to the old URL: those pairs remain visible
+without filtering, with an explanatory hint until updated coordinates arrive.
+The map page refetches its datasets on reconnection. An enriched dataset enables
+filters even if some entrances have malformed criteria or legacy pairs; those
+individual entrances remain visible. Missing quality follows the same rule as
+detailed markers. Other layers and massif maps keep the synchronous clustering
+path and their existing request URLs.
 
 ---
 
