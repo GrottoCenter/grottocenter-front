@@ -89,9 +89,9 @@ describe('entrance cluster engine', () => {
     ).toBe(3);
   });
 
-  it('keeps legacy pairs unfiltered, including mixed legacy/enriched datasets', () => {
+  it('keeps legacy pairs unfiltered and disables filters for a legacy dataset', () => {
     const engine = createEntranceClusterEngine();
-    const legacy = [[5.5, 45.5], coordinates[1]];
+    const legacy = coordinates.map(tuple => tuple.slice(0, 2));
     const ready = engine({
       type: 'build',
       revision: 1,
@@ -102,6 +102,39 @@ describe('entrance cluster engine', () => {
     expect(
       engine({ type: 'clusters', revision: 1, bounds: WORLD, zoom: 0 })
         .result[0].properties.point_count
-    ).toBe(2);
+    ).toBe(3);
+  });
+
+  it('filters enriched entrances despite individual malformed criteria or legacy pairs', () => {
+    const engine = createEntranceClusterEngine();
+    const data = [
+      ...coordinates,
+      [5.501, 45.501],
+      [5.502, 45.502, 4, 70, 9],
+      [5.503, 45.503, 3, null, 9]
+    ];
+    const ready = engine({
+      type: 'build',
+      revision: 1,
+      data,
+      filters: {
+        ...filters,
+        minInterest: 8,
+        qualities: { insufficient: false, satisfactory: false, good: false }
+      }
+    });
+    expect(ready.hasCriteria).toBe(true);
+    expect(
+      engine({ type: 'clusters', revision: 1, bounds: WORLD, zoom: 0 })
+        .result[0].properties.point_count
+    ).toBe(3);
+    expect(
+      engine({
+        type: 'clusters',
+        revision: 1,
+        bounds: WORLD,
+        zoom: 13
+      }).result.map(feature => feature.properties.pointId)
+    ).toEqual([3, 4, 5]);
   });
 });

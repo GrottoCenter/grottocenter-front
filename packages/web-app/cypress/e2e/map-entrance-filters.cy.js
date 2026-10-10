@@ -67,7 +67,9 @@ const visitMap = ({
   legacy = false,
   minimum = 0,
   zoom = 10,
-  massifs = false
+  massifs = false,
+  isWorkerUnavailable = false,
+  isOffline = false
 } = {}) => {
   cy.mockApiCatchAll();
   cy.intercept(
@@ -96,6 +98,22 @@ const visitMap = ({
   }
   cy.visit(`/map/45.5,5.5,${zoom}`, {
     onBeforeLoad: win => {
+      if (isWorkerUnavailable) {
+        Object.defineProperty(win, 'Worker', {
+          configurable: true,
+          value: class {
+            constructor() {
+              throw new Error('Worker unavailable');
+            }
+          }
+        });
+      }
+      if (isOffline) {
+        Object.defineProperty(win.navigator, 'onLine', {
+          configurable: true,
+          get: () => false
+        });
+      }
       win.localStorage.setItem('selectedLanguage', 'fr');
       win.localStorage.setItem('mapTourSeen_v2', 'true');
       win.localStorage.setItem(
@@ -224,6 +242,44 @@ describe('Entrance filters at every zoom', () => {
     expectCount(4);
     openFilters();
     cy.get('[data-testid="entrance-size-small"]').should('be.disabled');
+  });
+
+  it('refreshes legacy coordinates on reconnect and enables saved filters without reloading', () => {
+    visitMap({ legacy: true, minimum: 8, isOffline: true });
+    expectCount(4);
+    openFilters();
+    cy.get('[data-testid="entrance-size-small"]').should('be.disabled');
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/geoloc/entrancesCoordinates' },
+      { body: COORDINATES }
+    ).as('updatedCoordinates');
+    cy.window().then(win => {
+      Object.defineProperty(win.navigator, 'onLine', { get: () => true });
+      win.dispatchEvent(new win.Event('online'));
+    });
+    cy.wait('@updatedCoordinates');
+    expectCount(2);
+    cy.get('[data-testid="entrance-filters-unavailable"]').should('not.exist');
+    cy.get('[data-testid="entrance-size-small"]').should('be.enabled');
+    cy.get('@updatedCoordinates.all').should('have.length', 1);
+  });
+
+  it('keeps bubbles and filters usable when the Worker cannot start', () => {
+    visitMap({ minimum: 8, isWorkerUnavailable: true });
+    expectCount(2);
+    openFilters();
+    cy.get('[data-testid="entrance-size-small"]').should('be.enabled');
+    toggleCheckbox('[data-testid="entrance-quality-satisfactory"]', false);
+    expectCount(1);
+    cy.get('[data-testid="reset-entrance-filters"]').click();
+    expectCount(4);
+    cy.get('[data-tour="filters-control-toggle"]')
+      .parent()
+      .trigger('mouseout', { relatedTarget: null });
+    bubbles().click();
+    cy.wait('@markers');
+    expectZoom(15);
+    bubbles().should('not.exist');
   });
 
   it('preserves filters when the entrance layer is hidden and shown again', () => {

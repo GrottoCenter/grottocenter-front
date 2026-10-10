@@ -19,9 +19,12 @@ export const createEntranceClusterEngine = () => {
     if (message.type === 'build') {
       if (message.data) {
         coordinates = message.data;
-        // Legacy cache compatibility: check once per dataset. Old pairs (or a
-        // mixed dataset) remain visible without filtering until refreshed.
-        hasCriteria = coordinates.every(hasEntranceCoordinateCriteria);
+        // Legacy cache compatibility: only an entirely unenriched dataset
+        // disables filters. Individual pairs or malformed criteria stay visible
+        // without preventing the other entrances from being filtered.
+        hasCriteria =
+          coordinates.length === 0 ||
+          coordinates.some(hasEntranceCoordinateCriteria);
       }
       const points = [];
       for (let i = 0; i < coordinates.length; i++) {
