@@ -350,6 +350,10 @@ export const Entry = ({
                 <DeleteConfirmationDialog
                   entityType={DELETED_ENTITIES.entrance}
                   entityId={entrance.id}
+                  entityName={entrance.name}
+                  existingRedirectId={
+                    entrance.isDeleted ? entrance.redirectTo : null
+                  }
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
                   isPermanent={isDeleteConfirmationPermanent}

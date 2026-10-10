@@ -558,6 +558,10 @@ const Document = ({
       <DeleteConfirmationDialog
         entityType={DELETED_ENTITIES.document}
         entityId={documentData?.id}
+        entityName={documentData?.title}
+        existingRedirectId={
+          documentData?.isDeleted ? documentData.redirectTo : null
+        }
         isOpen={isDeleteConfirmationOpen}
         isLoading={isActionLoading}
         isPermanent={isDeleteConfirmationPermanent}

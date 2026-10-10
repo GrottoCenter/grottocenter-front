@@ -187,7 +187,7 @@ describe('Previewing a document before association', () => {
     cy.get('input[placeholder="Entrance name"]').should('exist');
 
     cy.get('[aria-label="Delete"]').click();
-    cy.contains('[role="dialog"]', 'Deletion confirmation')
+    cy.contains('[role="dialog"]', 'Delete this Document?')
       .contains('button', /^Delete$/)
       .click();
     cy.wait('@deleteDocument');

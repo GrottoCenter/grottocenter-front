@@ -198,6 +198,7 @@ const RelatedCaves = ({
           entities={exploredNetworks}
           onItemRemove={canManageCaves ? id => requestUnlink(id, 'cave') : null}
           toolTipTitle={toolTipTitle}
+          removeIcon={<LinkOffIcon data-testid="unlink-network-icon" />}
         />
       )}
       <EntitiesList
@@ -207,6 +208,7 @@ const RelatedCaves = ({
           canManageCaves ? id => requestUnlink(id, 'entrance') : null
         }
         toolTipTitle={toolTipTitle}
+        removeIcon={<LinkOffIcon data-testid="unlink-entrance-icon" />}
       />
     </Box>
   );
