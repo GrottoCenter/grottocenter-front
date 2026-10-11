@@ -48,6 +48,10 @@ export const makeEntranceData = (data, entityType) => {
   ) {
     entranceData.longitude = data.entrance.longitude;
     entranceData.latitude = data.entrance.latitude;
+    entranceData.precision =
+      data.entrance.precision == null || data.entrance.precision === ''
+        ? null
+        : Number(data.entrance.precision);
   }
 
   return entranceData;
@@ -108,6 +112,9 @@ export const hasEntranceChanged = (entranceDataFmt, originalEntranceValues) => {
         : null) ||
     // Coordinates are omitted from entranceDataFmt when the entrance is sensitive
     // and the user is non-admin, so treat undefined as "no change intended".
+    (entranceDataFmt.precision !== undefined &&
+      entranceDataFmt.precision !==
+        (originalEntranceValues.precision ?? null)) ||
     (entranceDataFmt.longitude !== undefined &&
       String(entranceDataFmt.longitude) !==
         String(originalEntranceValues.longitude ?? '')) ||

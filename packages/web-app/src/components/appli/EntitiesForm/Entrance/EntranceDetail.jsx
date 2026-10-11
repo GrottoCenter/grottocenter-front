@@ -3,17 +3,24 @@ import { useRef, useState } from 'react';
 import { useController, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { NUMERIC_FIELD_LIMITS } from '@/utils/numericFieldLimits';
+import {
+  NUMERIC_FIELD_LIMITS,
+  validateNumericRange
+} from '@/utils/numericFieldLimits';
 import { usePermissions, useNearbyEntrances } from '../../../../hooks';
 import SensitivitySection from '../../../common/SensitivitySection';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormSection } from '../utils/FormContainers';
 import NumberField from '../utils/NumberField';
 
+// The existing API precision column is a signed smallint, in meters.
+const MAX_PRECISION_METERS = 32767;
+
 const EntranceDetail = ({
   control,
   errors,
   getValues,
+  onLocationAccuracyChange,
   isNewEntrance = false
 }) => {
   const permissions = usePermissions();
@@ -37,6 +44,7 @@ const EntranceDetail = ({
   to allow the user to mark and unmark it freely before submitting the form
   */
   const values = getValues();
+  const initialPrecision = useRef(values.entrance.precision).current;
   const initialIsSensitive = useRef(values.entrance.isSensitive).current;
 
   // useController rather than a render-prop Controller: the panel needs both
@@ -87,6 +95,7 @@ const EntranceDetail = ({
           control={control}
           formLatitudeKey="entrance.latitude"
           formLongitudeKey="entrance.longitude"
+          formAccuracyKey="entrance.precision"
           required
           latitudeError={errors?.entrance?.latitude?.message}
           longitudeError={errors?.entrance?.longitude?.message}
@@ -95,6 +104,46 @@ const EntranceDetail = ({
             id: 'Existing nearby entrances'
           })}
           onZoomChange={setMapZoom}
+          onLocationAccuracyChange={onLocationAccuracyChange}
+          accuracyField={
+            <NumberField
+              name="entrance.precision"
+              control={control}
+              label="Accuracy"
+              prefix="±"
+              sx={{ flex: 'none', width: '100%' }}
+              unit="m"
+              isError={!!errors.entrance?.precision}
+              helperText={errors.entrance?.precision?.message}
+              rules={{
+                validate: value =>
+                  value == null ||
+                  value === '' ||
+                  // Preserve the legacy restriction marker when editing a row
+                  // that already has it; contributors cannot create new ones.
+                  (Number(value) === 0 && initialPrecision === 0) ||
+                  validateNumericRange(
+                    value,
+                    1,
+                    MAX_PRECISION_METERS,
+                    formatMessage
+                  ) === true ||
+                  formatMessage(
+                    {
+                      id: 'Accuracy must be a whole number between 1 and {max} m.'
+                    },
+                    { max: MAX_PRECISION_METERS }
+                  )
+              }}
+              inputProps={{
+                min: 1,
+                max: MAX_PRECISION_METERS,
+                step: 1,
+                inputMode: 'numeric',
+                'data-testid': 'entrance-precision'
+              }}
+            />
+          }
         />
       )}
       <Box
@@ -150,11 +199,13 @@ EntranceDetail.propTypes = {
       language: PropTypes.shape({ message: PropTypes.string }),
       name: PropTypes.shape({ message: PropTypes.string }),
       altitude: PropTypes.shape({ message: PropTypes.string }),
+      precision: PropTypes.shape({ message: PropTypes.string }),
       yearDiscovery: PropTypes.shape({ message: PropTypes.string })
     })
   }),
   control: PropTypes.shape({}),
   getValues: PropTypes.func.isRequired, // React-hook-form getValues() function
+  onLocationAccuracyChange: PropTypes.func,
   isNewEntrance: PropTypes.bool
 };
 

@@ -23,7 +23,7 @@ import {
 const buildIcon = () => {
   const rgbaCone = 'rgba(25, 118, 210, 0.35)';
   const html = `
-    <div style="width:48px;height:48px;position:relative;">
+    <div data-testid="user-location-dot" style="width:48px;height:48px;position:relative;">
       <div class="user-location-cone"
            style="position:absolute;inset:0;transform-origin:50% 50%;transform:rotate(0deg);display:none;">
         <div style="position:absolute;left:50%;top:2px;transform:translateX(-50%);

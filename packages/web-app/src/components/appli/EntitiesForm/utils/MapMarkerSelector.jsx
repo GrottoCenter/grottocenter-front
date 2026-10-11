@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
+import { useIntl } from 'react-intl';
 import {
   Circle,
   MapContainer,
@@ -8,14 +9,20 @@ import {
   ScaleControl
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
-import { isMobile } from 'react-device-detect';
-import { styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { isAndroid, isFirefox, isMobile } from 'react-device-detect';
+import { alpha, styled } from '@mui/material/styles';
+import { orange } from '@mui/material/colors';
+import { Box, Typography } from '@mui/material';
+import { ACCURACY_CIRCLE_STYLE } from '@/components/common/Maps/common/userLocationStyle';
+import usePreciseGeolocation from '@/hooks/usePreciseGeolocation';
+import useIsFullscreen from '@/components/common/Maps/common/useIsFullscreen';
 import { entranceMarkerIcon } from '../../../../assets/icons';
 import useMarkers from '../../../common/Maps/common/Markers/useMarkers';
 import { EntrancePopup } from '../../../common/Maps/common/Markers/Components';
 import LayersControl from '../../../common/Maps/common/LayersControl';
-import LocateMeControl from '../../../common/Maps/common/LocateMeControl';
+import LocateMeControl, {
+  LOCATE_ERRORS
+} from '../../../common/Maps/common/LocateMeControl';
 import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
 import FullscreenControl from '../../../common/Maps/common/FullscreenControl';
 import TileReloader from '../../../common/Maps/common/TileReloader';
@@ -47,22 +54,47 @@ const StyledMapContainer = styled(MapContainer)`
 // height uses `svh` (stable across toolbar show/hide) to avoid the scroll case.
 const RESIZE_GUARD_MS = 500;
 
-const MapBind = ({ center, zoom, onMoveEnd }) => {
+const MapBind = ({
+  center,
+  zoom,
+  onMoveEnd,
+  onInteractionStart,
+  onFullscreenChange
+}) => {
   const lastValidCenter = useRef({});
   const lastSetViewTs = useRef(0);
   const lastResizeTs = useRef(0);
   const isUserDragging = useRef(false);
   const map = useMap();
+  const lastMapSize = useRef(map.getSize());
+  const isFullscreen = useIsFullscreen();
 
+  useEffect(() => {
+    onFullscreenChange(isFullscreen);
+  }, [isFullscreen, onFullscreenChange]);
+
+  // Stop GPS as soon as a user starts dragging, before a fix can recenter the
+  // map mid-gesture. Programmatic setView does not emit dragstart.
   useMapEvent('dragstart', () => {
     isUserDragging.current = true;
+    onInteractionStart();
   });
 
   useMapEvent('resize', () => {
     lastResizeTs.current = Date.now();
+    lastMapSize.current = map.getSize();
   });
 
   useMapEvent('moveend', () => {
+    // invalidateSize emits moveend BEFORE resize. Detect the new dimensions
+    // here so fullscreen transitions cannot be mistaken for manual placement.
+    const size = map.getSize();
+    const previousSize = lastMapSize.current;
+    lastMapSize.current = size;
+    if (size.x !== previousSize.x || size.y !== previousSize.y) {
+      lastResizeTs.current = Date.now();
+      return;
+    }
     // Ignore moveend events not initiated by the user: those triggered by the
     // programmatic setView below, and those triggered by a container resize.
     const timeSinceSetViewMs = Date.now() - lastSetViewTs.current;
@@ -97,7 +129,9 @@ const MapBind = ({ center, zoom, onMoveEnd }) => {
 MapBind.propTypes = {
   center: PropTypes.shape({}),
   zoom: PropTypes.number,
-  onMoveEnd: PropTypes.func
+  onMoveEnd: PropTypes.func,
+  onInteractionStart: PropTypes.func.isRequired,
+  onFullscreenChange: PropTypes.func.isRequired
 };
 
 // Reports the map zoom upward so the parent can hide the duplicate-detection
@@ -136,6 +170,16 @@ const toFloat = value => {
   return parseFloat(v);
 };
 
+// Ignore formatting and the rounding already used when writing coordinates.
+// An empty/invalid coordinate still counts as a change during manual editing.
+const isSameCoordinate = (first, second) => {
+  const firstNumber = toFloat(first);
+  const secondNumber = toFloat(second);
+  return Number.isFinite(firstNumber) && Number.isFinite(secondNumber)
+    ? firstNumber.toFixed(6) === secondNumber.toFixed(6)
+    : first === second;
+};
+
 // Existing nearby entrances are drawn as distinctly-coloured circles so they
 // are not mistaken for the user's new entrance (the large central pin).
 const NEARBY_ENTRANCE_MARKER_STYLE = {
@@ -172,13 +216,11 @@ const LOCATE_ZOOM = 18;
 // How long after the map writes to the form before we allow form→map updates.
 // Prevents the map pan → form update → map recenter loop.
 const MAP_WRITE_GUARD_MS = 400;
-const hasGeolocation =
-  typeof navigator !== 'undefined' && Boolean(navigator.geolocation);
-const ACCURACY_CIRCLE_STYLE = {
-  color: '#1976d2',
-  fillColor: '#1976d2',
-  fillOpacity: 0.1,
-  weight: 1
+const ENTRANCE_ACCURACY_COLOR = orange[700];
+const ENTRANCE_ACCURACY_CIRCLE_STYLE = {
+  ...ACCURACY_CIRCLE_STYLE,
+  color: ENTRANCE_ACCURACY_COLOR,
+  fillColor: ENTRANCE_ACCURACY_COLOR
 };
 
 const MapMarkerSelector = ({
@@ -187,22 +229,98 @@ const MapMarkerSelector = ({
   formLongitudeKey,
   onLatitudeChange: setFormLatitude,
   onLongitudeChange: setFormLongitude,
+  formAccuracyKey,
   additionalPositions = [],
   additionalMarkersLabel,
   onZoomChange,
+  onLocationAccuracyChange,
   markerIcon,
-  mapHeight = '40svh'
+  mapHeight
 }) => {
-  const [locating, setLocating] = useState(false);
-  const [locateError, setLocateError] = useState(null);
+  const { formatMessage } = useIntl();
+  const hasGeolocation =
+    typeof navigator !== 'undefined' && Boolean(navigator.geolocation);
+  const {
+    locate,
+    cancel: cancelLocate,
+    isLocating: locating,
+    error: locateError,
+    hasTimedOut
+  } = usePreciseGeolocation();
   const [initialized, setInitialized] = useState(false);
   const [currentPosition, setCurrentPosition] = useState(defaultCoord);
   const [zoomLevel, setZoomLevel] = useState(defaultZoom);
-  const [locationAccuracy, setLocationAccuracy] = useState(null);
+  const [deviceFix, setDeviceFix] = useState(null);
+  const [accuracyHint, setAccuracyHint] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const lastSetFormTs = useRef(0);
+  const locationValuesRef = useRef(null);
 
   const rawLatitude = useWatch({ control, name: formLatitudeKey });
   const rawLongitude = useWatch({ control, name: formLongitudeKey });
+  const formAccuracy = useWatch({
+    control,
+    name: formAccuracyKey,
+    disabled: !formAccuracyKey
+  });
+
+  // Remember the point associated with the estimate. Recognize GPS writes
+  // from the fix rendered with the form, avoiding stale effects during updates.
+  // A value explicitly typed in this session remains a contributor's estimate.
+  useEffect(() => {
+    const previous = locationValuesRef.current;
+    const isDeviceUpdate =
+      deviceFix &&
+      isSameCoordinate(rawLatitude, deviceFix.location.lat) &&
+      isSameCoordinate(rawLongitude, deviceFix.location.lng) &&
+      (!formAccuracyKey ||
+        !onLocationAccuracyChange ||
+        Number(formAccuracy) === Math.max(1, Math.ceil(deviceFix.accuracy)));
+    const hasMoved =
+      previous &&
+      (!isSameCoordinate(rawLatitude, previous.latitude) ||
+        !isSameCoordinate(rawLongitude, previous.longitude));
+    const hasEditedAccuracy = previous && formAccuracy !== previous.accuracy;
+    const isManual =
+      !isDeviceUpdate && (hasEditedAccuracy || previous?.isManual || false);
+    locationValuesRef.current = {
+      latitude: rawLatitude,
+      longitude: rawLongitude,
+      accuracy: formAccuracy,
+      isManual
+    };
+    if (isDeviceUpdate) return;
+    if (hasMoved || hasEditedAccuracy) {
+      if (locating) cancelLocate();
+      if (formAccuracyKey) setDeviceFix(null);
+    }
+    if (hasEditedAccuracy) setAccuracyHint(null);
+    if (
+      hasMoved &&
+      formAccuracyKey &&
+      formAccuracy != null &&
+      formAccuracy !== '' &&
+      Number(formAccuracy) !== 0
+    ) {
+      if (isManual) {
+        setAccuracyHint('location.accuracy.checkDeclared');
+      } else {
+        // Zero is a legacy restricted-location marker, never an estimate.
+        locationValuesRef.current.accuracy = null;
+        onLocationAccuracyChange?.(null);
+        setAccuracyHint('location.accuracy.cleared');
+      }
+    }
+  }, [
+    rawLatitude,
+    rawLongitude,
+    formAccuracy,
+    formAccuracyKey,
+    deviceFix,
+    locating,
+    cancelLocate,
+    onLocationAccuracyChange
+  ]);
 
   const validLatitude = boundMinMax(-90, 90, toFloat(rawLatitude));
   const validLongitude = boundMinMax(-180, 180, toFloat(rawLongitude));
@@ -236,38 +354,98 @@ const MapMarkerSelector = ({
 
   // map → form (only direction after initialization)
   const onMoveEnd = newLocation => {
+    cancelLocate();
     lastSetFormTs.current = Date.now();
     setFormLatitude(newLocation.lat.toFixed(6));
     setFormLongitude(newLocation.lng.toFixed(6));
   };
 
   const handleLocateMe = () => {
-    setLocating(true);
-    setLocateError(null);
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        setFormLatitude(loc.lat.toFixed(6));
-        setFormLongitude(loc.lng.toFixed(6));
-        setCurrentPosition(loc);
-        setLocationAccuracy(pos.coords.accuracy);
-        setZoomLevel(LOCATE_ZOOM);
-        setLocating(false);
-      },
-      err => {
-        setLocateError(err.code);
-        setLocating(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
-    );
+    if (locating) {
+      cancelLocate();
+      return;
+    }
+    setDeviceFix(null);
+    locate(pos => {
+      const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      const latitude = loc.lat.toFixed(6);
+      const longitude = loc.lng.toFixed(6);
+      // The API stores whole meters; round up rather than understate the
+      // device estimate. Zero is reserved for restricted coordinates.
+      const accuracy = Math.max(1, Math.ceil(pos.coords.accuracy));
+      lastSetFormTs.current = Date.now();
+      setFormLatitude(latitude);
+      setFormLongitude(longitude);
+      setCurrentPosition(loc);
+      setDeviceFix({
+        location: loc,
+        accuracy: pos.coords.accuracy,
+        timestamp: pos.timestamp
+      });
+      setAccuracyHint(null);
+      onLocationAccuracyChange?.(accuracy);
+      setZoomLevel(LOCATE_ZOOM);
+    });
   };
 
-  const showLegend = additionalMarkersLabel && additionalPositions.length > 0;
+  const accuracyRadius = Number(
+    formAccuracyKey ? formAccuracy : deviceFix?.accuracy
+  );
+  const accuracyCenter = formAccuracyKey
+    ? { lat: validLatitude, lng: validLongitude }
+    : deviceFix?.location;
+  const hasAccuracyCircle =
+    Number.isFinite(accuracyRadius) &&
+    accuracyRadius > 0 &&
+    Number.isFinite(accuracyCenter?.lat) &&
+    Number.isFinite(accuracyCenter?.lng);
+  const showAccuracyLegend = Boolean(formAccuracyKey) && hasAccuracyCircle;
+  const showNearbyLegend =
+    additionalMarkersLabel && additionalPositions.length > 0;
+  const shouldMergeAccuracyStatus =
+    isFullscreen && showAccuracyLegend && Boolean(deviceFix) && !locateError;
+
+  let statusId = accuracyHint;
+  if (locateError) statusId = LOCATE_ERRORS[locateError];
+  else if (isAndroid && isFirefox && deviceFix?.accuracy === 100) {
+    // The exact device estimate is a hint of Mozilla bug 1946736, not proof.
+    // Keep acquiring: a better fix automatically restores the usual status.
+    statusId = 'location.acquisition.firefoxLimited';
+  } else if (locating) {
+    statusId = deviceFix
+      ? 'location.acquisition.improving'
+      : 'location.acquisition.searching';
+  } else if (deviceFix) {
+    statusId = hasTimedOut
+      ? 'location.acquisition.limited'
+      : 'location.acquisition.estimated';
+  }
+
+  const locationStatus = statusId && (
+    <Typography
+      variant="caption"
+      component="p"
+      role="status"
+      data-testid="location-status"
+      sx={{
+        m: 0,
+        mt: isFullscreen ? 0 : 0.5,
+        color: locateError ? 'error.main' : 'text.secondary'
+      }}>
+      {formatMessage(
+        { id: statusId },
+        { accuracy: Math.max(1, Math.ceil(deviceFix?.accuracy ?? 0)) }
+      )}
+    </Typography>
+  );
 
   return (
     <Box sx={{ position: 'relative' }}>
       <StyledMapContainer
-        style={{ height: mapHeight, width: '100%' }}
+        sx={{
+          height: mapHeight ?? { xs: '50svh', sm: '40svh' },
+          width: '100%'
+        }}
         center={currentPosition}
         zoom={zoomLevel}
         dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
@@ -278,6 +456,7 @@ const MapMarkerSelector = ({
         preferCanvas>
         <GeocodingControl
           onLocationSelect={newLocation => {
+            cancelLocate();
             setFormLatitude(newLocation.lat.toFixed(6));
             setFormLongitude(newLocation.lng.toFixed(6));
             setCurrentPosition({ lat: newLocation.lat, lng: newLocation.lng });
@@ -293,15 +472,22 @@ const MapMarkerSelector = ({
           center={currentPosition}
           zoom={zoomLevel}
           onMoveEnd={onMoveEnd}
+          onInteractionStart={cancelLocate}
+          onFullscreenChange={setIsFullscreen}
         />
 
         {onZoomChange && <ZoomReporter onZoomChange={onZoomChange} />}
 
-        {locationAccuracy && (
+        {hasAccuracyCircle && (
           <Circle
-            center={currentPosition}
-            radius={locationAccuracy}
-            pathOptions={ACCURACY_CIRCLE_STYLE}
+            center={accuracyCenter}
+            radius={accuracyRadius}
+            interactive={false}
+            pathOptions={
+              formAccuracyKey
+                ? ENTRANCE_ACCURACY_CIRCLE_STYLE
+                : ACCURACY_CIRCLE_STYLE
+            }
           />
         )}
 
@@ -310,6 +496,7 @@ const MapMarkerSelector = ({
             onClick={handleLocateMe}
             loading={locating}
             error={locateError}
+            retry={Boolean(locateError || (hasTimedOut && deviceFix))}
           />
         )}
 
@@ -323,40 +510,77 @@ const MapMarkerSelector = ({
 
         {/* Rendered inside the map container so it stays visible in fullscreen
             mode (only the map element enters fullscreen). */}
-        {showLegend && (
+        {(showNearbyLegend ||
+          showAccuracyLegend ||
+          (isFullscreen && statusId)) && (
           <Box
             sx={{
               position: 'absolute',
-              bottom: 10,
-              left: 12,
+              bottom: theme => theme.spacing(1.25),
+              left: theme => theme.spacing(1.5),
+              maxWidth: theme => `calc(100% - ${theme.spacing(10)})`,
               zIndex: 1000,
               display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 0.5,
               px: 0.5,
-              py: '4px',
+              py: 0.5,
               borderRadius: 1,
               boxShadow: 1,
-              fontSize: 12,
               color: 'text.primary',
               bgcolor: 'rgba(255, 255, 255, 0.9)',
+              typography: 'caption',
               pointerEvents: 'none'
             }}>
-            <Box
-              component="span"
-              sx={{
-                width: 10,
-                height: 10,
-                flexShrink: 0,
-                borderRadius: '50%',
-                border: `2px solid ${NEARBY_ENTRANCE_MARKER_STYLE.color}`,
-                bgcolor: NEARBY_ENTRANCE_MARKER_STYLE.fillColor
-              }}
-            />
-            {additionalMarkersLabel}
+            {showNearbyLegend && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Box
+                  component="span"
+                  sx={{
+                    width: 10,
+                    height: 10,
+                    flexShrink: 0,
+                    borderRadius: '50%',
+                    border: `2px solid ${NEARBY_ENTRANCE_MARKER_STYLE.color}`,
+                    bgcolor: NEARBY_ENTRANCE_MARKER_STYLE.fillColor
+                  }}
+                />
+                {additionalMarkersLabel}
+              </Box>
+            )}
+            {showAccuracyLegend && (
+              <Box
+                data-testid="entrance-precision-legend"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.75
+                }}>
+                <Box
+                  component="span"
+                  sx={{
+                    width: 10,
+                    height: 10,
+                    flexShrink: 0,
+                    borderRadius: '50%',
+                    border: `1px solid ${ENTRANCE_ACCURACY_CIRCLE_STYLE.color}`,
+                    bgcolor: alpha(
+                      ENTRANCE_ACCURACY_CIRCLE_STYLE.fillColor,
+                      0.1
+                    )
+                  }}
+                />
+                {shouldMergeAccuracyStatus
+                  ? locationStatus
+                  : formatMessage({ id: 'Accuracy' })}
+              </Box>
+            )}
+            {isFullscreen && !shouldMergeAccuracyStatus && locationStatus}
           </Box>
         )}
       </StyledMapContainer>
+      {!isFullscreen && locationStatus}
     </Box>
   );
 };
@@ -367,9 +591,11 @@ MapMarkerSelector.propTypes = {
   formLongitudeKey: PropTypes.string,
   onLatitudeChange: PropTypes.func.isRequired,
   onLongitudeChange: PropTypes.func.isRequired,
+  formAccuracyKey: PropTypes.string,
   additionalPositions: PropTypes.arrayOf(PropTypes.shape({})),
   additionalMarkersLabel: PropTypes.string,
   onZoomChange: PropTypes.func,
+  onLocationAccuracyChange: PropTypes.func,
   markerIcon: PropTypes.string,
   mapHeight: PropTypes.string
 };

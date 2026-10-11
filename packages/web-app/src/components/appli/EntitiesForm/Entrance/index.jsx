@@ -59,6 +59,7 @@ const defaultEntranceValues = {
   language: '',
   latitude: '',
   longitude: '',
+  precision: '',
   altitude: '',
   yearDiscovery: ''
 };
@@ -247,6 +248,12 @@ export const EntranceForm = ({
           errors={errors}
           getValues={getValues}
           isNewEntrance={isNewEntrance}
+          onLocationAccuracyChange={accuracy =>
+            setValue('entrance.precision', accuracy, {
+              shouldDirty: true,
+              shouldValidate: true
+            })
+          }
         />
         {isNewEntrance ? (
           <NetworkLinkSection
@@ -297,6 +304,7 @@ EntranceForm.propTypes = {
     language: PropTypes.string,
     latitude: PropTypes.number,
     longitude: PropTypes.number,
+    precision: PropTypes.number,
     isSensitive: PropTypes.bool,
     isSensitiveLocked: PropTypes.bool,
     hasBat: PropTypes.bool,

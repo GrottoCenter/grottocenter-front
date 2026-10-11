@@ -45,6 +45,7 @@ const EntranceEdit = () => {
           language: entrance.language,
           latitude: entrance.latitude,
           longitude: entrance.longitude,
+          precision: entrance.precision,
           altitude: entrance.altitude,
           yearDiscovery: entrance.discoveryYear
         }}

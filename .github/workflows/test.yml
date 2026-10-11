@@ -67,7 +67,9 @@ jobs:
         # refuse those requests at the browser layer, before CDP/proxy
         # intercepts can see them, so every `cy.wait('@alias')` would time
         # out. 9999 is high, unassigned, and not on the list.
-        run: yarn build
+        # Service-worker navigation caching bypasses Cypress's onBeforeLoad
+        # instrumentation. Keep browser stubs active across the full suite.
+        run: yarn build --mode e2e
         env:
           VITE_API_URL: http://127.0.0.1:9999
       - name: Share built app
