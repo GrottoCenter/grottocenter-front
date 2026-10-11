@@ -1,9 +1,4 @@
-import {
-  render,
-  screen,
-  waitForElementToBeRemoved,
-  within
-} from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -106,7 +101,10 @@ const messages = {
   'delete-confirmation-dialog': 'Delete this {entityFmt}?',
   'delete-permanent-confirmation-dialog':
     'Permanently delete this {entityFmt}?',
-  'Deletion confirmation': 'Deletion confirmation',
+  'delete-confirmation-soft-effect':
+    'This item will be marked as deleted. It can be restored.',
+  'delete-confirmation-permanent-effect': 'This action is irreversible.',
+  'delete-confirmation-merge-optional-label': 'Merge — optional',
   unlink: 'unlink',
   Unlink: 'Unlink',
   No: 'No',
@@ -291,7 +289,9 @@ it('keeps a deleted guideline available for moderators to restore', async () => 
   expect(
     await screen.findByText('This Guideline has been deleted')
   ).toBeVisible();
-  await waitForElementToBeRemoved(() => screen.queryByRole('dialog'));
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  );
   expect(screen.queryByRole('link', { name: 'Edit' })).not.toBeInTheDocument();
   expect(
     within(screen.getByRole('banner')).queryByRole('button', {
@@ -336,7 +336,7 @@ it('permanently deletes an already soft-deleted guideline', async () => {
 
   await user.click(screen.getByRole('button', { name: 'Permanently delete' }));
   const dialog = screen.getByRole('dialog', {
-    name: 'Deletion confirmation'
+    name: 'Permanently delete this Guideline?'
   });
   expect(
     within(dialog).getByText('Permanently delete this Guideline?')
