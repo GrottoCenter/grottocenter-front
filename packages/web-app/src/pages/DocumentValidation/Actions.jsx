@@ -113,6 +113,7 @@ const Actions = ({
         return;
       }
       if (error.status === 403) {
+        setIsConfirmationDialogOpen(false);
         onError(formatMessage({ id: 'processDocumentsForbidden' }));
         return;
       }

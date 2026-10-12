@@ -288,6 +288,9 @@ const MobileEntityList = ({
   }, [isNewQuery, isSelectionControlled]);
 
   useEffect(() => {
+    // A page change can clear rows while the next page loads. Keep the append
+    // pending until its data arrives so earlier cards remain in the list.
+    if (isLoading) return;
     if (isAppending.current) {
       setAllRows(prev => {
         const next = [...prev, ...(rows ?? [])];
@@ -299,7 +302,7 @@ const MobileEntityList = ({
       setAllRows(rows ?? []);
     }
     isAppending.current = false;
-  }, [rows]);
+  }, [rows, isLoading]);
 
   // Notify parent only when selection actually changes, not on mount.
   // Uncontrolled path only: controlled mode notifies through handleToggle and
