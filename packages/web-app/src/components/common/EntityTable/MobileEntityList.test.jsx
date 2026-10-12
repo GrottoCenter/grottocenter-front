@@ -62,6 +62,49 @@ describe('MobileEntityList - Controlled selection', () => {
     expect(onSelected).toHaveBeenCalledExactlyOnceWith([1, 2]);
   });
 
+  it.each(['controlled', 'uncontrolled'])(
+    'preserves appended cards through an unchanged refetch and resets on a new query (%s selection)',
+    mode => {
+      const onSelected = vi.fn();
+      const nextRows = [{ id: 2, name: 'Cave B' }];
+      const props = {
+        ...defaultProps,
+        totalRows: 2,
+        onSelected,
+        ...(mode === 'controlled' ? { selectedIds: [1] } : {})
+      };
+      const { rerender } = renderList(props);
+      const rerenderPage = overrides =>
+        rerender(
+          <IntlProvider locale="en" messages={messages}>
+            <MobileEntityList {...props} {...overrides} />
+          </IntlProvider>
+        );
+      if (mode === 'uncontrolled')
+        fireEvent.click(screen.getByRole('checkbox'));
+      fireEvent.click(screen.getByRole('button', { name: /Load more/ }));
+      rerenderPage({ rows: [], isLoading: true });
+      rerenderPage({ rows: nextRows });
+      expect(screen.getAllByRole('checkbox')).toHaveLength(2);
+
+      // Structural sharing keeps this exact array during an unchanged refetch.
+      rerenderPage({ rows: nextRows, isLoading: true });
+      rerenderPage({ rows: nextRows, isLoading: false });
+      const checkboxes = screen.getAllByRole('checkbox');
+      expect(checkboxes).toHaveLength(2);
+      expect(checkboxes[0]).toBeChecked();
+      fireEvent.click(checkboxes[1]);
+      expect(onSelected).toHaveBeenLastCalledWith([1, 2]);
+
+      // An explicit new query must still replace the accumulated list, even
+      // when its rows share the reference of the previously displayed page.
+      rerenderPage({ rows: nextRows, isNewQuery: true });
+      expect(screen.queryByText('Cave A')).not.toBeInTheDocument();
+      expect(screen.getByText('Cave B')).toBeInTheDocument();
+      expect(screen.getAllByRole('checkbox')).toHaveLength(1);
+    }
+  );
+
   it('starts a new selection after the parent clears selected ids', () => {
     const onSelected = vi.fn();
     const { rerender } = renderList({ onSelected, selectedIds: [] });
@@ -103,6 +146,7 @@ describe('MobileEntityList - Controlled selection', () => {
     renderList({ isNewQuery: true, onSelected, selectedIds: [1] });
 
     expect(onSelected).toHaveBeenCalledWith([]);
+    expect(screen.getByText('Cave A')).toBeInTheDocument();
   });
 });
 
