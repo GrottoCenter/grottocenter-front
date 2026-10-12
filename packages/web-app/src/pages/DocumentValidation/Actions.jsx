@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
@@ -6,7 +6,16 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import DeclineIcon from '@mui/icons-material/NotInterested';
 import EditIcon from '@mui/icons-material/Edit';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
-import { useNotification, useProcessDocuments } from '../../hooks';
+import {
+  formatDocumentProcessSummary,
+  isDocumentProcessFinished,
+  normalizeDocumentProcessResults
+} from '@/utils/documentProcessResults';
+import {
+  useNotification,
+  useOnlineStatus,
+  useProcessDocuments
+} from '../../hooks';
 import ActionButton from '../../components/common/ActionButton';
 import StandardDialog from '../../components/common/StandardDialog';
 import StringInput from '../../components/common/Form/StringInput';
@@ -21,28 +30,13 @@ const ActionTypes = {
     confirmationText: 'Confirmation of document refusal',
     helperText:
       'Indicate to the contributor(s) why you decline the document(s) he / she / they submitted.',
-    name: 'Decline',
-    successKey: 'documentsDeclinedSuccess'
+    name: 'Decline'
   },
   validate: {
     confirmationText: 'Confirmation of document approval',
     helperText:
       'Indicate to the contributor(s) why you validate the document(s) he / she / they submitted.',
-    name: 'Validate',
-    successKey: 'documentsValidatedSuccess'
-  }
-};
-
-// The endpoint does not return an error `code`, so we map on `status`. Falls
-// back to the generic key rather than leaking the back's English `message`.
-const getProcessErrorMessage = (error, formatMessage) => {
-  switch (error?.status) {
-    case 400:
-      return formatMessage({ id: 'processDocumentsBadRequest' });
-    case 403:
-      return formatMessage({ id: 'processDocumentsForbidden' });
-    default:
-      return formatMessage({ id: 'processDocumentsGenericError' });
+    name: 'Validate'
   }
 };
 
@@ -53,59 +47,72 @@ const Actions = ({
   disabled = false,
   isEditDisabled = false,
   editDescriptionId,
-  keepLabels = false
+  keepLabels = false,
+  documents = [],
+  draft,
+  onDraftChange
 }) => {
   const { formatMessage } = useIntl();
-  const processMutation = useProcessDocuments();
-  const { onSuccess, onError } = useNotification();
-  const {
-    error,
-    isPending: isLoading,
-    isSuccess: success,
-    reset
-  } = processMutation;
+  const isOnline = useOnlineStatus();
+  const { onSuccess, onWarning, onError } = useNotification();
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false);
-  const [actionType, setActionType] = useState(null);
-  const [comment, setComment] = useState('');
+  const [localDraft, setLocalDraft] = useState({
+    isValidated: true,
+    comment: ''
+  });
+  const activeDraft = draft ?? localDraft;
+  const setDraft = onDraftChange ?? setLocalDraft;
+  const { comment } = activeDraft;
+  const actionType = activeDraft.isValidated
+    ? ActionTypes.validate
+    : ActionTypes.decline;
+
+  const handleResults = (response, variables) => {
+    const results = normalizeDocumentProcessResults(
+      response,
+      variables.ids
+    ).map(result => ({
+      ...result,
+      title: variables.titles?.[result.id]
+    }));
+    const hasUnfinished = results.some(
+      result => !isDocumentProcessFinished(result)
+    );
+    setIsConfirmationDialogOpen(false);
+    setDraft(
+      hasUnfinished
+        ? { isValidated: variables.isValidated, comment: variables.comment }
+        : { isValidated: true, comment: '' }
+    );
+    const summary = formatDocumentProcessSummary(results, formatMessage);
+    if (hasUnfinished) onError(summary);
+    else if (
+      results.some(
+        result =>
+          result.status === 'auto_rejected' || result.status === 'not_found'
+      )
+    )
+      onWarning(summary);
+    else onSuccess(summary);
+    onProcessed?.(results, variables);
+  };
+  // Hook-level callbacks also run if the preview is closed while submitting.
+  const processMutation = useProcessDocuments({
+    onSuccess: handleResults,
+    onError: (_error, variables) => handleResults(null, variables)
+  });
+  const { isPending: isLoading } = processMutation;
 
   const hasNoSelectedIds = disabled || !selectedIds || selectedIds.length === 0;
 
   const handleActionConfirmation = selectedType => () => {
-    setActionType(selectedType);
+    setDraft({
+      ...activeDraft,
+      isValidated: selectedType === ActionTypes.validate
+    });
     setIsConfirmationDialogOpen(true);
   };
-
-  // Reset the mutation so `success` doesn't stay sticky across renders — if it
-  // did, an unmemoized `onProcessed` from the parent would re-fire this effect
-  // and re-invoke setSelectedIds([]) → infinite update loop.
-  useEffect(() => {
-    if (!success || !actionType) return;
-    setIsConfirmationDialogOpen(false);
-    onSuccess(
-      formatMessage(
-        { id: actionType.successKey },
-        { count: selectedIds.length }
-      )
-    );
-    setComment('');
-    if (onProcessed) onProcessed();
-    reset();
-  }, [
-    actionType,
-    formatMessage,
-    onProcessed,
-    onSuccess,
-    reset,
-    selectedIds,
-    success
-  ]);
-
-  useEffect(() => {
-    if (!error) return;
-    setIsConfirmationDialogOpen(false);
-    onError(getProcessErrorMessage(error, formatMessage));
-  }, [error, formatMessage, onError]);
 
   return (
     <>
@@ -186,11 +193,18 @@ const Actions = ({
             })} ${selectedIds.length} ${formatMessage({ id: 'document(s)' })}`}
             color={actionType === ActionTypes.validate ? 'success' : 'error'}
             onClick={() => {
-              if (comment.length > TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT) return;
+              if (
+                !isOnline ||
+                comment.length > TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT
+              )
+                return;
               processMutation.mutate({
-                ids: selectedIds,
+                ids: [...selectedIds],
                 isValidated: actionType === ActionTypes.validate,
-                comment
+                comment,
+                titles: Object.fromEntries(
+                  documents.map(document => [document.id, document.title])
+                )
               });
             }}
             icon={
@@ -204,6 +218,7 @@ const Actions = ({
             data-testid="confirm-process-documents"
             disabled={
               hasNoSelectedIds ||
+              !isOnline ||
               (actionType === ActionTypes.decline && !comment.trim()) ||
               comment.length > TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT
             }
@@ -218,7 +233,7 @@ const Actions = ({
               : ''
           }
           multiline
-          onValueChange={setComment}
+          onValueChange={value => setDraft({ ...activeDraft, comment: value })}
           value={comment}
           characterLimit={TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT}
           valueName={formatMessage({ id: 'Comment' })}
@@ -238,5 +253,16 @@ Actions.propTypes = {
   disabled: PropTypes.bool,
   isEditDisabled: PropTypes.bool,
   editDescriptionId: PropTypes.string,
-  keepLabels: PropTypes.bool
+  keepLabels: PropTypes.bool,
+  documents: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string
+    })
+  ),
+  draft: PropTypes.shape({
+    isValidated: PropTypes.bool.isRequired,
+    comment: PropTypes.string.isRequired
+  }),
+  onDraftChange: PropTypes.func
 };

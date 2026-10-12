@@ -1,12 +1,14 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useMediaQuery } from '@mui/material';
+import { isDocumentProcessFinished } from '@/utils/documentProcessResults';
 
 import { useDocuments, usePermissions } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StandardDialog from '../../components/common/StandardDialog';
 import Actions from './Actions';
 import DocumentPreview from './DocumentPreview';
+import ProcessResults from './ProcessResults';
 import DocumentEdit from '../DocumentEdit';
 import AuthChecker from '../../components/appli/AuthChecker';
 
@@ -20,6 +22,9 @@ const DocumentValidationPage = () => {
   // `max-width: 600px` media queries used by StandardDialog itself.
   const isNarrowViewport = useMediaQuery(theme => theme.breakpoints.down('sm'));
   const [selectedIds, setSelectedIds] = useState([]);
+  const [draft, setDraft] = useState({ isValidated: true, comment: '' });
+  const [processBatches, setProcessBatches] = useState([]);
+  const unfinishedSubmissions = useRef(new Map());
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
@@ -38,13 +43,30 @@ const DocumentValidationPage = () => {
   const documents = data?.documents ?? [];
   const totalCount = data?.totalCount ?? 0;
 
-  // useProcessDocuments already invalidates documentKeys.all, so the queue
-  // refetches on validate/decline. This callback only resets the UI selection
-  // and closes the details modal (side effects that stay local to this page).
-  // Memoized so Actions' onProcessed effect doesn't re-fire on every render.
-  const handleProcessed = useCallback(() => {
-    setSelectedIds([]);
-    closeDetailedView();
+  const handleProcessed = useCallback((results, variables) => {
+    const finishedIds = new Set(
+      results.filter(isDocumentProcessFinished).map(result => result.id)
+    );
+    setSelectedIds(ids => ids.filter(id => !finishedIds.has(id)));
+    setDetailedView(id => (finishedIds.has(id) ? null : id));
+    results.forEach(result => {
+      if (isDocumentProcessFinished(result)) {
+        unfinishedSubmissions.current.delete(result.id);
+      } else if (variables) {
+        unfinishedSubmissions.current.set(result.id, {
+          isValidated: variables.isValidated,
+          comment: variables.comment
+        });
+      }
+    });
+    // A successful unrelated batch must not erase an unresolved submission's
+    // comment. Keep its context even if its IDs are temporarily deselected.
+    const unfinishedDraft = [...unfinishedSubmissions.current.values()].at(-1);
+    if (unfinishedDraft) setDraft(unfinishedDraft);
+    setProcessBatches(batches => [
+      ...batches,
+      { key: batches.length, results }
+    ]);
   }, []);
 
   // useUpdateDocument invalidates documentKeys.all on success — the queue
@@ -63,30 +85,36 @@ const DocumentValidationPage = () => {
               selectedIds={selectedIds}
               onEdit={setEditView}
               onProcessed={handleProcessed}
+              documents={documents}
+              draft={draft}
+              onDraftChange={setDraft}
             />
           ) : null
         }
         content={
           <AuthChecker
             componentToDisplay={
-              <EntityTable
-                entityType="documents"
-                isLoading={isFetching}
-                pageRows={documents}
-                nbTotalRows={totalCount}
-                selectedIds={selectedIds}
-                onPageChange={(pageNum, pageSize) => {
-                  setPage(pageNum);
-                  setRowsPerPage(pageSize);
-                }}
-                onRowClick={doc => {
-                  setDetailedView(doc.id);
-                  return false;
-                }}
-                onSelected={ids => {
-                  setSelectedIds(ids);
-                }}
-              />
+              <>
+                <ProcessResults batches={processBatches} />
+                <EntityTable
+                  entityType="documents"
+                  isLoading={isFetching}
+                  pageRows={documents}
+                  nbTotalRows={totalCount}
+                  selectedIds={selectedIds}
+                  onPageChange={(pageNum, pageSize) => {
+                    setPage(pageNum);
+                    setRowsPerPage(pageSize);
+                  }}
+                  onRowClick={doc => {
+                    setDetailedView(doc.id);
+                    return false;
+                  }}
+                  onSelected={ids => {
+                    setSelectedIds(ids);
+                  }}
+                />
+              </>
             }
           />
         }
@@ -98,6 +126,9 @@ const DocumentValidationPage = () => {
           onClose={closeDetailedView}
           onEdit={setEditView}
           onProcessed={handleProcessed}
+          processBatches={processBatches}
+          draft={draft}
+          onDraftChange={setDraft}
         />
       )}
       <StandardDialog
