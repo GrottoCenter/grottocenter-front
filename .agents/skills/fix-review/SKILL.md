@@ -1,6 +1,6 @@
 ---
 name: fix-review
-description: Given a PR number, address actionable reviewer feedback across review summaries, general comments, and inline threads; fix relevant asks, push, and reply in each thread or on the PR.
+description: Given a PR number, address actionable reviewer feedback across review summaries, general comments, and inline threads; fix relevant asks, push, reply, and re-request reviews after addressing requested changes.
 argument-hint: "<pr-number>"
 ---
 
@@ -111,7 +111,30 @@ For a general PR comment or review body, post a normal PR comment that addresses
 gh pr comment <pr-number> --body-file reply_body.md
 ```
 
-State each outcome plainly: fixed and how, or not fixed and the specific reason. Clean up temporary reply files afterward.
+State each outcome using one of these formats:
+
+- ✅ Fixed — what changed, in a sentence.
+- ⏭️ Not fixed — the specific reason (out of scope, conflicts with `<convention>`, needs a decision, etc.).
+
+Clean up temporary reply files afterward.
+
+## 8. Re-request reviews after requested changes
+
+After pushing any fixes and publishing the replies, re-request a review from each reviewer whose `CHANGES_REQUESTED` feedback was addressed in this run. Include reviewers whose asks were not applied but received a specific explanation. Skip change requests that have since been superseded by an approval or dismissal.
+
+Check the PR author and pending requests before sending each request:
+
+```bash
+gh pr view <pr-number> --repo <owner>/<repo> --json author,reviewRequests
+```
+
+Compare logins case-insensitively. Exclude the PR author and the authenticated account, and skip reviewers who already have a pending request. Request each eligible reviewer separately:
+
+```bash
+gh pr edit <pr-number> --repo <owner>/<repo> --add-reviewer <reviewer-login>
+```
+
+Verify the resulting `reviewRequests` with `gh pr view`. If GitHub rejects a request, report the reviewer and the error, then continue with the other eligible reviewers. Do not finish the workflow without reporting any failed re-request.
 
 ## Notes
 
