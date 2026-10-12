@@ -1,0 +1,790 @@
+[
+  {
+    "id": "new-1",
+    "anchor": "→ 1AN (ou 2S) → 1S → 2S en Y ↓",
+    "language": "fra",
+    "expected": {
+      "min": [3, 3, 0, 0, 0],
+      "max": [5, 5, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/9728"
+  },
+  {
+    "id": "new-2",
+    "anchor": "CP + AN\n2S plein vide",
+    "language": "fra",
+    "expected": {
+      "min": [2, 2, 0, 0, 1],
+      "max": [2, 2, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/24794"
+  },
+  {
+    "id": "new-3",
+    "anchor": "2 G diam 10+2 AF + 6S",
+    "language": "fra",
+    "expected": {
+      "min": [8, 8, 2, 0, 2],
+      "max": [8, 8, 2, 0, 2]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/24286"
+  },
+  {
+    "id": "new-4",
+    "anchor": "1 AN",
+    "language": "fra",
+    "expected": {
+      "min": [0, 0, 0, 0, 1],
+      "max": [0, 0, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/28134"
+  },
+  {
+    "id": "new-5",
+    "anchor": "6 AN",
+    "language": "fra",
+    "expected": {
+      "min": [0, 0, 0, 0, 6],
+      "max": [0, 0, 0, 0, 6]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/1934"
+  },
+  {
+    "id": "new-6",
+    "anchor": "1S à gauche\n2S à droite",
+    "language": "fra",
+    "expected": {
+      "min": [3, 3, 0, 0, 0],
+      "max": [3, 3, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/5703"
+  },
+  {
+    "id": "new-7",
+    "anchor": "Broches",
+    "language": "fra",
+    "expected": {
+      "status": "unknown"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/116"
+  },
+  {
+    "id": "new-8",
+    "anchor": "2 goujons + 1 goujons pour dévintion",
+    "language": "fra",
+    "expected": {
+      "min": [3, 3, 3, 0, 1],
+      "max": [3, 3, 3, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/23750"
+  },
+  {
+    "id": "new-9",
+    "anchor": "6 B (dont 2 en Y)",
+    "language": "fra",
+    "expected": {
+      "min": [0, 6, 0, 0, 0],
+      "max": [0, 6, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/5838"
+  },
+  {
+    "id": "new-10",
+    "anchor": "AN + 1 S + 1 S\n1 S + AN",
+    "language": "fra",
+    "expected": {
+      "min": [3, 3, 0, 0, 2],
+      "max": [3, 3, 0, 0, 2]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/2218"
+  },
+  {
+    "id": "new-11",
+    "anchor": "1AN + 2S + 1S+1AN ",
+    "language": "fra",
+    "expected": {
+      "min": [3, 3, 0, 0, 2],
+      "max": [3, 3, 0, 0, 2]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/2961"
+  },
+  {
+    "id": "new-12",
+    "anchor": "8S",
+    "language": "fra",
+    "expected": {
+      "min": [8, 8, 0, 0, 0],
+      "max": [8, 8, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/5447"
+  },
+  {
+    "id": "new-13",
+    "anchor": "2B + 2B + 2B",
+    "language": "fra",
+    "expected": {
+      "min": [0, 6, 0, 0, 0],
+      "max": [0, 6, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/5661"
+  },
+  {
+    "id": "new-14",
+    "anchor": "2S + 1Dev (AF)",
+    "language": "fra",
+    "expected": {
+      "min": [2, 3, 0, 0, 1],
+      "max": [2, 3, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/74485"
+  },
+  {
+    "id": "new-15",
+    "anchor": "2S + 1S + 2S",
+    "language": "fra",
+    "expected": {
+      "min": [5, 5, 0, 0, 0],
+      "max": [5, 5, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/5447"
+  },
+  {
+    "id": "new-16",
+    "anchor": "Spits",
+    "language": "fra",
+    "expected": {
+      "status": "unknown"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/5588"
+  },
+  {
+    "id": "new-17",
+    "anchor": "2S en Y + AN (dev)",
+    "language": "fra",
+    "expected": {
+      "min": [2, 3, 0, 0, 1],
+      "max": [2, 3, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/2218"
+  },
+  {
+    "id": "new-18",
+    "anchor": "CP+1S → 1S+1AN ↓(2m) 1dév/S ↓",
+    "language": "fra",
+    "expected": {
+      "min": [3, 3, 0, 0, 2],
+      "max": [3, 3, 0, 0, 2]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/23392"
+  },
+  {
+    "id": "new-19",
+    "anchor": "2 AN et 2 spits",
+    "language": "fra",
+    "expected": {
+      "min": [2, 2, 0, 0, 2],
+      "max": [2, 2, 0, 0, 2]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/282"
+  },
+  {
+    "id": "new-20",
+    "anchor": "2S + 2S + 2S",
+    "language": "fra",
+    "expected": {
+      "min": [6, 6, 0, 0, 0],
+      "max": [6, 6, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/2961"
+  },
+  {
+    "id": "new-21",
+    "anchor": "6AN+2B",
+    "language": "fra",
+    "expected": {
+      "min": [0, 2, 0, 0, 6],
+      "max": [0, 2, 0, 0, 6]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/1934"
+  },
+  {
+    "id": "new-22",
+    "anchor": "1 relais (MC) + 1 relais (P12)",
+    "language": "fra",
+    "expected": {
+      "status": "unknown"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/6122"
+  },
+  {
+    "id": "new-23",
+    "anchor": "MC 4 m + 2AN + 1S\n4S\nAN + 3S",
+    "language": "fra",
+    "expected": {
+      "min": [8, 8, 0, 0, 3],
+      "max": [8, 8, 0, 0, 3]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/219"
+  },
+  {
+    "id": "new-24",
+    "anchor": "{2AN}",
+    "language": "fra",
+    "expected": {
+      "min": [0, 0, 0, 0, 2],
+      "max": [0, 0, 0, 0, 2]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/99028"
+  },
+  {
+    "id": "new-25",
+    "anchor": "Pilier naturel + Y sur 2 broches en plafond",
+    "language": "fra",
+    "expected": {
+      "min": [0, 2, 0, 0, 1],
+      "max": [0, 2, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/5698"
+  },
+  {
+    "id": "new-26",
+    "anchor": "1S + 1AN : tête de puits\n1S + 1 sangle sur becquet\n1S + 1 grande sangle sur lunule par dessous à g.\n1S : MC\n2SY : tête de puits",
+    "language": "fra",
+    "expected": {
+      "min": [6, 6, 0, 0, 3],
+      "max": [6, 6, 0, 0, 3]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/1495"
+  },
+  {
+    "id": "new-27",
+    "anchor": "7 broches\nY sur 2B (ou 2S ?)\nDéviation quelques mètres plus bas (B ou S + grande sangle)\nY sur 2 S à 10 m du fond",
+    "language": "fra",
+    "expected": {
+      "status": "partial"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/1197"
+  },
+  {
+    "id": "new-28",
+    "anchor": "1S + 1 plaquette artisanale en fixe sur goujon.\nIl y a aussi 3 goujons de 8 mm sans plaquettes.\n1 AN sur rocher. ",
+    "language": "fra",
+    "expected": {
+      "status": "partial"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/2548"
+  },
+  {
+    "id": "new-29",
+    "anchor": "1S  + 1S au plafond au départ\nPuis 2S au plafond à droite à la verticale du vide.\n\n",
+    "language": "eng",
+    "expected": {
+      "min": [4, 4, 0, 0, 0],
+      "max": [4, 4, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/2743"
+  },
+  {
+    "id": "new-30",
+    "anchor": "1 NAT (arbre) + 1 AF (ou 2) + 1 NAT (buis) + 1 AF + 2 S",
+    "language": "fra",
+    "expected": {
+      "min": [2, 2, 0, 0, 4],
+      "max": [2, 2, 0, 0, 5]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/1441"
+  },
+  {
+    "id": "new-31",
+    "anchor": "2 S vers - 15 (1 sangle utile pour diminuer la longueur de l'oreille sup. du nœud en Y)",
+    "language": "fra",
+    "expected": {
+      "min": [2, 2, 0, 0, 1],
+      "max": [2, 2, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/1441"
+  },
+  {
+    "id": "new-32",
+    "anchor": "2 S + 1 DEV + 1 DEV + 1 S + 1 S + 2 S + 1 DEV",
+    "language": "fra",
+    "expected": {
+      "min": [6, 9, 0, 0, 3],
+      "max": [6, 9, 0, 0, 3]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/1887"
+  },
+  {
+    "id": "new-33",
+    "anchor": "1B+1S+sangle sur 2 barres en travers du puits",
+    "language": "fra",
+    "expected": {
+      "min": [1, 2, 0, 0, 1],
+      "max": [1, 2, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/54"
+  },
+  {
+    "id": "new-34",
+    "anchor": "CP + 1B dév\n+ 1B + 1AF*\n+ 1AF + 1S**\n+ 2B\n+ 2B\n+ 1B dév\n+ 2B",
+    "language": "fra",
+    "expected": {
+      "min": [1, 10, 0, 0, 4],
+      "max": [1, 10, 0, 0, 4]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/5797"
+  },
+  {
+    "id": "new-35",
+    "anchor": "Au choix :\n3 S\n2 goujons de 10 mm sans plaquettes ni écrous au plafond.",
+    "language": "fra",
+    "expected": {
+      "status": "partial"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/2548"
+  },
+  {
+    "id": "new-36",
+    "anchor": "10 mousquetons\n1 plaquette\n3 sangles\n1 sangle longue\n1 kit pour frottement",
+    "language": "fra",
+    "expected": {
+      "min": [1, 10, 0, 0, 4],
+      "max": [1, 10, 0, 0, 4]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/18"
+  },
+  {
+    "id": "new-37",
+    "anchor": "Départ sur les 2S de l'extrémité de la vire.\n1S à droite et 1S à gauche (au choix)\n2S 4 m plus bas\n1S et/ou une colonnette 8 m plus bas pour déviation(s)",
+    "language": "eng",
+    "expected": {
+      "status": "partial"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/2743"
+  },
+  {
+    "id": "new-38",
+    "anchor": "1AN (arbre) + 2AN (arbre) Y\n\n2AF, 1AN + 1SP Y, 1SP dev\n\n2SP Y\n\n1AN, 1SP, 2SP Y, 2SP Y, 2SP Y\n\n\n\n1SP, 1AN, 2SP Y\n\n2SP Y, 2SP Y\n\n2SP Y, 1SP dév, 1 dév\n\n2SP Y, 2SP Y\n\n1AN dev, 1AN dev\n\n1SP, 1AN Y, 2SP Y, 1SP\n\n1AN, 1SP Y, 1SP + 1AF Y, dev fixe, 2SP Y,2SP Y\n\n\n\n",
+    "language": "fra",
+    "expected": {
+      "status": "partial"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/24590"
+  },
+  {
+    "id": "new-39",
+    "anchor": "1AN ou Y sur 2S\n1S + 1S\n3 m plus bas DEV sur sangles autour d'un béquet.\n10 m plus bas grande DEV sur 1S\n(présence à ce niveau de 5S dont deux prévus pour fractionnement sur Y et 3 pour répartiteur spéléo secours.",
+    "language": "fra",
+    "expected": {
+      "status": "partial"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/2055"
+  },
+  {
+    "id": "new-40",
+    "anchor": "AF + 1S : tête de puits\ndev 1S\n1 AN à d. au niveau de la 2e marche\n1 dev en place (corde rouge)\n(1 dev en place sangle)\n1AN sur stalagmite vers le pont rocheux\n1S douteux ou sangle sur becquet\n-> fin de la corde sur la tête du puits suivant",
+    "language": "fra",
+    "expected": {
+      "status": "partial"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/1495"
+  },
+  {
+    "id": "international-1",
+    "anchor": "2 Schlingen + 2 Spit(M8)",
+    "language": "deu",
+    "expected": {
+      "min": [2, 2, 0, 0, 2],
+      "max": [2, 2, 0, 0, 2]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/119473"
+  },
+  {
+    "id": "international-2",
+    "anchor": "1 Schlinge + 3 Spit(M8)",
+    "language": "deu",
+    "expected": {
+      "min": [3, 3, 0, 0, 1],
+      "max": [3, 3, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/119473"
+  },
+  {
+    "id": "international-3",
+    "anchor": "2 anelli 1 moschettone, 1cordino",
+    "language": "ita",
+    "expected": {
+      "min": [0, 1, 0, 0, 0],
+      "max": [0, 1, 0, 0, 0],
+      "status": "partial"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/22081"
+  },
+  {
+    "id": "international-4",
+    "anchor": "2 químics",
+    "language": "cat",
+    "expected": {
+      "min": [0, 2, 0, 0, 0],
+      "max": [0, 2, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/160369"
+  },
+  {
+    "id": "international-5",
+    "anchor": "2 multm.",
+    "language": "cat",
+    "expected": {
+      "status": "unknown"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/160369"
+  },
+  {
+    "id": "international-6",
+    "anchor": "30 feet of webbing",
+    "language": "eng",
+    "expected": {
+      "status": "unknown"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/65265"
+  },
+  {
+    "id": "international-7",
+    "anchor": "Not needed",
+    "language": "eng",
+    "expected": {
+      "status": "absence"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/119588"
+  },
+  {
+    "id": "international-8",
+    "anchor": "4",
+    "language": "spa",
+    "expected": {
+      "status": "unknown"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/87896"
+  },
+  {
+    "id": "rule-1",
+    "anchor": "2S + 3B + 1G + 1P + 2AS + 1AF + 1AN",
+    "language": "fra",
+    "expected": {
+      "min": [3, 7, 1, 2, 2],
+      "max": [3, 7, 1, 2, 2]
+    }
+  },
+  {
+    "id": "rule-2",
+    "anchor": "1 dév/S",
+    "language": "fra",
+    "expected": {
+      "min": [1, 1, 0, 0, 1],
+      "max": [1, 1, 0, 0, 1]
+    }
+  },
+  {
+    "id": "rule-3",
+    "anchor": "1dev/G",
+    "language": "fra",
+    "expected": {
+      "min": [1, 1, 1, 0, 1],
+      "max": [1, 1, 1, 0, 1]
+    }
+  },
+  {
+    "id": "rule-4",
+    "anchor": "1dev/AN",
+    "language": "fra",
+    "expected": {
+      "min": [0, 1, 0, 0, 1],
+      "max": [0, 1, 0, 0, 1]
+    }
+  },
+  {
+    "id": "rule-5",
+    "anchor": "1AF (dev)",
+    "language": "fra",
+    "expected": {
+      "min": [0, 1, 0, 0, 1],
+      "max": [0, 1, 0, 0, 1]
+    }
+  },
+  {
+    "id": "rule-6",
+    "anchor": "2S (dont 1 pour déviation)",
+    "language": "fra",
+    "expected": {
+      "min": [2, 2, 0, 0, 1],
+      "max": [2, 2, 0, 0, 1]
+    }
+  },
+  {
+    "id": "rule-7",
+    "anchor": "3 Spits (1 facultatif)",
+    "language": "fra",
+    "expected": {
+      "min": [3, 3, 0, 0, 0],
+      "max": [3, 3, 0, 0, 0]
+    }
+  },
+  {
+    "id": "rule-8",
+    "anchor": "3S (+1S facultatif)",
+    "language": "fra",
+    "expected": {
+      "min": [4, 4, 0, 0, 0],
+      "max": [4, 4, 0, 0, 0]
+    }
+  },
+  {
+    "id": "rule-9",
+    "anchor": "5 plaquettes / 5 mouskifs / 3 sangles",
+    "language": "fra",
+    "expected": {
+      "min": [5, 5, 0, 0, 3],
+      "max": [5, 5, 0, 0, 3]
+    }
+  },
+  {
+    "id": "rule-10",
+    "anchor": "(2 + 1 + 1 + 1 + 2 broches)",
+    "language": "fra",
+    "expected": {
+      "min": [0, 7, 0, 0, 0],
+      "max": [0, 7, 0, 0, 0]
+    }
+  },
+  {
+    "id": "rule-11",
+    "anchor": "2AF ou 2S + 1B",
+    "language": "fra",
+    "expected": {
+      "min": [0, 1, 0, 0, 0],
+      "max": [2, 3, 0, 0, 2]
+    }
+  },
+  {
+    "id": "rule-12",
+    "anchor": "(2AF ou 2S) + (1AF ou 1S) + 2 mousquetons",
+    "language": "fra",
+    "expected": {
+      "min": [0, 2, 0, 0, 0],
+      "max": [3, 5, 0, 0, 3]
+    }
+  },
+  {
+    "id": "rule-13",
+    "anchor": "1 ou 2 AN",
+    "language": "fra",
+    "expected": {
+      "min": [0, 0, 0, 0, 1],
+      "max": [0, 0, 0, 0, 2]
+    }
+  },
+  {
+    "id": "rule-14",
+    "anchor": "Y2S + 1ANMC + 2SY",
+    "language": "fra",
+    "expected": {
+      "min": [4, 4, 0, 0, 1],
+      "max": [4, 4, 0, 0, 1]
+    }
+  },
+  {
+    "id": "holdout-1",
+    "anchor": "1AN + 2S + 1S(dev) + 1AN + 1AN(dev) + 2S",
+    "language": "fra",
+    "expected": {
+      "min": [5, 6, 0, 0, 4],
+      "max": [5, 6, 0, 0, 4]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/350"
+  },
+  {
+    "id": "holdout-2",
+    "anchor": "15 amarrages",
+    "language": "fra",
+    "expected": {
+      "status": "unknown"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/242"
+  },
+  {
+    "id": "holdout-3",
+    "anchor": "3 S",
+    "language": "fra",
+    "expected": {
+      "min": [3, 3, 0, 0, 0],
+      "max": [3, 3, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/255"
+  },
+  {
+    "id": "holdout-4",
+    "anchor": "2 AN + 1S",
+    "language": "fra",
+    "expected": {
+      "min": [1, 1, 0, 0, 2],
+      "max": [1, 1, 0, 0, 2]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/239"
+  },
+  {
+    "id": "holdout-5",
+    "anchor": "3 ammarages",
+    "language": "fra",
+    "expected": {
+      "status": "unknown"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/242"
+  },
+  {
+    "id": "holdout-6",
+    "anchor": "1 Spit",
+    "language": "fra",
+    "expected": {
+      "min": [1, 1, 0, 0, 0],
+      "max": [1, 1, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/227"
+  },
+  {
+    "id": "holdout-7",
+    "anchor": "2B + 1B + 1AN + 1B et 1AN en Y + 1S Frac",
+    "language": "fra",
+    "expected": {
+      "min": [1, 5, 0, 0, 2],
+      "max": [1, 5, 0, 0, 2]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/241"
+  },
+  {
+    "id": "holdout-8",
+    "anchor": "1 broche",
+    "language": "fra",
+    "expected": {
+      "min": [0, 1, 0, 0, 0],
+      "max": [0, 1, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/246"
+  },
+  {
+    "id": "holdout-9",
+    "anchor": "4S",
+    "language": "fra",
+    "expected": {
+      "min": [4, 4, 0, 0, 0],
+      "max": [4, 4, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/283"
+  },
+  {
+    "id": "holdout-10",
+    "anchor": "?",
+    "language": "fra",
+    "expected": {
+      "status": "unknown"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/241"
+  },
+  {
+    "id": "holdout-11",
+    "anchor": "2S",
+    "language": "fra",
+    "expected": {
+      "min": [2, 2, 0, 0, 0],
+      "max": [2, 2, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/283"
+  },
+  {
+    "id": "holdout-12",
+    "anchor": "Nat + 1 spit",
+    "language": "fra",
+    "expected": {
+      "min": [1, 1, 0, 0, 1],
+      "max": [1, 1, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/285"
+  },
+  {
+    "id": "holdout-13",
+    "anchor": "Chaîne + broche\n1 fractio sur broche à mi-puits",
+    "language": "fra",
+    "expected": {
+      "min": [0, 2, 0, 0, 0],
+      "max": [0, 2, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/285"
+  },
+  {
+    "id": "holdout-14",
+    "anchor": "AN + 1AN + 1 frac sur spit + 1dév sur 1AN",
+    "language": "fra",
+    "expected": {
+      "min": [1, 2, 0, 0, 3],
+      "max": [1, 2, 0, 0, 3]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/239"
+  },
+  {
+    "id": "holdout-15",
+    "anchor": "MC sur 2 AN, frac sur 2 AN pour 1ère longueur\n2S + 1 S pour la 2ème longueur.",
+    "language": "fra",
+    "expected": {
+      "min": [3, 3, 0, 0, 4],
+      "max": [3, 3, 0, 0, 4]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/239"
+  },
+  {
+    "id": "holdout-16",
+    "anchor": "2S, étroiture, 2S\n2S + 1S + 1S + 1S + 1S + 2S",
+    "language": "fra",
+    "expected": {
+      "min": [12, 12, 0, 0, 0],
+      "max": [12, 12, 0, 0, 0]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/239"
+  },
+  {
+    "id": "holdout-17",
+    "anchor": "1 B + 1 B\nY sur 2 B\n7 Spits facultatifs\n2 B facultatives\n\nAN sur bloc\n1 B + 1 B (fractio)",
+    "language": "fra",
+    "expected": {
+      "min": [7, 15, 0, 0, 1],
+      "max": [7, 15, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/227"
+  },
+  {
+    "id": "holdout-18",
+    "anchor": "2S en Y\n2S en Y\n1S pour DEV\n1S pour fractio à-10\n1S sur bloc pour aborder le palier incliné",
+    "language": "fra",
+    "expected": {
+      "min": [7, 7, 0, 0, 1],
+      "max": [7, 7, 0, 0, 1]
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/247"
+  },
+  {
+    "id": "holdout-19",
+    "anchor": "CP + Y sur 2S\nSuivant le choix des spits au départ du puits prévoir 1 DEV sur 1S environ 3 m plus bas (3 mousquetons sans sangle).",
+    "language": "fra",
+    "expected": {
+      "status": "partial"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/243"
+  },
+  {
+    "id": "holdout-20",
+    "anchor": "AN sur arbre\nAucun amarrage fiable possible, se désescalade bien si vous êtes à l'aise. ",
+    "language": "fra",
+    "expected": {
+      "status": "partial"
+    },
+    "source": "https://api.grottocenter.org/api/v1/entrances/366"
+  }
+]
