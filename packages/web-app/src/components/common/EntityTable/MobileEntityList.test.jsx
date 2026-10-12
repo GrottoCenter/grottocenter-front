@@ -3,7 +3,7 @@ import { IntlProvider } from 'react-intl';
 
 import MobileEntityList from './MobileEntityList';
 
-const messages = { Name: 'Name', Preview: 'Preview' };
+const messages = { Name: 'Name', Preview: 'Preview', 'Load more': 'Load more' };
 
 const columns = [
   { field: 'name', label: 'Name', visible: true, isTitle: true }
@@ -28,6 +28,40 @@ const renderList = props =>
   );
 
 describe('MobileEntityList - Controlled selection', () => {
+  it('retains selected cards while loading and appending the next page', () => {
+    const onSelected = vi.fn();
+    const onPageChange = vi.fn();
+    const props = {
+      ...defaultProps,
+      totalRows: 2,
+      onSelected,
+      onPageChange,
+      selectedIds: [1]
+    };
+    const { rerender } = renderList(props);
+
+    fireEvent.click(screen.getByRole('button', { name: /Load more/ }));
+    expect(onPageChange).toHaveBeenCalledExactlyOnceWith(1, 20);
+
+    rerender(
+      <IntlProvider locale="en" messages={messages}>
+        <MobileEntityList {...props} rows={[]} isLoading />
+      </IntlProvider>
+    );
+    expect(screen.getByRole('checkbox')).toBeChecked();
+
+    rerender(
+      <IntlProvider locale="en" messages={messages}>
+        <MobileEntityList {...props} rows={[{ id: 2, name: 'Cave B' }]} />
+      </IntlProvider>
+    );
+    const checkboxes = screen.getAllByRole('checkbox');
+    expect(checkboxes).toHaveLength(2);
+    expect(checkboxes[0]).toBeChecked();
+    fireEvent.click(checkboxes[1]);
+    expect(onSelected).toHaveBeenCalledExactlyOnceWith([1, 2]);
+  });
+
   it('starts a new selection after the parent clears selected ids', () => {
     const onSelected = vi.fn();
     const { rerender } = renderList({ onSelected, selectedIds: [] });

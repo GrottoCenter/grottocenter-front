@@ -112,6 +112,7 @@ describe('Document moderation preview', () => {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
     cy.wait('@documents');
+    cy.contains('tr', 'Original document', { timeout: 30000 }).should('exist');
   });
 
   it('keeps failed documents selected after a mixed 207 and refreshes the queue', () => {
@@ -156,6 +157,105 @@ describe('Document moderation preview', () => {
       .and('not.contain.text', 'Internal server error');
   });
 
+  ['cards', 'table'].forEach(view => {
+    it(`keeps a failed selection and its draft when loading another page in ${view} view`, () => {
+      const firstPage = [
+        current,
+        ...Array.from({ length: 19 }, (_, index) => ({
+          ...other,
+          id: 100 + index,
+          title: `Page 1 document ${index + 1}`
+        }))
+      ];
+      const secondPage = Array.from({ length: 20 }, (_, index) => ({
+        ...other,
+        id: 200 + index,
+        title: `Page 2 document ${index + 1}`
+      }));
+      let processCount = 0;
+      cy.intercept(
+        { method: 'GET', pathname: '/api/v1/documents' },
+        request => {
+          const isSecondPage = Number(request.query.skip) === 20;
+          if (isSecondPage) request.alias = 'nextDocuments';
+          else
+            request.alias = processCount ? 'refreshedFirstPage' : 'firstPage';
+          request.reply({
+            body: { documents: isSecondPage ? secondPage : firstPage },
+            headers: {
+              'Content-Range': isSecondPage
+                ? 'documents 20-39/40'
+                : 'documents 0-19/40'
+            }
+          });
+        }
+      );
+      cy.intercept(
+        { method: 'PUT', pathname: '/api/v1/documents/validate' },
+        request => {
+          processCount++;
+          request.reply({
+            statusCode: processCount === 1 ? 207 : 200,
+            body: request.body.documents.map(document => ({
+              id: document.id,
+              status: processCount === 1 ? 'error' : 'rejected',
+              reason: null
+            }))
+          });
+        }
+      ).as('paginationProcess');
+      cy.visit('/documents/validation', {
+        onBeforeLoad: win => {
+          win.localStorage.setItem('selectedLanguage', 'en');
+          win.localStorage.removeItem('entityTable_rowsPerPage');
+        }
+      });
+      cy.wait('@firstPage');
+      if (view === 'cards') {
+        cy.viewport(390, 844);
+        cy.get('button[aria-label="Card view"]').click();
+      }
+      const selectDocument = title =>
+        cy
+          .contains(view === 'cards' ? 'button' : 'tr', title)
+          .find('input[type="checkbox"]')
+          .check();
+      selectDocument('Original document');
+      cy.get('[data-testid="batch-decline"]').click();
+      cy.get('[data-testid="confirm-process-documents"]')
+        .closest('[role="dialog"]')
+        .find('textarea')
+        .first()
+        .type('Wrong author');
+      cy.get('[data-testid="confirm-process-documents"]').click();
+      cy.wait('@paginationProcess');
+      cy.wait('@refreshedFirstPage');
+      if (view === 'cards')
+        cy.contains('button', 'Load more').click({ timeout: 10000 });
+      else cy.get('button[aria-label="Next page"]').click();
+      cy.wait('@nextDocuments');
+      if (view === 'cards') {
+        cy.contains('button', 'Original document')
+          .find('input[type="checkbox"]')
+          .should('be.checked');
+      }
+      selectDocument('Page 2 document 1');
+      cy.get('[data-testid="batch-decline"]').click();
+      cy.get('[data-testid="confirm-process-documents"]')
+        .closest('[role="dialog"]')
+        .find('textarea')
+        .first()
+        .should('have.value', 'Wrong author');
+      cy.get('[data-testid="confirm-process-documents"]').click();
+      cy.wait('@paginationProcess')
+        .its('request.body.documents')
+        .should('deep.equal', [
+          { id: 7, isValidated: 'false', validationComment: 'Wrong author' },
+          { id: 200, isValidated: 'false', validationComment: 'Wrong author' }
+        ]);
+    });
+  });
+
   [
     [
       400,
@@ -180,6 +280,10 @@ describe('Document moderation preview', () => {
       cy.wait('@refusedProcess');
       cy.contains(message).should('be.visible');
       cy.get('[data-testid="document-process-result-7"]').should('not.exist');
+      if (statusCode === 403) {
+        cy.get('[data-testid="confirm-process-documents"]').should('not.exist');
+        cy.get('[data-testid="preview-decline"]').click();
+      }
       cy.get('[data-testid="confirm-process-documents"]')
         .closest('[role="dialog"]')
         .find('textarea')
@@ -218,10 +322,13 @@ describe('Document moderation preview', () => {
       .type('Wrong author');
     cy.get('[data-testid="confirm-process-documents"]').click();
     cy.wait('@failedProcess');
+    cy.get('[data-testid="confirm-process-documents"]', {
+      timeout: 10000
+    }).should('not.exist');
     cy.get('[data-testid="document-moderation-title"]')
       .closest('[role="dialog"]')
       .find('button[aria-label="close"]')
-      .click();
+      .click({ timeout: 10000 });
     cy.contains('tr', 'Other document').click();
     cy.get('[data-testid="preview-validate"]').should('be.enabled').click();
     cy.get('[data-testid="confirm-process-documents"]')

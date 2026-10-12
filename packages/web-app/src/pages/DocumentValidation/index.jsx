@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useMediaQuery } from '@mui/material';
 import {
@@ -19,6 +19,8 @@ import EntityTable from '../../components/common/EntityTable';
 
 const EMPTY_DRAFT = { isValidated: true, comment: '' };
 
+// The query holds only the latest page, while selected IDs can span pages or
+// still be visible in appended mobile cards. Draft lifetime follows active IDs.
 const retainActiveDrafts = (drafts, selectedIds, detailedView) =>
   Object.fromEntries(
     Object.entries(drafts).filter(
@@ -87,25 +89,6 @@ const DocumentValidationPage = () => {
   });
   const documents = data?.documents ?? [];
   const totalCount = data?.totalCount ?? 0;
-
-  // Once the queue refresh completes, discard drafts for documents that
-  // another moderator has handled or that are no longer on this page.
-  useEffect(() => {
-    if (isFetching || !data) return;
-    const pendingIds = new Set(data.documents.map(document => document.id));
-    setModeration(state => {
-      const retainedDrafts = Object.fromEntries(
-        Object.entries(state.drafts).filter(([id]) =>
-          pendingIds.has(Number(id))
-        )
-      );
-      if (
-        Object.keys(retainedDrafts).length === Object.keys(state.drafts).length
-      )
-        return state;
-      return { ...state, drafts: retainedDrafts };
-    });
-  }, [data, isFetching]);
 
   const handleProcessed = useCallback((results, variables) => {
     const finishedIds = new Set(
@@ -188,7 +171,6 @@ const DocumentValidationPage = () => {
                   nbTotalRows={totalCount}
                   selectedIds={selectedIds}
                   onPageChange={(pageNum, pageSize) => {
-                    handleSelection([]);
                     setPage(pageNum);
                     setRowsPerPage(pageSize);
                   }}

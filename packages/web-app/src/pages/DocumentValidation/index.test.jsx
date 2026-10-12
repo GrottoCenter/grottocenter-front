@@ -168,20 +168,49 @@ describe('document moderation page', () => {
     expect(screen.getByTestId('draft')).toHaveTextContent('Wrong author');
   });
 
-  it.each(['Drop failed', 'Next page'])(
-    'discards abandoned drafts after %s',
-    action => {
-      renderPage();
-      fireEvent.click(screen.getByText('Select batch'));
-      fireEvent.click(screen.getByText('Process batch'));
-      expect(screen.getByTestId('draft')).toHaveTextContent('Wrong author');
-      fireEvent.click(screen.getByText(action));
-      expect(screen.getByTestId('draft')).toBeEmptyDOMElement();
-      fireEvent.click(screen.getByText('Select batch'));
-      fireEvent.click(screen.getByText('Preview failed'));
-      expect(screen.getByTestId('preview-draft')).toBeEmptyDOMElement();
-    }
-  );
+  it('discards abandoned drafts after deselection', () => {
+    renderPage();
+    fireEvent.click(screen.getByText('Select batch'));
+    fireEvent.click(screen.getByText('Process batch'));
+    expect(screen.getByTestId('draft')).toHaveTextContent('Wrong author');
+    fireEvent.click(screen.getByText('Drop failed'));
+    expect(screen.getByTestId('draft')).toBeEmptyDOMElement();
+    fireEvent.click(screen.getByText('Select batch'));
+    fireEvent.click(screen.getByText('Preview failed'));
+    expect(screen.getByTestId('preview-draft')).toBeEmptyDOMElement();
+  });
+
+  it('preserves selection and the failed draft across pagination and the next page response', () => {
+    const { rerender } = renderPage();
+    fireEvent.click(screen.getByText('Select batch'));
+    fireEvent.click(screen.getByText('Process batch'));
+    fireEvent.click(screen.getByText('Next page'));
+    expect(useDocuments).toHaveBeenLastCalledWith({
+      isValidated: false,
+      limit: 20,
+      skip: 20
+    });
+    expect(screen.getByTestId('selection')).toHaveTextContent('8');
+    expect(screen.getByTestId('draft')).toHaveTextContent('Wrong author');
+    useDocuments.mockReturnValue({
+      data: { documents: [{ id: 99 }], totalCount: 3 },
+      isFetching: false
+    });
+    rerender(
+      <ThemeProvider theme={createTheme()}>
+        <DocumentValidationPage />
+      </ThemeProvider>
+    );
+    expect(screen.getByTestId('selection')).toHaveTextContent('8');
+    expect(screen.getByTestId('draft')).toHaveTextContent('Wrong author');
+    fireEvent.click(screen.getByText('New selection'));
+    expect(screen.getByTestId('selection')).toHaveTextContent('7,8,99');
+    expect(screen.getByTestId('draft')).toHaveTextContent('Wrong author');
+    fireEvent.click(screen.getByText('Preview failed'));
+    expect(screen.getByTestId('preview-draft')).toHaveTextContent(
+      'Wrong author'
+    );
+  });
 
   it('retains the preview draft until the document is neither selected nor open', () => {
     renderPage();
@@ -210,7 +239,7 @@ describe('document moderation page', () => {
     expect(screen.getByTestId('preview-draft')).toBeEmptyDOMElement();
   });
 
-  it('discards drafts when a refreshed queue no longer contains the document', () => {
+  it('keeps active drafts when the latest queue response excludes an earlier selected or open document', () => {
     const { rerender } = renderPage();
     fireEvent.click(screen.getByText('Select batch'));
     fireEvent.click(screen.getByText('Process batch'));
@@ -223,7 +252,13 @@ describe('document moderation page', () => {
         <DocumentValidationPage />
       </ThemeProvider>
     );
-    expect(screen.getByTestId('draft')).toBeEmptyDOMElement();
+    expect(screen.getByTestId('draft')).toHaveTextContent('Wrong author');
+    fireEvent.click(screen.getByText('Preview failed'));
+    fireEvent.click(screen.getByText('Drop failed'));
+    expect(screen.getByTestId('preview-draft')).toHaveTextContent(
+      'Wrong author'
+    );
+    fireEvent.click(screen.getByText('Close preview'));
     fireEvent.click(screen.getByText('Preview failed'));
     expect(screen.getByTestId('preview-draft')).toBeEmptyDOMElement();
   });

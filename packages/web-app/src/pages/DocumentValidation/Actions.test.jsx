@@ -208,7 +208,7 @@ describe('document moderation actions', () => {
     [400, 'processDocumentsBadRequest'],
     [403, 'processDocumentsForbidden']
   ])(
-    'reports HTTP %i as a certain refusal and preserves the editable draft',
+    'reports HTTP %i as a certain refusal and preserves the draft',
     async (status, messageId) => {
       apiPut.mockRejectedValue({ status });
       const onProcessed = vi.fn();
@@ -228,6 +228,12 @@ describe('document moderation actions', () => {
       await waitFor(() =>
         expect(notifyError).toHaveBeenCalledExactlyOnceWith(messages[messageId])
       );
+      if (status === 403) {
+        await waitFor(() =>
+          expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+        );
+        fireEvent.click(screen.getByTestId('batch-decline'));
+      }
       expect(screen.getByRole('textbox')).toHaveValue('Wrong author');
       expect(onProcessed).not.toHaveBeenCalled();
       expect(notifySuccess).not.toHaveBeenCalled();
