@@ -90,7 +90,7 @@ const AccordionSnapshot = ({
   else if (isCurrent) dotColor = 'primary';
 
   return (
-    <TimelineItem sx={{ '&::before': { flex: 0, padding: 0.25 } }}>
+    <TimelineItem sx={{ '&&::before': { flex: 0, padding: 0.25 } }}>
       <TimelineSeparator>
         <TimelineDot
           color={dotColor}
