@@ -4,13 +4,13 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { DOCUMENT_SORT_ORDERS } from '@/utils/documentSort';
-import messages from '@/../public/lang/en.json';
 import DocumentChildrenList, {
   ChildrenControls,
   DocumentChildrenTiles
 } from './DocumentChildrenList';
 
-// Load the five real file icons without opening the entire barrel on Windows.
+// Importing the icon barrel opens thousands of modules. Load only the five
+// real file icons needed to verify the availability markers.
 vi.mock('@mui/icons-material', async () => ({
   PictureAsPdf: (await import('@mui/icons-material/PictureAsPdf')).default,
   Image: (await import('@mui/icons-material/Image')).default,
@@ -18,6 +18,19 @@ vi.mock('@mui/icons-material', async () => ({
   TableChart: (await import('@mui/icons-material/TableChart')).default,
   InsertDriveFile: (await import('@mui/icons-material/InsertDriveFile')).default
 }));
+
+const messages = {
+  Added: 'Added',
+  Document: 'Document',
+  'Document type': 'Document type',
+  'documentsSort.optionLabel': '{criterion} — {direction}',
+  'File available': 'File available',
+  'Newest first': 'Newest first',
+  'Oldest first': 'Oldest first',
+  Publication: 'Publication',
+  'Sort by': 'Sort by',
+  Title: 'Title'
+};
 
 const child = { id: 42, type: 'Issue', title: 'Test issue' };
 const pdf = {
@@ -42,8 +55,6 @@ it.each([
     { hasFiles: true, files: [] },
     'InsertDriveFileIcon'
   ],
-  ['false without files', { hasFiles: false }, null],
-  ['false overrides files', { hasFiles: false, files: [pdf] }, null],
   ['legacy PDF metadata', { files: [pdf] }, 'PictureAsPdfIcon'],
   [
     'legacy path without a filename',
@@ -64,11 +75,9 @@ it.each([
     'legacy unknown format',
     { files: [{ fileName: 'issue.zip' }] },
     'InsertDriveFileIcon'
-  ],
-  ['empty files', { files: [] }, null],
-  ['missing availability', {}, null]
+  ]
 ])(
-  'keeps tile, row and legend availability aligned: %s',
+  'shows available file markers, icons and legend: %s',
   (_name, fields, icon) => {
     renderChildren([{ ...child, ...fields }]);
 
@@ -77,24 +86,38 @@ it.each([
       screen.getByTestId('document-child-row')
     ];
     items.forEach(item => {
-      const marker = within(item).queryByLabelText('File available');
-      if (icon) {
-        expect(marker).toBeVisible();
-        expect(within(marker).getByTestId(icon)).toBeInTheDocument();
-      } else {
-        expect(marker).not.toBeInTheDocument();
-      }
+      const marker = within(item).getByLabelText('File available');
+      expect(marker).toBeVisible();
+      expect(within(marker).getByTestId(icon)).toBeInTheDocument();
     });
 
-    const legend = screen.queryByTestId('document-availability-legend');
-    if (icon) {
-      expect(legend).toBeVisible();
-      expect(legend).toHaveTextContent('File available');
-    } else {
-      expect(legend).not.toBeInTheDocument();
-    }
+    const legend = screen.getByTestId('document-availability-legend');
+    expect(legend).toBeVisible();
+    expect(legend).toHaveTextContent('File available');
   }
 );
+
+it.each([
+  ['false without files', { hasFiles: false }],
+  ['false overrides files', { hasFiles: false, files: [pdf] }],
+  ['empty files', { files: [] }],
+  ['missing availability', {}]
+])('omits unavailable file markers and legend: %s', (_name, fields) => {
+  renderChildren([{ ...child, ...fields }]);
+
+  const items = [
+    screen.getByTestId('document-child-tile'),
+    screen.getByTestId('document-child-row')
+  ];
+  items.forEach(item => {
+    expect(
+      within(item).queryByLabelText('File available')
+    ).not.toBeInTheDocument();
+  });
+  expect(
+    screen.queryByTestId('document-availability-legend')
+  ).not.toBeInTheDocument();
+});
 
 it('shows the legend when only one child has a validated file', () => {
   renderChildren([

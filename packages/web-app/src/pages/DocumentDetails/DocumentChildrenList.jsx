@@ -306,6 +306,7 @@ const TileAvailabilityCorner = styled(TileCorner)(({ theme }) => ({
 const DocumentTile = React.memo(({ doc, display, labelTier }) => {
   const { formatMessage } = useIntl();
   const fileName = getAttachedFileName(doc);
+  const isAvailable = hasAttachedFile(doc);
   const tooltip = [doc.title, hasOwnDescription(doc) ? doc.description : null]
     .filter(Boolean)
     .join(' — ');
@@ -323,9 +324,9 @@ const DocumentTile = React.memo(({ doc, display, labelTier }) => {
         <TileTypeCorner>
           <TypeIcon fontSize="small" />
         </TileTypeCorner>
-        {hasAttachedFile(doc) && (
+        {isAvailable && (
           <TileAvailabilityCorner>
-            <AvailabilityMarker isAvailable fileName={fileName} />
+            <AvailabilityMarker isAvailable={isAvailable} fileName={fileName} />
           </TileAvailabilityCorner>
         )}
         <TileLabel
