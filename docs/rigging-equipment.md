@@ -1,7 +1,7 @@
 # Equipment estimates for a rigging sheet
 
-Each sheet's summary displays estimated bolt hangers, carabiners, expansion
-bolts, soft anchors and accessory cords beside the rope total. Categories with
+Each sheet's summary displays estimated bolt hangers, carabiners, bolts/washers,
+soft anchors and accessory cords beside the rope total. Categories with
 no recognized quantity are hidden. Every quantity carries `~`; alternatives
 produce a minimum–maximum range per category, summed across anchor cells.
 Different categories' bounds do not necessarily describe the same alternative.
@@ -42,6 +42,8 @@ explains that it is estimated from the Anchors cells. The approximate marker
 also covers partial or unknown descriptions; there is no extra warning text.
 The accessory cord category retains source
 mentions of slings; its French label is “cordelettes”.
+The expansion bolt category is displayed as “bolts/washers” (“boulons/rondelles”
+in French); its parsing rules and quantities are unchanged.
 
 The React-independent parser lives in `src/utils/anchorEquipment.js`.
 It reads only the anchor column, using the sheet language for spelled-out

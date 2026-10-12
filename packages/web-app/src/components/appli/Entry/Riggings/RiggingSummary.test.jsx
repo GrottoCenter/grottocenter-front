@@ -39,7 +39,7 @@ describe('RiggingSummary', () => {
       '50 m',
       '~1–3 bolt hangers',
       '~4–6 carabiners',
-      '~1 expansion bolt',
+      '~1 bolt/washer',
       '~2 soft anchors (SA)',
       '~0–2 accessory cords'
     ].forEach(label => {
@@ -70,7 +70,7 @@ describe('RiggingSummary', () => {
         />
       </IntlProvider>
     );
-    expect(screen.getByText('~3 expansion bolts')).toBeInTheDocument();
+    expect(screen.getByText('~3 bolts/washers')).toBeInTheDocument();
     expect(screen.getByText('~3 carabiners')).toBeInTheDocument();
     expect(screen.getByText('~1 accessory cord')).toBeInTheDocument();
   });
@@ -94,7 +94,7 @@ describe('RiggingSummary', () => {
       </IntlProvider>
     );
     expect(screen.getByText('~1 carabiner')).toBeInTheDocument();
-    expect(screen.getByText('~1 expansion bolt')).toBeInTheDocument();
+    expect(screen.getByText('~1 bolt/washer')).toBeInTheDocument();
     expect(screen.getByText('~1 bolt hanger')).toBeInTheDocument();
   });
 
@@ -117,6 +117,7 @@ describe('RiggingSummary', () => {
       );
     });
     expect(screen.getByText('~1 plaquette')).toBeInTheDocument();
+    expect(screen.getByText('~1 boulon/rondelle')).toBeInTheDocument();
     expect(screen.getByText('~1 cordelette')).toBeInTheDocument();
     expect(screen.getByText('~1 AS')).toBeInTheDocument();
   });
@@ -158,13 +159,13 @@ describe('RiggingSummary', () => {
         <RiggingSummary obstacles={obstacles} language="eng" />
       </IntlProvider>
     );
-    expect(screen.getByText('~2 expansion bolts')).toBeInTheDocument();
+    expect(screen.getByText('~2 bolts/washers')).toBeInTheDocument();
     view.rerender(
       <IntlProvider locale="en" messages={messages}>
         <RiggingSummary obstacles={obstacles} language="fra" />
       </IntlProvider>
     );
-    expect(screen.getByText('~1 expansion bolt')).toBeInTheDocument();
+    expect(screen.getByText('~1 bolt/washer')).toBeInTheDocument();
   });
 
   it('does not show a summary in snapshot comparison mode', () => {

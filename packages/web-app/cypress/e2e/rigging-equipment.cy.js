@@ -75,7 +75,7 @@ describe('Automatic rigging equipment estimates', () => {
         );
         cy.get('[data-testid="rigging-equipment-expansionBolts"]').should(
           'have.text',
-          '~1 expansion bolt'
+          '~1 bolt/washer'
         );
         cy.get('[data-testid="rigging-equipment-softAnchors"]').should(
           'have.text',
@@ -96,7 +96,7 @@ describe('Automatic rigging equipment estimates', () => {
         );
         cy.get('[data-testid="rigging-equipment-expansionBolts"]').should(
           'have.text',
-          '~3 expansion bolts'
+          '~3 bolts/washers'
         );
         cy.get('[data-testid="rigging-equipment-slings"]').should(
           'have.text',
@@ -171,6 +171,21 @@ describe('Automatic rigging equipment estimates', () => {
     cy.get('[data-testid="rigging-equipment-slings"]')
       .first()
       .should('have.text', '~1–3 cordelettes');
+    cy.get('[data-testid="rigging-equipment-expansionBolts"]')
+      .last()
+      .should('have.text', '~3 boulons/rondelles');
+    cy.get('[data-testid="rigging-equipment-expansionBolts"]')
+      .first()
+      .should('have.text', '~1 boulon/rondelle')
+      .trigger('mouseover');
+    cy.get('[role="tooltip"]').should(
+      'have.text',
+      'Quantité approximative de boulons/rondelles, depuis les cases Ancrages'
+    );
+    cy.get('[data-testid="rigging-equipment-expansionBolts"]')
+      .first()
+      .trigger('mouseout');
+    cy.get('[role="tooltip"]').should('not.exist');
     cy.get('[data-testid="rigging-equipment-softAnchors"]')
       .first()
       .should('have.text', '~2 AS')
