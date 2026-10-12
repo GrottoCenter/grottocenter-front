@@ -115,7 +115,12 @@ const DocumentPreview = ({
       <Box
         data-testid="document-moderation-preview"
         sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
-        <ProcessResults batches={processBatches} />
+        <ProcessResults
+          batches={processBatches.map(batch => ({
+            ...batch,
+            results: batch.results.filter(result => result.id === id)
+          }))}
+        />
         {error || isPaused ? (
           <FetchErrorState
             error={error}

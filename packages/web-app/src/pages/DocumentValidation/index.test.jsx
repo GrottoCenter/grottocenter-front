@@ -22,7 +22,13 @@ vi.mock('../../components/appli/AuthChecker', () => ({
   default: ({ componentToDisplay }) => componentToDisplay
 }));
 vi.mock('../../components/common/EntityTable', () => ({
-  default: ({ onSelected, onRowClick, selectedIds, nbTotalRows }) => (
+  default: ({
+    onSelected,
+    onRowClick,
+    onPageChange,
+    selectedIds,
+    nbTotalRows
+  }) => (
     <div>
       <div data-testid="selection">{selectedIds.join(',')}</div>
       <div data-testid="count">{nbTotalRows}</div>
@@ -31,6 +37,12 @@ vi.mock('../../components/common/EntityTable', () => ({
       </button>
       <button type="button" onClick={() => onSelected([7, 8, 99])}>
         New selection
+      </button>
+      <button type="button" onClick={() => onSelected([99])}>
+        Drop failed
+      </button>
+      <button type="button" onClick={() => onPageChange(1, 20)}>
+        Next page
       </button>
       <button type="button" onClick={() => onRowClick({ id: 8 })}>
         Preview failed
@@ -70,12 +82,16 @@ vi.mock('./Actions', () => ({
   )
 }));
 vi.mock('./DocumentPreview', () => ({
-  default: ({ id, onProcessed }) => (
+  default: ({ id, onProcessed, onClose, draft }) => (
     <div data-testid="preview">
       {id}
+      <div data-testid="preview-draft">{draft.comment}</div>
+      <button type="button" onClick={onClose}>
+        Close preview
+      </button>
       <button
         type="button"
-        onClick={() => onProcessed([{ id, status: 'not_found' }])}>
+        onClick={() => onProcessed([{ id, status: 'validated' }])}>
         Finish preview
       </button>
     </div>
@@ -93,7 +109,7 @@ const renderPage = () =>
 
 beforeEach(() => {
   useDocuments.mockReturnValue({
-    data: { documents: [], totalCount: 2 },
+    data: { documents: [{ id: 7 }, { id: 8 }, { id: 99 }], totalCount: 3 },
     isFetching: false
   });
 });
@@ -114,7 +130,7 @@ describe('document moderation page', () => {
       screen.getByTestId('document-process-result-8')
     ).not.toHaveTextContent('Internal error');
     useDocuments.mockReturnValue({
-      data: { documents: [], totalCount: 1 },
+      data: { documents: [{ id: 8 }, { id: 99 }], totalCount: 1 },
       isFetching: false
     });
     act(() =>
@@ -143,11 +159,87 @@ describe('document moderation page', () => {
 
   it('preserves unresolved submission context after an unrelated document finishes', () => {
     renderPage();
+    fireEvent.click(screen.getByText('Select batch'));
     fireEvent.click(screen.getByText('Process batch'));
     expect(screen.getByTestId('draft')).toHaveTextContent('Wrong author');
     fireEvent.click(screen.getByText('Preview new'));
+    expect(screen.getByTestId('preview-draft')).toBeEmptyDOMElement();
     fireEvent.click(screen.getByText('Finish preview'));
     expect(screen.getByTestId('draft')).toHaveTextContent('Wrong author');
+  });
+
+  it.each(['Drop failed', 'Next page'])(
+    'discards abandoned drafts after %s',
+    action => {
+      renderPage();
+      fireEvent.click(screen.getByText('Select batch'));
+      fireEvent.click(screen.getByText('Process batch'));
+      expect(screen.getByTestId('draft')).toHaveTextContent('Wrong author');
+      fireEvent.click(screen.getByText(action));
+      expect(screen.getByTestId('draft')).toBeEmptyDOMElement();
+      fireEvent.click(screen.getByText('Select batch'));
+      fireEvent.click(screen.getByText('Preview failed'));
+      expect(screen.getByTestId('preview-draft')).toBeEmptyDOMElement();
+    }
+  );
+
+  it('retains the preview draft until the document is neither selected nor open', () => {
+    renderPage();
+    fireEvent.click(screen.getByText('Select batch'));
+    fireEvent.click(screen.getByText('Preview failed'));
+    fireEvent.click(screen.getByText('Process batch'));
+    fireEvent.click(screen.getByText('Drop failed'));
+    expect(screen.getByTestId('draft')).toBeEmptyDOMElement();
+    expect(screen.getByTestId('preview-draft')).toHaveTextContent(
+      'Wrong author'
+    );
+    fireEvent.click(screen.getByText('Close preview'));
+    fireEvent.click(screen.getByText('Preview failed'));
+    expect(screen.getByTestId('preview-draft')).toBeEmptyDOMElement();
+  });
+
+  it('does not restore a draft from a late result for abandoned IDs', () => {
+    renderPage();
+    fireEvent.click(screen.getByText('Select batch'));
+    fireEvent.click(screen.getByText('Drop failed'));
+    fireEvent.click(screen.getByText('Process batch'));
+    expect(screen.getByTestId('selection')).toHaveTextContent('99');
+    expect(screen.getByTestId('draft')).toBeEmptyDOMElement();
+    fireEvent.click(screen.getByText('Select batch'));
+    fireEvent.click(screen.getByText('Preview failed'));
+    expect(screen.getByTestId('preview-draft')).toBeEmptyDOMElement();
+  });
+
+  it('discards drafts when a refreshed queue no longer contains the document', () => {
+    const { rerender } = renderPage();
+    fireEvent.click(screen.getByText('Select batch'));
+    fireEvent.click(screen.getByText('Process batch'));
+    useDocuments.mockReturnValue({
+      data: { documents: [{ id: 99 }], totalCount: 1 },
+      isFetching: false
+    });
+    rerender(
+      <ThemeProvider theme={createTheme()}>
+        <DocumentValidationPage />
+      </ThemeProvider>
+    );
+    expect(screen.getByTestId('draft')).toBeEmptyDOMElement();
+    fireEvent.click(screen.getByText('Preview failed'));
+    expect(screen.getByTestId('preview-draft')).toBeEmptyDOMElement();
+  });
+
+  it('supersedes an old error when the document later finishes', () => {
+    renderPage();
+    fireEvent.click(screen.getByText('Select batch'));
+    fireEvent.click(screen.getByText('Process batch'));
+    fireEvent.click(screen.getByText('Process batch'));
+    expect(screen.getAllByTestId('document-process-result-8')).toHaveLength(1);
+    fireEvent.click(screen.getByText('Preview failed'));
+    fireEvent.click(screen.getByText('Finish preview'));
+    expect(
+      screen.queryByTestId('document-process-result-8')
+    ).not.toBeInTheDocument();
+    expect(screen.getByTestId('draft')).toBeEmptyDOMElement();
   });
 
   it('renders auto rejection reasons as plain text', () => {
@@ -171,6 +263,8 @@ describe('document moderation page', () => {
     );
     const detail = screen.getByTestId('document-process-result-7');
     expect(detail).toHaveTextContent('<b>Invalid attachment</b>');
+    expect(detail).toHaveTextContent('1 document automatically rejected');
+    expect(detail).not.toHaveTextContent('auto_rejected');
     expect(detail.querySelector('b')).toBeNull();
   });
 });

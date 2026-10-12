@@ -111,4 +111,14 @@ describe('global query and mutation error notifications', () => {
     });
     expect(enqueueSnackbar).not.toHaveBeenCalled();
   });
+
+  it('still reports rate limiting when a mutation owns its result summary', () => {
+    queryClient.getMutationCache().config.onError({ status: 429 }, null, null, {
+      meta: { skipErrorNotification: true }
+    });
+    expect(enqueueSnackbar).toHaveBeenCalledExactlyOnceWith(
+      'Trop de requêtes',
+      { variant: 'error', preventDuplicate: true }
+    );
+  });
 });

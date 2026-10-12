@@ -51,7 +51,6 @@ const notifyError = (error, meta) => {
     }
     return;
   }
-  if (meta?.skipErrorNotification) return;
   // Use the same translated "Too many requests" message as the legacy Redux
   // ErrorHandler on 429 rather than the generic fallback. The API's
   // body.code is not standardized across endpoints for rate-limiting, so
@@ -63,6 +62,7 @@ const notifyError = (error, meta) => {
     });
     return;
   }
+  if (meta?.skipErrorNotification) return;
   const fallback = translate(
     'unexpected error',
     'An unexpected error occurred'

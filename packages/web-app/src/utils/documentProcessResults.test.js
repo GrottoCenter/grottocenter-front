@@ -1,3 +1,4 @@
+import fc from 'fast-check';
 import {
   formatDocumentProcessSummary,
   isDocumentProcessFinished,
@@ -5,6 +6,44 @@ import {
 } from './documentProcessResults';
 
 describe('document process results', () => {
+  it('returns each unique submitted ID in order for arbitrary untrusted responses', () => {
+    const entry = fc.record({
+      id: fc.oneof(fc.integer({ min: 1, max: 30 }), fc.string()),
+      status: fc.oneof(
+        fc.constantFrom(
+          'validated',
+          'rejected',
+          'auto_rejected',
+          'not_found',
+          'error'
+        ),
+        fc.jsonValue()
+      ),
+      reason: fc.jsonValue()
+    });
+    fc.assert(
+      fc.property(
+        fc.array(fc.integer({ min: 1, max: 30 })),
+        fc.oneof(fc.jsonValue(), fc.array(fc.oneof(entry, fc.jsonValue()))),
+        (ids, response) => {
+          const results = normalizeDocumentProcessResults(response, ids);
+          expect(results.map(result => result.id)).toEqual([...new Set(ids)]);
+          results.forEach(result => {
+            if (result.status !== 'indeterminate') {
+              expect(Array.isArray(response)).toBe(true);
+              expect(
+                response.filter(item => item?.id === result.id)
+              ).toHaveLength(1);
+              expect(
+                result.reason === null || typeof result.reason === 'string'
+              ).toBe(true);
+            }
+          });
+        }
+      )
+    );
+  });
+
   it('matches submitted IDs only, irrespective of result order', () => {
     const results = normalizeDocumentProcessResults(
       [

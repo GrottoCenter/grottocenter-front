@@ -80,11 +80,15 @@ const Actions = ({
       result => !isDocumentProcessFinished(result)
     );
     setIsConfirmationDialogOpen(false);
-    setDraft(
-      hasUnfinished
-        ? { isValidated: variables.isValidated, comment: variables.comment }
-        : { isValidated: true, comment: '' }
-    );
+    // The page owns controlled drafts by submitted ID. Updating the current
+    // selection here could overwrite a different document's draft mid-request.
+    if (draft === undefined) {
+      setDraft(
+        hasUnfinished
+          ? { isValidated: variables.isValidated, comment: variables.comment }
+          : { isValidated: true, comment: '' }
+      );
+    }
     const summary = formatDocumentProcessSummary(results, formatMessage);
     if (hasUnfinished) onError(summary);
     else if (
@@ -100,7 +104,20 @@ const Actions = ({
   // Hook-level callbacks also run if the preview is closed while submitting.
   const processMutation = useProcessDocuments({
     onSuccess: handleResults,
-    onError: (_error, variables) => handleResults(null, variables)
+    onError: (error, variables) => {
+      // The global handler owns session loss and the deduplicated rate-limit
+      // toast. These requests did not reach document processing.
+      if (error.status === 401 || error.status === 429) return;
+      if (error.status === 400) {
+        onError(formatMessage({ id: 'processDocumentsBadRequest' }));
+        return;
+      }
+      if (error.status === 403) {
+        onError(formatMessage({ id: 'processDocumentsForbidden' }));
+        return;
+      }
+      handleResults(null, variables);
+    }
   });
   const { isPending: isLoading } = processMutation;
 

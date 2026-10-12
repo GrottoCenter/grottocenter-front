@@ -212,6 +212,7 @@ describe('DocumentPreview', () => {
             {
               key: 0,
               results: [
+                { id: 8, status: 'indeterminate', reason: null },
                 {
                   id: 7,
                   status: 'error',
@@ -227,6 +228,12 @@ describe('DocumentPreview', () => {
     expect(
       screen.getByTestId('document-process-result-7')
     ).not.toHaveTextContent('Internal server error');
+    expect(
+      screen.queryByTestId('document-process-result-8')
+    ).not.toBeInTheDocument();
+    expect(screen.getByTestId('document-process-result-7')).toHaveTextContent(
+      '1 document failed'
+    );
     fireEvent.click(screen.getByTestId('preview-validate'));
     fireEvent.click(screen.getByTestId('confirm-process-documents'));
     const variables = mutate.mock.calls[0][0];
