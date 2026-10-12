@@ -115,6 +115,47 @@ describe('document moderation actions', () => {
     ]);
   });
 
+  it('does not overwrite a new controlled draft when an earlier submission fails', async () => {
+    let resolve;
+    apiPut.mockReturnValue(
+      new Promise(done => {
+        resolve = done;
+      })
+    );
+    const onDraftChange = vi.fn();
+    const onProcessed = vi.fn();
+    const { rerender } = renderWithProviders(
+      <Actions
+        selectedIds={[7]}
+        onEdit={vi.fn()}
+        onProcessed={onProcessed}
+        draft={{ isValidated: false, comment: 'Wrong author' }}
+        onDraftChange={onDraftChange}
+      />,
+      { messages }
+    );
+    fireEvent.click(screen.getByTestId('batch-decline'));
+    fireEvent.click(screen.getByTestId('confirm-process-documents'));
+    onDraftChange.mockClear();
+    rerender(
+      <Actions
+        selectedIds={[8]}
+        onEdit={vi.fn()}
+        onProcessed={onProcessed}
+        draft={{ isValidated: true, comment: 'New draft' }}
+        onDraftChange={onDraftChange}
+      />
+    );
+    await act(async () => resolve([{ id: 7, status: 'error' }]));
+    await waitFor(() => expect(onProcessed).toHaveBeenCalledTimes(1));
+    expect(onDraftChange).not.toHaveBeenCalled();
+    expect(onProcessed.mock.calls[0][1]).toMatchObject({
+      ids: [7],
+      isValidated: false,
+      comment: 'Wrong author'
+    });
+  });
+
   it('distinguishes auto rejection and not found on a successful response', async () => {
     apiPut.mockResolvedValue([
       { id: 7, status: 'auto_rejected', reason: '<b>Invalid attachment</b>' },
@@ -162,4 +203,79 @@ describe('document moderation actions', () => {
       expect(notifySuccess).not.toHaveBeenCalled();
     }
   );
+
+  it.each([
+    [400, 'processDocumentsBadRequest'],
+    [403, 'processDocumentsForbidden']
+  ])(
+    'reports HTTP %i as a certain refusal and preserves the editable draft',
+    async (status, messageId) => {
+      apiPut.mockRejectedValue({ status });
+      const onProcessed = vi.fn();
+      renderWithProviders(
+        <Actions
+          selectedIds={[7]}
+          onEdit={vi.fn()}
+          onProcessed={onProcessed}
+        />,
+        { messages }
+      );
+      fireEvent.click(screen.getByTestId('batch-decline'));
+      fireEvent.change(screen.getByRole('textbox'), {
+        target: { value: 'Wrong author' }
+      });
+      fireEvent.click(screen.getByTestId('confirm-process-documents'));
+      await waitFor(() =>
+        expect(notifyError).toHaveBeenCalledExactlyOnceWith(messages[messageId])
+      );
+      expect(screen.getByRole('textbox')).toHaveValue('Wrong author');
+      expect(onProcessed).not.toHaveBeenCalled();
+      expect(notifySuccess).not.toHaveBeenCalled();
+      expect(apiPut).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it.each([401, 429])(
+    'leaves HTTP %i notifications to the global handler',
+    async status => {
+      apiPut.mockRejectedValue({ status });
+      const onProcessed = vi.fn();
+      renderWithProviders(
+        <Actions
+          selectedIds={[7]}
+          onEdit={vi.fn()}
+          onProcessed={onProcessed}
+        />,
+        { messages }
+      );
+      fireEvent.click(screen.getByTestId('batch-validate'));
+      await act(async () =>
+        fireEvent.click(screen.getByTestId('confirm-process-documents'))
+      );
+      await waitFor(() =>
+        expect(
+          screen.getByTestId('confirm-process-documents')
+        ).not.toBeDisabled()
+      );
+      expect(onProcessed).not.toHaveBeenCalled();
+      expect(notifyError).not.toHaveBeenCalled();
+      expect(notifySuccess).not.toHaveBeenCalled();
+      expect(apiPut).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it('keeps a server failure indeterminate', async () => {
+    apiPut.mockRejectedValue({ status: 500 });
+    const onProcessed = vi.fn();
+    renderWithProviders(
+      <Actions selectedIds={[7]} onEdit={vi.fn()} onProcessed={onProcessed} />,
+      { messages }
+    );
+    submit();
+    await waitFor(() => expect(onProcessed).toHaveBeenCalledTimes(1));
+    expect(onProcessed.mock.calls[0][0][0].status).toBe('indeterminate');
+    expect(notifyError).toHaveBeenCalledExactlyOnceWith(
+      '1 document with an indeterminate result'
+    );
+  });
 });

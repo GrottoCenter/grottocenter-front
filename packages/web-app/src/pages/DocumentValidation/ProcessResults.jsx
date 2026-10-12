@@ -1,16 +1,15 @@
 import PropTypes from 'prop-types';
 import { Alert, Box, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
-import { DOCUMENT_PROCESS_STATUSES } from '@/utils/documentProcessResults';
+import {
+  ANOMALY_STATUSES,
+  DOCUMENT_PROCESS_STATUSES
+} from '@/utils/documentProcessResults';
 
 const ProcessResults = ({ batches }) => {
   const { formatMessage } = useIntl();
   const anomalyBatches = batches.filter(batch =>
-    batch.results.some(result =>
-      ['auto_rejected', 'not_found', 'error', 'indeterminate'].includes(
-        result.status
-      )
-    )
+    batch.results.some(result => ANOMALY_STATUSES.includes(result.status))
   );
   if (!anomalyBatches.length) return null;
   return (
@@ -18,11 +17,7 @@ const ProcessResults = ({ batches }) => {
       {anomalyBatches.map(batch => (
         <Box key={batch.key} sx={{ mb: 1 }}>
           {batch.results
-            .filter(result =>
-              ['auto_rejected', 'not_found', 'error', 'indeterminate'].includes(
-                result.status
-              )
-            )
+            .filter(result => ANOMALY_STATUSES.includes(result.status))
             .map(result => (
               <Alert
                 key={result.id}
@@ -35,7 +30,7 @@ const ProcessResults = ({ batches }) => {
                 sx={{ mb: 0.5, overflowWrap: 'anywhere' }}>
                 <Typography component="p">
                   #{result.id}
-                  {result.title ? ` — ${result.title}` : ''} — {result.status}
+                  {result.title ? ` — ${result.title}` : ''}
                   {' — '}
                   {formatMessage(
                     { id: `documentProcess.count.${result.status}` },

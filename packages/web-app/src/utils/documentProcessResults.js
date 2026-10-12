@@ -1,16 +1,22 @@
-export const DOCUMENT_PROCESS_STATUSES = [
+export const FINISHED_STATUSES = [
   'validated',
   'rejected',
+  'auto_rejected',
+  'not_found'
+];
+
+export const ANOMALY_STATUSES = [
   'auto_rejected',
   'not_found',
   'error',
   'indeterminate'
 ];
 
+export const SERVER_STATUSES = [...FINISHED_STATUSES, 'error'];
+export const DOCUMENT_PROCESS_STATUSES = [...SERVER_STATUSES, 'indeterminate'];
+
 export const isDocumentProcessFinished = result =>
-  ['validated', 'rejected', 'auto_rejected', 'not_found'].includes(
-    result.status
-  );
+  FINISHED_STATUSES.includes(result.status);
 
 // Match only submitted IDs, once each. Missing or ambiguous answers cannot
 // establish whether a write reached the server.
@@ -22,7 +28,7 @@ export const normalizeDocumentProcessResults = (response, ids) =>
     const result = matches[0];
     const isValid =
       matches.length === 1 &&
-      DOCUMENT_PROCESS_STATUSES.slice(0, -1).includes(result.status) &&
+      SERVER_STATUSES.includes(result.status) &&
       (result.reason == null || typeof result.reason === 'string') &&
       (result.status !== 'auto_rejected' || !!result.reason?.trim());
     return isValid
