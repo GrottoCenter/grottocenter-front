@@ -108,23 +108,29 @@ describe('Document moderation preview', () => {
   });
 
   it('keeps failed documents selected after a mixed 207 and refreshes the queue', () => {
+    let isProcessed = false;
     cy.intercept(
       { method: 'PUT', pathname: '/api/v1/documents/validate' },
-      {
-        statusCode: 207,
-        body: [
-          { id: 7, status: 'validated', reason: null },
-          { id: 8, status: 'error', reason: 'Internal server error' }
-        ]
+      request => {
+        isProcessed = true;
+        request.reply({
+          statusCode: 207,
+          body: [
+            { id: 7, status: 'validated', reason: null },
+            { id: 8, status: 'error', reason: 'Internal server error' }
+          ]
+        });
       }
     ).as('mixedProcess');
-    cy.intercept(
-      { method: 'GET', pathname: '/api/v1/documents' },
-      {
-        body: { documents: [other] },
-        headers: { 'Content-Range': 'documents 0-0/1' }
-      }
-    ).as('refreshedDocuments');
+    cy.intercept({ method: 'GET', pathname: '/api/v1/documents' }, request => {
+      if (isProcessed) request.alias = 'refreshedDocuments';
+      request.reply({
+        body: { documents: isProcessed ? [other] : [current, other] },
+        headers: {
+          'Content-Range': isProcessed ? 'documents 0-0/1' : 'documents 0-1/2'
+        }
+      });
+    });
     cy.contains('tr', 'Original document')
       .find('input[type="checkbox"]')
       .check();
@@ -182,6 +188,13 @@ describe('Document moderation preview', () => {
         body === null ? { forceNetworkError: true } : { statusCode: 200, body }
       ).as('failedProcess');
       openPreview();
+      // Count application calls, since the browser or Cypress proxy can replay
+      // a forced connection reset without the application calling fetch again.
+      cy.window().then(win => {
+        cy.spy(win, 'fetch')
+          .withArgs(Cypress.sinon.match(/\/api\/v1\/documents\/validate$/))
+          .as('processFetch');
+      });
       cy.get('[data-testid="preview-decline"]').click();
       cy.get('[data-testid="confirm-process-documents"]')
         .closest('[role="dialog"]')
@@ -190,11 +203,15 @@ describe('Document moderation preview', () => {
         .type('Wrong author');
       cy.get('[data-testid="confirm-process-documents"]').click();
       cy.wait('@failedProcess');
-      cy.get('[data-testid="document-moderation-preview"]').should(
-        'be.visible'
-      );
+      cy.get('[data-testid="document-moderation-title"]')
+        .closest('[role="dialog"]')
+        .should('be.visible');
       cy.get('[data-testid="document-moderation-preview"]')
         .find('[data-testid="document-process-result-7"]')
+        .scrollIntoView();
+      cy.get('[data-testid="document-moderation-preview"]')
+        .find('[data-testid="document-process-result-7"]')
+        .should('be.visible')
         .should('contain.text', status)
         .and('not.contain.text', 'Internal server error');
       cy.get('[data-testid="preview-decline"]').click();
@@ -203,7 +220,7 @@ describe('Document moderation preview', () => {
         .find('textarea')
         .first()
         .should('have.value', 'Wrong author');
-      cy.get('@failedProcess.all').should('have.length', 1);
+      cy.get('@processFetch').should('have.been.calledOnce');
     });
   });
 
