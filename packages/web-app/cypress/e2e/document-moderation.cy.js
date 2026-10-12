@@ -83,7 +83,14 @@ describe('Document moderation preview', () => {
       { method: 'PUT', pathname: '/api/v1/documents/validate' },
       request => {
         isProcessed = true;
-        request.reply({ statusCode: 200, body: {} });
+        request.reply({
+          statusCode: 200,
+          body: request.body.documents.map(document => ({
+            id: document.id,
+            status: document.isValidated === 'true' ? 'validated' : 'rejected',
+            reason: null
+          }))
+        });
       }
     ).as('process');
     cy.intercept(
@@ -98,6 +105,106 @@ describe('Document moderation preview', () => {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
     cy.wait('@documents');
+  });
+
+  it('keeps failed documents selected after a mixed 207 and refreshes the queue', () => {
+    cy.intercept(
+      { method: 'PUT', pathname: '/api/v1/documents/validate' },
+      {
+        statusCode: 207,
+        body: [
+          { id: 7, status: 'validated', reason: null },
+          { id: 8, status: 'error', reason: 'Internal server error' }
+        ]
+      }
+    ).as('mixedProcess');
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/documents' },
+      {
+        body: { documents: [other] },
+        headers: { 'Content-Range': 'documents 0-0/1' }
+      }
+    ).as('refreshedDocuments');
+    cy.contains('tr', 'Original document')
+      .find('input[type="checkbox"]')
+      .check();
+    cy.contains('tr', 'Other document').find('input[type="checkbox"]').check();
+    cy.get('[data-testid="batch-validate"]').click();
+    cy.get('[data-testid="confirm-process-documents"]').click();
+    cy.wait('@mixedProcess');
+    cy.wait('@refreshedDocuments');
+    cy.contains('1 document validated, 1 document failed').should('be.visible');
+    cy.contains('tr', 'Original document').should('not.exist');
+    cy.contains('tr', 'Other document')
+      .find('input[type="checkbox"]')
+      .should('be.checked');
+    cy.get('[data-testid="document-process-result-8"]')
+      .should('contain.text', 'Other document')
+      .and('not.contain.text', 'Internal server error');
+  });
+
+  [
+    ['auto_rejected', 'Invalid attachment'],
+    ['not_found', null]
+  ].forEach(([status, reason]) => {
+    it(`distinguishes ${status} in a 200 and preserves its detail after closing the preview`, () => {
+      cy.intercept(
+        { method: 'PUT', pathname: '/api/v1/documents/validate' },
+        { statusCode: 200, body: [{ id: 7, status, reason }] }
+      ).as('terminalProcess');
+      openPreview();
+      cy.get('[data-testid="preview-validate"]').click();
+      cy.get('[data-testid="confirm-process-documents"]').click();
+      cy.wait('@terminalProcess');
+      cy.get('[data-testid="document-moderation-preview"]').should('not.exist');
+      cy.get('[data-testid="document-process-result-7"]')
+        .should('be.visible')
+        .and('contain.text', status);
+      if (reason) {
+        cy.get('[data-testid="document-process-result-7"]').should(
+          'contain.text',
+          reason
+        );
+      }
+    });
+  });
+
+  [
+    ['error', [{ id: 7, status: 'error', reason: 'Internal server error' }]],
+    ['indeterminate', {}],
+    ['indeterminate', []],
+    ['indeterminate', [{ id: 7, status: 'unknown', reason: null }]],
+    ['indeterminate', null]
+  ].forEach(([status, body], index) => {
+    it(`keeps the preview and comment without retry for ${status} (${index})`, () => {
+      cy.intercept(
+        { method: 'PUT', pathname: '/api/v1/documents/validate' },
+        body === null ? { forceNetworkError: true } : { statusCode: 200, body }
+      ).as('failedProcess');
+      openPreview();
+      cy.get('[data-testid="preview-decline"]').click();
+      cy.get('[data-testid="confirm-process-documents"]')
+        .closest('[role="dialog"]')
+        .find('textarea')
+        .first()
+        .type('Wrong author');
+      cy.get('[data-testid="confirm-process-documents"]').click();
+      cy.wait('@failedProcess');
+      cy.get('[data-testid="document-moderation-preview"]').should(
+        'be.visible'
+      );
+      cy.get('[data-testid="document-moderation-preview"]')
+        .find('[data-testid="document-process-result-7"]')
+        .should('contain.text', status)
+        .and('not.contain.text', 'Internal server error');
+      cy.get('[data-testid="preview-decline"]').click();
+      cy.get('[data-testid="confirm-process-documents"]')
+        .closest('[role="dialog"]')
+        .find('textarea')
+        .first()
+        .should('have.value', 'Wrong author');
+      cy.get('@failedProcess.all').should('have.length', 1);
+    });
   });
 
   it('keeps organization names in the proposed detail, author diff and edit chips', () => {

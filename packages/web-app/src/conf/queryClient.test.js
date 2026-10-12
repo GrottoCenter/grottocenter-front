@@ -92,4 +92,23 @@ describe('global query and mutation error notifications', () => {
     });
     expect(enqueueSnackbar).not.toHaveBeenCalled();
   });
+
+  it('lets a mutation provide its own summary without a duplicate global toast', () => {
+    queryClient
+      .getMutationCache()
+      .config.onError(new TypeError('Network failure'), null, null, {
+        meta: { skipErrorNotification: true }
+      });
+    expect(enqueueSnackbar).not.toHaveBeenCalled();
+  });
+
+  it('still logs out on 401 when a mutation owns its notifications', () => {
+    queryClient.getMutationCache().config.onError({ status: 401 }, null, null, {
+      meta: { skipErrorNotification: true }
+    });
+    expect(store.dispatch).toHaveBeenCalledExactlyOnceWith({
+      type: 'POST_LOGOUT'
+    });
+    expect(enqueueSnackbar).not.toHaveBeenCalled();
+  });
 });
