@@ -64,6 +64,26 @@ Cypress.Commands.add('checkPageLoaded', ({ timeout = 15000 } = {}) => {
 });
 
 /**
+ * Isolate mocked scenarios when serving a production build. A service worker
+ * can retain API responses and serve cached HTML before onBeforeLoad runs.
+ * Unregister it, remove its caches and prevent registration for this scenario.
+ */
+Cypress.Commands.add('disableServiceWorker', () => {
+  cy.then(async () => {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(
+      registrations.map(registration => registration.unregister())
+    );
+    const cacheNames = await caches.keys();
+    await Promise.all(cacheNames.map(name => caches.delete(name)));
+  });
+  cy.intercept(
+    { method: 'GET', pathname: '/sw.js' },
+    { statusCode: 404, body: '' }
+  );
+});
+
+/**
  * Intercept all API calls with a 200 empty response.
  * Prevents unexpected 401s from triggering the app's logout flow.
  * Call this BEFORE more specific intercepts (Cypress matches last-registered first).
