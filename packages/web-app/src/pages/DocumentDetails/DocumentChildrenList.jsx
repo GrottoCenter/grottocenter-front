@@ -25,7 +25,7 @@ import { DocumentChildPropTypes } from '@/types/document.type';
 /* Availability                                                               */
 /* -------------------------------------------------------------------------- */
 
-// An attached file is the only availability signal that is actual data.
+// Availability comes from the API's validated-file flag or attached files.
 //
 // Detecting a URL inside the free-text description was tried and dropped: it
 // meant pattern-matching prose, and since `.la`, `.at`, `.be`, `.it` and `.co`
@@ -38,6 +38,13 @@ const getAttachedFileName = doc => {
   // fileName, and keying only on fileName silently disabled the indicator.
   return file?.fileName ?? file?.completePath ?? null;
 };
+
+// Children expose hasFiles without file metadata. Other document payloads still
+// carry files; an explicit boolean takes precedence over that fallback.
+const hasAttachedFile = doc =>
+  typeof doc.hasFiles === 'boolean'
+    ? doc.hasFiles
+    : Boolean(getAttachedFileName(doc));
 
 // A chip rather than a bare icon: on its own, an icon dropped next to a title
 // reads as a button. Enclosed and outlined it reads as a badge — a statement
@@ -63,11 +70,12 @@ const MarkerChip = styled(Chip)(({ theme }) => ({
 // Deliberately no tooltip: a badge that reacts to the pointer reads as a button.
 // The legend in the section header names the marker once for the whole list, and
 // the aria-label carries the same text for screen readers.
-const AvailabilityMarker = ({ fileName, sx }) => {
+const AvailabilityMarker = ({ isAvailable, fileName, sx }) => {
   const { formatMessage } = useIntl();
-  if (!fileName) return null;
+  if (!isAvailable) return null;
   return (
     <MarkerChip
+      data-testid="document-availability-marker"
       size="small"
       variant="outlined"
       aria-label={formatMessage({ id: 'File available' })}
@@ -78,7 +86,9 @@ const AvailabilityMarker = ({ fileName, sx }) => {
 };
 
 AvailabilityMarker.propTypes = {
+  isAvailable: PropTypes.bool.isRequired,
   fileName: PropTypes.string,
+  // MUI sx accepts style objects with theme-dependent values from the parent.
   // eslint-disable-next-line react/forbid-prop-types
   sx: PropTypes.object
 };
@@ -123,7 +133,7 @@ export const ChildrenControls = ({
   // re-renders on every dialog / sort / license state change — so the array scan
   // is kept off that path.
   const hasFiles = useMemo(
-    () => (documents ?? []).some(doc => getAttachedFileName(doc)),
+    () => (documents ?? []).some(hasAttachedFile),
     [documents]
   );
   const showSort = Boolean(onSortOrderChange) && canSortDocuments(documents);
@@ -133,6 +143,7 @@ export const ChildrenControls = ({
     <ControlsRow onClick={e => e.stopPropagation()}>
       {hasFiles && (
         <MarkerChip
+          data-testid="document-availability-legend"
           size="small"
           variant="outlined"
           label={
@@ -306,14 +317,15 @@ const DocumentTile = React.memo(({ doc, display, labelTier }) => {
           untouched title instead of the shortened form. An untitled child would
           otherwise leave the link with no accessible name at all. */}
       <Tile
+        data-testid="document-child-tile"
         to={`/ui/documents/${doc.id}`}
         aria-label={tooltip || formatMessage({ id: 'Document' })}>
         <TileTypeCorner>
           <TypeIcon fontSize="small" />
         </TileTypeCorner>
-        {fileName && (
+        {hasAttachedFile(doc) && (
           <TileAvailabilityCorner>
-            <AvailabilityMarker fileName={fileName} />
+            <AvailabilityMarker isAvailable fileName={fileName} />
           </TileAvailabilityCorner>
         )}
         <TileLabel
@@ -435,7 +447,7 @@ const Description = styled(Typography)`
 const DocumentChildRow = React.memo(({ doc }) => {
   const TypeIcon = DOCUMENT_TYPE_ICONS[doc.type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
   return (
-    <ChildItem>
+    <ChildItem data-testid="document-child-row">
       <RowTypeIcon>
         <TypeIcon fontSize="small" />
       </RowTypeIcon>
@@ -447,6 +459,7 @@ const DocumentChildRow = React.memo(({ doc }) => {
           {/* The marker follows the title rather than preceding it: the type
               icon already owns the left gutter. */}
           <AvailabilityMarker
+            isAvailable={hasAttachedFile(doc)}
             fileName={getAttachedFileName(doc)}
             sx={{ ml: 0.5, verticalAlign: 'text-bottom' }}
           />
