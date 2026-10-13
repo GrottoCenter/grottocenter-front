@@ -25,7 +25,7 @@ import { DocumentChildPropTypes } from '@/types/document.type';
 /* Availability                                                               */
 /* -------------------------------------------------------------------------- */
 
-// An attached file is the only availability signal that is actual data.
+// Availability comes from the API's validated-file flag or attached files.
 //
 // Detecting a URL inside the free-text description was tried and dropped: it
 // meant pattern-matching prose, and since `.la`, `.at`, `.be`, `.it` and `.co`
@@ -38,6 +38,13 @@ const getAttachedFileName = doc => {
   // fileName, and keying only on fileName silently disabled the indicator.
   return file?.fileName ?? file?.completePath ?? null;
 };
+
+// Children expose hasFiles without file metadata. Other document payloads still
+// carry files; an explicit boolean takes precedence over that fallback.
+const hasAttachedFile = doc =>
+  typeof doc.hasFiles === 'boolean'
+    ? doc.hasFiles
+    : Boolean(getAttachedFileName(doc));
 
 // A chip rather than a bare icon: on its own, an icon dropped next to a title
 // reads as a button. Enclosed and outlined it reads as a badge — a statement
@@ -63,11 +70,12 @@ const MarkerChip = styled(Chip)(({ theme }) => ({
 // Deliberately no tooltip: a badge that reacts to the pointer reads as a button.
 // The legend in the section header names the marker once for the whole list, and
 // the aria-label carries the same text for screen readers.
-const AvailabilityMarker = ({ fileName, sx }) => {
+const AvailabilityMarker = ({ isAvailable, fileName, sx }) => {
   const { formatMessage } = useIntl();
-  if (!fileName) return null;
+  if (!isAvailable) return null;
   return (
     <MarkerChip
+      data-testid="document-availability-marker"
       size="small"
       variant="outlined"
       aria-label={formatMessage({ id: 'File available' })}
@@ -78,7 +86,9 @@ const AvailabilityMarker = ({ fileName, sx }) => {
 };
 
 AvailabilityMarker.propTypes = {
+  isAvailable: PropTypes.bool.isRequired,
   fileName: PropTypes.string,
+  // MUI sx accepts style objects with theme-dependent values from the parent.
   // eslint-disable-next-line react/forbid-prop-types
   sx: PropTypes.object
 };
@@ -123,7 +133,7 @@ export const ChildrenControls = ({
   // re-renders on every dialog / sort / license state change — so the array scan
   // is kept off that path.
   const hasFiles = useMemo(
-    () => (documents ?? []).some(doc => getAttachedFileName(doc)),
+    () => (documents ?? []).some(hasAttachedFile),
     [documents]
   );
   const showSort = Boolean(onSortOrderChange) && canSortDocuments(documents);
@@ -133,6 +143,7 @@ export const ChildrenControls = ({
     <ControlsRow onClick={e => e.stopPropagation()}>
       {hasFiles && (
         <MarkerChip
+          data-testid="document-availability-legend"
           size="small"
           variant="outlined"
           label={
@@ -204,7 +215,8 @@ const Tile = styled(AppLink)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   gap: theme.spacing(0.25),
-  padding: theme.spacing(2, 1.5, 1.5),
+  // Reserve the top strip for the type and availability markers.
+  padding: theme.spacing(4, 1.5, 1.5),
   border: `1px solid ${theme.palette.divider}`,
   borderRadius: theme.shape.borderRadius,
   backgroundColor: theme.palette.background.paper,
@@ -219,22 +231,16 @@ const Tile = styled(AppLink)(({ theme }) => ({
   }
 }));
 
-// An issue designation is short ("No 47", "n°6") and has to read at a glance
-// from across the grid, so it gets a display size. Collections whose titles do
-// not reduce to a short designation step down instead of forcing every tile to
-// be sized for the worst case.
+// Short issue designations use the item-heading scale. Longer titles step down
+// one theme variant so they remain readable without competing with the section.
 //
 // The tier is chosen ONCE per grid, from the longest label in it — never per
 // tile. Sizing each tile on its own label put "N° 9, Mars" at display size right
 // next to "N° 17, Février" at two thirds of it: the same kind of item rendered
 // two different ways inside one row.
-//
-// Sizes are in rem and the theme sets htmlFontSize to 10, so 1rem is 10px here,
-// not 16 — hence values that look large for body copy but are not.
 const LABEL_TIERS = [
-  { maxLength: 16, fontSize: '2.0rem', lineClamp: 2 },
-  { maxLength: 34, fontSize: '1.7rem', lineClamp: 3 },
-  { maxLength: Infinity, fontSize: '1.4rem', lineClamp: 3 }
+  { maxLength: 16, variant: 'h4', lineClamp: 2 },
+  { maxLength: Infinity, variant: 'h5', lineClamp: 3 }
 ];
 
 const getLabelTier = labels => {
@@ -242,12 +248,9 @@ const getLabelTier = labels => {
   return LABEL_TIERS.find(tier => longest <= tier.maxLength);
 };
 
-const TileLabel = styled('span', {
+const TileLabel = styled(Typography, {
   shouldForwardProp: prop => prop[0] !== '$'
-})(({ theme, $fontSize, $lineClamp }) => ({
-  fontSize: $fontSize,
-  fontWeight: 700,
-  lineHeight: 1.2,
+})(({ theme, $lineClamp }) => ({
   // No reserved height: grid items already stretch to their row, so tiles line
   // up without every short label paying for a second line it never uses.
   display: '-webkit-box',
@@ -260,9 +263,7 @@ const TileLabel = styled('span', {
 
 // Kept a clear step below the designation and in a muted tone: the date is the
 // chronological anchor, not the identity of the issue.
-const TileDate = styled('span')(({ theme }) => ({
-  fontSize: '1.7rem',
-  lineHeight: 1.2,
+const TileDate = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary
 }));
 
@@ -295,6 +296,7 @@ const TileAvailabilityCorner = styled(TileCorner)(({ theme }) => ({
 const DocumentTile = React.memo(({ doc, display, labelTier }) => {
   const { formatMessage } = useIntl();
   const fileName = getAttachedFileName(doc);
+  const isAvailable = hasAttachedFile(doc);
   const tooltip = [doc.title, hasOwnDescription(doc) ? doc.description : null]
     .filter(Boolean)
     .join(' — ');
@@ -306,22 +308,28 @@ const DocumentTile = React.memo(({ doc, display, labelTier }) => {
           untouched title instead of the shortened form. An untitled child would
           otherwise leave the link with no accessible name at all. */}
       <Tile
+        data-testid="document-child-tile"
         to={`/ui/documents/${doc.id}`}
         aria-label={tooltip || formatMessage({ id: 'Document' })}>
         <TileTypeCorner>
           <TypeIcon fontSize="small" />
         </TileTypeCorner>
-        {fileName && (
+        {isAvailable && (
           <TileAvailabilityCorner>
-            <AvailabilityMarker fileName={fileName} />
+            <AvailabilityMarker isAvailable={isAvailable} fileName={fileName} />
           </TileAvailabilityCorner>
         )}
         <TileLabel
-          $fontSize={labelTier.fontSize}
+          variant={labelTier.variant}
+          component="span"
           $lineClamp={labelTier.lineClamp}>
           {display.primary}
         </TileLabel>
-        {display.secondary && <TileDate>{display.secondary}</TileDate>}
+        {display.secondary && (
+          <TileDate variant="body2" component="span">
+            {display.secondary}
+          </TileDate>
+        )}
       </Tile>
     </Tooltip>
   );
@@ -336,7 +344,7 @@ DocumentTile.propTypes = {
     secondary: PropTypes.string
   }).isRequired,
   labelTier: PropTypes.shape({
-    fontSize: PropTypes.string.isRequired,
+    variant: PropTypes.oneOf(['h4', 'h5']).isRequired,
     lineClamp: PropTypes.number.isRequired
   }).isRequired
 };
@@ -435,7 +443,7 @@ const Description = styled(Typography)`
 const DocumentChildRow = React.memo(({ doc }) => {
   const TypeIcon = DOCUMENT_TYPE_ICONS[doc.type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
   return (
-    <ChildItem>
+    <ChildItem data-testid="document-child-row">
       <RowTypeIcon>
         <TypeIcon fontSize="small" />
       </RowTypeIcon>
@@ -447,6 +455,7 @@ const DocumentChildRow = React.memo(({ doc }) => {
           {/* The marker follows the title rather than preceding it: the type
               icon already owns the left gutter. */}
           <AvailabilityMarker
+            isAvailable={hasAttachedFile(doc)}
             fileName={getAttachedFileName(doc)}
             sx={{ ml: 0.5, verticalAlign: 'text-bottom' }}
           />
