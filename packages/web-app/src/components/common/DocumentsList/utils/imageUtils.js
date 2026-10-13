@@ -130,12 +130,3 @@ export const getThumbnailSources = file => {
     srcSet: srcSet || undefined
   };
 };
-
-/**
- * Pick the best image source for a full-screen lightbox view: the `large`
- * thumbnail variant, falling back to `completePath` when unavailable.
- * @param {object} file - File object with `completePath` and optional `thumbnails`
- * @returns {string}
- */
-export const getLightboxSrc = file =>
-  file.thumbnails?.large || file.completePath;

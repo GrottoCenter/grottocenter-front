@@ -4,6 +4,7 @@ import {
   Box,
   ButtonBase,
   Chip,
+  CircularProgress,
   Dialog,
   IconButton,
   Tooltip,
@@ -18,11 +19,7 @@ import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import NavigateBefore from '@mui/icons-material/NavigateBefore';
 import NavigateNext from '@mui/icons-material/NavigateNext';
 import { useIntl } from 'react-intl';
-import {
-  decodeFileName,
-  downloadFile,
-  getLightboxSrc
-} from './utils/imageUtils';
+import { decodeFileName, downloadFile } from './utils/imageUtils';
 import { ThumbnailsPropTypes } from '../../../types/document.type';
 
 // The image is already scaled to fit the frame at 1, so anything below it would
@@ -183,6 +180,7 @@ const ImageLightbox = ({
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchPanning, setIsTouchPanning] = useState(false);
   const [isCaptionVisible, setIsCaptionVisible] = useState(true);
+  const [settledImageSrc, setSettledImageSrc] = useState(null);
   const captionId = useId();
 
   // Only a zoomed-in image can be panned, so only it gets a grab cursor.
@@ -209,6 +207,7 @@ const ImageLightbox = ({
   }, [currentIndex, open]);
 
   const currentImage = images[currentIndex];
+  const isImageLoading = settledImageSrc !== currentImage?.completePath;
   const hasMultipleImages = images.length > 1;
 
   const handlePrevious = useCallback(() => {
@@ -373,6 +372,7 @@ const ImageLightbox = ({
       aria-label={decodeFileName(currentImage.fileName)}>
       <Box
         ref={contentRef}
+        aria-busy={isImageLoading}
         sx={{
           position: 'relative',
           width: '100%',
@@ -390,10 +390,15 @@ const ImageLightbox = ({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}>
         <LightboxImage
-          src={getLightboxSrc(currentImage)}
+          key={currentImage.completePath}
+          data-testid="lightbox-image"
+          src={currentImage.completePath}
           alt={decodeFileName(currentImage.fileName)}
           draggable={false}
+          onLoad={() => setSettledImageSrc(currentImage.completePath)}
+          onError={() => setSettledImageSrc(currentImage.completePath)}
           style={{
+            opacity: isImageLoading ? 0 : 1,
             transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
               position.y / zoom
             }px)`,
@@ -403,6 +408,24 @@ const ImageLightbox = ({
             cursor: panCursor
           }}
         />
+
+        {isImageLoading && (
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'none'
+            }}>
+            <CircularProgress
+              size={32}
+              sx={{ color: 'common.white' }}
+              aria-label={formatMessage({ id: 'Loading ...' })}
+            />
+          </Box>
+        )}
 
         {zoom !== MIN_ZOOM && (
           <ZoomResetButton
