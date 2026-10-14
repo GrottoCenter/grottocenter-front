@@ -19,6 +19,7 @@ import {
 import DocumentDetails from '../DocumentDetails';
 import DocumentDiff from './DocumentDiff';
 import Actions from './Actions';
+import ProcessResults, { processBatchesPropType } from './ProcessResults';
 
 const SUBMISSION_TITLES = {
   creation: 'documentModeration.reviewCreation',
@@ -26,7 +27,15 @@ const SUBMISSION_TITLES = {
   unknown: 'documentModeration.reviewDocument'
 };
 
-const DocumentPreview = ({ id, onClose, onEdit, onProcessed }) => {
+const DocumentPreview = ({
+  id,
+  onClose,
+  onEdit,
+  onProcessed,
+  processBatches = [],
+  draft,
+  onDraftChange
+}) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const isNarrowViewport = useMediaQuery(theme => theme.breakpoints.down('sm'));
@@ -73,6 +82,9 @@ const DocumentPreview = ({ id, onClose, onEdit, onProcessed }) => {
               selectedIds={[id]}
               onEdit={onEdit}
               onProcessed={onProcessed}
+              documents={current ? [current] : []}
+              draft={draft}
+              onDraftChange={onDraftChange}
               disabled={
                 !isReady || currentQuery.isFetching || proposedQuery.isFetching
               }
@@ -103,6 +115,12 @@ const DocumentPreview = ({ id, onClose, onEdit, onProcessed }) => {
       <Box
         data-testid="document-moderation-preview"
         sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
+        <ProcessResults
+          batches={processBatches.map(batch => ({
+            ...batch,
+            results: batch.results.filter(result => result.id === id)
+          }))}
+        />
         {error || isPaused ? (
           <FetchErrorState
             error={error}
@@ -142,7 +160,10 @@ DocumentPreview.propTypes = {
   id: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
-  onProcessed: PropTypes.func.isRequired
+  onProcessed: PropTypes.func.isRequired,
+  processBatches: processBatchesPropType,
+  draft: Actions.propTypes.draft,
+  onDraftChange: PropTypes.func
 };
 
 export default DocumentPreview;

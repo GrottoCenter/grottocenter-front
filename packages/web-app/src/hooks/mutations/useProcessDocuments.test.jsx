@@ -26,13 +26,20 @@ const makeWrapper = queryClient => {
 };
 
 describe('useProcessDocuments', () => {
+  beforeEach(() => vi.clearAllMocks());
+
   it('invalidates every detail domain that embeds validated documents', async () => {
     const queryClient = createTestQueryClient();
     const invalidateQueries = vi
       .spyOn(queryClient, 'invalidateQueries')
       .mockResolvedValue();
-    apiPut.mockResolvedValue(null);
-    const { result } = renderHook(() => useProcessDocuments(), {
+    const results = [
+      { id: 12, status: 'validated', reason: null },
+      { id: 13, status: 'error', reason: 'Internal error' }
+    ];
+    apiPut.mockResolvedValue(results);
+    const onSuccess = vi.fn();
+    const { result } = renderHook(() => useProcessDocuments({ onSuccess }), {
       wrapper: makeWrapper(queryClient)
     });
 
@@ -50,6 +57,11 @@ describe('useProcessDocuments', () => {
         { id: 13, isValidated: 'true', validationComment: 'validated' }
       ]
     });
+    expect(onSuccess).toHaveBeenCalledWith(results, {
+      ids: [12, 13],
+      isValidated: true,
+      comment: 'validated'
+    });
     [
       countKeys.pendingDocuments(),
       documentKeys.all,
@@ -61,6 +73,33 @@ describe('useProcessDocuments', () => {
       expect(invalidateQueries).toHaveBeenCalledWith({ queryKey });
     });
 
+    queryClient.clear();
+  });
+
+  it('does not retry transport failures even if the client enables retries', async () => {
+    const queryClient = createTestQueryClient();
+    queryClient.setDefaultOptions({
+      mutations: { retry: 3, retryDelay: 0 }
+    });
+    const error = new TypeError('Network error');
+    apiPut.mockRejectedValue(error);
+    const onError = vi.fn();
+    const { result } = renderHook(() => useProcessDocuments({ onError }), {
+      wrapper: makeWrapper(queryClient)
+    });
+    const variables = { ids: [12], isValidated: true, comment: '' };
+    await act(async () => {
+      await expect(result.current.mutateAsync(variables)).rejects.toThrow(
+        'Network error'
+      );
+    });
+    expect(apiPut).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledWith(
+      error,
+      variables,
+      undefined,
+      expect.anything()
+    );
     queryClient.clear();
   });
 });
