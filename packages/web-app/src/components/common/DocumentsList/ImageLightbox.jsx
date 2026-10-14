@@ -4,6 +4,7 @@ import {
   Box,
   ButtonBase,
   Chip,
+  CircularProgress,
   Dialog,
   IconButton,
   Tooltip,
@@ -18,11 +19,7 @@ import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import NavigateBefore from '@mui/icons-material/NavigateBefore';
 import NavigateNext from '@mui/icons-material/NavigateNext';
 import { useIntl } from 'react-intl';
-import {
-  decodeFileName,
-  downloadFile,
-  getLightboxSrc
-} from './utils/imageUtils';
+import { decodeFileName, downloadFile } from './utils/imageUtils';
 import { ThumbnailsPropTypes } from '../../../types/document.type';
 
 // The image is already scaled to fit the frame at 1, so anything below it would
@@ -162,10 +159,11 @@ const ImageCounter = styled(Chip)(({ theme }) => ({
 }));
 
 const LightboxImage = styled('img')`
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   display: block;
+  flex-shrink: 0;
   user-select: none;
 `;
 
@@ -183,6 +181,8 @@ const ImageLightbox = ({
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchPanning, setIsTouchPanning] = useState(false);
   const [isCaptionVisible, setIsCaptionVisible] = useState(true);
+  const [settledImageSrc, setSettledImageSrc] = useState(null);
+  const [loadedImage, setLoadedImage] = useState(null);
   const captionId = useId();
 
   // Only a zoomed-in image can be panned, so only it gets a grab cursor.
@@ -209,7 +209,23 @@ const ImageLightbox = ({
   }, [currentIndex, open]);
 
   const currentImage = images[currentIndex];
+  const isImageLoading = settledImageSrc !== currentImage?.completePath;
+  const imageAspectRatio =
+    loadedImage?.src === currentImage?.completePath
+      ? loadedImage?.aspectRatio
+      : null;
   const hasMultipleImages = images.length > 1;
+
+  const handleImageLoad = e => {
+    setSettledImageSrc(currentImage.completePath);
+    const { naturalWidth, naturalHeight } = e.currentTarget;
+    if (naturalWidth > 0 && naturalHeight > 0) {
+      setLoadedImage({
+        src: currentImage.completePath,
+        aspectRatio: naturalWidth / naturalHeight
+      });
+    }
+  };
 
   const handlePrevious = useCallback(() => {
     setCurrentIndex(prev => (prev > 0 ? prev - 1 : images.length - 1));
@@ -373,8 +389,10 @@ const ImageLightbox = ({
       aria-label={decodeFileName(currentImage.fileName)}>
       <Box
         ref={contentRef}
+        aria-busy={isImageLoading}
         sx={{
           position: 'relative',
+          containerType: 'size',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -390,10 +408,26 @@ const ImageLightbox = ({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}>
         <LightboxImage
-          src={getLightboxSrc(currentImage)}
+          key={currentImage.completePath}
+          data-testid="lightbox-image"
+          src={currentImage.completePath}
           alt={decodeFileName(currentImage.fileName)}
           draggable={false}
+          onLoad={handleImageLoad}
+          onError={() => setSettledImageSrc(currentImage.completePath)}
+          sx={{
+            backgroundColor: imageAspectRatio ? 'common.white' : 'transparent'
+          }}
           style={{
+            opacity: isImageLoading ? 0 : 1,
+            // The white backing must fit the bitmap, not a full-screen
+            // object-fit box. Container units keep it fitted on resize too.
+            width: imageAspectRatio
+              ? `min(100cqw, ${100 * imageAspectRatio}cqh)`
+              : '100%',
+            height: imageAspectRatio
+              ? `min(100cqh, ${100 / imageAspectRatio}cqw)`
+              : '100%',
             transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
               position.y / zoom
             }px)`,
@@ -403,6 +437,24 @@ const ImageLightbox = ({
             cursor: panCursor
           }}
         />
+
+        {isImageLoading && (
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'none'
+            }}>
+            <CircularProgress
+              size={32}
+              sx={{ color: 'common.white' }}
+              aria-label={formatMessage({ id: 'Loading ...' })}
+            />
+          </Box>
+        )}
 
         {zoom !== MIN_ZOOM && (
           <ZoomResetButton
