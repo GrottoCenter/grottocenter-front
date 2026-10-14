@@ -159,10 +159,9 @@ const ImageCounter = styled(Chip)(({ theme }) => ({
 }));
 
 const LightboxImage = styled('img')`
-  width: 100%;
-  height: 100%;
   object-fit: contain;
   display: block;
+  flex-shrink: 0;
   user-select: none;
 `;
 
@@ -181,6 +180,7 @@ const ImageLightbox = ({
   const [isTouchPanning, setIsTouchPanning] = useState(false);
   const [isCaptionVisible, setIsCaptionVisible] = useState(true);
   const [settledImageSrc, setSettledImageSrc] = useState(null);
+  const [loadedImage, setLoadedImage] = useState(null);
   const captionId = useId();
 
   // Only a zoomed-in image can be panned, so only it gets a grab cursor.
@@ -208,6 +208,10 @@ const ImageLightbox = ({
 
   const currentImage = images[currentIndex];
   const isImageLoading = settledImageSrc !== currentImage?.completePath;
+  const imageAspectRatio =
+    loadedImage?.src === currentImage?.completePath
+      ? loadedImage?.aspectRatio
+      : null;
   const hasMultipleImages = images.length > 1;
 
   const handlePrevious = useCallback(() => {
@@ -375,6 +379,7 @@ const ImageLightbox = ({
         aria-busy={isImageLoading}
         sx={{
           position: 'relative',
+          containerType: 'size',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -395,10 +400,28 @@ const ImageLightbox = ({
           src={currentImage.completePath}
           alt={decodeFileName(currentImage.fileName)}
           draggable={false}
-          onLoad={() => setSettledImageSrc(currentImage.completePath)}
+          onLoad={e => {
+            setSettledImageSrc(currentImage.completePath);
+            const { naturalWidth, naturalHeight } = e.currentTarget;
+            if (naturalWidth > 0 && naturalHeight > 0) {
+              setLoadedImage({
+                src: currentImage.completePath,
+                aspectRatio: naturalWidth / naturalHeight
+              });
+            }
+          }}
           onError={() => setSettledImageSrc(currentImage.completePath)}
           style={{
             opacity: isImageLoading ? 0 : 1,
+            // The white backing must fit the bitmap, not a full-screen
+            // object-fit box. Container units keep it fitted on resize too.
+            width: imageAspectRatio
+              ? `min(100cqw, ${100 * imageAspectRatio}cqh)`
+              : '100%',
+            height: imageAspectRatio
+              ? `min(100cqh, ${100 / imageAspectRatio}cqw)`
+              : '100%',
+            backgroundColor: imageAspectRatio ? '#fff' : 'transparent',
             transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
               position.y / zoom
             }px)`,

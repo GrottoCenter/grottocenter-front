@@ -38,6 +38,14 @@ const renderLightbox = () =>
     </IntlProvider>
   );
 
+const loadImage = (image, width, height) => {
+  Object.defineProperties(image, {
+    naturalWidth: { configurable: true, value: width },
+    naturalHeight: { configurable: true, value: height }
+  });
+  fireEvent.load(image);
+};
+
 describe('ImageLightbox original images', () => {
   it('loads only the active original and keeps its source while zooming', () => {
     renderLightbox();
@@ -88,6 +96,30 @@ describe('ImageLightbox original images', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Next image' }));
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
+  });
+});
+
+describe('ImageLightbox image backing', () => {
+  it('does not reuse the previous image dimensions while navigating', () => {
+    renderLightbox();
+    const firstImage = screen.getByTestId('lightbox-image');
+    loadImage(firstImage, 800, 400);
+    expect(firstImage).toHaveStyle({
+      backgroundColor: '#fff',
+      width: 'min(100cqw, 200cqh)',
+      height: 'min(100cqh, 50cqw)'
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Next image' }));
+    const image = screen.getByTestId('lightbox-image');
+
+    expect(image).toHaveAttribute('src', '/second.jpg');
+    expect(image).toHaveStyle({ backgroundColor: 'rgba(0, 0, 0, 0)' });
+    loadImage(image, 400, 800);
+    expect(image).toHaveStyle({
+      backgroundColor: '#fff',
+      width: 'min(100cqw, 50cqh)',
+      height: 'min(100cqh, 200cqw)'
+    });
   });
 });
 
