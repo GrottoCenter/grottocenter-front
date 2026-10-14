@@ -159,6 +159,8 @@ const ImageCounter = styled(Chip)(({ theme }) => ({
 }));
 
 const LightboxImage = styled('img')`
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
@@ -213,6 +215,17 @@ const ImageLightbox = ({
       ? loadedImage?.aspectRatio
       : null;
   const hasMultipleImages = images.length > 1;
+
+  const handleImageLoad = e => {
+    setSettledImageSrc(currentImage.completePath);
+    const { naturalWidth, naturalHeight } = e.currentTarget;
+    if (naturalWidth > 0 && naturalHeight > 0) {
+      setLoadedImage({
+        src: currentImage.completePath,
+        aspectRatio: naturalWidth / naturalHeight
+      });
+    }
+  };
 
   const handlePrevious = useCallback(() => {
     setCurrentIndex(prev => (prev > 0 ? prev - 1 : images.length - 1));
@@ -400,17 +413,11 @@ const ImageLightbox = ({
           src={currentImage.completePath}
           alt={decodeFileName(currentImage.fileName)}
           draggable={false}
-          onLoad={e => {
-            setSettledImageSrc(currentImage.completePath);
-            const { naturalWidth, naturalHeight } = e.currentTarget;
-            if (naturalWidth > 0 && naturalHeight > 0) {
-              setLoadedImage({
-                src: currentImage.completePath,
-                aspectRatio: naturalWidth / naturalHeight
-              });
-            }
-          }}
+          onLoad={handleImageLoad}
           onError={() => setSettledImageSrc(currentImage.completePath)}
+          sx={{
+            backgroundColor: imageAspectRatio ? 'common.white' : 'transparent'
+          }}
           style={{
             opacity: isImageLoading ? 0 : 1,
             // The white backing must fit the bitmap, not a full-screen
@@ -421,7 +428,6 @@ const ImageLightbox = ({
             height: imageAspectRatio
               ? `min(100cqh, ${100 / imageAspectRatio}cqw)`
               : '100%',
-            backgroundColor: imageAspectRatio ? '#fff' : 'transparent',
             transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
               position.y / zoom
             }px)`,
