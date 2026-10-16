@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 
 import { DocumentChildPropTypes } from './document.type';
 import { EntranceSimplePropTypes } from './entrance.type';
+import { organizationTypePropType } from './organization.type';
 
 export const CaverPropTypes = PropTypes.shape({
   id: PropTypes.number.isRequired,
@@ -18,6 +19,7 @@ export const NetworkPropTypes = PropTypes.shape({
 
 export const GrottoFullPropTypes = PropTypes.shape({
   id: PropTypes.number,
+  type: organizationTypePropType,
   isDeleted: PropTypes.bool,
   address: PropTypes.string,
   mail: PropTypes.string,

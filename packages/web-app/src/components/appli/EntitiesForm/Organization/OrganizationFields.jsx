@@ -1,7 +1,8 @@
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import OrganizationTypeField from '@/components/common/OrganizationTypeField';
 
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import InputText from '../utils/InputText';
 import InputCountry from '../utils/InputCountry';
 import InputLanguage from '../utils/InputLanguage';
@@ -17,6 +18,7 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
         <InputText
           formKey="organization.name"
           labelName="Organization name"
+          testId="organization-name"
           control={control}
           isError={!!errors?.organization?.name}
           isRequired
@@ -27,9 +29,11 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
           formKey="organization.language"
           control={control}
           isError={!!errors?.organization?.language}
-          disabled={!isNewOrganization}
+          isDisabled={!isNewOrganization}
         />
       </FormRow>
+
+      <OrganizationTypeField control={control} name="organization.type" />
 
       {/* To uncomment to use description instead of customMessage when API will be ready
         <FormLabel>
