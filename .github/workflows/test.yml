@@ -42,10 +42,10 @@ jobs:
       - name: List E2E specs
         id: specs
         run: |
-          # A separate Firefox runner per spec avoids the browser reconnect
-          # failure seen between specs; Chrome can run the whole suite at once.
+          # Isolate each browser/spec pair. Firefox can fail to reconnect
+          # between specs, while Chrome can retain failed lazy-resource loads.
           # The action resolves spec paths from the repository root.
-          include=$(find packages/web-app/cypress/e2e -type f \( -name '*.cy.js' -o -name '*.cy.jsx' -o -name '*.cy.ts' -o -name '*.cy.tsx' \) | sort | jq -R . | jq -s -c 'map({browser: "firefox", spec: .}) + [{browser: "chrome", spec: ""}]')
+          include=$(find packages/web-app/cypress/e2e -type f \( -name '*.cy.js' -o -name '*.cy.jsx' -o -name '*.cy.ts' -o -name '*.cy.tsx' \) | sort | jq -R . | jq -s -c 'map(. as $spec | ["firefox", "chrome"][] | {browser: ., spec: $spec})')
           echo "include=$include" >> "$GITHUB_OUTPUT"
       - name: Install dependencies
         run: yarn
@@ -119,13 +119,11 @@ jobs:
           start: >
             yarn preview --host 0.0.0.0 --port 3000 --strictPort
           wait-on: 'http://localhost:3000'
-      - name: Upload E2E failure diagnostics
+      - name: Upload E2E failure screenshots
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: e2e-${{ matrix.browser }}-${{ strategy.job-index }}-screenshots
-          path: |
-            packages/web-app/cypress/screenshots
-            packages/web-app/cypress/chrome-netlog.json
+          path: packages/web-app/cypress/screenshots
           if-no-files-found: ignore
           retention-days: 7
