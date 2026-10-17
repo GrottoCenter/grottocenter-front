@@ -23,8 +23,16 @@ beforeEach(() => {
   localStorage.setItem('mapTourSeen_v2', 'true');
   let appWindow = null;
   const consoleErrors = [];
+  const stopCalls = [];
   cy.on('window:before:load', win => {
     appWindow = win;
+    const originalStop = win.stop.bind(win);
+    Object.assign(win, {
+      stop: () => {
+        stopCalls.push({ url: win.location.href, stack: new Error().stack });
+        originalStop();
+      }
+    });
     const appConsole = win.console;
     const originalError = appConsole.error.bind(appConsole);
     appConsole.error = (...args) => {
@@ -49,7 +57,8 @@ beforeEach(() => {
           ),
           online: appWindow.navigator.onLine,
           title: appWindow.document.querySelector('h1')?.textContent,
-          consoleErrors: consoleErrors.slice(-3)
+          consoleErrors: consoleErrors.slice(-3),
+          stopCalls: stopCalls.slice(-3)
         };
       }
     } catch {
