@@ -61,7 +61,7 @@ describe('DocumentsList', () => {
     );
   });
 
-  it('does not render bibliographic references by default', () => {
+  it('omits subsection headings when bibliographic references are disabled', () => {
     renderWithProviders(
       <MemoryRouter>
         <DocumentsList
@@ -82,6 +82,9 @@ describe('DocumentsList', () => {
 
     expect(
       screen.queryByRole('heading', { name: 'Bibliographic references' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'Document list' })
     ).not.toBeInTheDocument();
   });
 

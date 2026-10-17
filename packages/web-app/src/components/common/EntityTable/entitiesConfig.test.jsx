@@ -1,10 +1,35 @@
 import { render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { getOrganizationIconSource } from '@/utils/organizationIcons';
+import { getPersonIconSource } from '@/utils/personTypes';
 
 import messages from '../../../../public/lang/en.json';
 import entitiesConfig from './entitiesConfig';
 import { renderCell } from './tableUtils';
+
+it.each(['CAVER', 'AUTHOR', null, 'FUTURE'])(
+  'keeps person type %s in its dedicated column and uses a neutral empty value otherwise',
+  type => {
+    const column = entitiesConfig.persons.columns.find(
+      item => item.field === 'type'
+    );
+    const { container } = render(
+      <IntlProvider locale="en" messages={messages}>
+        <div>{renderCell({ type }, column.field, column.render)}</div>
+      </IntlProvider>
+    );
+    expect(column.visible).toBe(true);
+    if (type === 'CAVER' || type === 'AUTHOR') {
+      expect(container.querySelector('img')).toHaveAttribute(
+        'src',
+        getPersonIconSource(type)
+      );
+    } else {
+      expect(container.textContent).toBe('-');
+      expect(container.querySelector('img')).toBeNull();
+    }
+  }
+);
 
 it.each(['EDITION', null, undefined, '', 'FUTURE'])(
   'renders known type %s with its icon, otherwise the standard empty cell',

@@ -184,8 +184,8 @@ const MenuLinks = ({ toggle, isExpanded = true }) => {
           isExpanded={isExpanded}
         />
         <LinkedItem
-          icon={<CustomIcon type="caver" size={MENU_ICON_SIZE} />}
-          label={formatMessage({ id: 'Cavers' })}
+          icon={<CustomIcon type="person" size={MENU_ICON_SIZE} />}
+          label={formatMessage({ id: 'Persons' })}
           href="/ui/persons"
           onClick={toggle}
           isExpanded={isExpanded}

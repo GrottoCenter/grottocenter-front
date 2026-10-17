@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { OrganizationSimplePropTypes } from '@/types/organization.type';
-import OrganizationIcon from '../OrganizationIcon';
 import CustomIcon from '../CustomIcon';
 import { Property } from '../Properties';
 
@@ -83,7 +82,7 @@ export const OrganizationProperty = ({ organization }) => (
     key={organization.id}
     value={organization.name}
     url={`/ui/organizations/${organization.id}`}
-    icon={<OrganizationIcon organizationType={organization.type} />}
+    icon={<CustomIcon type="organization" alt="" />}
     secondary
   />
 );

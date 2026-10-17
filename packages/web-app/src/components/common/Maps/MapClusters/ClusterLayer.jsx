@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useMap, useMapEvent } from 'react-leaflet';
 import L from 'leaflet';
 import { GlobalStyles } from '@mui/material';
+import { ORGANIZATION_MARKER_COLOR } from '@/components/common/Maps/common/mapMarkerColors';
 import {
   MAP_MARKER_OUTLINE_COLOR,
   MAP_MARKER_OUTLINE_WIDTH,
@@ -56,10 +57,9 @@ export const ClusterGlobalCss = (
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         border-radius: 50%;
       }
-      /* Organization — rounded square. Amber needs dark text for legibility. */
+      /* Organization — same opaque yellow as individual map pins. */
       .cluster-bubble[data-type="organization"] {
-        background: rgba(255, 193, 7, 0.9);
-        color: #3E2723;
+        background: ${ORGANIZATION_MARKER_COLOR};
         border: ${CSS_MARKER_OUTLINE_WIDTH}px solid ${MAP_MARKER_OUTLINE_COLOR};
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         border-radius: 22%;
@@ -96,6 +96,8 @@ export const ClusterGlobalCss = (
       .cluster-bubble[data-type="entrance"]:hover,
       .cluster-bubble[data-type="organization"]:hover {
         transform: scale(1.08);
+      }
+      .cluster-bubble[data-type="entrance"]:hover {
         filter: brightness(1.15);
       }
       .cluster-bubble[data-type="massif"]:hover {

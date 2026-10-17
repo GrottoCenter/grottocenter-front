@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
   Autocomplete,
+  Chip,
   CircularProgress,
   Collapse,
   IconButton,
@@ -12,6 +13,7 @@ import {
 import AddCircle from '@mui/icons-material/AddCircle';
 import Cancel from '@mui/icons-material/Cancel';
 import { styled } from '@mui/material/styles';
+import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
 import { entityOptionForSelector } from '../../../helpers/Entity';
 import { useEntitySearch } from '../../../hooks';
 import CreateCaverPanel from './CreateCaverPanel';
@@ -29,7 +31,6 @@ const InputWrapper = styled('div')`
   flex-direction: column;
 `;
 
-const CHIP_SLOT_PROPS = { chip: { color: 'primary' } };
 const MIN_SEARCH_LENGTH = 3;
 const PERSON_ENTITIES = ['persons'];
 
@@ -108,11 +109,20 @@ const AuthorsSelect = ({
             loading={isLoading}
             getOptionLabel={option => option.nickname || ''}
             renderOption={(props, option) =>
-              entityOptionForSelector(props, option)
+              entityOptionForSelector(props, option, { showPersonType: true })
             }
             isOptionEqualToValue={(option, val) => option.id === val.id}
             filterSelectedOptions
-            slotProps={CHIP_SLOT_PROPS}
+            renderValue={(selected, getItemProps) =>
+              selected.map((person, index) => (
+                <Chip
+                  {...getItemProps({ index })}
+                  key={person.id}
+                  color="primary"
+                  label={<DocumentAuthorLabel author={person} />}
+                />
+              ))
+            }
             filterOptions={options => options}
             noOptionsText={
               inputValue.length >= MIN_SEARCH_LENGTH ? (
@@ -185,7 +195,8 @@ AuthorsSelect.propTypes = {
   value: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      nickname: PropTypes.string
+      nickname: PropTypes.string,
+      type: PropTypes.string
     })
   ),
   onChange: PropTypes.func.isRequired,

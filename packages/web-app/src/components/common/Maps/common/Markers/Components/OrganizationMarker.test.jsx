@@ -1,4 +1,3 @@
-import { amber } from '@mui/material/colors';
 import { getOrganizationMapIconSource } from '@/utils/organizationIcons';
 import { ORGANIZATION_TYPE_VALUES } from '@/utils/organizationTypes';
 import {
@@ -15,7 +14,7 @@ it.each(ORGANIZATION_TYPE_VALUES)(
     expect(preview.querySelector('image').getAttribute('href')).toBe(
       getOrganizationMapIconSource(type)
     );
-    expect(preview.querySelector('path')).toHaveAttribute('fill', amber[500]);
+    expect(preview.querySelector('path')).toHaveAttribute('fill', '#d19a00');
     const symbol = decodeURIComponent(
       getOrganizationMapIconSource(type).split(',')[1]
     );

@@ -31,6 +31,7 @@ import {
   organizationPublisherIcon,
   organizationRescueIcon,
   organizationResearchIcon,
+  personIcon,
   pollutionIcon,
   rockfallIcon,
   rulesIcon,
@@ -51,6 +52,7 @@ const Icon = styled('span')`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: ${({ size }) => size}px;
   height: ${({ size }) => size}px;
   margin: 0px 4px 0px 0px;
@@ -96,6 +98,7 @@ const iconSources = {
   organization_publisher: organizationPublisherIcon,
   organization_rescue: organizationRescueIcon,
   organization_research: organizationResearchIcon,
+  person: personIcon,
   pollution: pollutionIcon,
   rockfall: rockfallIcon,
   rules: rulesIcon,
@@ -138,6 +141,7 @@ const altTexts = {
   organization_publisher: 'Publisher',
   organization_rescue: 'Cave rescue',
   organization_research: 'Research organization',
+  person: 'Person',
   pollution: 'Pollution',
   rockfall: 'Rockfall',
   rules: 'Rules',

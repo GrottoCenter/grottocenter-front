@@ -16,7 +16,7 @@ import { useIntl } from 'react-intl';
 import AddCircle from '@mui/icons-material/AddCircle';
 import Cancel from '@mui/icons-material/Cancel';
 import CustomIcon from '@/components/common/CustomIcon';
-import { getOrganizationIconType } from '@/utils/organizationIcons';
+import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
 import { entityOptionForSelector } from '@/helpers/Entity';
 import { useEntitySearch, useUserProperties } from '@/hooks';
 import { DocumentFormContext } from '@/components/appli/EntitiesForm/Document/Provider';
@@ -42,12 +42,6 @@ const MIXED_ENTITIES = ['persons', 'organizations'];
 
 const getOptionLabel = option =>
   (option._type === 'organizations' ? option.name : option.nickname) || '';
-
-const getPersonIconType = option => {
-  if (option._type === 'organizations')
-    return getOrganizationIconType(option.type);
-  return option.type === 'AUTHOR' ? 'author' : 'caver';
-};
 
 const stripType = ({ _type, ...rest }) => rest;
 
@@ -136,7 +130,7 @@ const AuthorsSection = () => {
   };
 
   return (
-    <Box sx={{ mt: 2 }}>
+    <Box data-testid="document-authors" sx={{ mt: 2 }}>
       <Typography
         variant="caption"
         sx={{
@@ -162,7 +156,7 @@ const AuthorsSection = () => {
             loading={isLoading}
             getOptionLabel={getOptionLabel}
             renderOption={(props, option) =>
-              entityOptionForSelector(props, option)
+              entityOptionForSelector(props, option, { showPersonType: true })
             }
             isOptionEqualToValue={(option, val) =>
               option.id === val.id && option._type === val._type
@@ -176,10 +170,10 @@ const AuthorsSection = () => {
                   key={`${option._type}-${option.id}`}
                   color="primary"
                   label={
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <CustomIcon type={getPersonIconType(option)} size={18} />
-                      {getOptionLabel(option)}
-                    </Box>
+                    <DocumentAuthorLabel
+                      author={option}
+                      entityType={option._type}
+                    />
                   }
                 />
               ))
@@ -234,7 +228,7 @@ const AuthorsSection = () => {
               })}
               sx={{ display: 'flex', width: '100%', mb: 1 }}>
               <ToggleButton value="person" sx={{ flex: 1, gap: 0.5 }}>
-                <CustomIcon type="caver" size={20} />
+                <CustomIcon type="person" size={20} alt="" />
                 {formatMessage({ id: 'Person' })}
               </ToggleButton>
               <ToggleButton value="organization" sx={{ flex: 1, gap: 0.5 }}>

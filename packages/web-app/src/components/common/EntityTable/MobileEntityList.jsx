@@ -152,6 +152,7 @@ const MobileEntityCard = React.memo(
                     sx={{
                       fontWeight: 'bold',
                       fontSize: '0.9375rem',
+                      minWidth: 0,
                       lineHeight: 1.3
                     }}>
                     {renderCellFn(doc, titleCol.field, titleCol.render)}
@@ -198,6 +199,7 @@ const MobileEntityCard = React.memo(
                           variant="body2"
                           sx={{
                             color: isMissing ? 'text.disabled' : 'text.primary',
+                            minWidth: 0,
                             fontWeight: isMissing ? 'normal' : 500
                           }}>
                           {value}

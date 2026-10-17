@@ -9,7 +9,8 @@ export const subjectType = PropTypes.shape({
 
 export const simpleCaverType = PropTypes.shape({
   id: PropTypes.number,
-  nickname: PropTypes.string
+  nickname: PropTypes.string,
+  type: PropTypes.string
 });
 
 export const simpleOrganisationType = OrganizationSimplePropTypes;

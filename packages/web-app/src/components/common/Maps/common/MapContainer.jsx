@@ -133,6 +133,7 @@ const CustomMapContainer = ({
   isLocationControlInFullscreen = false,
   isFullscreenAllowed = true,
   shouldChangeControlInFullscreen = true,
+  sx,
   style,
   children,
   forceCentering,
@@ -197,7 +198,7 @@ const CustomMapContainer = ({
   );
 
   return (
-    <Wrapper $wholePage={wholePage}>
+    <Wrapper $wholePage={wholePage} sx={sx}>
       <MapContainer
         style={{ flex: '1 1 auto', minHeight: 0, width: '100%', ...style }}
         wholePage={wholePage}
@@ -256,6 +257,7 @@ CustomMapContainer.propTypes = {
   isFullscreenAllowed: PropTypes.bool,
   shouldChangeControlInFullscreen: PropTypes.bool,
   style: PropTypes.shape({}),
+  sx: PropTypes.shape({}),
   forceCentering: PropTypes.bool,
   mapRef: PropTypes.shape({ current: PropTypes.shape({}) }),
   // A Leaflet renderer instance (L.canvas() / L.svg()), not a plain object.
