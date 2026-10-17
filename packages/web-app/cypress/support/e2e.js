@@ -20,15 +20,6 @@ import './commands';
 // Tours read localStorage on mount — pre-setting the key prevents them from auto-launching
 // and avoids overlay interference with Cypress selectors.
 beforeEach(() => {
-  if (Cypress.isBrowser({ family: 'chromium' })) {
-    // Keep module/CSS loads out of Chrome's cross-test HTTP cache.
-    cy.then(() =>
-      Cypress.automation('remote:debugger:protocol', {
-        command: 'Network.setCacheDisabled',
-        params: { cacheDisabled: true }
-      })
-    );
-  }
   localStorage.setItem('mapTourSeen_v2', 'true');
   let appWindow = null;
   const consoleErrors = [];
