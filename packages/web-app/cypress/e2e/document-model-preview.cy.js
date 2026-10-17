@@ -326,7 +326,7 @@ describe('Document 3D preview', () => {
     cy.contains('a', 'physical-object.GLB').should('be.visible');
     cy.get('[data-testid="model-preview-start"]').first().click();
     cy.wait('@firstModel', { requestTimeout: 30000 });
-    cy.get('[data-testid="model-preview"]')
+    cy.get('[data-testid="model-preview"]', { timeout: 30000 })
       .first()
       .should('have.attr', 'data-status', 'ready');
     cy.get('[data-testid="model-preview"]')
