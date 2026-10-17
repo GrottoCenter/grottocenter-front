@@ -17,9 +17,15 @@ vi.mock('@/api/client', () => ({
 vi.mock('@/hooks', async () => ({
   ...(await import('@/hooks/mutations/useOrganizationForm')),
   ...(await import('@/hooks/mutations/useUpdateName')),
-  useOnlineStatus: () => state.isOnline
+  useOnlineStatus: () => state.isOnline,
+  useLanguages: () => ({
+    isSuccess: true,
+    data: [
+      { id: 'eng', refName: 'English' },
+      { id: 'fra', refName: 'French' }
+    ]
+  })
 }));
-vi.mock('../utils/InputLanguage', () => ({ default: () => null }));
 vi.mock('../utils/InputCountry', () => ({ default: () => null }));
 vi.mock('../utils/CoordinateFormSection', () => ({ default: () => null }));
 vi.mock('../utils/LicenseBox', () => ({ default: () => null }));
@@ -66,6 +72,37 @@ beforeEach(() => {
 });
 
 describe('organization editor classification', () => {
+  it.each(['000', 'eng'])(
+    'allows changing the language from %s without renaming the organization',
+    async language => {
+      renderForm(
+        <OrganizationForm
+          organizationValues={makeOrganizationValueData({
+            ...existingOrganization,
+            type: 'SPELEOLOGY',
+            language
+          })}
+        />
+      );
+      const languageSelect = screen
+        .getByText(language === '000' ? 'Select a language' : 'English')
+        .closest('[role="combobox"]');
+      expect(languageSelect).not.toHaveAttribute('aria-disabled', 'true');
+      fireEvent.mouseDown(languageSelect);
+      fireEvent.click(screen.getByRole('option', { name: 'French' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Update' }));
+      await screen.findByText('Organization saved');
+      expect(apiPatch).toHaveBeenCalledWith(
+        expect.stringContaining('/names/17'),
+        { id: 17, name: existingOrganization.name, language: 'fra' }
+      );
+      expect(apiPut).toHaveBeenCalledWith(
+        expect.stringContaining('/organizations/42'),
+        expect.objectContaining({ type: 'SPELEOLOGY' })
+      );
+    }
+  );
+
   it.each([null, undefined, 'FUTURE_TYPE'])(
     'requires classification of an existing organization with type %s before any write',
     async type => {

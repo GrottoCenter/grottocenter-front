@@ -93,10 +93,14 @@ export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
           makePostOrganizationData(normalizedData)
         );
       } else {
-        if (data.organization.name !== organizationValues.name) {
+        if (
+          data.organization.name !== organizationValues.name ||
+          data.organization.language !== organizationValues.language
+        ) {
           await updateNameMutation.mutateAsync({
             id: organizationValues.nameId,
-            name: data.organization.name
+            name: data.organization.name,
+            language: data.organization.language
           });
         }
         await updateOrganizationMutation.mutateAsync(
@@ -134,11 +138,7 @@ export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
     <FormContainer>
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <FormSubmissionError error={organizationError || nameError} />
-        <OrganizationFields
-          isNewOrganization={isNewOrganization}
-          control={control}
-          errors={errors}
-        />
+        <OrganizationFields control={control} errors={errors} />
         <FormActionRow
           isNew={isNewOrganization}
           isSubmitting={isSubmitting || organizationLoading || nameLoading}
