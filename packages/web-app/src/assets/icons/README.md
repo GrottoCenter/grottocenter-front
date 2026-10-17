@@ -2,6 +2,12 @@
 
 All application icons in this directory share a common visual language. Follow this spec when creating or modifying icons.
 
+Organization subtype SVGs wrap their foreground in a group with
+`id="organization-symbol"`. The map resolver extracts this group, discards the
+card and shadow, and paints the symbol white. Use `data-map-fill="none"` on a
+shape that must become transparent on the map (the rescue circle, for example).
+This keeps map cutouts independent of the icon's UI accent colors.
+
 ---
 
 ## Canvas

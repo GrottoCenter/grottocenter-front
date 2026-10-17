@@ -1,4 +1,4 @@
-import { getOrganizationMapIconSource } from '@/utils/organizationIcons';
+import { getOrganizationMapIconSource } from '@/utils/organizationMapIcons';
 import { ORGANIZATION_TYPE_VALUES } from '@/utils/organizationTypes';
 import {
   getOrganizationMarker,
@@ -26,6 +26,15 @@ it.each(ORGANIZATION_TYPE_VALUES)(
         if (paint) expect(['#fff', 'none']).toContain(paint);
       });
     });
+    expect(foreground.querySelector('defs')).toBeNull();
+    if (type === 'CAVE_RESCUE') {
+      expect(foreground.querySelector('circle').getAttribute('fill')).toBe(
+        'none'
+      );
+      expect(foreground.querySelector('circle').getAttribute('stroke')).toBe(
+        '#fff'
+      );
+    }
     expect(marker.options.html).toContain(`data-organization-type="${type}"`);
     expect(marker.options.iconAnchor).toEqual([15, 39]);
     expect(getOrganizationMarker({ type })).toBe(marker);

@@ -23,7 +23,7 @@
 
   <!-- White rescue cross in an orange circle, centered on the brown card -->
   <g id="organization-symbol" transform="matrix(3.6000 0 0 3.6000 4.300 4.550)">
-    <circle cx="12" cy="12" r="10" fill="#f57c00" stroke="#f57c00" stroke-width="1.1"/>
+    <circle cx="12" cy="12" r="10" fill="#f57c00" stroke="#f57c00" stroke-width="1.1" data-map-fill="none"/>
     <path d="M9.5 5h5v4.5H19v5h-4.5V19h-5v-4.5H5v-5h4.5z" fill="#fff"/>
   </g>
 </svg>

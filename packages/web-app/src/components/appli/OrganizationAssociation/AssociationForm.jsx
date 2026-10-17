@@ -1,7 +1,7 @@
 import { createElement, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import {
   Box,
   TextField,
@@ -17,7 +17,8 @@ import {
   TEXT_LENGTH_LIMITS,
   isNearLengthLimit
 } from '@/utils/textLengthLimits';
-import { useEntitySearch, useOnlineStatus } from '../../../hooks';
+import { AUTOCOMPLETE_DEBOUNCE_DELAY } from '@/conf/config';
+import { useDebounce, useQuickSearch, useOnlineStatus } from '@/hooks';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { FormActionRow } from '../EntitiesForm/utils/FormContainers';
 
@@ -26,22 +27,22 @@ const ORGANIZATION_ENTITIES = ['organizations'];
 const AssociationForm = ({ onClose, onSubmit, status, error }) => {
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
-  // Holds ONLY an existing organization picked from the list (it always has an
-  // `id`). Free text is never stored here — the "create" path is derived from
-  // the input alone. This keeps the submit decision unambiguous.
+  // Only an option object is an existing organization; RHF owns the input text.
   const [selectedOrg, setSelectedOrg] = useState(null);
-  // Selecting an option makes the field show the org name; skip searching for
-  // that exact name (it just re-fetches the already selected organization).
-  const { inputValue, setInputValue, results, isLoading } = useEntitySearch(
-    ORGANIZATION_ENTITIES,
-    { skipQuery: selectedOrg?.name }
-  );
-  const trimmedInput = inputValue.trim();
-  const { control, handleSubmit, resetField } = useForm({
+  const { control, handleSubmit } = useForm({
     mode: 'onTouched',
     reValidateMode: 'onChange',
     defaultValues: { type: '', name: '' }
   });
+  const inputValue = useWatch({ control, name: 'name' });
+  const trimmedInput = inputValue.trim();
+  const debouncedInput = useDebounce(trimmedInput, AUTOCOMPLETE_DEBOUNCE_DELAY);
+  const { data: searchData, isFetching: isLoading } = useQuickSearch({
+    entities: ORGANIZATION_ENTITIES,
+    // Selecting an existing option must not search for its own label again.
+    query: debouncedInput === selectedOrg?.name ? '' : debouncedInput
+  });
+  const results = searchData?.results ?? [];
 
   // Local state reset on success is not strictly needed anymore — the parent
   // unmounts this component when it closes — but keep the effect so a caller
@@ -54,13 +55,10 @@ const AssociationForm = ({ onClose, onSubmit, status, error }) => {
 
   const handleValidSubmit = data => {
     if (!isOnline || status === REDUCER_STATUS.LOADING) return;
-    if (selectedOrg && selectedOrg.id) {
+    if (selectedOrg) {
       onSubmit({ id: selectedOrg.id, name: selectedOrg.name });
-    } else if (
-      trimmedInput &&
-      trimmedInput.length <= TEXT_LENGTH_LIMITS.ENTITY_NAME
-    ) {
-      onSubmit({ name: trimmedInput, type: data.type });
+    } else {
+      onSubmit({ name: data.name.trim(), type: data.type });
     }
   };
 
@@ -96,15 +94,27 @@ const AssociationForm = ({ onClose, onSubmit, status, error }) => {
         name="name"
         control={control}
         rules={{
-          validate: () =>
-            !!selectedOrg ||
-            (!!trimmedInput &&
-              trimmedInput.length <= TEXT_LENGTH_LIMITS.ENTITY_NAME) ||
-            formatMessage({ id: 'Required' })
+          validate: {
+            required: value =>
+              !!selectedOrg ||
+              !!value.trim() ||
+              formatMessage({ id: 'Required' }),
+            maxLength: value =>
+              !!selectedOrg ||
+              value.trim().length <= TEXT_LENGTH_LIMITS.ENTITY_NAME ||
+              formatMessage(
+                { id: 'form.maxLength' },
+                {
+                  limit: TEXT_LENGTH_LIMITS.ENTITY_NAME,
+                  count: value.trim().length
+                }
+              )
+          }
         }}
         render={({ field, fieldState }) => (
           <Autocomplete
             freeSolo
+            disabled={status === REDUCER_STATUS.LOADING}
             options={results}
             renderOption={(optionProps, option) => {
               const { key, ...liProps } = optionProps;
@@ -124,14 +134,12 @@ const AssociationForm = ({ onClose, onSubmit, status, error }) => {
               // string is left unstored: it will be handled as a creation from
               // the input on submit.
               setSelectedOrg(typeof newValue === 'string' ? null : newValue);
-              resetField('type');
               field.onChange(
                 typeof newValue === 'string' ? newValue : (newValue?.name ?? '')
               );
             }}
             inputValue={inputValue}
             onInputChange={(event, newInputValue, reason) => {
-              setInputValue(newInputValue);
               field.onChange(newInputValue);
               if (reason === 'input') {
                 setSelectedOrg(null);
@@ -140,7 +148,7 @@ const AssociationForm = ({ onClose, onSubmit, status, error }) => {
             renderInput={params => (
               <TextField
                 id={params.id}
-                disabled={params.disabled || status === REDUCER_STATUS.LOADING}
+                disabled={params.disabled}
                 fullWidth={params.fullWidth}
                 size={params.size}
                 name={field.name}

@@ -6,6 +6,7 @@ export { NetworkMarker } from './NetworkMarker';
 export { NetworkPopup } from './NetworkPopup';
 export {
   OrganizationMarker,
-  getOrganizationMarker
+  getOrganizationMarker,
+  shouldReplaceOrganizationMarker
 } from './OrganizationMarker';
 export { OrganizationPopup } from './OrganizationPopup';

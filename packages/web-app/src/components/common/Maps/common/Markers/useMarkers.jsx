@@ -15,6 +15,7 @@ const useMarkers = ({
   onPopupOpen = null,
   onPopupClose = null,
   shouldFitMapBound = false,
+  shouldReplaceMarker = null,
   markerOptions = null
 }) => {
   const map = useMap();
@@ -68,10 +69,8 @@ const useMarkers = ({
         markerEl.on('click', () => onMarkerClick(marker));
       }
 
-      // Listeners are cleaned up by Leaflet when markerEl.remove() is called.
-      // This relies on callbacks being stable references (useCallback with stable
-      // deps in Markers.jsx). If deps ever change identity, existing markers won't
-      // get updated listeners — updateMarkers only adds/removes, never replaces.
+      // Callbacks must stay stable: retained markers keep their event closures.
+      // Callers can opt into replacing changed records with shouldReplaceMarker.
       if (onMarkerOver) markerEl.on('mouseover', () => onMarkerOver(marker));
       if (onMarkerOut) markerEl.on('mouseout', () => onMarkerOut(marker));
       if (onPopupOpen) markerEl.on('popupopen', () => onPopupOpen(marker));
@@ -122,21 +121,13 @@ const useMarkers = ({
       // Add markers that are new
       let addedCount = 0;
       for (const marker of newMarkers) {
-        // Organizations can retain their ID while changing their name, location
-        // or type. Replace changed records to refresh popup/event closures too;
-        // the existing entrance/network paths retain their marker identities.
-        const previous = recordsRef.current.get(marker.id);
-        if (
-          typeof icon === 'function' &&
-          previous &&
-          (previous.type !== marker.type ||
-            previous.name !== marker.name ||
-            previous.address !== marker.address ||
-            previous.latitude !== marker.latitude ||
-            previous.longitude !== marker.longitude)
-        ) {
-          currentMap.get(marker.id)?.remove();
-          currentMap.delete(marker.id);
+        if (shouldReplaceMarker) {
+          const previous = recordsRef.current.get(marker.id);
+          if (previous && shouldReplaceMarker(previous, marker)) {
+            currentMap.get(marker.id)?.remove();
+            currentMap.delete(marker.id);
+          }
+          recordsRef.current.set(marker.id, marker);
         }
         if (!currentMap.has(marker.id)) {
           const leafletMarker = createLeafletMarker(marker);
@@ -144,7 +135,6 @@ const useMarkers = ({
           currentMap.set(marker.id, leafletMarker);
           addedCount += 1;
         }
-        recordsRef.current.set(marker.id, marker);
       }
 
       // Fit bounds on initial load if requested
@@ -159,15 +149,17 @@ const useMarkers = ({
         );
       }
     },
-    [map, createLeafletMarker, shouldFitMapBound, icon]
+    [map, createLeafletMarker, shouldFitMapBound, shouldReplaceMarker]
   );
 
   // Cleanup all markers on unmount
   useEffect(() => {
     const currentMarkers = markersRef.current;
+    const currentRecords = recordsRef.current;
     return () => {
       for (const m of currentMarkers.values()) m.remove();
       currentMarkers.clear();
+      currentRecords.clear();
     };
   }, []);
 
