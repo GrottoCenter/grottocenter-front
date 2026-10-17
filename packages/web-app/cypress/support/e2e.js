@@ -21,6 +21,32 @@ import './commands';
 // and avoids overlay interference with Cypress selectors.
 beforeEach(() => {
   localStorage.setItem('mapTourSeen_v2', 'true');
+  let appWindow = null;
+  cy.on('window:before:load', win => {
+    appWindow = win;
+  });
+  cy.on('fail', error => {
+    let context = { beforeLoadObserved: Boolean(appWindow) };
+    try {
+      if (appWindow) {
+        context = {
+          ...context,
+          url: appWindow.location.href,
+          tokenPresent: Boolean(
+            appWindow.localStorage.getItem('grottocenter_token')
+          ),
+          online: appWindow.navigator.onLine,
+          title: appWindow.document.querySelector('h1')?.textContent
+        };
+      }
+    } catch {
+      context.contextUnavailable = true;
+    }
+    Object.assign(error, {
+      message: `${error.message}\nApplication state: ${JSON.stringify(context)}`
+    });
+    throw error;
+  });
 });
 
 // Alternatively you can use CommonJS syntax:
