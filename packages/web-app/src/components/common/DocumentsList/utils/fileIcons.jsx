@@ -5,9 +5,15 @@ import {
   TableChart,
   InsertDriveFile
 } from '@mui/icons-material';
+import ViewInArIcon from '@mui/icons-material/ViewInAr';
 import { getFileExtension } from './imageUtils';
 
+// glTF logo green, from the Khronos Logo Family Color Guide (also used for GLB).
+const GLTF_COLOR = '#87c540';
+
 const FILE_ICONS = {
+  '.glb': <ViewInArIcon fontSize="small" sx={{ color: GLTF_COLOR }} />,
+  '.gltf': <ViewInArIcon fontSize="small" sx={{ color: GLTF_COLOR }} />,
   '.pdf': <PictureAsPdf fontSize="small" sx={{ color: '#d32f2f' }} />,
   '.svg': <Image fontSize="small" sx={{ color: '#7b61ff' }} />,
   '.doc': <Article fontSize="small" sx={{ color: '#1976d2' }} />,

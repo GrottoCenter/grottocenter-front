@@ -199,7 +199,8 @@ const AddFileForm = ({
     const { entries, errors: errorsList } = validateAndBuildFileEntries(
       newFiles,
       files,
-      formatMessage
+      formatMessage,
+      acceptConfig?.extensions
     );
     setErrors(isEmpty(errorsList) ? [] : errorsList);
     setFiles([...files, ...entries]);

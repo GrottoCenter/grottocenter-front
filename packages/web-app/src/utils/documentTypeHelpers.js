@@ -130,8 +130,26 @@ export const DOCUMENT_TYPE_ACCEPT = {
     mime: 'video/mp4,video/x-msvideo,video/mpeg,image/gif',
     extensions: ['avi', 'gif', 'mp4', 'mpeg']
   },
+  [DocumentTypes.PHYSICAL_OBJECT]: {
+    // API-supported 3D formats and containers. PDF may embed a 3D model;
+    // ZIP/GZ and KMZ can preserve a model with its dependent resources.
+    mime: 'model/gltf-binary,model/gltf+json,model/obj,application/pdf,application/zip,application/gzip,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,image/vnd.dxf,chemical/x-xyz',
+    extensions: [
+      'dxf',
+      'glb',
+      'gltf',
+      'gz',
+      'kml',
+      'kmz',
+      'lox',
+      'obj',
+      'pdf',
+      'xyz',
+      'zip'
+    ]
+  },
   [DocumentTypes.TOPOGRAPHIC_DATA]: {
-    mime: 'image/*,application/pdf,.th,.th2,.thconfig,.lox,.dxf,.cxf,.dpt,.xyz,.xvi,.zip,.gz',
+    mime: 'image/*,application/pdf,model/gltf-binary,model/gltf+json,.th,.th2,.thconfig,.lox,.dxf,.cxf,.dpt,.xyz,.xvi,.zip,.gz',
     extensions: [
       'bmp',
       'cxf',
@@ -139,6 +157,8 @@ export const DOCUMENT_TYPE_ACCEPT = {
       'dxf',
       'eps',
       'gif',
+      'glb',
+      'gltf',
       'gpx',
       'gz',
       'jpeg',

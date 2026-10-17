@@ -325,7 +325,10 @@ export default defineConfig(({ mode }) => {
             '**/stats.html',
             '**/*.{gz,br}',
             '**/.well-known/**',
-            '**/screenshots/**'
+            '**/screenshots/**',
+            // Loading the static preview must not download the 3D engine,
+            // including through the service worker's background installation.
+            '**/modelViewer-*.js'
           ],
           // Take control of the page on the very first load so offline works
           // from the first visit (matches the previous CRA SW's clientsClaim()).
@@ -334,6 +337,20 @@ export default defineConfig(({ mode }) => {
           navigateFallbackDenylist: [/^\/api/, /^\/\.well-known/],
           cleanupOutdatedCaches: true,
           runtimeCaching: [
+            {
+              // The named lazy 3D runtime is fetched only on View in 3D. Keep
+              // it available offline after use without downloading it for all
+              // visitors as part of the app's precache.
+              urlPattern: ({ url, sameOrigin }) =>
+                sameOrigin &&
+                /\/assets\/modelViewer-[^/]+\.js$/.test(url.pathname),
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'model-viewer-runtime',
+                expiration: { maxEntries: 2, purgeOnQuotaError: true },
+                cacheableResponse: { statuses: [200] }
+              }
+            },
             {
               // OpenStreetMap basemap tiles (default Leaflet layer).
               // OSM requires this exact canonical hostname. Using it also gives

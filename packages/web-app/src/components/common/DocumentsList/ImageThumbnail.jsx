@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Card, CardActionArea, Skeleton, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Description } from '@mui/icons-material';
+import AppLink from '@/components/common/AppLink';
 
 // Image count at which tiles stop sharing one card and get a tiling of their
 // own. DocumentsList imports it to give those documents the full row, so the
@@ -79,8 +80,10 @@ const ImageThumbnail = ({
   srcSet,
   sizes = DEFAULT_SIZES,
   maxHeight = DEFAULT_MAX_HEIGHT,
+  objectFit = 'cover',
   alt,
-  onClick
+  onClick,
+  to
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -95,8 +98,13 @@ const ImageThumbnail = ({
   };
 
   return (
-    <ThumbnailCard onClick={onClick} $maxHeight={maxHeight}>
-      <CardActionArea sx={{ height: '100%' }}>
+    <ThumbnailCard $maxHeight={maxHeight}>
+      <CardActionArea
+        component={to ? AppLink : 'button'}
+        to={to}
+        onClick={onClick}
+        aria-label={alt}
+        sx={{ height: '100%' }}>
         {error ? (
           <FallbackIconWrapper>
             <Description color="action" fontSize="large" />
@@ -120,7 +128,11 @@ const ImageThumbnail = ({
               loading="lazy"
               onLoad={handleLoad}
               onError={handleError}
-              style={{ opacity: loading ? 0 : 1, transition: 'opacity 0.3s' }}
+              style={{
+                objectFit,
+                opacity: loading ? 0 : 1,
+                transition: 'opacity 0.3s'
+              }}
             />
           </>
         )}
@@ -134,8 +146,10 @@ ImageThumbnail.propTypes = {
   srcSet: PropTypes.string,
   sizes: PropTypes.string,
   maxHeight: PropTypes.number,
+  objectFit: PropTypes.oneOf(['cover', 'contain']),
   alt: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func,
+  to: PropTypes.string
 };
 
 export default ImageThumbnail;
