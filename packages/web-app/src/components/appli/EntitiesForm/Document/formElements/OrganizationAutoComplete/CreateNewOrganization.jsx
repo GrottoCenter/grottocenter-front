@@ -11,6 +11,7 @@ import FormSubmissionError from '@/components/common/FormSubmissionError';
 import OrganizationTypeField from '@/components/common/OrganizationTypeField';
 import InputText from '@/components/appli/EntitiesForm/utils/InputText';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import { getDefaultOrganizationType } from '@/utils/organizationTypes';
 import { DocumentFormContext } from '../../Provider';
 
 const CreateNewOrganization = ({
@@ -28,6 +29,7 @@ const CreateNewOrganization = ({
   const { updateAttribute } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
+  const defaultType = getDefaultOrganizationType(contextValueName);
   const {
     control,
     handleSubmit,
@@ -37,16 +39,16 @@ const CreateNewOrganization = ({
   } = useForm({
     mode: 'onTouched',
     reValidateMode: 'onChange',
-    defaultValues: { name: defaultValue, type: '' }
+    defaultValues: { name: defaultValue, type: defaultType }
   });
 
   useEffect(() => {
     if (enabled) {
-      reset({ name: defaultValue, type: '' });
+      reset({ name: defaultValue, type: defaultType });
       resetMutation();
       setFocus('name');
     }
-  }, [enabled, defaultValue, reset, resetMutation, setFocus]);
+  }, [enabled, defaultValue, defaultType, reset, resetMutation, setFocus]);
 
   const handleCreate = handleSubmit(async ({ name, type }) => {
     if (!enabled || !isOnline || isPending) return;
@@ -62,7 +64,7 @@ const CreateNewOrganization = ({
           updateAttribute('library', organization.library ?? null);
         }
       }
-      reset({ name: '', type: '' });
+      reset({ name: '', type: defaultType });
       onCreateSuccess(organization);
     } catch {
       // Keep the input and structured mutation error available for correction.

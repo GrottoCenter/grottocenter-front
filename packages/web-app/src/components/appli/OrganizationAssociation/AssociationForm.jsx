@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { createElement, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Controller, useForm } from 'react-hook-form';
@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 
 import OrganizationTypeField from '@/components/common/OrganizationTypeField';
+import OrganizationIcon from '@/components/common/OrganizationIcon';
 import FormSubmissionError from '@/components/common/FormSubmissionError';
 import {
   TEXT_LENGTH_LIMITS,
@@ -105,6 +106,15 @@ const AssociationForm = ({ onClose, onSubmit, status, error }) => {
           <Autocomplete
             freeSolo
             options={results}
+            renderOption={(optionProps, option) => {
+              const { key, ...liProps } = optionProps;
+              return createElement(
+                'li',
+                { ...liProps, key },
+                <OrganizationIcon organizationType={option.type} size={24} />,
+                option.name
+              );
+            }}
             getOptionLabel={option =>
               typeof option === 'string' ? option : option.name || ''
             }

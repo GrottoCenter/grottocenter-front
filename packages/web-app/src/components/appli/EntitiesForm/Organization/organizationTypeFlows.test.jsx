@@ -257,14 +257,20 @@ describe('inline document organization creation', () => {
   };
 
   it.each([null, 'editor', 'library'])(
-    'requires an explicit type for context %s and returns the created reference',
+    'uses the context default when available for %s and allows overriding it',
     async contextValueName => {
       const { container, updateAttribute, onCreateSuccess, parentSubmit } =
         renderInline(contextValueName);
       expect(container.querySelectorAll('form')).toHaveLength(1);
-      fireEvent.click(screen.getByRole('button', { name: 'create' }));
-      await screen.findByText('Choose an organization type.');
-      expect(apiPost).not.toHaveBeenCalled();
+      if (contextValueName === null) {
+        fireEvent.click(screen.getByRole('button', { name: 'create' }));
+        await screen.findByText('Choose an organization type.');
+        expect(apiPost).not.toHaveBeenCalled();
+      } else {
+        expect(
+          screen.getByTestId('organization-type-field').querySelector('input')
+        ).toHaveValue(contextValueName === 'editor' ? 'EDITION' : 'LIBRARY');
+      }
       selectType('Library / documentation centre');
       fireEvent.click(screen.getByRole('button', { name: 'create' }));
       await waitFor(() =>

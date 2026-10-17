@@ -1,24 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty, isNil } from 'ramda';
+import { isNil } from 'ramda';
 import { InputAdornment } from '@mui/material';
 import AddCircle from '@mui/icons-material/AddCircle';
-import { organizationIcon } from '../../../../../../assets/icons';
+import OrganizationIcon from '@/components/common/OrganizationIcon';
+import { DocumentFormContext } from '../../Provider';
 
 import SearchBar from '../SearchBar';
 import DocumentFormAutoComplete from '../DocumentFormAutoComplete';
 import { useBoolean, useQuickSearch } from '../../../../../../hooks';
 import CreateNewOrganization from './CreateNewOrganization';
-
-const resultEndAdornment = (
-  <InputAdornment position="end">
-    <img
-      src={organizationIcon}
-      alt="Organization icon"
-      style={{ width: '40px' }}
-    />
-  </InputAdornment>
-);
 
 const getOrganizationToString = organization =>
   `#${organization.id} - ${organization.name}`;
@@ -37,7 +28,7 @@ const OrganizationAutoComplete = ({
   const [defaultNewOrganizationValue, setDefaultNewOrganizationValue] =
     useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const { isTrue: actionEnabled, true: enableAction } = useBoolean();
+  const { document } = useContext(DocumentFormContext);
   const { isOpen: isCreateOrganizationOpen, toggle: toggleCreateOrganization } =
     useBoolean();
   const {
@@ -53,13 +44,6 @@ const OrganizationAutoComplete = ({
   };
 
   const resetSearchResults = () => setSearchQuery('');
-
-  useEffect(() => {
-    if (isLoading && !isEmpty(defaultNewOrganizationValue)) {
-      enableAction();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, defaultNewOrganizationValue]);
 
   const handleOpenSideAction = () => {
     setDefaultSearchValue('');
@@ -91,8 +75,15 @@ const OrganizationAutoComplete = ({
       helperContentIfValueIsForced={helperContentIfValueIsForced}
       label={labelText}
       required={required}
-      resultEndAdornment={resultEndAdornment}
-      sideActionDisabled={!actionEnabled}
+      resultEndAdornment={
+        <InputAdornment position="end">
+          <OrganizationIcon
+            organizationType={document[contextValueName]?.type}
+            size={40}
+          />
+        </InputAdornment>
+      }
+      sideActionDisabled={!defaultNewOrganizationValue.trim()}
       sideActionIcon={<AddCircle fontSize="large" />}
       onSideAction={handleOpenSideAction}
       isSideActionOpen={isCreateOrganizationOpen}>

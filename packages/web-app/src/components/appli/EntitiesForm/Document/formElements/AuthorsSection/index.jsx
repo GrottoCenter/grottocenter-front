@@ -16,6 +16,7 @@ import { useIntl } from 'react-intl';
 import AddCircle from '@mui/icons-material/AddCircle';
 import Cancel from '@mui/icons-material/Cancel';
 import CustomIcon from '@/components/common/CustomIcon';
+import { getOrganizationIconType } from '@/utils/organizationIcons';
 import { entityOptionForSelector } from '@/helpers/Entity';
 import { useEntitySearch, useUserProperties } from '@/hooks';
 import { DocumentFormContext } from '@/components/appli/EntitiesForm/Document/Provider';
@@ -43,7 +44,8 @@ const getOptionLabel = option =>
   (option._type === 'organizations' ? option.name : option.nickname) || '';
 
 const getPersonIconType = option => {
-  if (option._type === 'organizations') return 'organization';
+  if (option._type === 'organizations')
+    return getOrganizationIconType(option.type);
   return option.type === 'AUTHOR' ? 'author' : 'caver';
 };
 

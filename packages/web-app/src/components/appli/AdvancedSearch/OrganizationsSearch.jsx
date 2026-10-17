@@ -1,5 +1,10 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
+import {
+  getOrganizationTypeLabelId,
+  ORGANIZATION_TYPE_VALUES
+} from '@/utils/organizationTypes';
+import EntityTypeFilter from './EntityTypeFilter';
 
 import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
 import useSearchFilter from '../../../hooks/useSearchFilter';
@@ -18,6 +23,7 @@ import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 import { getStoredRowsPerPage } from '../../common/EntityTable';
 
 const FILTER_LABELS = {
+  type: 'organizationType.label',
   city: 'City',
   county: 'County',
   country: 'Country',
@@ -26,12 +32,21 @@ const FILTER_LABELS = {
 };
 
 const initialFilterState = {
+  type: '',
   city: '',
   county: '',
   country: '',
   postalCode: '',
   region: ''
 };
+
+const TYPE_OPTIONS = [
+  { value: '', labelId: 'All' },
+  ...ORGANIZATION_TYPE_VALUES.map(type => ({
+    value: type,
+    labelId: getOrganizationTypeLabelId(type)
+  }))
+];
 
 const OrganizationsSearch = () => {
   const { formatMessage } = useIntl();
@@ -46,18 +61,28 @@ const OrganizationsSearch = () => {
     overrideQuery,
     overrideFilter,
     overrideMatchAll
-  ) =>
+  ) => {
+    const { type, ...otherFilters } = overrideFilter ?? filterState;
     startAdvancedSearch({
       entity: searchEntity,
       query: overrideQuery !== undefined ? overrideQuery : query,
-      filter: overrideFilter !== undefined ? overrideFilter : filterState,
+      filter: type ? { ...otherFilters, type } : otherFilters,
       matchAllFields:
         overrideMatchAll !== undefined ? overrideMatchAll : matchAllFields,
       size: getStoredRowsPerPage()
     });
+  };
 
-  const advancedFilterCount = countActiveFilters(filterState);
-  const hasClearableFilters = query !== '' || advancedFilterCount > 0;
+  const handleTypeChange = type => {
+    updateFilter('type', type);
+    startAdvancedsearch(undefined, { ...filterState, type });
+  };
+
+  const { type: organizationType, ...locationFilters } = filterState;
+  const effectiveFilter = organizationType ? filterState : locationFilters;
+  const advancedFilterCount = countActiveFilters(locationFilters);
+  const hasClearableFilters =
+    query !== '' || advancedFilterCount > 0 || !!organizationType;
 
   const handleClearAll = () => {
     setQuery('');
@@ -78,6 +103,14 @@ const OrganizationsSearch = () => {
         placeholder={formatMessage({ id: 'Organization name' })}
       />
 
+      <SearchFieldset title="Type">
+        <EntityTypeFilter
+          options={TYPE_OPTIONS}
+          value={filterState.type}
+          onChange={handleTypeChange}
+        />
+      </SearchFieldset>
+
       <SearchFilterAccordion
         filterCount={advancedFilterCount}
         expanded={advancedExpanded}
@@ -86,7 +119,7 @@ const OrganizationsSearch = () => {
           <SearchTextAutocomplete
             ressourceType={searchEntity}
             ressourceField="country"
-            ressourceFilter={matchAllFields ? filterState : {}}
+            ressourceFilter={matchAllFields ? effectiveFilter : {}}
             label="Country"
             onChange={e => updateFilter('country', e)}
             value={filterState.country}
@@ -94,7 +127,7 @@ const OrganizationsSearch = () => {
           <SearchTextAutocomplete
             ressourceType={searchEntity}
             ressourceField="region"
-            ressourceFilter={matchAllFields ? filterState : {}}
+            ressourceFilter={matchAllFields ? effectiveFilter : {}}
             label="Region"
             onChange={e => updateFilter('region', e)}
             value={filterState.region}
@@ -102,7 +135,7 @@ const OrganizationsSearch = () => {
           <SearchTextAutocomplete
             ressourceType={searchEntity}
             ressourceField="county"
-            ressourceFilter={matchAllFields ? filterState : {}}
+            ressourceFilter={matchAllFields ? effectiveFilter : {}}
             label="County"
             onChange={e => updateFilter('county', e)}
             value={filterState.county}
@@ -110,7 +143,7 @@ const OrganizationsSearch = () => {
           <SearchTextAutocomplete
             ressourceType={searchEntity}
             ressourceField="postalCode"
-            ressourceFilter={matchAllFields ? filterState : {}}
+            ressourceFilter={matchAllFields ? effectiveFilter : {}}
             label="Postal code"
             onChange={e => updateFilter('postalCode', e)}
             value={filterState.postalCode}
@@ -118,7 +151,7 @@ const OrganizationsSearch = () => {
           <SearchTextAutocomplete
             ressourceType={searchEntity}
             ressourceField="city"
-            ressourceFilter={matchAllFields ? filterState : {}}
+            ressourceFilter={matchAllFields ? effectiveFilter : {}}
             label="City"
             onChange={e => updateFilter('city', e)}
             value={filterState.city}
@@ -135,10 +168,18 @@ const OrganizationsSearch = () => {
         filterState={filterState}
         query={query}
         queryLabel="Organization name"
-        onRemoveFilter={handleRemoveFilter}
+        onRemoveFilter={key => {
+          if (key === 'type') handleTypeChange('');
+          else handleRemoveFilter(key);
+        }}
         onClearQuery={() => setQuery('')}
         onClearAll={hasClearableFilters ? handleClearAll : undefined}
         labelMap={FILTER_LABELS}
+        valueLabels={{
+          type: formatMessage({
+            id: getOrganizationTypeLabelId(filterState.type)
+          })
+        }}
       />
       <SearchActionButtons />
     </SearchForm>

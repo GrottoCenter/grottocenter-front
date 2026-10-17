@@ -13,6 +13,8 @@ import ShareIcon from '@mui/icons-material/Share';
 import LinkIcon from '@mui/icons-material/Link';
 import { NavigateNext } from '@mui/icons-material';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
+import OrganizationIcon from '@/components/common/OrganizationIcon';
+import { getOrganizationIconType } from '@/utils/organizationIcons';
 import { LicenseBadge } from '@/components/common/LicenseTag';
 import {
   DEFAULT_COLLECTION_SORT_ORDER,
@@ -273,7 +275,7 @@ const Document = ({
       ...(documentData.authorsOrganization ?? []).map(a => ({
         id: `org-${a.id}`,
         name: a.name,
-        iconType: 'organization',
+        iconType: getOrganizationIconType(a.type),
         url: `/ui/organizations/${a.id}`
       }))
     ];
@@ -719,7 +721,10 @@ const Document = ({
                             documentData.editor ? (
                               <InternalTextLink
                                 icon={
-                                  <CustomIcon type="organization" size={18} />
+                                  <OrganizationIcon
+                                    organizationType={documentData.editor.type}
+                                    size={18}
+                                  />
                                 }
                                 value={documentData.editor.name}
                                 url={`/ui/organizations/${documentData.editor.id}`}
@@ -734,7 +739,10 @@ const Document = ({
                             documentData.library ? (
                               <InternalTextLink
                                 icon={
-                                  <CustomIcon type="organization" size={18} />
+                                  <OrganizationIcon
+                                    organizationType={documentData.library.type}
+                                    size={18}
+                                  />
                                 }
                                 value={documentData.library.name}
                                 url={`/ui/organizations/${documentData.library.id}`}

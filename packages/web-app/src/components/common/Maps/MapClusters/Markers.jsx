@@ -1,23 +1,20 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { includes, values } from 'ramda';
 import PropTypes from 'prop-types';
+import { getOrganizationIconSource } from '@/utils/organizationIcons';
 import { layerTypes } from './DataDisplayControl';
 import useMarkers from '../common/Markers/useMarkers';
 import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
 import useNetworkHighlight from './useNetworkHighlight';
 import { getEntranceCircleStyle } from './constants';
 import {
-  OrganizationMarker,
+  getOrganizationMarker,
   OrganizationPopup,
   EntrancePopup,
   NetworkMarker,
   NetworkPopup
 } from '../common/Markers/Components';
-import {
-  entranceIcon,
-  networkIcon,
-  organizationIcon
-} from '../../../../assets/icons';
+import { entranceIcon, networkIcon } from '../../../../assets/icons';
 
 const isEntrances = includes(layerTypes.ENTRANCES);
 const isNetworks = includes(layerTypes.NETWORKS);
@@ -31,7 +28,10 @@ const organizationPopup = organization => (
   <OrganizationPopup organization={organization} />
 );
 const organizationTip = organization =>
-  makeIconTooltip(organizationIcon, organization?.name);
+  makeIconTooltip(
+    getOrganizationIconSource(organization?.type),
+    organization?.name
+  );
 
 const Markers = ({
   visibleMarkers,
@@ -75,7 +75,7 @@ const Markers = ({
     onPopupClose: handleNetworkPopupClose
   });
   const updateOrganizationMarkers = useMarkers({
-    icon: OrganizationMarker,
+    icon: getOrganizationMarker,
     popupContent: organizationPopup,
     tooltipContent: organizationTip
   });

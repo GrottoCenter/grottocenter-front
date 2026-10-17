@@ -4,5 +4,8 @@ export { EntrancePopup } from './EntrancePopup';
 export { MassifPopup } from './MassifPopup';
 export { NetworkMarker } from './NetworkMarker';
 export { NetworkPopup } from './NetworkPopup';
-export { OrganizationMarker } from './OrganizationMarker';
+export {
+  OrganizationMarker,
+  getOrganizationMarker
+} from './OrganizationMarker';
 export { OrganizationPopup } from './OrganizationPopup';

@@ -9,9 +9,10 @@ import Linkify from 'linkify-react';
 import { useIntl } from 'react-intl';
 import { isMobile } from 'react-device-detect';
 
+import { getOrganizationMarker } from '@/components/common/Maps/common/Markers/Components/OrganizationMarker';
+import { canOrganizationExplore } from '@/utils/organizationTypes';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import MultilinesTypography from '../../common/MultilinesTypography';
-import OrganizationMarker from '../../common/Maps/common/Markers/Components/OrganizationMarker';
 import OrganizationPopup from '../../common/Maps/common/Markers/Components/OrganizationPopup';
 import InfoSection from '../../common/InfoSection';
 import { GrottoFullPropTypes } from '../../../types/grotto.type';
@@ -79,9 +80,10 @@ StatItem.propTypes = {
 
 const Details = ({ organization }) => {
   const { formatMessage } = useIntl();
+  const hasExploration = canOrganizationExplore(organization.type);
 
   let position = [];
-  if (organization?.latitude && organization?.longitude) {
+  if (organization?.latitude != null && organization?.longitude != null) {
     position = [organization.latitude, organization.longitude];
   }
 
@@ -120,7 +122,9 @@ const Details = ({ organization }) => {
             scrollWheelZoom={false}
             zoom={14}
             center={position}>
-            <Marker icon={OrganizationMarker} position={position}>
+            <Marker
+              icon={getOrganizationMarker(organization)}
+              position={position}>
               <Popup>
                 <OrganizationPopup organization={organization} />
               </Popup>
@@ -146,12 +150,14 @@ const Details = ({ organization }) => {
               flexWrap: 'wrap',
               gap: 1
             }}>
-            <StatItem
-              src={caverIcon}
-              alt="cavers"
-              count={nbCavers}
-              label={formatMessage({ id: 'Number of cavers' })}
-            />
+            {hasExploration && (
+              <StatItem
+                src={caverIcon}
+                alt="cavers"
+                count={nbCavers}
+                label={formatMessage({ id: 'Number of cavers' })}
+              />
+            )}
             <StatItem
               src={bibliographyIcon}
               alt="authored documents"
@@ -164,18 +170,22 @@ const Details = ({ organization }) => {
               count={publishedCount}
               label={formatMessage({ id: 'Number of published documents' })}
             />
-            <StatItem
-              src={networkIcon}
-              alt="networks"
-              count={nbNetworks}
-              label={formatMessage({ id: 'Number of explored networks' })}
-            />
-            <StatItem
-              src={entranceIcon}
-              alt="entrances"
-              count={nbEntrances}
-              label={formatMessage({ id: 'Number of explored entrances' })}
-            />
+            {hasExploration && (
+              <StatItem
+                src={networkIcon}
+                alt="networks"
+                count={nbNetworks}
+                label={formatMessage({ id: 'Number of explored networks' })}
+              />
+            )}
+            {hasExploration && (
+              <StatItem
+                src={entranceIcon}
+                alt="entrances"
+                count={nbEntrances}
+                label={formatMessage({ id: 'Number of explored entrances' })}
+              />
+            )}
           </Box>
         </SectionPaper>
 

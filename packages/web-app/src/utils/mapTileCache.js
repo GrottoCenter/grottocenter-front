@@ -43,7 +43,8 @@ const ensureEntity = entity => {
       // scheduleEmit uses this to skip dispatches when nothing has changed since
       // the last emit — the common case when panning within already-cached tiles.
       tilesVersion: 0,
-      lastEmittedVersion: -1
+      lastEmittedVersion: -1,
+      generation: 0
     };
   }
   return state[entity];
@@ -107,6 +108,7 @@ const fetchTile = (entity, tile, apiZoom) => {
   const s = state[entity];
   const key = tileKey(entity, tile);
   const existing = s.tiles.get(key);
+  const { generation } = s;
   if (existing?.inFlight) return existing.inFlight;
 
   const bounds = tileToBounds(tile.x, tile.y, tile.z);
@@ -140,6 +142,7 @@ const fetchTile = (entity, tile, apiZoom) => {
     })
     .then(text => JSON.parse(text))
     .then(data => {
+      if (generation !== s.generation) return data;
       clearInFlight();
       s.tiles.set(key, { data, fetchedAt: now() });
       s.tilesVersion += 1;
@@ -148,6 +151,7 @@ const fetchTile = (entity, tile, apiZoom) => {
       return data;
     })
     .catch(error => {
+      if (generation !== s.generation) return undefined;
       // Preserve previously-cached data on failure (stale-while-error): a
       // transient network hiccup during background revalidation must not
       // blank out the user's view. `fetchedAt` is refreshed to `now()` so
@@ -245,13 +249,20 @@ export const refetchVisibleTiles = entity => {
 
 // Mark every tile of an entity as stale and refetch tiles overlapping the
 // current viewport. Called from the invalidation middleware after a mutation.
-// Deliberately does NOT bump s.tilesVersion: the union of cached tiles hasn't
-// changed yet (only fetchedAt flags), so scheduleEmit's version guard inside
-// the fetchForBounds call below correctly no-ops until the refetch actually
-// lands and calls scheduleEmit again with fresh data.
-export const invalidateAll = entity => {
+// By default the union stays available until fresh data arrives. discardData
+// clears it immediately when a mutation can remove records from geoloc.
+export const invalidateAll = (entity, { discardData = false } = {}) => {
   const s = state[entity];
   if (!s) return;
+  if (discardData) {
+    // A classification change can remove an organization from geoloc entirely.
+    // Discard every old tile, including off-screen duplicates, and ignore any
+    // response that started before this invalidation.
+    s.generation += 1;
+    s.tiles.clear();
+    s.tilesVersion += 1;
+    scheduleEmit(entity);
+  }
   s.tiles.forEach(rec => {
     // The cache records are mutable by design: marking them stale in place is
     // what keeps the tile identities (and the Map keys) stable.

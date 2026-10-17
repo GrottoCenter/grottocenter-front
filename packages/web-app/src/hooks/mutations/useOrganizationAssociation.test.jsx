@@ -3,6 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 
 import { apiPost, apiPut } from '@/api/client';
 import { createTestQueryClient } from '@/test/renderWithProviders';
+import { invalidateOrganizationCaches } from '@/utils/organizationCache';
 import {
   useSetCountryOrganization,
   useSetRegionOrganization,
@@ -13,6 +14,10 @@ vi.mock('@/api/client', () => ({
   apiPost: vi.fn(),
   apiPut: vi.fn(),
   apiDelete: vi.fn()
+}));
+
+vi.mock('@/utils/organizationCache', () => ({
+  invalidateOrganizationCaches: vi.fn()
 }));
 
 const renderMutation = hook => {
@@ -70,6 +75,7 @@ describe.each(cases)(
         }
       );
       expect(apiPut).toHaveBeenCalledWith(expect.stringContaining(path));
+      expect(invalidateOrganizationCaches).toHaveBeenCalledTimes(1);
       expect(apiPost.mock.invocationCallOrder[0]).toBeLessThan(
         apiPut.mock.invocationCallOrder[0]
       );
@@ -81,6 +87,7 @@ describe.each(cases)(
         result.current.mutateAsync({ ...scope, organizationId: 42 })
       );
       expect(apiPost).not.toHaveBeenCalled();
+      expect(invalidateOrganizationCaches).not.toHaveBeenCalled();
       expect(apiPut).toHaveBeenCalledWith(expect.stringContaining(path));
     });
 
@@ -101,6 +108,23 @@ describe.each(cases)(
         ).rejects.toBe(error);
       });
       expect(apiPut).not.toHaveBeenCalled();
+      expect(invalidateOrganizationCaches).not.toHaveBeenCalled();
+    });
+
+    it('refreshes the created organization even when linking fails', async () => {
+      const error = new Error('Association rejected');
+      apiPut.mockRejectedValueOnce(error);
+      const { result } = renderMutation(hook);
+      await act(async () => {
+        await expect(
+          result.current.mutateAsync({
+            ...scope,
+            organizationName: 'New organization',
+            organizationType: 'RESEARCH'
+          })
+        ).rejects.toBe(error);
+      });
+      expect(invalidateOrganizationCaches).toHaveBeenCalledTimes(1);
     });
   }
 );

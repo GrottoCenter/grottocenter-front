@@ -143,6 +143,7 @@ describe('Required organization classification', () => {
       language: 'fra'
     });
     cy.wait('@saveOrganization');
+    cy.contains('[role="combobox"]', 'French').scrollIntoView();
     cy.contains('[role="combobox"]', 'French').should('be.visible');
   });
 });
