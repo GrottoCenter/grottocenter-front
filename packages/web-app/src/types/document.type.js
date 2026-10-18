@@ -44,9 +44,10 @@ const CitationOrganizationPropTypes = PropTypes.shape({
 
 // The shape of a document as it comes attached to something else: the children
 // of a collection (GET /documents/{id}/children) and the documents of an
-// entrance, massif, organization or person, which the API returns identically.
+// entrance, massif, organization or person. Children expose hasFiles; other
+// document lists can still provide file metadata.
 // Richer than the simple shape: it carries the dates the lists are ordered on
-// and the files the availability indicator is derived from.
+// and the availability information used by their indicators.
 export const DocumentChildPropTypes = PropTypes.shape({
   id: PropTypes.number.isRequired,
   type: PropTypes.string,
@@ -57,6 +58,7 @@ export const DocumentChildPropTypes = PropTypes.shape({
   dateReviewed: PropTypes.string,
   isValidated: PropTypes.bool,
   isDeleted: PropTypes.bool,
+  hasFiles: PropTypes.bool,
   authors: PropTypes.arrayOf(authorType),
   authorsOrganization: PropTypes.arrayOf(CitationOrganizationPropTypes),
   editor: CitationOrganizationPropTypes,
