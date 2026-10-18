@@ -91,6 +91,7 @@ export const DocumentPropTypes = PropTypes.shape({
   creatorComment: PropTypes.string,
   reviewer: authorType,
   validator: authorType,
+  validatorComment: PropTypes.string,
   authors: PropTypes.arrayOf(authorType),
   authorsOrganization: PropTypes.arrayOf(idNameType),
   title: PropTypes.string,

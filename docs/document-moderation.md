@@ -23,5 +23,15 @@ Moderation mutations never retry automatically, including after reconnect.
 Manual retries are not guaranteed safe until attachment processing is atomic
 on the API.
 
+Document details distinguish a pending submission (`isValidated: false` with
+an explicitly null `dateValidation`) from a refused submission (false with a
+valid decision date). The existing notice shows the refusal, plain-text comment
+when available and localized decision date. Accepted versions show no notice,
+including after a proposed modification was refused. Missing or invalid metadata
+does not establish a moderation state. Notice visibility still follows the
+existing authenticated, non-preview detail view. This relies on the API's
+creation-versus-modification rejection contract described in API issue #1907.
+
 Coverage lives in the `useProcessDocuments` tests, `documentProcessResults.test.js`,
-the `DocumentValidation` component tests and `document-moderation.cy.js`.
+the `DocumentValidation` and `DocumentDetails` component tests,
+`document-moderation.cy.js` and `document-moderation-notice.cy.js`.
