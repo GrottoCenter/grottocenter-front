@@ -54,6 +54,9 @@ it('shows moderators an accessible Guidelines link', () => {
     'href',
     '/ui/guidelines'
   );
+  expect(
+    screen.getByRole('link', { name: /Organization management/ })
+  ).toHaveAttribute('href', '/ui/organizations/management');
 });
 
 it('does not show the Guidelines card to leaders without moderation rights', () => {
@@ -69,6 +72,9 @@ it('does not show the Guidelines card to leaders without moderation rights', () 
   renderDashboard();
 
   expect(screen.queryByRole('link', { name: /Guidelines/ })).toBeNull();
+  expect(
+    screen.queryByRole('link', { name: /Organization management/ })
+  ).toBeNull();
 });
 
 it('orders management groups as content, data and users', () => {

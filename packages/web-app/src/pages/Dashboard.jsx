@@ -20,6 +20,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import DocumentListIcon from '@mui/icons-material/PlaylistAddCheck';
 import PublishIcon from '@mui/icons-material/Publish';
 import ArchiveIcon from '@mui/icons-material/Archive';
+import BusinessIcon from '@mui/icons-material/Business';
 import { styled } from '@mui/material/styles';
 
 import {
@@ -320,6 +321,15 @@ const Dashboard = () => {
                   })}
                   roleId="Moderator"
                   to="/ui/guidelines"
+                />
+                <ToolCard
+                  icon={<BusinessIcon />}
+                  title={formatMessage({ id: 'Organization management' })}
+                  description={formatMessage({
+                    id: 'Organization management description'
+                  })}
+                  roleId="Moderator"
+                  to="/ui/organizations/management"
                 />
               </ToolGrid>
             </Section>
