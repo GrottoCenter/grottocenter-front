@@ -69,6 +69,10 @@ export const organizationKeys = {
   detail: detailKey('organization')
 };
 
+export const organizationManagementKeys = {
+  unclassified: ['organizationManagement', 'unclassified']
+};
+
 export const countryKeys = {
   all: ['country'],
   detail: detailKey('country')

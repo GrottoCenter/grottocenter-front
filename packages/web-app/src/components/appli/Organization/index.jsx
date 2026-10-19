@@ -50,12 +50,19 @@ import {
   DELETED_ENTITIES
 } from '../../common/card/Deleted';
 
-const Organization = ({ error, isPaused = false, isLoading, organization }) => {
+const Organization = ({
+  error,
+  isPaused = false,
+  isLoading,
+  organization,
+  isPreview = false
+}) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const { isAuth, isAdmin, isModerator } = usePermissions();
   const queryClient = useQueryClient();
-  const { organizationId } = useParams();
+  const { organizationId: routeOrganizationId } = useParams();
+  const organizationId = routeOrganizationId ?? organization?.id;
   const authState = useSelector(state => state.login);
   const deleteOrganizationMutation = useDeleteOrganization();
   const restoreOrganizationMutation = useRestoreOrganization();
@@ -87,13 +94,14 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
   );
   const hasExploration = canOrganizationExplore(organization?.type);
   const canManageCaves =
+    !isPreview &&
     hasExploration &&
     !organization?.isDeleted &&
     (isAdmin || isModerator || isMember);
 
   let onEdit = null;
   let onDelete = null;
-  if (isAuth && !organization?.isDeleted) {
+  if (!isPreview && isAuth && !organization?.isDeleted) {
     onEdit = () => {
       navigate(`/ui/organizations/${organizationId}/edit`);
     };
@@ -179,33 +187,34 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
   const nbNetworks = (organization?.exploredNetworks ?? []).length;
   const nbEntrances = (organization?.exploredEntrances ?? []).length;
 
-  const actions = organization ? (
-    <ResponsiveActions
-      items={[
-        {
-          key: 'share',
-          icon: <ShareIcon />,
-          label: formatMessage({ id: 'Copy link' }),
-          onClick: handleShare
-        },
-        {
-          key: 'edit',
-          icon: <CreateIcon />,
-          label: formatMessage({ id: 'Edit properties' }),
-          onClick: onEdit,
-          hidden: !onEdit
-        },
-        {
-          key: 'delete',
-          icon: <DeleteIcon />,
-          label: formatMessage({ id: 'Delete' }),
-          onClick: onDelete,
-          hidden: !onDelete,
-          destructive: true
-        }
-      ]}
-    />
-  ) : null;
+  const actions =
+    organization && !isPreview ? (
+      <ResponsiveActions
+        items={[
+          {
+            key: 'share',
+            icon: <ShareIcon />,
+            label: formatMessage({ id: 'Copy link' }),
+            onClick: handleShare
+          },
+          {
+            key: 'edit',
+            icon: <CreateIcon />,
+            label: formatMessage({ id: 'Edit properties' }),
+            onClick: onEdit,
+            hidden: !onEdit
+          },
+          {
+            key: 'delete',
+            icon: <DeleteIcon />,
+            label: formatMessage({ id: 'Delete' }),
+            onClick: onDelete,
+            hidden: !onDelete,
+            destructive: true
+          }
+        ]}
+      />
+    ) : null;
 
   const hasSubheader =
     organization &&
@@ -283,7 +292,7 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
             <FetchErrorState
               error={error}
               isPaused={isPaused}
-              onRetry={handleRefresh}
+              onRetry={isPreview ? null : handleRefresh}
               messageId="Error, the organization data you are looking for is not available."
             />
           </Card>
@@ -296,28 +305,34 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
               entityType={DELETED_ENTITIES.organization}
               entity={organization}
               isLoading={isActionLoading}
-              onRestorePress={onRestorePress}
-              onPermanentDeletePress={() => {
-                setIsDeleteConfirmationPermanent(true);
-                setIsDeleteConfirmationOpen(true);
+              onRestorePress={isPreview ? null : onRestorePress}
+              onPermanentDeletePress={
+                isPreview
+                  ? null
+                  : () => {
+                      setIsDeleteConfirmationPermanent(true);
+                      setIsDeleteConfirmationOpen(true);
+                    }
+              }
+            />
+          )}
+          {!isPreview && (
+            <DeleteConfirmationDialog
+              entityType={DELETED_ENTITIES.organization}
+              entityId={organization.id}
+              entityName={organization.name}
+              existingRedirectId={
+                organization.isDeleted ? organization.redirectTo : null
+              }
+              isOpen={isDeleteConfirmationOpen}
+              isLoading={isActionLoading}
+              isPermanent={isDeleteConfirmationPermanent}
+              onClose={() => setIsDeleteConfirmationOpen(false)}
+              onConfirmation={entity => {
+                onDeletePress(entity?.id, isDeleteConfirmationPermanent);
               }}
             />
           )}
-          <DeleteConfirmationDialog
-            entityType={DELETED_ENTITIES.organization}
-            entityId={organization.id}
-            entityName={organization.name}
-            existingRedirectId={
-              organization.isDeleted ? organization.redirectTo : null
-            }
-            isOpen={isDeleteConfirmationOpen}
-            isLoading={isActionLoading}
-            isPermanent={isDeleteConfirmationPermanent}
-            onClose={() => setIsDeleteConfirmationOpen(false)}
-            onConfirmation={entity => {
-              onDeletePress(entity?.id, isDeleteConfirmationPermanent);
-            }}
-          />
           <ScrollableContent
             content={<Details organization={organization} />}
           />
@@ -343,6 +358,7 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
               defaultExpanded={(organization.cavers ?? []).length > 0}
               count={(organization.cavers ?? []).length}
               icon={
+                !isPreview &&
                 isAuth &&
                 !organization.isDeleted && (
                   <Tooltip
@@ -374,7 +390,9 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
                   <EntitiesList
                     type="person"
                     entities={organization.cavers}
-                    onItemRemove={isAdmin ? requestRemoveMember : null}
+                    onItemRemove={
+                      !isPreview && isAdmin ? requestRemoveMember : null
+                    }
                     toolTipTitle={formatMessage({
                       id: 'Remove from organization'
                     })}
@@ -534,7 +552,8 @@ Organization.propTypes = {
   error: PropTypes.shape({}),
   isPaused: PropTypes.bool,
   isLoading: PropTypes.bool.isRequired,
-  organization: GrottoFullPropTypes
+  organization: GrottoFullPropTypes,
+  isPreview: PropTypes.bool
 };
 
 export default Organization;

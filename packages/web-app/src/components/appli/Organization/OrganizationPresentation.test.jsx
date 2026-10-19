@@ -36,7 +36,11 @@ vi.mock('@/components/common/Layouts/Fixed/ScrollableContent', () => ({
   )
 }));
 vi.mock('@/components/common/RelatedCaves/RelatedCaves', () => ({
-  default: () => <p>Exploration controls</p>
+  default: ({ canManageCaves }) => (
+    <p data-testid="exploration-permission">
+      {canManageCaves ? 'editable' : 'read-only'}
+    </p>
+  )
 }));
 vi.mock(
   '@/components/common/DocumentsList/OrganizationDocumentReferences',
@@ -49,11 +53,12 @@ vi.mock('@/components/common/Maps/common/MapContainer', () => ({
   default: () => null
 }));
 
-const renderOrganization = type =>
+const renderOrganization = (type, isPreview = false) =>
   renderWithProviders(
     <MemoryRouter>
       <Organization
         isLoading={false}
+        isPreview={isPreview}
         organization={{
           id: 42,
           name: 'Example organization',
@@ -83,6 +88,56 @@ it.each(['SPELEOLOGY', 'CAVE_RESCUE', 'RESEARCH', null, undefined, ''])(
     ).not.toBeEmptyDOMElement();
   }
 );
+
+it('keeps the full organization details but hides every editing control in preview', () => {
+  renderOrganization('SPELEOLOGY', true);
+
+  expect(screen.getByTestId('organization-properties')).toBeInTheDocument();
+  expect(screen.getByTestId('members')).toBeInTheDocument();
+  expect(screen.getByTestId('related-caves')).toBeInTheDocument();
+  expect(screen.getByTestId('authored-documents')).toBeInTheDocument();
+  expect(screen.getByTestId('exploration-permission')).toHaveTextContent(
+    'read-only'
+  );
+  for (const action of [
+    'Copy link',
+    'Edit properties',
+    'Delete',
+    'Join organization',
+    'Add a cave',
+    'Remove from organization'
+  ]) {
+    expect(screen.queryByRole('button', { name: action })).toBeNull();
+  }
+});
+
+it('retains the usual controls outside the preview', () => {
+  renderOrganization('SPELEOLOGY');
+
+  expect(screen.getByTestId('exploration-permission')).toHaveTextContent(
+    'editable'
+  );
+  expect(
+    screen.getByRole('button', { name: 'Edit properties' })
+  ).toBeInTheDocument();
+});
+
+it('shows a failed preview without a retry action', () => {
+  renderWithProviders(
+    <MemoryRouter>
+      <Organization
+        isPreview
+        isLoading={false}
+        error={new Error('Unavailable')}
+        organization={null}
+      />
+    </MemoryRouter>,
+    { messages }
+  );
+
+  expect(screen.getByTestId('fetch-error-state')).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
+});
 
 it.each([
   'EDITION',
