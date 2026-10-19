@@ -1,0 +1,1 @@
+export const ORGANIZATION_MARKER_COLOR = '#d19a00';

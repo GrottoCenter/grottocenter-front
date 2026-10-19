@@ -219,43 +219,49 @@ const DocumentsList = ({
 
   if (!sortedDocuments.length) return emptyMessageComponent ?? null;
 
+  const shouldShowSort = showSort && canSortDocuments(sortedDocuments);
+
   return (
     <>
       {title && <Typography variant="h3">{title}</Typography>}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          columnGap: 2,
-          rowGap: 1,
-          mb: 0.5
-        }}>
-        <Typography variant="h5" component="h3">
-          {formatMessage({ id: 'Document list' })}
-        </Typography>
-        {showSort && canSortDocuments(sortedDocuments) && (
-          // On paper the order is already fixed, and a dropdown is not
-          // operable.
-          <Box
-            sx={{
-              flexShrink: 0,
-              ml: 'auto',
-              '@media print': { display: 'none' }
-            }}>
-            <DocumentSortSelect
-              value={sortOrder}
-              onChange={order => {
-                setSortOrder(order);
-                // The document that was on screen is now somewhere else
-                // entirely; landing back on page 1 is the only honest answer.
-                setPage(1);
-              }}
-            />
-          </Box>
-        )}
-      </Box>
+      {(showBibliographicReferences || shouldShowSort) && (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            columnGap: 2,
+            rowGap: 1,
+            mb: 0.5
+          }}>
+          {showBibliographicReferences && (
+            <Typography variant="h5" component="h3">
+              {formatMessage({ id: 'Document list' })}
+            </Typography>
+          )}
+          {shouldShowSort && (
+            // On paper the order is already fixed, and a dropdown is not
+            // operable.
+            <Box
+              sx={{
+                flexShrink: 0,
+                ml: 'auto',
+                '@media print': { display: 'none' }
+              }}>
+              <DocumentSortSelect
+                value={sortOrder}
+                onChange={order => {
+                  setSortOrder(order);
+                  // The document that was on screen is now somewhere else
+                  // entirely; landing back on page 1 is the only honest answer.
+                  setPage(1);
+                }}
+              />
+            </Box>
+          )}
+        </Box>
+      )}
       <DocumentsGrid dense disablePadding>
         {sortedDocuments.map((document, i) => {
           const isOnPage = i >= startIndex && i < endIndex;

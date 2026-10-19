@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
@@ -77,7 +77,9 @@ it.each(['SPELEOLOGY', 'CAVE_RESCUE', 'RESEARCH', null, undefined, ''])(
     expect(screen.getByAltText('networks')).toBeInTheDocument();
     expect(screen.getByAltText('entrances')).toBeInTheDocument();
     expect(
-      screen.getByTestId('organization-type-label')
+      within(screen.getByTestId('organization-properties')).getByTestId(
+        'organization-type-label'
+      )
     ).not.toBeEmptyDOMElement();
   }
 );

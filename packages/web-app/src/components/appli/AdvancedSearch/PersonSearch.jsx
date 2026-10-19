@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import { DEFAULT_PERSON_TYPE } from '@/utils/personTypes';
 import EntityTypeFilter from './EntityTypeFilter';
 
 import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
@@ -13,18 +15,16 @@ import SearchInput from '../../common/SearchInput';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 import { getStoredRowsPerPage } from '../../common/EntityTable';
 
-const DEFAULT_PERSON_TYPE = 'CAVER';
-
 const TYPE_OPTIONS = [
   { value: null, labelId: 'All' },
   { value: 'CAVER', labelId: 'Cavers' },
   { value: 'AUTHOR', labelId: 'Authors' }
 ];
 
-const PersonSearch = () => {
+const PersonSearch = ({ initialType = DEFAULT_PERSON_TYPE }) => {
   const { formatMessage } = useIntl();
   const [query, setQuery] = useState('');
-  const [personType, setPersonType] = useState(DEFAULT_PERSON_TYPE);
+  const [personType, setPersonType] = useState(initialType);
 
   const startAdvancedsearch = (overrideQuery, overrideType) => {
     const type = overrideType !== undefined ? overrideType : personType;
@@ -75,5 +75,7 @@ const PersonSearch = () => {
     </SearchForm>
   );
 };
+
+PersonSearch.propTypes = { initialType: PropTypes.oneOf(['CAVER', 'AUTHOR']) };
 
 export default PersonSearch;

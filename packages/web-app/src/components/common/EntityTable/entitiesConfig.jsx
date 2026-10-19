@@ -10,6 +10,10 @@ import {
   getOrganizationTypeLabelId,
   isOrganizationType
 } from '@/utils/organizationTypes';
+import PersonType from '@/components/common/Person/PersonType';
+import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
+import IconLabel from '@/components/common/IconLabel';
+import { isPersonType } from '@/utils/personTypes';
 import AppLink from '../AppLink';
 import Translate from '../Translate';
 import DataQualityBadge from '../DataQualityBadge';
@@ -139,18 +143,18 @@ const cellsRender = {
   // iconPath empty. The presenter picks its own MUI icon + type label to keep
   // the column visually consistent with entity rows on either side.
   notificationEntityType: (value, doc) => (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      {doc.notificationType === 'IMPORT_COMPLETE' ? (
-        <PublishIcon fontSize="small" />
-      ) : (
-        <img src={doc.iconPath} alt="icon" style={{ width: '24px' }} />
-      )}
-      <span>
-        <Translate>
-          {doc.notificationType === 'IMPORT_COMPLETE' ? 'import' : value}
-        </Translate>
-      </span>
-    </Box>
+    <IconLabel
+      icon={
+        doc.notificationType === 'IMPORT_COMPLETE' ? (
+          <PublishIcon fontSize="small" />
+        ) : (
+          <img src={doc.iconPath} alt="" width={24} height={24} />
+        )
+      }>
+      <Translate>
+        {doc.notificationType === 'IMPORT_COMPLETE' ? 'import' : value}
+      </Translate>
+    </IconLabel>
   ),
   // Non-entity notifications carry no entity name — surface a translated
   // label so the "Name" column still reads at a glance.
@@ -175,11 +179,24 @@ const cellsRender = {
   // (`authorsOrganization`) — merge both into a single column, same as the
   // "Authors" field on the document details page.
   documentAuthors: (_value, doc) => {
-    const names = [
-      ...(doc.authors ?? []).map(a => a.nickname),
-      ...(doc.authorsOrganization ?? []).map(o => o.name)
+    const authors = [
+      ...(doc.authors ?? []).map(author => ({ author, entityType: 'persons' })),
+      ...(doc.authorsOrganization ?? []).map(author => ({
+        author,
+        entityType: 'organizations'
+      }))
     ];
-    return names.length ? names.join(', ') : null;
+    return authors.length ? (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        {authors.map(({ author, entityType }) => (
+          <DocumentAuthorLabel
+            key={`${entityType}-${author.id ?? author.nickname ?? author.name}`}
+            author={author}
+            entityType={entityType}
+          />
+        ))}
+      </Box>
+    ) : null;
   },
   translate: value => (!value ? null : <Translate>{value}</Translate>),
   ellipsis: value =>
@@ -321,12 +338,10 @@ const organizations = {
       render: type => {
         if (!isOrganizationType(type)) return null;
         return (
-          <Box
-            component="span"
-            sx={{ display: 'inline-flex', alignItems: 'center' }}>
-            <OrganizationIcon organizationType={type} size={20} />
+          <IconLabel
+            icon={<OrganizationIcon organizationType={type} size={20} />}>
             <Translate>{getOrganizationTypeLabelId(type)}</Translate>
-          </Box>
+          </IconLabel>
         );
       }
     },
@@ -369,12 +384,8 @@ const organizations = {
   link: doc => `/ui/organizations/${doc.id}`
 };
 
-const PERSON_TYPE_LABEL = { CAVER: 'Caver', AUTHOR: 'Author' };
-
 const persons = {
-  icon: doc => (
-    <CustomIcon type={doc?.type === 'AUTHOR' ? 'author' : 'caver'} size={16} />
-  ),
+  icon: <CustomIcon type="person" size={16} alt="" />,
   columns: [
     { visible: true, field: 'id', label: 'Id', sortable: false },
     {
@@ -387,16 +398,12 @@ const persons = {
     { visible: true, field: 'name', label: 'First name', sortable: true },
     { visible: true, field: 'surname', label: 'Last name', sortable: true },
     {
-      visible: false,
+      visible: true,
       field: 'type',
       label: 'Type',
       sortable: true,
       render: value =>
-        value && PERSON_TYPE_LABEL[value] ? (
-          <Translate>{PERSON_TYPE_LABEL[value]}</Translate>
-        ) : (
-          value || null
-        )
+        isPersonType(value) ? <PersonType type={value} /> : null
     }
   ],
   link: doc => `/ui/persons/${doc.id}`

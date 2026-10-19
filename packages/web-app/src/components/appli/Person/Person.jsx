@@ -143,20 +143,6 @@ const Person = ({
         }}
       />
     );
-  } else if (isAuthor) {
-    titleAdornment = (
-      <Chip
-        label={formatMessage({ id: 'Author' }).toUpperCase()}
-        variant="outlined"
-        sx={{
-          ml: 2,
-          fontSize: '0.875rem',
-          letterSpacing: 1.5,
-          verticalAlign: 'middle',
-          fontWeight: 700
-        }}
-      />
-    );
   }
 
   const actions = person ? (
@@ -205,7 +191,7 @@ const Person = ({
       {(isLoading || person) && (
         <PageHeader
           title={isLoading ? undefined : title}
-          icon={<CustomIcon type={isAuthor ? 'author' : 'caver'} />}
+          icon={<CustomIcon type="person" />}
           titleAdornment={titleAdornment}
           actions={actions}
         />
@@ -240,7 +226,7 @@ const Person = ({
             entityType={DELETED_ENTITIES.person}
             entityId={person.id}
             entityName={title}
-            entityIconType={isAuthor ? 'author' : 'caver'}
+            entityIconType="person"
             isOpen={isDeleteConfirmationOpen}
             isLoading={false}
             isPermanent

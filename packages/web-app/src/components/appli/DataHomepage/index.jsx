@@ -72,7 +72,7 @@ const DataHomepage = () => {
 
           <Grid size={{ xs: 12, sm: 4 }}>
             {users.data != null && (
-              <StyledLink to="/ui/persons">
+              <StyledLink to="/ui/persons?type=CAVER">
                 <DataCard
                   isColored
                   icon={<CustomIcon type="caver" size={55} />}

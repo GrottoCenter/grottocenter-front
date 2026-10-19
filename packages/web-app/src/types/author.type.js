@@ -4,7 +4,8 @@ const authorType = shape({
   id: number.isRequired,
   nickname: string.isRequired,
   name: string,
-  surname: string
+  surname: string,
+  type: string
 });
 
 export default authorType;

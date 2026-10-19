@@ -53,8 +53,24 @@ it('searches the explicit type immediately and clears back to All', () => {
   );
 });
 
-it('keeps the persons selector default and shared pressed-state behavior', () => {
-  renderSearch(<PersonSearch />);
+it('defaults persons to Cavers and clears an explicit author filter back to Cavers', () => {
+  const { container } = renderSearch(<PersonSearch />);
+  expect(screen.getByRole('button', { name: 'Cavers' })).toHaveAttribute(
+    'aria-pressed',
+    'true'
+  );
+  fireEvent.submit(container.querySelector('form'));
+  expect(startAdvancedSearch).toHaveBeenLastCalledWith(
+    expect.objectContaining({ filter: { type: 'CAVER' } })
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Authors' }));
+  expect(startAdvancedSearch).toHaveBeenLastCalledWith(
+    expect.objectContaining({ filter: { type: 'AUTHOR' } })
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Clear all' }));
+  expect(startAdvancedSearch).toHaveBeenLastCalledWith(
+    expect.objectContaining({ filter: { type: 'CAVER' } })
+  );
   expect(screen.getByRole('button', { name: 'Cavers' })).toHaveAttribute(
     'aria-pressed',
     'true'

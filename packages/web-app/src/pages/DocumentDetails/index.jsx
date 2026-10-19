@@ -13,8 +13,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import LinkIcon from '@mui/icons-material/Link';
 import { NavigateNext } from '@mui/icons-material';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
-import OrganizationIcon from '@/components/common/OrganizationIcon';
-import { getOrganizationIconType } from '@/utils/organizationIcons';
+import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
 import { LicenseBadge } from '@/components/common/LicenseTag';
 import {
   DEFAULT_COLLECTION_SORT_ORDER,
@@ -105,7 +104,7 @@ const InternalTextLink = ({ value, url, icon }) => (
 );
 
 InternalTextLink.propTypes = {
-  value: PropTypes.string.isRequired,
+  value: PropTypes.node.isRequired,
   url: PropTypes.string.isRequired,
   icon: PropTypes.node
 };
@@ -272,14 +271,14 @@ const Document = ({
     const items = [
       ...(documentData.authors ?? []).map(a => ({
         id: `caver-${a.id}`,
-        name: a.nickname,
-        iconType: 'caver',
+        author: a,
+        entityType: 'persons',
         url: `/ui/persons/${a.id}`
       })),
       ...(documentData.authorsOrganization ?? []).map(a => ({
         id: `org-${a.id}`,
-        name: a.name,
-        iconType: getOrganizationIconType(a.type),
+        author: a,
+        entityType: 'organizations',
         url: `/ui/organizations/${a.id}`
       }))
     ];
@@ -288,8 +287,9 @@ const Document = ({
       const entry = (
         <InternalTextLink
           key={a.id}
-          icon={<CustomIcon type={a.iconType} size={18} />}
-          value={a.name}
+          value={
+            <DocumentAuthorLabel author={a.author} entityType={a.entityType} />
+          }
           url={a.url}
         />
       );
@@ -767,9 +767,10 @@ const Document = ({
                             documentData.editor ? (
                               <InternalTextLink
                                 icon={
-                                  <OrganizationIcon
-                                    organizationType={documentData.editor.type}
+                                  <CustomIcon
+                                    type="organization"
                                     size={18}
+                                    alt=""
                                   />
                                 }
                                 value={documentData.editor.name}
@@ -785,9 +786,10 @@ const Document = ({
                             documentData.library ? (
                               <InternalTextLink
                                 icon={
-                                  <OrganizationIcon
-                                    organizationType={documentData.library.type}
+                                  <CustomIcon
+                                    type="organization"
                                     size={18}
+                                    alt=""
                                   />
                                 }
                                 value={documentData.library.name}

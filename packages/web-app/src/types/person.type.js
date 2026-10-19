@@ -9,6 +9,7 @@ export const PersonPropTypes = PropTypes.shape({
   name: PropTypes.string,
   surname: PropTypes.string,
   nickname: PropTypes.string,
+  type: PropTypes.string,
   language: PropTypes.string,
   groups: PropTypes.arrayOf(PropTypes.shape({})),
   organizations: PropTypes.arrayOf(OrganizationSimplePropTypes),

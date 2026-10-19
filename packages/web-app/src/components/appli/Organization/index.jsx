@@ -15,11 +15,7 @@ import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShareIcon from '@mui/icons-material/Share';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
-import OrganizationIcon from '@/components/common/OrganizationIcon';
-import {
-  canOrganizationExplore,
-  getOrganizationTypeLabelId
-} from '@/utils/organizationTypes';
+import { canOrganizationExplore } from '@/utils/organizationTypes';
 import AppLink from '../../common/AppLink';
 import StandardDialog from '../../common/StandardDialog';
 import PageContainer from '../../common/Layouts/PageContainer';
@@ -211,7 +207,12 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
     />
   ) : null;
 
-  const subheader = organization ? (
+  const hasSubheader =
+    organization &&
+    (organization.country ||
+      organization.yearBirth ||
+      organization.isOfficialPartner);
+  const subheader = hasSubheader ? (
     <Stack
       direction="row"
       divider={
@@ -255,15 +256,6 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
           </Typography>
         </Box>
       )}
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <OrganizationIcon organizationType={organization.type} size={20} />
-        <Typography
-          component="span"
-          variant="body2"
-          data-testid="organization-type-label">
-          {formatMessage({ id: getOrganizationTypeLabelId(organization.type) })}
-        </Typography>
-      </Box>
     </Stack>
   ) : null;
 
@@ -347,7 +339,7 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
           {hasExploration && (
             <ScrollableContent
               anchorId="members"
-              title={formatMessage({ id: 'Members or former members' })}
+              title={formatMessage({ id: 'Members on Grottocenter' })}
               defaultExpanded={(organization.cavers ?? []).length > 0}
               count={(organization.cavers ?? []).length}
               icon={

@@ -13,7 +13,7 @@ const ENTITY_ICON_TYPE = {
   documents: 'bibliography',
   massifs: 'massif',
   organizations: 'organization',
-  persons: 'caver'
+  persons: 'person'
 };
 
 const EntitySearchPage = ({
