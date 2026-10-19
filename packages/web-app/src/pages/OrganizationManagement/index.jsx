@@ -1,29 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient
+} from '@tanstack/react-query';
 import { useIntl } from 'react-intl';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Button,
+  Card,
   CircularProgress,
-  IconButton,
   MenuItem,
   Stack,
   TextField,
-  Tooltip,
   Typography
 } from '@mui/material';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import CallMergeIcon from '@mui/icons-material/CallMerge';
+import BusinessIcon from '@mui/icons-material/Business';
+import SaveIcon from '@mui/icons-material/Save';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
 import { apiGet, apiPost } from '@/api/client';
 import { organizationManagementKeys } from '@/api/queryKeys';
 import { advancedSearchUrl, getOrganizationUrl } from '@/conf/apiRoutes';
+import { STALE } from '@/conf/queryClient';
 import Organization from '@/components/appli/Organization';
 import StandardDialog from '@/components/common/StandardDialog';
-import Layout from '@/components/common/Layouts/Fixed/FixedContent';
+import OrganizationIcon from '@/components/common/OrganizationIcon';
+import CustomIcon from '@/components/common/CustomIcon';
+import PageContainer from '@/components/common/Layouts/PageContainer';
+import PageHeader from '@/components/common/Layouts/PageHeader';
+import PageTabs from '@/components/common/Layouts/PageTabs';
 import FormSubmissionError from '@/components/common/FormSubmissionError';
 import {
   useOnlineStatus,
@@ -36,18 +46,25 @@ import {
   ORGANIZATION_TYPE_VALUES
 } from '@/utils/organizationTypes';
 import { useNotification } from '@/hooks/useNotification';
+import DuplicatesSection from './DuplicatesSection';
+import OrganizationActionButtons from './OrganizationActionButtons';
 
 const PAGE_SIZE = 100;
+const CLASSIFICATION_BATCH_SIZE = 50;
 
-const getOrganizationsPage = ({ pageParam }) =>
-  apiPost(advancedSearchUrl, {
-    entity: 'organizations',
-    query: '',
-    filter: {},
-    matchAllFields: true,
-    page: pageParam,
-    size: PAGE_SIZE
-  });
+const getOrganizationsPage = ({ pageParam, signal }) =>
+  apiPost(
+    advancedSearchUrl,
+    {
+      entity: 'organizations',
+      query: '',
+      filter: {},
+      matchAllFields: true,
+      page: pageParam,
+      size: PAGE_SIZE
+    },
+    { signal }
+  );
 
 const getNextPage = (lastPage, pages) => {
   const loaded = pages.reduce((count, page) => count + page.results.length, 0);
@@ -117,10 +134,6 @@ const OrganizationRow = ({
 }) => {
   const { formatMessage } = useIntl();
   const [type, setType] = useState('');
-  const viewLabel = formatMessage(
-    { id: 'View organization {name}' },
-    { name: organization.name }
-  );
 
   return (
     <Box
@@ -137,13 +150,10 @@ const OrganizationRow = ({
         borderColor: 'divider',
         py: 1
       }}>
-      <Tooltip title={viewLabel}>
-        <IconButton
-          aria-label={viewLabel}
-          onClick={() => onPreview(organization.id)}>
-          <VisibilityIcon />
-        </IconButton>
-      </Tooltip>
+      <OrganizationActionButtons
+        organization={organization}
+        onPreview={onPreview}
+      />
       <Typography sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
         {organization.name}
       </Typography>
@@ -180,20 +190,22 @@ const OrganizationRow = ({
           </MenuItem>
           {ORGANIZATION_TYPE_VALUES.map(value => (
             <MenuItem key={value} value={value}>
-              {formatMessage({ id: getOrganizationTypeLabelId(value) })}
+              <Box
+                component="span"
+                sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                <OrganizationIcon organizationType={value} size={24} />
+                {formatMessage({ id: getOrganizationTypeLabelId(value) })}
+              </Box>
             </MenuItem>
           ))}
         </TextField>
         <Button
           size="small"
           variant="contained"
+          startIcon={isSaving ? <CircularProgress size={18} /> : <SaveIcon />}
           disabled={!type || isSaving || !isOnline}
           onClick={() => onSave(organization.id, type)}>
-          {isSaving ? (
-            <CircularProgress size={20} />
-          ) : (
-            formatMessage({ id: 'Save' })
-          )}
+          {formatMessage({ id: 'Save' })}
         </Button>
       </Stack>
       {error && (
@@ -224,15 +236,39 @@ OrganizationRow.propTypes = {
 
 const OrganizationManagement = () => {
   const { formatMessage } = useIntl();
+  const [searchParams] = useSearchParams();
+  const isClassifyTab = searchParams.get('tab') !== 'duplicates';
+  const tabs = useMemo(
+    () => [
+      {
+        id: 'classify',
+        label: formatMessage({ id: 'Organizations to classify' }),
+        icon: <CustomIcon type="organization" size={20} />
+      },
+      {
+        id: 'duplicates',
+        label: formatMessage({ id: 'duplicates.heading' }),
+        icon: <CallMergeIcon />
+      }
+    ],
+    [formatMessage]
+  );
   const navigate = useNavigate();
   const { isAuth, isModerator } = usePermissions();
   const isOnline = useOnlineStatus();
   const { onSuccess } = useNotification();
+  const queryClient = useQueryClient();
   const update = useUpdateOrganization();
   const [previewId, setPreviewId] = useState(null);
   const [savingId, setSavingId] = useState(null);
   const [saveError, setSaveError] = useState(null);
   const [savedIds, setSavedIds] = useState(() => new Set());
+  const [deletedIds, setDeletedIds] = useState(() => new Set());
+  const [visibleLimit, setVisibleLimit] = useState(CLASSIFICATION_BATCH_SIZE);
+  const [scanStarted, setScanStarted] = useState(false);
+  const [scanCompleted, setScanCompleted] = useState(false);
+  const [scanProgress, setScanProgress] = useState({ loaded: 0, total: 0 });
+  const scanRun = useRef(0);
   const canAccess = isAuth && isModerator;
   const {
     data,
@@ -248,27 +284,116 @@ const OrganizationManagement = () => {
     queryFn: getOrganizationsPage,
     initialPageParam: 1,
     getNextPageParam: getNextPage,
-    enabled: canAccess,
+    enabled: canAccess && isClassifyTab,
+    staleTime: STALE.VOLATILE,
     gcTime: 60 * 1000
+  });
+  const scan = useQuery({
+    queryKey: organizationManagementKeys.duplicates,
+    enabled: false,
+    retry: false,
+    gcTime: 60 * 1000,
+    queryFn: async ({ signal }) => {
+      const cachedPages =
+        queryClient.getQueryData(organizationManagementKeys.unclassified)
+          ?.pages ?? [];
+      const allOrganizations = cachedPages.flatMap(page => page.results);
+      let scanned = allOrganizations.length;
+      let total = cachedPages[0]?.totalResults ?? 0;
+      let pageNumber = cachedPages.length + 1;
+      setScanProgress({ loaded: scanned, total });
+      while (pageNumber === 1 || scanned < total) {
+        signal.throwIfAborted();
+        // Requests are sequential so cancellation stops before the next page.
+        // eslint-disable-next-line no-await-in-loop
+        const page = await getOrganizationsPage({
+          pageParam: pageNumber,
+          signal
+        });
+        signal.throwIfAborted();
+        total = page.totalResults;
+        if (!page.results.length && scanned < total) {
+          throw new Error(formatMessage({ id: 'duplicates.incompleteScan' }));
+        }
+        allOrganizations.push(...page.results);
+        scanned += page.results.length;
+        setScanProgress({ loaded: scanned, total });
+        pageNumber += 1;
+      }
+      return allOrganizations;
+    }
   });
 
   useEffect(() => {
     if (!canAccess) navigate('/ui/dashboard', { replace: true });
   }, [canAccess, navigate]);
 
-  useEffect(() => {
-    if (hasNextPage && !isFetching && !isError) fetchNextPage();
-  }, [hasNextPage, isFetching, isError, fetchNextPage]);
-
   const pages = data?.pages ?? [];
   const loaded = pages.reduce((count, page) => count + page.results.length, 0);
   const total = pages[0]?.totalResults ?? 0;
-  const unclassified = pages
+  const foundUnclassified = pages
     .flatMap(page => page.results)
+    .filter(organization => organization.type == null);
+  const unclassified = foundUnclassified
     .filter(
       organization =>
-        organization.type == null && !savedIds.has(String(organization.id))
-    );
+        !savedIds.has(String(organization.id)) &&
+        !deletedIds.has(String(organization.id))
+    )
+    .slice(0, visibleLimit);
+
+  useEffect(() => {
+    if (
+      canAccess &&
+      isClassifyTab &&
+      foundUnclassified.length < visibleLimit &&
+      hasNextPage &&
+      !isFetching &&
+      !isError
+    ) {
+      fetchNextPage();
+    }
+  }, [
+    canAccess,
+    isClassifyTab,
+    foundUnclassified.length,
+    visibleLimit,
+    hasNextPage,
+    isFetching,
+    isError,
+    fetchNextPage
+  ]);
+
+  useEffect(
+    () => () => {
+      scanRun.current += 1;
+      queryClient.cancelQueries({
+        queryKey: organizationManagementKeys.duplicates,
+        exact: true
+      });
+    },
+    [queryClient]
+  );
+
+  const handleAnalyze = async () => {
+    if (scan.isFetching || !isOnline) return;
+    const currentRun = ++scanRun.current;
+    setScanStarted(true);
+    setScanCompleted(false);
+    setScanProgress({ loaded: 0, total: 0 });
+    const result = await scan.refetch();
+    if (currentRun === scanRun.current && result.isSuccess) {
+      setScanCompleted(true);
+    }
+  };
+
+  const handleCancelScan = () => {
+    scanRun.current += 1;
+    queryClient.cancelQueries({
+      queryKey: organizationManagementKeys.duplicates,
+      exact: true
+    });
+  };
 
   const handleSave = async (id, type) => {
     if (!isOnline || savingId != null) return;
@@ -294,10 +419,13 @@ const OrganizationManagement = () => {
   if (!canAccess) return null;
 
   return (
-    <Layout
-      title={formatMessage({ id: 'Organization management' })}
-      content={
-        <Box sx={{ py: 2 }}>
+    <PageContainer>
+      <PageHeader
+        title={formatMessage({ id: 'Organization management' })}
+        icon={<BusinessIcon />}
+      />
+      <PageTabs tabs={tabs}>
+        <Card sx={{ p: 2 }}>
           <Typography variant="h2" sx={{ mb: 1 }}>
             {formatMessage({ id: 'Organizations to classify' })}
           </Typography>
@@ -359,18 +487,58 @@ const OrganizationManagement = () => {
               error={saveError?.id === organization.id ? saveError.error : null}
             />
           ))}
-          {hasNextPage && !isError && (
-            <CircularProgress size={24} sx={{ mt: 2 }} />
-          )}
-          {previewId != null && (
-            <OrganizationPreview
-              id={previewId}
-              onClose={() => setPreviewId(null)}
-            />
-          )}
-        </Box>
-      }
-    />
+          {foundUnclassified.length < visibleLimit &&
+            hasNextPage &&
+            !isError && <CircularProgress size={24} sx={{ mt: 2 }} />}
+          {!isError &&
+            (hasNextPage || foundUnclassified.length > visibleLimit) && (
+              <Button
+                variant="outlined"
+                fullWidth
+                sx={{ mt: 2 }}
+                disabled={
+                  isFetching ||
+                  !isOnline ||
+                  foundUnclassified.length < visibleLimit
+                }
+                onClick={() =>
+                  setVisibleLimit(limit => limit + CLASSIFICATION_BATCH_SIZE)
+                }>
+                {formatMessage({ id: 'Load more' })}
+              </Button>
+            )}
+        </Card>
+        <Card sx={{ p: 2 }}>
+          <DuplicatesSection
+            organizations={
+              scanCompleted
+                ? scan.data.filter(
+                    organization => !deletedIds.has(String(organization.id))
+                  )
+                : []
+            }
+            isLoading={scan.isFetching}
+            hasStarted={scanStarted}
+            hasCompleted={scanCompleted}
+            progress={scanProgress}
+            error={scanStarted && !scan.isFetching ? scan.error : null}
+            onAnalyze={handleAnalyze}
+            onCancel={handleCancelScan}
+            isOnline={isOnline}
+            onPreview={setPreviewId}
+            onDeleted={id =>
+              setDeletedIds(previous => new Set(previous).add(String(id)))
+            }
+          />
+        </Card>
+      </PageTabs>
+      {previewId != null && (
+        <OrganizationPreview
+          id={previewId}
+          onClose={() => setPreviewId(null)}
+        />
+      )}
+    </PageContainer>
   );
 };
 
