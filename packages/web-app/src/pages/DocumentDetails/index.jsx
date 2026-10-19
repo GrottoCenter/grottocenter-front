@@ -21,6 +21,10 @@ import {
 } from '@/utils/documentSort';
 import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
 import { formatDocumentReference } from '@/utils/documentReference';
+import {
+  getDocumentModerationStatus,
+  getDocumentSubmissionKind
+} from '@/utils/documentModeration';
 import LinkedEntityCards from '@/components/common/entitiesList/LinkedEntityCards';
 import SearchEntranceForm from '@/components/appli/SearchEntranceForm';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
@@ -404,12 +408,15 @@ const Document = ({
     ? `/ui/documents/${documentData.id}/snapshots`
     : null;
 
-  const needsValidation =
+  const moderationStatus = getDocumentModerationStatus(documentData);
+  const isRejected = moderationStatus === 'rejected';
+  const shouldShowModerationNotice =
     !hideActions &&
     !isLoading &&
     documentData &&
+    !documentData.isDeleted &&
     permissions.isAuth &&
-    !documentData?.isValidated;
+    (moderationStatus === 'pending' || isRejected);
 
   const ParentTypeIcon =
     (documentData?.parent?.type &&
@@ -625,12 +632,51 @@ const Document = ({
                 <>
                   <HalfSplitContainer>
                     <MainSummary>
-                      {needsValidation && (
+                      {shouldShowModerationNotice && (
                         <Alert
-                          severity="warning"
-                          content={formatMessage({
-                            id: 'A moderator needs to validate the last modification before being able to edit the document again.'
-                          })}
+                          data-testid="document-moderation-notice"
+                          severity={isRejected ? 'error' : 'warning'}
+                          title={
+                            isRejected
+                              ? formatMessage({
+                                  id: 'documentModeration.rejected'
+                                })
+                              : undefined
+                          }
+                          content={
+                            isRejected ? (
+                              <Box sx={{ overflowWrap: 'anywhere' }}>
+                                {documentData.validatorComment?.trim() && (
+                                  <Typography sx={{ whiteSpace: 'pre-wrap' }}>
+                                    {formatMessage(
+                                      {
+                                        id: 'documentModeration.rejectionReason'
+                                      },
+                                      { comment: documentData.validatorComment }
+                                    )}
+                                  </Typography>
+                                )}
+                                <Typography>
+                                  {formatMessage(
+                                    { id: 'documentModeration.decisionDate' },
+                                    {
+                                      date: new Date(
+                                        documentData.dateValidation
+                                      )
+                                    }
+                                  )}
+                                </Typography>
+                              </Box>
+                            ) : (
+                              formatMessage({
+                                id:
+                                  getDocumentSubmissionKind(documentData) ===
+                                  'modification'
+                                    ? 'A moderator needs to validate the last modification before being able to edit the document again.'
+                                    : 'documentModeration.pendingCreation'
+                              })
+                            )
+                          }
                         />
                       )}
                       <SummaryText>{documentData.description}</SummaryText>

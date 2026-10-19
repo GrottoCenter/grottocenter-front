@@ -14,9 +14,13 @@ import {
 // Moderator batch validate/reject on the pending-documents queue. Refreshes
 // both the pending count badge (in AppBar + Dashboard) and any mounted
 // document list so the processed rows disappear from the queue.
-export const useProcessDocuments = () => {
+export const useProcessDocuments = ({ onSuccess, onError } = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
+    retry: false,
+    networkMode: 'always',
+    meta: { skipErrorNotification: true },
+    onError,
     mutationFn: ({ ids, isValidated, comment }) => {
       const documents = (ids ?? []).map(id => ({
         id,
@@ -25,7 +29,7 @@ export const useProcessDocuments = () => {
       }));
       return apiPut(processDocumentIdsUrl, { documents });
     },
-    onSuccess: () => {
+    onSuccess: (results, variables) => {
       queryClient.invalidateQueries({
         queryKey: countKeys.pendingDocuments()
       });
@@ -38,6 +42,7 @@ export const useProcessDocuments = () => {
       queryClient.invalidateQueries({ queryKey: massifKeys.all });
       queryClient.invalidateQueries({ queryKey: organizationKeys.all });
       queryClient.invalidateQueries({ queryKey: personKeys.all });
+      onSuccess?.(results, variables);
     }
   });
 };

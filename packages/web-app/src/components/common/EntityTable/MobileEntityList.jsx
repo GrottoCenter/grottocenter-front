@@ -270,6 +270,7 @@ const MobileEntityList = ({
   const selectedIds = controlledSelectedIds ?? internalSelectedIds;
   const isSelectionControlled = controlledSelectedIds !== undefined;
   const isAppending = useRef(false);
+  const lastRowsRef = useRef(rows);
   const hasInteracted = useRef(false);
   // Keep callback changes from retriggering the internal selection effect.
   const onSelectedRef = useRef(onSelected);
@@ -285,9 +286,17 @@ const MobileEntityList = ({
     }
     hasInteracted.current = false;
     isAppending.current = false;
+    // A new query replaces accumulated cards even if its rows are shared.
+    lastRowsRef.current = undefined;
   }, [isNewQuery, isSelectionControlled]);
 
   useEffect(() => {
+    // A page change can clear rows while the next page loads. Keep the append
+    // pending until its data arrives so earlier cards remain in the list.
+    if (isLoading) return;
+    // Background refetches can keep the same rows through structural sharing.
+    if (!isAppending.current && rows === lastRowsRef.current) return;
+    lastRowsRef.current = rows;
     if (isAppending.current) {
       setAllRows(prev => {
         const next = [...prev, ...(rows ?? [])];
@@ -299,7 +308,7 @@ const MobileEntityList = ({
       setAllRows(rows ?? []);
     }
     isAppending.current = false;
-  }, [rows]);
+  }, [rows, isLoading, isNewQuery]);
 
   // Notify parent only when selection actually changes, not on mount.
   // Uncontrolled path only: controlled mode notifies through handleToggle and

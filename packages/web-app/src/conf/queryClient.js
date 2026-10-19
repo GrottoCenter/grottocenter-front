@@ -62,6 +62,7 @@ const notifyError = (error, meta) => {
     });
     return;
   }
+  if (meta?.skipErrorNotification) return;
   const fallback = translate(
     'unexpected error',
     'An unexpected error occurred'

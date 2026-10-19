@@ -4,6 +4,20 @@ import {
 } from '@/components/appli/EntitiesForm/Document/formElements/AddFileForm/FileHelpers';
 import { getSubjectCode } from './subjectHelpers';
 
+// Lists can omit the decision date. Only an explicit null establishes that
+// moderation is pending; an absent or invalid date cannot establish a refusal.
+export const getDocumentModerationStatus = document => {
+  if (document?.isValidated === true) return 'validated';
+  if (document?.isValidated !== false) return 'unknown';
+  if (document.dateValidation === null) return 'pending';
+  if (
+    typeof document.dateValidation === 'string' &&
+    !Number.isNaN(Date.parse(document.dateValidation))
+  )
+    return 'rejected';
+  return 'unknown';
+};
+
 // UI convention: a document is new until its first moderation decision.
 // Corrections before that decision remain a creation, reviewed in full.
 // The API also sets validator on refusal, so a refused document submitted

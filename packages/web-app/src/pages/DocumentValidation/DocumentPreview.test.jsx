@@ -1,4 +1,4 @@
-import { screen, within, fireEvent } from '@testing-library/react';
+import { act, screen, within, fireEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 import { useDocument, useProcessDocuments } from '@/hooks';
@@ -10,7 +10,11 @@ vi.mock('@/hooks', () => ({
   useDocument: vi.fn(),
   usePermissions: () => ({ isModerator: true }),
   useProcessDocuments: vi.fn(),
-  useNotification: () => ({ onSuccess: vi.fn(), onError: vi.fn() }),
+  useNotification: () => ({
+    onSuccess: vi.fn(),
+    onWarning: vi.fn(),
+    onError: vi.fn()
+  }),
   useOnlineStatus: () => true
 }));
 // Keep the moderation UI real; the public detail page has its own integration
@@ -81,7 +85,8 @@ describe('DocumentPreview', () => {
     expect(mutate).toHaveBeenCalledWith({
       ids: [7],
       isValidated: true,
-      comment: ''
+      comment: '',
+      titles: { 7: 'Old title' }
     });
   });
 
@@ -104,7 +109,8 @@ describe('DocumentPreview', () => {
     expect(mutate).toHaveBeenCalledWith({
       ids: [7],
       isValidated: false,
-      comment: 'Wrong author'
+      comment: 'Wrong author',
+      titles: { 7: 'Old title' }
     });
   });
 
@@ -191,5 +197,67 @@ describe('DocumentPreview', () => {
     expect(
       screen.queryByTestId('pending-files-edit-notice')
     ).not.toBeInTheDocument();
+  });
+
+  it('delegates an error result without closing the preview or exposing technical details', () => {
+    const onProcessed = vi.fn();
+    renderWithProviders(
+      <ThemeProvider theme={createTheme()}>
+        <DocumentPreview
+          id={7}
+          onClose={vi.fn()}
+          onEdit={onEdit}
+          onProcessed={onProcessed}
+          processBatches={[
+            {
+              key: 0,
+              results: [
+                { id: 8, status: 'indeterminate', reason: null },
+                {
+                  id: 7,
+                  status: 'error',
+                  reason: 'Internal server error'
+                }
+              ]
+            }
+          ]}
+        />
+      </ThemeProvider>,
+      { messages }
+    );
+    expect(
+      screen.getByTestId('document-process-result-7')
+    ).not.toHaveTextContent('Internal server error');
+    expect(
+      screen.queryByTestId('document-process-result-8')
+    ).not.toBeInTheDocument();
+    expect(screen.getByTestId('document-process-result-7')).toHaveTextContent(
+      '1 document failed'
+    );
+    fireEvent.click(screen.getByTestId('preview-validate'));
+    fireEvent.click(screen.getByTestId('confirm-process-documents'));
+    const variables = mutate.mock.calls[0][0];
+    act(() =>
+      useProcessDocuments.mock.calls
+        .at(-1)[0]
+        .onSuccess(
+          [{ id: 7, status: 'error', reason: 'Internal server error' }],
+          variables
+        )
+    );
+    expect(onProcessed).toHaveBeenCalledWith(
+      [
+        {
+          id: 7,
+          status: 'error',
+          reason: 'Internal server error',
+          title: 'Old title'
+        }
+      ],
+      variables
+    );
+    expect(
+      screen.getByTestId('document-moderation-preview')
+    ).toBeInTheDocument();
   });
 });

@@ -65,6 +65,7 @@ const document = {
   id: 123,
   title: 'Cave survey',
   type: 'Article',
+  dateInscription: '2026-01-01T00:00:00Z',
   isValidated: true,
   isDeleted: false,
   authors: [],
@@ -178,22 +179,129 @@ it.each([
   }
 );
 
-it.each([false, true])(
-  'shows the pending validation notice only when editing actions are shown (hidden: %s)',
-  hideActions => {
+it.each([
+  [null, 'This document is awaiting validation by a moderator.'],
+  [
+    { id: 9, nickname: 'Moderator' },
+    messages[
+      'A moderator needs to validate the last modification before being able to edit the document again.'
+    ]
+  ]
+])(
+  'shows the pending notice for the submission kind (%j)',
+  (validator, text) => {
     useDocument.mockReturnValue({
-      data: { ...document, isValidated: false },
+      data: {
+        ...document,
+        isValidated: false,
+        dateValidation: null,
+        validator
+      },
       isPending: false,
       refetch: vi.fn()
     });
-    renderPage(hideActions);
-    const notice = screen.queryByText(
-      messages[
-        'A moderator needs to validate the last modification before being able to edit the document again.'
-      ]
-    );
-    if (hideActions) expect(notice).not.toBeInTheDocument();
-    else expect(notice).toBeVisible();
+    renderPage();
+    expect(screen.getByRole('alert')).toHaveTextContent(text);
+    expect(
+      screen.queryByText('This document has been rejected.')
+    ).not.toBeInTheDocument();
+  }
+);
+
+it('shows the refusal, plain-text reason and localized decision date', () => {
+  useDocument.mockReturnValue({
+    data: {
+      ...document,
+      isValidated: false,
+      dateValidation: '2026-10-18T12:00:00Z',
+      validatorComment: '<b>Wrong entrance</b>\nPlease check the location.'
+    },
+    isPending: false,
+    refetch: vi.fn()
+  });
+  renderPage();
+  const notice = screen.getByRole('alert');
+  expect(notice).toHaveTextContent('This document has been rejected.');
+  expect(notice).toHaveTextContent('Reason: <b>Wrong entrance</b>');
+  expect(notice).toHaveTextContent('Decision on October 18, 2026');
+  expect(notice.querySelector('b')).toBeNull();
+  expect(notice).not.toHaveTextContent('awaiting validation');
+  expect(notice).not.toHaveTextContent('A moderator needs to validate');
+});
+
+it('shows a refusal without an empty reason when no comment is available', () => {
+  useDocument.mockReturnValue({
+    data: {
+      ...document,
+      isValidated: false,
+      dateValidation: '2026-10-18T12:00:00Z',
+      validatorComment: '   '
+    },
+    isPending: false,
+    refetch: vi.fn()
+  });
+  renderPage();
+  expect(screen.getByRole('alert')).toHaveTextContent(
+    'This document has been rejected.'
+  );
+  expect(screen.getByRole('alert')).not.toHaveTextContent('Reason:');
+});
+
+it.each([
+  [
+    'accepted version after a refused modification',
+    {
+      isValidated: true,
+      dateValidation: '2026-10-18T12:00:00Z',
+      validatorComment: 'No'
+    }
+  ],
+  ['missing decision date', { isValidated: false }],
+  ['invalid decision date', { isValidated: false, dateValidation: 'invalid' }],
+  ['missing validation flag', { isValidated: undefined, dateValidation: null }],
+  [
+    'deleted document',
+    { isValidated: false, dateValidation: null, isDeleted: true }
+  ]
+])('does not invent a pending or refused state for %s', (_label, state) => {
+  useDocument.mockReturnValue({
+    data: { ...document, ...state },
+    isPending: false,
+    refetch: vi.fn()
+  });
+  renderPage();
+  expect(
+    screen.queryByTestId('document-moderation-notice')
+  ).not.toBeInTheDocument();
+  expect(
+    screen.queryByText(/A moderator needs to validate/)
+  ).not.toBeInTheDocument();
+});
+
+it.each([null, '2026-10-18T12:00:00Z'])(
+  'hides the moderation notice when actions are hidden (decision: %s)',
+  dateValidation => {
+    useDocument.mockReturnValue({
+      data: { ...document, isValidated: false, dateValidation },
+      isPending: false,
+      refetch: vi.fn()
+    });
+    renderPage(true);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  }
+);
+
+it.each([null, '2026-10-18T12:00:00Z'])(
+  'hides the moderation notice for anonymous readers (decision: %s)',
+  dateValidation => {
+    usePermissions.mockReturnValue({ isAuth: false, isModerator: false });
+    useDocument.mockReturnValue({
+      data: { ...document, isValidated: false, dateValidation },
+      isPending: false,
+      refetch: vi.fn()
+    });
+    renderPage();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   }
 );
 
