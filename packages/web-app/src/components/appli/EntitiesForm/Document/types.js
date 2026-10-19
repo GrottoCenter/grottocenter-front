@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { OrganizationSimplePropTypes } from '@/types/organization.type';
 
 export const subjectType = PropTypes.shape({
   id: PropTypes.string,
@@ -11,11 +12,7 @@ export const simpleCaverType = PropTypes.shape({
   nickname: PropTypes.string
 });
 
-export const simpleOrganisationType = PropTypes.shape({
-  id: PropTypes.number,
-  name: PropTypes.string,
-  isDeleted: PropTypes.bool
-});
+export const simpleOrganisationType = OrganizationSimplePropTypes;
 
 export const iso3166Type = PropTypes.shape({
   iso: PropTypes.string,

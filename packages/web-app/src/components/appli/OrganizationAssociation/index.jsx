@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { Skeleton, Box, Button, Typography } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
+import { OrganizationSimplePropTypes } from '@/types/organization.type';
 import {
   usePermissions,
   useNotification,
@@ -41,7 +42,8 @@ const useAssociationMutations = (entityType, parentEntityId, entityId) => {
       makeSetArgs: orgData => ({
         countryId: entityId,
         organizationId: orgData.id,
-        organizationName: orgData.name
+        organizationName: orgData.name,
+        organizationType: orgData.type
       }),
       makeRemoveArgs: orgId => ({
         countryId: entityId,
@@ -57,7 +59,8 @@ const useAssociationMutations = (entityType, parentEntityId, entityId) => {
         countryId: parentEntityId,
         regionId: entityId,
         organizationId: orgData.id,
-        organizationName: orgData.name
+        organizationName: orgData.name,
+        organizationType: orgData.type
       }),
       makeRemoveArgs: orgId => ({
         countryId: parentEntityId,
@@ -72,7 +75,8 @@ const useAssociationMutations = (entityType, parentEntityId, entityId) => {
     makeSetArgs: orgData => ({
       massifId: entityId,
       organizationId: orgData.id,
-      organizationName: orgData.name
+      organizationName: orgData.name,
+      organizationType: orgData.type
     }),
     makeRemoveArgs: orgId => ({
       massifId: entityId,
@@ -112,14 +116,8 @@ const AssociationSection = ({
   const error = setMutation.error ?? removeMutation.error;
 
   const handleSet = orgData => {
-    setMutation.mutate(makeSetArgs(orgData), {
-      onError: err =>
-        onError(
-          err?.body?.message ||
-            err?.message ||
-            formatMessage({ id: 'An error occurred while saving.' })
-        )
-    });
+    // AssociationForm renders the structured error beside the preserved fields.
+    setMutation.mutate(makeSetArgs(orgData));
   };
 
   const handleRemove = () => {
@@ -240,14 +238,7 @@ const AssociationSection = ({
 };
 
 AssociationSection.propTypes = {
-  organizations: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      name: PropTypes.string.isRequired,
-      isDeleted: PropTypes.bool,
-      redirectTo: PropTypes.string
-    })
-  ),
+  organizations: PropTypes.arrayOf(OrganizationSimplePropTypes),
   entityType: PropTypes.oneOf(['country', 'region', 'massif']).isRequired,
   entityId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     .isRequired,

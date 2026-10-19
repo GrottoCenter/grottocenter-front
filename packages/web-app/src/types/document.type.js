@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 
 import authorType from './author.type';
 import idNameType from './idName.type';
+import { OrganizationSimplePropTypes } from './organization.type';
 
 export const ThumbnailsPropTypes = PropTypes.shape({
   small: PropTypes.string,
@@ -37,11 +38,6 @@ const CitationParentPropTypes = PropTypes.shape({
   })
 });
 
-const CitationOrganizationPropTypes = PropTypes.shape({
-  id: PropTypes.number.isRequired,
-  name: PropTypes.string
-});
-
 // The shape of a document as it comes attached to something else: the children
 // of a collection (GET /documents/{id}/children) and the documents of an
 // entrance, massif, organization or person. Children expose hasFiles; other
@@ -60,9 +56,9 @@ export const DocumentChildPropTypes = PropTypes.shape({
   isDeleted: PropTypes.bool,
   hasFiles: PropTypes.bool,
   authors: PropTypes.arrayOf(authorType),
-  authorsOrganization: PropTypes.arrayOf(CitationOrganizationPropTypes),
-  editor: CitationOrganizationPropTypes,
-  library: CitationOrganizationPropTypes,
+  authorsOrganization: PropTypes.arrayOf(OrganizationSimplePropTypes),
+  editor: OrganizationSimplePropTypes,
+  library: OrganizationSimplePropTypes,
   parent: CitationParentPropTypes,
   identifier: PropTypes.string,
   identifierType: PropTypes.string,
@@ -93,15 +89,15 @@ export const DocumentPropTypes = PropTypes.shape({
   validator: authorType,
   validatorComment: PropTypes.string,
   authors: PropTypes.arrayOf(authorType),
-  authorsOrganization: PropTypes.arrayOf(idNameType),
+  authorsOrganization: PropTypes.arrayOf(OrganizationSimplePropTypes),
   title: PropTypes.string,
   description: PropTypes.string,
   mainLanguage: PropTypes.string,
   languages: PropTypes.arrayOf(PropTypes.string),
   identifier: PropTypes.string,
   identifierType: PropTypes.string,
-  library: idNameType,
-  editor: idNameType,
+  library: OrganizationSimplePropTypes,
+  editor: OrganizationSimplePropTypes,
   subjects: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

@@ -22,11 +22,16 @@ import { invalidateAll } from '../../utils/mapTileCache';
 // or a free-text organizationName. In the second case we first POST a new
 // organization to obtain its id, then PUT the association — same chain as the
 // legacy thunks. Kept here so consumers still call a single mutation.
-const resolveOrganizationId = async ({ organizationId, organizationName }) => {
+const resolveOrganizationId = async ({
+  organizationId,
+  organizationName,
+  organizationType
+}) => {
   if (organizationId) return organizationId;
   if (!organizationName) throw new Error('Organization ID is missing');
   const created = await apiPost(postOrganizationUrl, {
-    name: { text: organizationName, language: 'en' }
+    name: { text: organizationName, language: 'en' },
+    type: organizationType
   });
   return created.id;
 };
@@ -44,10 +49,16 @@ const invalidateOrgKeys = queryClient => {
 export const useSetCountryOrganization = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ countryId, organizationId, organizationName }) => {
+    mutationFn: async ({
+      countryId,
+      organizationId,
+      organizationName,
+      organizationType
+    }) => {
       const finalOrgId = await resolveOrganizationId({
         organizationId,
-        organizationName
+        organizationName,
+        organizationType
       });
       return apiPut(putCountryOrganizationUrl(countryId, finalOrgId));
     },
@@ -81,11 +92,13 @@ export const useSetRegionOrganization = () => {
       countryId,
       regionId,
       organizationId,
-      organizationName
+      organizationName,
+      organizationType
     }) => {
       const finalOrgId = await resolveOrganizationId({
         organizationId,
-        organizationName
+        organizationName,
+        organizationType
       });
       return apiPut(putRegionOrganizationUrl(countryId, regionId, finalOrgId));
     },
@@ -117,10 +130,16 @@ export const useRemoveRegionOrganization = () => {
 export const useSetMassifOrganization = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ massifId, organizationId, organizationName }) => {
+    mutationFn: async ({
+      massifId,
+      organizationId,
+      organizationName,
+      organizationType
+    }) => {
       const finalOrgId = await resolveOrganizationId({
         organizationId,
-        organizationName
+        organizationName,
+        organizationType
       });
       return apiPut(putMassifOrganizationUrl(massifId, finalOrgId));
     },

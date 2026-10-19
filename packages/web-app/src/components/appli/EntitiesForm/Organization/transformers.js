@@ -1,4 +1,5 @@
 export const makePostOrganizationData = data => ({
+  type: data.organization.type,
   address: data.organization.address,
   city: data.organization.city,
   country: { id: data.organization.country },
@@ -17,6 +18,7 @@ export const makePostOrganizationData = data => ({
 export const makePutOrganizationData = (data, defaultValues) => {
   const myObj = {};
   myObj.id = defaultValues.organizationId;
+  myObj.type = data.organization.type;
   myObj.address = data.organization.address;
   myObj.city = data.organization.city;
   myObj.country = { id: data.organization.country };
@@ -31,18 +33,19 @@ export const makePutOrganizationData = (data, defaultValues) => {
 };
 
 export const makeOrganizationValueData = data => ({
+  type: data.type ?? '',
   name: data.name,
   isPartner: data.isOfficialPartner,
-  customMessage: data.customMessage,
+  customMessage: data.customMessage ?? '',
   language: data.language,
   nameId: data.nameId,
-  address: data.address || null,
-  zipCode: data.postalCode || null,
-  city: data.city || null,
+  address: data.address ?? '',
+  zipCode: data.postalCode ?? '',
+  city: data.city ?? '',
   country: data.country || null,
-  mail: data.mail || null,
-  url: data.url || null,
-  latitude: data.latitude || null,
-  longitude: data.longitude || null,
+  mail: data.mail ?? '',
+  url: data.url ?? '',
+  latitude: data.latitude ?? '',
+  longitude: data.longitude ?? '',
   organizationId: data.id
 });
