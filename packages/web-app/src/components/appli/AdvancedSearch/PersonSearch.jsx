@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Chip } from '@mui/material';
-import CheckIcon from '@mui/icons-material/Check';
+import EntityTypeFilter from './EntityTypeFilter';
 
 import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
 import {
@@ -60,20 +59,11 @@ const PersonSearch = () => {
         placeholder={formatMessage({ id: 'Search for a person...' })}
       />
       <SearchFieldset title="Type">
-        <Box sx={{ display: 'flex' }}>
-          {TYPE_OPTIONS.map(opt => (
-            <Chip
-              key={String(opt.value)}
-              label={formatMessage({ id: opt.labelId })}
-              size="small"
-              clickable
-              color={personType === opt.value ? 'primary' : 'default'}
-              variant={personType === opt.value ? 'filled' : 'outlined'}
-              icon={personType === opt.value ? <CheckIcon /> : undefined}
-              onClick={() => handleTypeChange(opt.value)}
-            />
-          ))}
-        </Box>
+        <EntityTypeFilter
+          options={TYPE_OPTIONS}
+          value={personType}
+          onChange={handleTypeChange}
+        />
       </SearchFieldset>
       <ActiveFilterChips
         query={query}

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { invalidateOrganizationCaches } from '@/utils/organizationCache';
 import {
   postOrganizationUrl,
   putCountryOrganizationUrl,
@@ -23,6 +24,7 @@ import { invalidateAll } from '../../utils/mapTileCache';
 // organization to obtain its id, then PUT the association — same chain as the
 // legacy thunks. Kept here so consumers still call a single mutation.
 const resolveOrganizationId = async ({
+  queryClient,
   organizationId,
   organizationName,
   organizationType
@@ -33,6 +35,8 @@ const resolveOrganizationId = async ({
     name: { text: organizationName, language: 'en' },
     type: organizationType
   });
+  // Creation succeeded independently of the subsequent association request.
+  invalidateOrganizationCaches(queryClient);
   return created.id;
 };
 
@@ -56,6 +60,7 @@ export const useSetCountryOrganization = () => {
       organizationType
     }) => {
       const finalOrgId = await resolveOrganizationId({
+        queryClient,
         organizationId,
         organizationName,
         organizationType
@@ -96,6 +101,7 @@ export const useSetRegionOrganization = () => {
       organizationType
     }) => {
       const finalOrgId = await resolveOrganizationId({
+        queryClient,
         organizationId,
         organizationName,
         organizationType
@@ -137,6 +143,7 @@ export const useSetMassifOrganization = () => {
       organizationType
     }) => {
       const finalOrgId = await resolveOrganizationId({
+        queryClient,
         organizationId,
         organizationName,
         organizationType

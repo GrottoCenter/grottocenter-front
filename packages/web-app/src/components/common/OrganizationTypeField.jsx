@@ -2,13 +2,13 @@ import { useId } from 'react';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { MenuItem, TextField } from '@mui/material';
-
+import { Box, MenuItem, TextField } from '@mui/material';
 import {
   getOrganizationTypeLabelId,
   isOrganizationType,
   ORGANIZATION_TYPE_VALUES
 } from '@/utils/organizationTypes';
+import OrganizationIcon from './OrganizationIcon';
 
 const OrganizationTypeField = ({ control, name, disabled = false }) => {
   const { formatMessage } = useIntl();
@@ -42,7 +42,12 @@ const OrganizationTypeField = ({ control, name, disabled = false }) => {
           data-testid="organization-type-field">
           {ORGANIZATION_TYPE_VALUES.map(type => (
             <MenuItem key={type} value={type} data-testid={`type-${type}`}>
-              {formatMessage({ id: getOrganizationTypeLabelId(type) })}
+              <Box
+                component="span"
+                sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                <OrganizationIcon organizationType={type} size={24} />
+                {formatMessage({ id: getOrganizationTypeLabelId(type) })}
+              </Box>
             </MenuItem>
           ))}
         </TextField>

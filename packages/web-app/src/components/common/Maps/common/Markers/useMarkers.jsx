@@ -20,6 +20,7 @@ const useMarkers = ({
   const map = useMap();
   // Map<id, L.Marker> for O(1) lookups during diff
   const markersRef = useRef(new Map());
+  const recordsRef = useRef(new Map());
   const renderPopup = useRenderPopup();
   const isTouch = useMediaQuery('(pointer: coarse)');
 
@@ -35,7 +36,10 @@ const useMarkers = ({
             : circleMarkerStyle;
         markerEl = L.circleMarker([latitude, longitude], style);
       } else {
-        markerEl = L.marker([latitude, longitude], { icon, ...markerOptions });
+        markerEl = L.marker([latitude, longitude], {
+          icon: typeof icon === 'function' ? icon(marker) : icon,
+          ...markerOptions
+        });
       }
 
       // Lazy popup: content is rendered only when the popup is opened
@@ -99,6 +103,7 @@ const useMarkers = ({
         // Remove all markers
         for (const m of currentMap.values()) m.remove();
         currentMap.clear();
+        recordsRef.current.clear();
         return;
       }
 
@@ -110,18 +115,36 @@ const useMarkers = ({
         if (!newIds.has(id)) {
           leafletMarker.remove();
           currentMap.delete(id);
+          recordsRef.current.delete(id);
         }
       }
 
       // Add markers that are new
       let addedCount = 0;
       for (const marker of newMarkers) {
+        // Organizations can retain their ID while changing their name, location
+        // or type. Replace changed records to refresh popup/event closures too;
+        // the existing entrance/network paths retain their marker identities.
+        const previous = recordsRef.current.get(marker.id);
+        if (
+          typeof icon === 'function' &&
+          previous &&
+          (previous.type !== marker.type ||
+            previous.name !== marker.name ||
+            previous.address !== marker.address ||
+            previous.latitude !== marker.latitude ||
+            previous.longitude !== marker.longitude)
+        ) {
+          currentMap.get(marker.id)?.remove();
+          currentMap.delete(marker.id);
+        }
         if (!currentMap.has(marker.id)) {
           const leafletMarker = createLeafletMarker(marker);
           leafletMarker.addTo(map);
           currentMap.set(marker.id, leafletMarker);
           addedCount += 1;
         }
+        recordsRef.current.set(marker.id, marker);
       }
 
       // Fit bounds on initial load if requested
@@ -136,7 +159,7 @@ const useMarkers = ({
         );
       }
     },
-    [map, createLeafletMarker, shouldFitMapBound]
+    [map, createLeafletMarker, shouldFitMapBound, icon]
   );
 
   // Cleanup all markers on unmount

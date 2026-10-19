@@ -232,7 +232,10 @@ export const refetchMapViewport = () => {
 // normal organizations endpoint with world-wide bounds and strip everything
 // but [longitude, latitude] client-side before storing. Organizations are few
 // enough (~thousands, not 100k+) that the one-shot fetch is fine.
+let organizationsCoordinatesVersion = 0;
+
 export const fetchAllOrganizationsCoordinates = () => dispatch => {
+  const version = ++organizationsCoordinatesVersion;
   dispatch({
     type: FETCH_MAP_START_LOADING,
     key: LOADINGS.ORGANIZATIONS_COORDINATES
@@ -245,25 +248,31 @@ export const fetchAllOrganizationsCoordinates = () => dispatch => {
             .filter(o => o.longitude != null && o.latitude != null)
             .map(o => [o.longitude, o.latitude])
         : [];
-      dispatch({
-        type: FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS,
-        data: coords
-      });
+      if (version === organizationsCoordinatesVersion) {
+        dispatch({
+          type: FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS,
+          data: coords
+        });
+      }
     })
     .catch(error => {
-      dispatch({
-        type: FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE,
-        error: makeErrorMessage(
-          error.message,
-          `Fetching all organizations coordinates`
-        )
-      });
+      if (version === organizationsCoordinatesVersion) {
+        dispatch({
+          type: FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE,
+          error: makeErrorMessage(
+            error.message,
+            `Fetching all organizations coordinates`
+          )
+        });
+      }
     })
     .finally(() => {
-      dispatch({
-        type: FETCH_MAP_END_LOADING,
-        key: LOADINGS.ORGANIZATIONS_COORDINATES
-      });
+      if (version === organizationsCoordinatesVersion) {
+        dispatch({
+          type: FETCH_MAP_END_LOADING,
+          key: LOADINGS.ORGANIZATIONS_COORDINATES
+        });
+      }
     });
 };
 

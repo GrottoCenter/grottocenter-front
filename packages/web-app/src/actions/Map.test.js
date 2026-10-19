@@ -1,13 +1,69 @@
 import {
   fetchAllNetworksCoordinates,
   fetchAllEntrancesCoordinates,
+  fetchAllOrganizationsCoordinates,
   FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
   FETCH_MAP_START_LOADING,
   FETCH_MAP_END_LOADING,
   FETCH_MAP_NETWORKS_COORDINATES_SUCCESS,
   FETCH_MAP_NETWORKS_COORDINATES_FAILURE,
+  FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS,
+  FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE,
   LOADINGS
 } from './Map';
+
+describe('organization coordinate refresh', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it.each(['success', 'failure'])(
+    'ignores an older %s after a classification refresh',
+    async outcome => {
+      let resolvePrevious;
+      const previous = new Promise(resolve => {
+        resolvePrevious = resolve;
+      });
+      vi.stubGlobal(
+        'fetch',
+        vi
+          .fn()
+          .mockReturnValueOnce(previous)
+          .mockResolvedValueOnce({
+            status: 200,
+            text: async () => '[]'
+          })
+      );
+      const dispatch = vi.fn();
+      const oldRequest = fetchAllOrganizationsCoordinates()(dispatch);
+      await fetchAllOrganizationsCoordinates()(dispatch);
+
+      if (outcome === 'failure') {
+        resolvePrevious({ status: 400 });
+      } else {
+        resolvePrevious({
+          status: 200,
+          text: async () =>
+            JSON.stringify([{ id: 42, longitude: 6, latitude: 45 }])
+        });
+      }
+      await oldRequest;
+
+      const actions = dispatch.mock.calls.map(([action]) => action);
+      expect(
+        actions.filter(
+          action => action.type === FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS
+        )
+      ).toEqual([
+        { type: FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS, data: [] }
+      ]);
+      expect(actions.map(action => action.type)).not.toContain(
+        FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE
+      );
+      expect(
+        actions.filter(action => action.type === FETCH_MAP_END_LOADING)
+      ).toHaveLength(1);
+    }
+  );
+});
 
 describe('fetchAllNetworksCoordinates retry policy', () => {
   const mockFetch = vi.fn();

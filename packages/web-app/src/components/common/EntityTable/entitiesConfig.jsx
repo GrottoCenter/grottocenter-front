@@ -5,10 +5,16 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
 import PublishIcon from '@mui/icons-material/Publish';
 import { useIntl } from 'react-intl';
+import {
+  canOrganizationExplore,
+  getOrganizationTypeLabelId,
+  isOrganizationType
+} from '@/utils/organizationTypes';
 import AppLink from '../AppLink';
 import Translate from '../Translate';
 import DataQualityBadge from '../DataQualityBadge';
 import CustomIcon from '../CustomIcon';
+import OrganizationIcon from '../OrganizationIcon';
 import * as CSV from '../../appli/ImportCSV/constants';
 
 // React component (uses useIntl hook) — must be rendered as JSX, not called as a function
@@ -299,10 +305,31 @@ const massifs = {
 };
 
 const organizations = {
-  icon: <CustomIcon type="organization" size={16} />,
   columns: [
     { visible: false, field: 'id', label: 'Id', sortable: false },
-    { visible: true, field: 'name', label: 'Name', sortable: true },
+    {
+      visible: true,
+      field: 'name',
+      label: 'Name',
+      sortable: true
+    },
+    {
+      visible: true,
+      field: 'type',
+      label: 'Type',
+      sortable: false,
+      render: type => {
+        if (!isOrganizationType(type)) return null;
+        return (
+          <Box
+            component="span"
+            sx={{ display: 'inline-flex', alignItems: 'center' }}>
+            <OrganizationIcon organizationType={type} size={20} />
+            <Translate>{getOrganizationTypeLabelId(type)}</Translate>
+          </Box>
+        );
+      }
+    },
     { visible: false, field: 'language', label: 'Language', sortable: true },
     { visible: true, field: 'mail', label: 'Email', sortable: false },
     { visible: false, field: 'url', label: 'URL', sortable: false },
@@ -323,7 +350,14 @@ const organizations = {
     { visible: true, field: 'county', label: 'County', sortable: true },
     { visible: true, field: 'region', label: 'Region', sortable: true },
     { visible: true, field: 'country', label: 'Country', sortable: true },
-    { visible: true, field: 'nbCavers', label: 'Cavers', sortable: true },
+    {
+      visible: true,
+      field: 'nbCavers',
+      label: 'Cavers',
+      sortable: true,
+      render: (value, organization) =>
+        canOrganizationExplore(organization.type) ? value : null
+    },
     { visible: false, field: 'iso3166', label: 'ISO code', sortable: true },
     {
       visible: false,

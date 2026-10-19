@@ -1,6 +1,8 @@
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
 import { amber } from '@mui/material/colors';
+import { getOrganizationMapIconSource } from '@/utils/organizationIcons';
+import { ORGANIZATION_TYPE_VALUES } from '@/utils/organizationTypes';
 import {
   MAP_MARKER_OUTLINE_COLOR,
   MAP_MARKER_OUTLINE_WIDTH
@@ -46,5 +48,45 @@ export const OrganizationMarker = L.divIcon({
   iconAnchor: [15, 39],
   className: ''
 });
+
+// Use the application pictogram's foreground over the yellow map pin, including
+// on organization detail maps. Cache the seven icons instead of rebuilding SVGs
+// for every marker or every viewport change.
+const typedMarkers = new Map(
+  ORGANIZATION_TYPE_VALUES.map(type => [
+    type,
+    L.divIcon({
+      html: renderToString(
+        <svg
+          viewBox="0 0 100 130"
+          width="30"
+          height="39"
+          xmlns="http://www.w3.org/2000/svg"
+          data-organization-type={type}>
+          <path
+            d="M14 2 H86 Q98 2 98 14 V86 Q98 98 86 98 H67 L50 128 L33 98 H14 Q2 98 2 86 V14 Q2 2 14 2 Z"
+            fill={amber[500]}
+            stroke={MAP_MARKER_OUTLINE_COLOR}
+            strokeWidth={MAP_MARKER_OUTLINE_WIDTH}
+            vectorEffect="non-scaling-stroke"
+          />
+          <image
+            href={getOrganizationMapIconSource(type)}
+            x="2.5"
+            y="2.25"
+            width="100"
+            height="100"
+          />
+        </svg>
+      ),
+      iconSize: [30, 39],
+      iconAnchor: [15, 39],
+      className: ''
+    })
+  ])
+);
+
+export const getOrganizationMarker = organization =>
+  typedMarkers.get(organization?.type) ?? OrganizationMarker;
 
 export default OrganizationMarker;

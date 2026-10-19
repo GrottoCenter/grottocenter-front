@@ -1,10 +1,11 @@
+import { createElement } from 'react';
 import { styled } from '@mui/material/styles';
+import { getOrganizationIconSource } from '@/utils/organizationIcons';
 import {
   authorIcon,
   bibliographyIcon,
   entranceIcon,
   networkIcon,
-  organizationIcon,
   caverIcon,
   massifIcon
 } from '../assets/icons';
@@ -78,7 +79,7 @@ export const nomelizeSearchEntity = option => {
     }
 
     case 'organizations':
-      iconSrc = organizationIcon;
+      iconSrc = getOrganizationIconSource(option.type);
       break;
 
     case 'massifs':
@@ -94,15 +95,15 @@ export const nomelizeSearchEntity = option => {
 export const entityOptionForSelector = (props, option) => {
   const { iconSrc, title, subtitle, id } = nomelizeSearchEntity(option);
   const { key, ...otherProps } = props;
-  return (
-    <li key={key || `${option._type}-${id}`} {...otherProps}>
-      {iconSrc && <EntityIcon src={iconSrc} alt={`${option.type} icon`} />}
-      <div>
-        <EntityTitle>
-          {title} <EntityId>{id}</EntityId>
-        </EntityTitle>
-        <EntitySubtitle>{subtitle}</EntitySubtitle>
-      </div>
-    </li>
+  return createElement(
+    'li',
+    { ...otherProps, key: key || `${option._type}-${id}` },
+    iconSrc && <EntityIcon src={iconSrc} alt="" />,
+    <div>
+      <EntityTitle>
+        {title} <EntityId>{id}</EntityId>
+      </EntityTitle>
+      <EntitySubtitle>{subtitle}</EntitySubtitle>
+    </div>
   );
 };

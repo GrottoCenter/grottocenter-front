@@ -15,6 +15,11 @@ import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShareIcon from '@mui/icons-material/Share';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
+import OrganizationIcon from '@/components/common/OrganizationIcon';
+import {
+  canOrganizationExplore,
+  getOrganizationTypeLabelId
+} from '@/utils/organizationTypes';
 import AppLink from '../../common/AppLink';
 import StandardDialog from '../../common/StandardDialog';
 import PageContainer from '../../common/Layouts/PageContainer';
@@ -84,7 +89,11 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
       isAuth && organization?.cavers?.some(caver => caver.id === currentUserId),
     [isAuth, organization?.cavers, currentUserId]
   );
-  const canManageCaves = isAdmin || isModerator || isMember;
+  const hasExploration = canOrganizationExplore(organization?.type);
+  const canManageCaves =
+    hasExploration &&
+    !organization?.isDeleted &&
+    (isAdmin || isModerator || isMember);
 
   let onEdit = null;
   let onDelete = null;
@@ -112,7 +121,7 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
   }, [queryClient, organizationId]);
 
   const handleJoinLeave = useCallback(async () => {
-    if (!currentUserId) return;
+    if (!currentUserId || !hasExploration || organization?.isDeleted) return;
     setIsJoining(true);
     setJoinLeaveError(null);
     try {
@@ -138,7 +147,9 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
     currentUserId,
     organizationId,
     joinOrganizationMutation,
-    leaveOrganizationMutation
+    leaveOrganizationMutation,
+    hasExploration,
+    organization?.isDeleted
   ]);
 
   const requestRemoveMember = useCallback(
@@ -200,55 +211,61 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
     />
   ) : null;
 
-  const subheader =
-    organization?.country ||
-    organization?.yearBirth ||
-    organization?.isOfficialPartner ? (
-      <Stack
-        direction="row"
-        divider={
-          <Typography
-            component="span"
-            sx={{
-              color: 'text.secondary',
-              mx: 0.5
-            }}>
-            ·
-          </Typography>
-        }
-        sx={{
-          alignItems: 'center',
-          flexWrap: 'wrap'
-        }}>
-        {organization.country && (
-          <AppLink
-            to={`/ui/countries/${organization.country}`}
-            underline="hover"
-            color="inherit"
-            sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <CustomIcon type="country" size={16} />
-            {organization.country}
-          </AppLink>
-        )}
-        {organization.yearBirth && (
+  const subheader = organization ? (
+    <Stack
+      direction="row"
+      divider={
+        <Typography
+          component="span"
+          sx={{
+            color: 'text.secondary',
+            mx: 0.5
+          }}>
+          ·
+        </Typography>
+      }
+      sx={{
+        alignItems: 'center',
+        flexWrap: 'wrap'
+      }}>
+      {organization.country && (
+        <AppLink
+          to={`/ui/countries/${organization.country}`}
+          underline="hover"
+          color="inherit"
+          sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <CustomIcon type="country" size={16} />
+          {organization.country}
+        </AppLink>
+      )}
+      {organization.yearBirth && (
+        <Typography
+          component="span"
+          sx={{ fontSize: 'inherit', color: 'inherit' }}>
+          {`${formatMessage({ id: 'Since' })} ${organization.yearBirth}`}
+        </Typography>
+      )}
+      {organization.isOfficialPartner && (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <HandshakeIcon sx={{ fontSize: 'inherit' }} />
           <Typography
             component="span"
             sx={{ fontSize: 'inherit', color: 'inherit' }}>
-            {`${formatMessage({ id: 'Since' })} ${organization.yearBirth}`}
+            {formatMessage({ id: 'Official partner' })}
           </Typography>
-        )}
-        {organization.isOfficialPartner && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <HandshakeIcon sx={{ fontSize: 'inherit' }} />
-            <Typography
-              component="span"
-              sx={{ fontSize: 'inherit', color: 'inherit' }}>
-              {formatMessage({ id: 'Official partner' })}
-            </Typography>
-          </Box>
-        )}
-      </Stack>
-    ) : null;
+        </Box>
+      )}
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <OrganizationIcon organizationType={organization.type} size={20} />
+        <Typography
+          component="span"
+          variant="body2"
+          data-testid="organization-type-label">
+          {formatMessage({ id: getOrganizationTypeLabelId(organization.type) })}
+        </Typography>
+      </Box>
+    </Stack>
+  ) : null;
 
   return (
     <PageContainer>
@@ -327,62 +344,65 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
               content={<ManagedEntitiesSection organization={organization} />}
             />
           )}
-          <ScrollableContent
-            anchorId="members"
-            title={formatMessage({ id: 'Members or former members' })}
-            defaultExpanded={(organization.cavers ?? []).length > 0}
-            count={(organization.cavers ?? []).length}
-            icon={
-              isAuth && (
-                <Tooltip
-                  title={formatMessage({
-                    id: isMember ? 'Leave organization' : 'Join organization'
-                  })}>
-                  <Button
-                    variant="outlined"
-                    color={isMember ? 'error' : 'primary'}
-                    onClick={handleJoinLeave}
-                    disabled={isJoining}
-                    startIcon={
-                      isMember ? <PersonRemoveIcon /> : <PersonAddIcon />
+          {hasExploration && (
+            <ScrollableContent
+              anchorId="members"
+              title={formatMessage({ id: 'Members or former members' })}
+              defaultExpanded={(organization.cavers ?? []).length > 0}
+              count={(organization.cavers ?? []).length}
+              icon={
+                isAuth &&
+                !organization.isDeleted && (
+                  <Tooltip
+                    title={formatMessage({
+                      id: isMember ? 'Leave organization' : 'Join organization'
+                    })}>
+                    <Button
+                      variant="outlined"
+                      color={isMember ? 'error' : 'primary'}
+                      onClick={handleJoinLeave}
+                      disabled={isJoining}
+                      startIcon={
+                        isMember ? <PersonRemoveIcon /> : <PersonAddIcon />
+                      }
+                      sx={{ minWidth: 0 }}>
+                      <Box
+                        component="span"
+                        sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                        {isMember
+                          ? formatMessage({ id: 'Leave organization' })
+                          : formatMessage({ id: 'Join organization' })}
+                      </Box>
+                    </Button>
+                  </Tooltip>
+                )
+              }
+              content={
+                <>
+                  <EntitiesList
+                    type="person"
+                    entities={organization.cavers}
+                    onItemRemove={isAdmin ? requestRemoveMember : null}
+                    toolTipTitle={formatMessage({
+                      id: 'Remove from organization'
+                    })}
+                    removeIcon={<PersonRemoveIcon />}
+                    emptyMessage={
+                      <Alert
+                        severity="info"
+                        content={formatMessage({
+                          id: 'This organization has no members yet.'
+                        })}
+                      />
                     }
-                    sx={{ minWidth: 0 }}>
-                    <Box
-                      component="span"
-                      sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                      {isMember
-                        ? formatMessage({ id: 'Leave organization' })
-                        : formatMessage({ id: 'Join organization' })}
-                    </Box>
-                  </Button>
-                </Tooltip>
-              )
-            }
-            content={
-              <>
-                <EntitiesList
-                  type="person"
-                  entities={organization.cavers}
-                  onItemRemove={isAdmin ? requestRemoveMember : null}
-                  toolTipTitle={formatMessage({
-                    id: 'Remove from organization'
-                  })}
-                  removeIcon={<PersonRemoveIcon />}
-                  emptyMessage={
-                    <Alert
-                      severity="info"
-                      content={formatMessage({
-                        id: 'This organization has no members yet.'
-                      })}
-                    />
-                  }
-                />
-                {joinLeaveError && (
-                  <Alert severity="error" title={joinLeaveError} />
-                )}
-              </>
-            }
-          />
+                  />
+                  {joinLeaveError && (
+                    <Alert severity="error" title={joinLeaveError} />
+                  )}
+                </>
+              }
+            />
+          )}
           <ScrollableContent
             dense
             anchorId="authored-documents"
@@ -441,35 +461,37 @@ const Organization = ({ error, isPaused = false, isLoading, organization }) => {
               />
             }
           />
-          <ScrollableContent
-            anchorId="related-caves"
-            title={formatMessage({ id: 'Explored caves' })}
-            defaultExpanded={nbNetworks + nbEntrances > 0}
-            count={nbNetworks + nbEntrances}
-            icon={
-              canManageCaves && (
-                <SectionCreateButton
-                  isOpen={isCaveSearchVisible}
-                  onToggle={() => setIsCaveSearchVisible(v => !v)}
-                  label={formatMessage({ id: 'Add' })}
-                  tooltip={formatMessage({ id: 'Add a cave' })}
-                  openTooltip={formatMessage({ id: 'Cancel this search' })}
+          {hasExploration && (
+            <ScrollableContent
+              anchorId="related-caves"
+              title={formatMessage({ id: 'Explored caves' })}
+              defaultExpanded={nbNetworks + nbEntrances > 0}
+              count={nbNetworks + nbEntrances}
+              icon={
+                canManageCaves && (
+                  <SectionCreateButton
+                    isOpen={isCaveSearchVisible}
+                    onToggle={() => setIsCaveSearchVisible(v => !v)}
+                    label={formatMessage({ id: 'Add' })}
+                    tooltip={formatMessage({ id: 'Add a cave' })}
+                    openTooltip={formatMessage({ id: 'Cancel this search' })}
+                  />
+                )
+              }
+              content={
+                <RelatedCaves
+                  exploredEntrances={organization.exploredEntrances}
+                  exploredNetworks={organization.exploredNetworks}
+                  entityId={organization.id}
+                  isOrganization
+                  canManageCaves={canManageCaves}
+                  onRefresh={handleRefresh}
+                  isCaveSearchVisible={isCaveSearchVisible}
+                  onToggleCaveSearch={setIsCaveSearchVisible}
                 />
-              )
-            }
-            content={
-              <RelatedCaves
-                exploredEntrances={organization.exploredEntrances}
-                exploredNetworks={organization.exploredNetworks}
-                entityId={organization.id}
-                isOrganization
-                canManageCaves={canManageCaves}
-                onRefresh={handleRefresh}
-                isCaveSearchVisible={isCaveSearchVisible}
-                onToggleCaveSearch={setIsCaveSearchVisible}
-              />
-            }
-          />
+              }
+            />
+          )}
         </SectionStack>
       )}
       <StandardDialog
