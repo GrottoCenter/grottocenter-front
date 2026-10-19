@@ -9,7 +9,7 @@ import InputLanguage from '../utils/InputLanguage';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormRow, FormSectionLabel } from '../utils/FormContainers';
 
-const OrganizationFields = ({ control, errors, isNewOrganization }) => {
+const OrganizationFields = ({ control, errors }) => {
   const { formatMessage } = useIntl();
   return (
     <>
@@ -29,7 +29,6 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
           formKey="organization.language"
           control={control}
           isError={!!errors?.organization?.language}
-          isDisabled={!isNewOrganization}
         />
       </FormRow>
 
@@ -160,8 +159,7 @@ OrganizationFields.propTypes = {
       latitude: PropTypes.shape({ message: PropTypes.string }),
       longitude: PropTypes.shape({ message: PropTypes.string })
     })
-  }),
-  isNewOrganization: PropTypes.bool
+  })
 };
 
 export default OrganizationFields;

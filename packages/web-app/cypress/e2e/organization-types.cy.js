@@ -18,7 +18,14 @@ describe('Required organization classification', () => {
     cy.mockApiCatchAll();
     cy.intercept(
       { method: 'GET', pathname: '/api/v1/languages' },
-      { body: { languages: [{ id: 'eng', part1: 'en', refName: 'English' }] } }
+      {
+        body: {
+          languages: [
+            { id: 'eng', part1: 'en', refName: 'English' },
+            { id: 'fra', part1: 'fr', refName: 'French' }
+          ]
+        }
+      }
     );
   });
 
@@ -102,5 +109,40 @@ describe('Required organization classification', () => {
     cy.wait('@updateOrganization')
       .its('request.body.type')
       .should('eq', 'CAVE_RESCUE');
+  });
+
+  it('lets users classify the name language without renaming the organization', () => {
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/organizations/42' },
+      {
+        body: {
+          id: 42,
+          nameId: 17,
+          name: 'Old organization',
+          language: '000',
+          type: 'SPELEOLOGY',
+          country: 'FR',
+          customMessage: 'Test description'
+        }
+      }
+    );
+    cy.intercept(
+      { method: 'PATCH', pathname: '/api/v1/names/17' },
+      { body: {} }
+    ).as('updateNameLanguage');
+    cy.intercept(
+      { method: 'PUT', pathname: '/api/v1/organizations/42' },
+      { statusCode: 400, body: { message: 'Test rejection' } }
+    ).as('saveOrganization');
+    visitForm('/organizations/42/edit');
+    cy.contains('[role="combobox"]', 'Select a language').click();
+    cy.contains('[role="option"]', 'French').click();
+    cy.contains('button', 'Update').click();
+    cy.wait('@updateNameLanguage').its('request.body').should('include', {
+      name: 'Old organization',
+      language: 'fra'
+    });
+    cy.wait('@saveOrganization');
+    cy.contains('[role="combobox"]', 'French').should('be.visible');
   });
 });
