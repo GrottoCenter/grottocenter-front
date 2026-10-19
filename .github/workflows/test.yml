@@ -106,12 +106,21 @@ jobs:
         with:
           name: e2e-dist
           path: packages/web-app/dist
+      - name: Set up Chrome
+        if: matrix.browser == 'chrome'
+        id: chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          # The runner's 155.0.8059.39 rejects legitimate reused request IDs
+          # under DevTools interception and aborts pending resource loads.
+          # This release includes the Chromium fix for crbug.com/559770861.
+          chrome-version: '155.0.8059.84'
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Cypress run
         uses: cypress-io/github-action@v7
         with:
-          browser: ${{ matrix.browser }}
+          browser: ${{ steps.chrome.outputs.chrome-path || matrix.browser }}
           spec: ${{ matrix.spec }}
           project: packages/web-app
           # Serve the production build so Vite cannot invalidate optimized
