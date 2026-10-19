@@ -1,21 +1,25 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import messages from '@/../public/lang/en.json';
 import AssociationForm from './AssociationForm';
 
 const searchState = vi.hoisted(() => ({
-  inputValue: '',
   results: [],
   isOnline: true
 }));
 
 vi.mock('@/hooks', () => ({
-  useEntitySearch: () => ({
-    inputValue: searchState.inputValue,
-    setInputValue: vi.fn(),
-    results: searchState.results,
-    isLoading: false
-  }),
+  useDebounce: value => value,
+  useQuickSearch: vi.fn(() => ({
+    data: { results: searchState.results },
+    isFetching: false
+  })),
   useOnlineStatus: () => searchState.isOnline
 }));
 
@@ -35,20 +39,25 @@ const renderForm = onSubmit =>
     </IntlProvider>
   );
 
+const enterName = value =>
+  fireEvent.change(
+    screen.getByRole('combobox', { name: 'Search or create organization' }),
+    { target: { value } }
+  );
+
 describe('organization name length', () => {
   afterEach(() => {
-    searchState.inputValue = '';
     searchState.results = [];
     searchState.isOnline = true;
   });
 
-  it('rejects an oversized name even when the form is submitted directly', () => {
-    searchState.inputValue = 'x'.repeat(201);
+  it('rejects an oversized name even when the form is submitted directly', async () => {
     const onSubmit = vi.fn();
     const { container } = renderForm(onSubmit);
+    enterName('x'.repeat(201));
 
     expect(screen.getByRole('button', { name: 'Associate' })).toBeEnabled();
-    fireEvent.submit(container.querySelector('form'));
+    await act(async () => fireEvent.submit(container.querySelector('form')));
 
     expect(onSubmit).not.toHaveBeenCalled();
     expect(
@@ -57,9 +66,9 @@ describe('organization name length', () => {
   });
 
   it('allows a name at the limit with an explicit type', async () => {
-    searchState.inputValue = 'x'.repeat(200);
     const onSubmit = vi.fn();
     const { container } = renderForm(onSubmit);
+    enterName('x'.repeat(200));
 
     const input = screen.getByRole('combobox', {
       name: 'Search or create organization'
@@ -83,9 +92,9 @@ describe('organization name length', () => {
   });
 
   it('blocks creation without a type and focuses its selector', async () => {
-    searchState.inputValue = 'New organization';
     const onSubmit = vi.fn();
     renderForm(onSubmit);
+    enterName('New organization');
     fireEvent.click(screen.getByRole('button', { name: 'Associate' }));
     await screen.findByText('Choose an organization type.');
     expect(
@@ -95,10 +104,10 @@ describe('organization name length', () => {
   });
 
   it('links an existing unclassified organization without asking for a type', async () => {
-    searchState.inputValue = 'Existing';
     searchState.results = [{ id: 42, name: 'Existing', type: null }];
     const onSubmit = vi.fn();
     renderForm(onSubmit);
+    enterName('Existing');
     fireEvent.click(screen.getByRole('button', { name: 'Associate' }));
     await screen.findByText('Choose an organization type.');
     fireEvent.mouseDown(
@@ -116,14 +125,35 @@ describe('organization name length', () => {
 
   it('cannot submit an association offline', async () => {
     searchState.isOnline = false;
-    searchState.inputValue = 'New organization';
     const onSubmit = vi.fn();
     const { container } = renderForm(onSubmit);
+    enterName('New organization');
     fireEvent.mouseDown(
       screen.getByRole('combobox', { name: /Organization type/ })
     );
     fireEvent.click(screen.getByRole('option', { name: 'Publisher' }));
     fireEvent.submit(container.querySelector('form'));
     await waitFor(() => expect(onSubmit).not.toHaveBeenCalled());
+  });
+
+  it('validates whitespace-only input and submits the corrected trimmed name', async () => {
+    const onSubmit = vi.fn();
+    renderForm(onSubmit);
+    enterName('   ');
+    fireEvent.mouseDown(
+      screen.getByRole('combobox', { name: /Organization type/ })
+    );
+    fireEvent.click(screen.getByRole('option', { name: 'Publisher' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Associate' }));
+    expect(await screen.findByText('Required')).toBeVisible();
+    expect(onSubmit).not.toHaveBeenCalled();
+    enterName(' New publisher ');
+    fireEvent.click(screen.getByRole('button', { name: 'Associate' }));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith({
+        name: 'New publisher',
+        type: 'EDITION'
+      })
+    );
   });
 });

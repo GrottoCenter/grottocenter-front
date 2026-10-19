@@ -9,6 +9,7 @@ import useNetworkHighlight from './useNetworkHighlight';
 import { getEntranceCircleStyle } from './constants';
 import {
   getOrganizationMarker,
+  shouldReplaceOrganizationMarker,
   OrganizationPopup,
   EntrancePopup,
   NetworkMarker,
@@ -76,6 +77,7 @@ const Markers = ({
   });
   const updateOrganizationMarkers = useMarkers({
     icon: getOrganizationMarker,
+    shouldReplaceMarker: shouldReplaceOrganizationMarker,
     popupContent: organizationPopup,
     tooltipContent: organizationTip
   });

@@ -1,7 +1,10 @@
 import { act, renderHook } from '@testing-library/react';
 import L from 'leaflet';
 import useMarkers from './useMarkers';
-import { getOrganizationMarker } from './Components/OrganizationMarker';
+import {
+  getOrganizationMarker,
+  shouldReplaceOrganizationMarker
+} from './Components/OrganizationMarker';
 
 const state = vi.hoisted(() => ({ map: null }));
 vi.mock('react-leaflet', () => ({ useMap: () => state.map }));
@@ -31,7 +34,11 @@ afterEach(() => {
 
 it('updates same-ID organization pictograms, position and popup, and removes ineligible results', () => {
   const { result, unmount } = renderHook(() =>
-    useMarkers({ icon: getOrganizationMarker, popupContent })
+    useMarkers({
+      icon: getOrganizationMarker,
+      popupContent,
+      shouldReplaceMarker: shouldReplaceOrganizationMarker
+    })
   );
   act(() => result.current([record]));
   expect(
@@ -63,16 +70,38 @@ it('updates same-ID organization pictograms, position and popup, and removes ine
   unmount();
 });
 
-it('preserves static marker identities for existing network callers', () => {
-  const { result, unmount } = renderHook(() =>
-    useMarkers({ icon: getOrganizationMarker(record) })
+it.each([
+  ['a static icon', getOrganizationMarker(record)],
+  ['an icon factory', getOrganizationMarker]
+])(
+  'preserves marker identities without a replacement rule for %s',
+  (_label, icon) => {
+    const { result, unmount } = renderHook(() => useMarkers({ icon }));
+    act(() => result.current([record]));
+    const before = [];
+    state.map.eachLayer(layer => before.push(layer));
+    act(() => result.current([{ ...record, name: 'Updated' }]));
+    const after = [];
+    state.map.eachLayer(layer => after.push(layer));
+    expect(after).toEqual(before);
+    unmount();
+  }
+);
+
+it('retains an unchanged organization marker and its open popup', () => {
+  const { result } = renderHook(() =>
+    useMarkers({
+      icon: getOrganizationMarker,
+      popupContent,
+      shouldReplaceMarker: shouldReplaceOrganizationMarker
+    })
   );
   act(() => result.current([record]));
-  const before = [];
-  state.map.eachLayer(layer => before.push(layer));
-  act(() => result.current([{ ...record, name: 'Updated' }]));
-  const after = [];
-  state.map.eachLayer(layer => after.push(layer));
-  expect(after).toEqual(before);
-  unmount();
+  const markers = [];
+  state.map.eachLayer(layer => markers.push(layer));
+  act(() => markers[0].openPopup());
+  const popup = markers[0].getPopup();
+  act(() => result.current([{ ...record }]));
+  expect(markers[0].getPopup()).toBe(popup);
+  expect(markers[0].isPopupOpen()).toBe(true);
 });

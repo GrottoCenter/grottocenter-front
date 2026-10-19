@@ -1,4 +1,6 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 import { apiPatch, apiPost, apiPut } from '@/api/client';
 import { renderWithProviders } from '@/test/renderWithProviders';
@@ -16,7 +18,6 @@ vi.mock('@/api/client', () => ({
 }));
 vi.mock('@/hooks', async () => ({
   ...(await import('@/hooks/mutations/useOrganizationForm')),
-  ...(await import('@/hooks/mutations/useUpdateName')),
   useOnlineStatus: () => state.isOnline,
   useLanguages: () => ({
     isSuccess: true,
@@ -29,17 +30,24 @@ vi.mock('@/hooks', async () => ({
 vi.mock('../utils/InputCountry', () => ({ default: () => null }));
 vi.mock('../utils/CoordinateFormSection', () => ({ default: () => null }));
 vi.mock('../utils/LicenseBox', () => ({ default: () => null }));
-vi.mock('../utils/FormProgressInfo', () => ({
-  default: () => <p>Organization saved</p>
-}));
-
 const renderForm = element =>
-  renderWithProviders(element, {
-    messages,
-    preloadedState: {
-      intl: { locale: 'en', AVAILABLE_LANGUAGES: { en: { id: 'eng' } } }
+  renderWithProviders(
+    <MemoryRouter>
+      <Routes>
+        <Route path="/" element={element} />
+        <Route
+          path="/ui/organizations/:id"
+          element={<p>Organization saved</p>}
+        />
+      </Routes>
+    </MemoryRouter>,
+    {
+      messages,
+      preloadedState: {
+        intl: { locale: 'en', AVAILABLE_LANGUAGES: { en: { id: 'eng' } } }
+      }
     }
-  });
+  );
 
 const selectType = label => {
   fireEvent.mouseDown(
@@ -92,13 +100,13 @@ describe('organization editor classification', () => {
       fireEvent.click(screen.getByRole('option', { name: 'French' }));
       fireEvent.click(screen.getByRole('button', { name: 'Update' }));
       await screen.findByText('Organization saved');
-      expect(apiPatch).toHaveBeenCalledWith(
-        expect.stringContaining('/names/17'),
-        { id: 17, name: existingOrganization.name, language: 'fra' }
-      );
+      expect(apiPatch).not.toHaveBeenCalled();
       expect(apiPut).toHaveBeenCalledWith(
         expect.stringContaining('/organizations/42'),
-        expect.objectContaining({ type: 'SPELEOLOGY' })
+        expect.objectContaining({
+          type: 'SPELEOLOGY',
+          name: { text: existingOrganization.name, language: 'fra' }
+        })
       );
     }
   );
@@ -137,8 +145,15 @@ describe('organization editor classification', () => {
       expect(await screen.findByText('Organization saved')).toBeVisible();
       expect(apiPut).toHaveBeenCalledWith(
         expect.stringContaining('/organizations/42'),
-        expect.objectContaining({ id: 42, type: 'RESEARCH' })
+        expect.objectContaining({
+          id: 42,
+          type: 'RESEARCH',
+          name: { text: 'Renamed organization', language: 'eng' },
+          latitude: 0,
+          longitude: 0
+        })
       );
+      expect(apiPatch).not.toHaveBeenCalled();
     }
   );
 
@@ -218,20 +233,58 @@ describe('organization editor classification', () => {
         })}
       />
     );
+    fireEvent.change(screen.getByLabelText(/Organization name/), {
+      target: { value: 'Renamed organization' }
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Update' }));
     await screen.findByText('Please classify the organization.');
     expect(screen.getByLabelText(/Organization name/)).toHaveValue(
-      existingOrganization.name
+      'Renamed organization'
     );
+    expect(apiPatch).not.toHaveBeenCalled();
     expect(screen.getByText('Choose an organization type.')).toBeVisible();
     selectType('Caving club');
     fireEvent.click(screen.getByRole('button', { name: 'Update' }));
     await screen.findByText('Organization saved');
     expect(apiPut).toHaveBeenLastCalledWith(
       expect.stringContaining('/organizations/42'),
-      expect.objectContaining({ type: 'SPELEOLOGY' })
+      expect.objectContaining({
+        type: 'SPELEOLOGY',
+        name: { text: 'Renamed organization', language: 'eng' }
+      })
     );
   });
+
+  it.each([
+    ['Email', 'bad-email', 'The email must be valid.', 'contact@example.org'],
+    ['URL', 'bad-url', 'The URL must be valid.', 'https://example.org']
+  ])(
+    'validates %s before saving and allows correction',
+    async (label, invalid, message, valid) => {
+      renderForm(
+        <OrganizationForm
+          organizationValues={makeOrganizationValueData({
+            ...existingOrganization,
+            type: 'SPELEOLOGY'
+          })}
+        />
+      );
+      const input = screen.getByLabelText(label);
+      fireEvent.change(input, { target: { value: invalid } });
+      await userEvent
+        .setup()
+        .click(screen.getByRole('button', { name: 'Update' }));
+      expect(await screen.findByText(message)).toBeVisible();
+      expect(apiPut).not.toHaveBeenCalled();
+      fireEvent.change(input, { target: { value: valid } });
+      fireEvent.click(screen.getByRole('button', { name: 'Update' }));
+      await screen.findByText('Organization saved');
+      expect(apiPut).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ [label === 'Email' ? 'mail' : 'url']: valid })
+      );
+    }
+  );
 });
 
 describe('inline document organization creation', () => {

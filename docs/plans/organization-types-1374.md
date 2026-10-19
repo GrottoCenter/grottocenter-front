@@ -89,6 +89,11 @@ API implementation: https://github.com/GrottoCenter/grottocenter-api/pull/1895
   submit available for validation, and disable writes during pending/offline
   states. No mutation, including a name update, before validation succeeds.
 - Preserve data after API rejection, show structured errors, and allow retry.
+- Save the name, language and organization fields in a single organization PUT.
+  Creation and editing share the payload conversion and coordinate normalization;
+  there is no separate name PATCH. Redirect only after the mutation succeeds.
+- Validate optional email and URL formats through RHF, since the form uses
+  `noValidate`; keep both fields optional.
 
 ### Inline document creation
 
@@ -185,6 +190,11 @@ API implementation: https://github.com/GrottoCenter/grottocenter-api/pull/1895
 - useMarkers: support per-record icon factories and replace changed organization
   markers to refresh location, icon, popup and event closures. Preserve static
   entrance/network marker identities and the touch tooltip behavior.
+- Replacement uses an explicit comparison callback supplied by the organization
+  caller. The generic hook stores previous records only for opted-in callers.
+- Resolve UI icons without loading raw SVGs. The map-only resolver extracts the
+  foreground using XML parsing and caches each white symbol; artwork declares
+  transparent map cutouts explicitly, independently of its UI accent colors.
 - Keep a generic organization cluster at low zoom. actions/Map currently strips
   worldwide results down to coordinate pairs; no subtype clustering is needed.
 - Refresh both tile data and worldwide organization coordinates on organization

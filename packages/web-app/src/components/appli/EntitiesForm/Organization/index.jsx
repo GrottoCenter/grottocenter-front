@@ -1,43 +1,31 @@
-import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   useOnlineStatus,
   useCreateOrganization,
-  useUpdateOrganization,
-  useUpdateName
+  useUpdateOrganization
 } from '@/hooks';
 import FormSubmissionError from '@/components/common/FormSubmissionError';
-import FormProgressInfo from '../utils/FormProgressInfo';
-import { normelizeCoordinate } from '../utils/InputCoordinate';
 import OrganizationFields from './OrganizationFields';
 import LicenseBox from '../utils/LicenseBox';
-import {
-  makePostOrganizationData,
-  makePutOrganizationData
-} from './transformers';
+import { makeOrganizationData } from './transformers';
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 
 const defaultOrganizationValues = {
   name: '',
   type: '',
-  isPartner: false,
   customMessage: '',
-  description: '',
-  descriptionTitle: '',
   language: '',
   address: '',
-  addressLine2: '',
   zipCode: '',
   city: '',
   country: 'FR',
-  phone: '',
   mail: '',
   url: '',
   latitude: '',
-  longitude: '',
-  logo: ''
+  longitude: ''
 };
 
 export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
@@ -47,16 +35,10 @@ export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
   const organizationMutation = isNewOrganization
     ? createOrganizationMutation
     : updateOrganizationMutation;
-  const {
-    error: organizationError,
-    isPending: organizationLoading,
-    data: organizationData
-  } = organizationMutation;
-  const updateNameMutation = useUpdateName();
-  const nameError = updateNameMutation.error;
-  const nameLoading = updateNameMutation.isPending;
+  const { error: organizationError, isPending: organizationLoading } =
+    organizationMutation;
   const isOnline = useOnlineStatus();
-  const [isSaved, setIsSaved] = useState(false);
+  const navigate = useNavigate();
 
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
 
@@ -78,70 +60,25 @@ export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
   });
 
   const onSubmit = async data => {
-    if (!isOnline || organizationLoading || nameLoading) return;
-    const normalizedData = {
-      organization: {
-        ...data.organization,
-        longitude: normelizeCoordinate(data.organization.longitude),
-        latitude: normelizeCoordinate(data.organization.latitude)
-      }
-    };
-
+    if (!isOnline || organizationLoading) return;
     try {
-      if (isNewOrganization) {
-        await createOrganizationMutation.mutateAsync(
-          makePostOrganizationData(normalizedData)
-        );
-      } else {
-        if (
-          data.organization.name !== organizationValues.name ||
-          data.organization.language !== organizationValues.language
-        ) {
-          await updateNameMutation.mutateAsync({
-            id: organizationValues.nameId,
-            name: data.organization.name,
-            language: data.organization.language
-          });
-        }
-        await updateOrganizationMutation.mutateAsync(
-          makePutOrganizationData(normalizedData, organizationValues)
-        );
-      }
-      setIsSaved(true);
+      const organization = await organizationMutation.mutateAsync(
+        makeOrganizationData(data)
+      );
+      navigate(`/ui/organizations/${organization.id}`);
     } catch {
       // The mutation retains the structured error; keep the form for correction.
     }
   };
 
-  if (isSaved) {
-    return (
-      <FormProgressInfo
-        isLoading={organizationLoading || nameLoading || !organizationData}
-        isError={!!(organizationError || nameError)}
-        labelLoading={
-          isNewOrganization
-            ? 'Creating organization...'
-            : 'Updating organization...'
-        }
-        labelError={
-          isNewOrganization
-            ? 'An error occurred when creating a organization.'
-            : 'An error occurred when updating a organization.'
-        }
-        resetFn={() => setIsSaved(false)}
-        getRedirectFn={() => `/ui/organizations/${organizationData.id}`}
-      />
-    );
-  }
-
   return (
     <FormContainer>
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-        <FormSubmissionError error={organizationError || nameError} />
+        <FormSubmissionError error={organizationError} />
         <OrganizationFields control={control} errors={errors} />
         <FormActionRow
           isNew={isNewOrganization}
-          isSubmitting={isSubmitting || organizationLoading || nameLoading}
+          isSubmitting={isSubmitting || organizationLoading}
           onCancel={onCancel}
         />
       </form>

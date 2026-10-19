@@ -1,6 +1,6 @@
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
-import { getOrganizationMapIconSource } from '@/utils/organizationIcons';
+import { getOrganizationMapIconSource } from '@/utils/organizationMapIcons';
 import { ORGANIZATION_TYPE_VALUES } from '@/utils/organizationTypes';
 import { ORGANIZATION_MARKER_COLOR } from '@/components/common/Maps/common/mapMarkerColors';
 import {
@@ -91,5 +91,10 @@ const typedMarkers = new Map(
 
 export const getOrganizationMarker = organization =>
   typedMarkers.get(organization?.type) ?? OrganizationMarker;
+
+export const shouldReplaceOrganizationMarker = (previous, next) =>
+  ['type', 'name', 'address', 'latitude', 'longitude'].some(
+    field => previous[field] !== next[field]
+  );
 
 export default OrganizationMarker;

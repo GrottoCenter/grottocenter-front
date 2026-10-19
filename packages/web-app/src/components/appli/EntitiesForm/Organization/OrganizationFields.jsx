@@ -2,12 +2,27 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import OrganizationTypeField from '@/components/common/OrganizationTypeField';
 
+import { isValidEmail } from '@/conf/config';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import InputText from '../utils/InputText';
 import InputCountry from '../utils/InputCountry';
 import InputLanguage from '../utils/InputLanguage';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormRow, FormSectionLabel } from '../utils/FormContainers';
+
+const validateEmail = (value, formatMessage) =>
+  !value ||
+  isValidEmail(value) ||
+  formatMessage({ id: 'The email must be valid.' });
+
+const validateUrl = (value, formatMessage) => {
+  if (!value) return true;
+  try {
+    return Boolean(new URL(value));
+  } catch {
+    return formatMessage({ id: 'The URL must be valid.' });
+  }
+};
 
 const OrganizationFields = ({ control, errors }) => {
   const { formatMessage } = useIntl();
@@ -74,6 +89,7 @@ const OrganizationFields = ({ control, errors }) => {
           control={control}
           isError={!!errors?.organization?.mail}
           type="email"
+          validatorFn={validateEmail}
           maxLength={TEXT_LENGTH_LIMITS.EMAIL}
         />
         <InputText
@@ -82,6 +98,7 @@ const OrganizationFields = ({ control, errors }) => {
           control={control}
           isError={!!errors?.organization?.url}
           type="url"
+          validatorFn={validateUrl}
           maxLength={TEXT_LENGTH_LIMITS.URL}
         />
       </FormRow>

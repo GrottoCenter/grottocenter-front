@@ -68,7 +68,7 @@ describe('Required organization classification', () => {
       .should('eq', 'LIBRARY');
   });
 
-  it('requires classification when editing an old organization, before updating its name', () => {
+  it('requires classification before saving the name and organization together', () => {
     cy.intercept(
       { method: 'GET', pathname: '/api/v1/organizations/42' },
       {
@@ -105,10 +105,38 @@ describe('Required organization classification', () => {
     cy.get('@updateOrganization.all').should('have.length', 0);
     selectType('CAVE_RESCUE');
     cy.contains('button', 'Update').click();
-    cy.wait('@updateName');
     cy.wait('@updateOrganization')
-      .its('request.body.type')
-      .should('eq', 'CAVE_RESCUE');
+      .its('request.body')
+      .should('include', { type: 'CAVE_RESCUE' })
+      .and('have.property', 'name')
+      .and('deep.equal', { text: 'Renamed organization', language: 'eng' });
+    cy.get('@updateName.all').should('have.length', 0);
+  });
+
+  it('validates optional email and URL formats before creating an organization', () => {
+    cy.intercept(
+      { method: 'POST', pathname: '/api/v1/organizations' },
+      { statusCode: 400, body: { message: 'Test rejection' } }
+    ).as('createOrganization');
+    visitForm('/entity/add/organization');
+    cy.get('[data-testid="organization-name"] input').type('New organization');
+    cy.get('[name="organization.customMessage"]').type('Test description');
+    selectType('SPELEOLOGY');
+    cy.get('[name="organization.mail"]').type('bad-email');
+    cy.get('[name="organization.url"]').type('bad-url');
+    cy.contains('button', 'Create').click();
+    cy.contains('The email must be valid.').should('be.visible');
+    cy.contains('The URL must be valid.').should('be.visible');
+    cy.get('@createOrganization.all').should('have.length', 0);
+    cy.get('[name="organization.mail"]').clear();
+    cy.get('[name="organization.mail"]').type('contact@example.org');
+    cy.get('[name="organization.url"]').clear();
+    cy.get('[name="organization.url"]').type('https://example.org');
+    cy.contains('button', 'Create').click();
+    cy.wait('@createOrganization').its('request.body').should('include', {
+      mail: 'contact@example.org',
+      url: 'https://example.org'
+    });
   });
 
   it('lets users classify the name language without renaming the organization', () => {
@@ -138,11 +166,11 @@ describe('Required organization classification', () => {
     cy.contains('[role="combobox"]', 'Select a language').click();
     cy.contains('[role="option"]', 'French').click();
     cy.contains('button', 'Update').click();
-    cy.wait('@updateNameLanguage').its('request.body').should('include', {
-      name: 'Old organization',
+    cy.wait('@saveOrganization').its('request.body.name').should('deep.equal', {
+      text: 'Old organization',
       language: 'fra'
     });
-    cy.wait('@saveOrganization');
+    cy.get('@updateNameLanguage.all').should('have.length', 0);
     cy.contains('[role="combobox"]', 'French').scrollIntoView();
     cy.contains('[role="combobox"]', 'French').should('be.visible');
   });
