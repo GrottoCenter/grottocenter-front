@@ -70,7 +70,8 @@ export const organizationKeys = {
 };
 
 export const organizationManagementKeys = {
-  unclassified: ['organizationManagement', 'unclassified']
+  unclassified: ['organizationManagement', 'unclassified'],
+  duplicates: ['organizationManagement', 'duplicates']
 };
 
 export const countryKeys = {

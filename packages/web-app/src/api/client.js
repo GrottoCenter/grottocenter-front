@@ -50,16 +50,19 @@ export const apiGetWithRange = async url => {
   return { data, contentRange };
 };
 
-const send = method => async (url, body) => {
-  const init = {
-    method,
-    headers: body != null ? jsonHeaders() : authHeaders()
+const send =
+  method =>
+  async (url, body, { signal } = {}) => {
+    const init = {
+      method,
+      headers: body != null ? jsonHeaders() : authHeaders(),
+      ...(signal && { signal })
+    };
+    if (body != null) init.body = JSON.stringify(body);
+    const response = await fetch(url, init);
+    await checkAndGetStatus(response);
+    return parseJsonOr204(response);
   };
-  if (body != null) init.body = JSON.stringify(body);
-  const response = await fetch(url, init);
-  await checkAndGetStatus(response);
-  return parseJsonOr204(response);
-};
 
 /**
  * POST a JSON body and return the parsed response.
