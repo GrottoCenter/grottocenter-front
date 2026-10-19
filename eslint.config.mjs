@@ -8,6 +8,8 @@ export default [
   {
     ignores: [
       '**/node_modules/**',
+      '**/.yarn/**',
+      '**/*.local/**',
       '**/*.d.ts',
       '**/dist/**',
       '**/storybook-static/**',
