@@ -1,3 +1,4 @@
+import organizationSvg from '@/assets/icons/organization.svg?raw';
 import clubSvg from '@/assets/icons/organization-club.svg?raw';
 import rescueSvg from '@/assets/icons/organization-rescue.svg?raw';
 import publisherSvg from '@/assets/icons/organization-publisher.svg?raw';
@@ -20,10 +21,10 @@ const mapSources = new Map();
 // Only maps load/convert the SVG foregrounds. UI icon resolution stays cheap.
 // Artwork marks transparent map cutouts explicitly, independently of UI colors.
 export const getOrganizationMapIconSource = type => {
-  if (!Object.hasOwn(SOURCES, type)) return null;
-  if (!mapSources.has(type)) {
+  const key = Object.hasOwn(SOURCES, type) ? type : null;
+  if (!mapSources.has(key)) {
     const svgDocument = new DOMParser().parseFromString(
-      SOURCES[type],
+      SOURCES[key] ?? organizationSvg,
       'image/svg+xml'
     );
     const symbol = svgDocument.getElementById('organization-symbol');
@@ -44,11 +45,11 @@ export const getOrganizationMapIconSource = type => {
       }
     );
     mapSources.set(
-      type,
+      key,
       `data:image/svg+xml,${encodeURIComponent(
         new XMLSerializer().serializeToString(svg)
       )}`
     );
   }
-  return mapSources.get(type);
+  return mapSources.get(key);
 };

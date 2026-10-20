@@ -43,6 +43,17 @@ it.each(ORGANIZATION_TYPE_VALUES)(
 it.each([null, undefined, 'FUTURE', 'constructor'])(
   'uses the generic marker for %s',
   type => {
-    expect(getOrganizationMarker({ type })).toBe(OrganizationMarker);
+    const marker = getOrganizationMarker({ type });
+    expect(marker).toBe(OrganizationMarker);
+    const preview = document.createElement('div');
+    preview.innerHTML = marker.options.html;
+    expect(preview.querySelector('image').getAttribute('href')).toBe(
+      getOrganizationMapIconSource(null)
+    );
+    expect(getOrganizationMapIconSource(type)).toBe(
+      getOrganizationMapIconSource(null)
+    );
+    expect(marker.options.iconSize).toEqual([30, 39]);
+    expect(marker.options.iconAnchor).toEqual([15, 39]);
   }
 );
