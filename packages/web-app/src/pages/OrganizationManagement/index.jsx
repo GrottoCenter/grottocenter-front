@@ -20,6 +20,7 @@ import {
 import CallMergeIcon from '@mui/icons-material/CallMerge';
 import BusinessIcon from '@mui/icons-material/Business';
 import SaveIcon from '@mui/icons-material/Save';
+import DeleteIcon from '@mui/icons-material/Delete';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
@@ -48,6 +49,7 @@ import {
 import { useNotification } from '@/hooks/useNotification';
 import DuplicatesSection from './DuplicatesSection';
 import OrganizationActionButtons from './OrganizationActionButtons';
+import DeletedOrganizationsSection from './DeletedOrganizationsSection';
 
 const PAGE_SIZE = 100;
 const CLASSIFICATION_BATCH_SIZE = 50;
@@ -237,7 +239,8 @@ OrganizationRow.propTypes = {
 const OrganizationManagement = () => {
   const { formatMessage } = useIntl();
   const [searchParams] = useSearchParams();
-  const isClassifyTab = searchParams.get('tab') !== 'duplicates';
+  const activeTab = searchParams.get('tab');
+  const isClassifyTab = !['duplicates', 'deleted'].includes(activeTab);
   const tabs = useMemo(
     () => [
       {
@@ -249,6 +252,11 @@ const OrganizationManagement = () => {
         id: 'duplicates',
         label: formatMessage({ id: 'duplicates.heading' }),
         icon: <CallMergeIcon />
+      },
+      {
+        id: 'deleted',
+        label: formatMessage({ id: 'deletedOrganizations.heading' }),
+        icon: <DeleteIcon />
       }
     ],
     [formatMessage]
@@ -524,6 +532,12 @@ const OrganizationManagement = () => {
             onDeleted={id =>
               setDeletedIds(previous => new Set(previous).add(String(id)))
             }
+          />
+        </Card>
+        <Card sx={{ p: 2 }}>
+          <DeletedOrganizationsSection
+            enabled={canAccess && activeTab === 'deleted'}
+            onPreview={setPreviewId}
           />
         </Card>
       </PageTabs>

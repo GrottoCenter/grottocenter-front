@@ -5,12 +5,15 @@ import { apiGet } from '../../api/client';
 import { organizationKeys } from '../../api/queryKeys';
 import { STALE } from '../../conf/queryClient';
 
-export const useOrganization = organizationId =>
+export const useOrganization = (
+  organizationId,
+  { staleTime = STALE.STANDARD } = {}
+) =>
   useQuery({
     queryKey: organizationKeys.detail(organizationId),
     queryFn: () => apiGet(`${getOrganizationUrl}${organizationId}`),
     enabled: Boolean(organizationId),
-    staleTime: STALE.STANDARD
+    staleTime
   });
 
 export default useOrganization;

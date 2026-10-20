@@ -15,6 +15,7 @@ import OrganizationManagement from './index';
 
 vi.mock('@/api/client', () => ({
   apiGet: vi.fn(),
+  apiGetWithRange: vi.fn(),
   apiPost: vi.fn()
 }));
 vi.mock('@/hooks', () => ({

@@ -10,7 +10,8 @@ const OrganizationActionButtons = ({
   organization,
   onPreview,
   showIdInLabel = false,
-  showOpenLink = false
+  showOpenLink = false,
+  showEditLink = true
 }) => {
   const { formatMessage } = useIntl();
   const name = showIdInLabel
@@ -31,25 +32,29 @@ const OrganizationActionButtons = ({
       <Tooltip title={label}>
         <IconButton
           aria-label={label}
+          data-testid={`preview-organization-${organization.id}`}
           onClick={() => onPreview(organization.id)}>
           <VisibilityIcon />
         </IconButton>
       </Tooltip>
-      <Tooltip title={editLabel}>
-        <IconButton
-          component={AppLink}
-          to={`/ui/organizations/${organization.id}/edit`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={editLabel}>
-          <EditIcon />
-        </IconButton>
-      </Tooltip>
+      {showEditLink && (
+        <Tooltip title={editLabel}>
+          <IconButton
+            component={AppLink}
+            to={`/ui/organizations/${organization.id}/edit`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={editLabel}>
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+      )}
       {showOpenLink && (
         <Tooltip title={openLabel}>
           <IconButton
             component={AppLink}
             to={`/ui/organizations/${organization.id}`}
+            data-testid={`open-organization-${organization.id}`}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={openLabel}>
@@ -68,7 +73,8 @@ OrganizationActionButtons.propTypes = {
   }).isRequired,
   onPreview: PropTypes.func.isRequired,
   showIdInLabel: PropTypes.bool,
-  showOpenLink: PropTypes.bool
+  showOpenLink: PropTypes.bool,
+  showEditLink: PropTypes.bool
 };
 
 export default OrganizationActionButtons;

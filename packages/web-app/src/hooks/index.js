@@ -156,6 +156,7 @@ export {
   useUpdatePersonGroups
 } from './mutations/usePerson';
 export { useOrganization } from './queries/useOrganization';
+export { useDeletedOrganizations } from './queries/useDeletedOrganizations';
 export { useCountry } from './queries/useCountry';
 export { useRegion } from './queries/useRegion';
 export { useSnapshots } from './queries/useSnapshots';
