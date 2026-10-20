@@ -91,7 +91,7 @@ const CreateNewOrganization = ({
         testId="inline-organization-name"
         isError={!!errors.name}
         isRequired
-        isDisabled={isPending}
+        isDisabled={!enabled || isPending}
         maxLength={TEXT_LENGTH_LIMITS.ENTITY_NAME}
         validatorFn={value =>
           !!value?.trim() || formatMessage({ id: 'Required' })
