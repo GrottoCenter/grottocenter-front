@@ -24,7 +24,7 @@ const IconLabel = ({ icon = null, children, alignToFirstLine = false }) => (
           // Match one text line so the icon stays centered on that line.
           height: alignToFirstLine ? '1lh' : undefined,
           // The parent gap owns spacing, including for CustomIcon's own margin.
-          '& > :first-child': { mr: 0 }
+          '& > :first-of-type': { mr: 0 }
         }}>
         {icon}
       </Box>
