@@ -38,7 +38,7 @@ API implementation: https://github.com/GrottoCenter/grottocenter-api/pull/1895
   Hide these sections for other classified and unknown nonempty types without
   deleting stored relations. Account joining also rejects unsupported types. Document author
   and publisher roles remain available independently of the principal type.
-- The seven API values are SPELEOLOGY (Caving club), CAVE_RESCUE (Cave rescue),
+- The seven API values are SPELEOLOGY (Caving group), CAVE_RESCUE (Cave rescue),
   EDITION (Publisher), RESEARCH (Research organization), ADMINISTRATION
   (Administration), NATURE_CONSERVATION (Nature conservation), LIBRARY
   (Library / documentation centre).

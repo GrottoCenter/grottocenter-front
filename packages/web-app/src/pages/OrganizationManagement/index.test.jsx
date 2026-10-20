@@ -160,7 +160,7 @@ it('sends the selected type with all existing editable fields', async () => {
       .querySelector('[data-testid="SaveIcon"]')
   ).toBeInTheDocument();
   fireEvent.mouseDown(within(row).getByRole('combobox'));
-  fireEvent.click(screen.getByRole('option', { name: 'Caving club' }));
+  fireEvent.click(screen.getByRole('option', { name: 'Caving group' }));
   fireEvent.click(within(row).getByRole('button', { name: 'Save' }));
 
   await waitFor(() =>

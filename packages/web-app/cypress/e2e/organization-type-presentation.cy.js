@@ -142,7 +142,7 @@ describe('Organization type presentation', () => {
       cy.get('[data-testid="organization-summary"]').scrollIntoView({
         offset: { top: -96, left: 0 }
       });
-      expectOrganizationSummary('Caving club');
+      expectOrganizationSummary('Caving group');
       cy.get('[data-testid="organization-type-label"]').should('be.visible');
       cy.get('[data-testid="organization-statistics"]').within(() => {
         ['Members', 'Documents', 'Networks', 'Entrances'].forEach(label => {
@@ -336,7 +336,7 @@ describe('Organization type presentation', () => {
     cy.get('.leaflet-popup-content').within(() => {
       cy.get('.map-popup-title').should('have.text', 'CLUB');
       cy.get('.map-popup-title').parent().find('img').should('not.exist');
-      cy.contains('.map-popup-property', 'Caving club')
+      cy.contains('.map-popup-property', 'Caving group')
         .find('img')
         .should('have.length', 1);
       cy.contains('.map-popup-property', '1 Club street').should('be.visible');

@@ -56,7 +56,7 @@ it('uses shared organization icons for organization authors alongside person ico
         {
           authors: [{ id: 1, nickname: 'Cave author', type: 'AUTHOR' }],
           authorsOrganization: [
-            { id: 42, name: 'Caving club', type: 'SPELEOLOGY' }
+            { id: 42, name: 'Caving group', type: 'SPELEOLOGY' }
           ]
         },
         column.field,
@@ -71,7 +71,7 @@ it('uses shared organization icons for organization authors alongside person ico
     'src',
     getOrganizationIconSource('SPELEOLOGY')
   );
-  expect(screen.getByText('Caving club')).toBeInTheDocument();
+  expect(screen.getByText('Caving group')).toBeInTheDocument();
 });
 
 it.each(['CAVER', 'AUTHOR', null, 'FUTURE'])(

@@ -269,7 +269,7 @@ describe('organization editor classification', () => {
     );
     expect(apiPatch).not.toHaveBeenCalled();
     expect(screen.getByText('Choose an organization type.')).toBeVisible();
-    selectType('Caving club');
+    selectType('Caving group');
     fireEvent.click(screen.getByRole('button', { name: 'Update' }));
     await screen.findByText('Organization saved');
     expect(apiPut).toHaveBeenLastCalledWith(

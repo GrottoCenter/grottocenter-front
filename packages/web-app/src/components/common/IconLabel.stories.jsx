@@ -10,7 +10,7 @@ export default meta;
 export const Default = {
   args: {
     icon: <CustomIcon type="organization_club" size={20} alt="" />,
-    children: 'Caving club'
+    children: 'Caving group'
   }
 };
 

@@ -135,7 +135,7 @@ const altTexts = {
   network: 'Network',
   organization: 'Organization',
   organization_administration: 'Administration',
-  organization_club: 'Caving club',
+  organization_club: 'Caving group',
   organization_conservation: 'Nature conservation',
   organization_library: 'Library',
   organization_publisher: 'Publisher',

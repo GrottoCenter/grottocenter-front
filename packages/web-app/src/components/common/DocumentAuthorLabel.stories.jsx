@@ -17,7 +17,7 @@ export const Unknown = {
 };
 export const Organization = {
   args: {
-    author: { name: 'Caving club', type: 'SPELEOLOGY' },
+    author: { name: 'Caving group', type: 'SPELEOLOGY' },
     entityType: 'organizations'
   }
 };
