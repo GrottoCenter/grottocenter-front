@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 
-const IconLabel = ({ icon = null, children }) => (
+const IconLabel = ({ icon = null, children, alignToFirstLine = false }) => (
   <Box
     component="span"
     sx={{
       display: 'inline-flex',
-      alignItems: 'center',
+      alignItems: alignToFirstLine ? 'flex-start' : 'center',
       gap: 0.5,
       maxWidth: '100%',
       minWidth: 0,
@@ -19,7 +19,10 @@ const IconLabel = ({ icon = null, children }) => (
         component="span"
         sx={{
           display: 'inline-flex',
+          alignItems: 'center',
           flexShrink: 0,
+          // Match one text line so the icon stays centered on that line.
+          height: alignToFirstLine ? '1lh' : undefined,
           // The parent gap owns spacing, including for CustomIcon's own margin.
           '& > :first-child': { mr: 0 }
         }}>
@@ -34,7 +37,8 @@ const IconLabel = ({ icon = null, children }) => (
 
 IconLabel.propTypes = {
   icon: PropTypes.node,
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
+  alignToFirstLine: PropTypes.bool
 };
 
 export default IconLabel;

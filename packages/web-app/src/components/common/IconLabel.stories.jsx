@@ -17,7 +17,8 @@ export const Default = {
 export const Narrow = {
   args: {
     icon: <CustomIcon type="person" size={18} alt="" />,
-    children: 'Marie Jeanne Dupont (Caver)'
+    children: 'Marie Jeanne Dupont (Caver)',
+    alignToFirstLine: true
   },
   render: args => (
     <Box sx={{ width: 120 }}>

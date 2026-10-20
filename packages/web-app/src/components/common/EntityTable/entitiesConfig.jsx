@@ -193,6 +193,7 @@ const cellsRender = {
             key={`${entityType}-${author.id ?? author.nickname ?? author.name}`}
             author={author}
             entityType={entityType}
+            alignToFirstLine
           />
         ))}
       </Box>

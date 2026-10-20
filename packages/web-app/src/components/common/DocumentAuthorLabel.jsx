@@ -10,12 +10,18 @@ import {
 import CustomIcon from './CustomIcon';
 import IconLabel from './IconLabel';
 
-const DocumentAuthorLabel = ({ author, entityType = 'persons', size = 18 }) => {
+const DocumentAuthorLabel = ({
+  author,
+  entityType = 'persons',
+  size = 18,
+  alignToFirstLine = false
+}) => {
   const { formatMessage } = useIntl();
   const isOrganization = entityType === 'organizations';
   const name = isOrganization ? author.name : author.nickname;
   return (
     <IconLabel
+      alignToFirstLine={alignToFirstLine}
       icon={
         <CustomIcon
           type={
@@ -45,7 +51,8 @@ DocumentAuthorLabel.propTypes = {
     type: PropTypes.string
   }).isRequired,
   entityType: PropTypes.oneOf(['persons', 'organizations']),
-  size: PropTypes.number
+  size: PropTypes.number,
+  alignToFirstLine: PropTypes.bool
 };
 
 export default DocumentAuthorLabel;
