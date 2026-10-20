@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { Box, Chip, Paper, Typography } from '@mui/material';
+import OrganizationIcon from '@/components/common/OrganizationIcon';
 import { OrganizationSimplePropTypes } from '@/types/organization.type';
 import { depthIcon, lengthIcon } from '../../../assets/icons';
 import CustomIcon from '../CustomIcon';
@@ -224,7 +225,9 @@ export const OrganizationCard = ({ organization, itemActionButton }) => {
     return (
       <EntityCard
         to={to}
-        icon={<CustomIcon type="organization" size={32} alt="" />}
+        icon={
+          <OrganizationIcon organizationType={organization.type} size={32} />
+        }
         itemActionButton={itemActionButton}>
         <Box
           sx={{
@@ -260,7 +263,7 @@ export const OrganizationCard = ({ organization, itemActionButton }) => {
   return (
     <EntityCard
       to={`/ui/organizations/${organization.id}`}
-      icon={<CustomIcon type="organization" size={32} alt="" />}
+      icon={<OrganizationIcon organizationType={organization.type} size={32} />}
       itemActionButton={itemActionButton}>
       <CardLabel>{organization.name}</CardLabel>
     </EntityCard>
