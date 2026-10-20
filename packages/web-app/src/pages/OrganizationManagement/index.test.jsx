@@ -62,6 +62,14 @@ const openDuplicatesTab = () =>
     screen.getByRole('tab', { name: 'Manage duplicate organizations' })
   );
 
+const keepOrganization = id =>
+  fireEvent.click(
+    within(screen.getByTestId(`duplicate-comparison-${id}`)).getByRole(
+      'button',
+      { name: 'Keep' }
+    )
+  );
+
 beforeEach(() => {
   vi.clearAllMocks();
   sessionStorage.clear();
@@ -242,12 +250,16 @@ it('starts duplicate analysis only on request and reuses already loaded pages', 
   expect(
     await within(section).findByText('Same name, city and country')
   ).toBeInTheDocument();
-  const duplicateEdit = within(section).getByRole('link', {
-    name: 'Edit organization Old club (#42) (opens in a new tab)'
-  });
-  expect(duplicateEdit).toHaveAttribute('href', '/ui/organizations/42/edit');
-  expect(duplicateEdit).toHaveAttribute('target', '_blank');
-  expect(duplicateEdit).toHaveAttribute('rel', 'noopener noreferrer');
+  expect(
+    within(section).queryByRole('link', {
+      name: 'Edit organization Old club (#42) (opens in a new tab)'
+    })
+  ).toBeNull();
+  expect(
+    within(section).queryByRole('button', {
+      name: 'View organization Old club (#42)'
+    })
+  ).toBeNull();
   expect(within(section).getByRole('button', { name: 'Compare' })).toHaveClass(
     'MuiButton-contained',
     'MuiButton-colorPrimary'
@@ -257,6 +269,30 @@ it('starts duplicate analysis only on request and reuses already loaded pages', 
       .getByRole('button', { name: 'Compare' })
       .querySelector('[data-testid="CompareIcon"]')
   ).toBeInTheDocument();
+  fireEvent.click(within(section).getByRole('button', { name: 'Compare' }));
+  const comparison = screen.getByTestId('duplicate-comparison-42');
+  const duplicateEdit = within(comparison).getByRole('link', {
+    name: 'Edit organization Old club (#42) (opens in a new tab)'
+  });
+  expect(duplicateEdit).toHaveAttribute('href', '/ui/organizations/42/edit');
+  expect(duplicateEdit).toHaveAttribute('target', '_blank');
+  expect(duplicateEdit).toHaveAttribute('rel', 'noopener noreferrer');
+  const openLink = within(comparison).getByRole('link', {
+    name: 'Open organization Old club (#42) (opens in a new tab)'
+  });
+  expect(openLink).toHaveAttribute('href', '/ui/organizations/42');
+  expect(openLink).toHaveAttribute('target', '_blank');
+  expect(openLink).toHaveAttribute('rel', 'noopener noreferrer');
+  fireEvent.click(
+    within(comparison).getByRole('button', {
+      name: 'View organization Old club (#42)'
+    })
+  );
+  expect(await screen.findByTestId('full-organization')).toBeInTheDocument();
+  fireEvent.click(
+    within(screen.getByRole('dialog')).getByRole('button', { name: 'close' })
+  );
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   expect(
     within(section).getByRole('button', { name: 'Ignore for this session' })
   ).toHaveClass('MuiButton-outlined', 'MuiButton-colorSecondary');
@@ -295,6 +331,12 @@ it('shows a named similarity score for close names in the same city', async () =
   expect(
     await within(section).findByText(/Similar names in the same city/)
   ).toHaveTextContent(/Name similarity: \d+%/);
+  expect(
+    within(section).queryByRole('button', {
+      name: 'View organization Spéléo Club du Luberon (#42)'
+    })
+  ).toBeNull();
+  fireEvent.click(within(section).getByRole('button', { name: 'Compare' }));
   expect(
     within(section).getByRole('button', {
       name: 'View organization Spéléo Club du Luberon (#42)'
@@ -387,6 +429,81 @@ it('ignores a group for this tab session and lets the moderator show it again', 
   ).toBeNull();
 });
 
+it.each([2, 3])(
+  'emphasizes differing values across %i organizations while keeping matching fields visible',
+  async count => {
+    const organizations = [
+      {
+        id: 42,
+        name: 'First organization',
+        mail: 'shared@example.org',
+        type: null,
+        authoredCount: 8,
+        publishedCount: 5,
+        url: null
+      },
+      {
+        id: 43,
+        name: 'Second organization',
+        mail: 'shared@example.org',
+        type: 'RESEARCH',
+        authoredCount: 0,
+        publishedCount: 0,
+        url: ''
+      },
+      {
+        id: 44,
+        name: 'Third organization',
+        mail: 'shared@example.org',
+        type: 'RESEARCH'
+      }
+    ].slice(0, count);
+    apiPost.mockResolvedValue({ results: organizations, totalResults: count });
+    apiGet.mockImplementation(url =>
+      Promise.resolve(
+        organizations.find(org => org.id === Number(url.split('/').pop()))
+      )
+    );
+    renderManagement('/ui/organizations/management?tab=duplicates');
+    fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Compare' }));
+
+    const firstCard = within(screen.getByTestId('duplicate-comparison-42'));
+    await waitFor(() =>
+      expect(firstCard.getByText('13', { selector: 'strong' })).toBeVisible()
+    );
+    for (const organization of organizations) {
+      const card = within(
+        screen.getByTestId(`duplicate-comparison-${organization.id}`)
+      );
+      expect(
+        card.getByTestId('comparison-field-type').querySelector('strong')
+      ).toHaveTextContent(
+        organization.id === 42 ? 'Type not specified' : 'Research organization'
+      );
+      expect(
+        card.getByTestId('comparison-field-documents').querySelector('strong')
+      ).toHaveTextContent(organization.id === 42 ? '13' : '0');
+      for (const field of [
+        'mail',
+        'url',
+        'address',
+        'members',
+        'caves',
+        'managed'
+      ]) {
+        const row = card.getByTestId(`comparison-field-${field}`);
+        expect(row).toBeVisible();
+        expect(row.querySelector('strong')).toBeNull();
+      }
+      expect(card.getByTestId('comparison-field-url')).toHaveTextContent('—');
+      expect(card.getByTestId('comparison-field-members')).toHaveTextContent(
+        '0'
+      );
+    }
+  }
+);
+
 it('requires an explicit direction and confirms a soft delete with redirect only', async () => {
   apiPost.mockResolvedValue({
     results: [
@@ -415,27 +532,17 @@ it('requires an explicit direction and confirms a soft delete with redirect only
     })
   ).toHaveClass('MuiIconButton-root');
   expect(
-    screen.queryByRole('button', { name: /Delete and redirect/ })
+    screen.queryByRole('button', { name: /^Delete .* and redirect to/ })
   ).toBeNull();
-  fireEvent.click(
-    within(
-      screen.getByRole('radiogroup', { name: 'Organization to keep' })
-    ).getByRole('radio', { name: 'Old publisher (#43)' })
-  );
+  keepOrganization(43);
   const keptCard = screen.getByTestId('duplicate-comparison-43');
   const removedCard = screen.getByTestId('duplicate-comparison-42');
-  expect(
-    within(keptCard).getByText('Organization to keep')
-  ).toBeInTheDocument();
-  expect(
-    within(removedCard).getByText('Organization to remove')
-  ).toBeInTheDocument();
-  expect(within(keptCard).getByTestId('CheckIcon').parentElement).toBe(
-    within(keptCard).getByText('Organization to keep').parentElement
+  expect(within(keptCard).getByRole('status')).toHaveTextContent('To keep');
+  expect(within(removedCard).queryByText('Organization to remove')).toBeNull();
+  expect(within(keptCard).getByRole('status')).toContainElement(
+    within(keptCard).getByTestId('CheckIcon')
   );
-  expect(within(removedCard).getByTestId('CloseIcon').parentElement).toBe(
-    within(removedCard).getByText('Organization to remove').parentElement
-  );
+  expect(within(removedCard).queryByTestId('CloseIcon')).toBeNull();
   expect(within(keptCard).getByTestId('CheckIcon')).toHaveAttribute(
     'aria-hidden',
     'true'
@@ -444,16 +551,17 @@ it('requires an explicit direction and confirms a soft delete with redirect only
     getComputedStyle(removedCard).borderColor
   );
   const action = screen.getByRole('button', {
-    name: 'Delete and redirect… (#42)'
+    name: 'Delete Old club (#42) and redirect to Old publisher (#43)…'
   });
   await waitFor(() => expect(action).toBeEnabled());
   expect(action).toHaveClass('MuiButton-contained', 'MuiButton-colorError');
   expect(
-    action.querySelector('[data-testid="MergeTypeIcon"]')
+    action.querySelector('[data-testid="DeleteRoundedIcon"]')
   ).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'Close' }).parentElement).toBe(
-    action.parentElement
-  );
+  expect(removedCard).toContainElement(action);
+  expect(
+    within(keptCard).queryByRole('button', { name: /^Delete/ })
+  ).toBeNull();
   expect(screen.getByRole('button', { name: 'Close' })).toHaveClass(
     'MuiButton-outlined'
   );
@@ -465,7 +573,7 @@ it('requires an explicit direction and confirms a soft delete with redirect only
   expect(
     screen.getByRole('button', { name: 'Ignore for this session' })
       .parentElement
-  ).toBe(action.parentElement);
+  ).toBe(screen.getByRole('button', { name: 'Close' }).parentElement);
   fireEvent.click(action);
   const dialog = screen.getByRole('dialog');
   expect(dialog).toHaveTextContent(
@@ -495,15 +603,20 @@ it('requires an explicit direction and confirms a soft delete with redirect only
     'Old club (#42) was soft-deleted and now redirects to Old publisher (#43).'
   );
   expect(
-    within(success).getByRole('button', {
+    within(success).queryByRole('button', {
       name: 'View organization Old publisher (#43)'
     })
-  ).toBeInTheDocument();
-  const editLink = within(success).getByRole('link', {
-    name: 'Edit organization Old publisher (#43) (opens in a new tab)'
-  });
-  expect(editLink).toHaveAttribute('href', '/ui/organizations/43/edit');
-  expect(editLink).toHaveAttribute('target', '_blank');
+  ).toBeNull();
+  for (const [name, id] of [
+    ['Old club (#42)', 42],
+    ['Old publisher (#43)', 43]
+  ]) {
+    const link = within(success).getByRole('link', { name });
+    expect(link).toHaveAttribute('href', `/ui/organizations/${id}`);
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  }
+  expect(within(success).getAllByRole('link')).toHaveLength(2);
   const acknowledge = within(success).getByRole('button', { name: 'Got it' });
   expect(acknowledge).toHaveClass(
     'MuiButton-outlined',
@@ -552,17 +665,24 @@ it('offers one delete action per other organization in a larger group', async ()
   expect(
     screen.queryByRole('radiogroup', { name: 'Organization to remove' })
   ).toBeNull();
-  fireEvent.click(
-    within(
-      screen.getByRole('radiogroup', { name: 'Organization to keep' })
-    ).getByRole('radio', { name: 'Old publisher (#43)' })
-  );
+  keepOrganization(42);
+  expect(screen.getAllByText('To keep')).toHaveLength(1);
+  keepOrganization(43);
+  expect(screen.getAllByText('To keep')).toHaveLength(1);
+  const selected = within(screen.getByTestId('duplicate-comparison-43'));
+  expect(selected.getByRole('status')).toHaveTextContent('To keep');
+  expect(selected.queryByRole('button', { name: /Keep|To keep/ })).toBeNull();
+  expect(
+    within(screen.getByTestId('duplicate-comparison-42')).getByRole('button', {
+      name: 'Keep'
+    })
+  ).toBeEnabled();
   const removeThird = screen.getByRole('button', {
-    name: 'Delete and redirect… (#44)'
+    name: 'Delete Another club (#44) and redirect to Old publisher (#43)…'
   });
   expect(
     screen.getByRole('button', {
-      name: 'Delete and redirect… (#42)'
+      name: 'Delete Old club (#42) and redirect to Old publisher (#43)…'
     })
   ).toBeInTheDocument();
   await waitFor(() => expect(removeThird).toBeEnabled());
@@ -580,6 +700,89 @@ it('offers one delete action per other organization in a larger group', async ()
       isPermanent: false
     })
   );
+  expect(screen.getByTestId('duplicate-success-44')).toBeInTheDocument();
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  expect(screen.getByText('1 organization left to examine.')).toBeVisible();
+  expect(selected.getByRole('status')).toHaveTextContent('To keep');
+  expect(screen.getByTestId('duplicate-comparison-42')).toBeVisible();
+  expect(screen.queryByTestId('duplicate-comparison-44')).toBeNull();
+  // The actual mutation invalidates detail queries; a deleted source must no
+  // longer participate in the comparison's readiness checks.
+  apiGet.mockImplementation(url => {
+    const id = Number(url.split('/').pop());
+    return Promise.resolve({ ...byId.get(id), id, isDeleted: id === 44 });
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Compare' }));
+  expect(
+    within(screen.getByTestId('duplicate-comparison-43')).getByRole('status')
+  ).toHaveTextContent('To keep');
+  const remainingAction = screen.getByRole('button', {
+    name: 'Delete Old club (#42) and redirect to Old publisher (#43)…'
+  });
+  await waitFor(() => expect(remainingAction).toBeEnabled());
+  fireEvent.click(remainingAction);
+  fireEvent.click(
+    within(screen.getByRole('dialog')).getByRole('button', { name: 'Delete' })
+  );
+  await waitFor(() =>
+    expect(mutateAsync).toHaveBeenLastCalledWith({
+      id: '42',
+      entityId: '43',
+      isPermanent: false
+    })
+  );
+  expect(screen.getByTestId('duplicate-success-42')).toBeInTheDocument();
+  expect(screen.getByTestId('duplicate-success-44')).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Compare' })).toBeNull();
+  expect(screen.queryByRole('radiogroup')).toBeNull();
+});
+
+it('keeps completed groups in their original position until acknowledged', async () => {
+  const organizations = Array.from({ length: 6 }, (_, index) => ({
+    id: index + 1,
+    name: `${['Alpha', 'Beta', 'Gamma'][Math.floor(index / 2)]} organization ${index}`,
+    mail: `pair${Math.floor(index / 2)}@example.org`,
+    type: 'SPELEOLOGY'
+  }));
+  apiPost.mockResolvedValue({ results: organizations, totalResults: 6 });
+  apiGet.mockImplementation(url =>
+    Promise.resolve(
+      organizations.find(
+        organization => organization.id === Number(url.split('/').pop())
+      )
+    )
+  );
+  const mutateAsync = vi.fn().mockResolvedValue({});
+  useDeleteOrganization.mockReturnValue({ mutateAsync, isPending: false });
+  renderManagement('/ui/organizations/management?tab=duplicates');
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
+  const middleGroup = await screen.findByTestId('duplicate-group-3:4');
+  const initialGroups = screen.getAllByTestId(/^duplicate-group-/);
+  fireEvent.click(within(middleGroup).getByRole('button', { name: 'Compare' }));
+  keepOrganization(4);
+  const action = within(middleGroup).getByRole('button', {
+    name: 'Delete Beta organization 2 (#3) and redirect to Beta organization 3 (#4)…'
+  });
+  await waitFor(() => expect(action).toBeEnabled());
+  fireEvent.click(action);
+  fireEvent.click(
+    within(screen.getByRole('dialog')).getByRole('button', { name: 'Delete' })
+  );
+  const success = await screen.findByTestId('duplicate-success-3');
+  expect(middleGroup).toContainElement(success);
+  expect(screen.getAllByTestId(/^duplicate-group-/)).toEqual(initialGroups);
+  fireEvent.click(
+    screen.getByRole('tab', { name: 'Organizations to classify' })
+  );
+  openDuplicatesTab();
+  expect(screen.getAllByTestId(/^duplicate-group-/)).toEqual(initialGroups);
+  fireEvent.click(within(success).getByRole('button', { name: 'Got it' }));
+  expect(screen.queryByTestId('duplicate-group-3:4')).toBeNull();
+  expect(screen.getAllByTestId(/^duplicate-group-/)).toEqual([
+    initialGroups[0],
+    initialGroups[2]
+  ]);
 });
 
 it('loads at least 50 unclassified organizations then waits for Load more', async () => {

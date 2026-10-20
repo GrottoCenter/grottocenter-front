@@ -510,13 +510,8 @@ const OrganizationManagement = () => {
         </Card>
         <Card sx={{ p: 2 }}>
           <DuplicatesSection
-            organizations={
-              scanCompleted
-                ? scan.data.filter(
-                    organization => !deletedIds.has(String(organization.id))
-                  )
-                : []
-            }
+            organizations={scanCompleted ? scan.data : []}
+            deletedIds={deletedIds}
             isLoading={scan.isFetching}
             hasStarted={scanStarted}
             hasCompleted={scanCompleted}

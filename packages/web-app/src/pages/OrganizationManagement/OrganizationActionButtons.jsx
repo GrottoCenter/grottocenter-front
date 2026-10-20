@@ -3,12 +3,14 @@ import { useIntl } from 'react-intl';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import AppLink from '@/components/common/AppLink';
 
 const OrganizationActionButtons = ({
   organization,
   onPreview,
-  showIdInLabel = false
+  showIdInLabel = false,
+  showOpenLink = false
 }) => {
   const { formatMessage } = useIntl();
   const name = showIdInLabel
@@ -17,6 +19,10 @@ const OrganizationActionButtons = ({
   const label = formatMessage({ id: 'View organization {name}' }, { name });
   const editLabel = formatMessage(
     { id: 'Edit organization {name} in new tab' },
+    { name }
+  );
+  const openLabel = formatMessage(
+    { id: 'Open organization {name} in new tab' },
     { name }
   );
 
@@ -39,6 +45,18 @@ const OrganizationActionButtons = ({
           <EditIcon />
         </IconButton>
       </Tooltip>
+      {showOpenLink && (
+        <Tooltip title={openLabel}>
+          <IconButton
+            component={AppLink}
+            to={`/ui/organizations/${organization.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={openLabel}>
+            <OpenInNewIcon />
+          </IconButton>
+        </Tooltip>
+      )}
     </Box>
   );
 };
@@ -49,7 +67,8 @@ OrganizationActionButtons.propTypes = {
     name: PropTypes.string.isRequired
   }).isRequired,
   onPreview: PropTypes.func.isRequired,
-  showIdInLabel: PropTypes.bool
+  showIdInLabel: PropTypes.bool,
+  showOpenLink: PropTypes.bool
 };
 
 export default OrganizationActionButtons;
