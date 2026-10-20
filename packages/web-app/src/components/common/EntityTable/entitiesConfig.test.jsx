@@ -7,6 +7,73 @@ import messages from '../../../../public/lang/en.json';
 import entitiesConfig from './entitiesConfig';
 import { renderCell } from './tableUtils';
 
+it.each(['EDITION', 'SPELEOLOGY', null, undefined, 'FUTURE'])(
+  'uses the editor organization type %s in document table cells',
+  type => {
+    const column = entitiesConfig.documents.columns.find(
+      item => item.field === 'editor.name'
+    );
+    const { container } = render(
+      <div>
+        {renderCell(
+          { editor: { id: 42, name: 'Document publisher', type } },
+          column.field,
+          column.render
+        )}
+      </div>
+    );
+    expect(screen.getByText('Document publisher')).toBeInTheDocument();
+    expect(container.querySelector('img')).toHaveAttribute(
+      'src',
+      getOrganizationIconSource(type)
+    );
+    expect(container.querySelector('img')).toHaveAttribute('alt', '');
+    expect(column.sortable).toBe(true);
+  }
+);
+
+it.each([null, undefined, { id: 42, name: '' }])(
+  'keeps the empty document editor %j as a placeholder without an icon',
+  editor => {
+    const column = entitiesConfig.documents.columns.find(
+      item => item.field === 'editor.name'
+    );
+    const { container } = render(
+      <div>{renderCell({ editor }, column.field, column.render)}</div>
+    );
+    expect(container.textContent).toBe('-');
+    expect(container.querySelector('img')).toBeNull();
+  }
+);
+
+it('uses shared organization icons for organization authors alongside person icons', () => {
+  const column = entitiesConfig.documents.columns.find(
+    item => item.field === 'authors'
+  );
+  const { container } = render(
+    <IntlProvider locale="en" messages={messages}>
+      {renderCell(
+        {
+          authors: [{ id: 1, nickname: 'Cave author', type: 'AUTHOR' }],
+          authorsOrganization: [
+            { id: 42, name: 'Caving club', type: 'SPELEOLOGY' }
+          ]
+        },
+        column.field,
+        column.render
+      )}
+    </IntlProvider>
+  );
+  const icons = container.querySelectorAll('img');
+  expect(icons).toHaveLength(2);
+  expect(icons[0]).toHaveAttribute('src', getPersonIconSource('AUTHOR'));
+  expect(icons[1]).toHaveAttribute(
+    'src',
+    getOrganizationIconSource('SPELEOLOGY')
+  );
+  expect(screen.getByText('Caving club')).toBeInTheDocument();
+});
+
 it.each(['CAVER', 'AUTHOR', null, 'FUTURE'])(
   'keeps person type %s in its dedicated column and uses a neutral empty value otherwise',
   type => {

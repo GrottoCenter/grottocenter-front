@@ -9,6 +9,7 @@ import {
 } from '@/utils/personTypes';
 import CustomIcon from './CustomIcon';
 import IconLabel from './IconLabel';
+import OrganizationIcon from './OrganizationIcon';
 
 const DocumentAuthorLabel = ({
   author,
@@ -23,13 +24,15 @@ const DocumentAuthorLabel = ({
     <IconLabel
       alignToFirstLine={alignToFirstLine}
       icon={
-        <CustomIcon
-          type={
-            isOrganization ? 'organization' : getPersonIconType(author.type)
-          }
-          size={size}
-          alt={isOrganization ? formatMessage({ id: 'Organization' }) : ''}
-        />
+        isOrganization ? (
+          <OrganizationIcon organizationType={author.type} size={size} />
+        ) : (
+          <CustomIcon
+            type={getPersonIconType(author.type)}
+            size={size}
+            alt=""
+          />
+        )
       }>
       {name}
       {!isOrganization && isPersonType(author.type) && (

@@ -14,6 +14,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import { NavigateNext } from '@mui/icons-material';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
+import OrganizationIcon from '@/components/common/OrganizationIcon';
 import { LicenseBadge } from '@/components/common/LicenseTag';
 import {
   DEFAULT_COLLECTION_SORT_ORDER,
@@ -767,10 +768,9 @@ const Document = ({
                             documentData.editor ? (
                               <InternalTextLink
                                 icon={
-                                  <CustomIcon
-                                    type="organization"
+                                  <OrganizationIcon
+                                    organizationType={documentData.editor.type}
                                     size={18}
-                                    alt=""
                                   />
                                 }
                                 value={documentData.editor.name}

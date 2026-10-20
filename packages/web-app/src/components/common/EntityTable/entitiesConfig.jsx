@@ -577,7 +577,22 @@ const documents = {
       sortField: 'authorsSort'
     },
     { visible: false, field: 'library.name', label: 'Library', sortable: true },
-    { visible: false, field: 'editor.name', label: 'Editor', sortable: true },
+    {
+      visible: false,
+      field: 'editor.name',
+      label: 'Editor',
+      sortable: true,
+      render: (value, doc) =>
+        value ? (
+          <IconLabel
+            alignToFirstLine
+            icon={
+              <OrganizationIcon organizationType={doc.editor.type} size={18} />
+            }>
+            {value}
+          </IconLabel>
+        ) : null
+    },
     { visible: true, field: 'parent.title', label: 'Parent', sortable: true },
     { visible: false, field: 'issue', label: 'Issue', sortable: true },
     { visible: false, field: 'pages', label: 'Pages', sortable: true },
