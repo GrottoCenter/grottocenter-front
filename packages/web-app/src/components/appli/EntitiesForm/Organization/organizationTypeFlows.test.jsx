@@ -27,7 +27,6 @@ vi.mock('@/hooks', async () => ({
     ]
   })
 }));
-vi.mock('../utils/InputCountry', () => ({ default: () => null }));
 vi.mock('../utils/CoordinateFormSection', () => ({ default: () => null }));
 vi.mock('../utils/LicenseBox', () => ({ default: () => null }));
 const renderForm = element =>
@@ -80,6 +79,30 @@ beforeEach(() => {
 });
 
 describe('organization editor classification', () => {
+  it.each([null, ''])(
+    'allows saving an organization without a country (%s)',
+    async country => {
+      renderForm(
+        <OrganizationForm
+          organizationValues={makeOrganizationValueData({
+            ...existingOrganization,
+            type: 'SPELEOLOGY',
+            country,
+            customMessage: ''
+          })}
+        />
+      );
+      const countrySelect = screen.getByRole('combobox', { name: /Country/ });
+      expect(countrySelect).not.toHaveAttribute('aria-required', 'true');
+      fireEvent.click(screen.getByRole('button', { name: 'Update' }));
+      await screen.findByText('Organization saved');
+      expect(apiPut).toHaveBeenCalledWith(
+        expect.stringContaining('/organizations/42'),
+        expect.objectContaining({ country: { id: null }, customMessage: '' })
+      );
+    }
+  );
+
   it.each(['000', 'eng'])(
     'allows changing the language from %s without renaming the organization',
     async language => {
@@ -183,9 +206,8 @@ describe('organization editor classification', () => {
     fireEvent.change(screen.getByLabelText(/Organization name/), {
       target: { value: 'New organization' }
     });
-    fireEvent.change(screen.getByLabelText(/Custom message/), {
-      target: { value: 'Description' }
-    });
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: /Country/ }));
+    fireEvent.click(screen.getByRole('option', { name: 'none' }));
     fireEvent.click(screen.getByRole('button', { name: 'Create' }));
     await screen.findByText('Choose an organization type.');
     expect(apiPost).not.toHaveBeenCalled();
@@ -194,7 +216,11 @@ describe('organization editor classification', () => {
     await screen.findByText('Organization saved');
     expect(apiPost).toHaveBeenCalledWith(
       expect.stringContaining('/organizations'),
-      expect.objectContaining({ type: 'LIBRARY' })
+      expect.objectContaining({
+        type: 'LIBRARY',
+        customMessage: '',
+        country: { id: null }
+      })
     );
   });
 

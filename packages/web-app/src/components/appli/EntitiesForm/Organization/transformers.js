@@ -7,7 +7,7 @@ export const makeOrganizationData = ({ organization }) => ({
   type: organization.type,
   address: organization.address,
   city: organization.city,
-  country: { id: organization.country },
+  country: { id: organization.country || null },
   customMessage: organization.customMessage,
   latitude: normelizeCoordinate(organization.latitude),
   longitude: normelizeCoordinate(organization.longitude),

@@ -75,7 +75,6 @@ const OrganizationFields = ({ control, errors }) => {
         control={control}
         isError={!!errors?.organization?.customMessage}
         minRows={6}
-        isRequired
         characterLimit={TEXT_LENGTH_LIMITS.ORGANIZATION_MESSAGE}
       />
 
@@ -142,7 +141,11 @@ const OrganizationFields = ({ control, errors }) => {
           isError={!!errors?.organization?.city}
           maxLength={TEXT_LENGTH_LIMITS.CITY}
         />
-        <InputCountry control={control} formKey="organization.country" />
+        <InputCountry
+          control={control}
+          formKey="organization.country"
+          isRequired={false}
+        />
       </FormRow>
 
       <CoordinateFormSection
