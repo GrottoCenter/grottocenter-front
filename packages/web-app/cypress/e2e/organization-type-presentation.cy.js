@@ -4,6 +4,10 @@ const organization = type => ({
   type,
   nameId: 17,
   language: 'eng',
+  author: { id: 11, nickname: 'OrganizationCreator' },
+  reviewer: { id: 12, nickname: 'OrganizationEditor' },
+  dateInscription: '2026-01-02T12:00:00Z',
+  dateReviewed: '2026-03-04T12:00:00Z',
   customMessage: 'Description',
   country: 'FR',
   mail: 'contact@example.org',
@@ -83,6 +87,29 @@ describe('Organization type presentation', () => {
         label
       );
       expectOrganizationSummary(label);
+      cy.get('[data-testid="organization-properties"]')
+        .next()
+        .should($metadata => {
+          expect($metadata.text()).to.match(
+            /Created by\s+OrganizationCreator 1\/2\/26/
+          );
+          expect($metadata.text()).to.match(
+            /Updated by\s+OrganizationEditor 3\/4\/26/
+          );
+        })
+        .and('contain.text', 'Language : ENG')
+        .within(() => {
+          cy.contains('a', 'OrganizationCreator').should(
+            'have.attr',
+            'href',
+            '/ui/persons/11'
+          );
+          cy.contains('a', 'OrganizationEditor').should(
+            'have.attr',
+            'href',
+            '/ui/persons/12'
+          );
+        });
       cy.get('h1').find('img').should('have.attr', 'alt', 'Organization');
       cy.get('h1').parent().parent().parent().should('not.contain.text', label);
       cy.get('[id="members"]').should(hasExploration ? 'exist' : 'not.exist');

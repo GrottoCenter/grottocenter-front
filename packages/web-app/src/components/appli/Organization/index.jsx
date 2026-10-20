@@ -14,6 +14,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShareIcon from '@mui/icons-material/Share';
+import ContributionMetadata from '@/components/common/Contribution/ContributionMetadata';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { canOrganizationExplore } from '@/utils/organizationTypes';
 import AppLink from '../../common/AppLink';
@@ -334,7 +335,18 @@ const Organization = ({
             />
           )}
           <ScrollableContent
-            content={<Details organization={organization} />}
+            content={
+              <>
+                <Details organization={organization} />
+                <ContributionMetadata
+                  createdBy={organization.author}
+                  createdAt={organization.dateInscription}
+                  updatedBy={organization.reviewer}
+                  updatedAt={organization.dateReviewed}
+                  language={organization.language}
+                />
+              </>
+            }
           />
           {(organization?.countries?.length > 0 ||
             organization?.regions?.length > 0 ||

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { DocumentChildPropTypes } from './document.type';
 import { EntranceSimplePropTypes } from './entrance.type';
 import { organizationTypePropType } from './organization.type';
+import authorType from './author.type';
 
 export const CaverPropTypes = PropTypes.shape({
   id: PropTypes.number.isRequired,
@@ -19,6 +20,18 @@ export const NetworkPropTypes = PropTypes.shape({
 
 export const GrottoFullPropTypes = PropTypes.shape({
   id: PropTypes.number,
+  author: authorType,
+  reviewer: authorType,
+  dateInscription: PropTypes.string,
+  dateReviewed: PropTypes.string,
+  language: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      refName: PropTypes.string
+    })
+  ]),
   type: organizationTypePropType,
   isDeleted: PropTypes.bool,
   address: PropTypes.string,
