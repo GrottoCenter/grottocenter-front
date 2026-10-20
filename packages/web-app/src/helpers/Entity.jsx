@@ -1,5 +1,6 @@
 import { createElement } from 'react';
 import { styled } from '@mui/material/styles';
+import { getOrganizationIconSource } from '@/utils/organizationIcons';
 import {
   getOrganizationTypeLabelId,
   isOrganizationType
@@ -15,7 +16,6 @@ import {
   entranceIcon,
   networkIcon,
   personIcon,
-  organizationIcon,
   massifIcon
 } from '../assets/icons';
 
@@ -88,7 +88,7 @@ export const nomelizeSearchEntity = option => {
     }
 
     case 'organizations':
-      iconSrc = organizationIcon;
+      iconSrc = getOrganizationIconSource(option.type);
       break;
 
     case 'massifs':

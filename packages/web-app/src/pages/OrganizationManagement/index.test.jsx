@@ -634,17 +634,17 @@ it('shows ten duplicate groups at a time with a full-width load-more button', as
 });
 
 it('cancels an in-flight duplicate request and never shows partial matches', async () => {
-  const unclassified = Array.from({ length: 50 }, (_, i) => ({
-    id: String(i + 1),
-    name: `Group ${i}`,
-    type: null
-  }));
+  const firstPage = [
+    { ...first, type: 'SPELEOLOGY', mail: 'club@example.org' },
+    { ...second, type: 'EDITION', mail: 'club@example.org' },
+    ...typed.slice(0, 98)
+  ];
   let scanSignal;
   let scanAttempts = 0;
   apiPost.mockImplementation((_url, { page }, { signal }) => {
     if (page === 1) {
       return Promise.resolve({
-        results: [...unclassified, ...typed.slice(0, 50)],
+        results: firstPage,
         totalResults: 200
       });
     }
@@ -662,44 +662,88 @@ it('cancels an in-flight duplicate request and never shows partial matches', asy
       );
     });
   });
-  renderManagement();
-  await waitFor(() => expect(apiPost).toHaveBeenCalledTimes(1));
-  openDuplicatesTab();
-  fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
-  const section = screen.getByRole('region', {
-    name: 'Manage duplicate organizations'
-  });
+  renderManagement('/ui/organizations/management?tab=duplicates');
+  const section = within(
+    screen.getByRole('region', { name: 'Manage duplicate organizations' })
+  );
+  fireEvent.click(section.getByRole('button', { name: 'Analyze duplicates' }));
   expect(
-    await within(section).findByText('Organizations scanned: 100 of 200')
+    await section.findByText('Organizations scanned: 100 of 200')
   ).toBeInTheDocument();
-  expect(within(section).getByRole('progressbar')).toHaveAttribute(
+  expect(section.getByRole('progressbar')).toHaveAttribute(
     'aria-valuenow',
     '50'
   );
-  const cancel = within(section).getByRole('button', { name: 'Cancel' });
+  const cancel = section.getByRole('button', { name: 'Cancel' });
   expect(cancel.parentElement).toBe(
-    within(section).getByRole('progressbar').parentElement
+    section.getByRole('progressbar').parentElement
   );
   expect(cancel).toHaveClass('MuiButton-outlined', 'MuiButton-colorError');
-  fireEvent.click(
-    screen.getByRole('tab', { name: 'Organizations to classify' })
-  );
-  expect(scanSignal.aborted).toBe(false);
-  openDuplicatesTab();
-  fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+  fireEvent.click(cancel);
   await waitFor(() => expect(scanSignal.aborted).toBe(true));
   expect(
-    await screen.findByText('Analysis cancelled. No partial results are shown.')
-  ).toBeInTheDocument();
-  expect(apiPost).toHaveBeenCalledTimes(2);
-  expect(screen.queryByRole('button', { name: 'Compare' })).toBeNull();
-  fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
-  expect(
-    await within(section).findByText(
-      'Analysis complete: 200 organizations examined.'
+    await section.findByText(
+      'Analysis cancelled. No partial results are shown.'
     )
   ).toBeInTheDocument();
-  expect(apiPost).toHaveBeenCalledTimes(3);
+  expect(apiPost).toHaveBeenCalledTimes(2);
+  expect(section.queryByRole('button', { name: 'Compare' })).toBeNull();
+  fireEvent.click(section.getByRole('button', { name: 'Analyze duplicates' }));
+  expect(
+    await section.findByText('Analysis complete: 200 organizations examined.')
+  ).toBeInTheDocument();
+  expect(apiPost).toHaveBeenCalledTimes(4);
+  expect(section.getByRole('button', { name: 'Compare' })).toBeInTheDocument();
+});
+
+it('keeps an in-flight duplicate scan running when switching tabs', async () => {
+  const unclassified = Array.from({ length: 50 }, (_, i) => ({
+    id: String(i + 1),
+    name: `Group ${i}`,
+    type: null
+  }));
+  let scanSignal;
+  apiPost.mockImplementation((_url, { page }, { signal }) => {
+    if (page === 1) {
+      return Promise.resolve({
+        results: [...unclassified, ...typed.slice(0, 50)],
+        totalResults: 200
+      });
+    }
+    scanSignal = signal;
+    return new Promise((_resolve, reject) => {
+      signal.addEventListener('abort', () =>
+        reject(new DOMException('Aborted', 'AbortError'))
+      );
+    });
+  });
+  renderManagement();
+  const tabs = within(screen.getByRole('tablist'));
+  const duplicatesTab = tabs.getByRole('tab', {
+    name: 'Manage duplicate organizations'
+  });
+  const classifyTab = tabs.getByRole('tab', {
+    name: 'Organizations to classify'
+  });
+  await screen.findByTestId('organization-row-1');
+  fireEvent.click(duplicatesTab);
+  // The classification tab keeps 50 MUI rows mounted while hidden. Scope
+  // queries to the scan controls to avoid repeatedly traversing those rows.
+  const section = within(
+    screen.getByRole('region', { name: 'Manage duplicate organizations' })
+  );
+  fireEvent.click(section.getByRole('button', { name: 'Analyze duplicates' }));
+  await waitFor(() => expect(apiPost).toHaveBeenCalledTimes(2));
+  fireEvent.click(classifyTab);
+  expect(scanSignal.aborted).toBe(false);
+  fireEvent.click(duplicatesTab);
+  expect(section.getByRole('progressbar')).toHaveAttribute(
+    'aria-valuenow',
+    '50'
+  );
+  expect(scanSignal.aborted).toBe(false);
+  fireEvent.click(section.getByRole('button', { name: 'Cancel' }));
+  await waitFor(() => expect(scanSignal.aborted).toBe(true));
 });
 
 it('opens either tab directly without scanning until requested', async () => {
