@@ -1,8 +1,18 @@
+const expectOrganizationIcon = name => {
+  cy.get('@sourceIcon').then(iconSrc => {
+    cy.contains('p', name)
+      .parent()
+      .find('img')
+      .should('have.attr', 'src', iconSrc);
+  });
+};
+
 const scenarios = [
   {
     path: 'organizations',
     source: {
       name: 'Source organization',
+      type: 'SPELEOLOGY',
       cavers: [],
       exploredEntrances: [{ id: 101, name: 'Linked entrance' }],
       exploredNetworks: [{ id: 102, name: 'Linked network', nbEntrances: 2 }]
@@ -81,6 +91,9 @@ describe('Deletion with an existing redirect', () => {
       cy.wait('@source');
 
       if (path === 'organizations') {
+        cy.get('[data-testid="organization-type"] img')
+          .invoke('attr', 'src')
+          .as('sourceIcon', { type: 'static' });
         // MUI's generated icon test IDs are omitted from production builds.
         // Use the application-owned IDs so this also checks the CI bundle.
         cy.get('[data-testid="unlink-network-icon"]').should('have.length', 1);
@@ -89,6 +102,9 @@ describe('Deletion with an existing redirect', () => {
 
       cy.get('button[aria-label="Delete"]').click();
       cy.get('[role="dialog"]').within(() => {
+        if (path === 'organizations') {
+          expectOrganizationIcon(source.name);
+        }
         cy.get('[role="combobox"]').type('Destination');
       });
       cy.wait('@search');
@@ -105,6 +121,9 @@ describe('Deletion with an existing redirect', () => {
       cy.contains('button', /^Permanently delete$/).click();
       cy.wait('@target');
       cy.get('[role="dialog"]').within(() => {
+        if (path === 'organizations') {
+          expectOrganizationIcon(source.name);
+        }
         cy.contains(target.title ?? target.name).should('be.visible');
         cy.get('[role="combobox"]').should('not.exist');
         cy.contains('button', /^Cancel$/).click();

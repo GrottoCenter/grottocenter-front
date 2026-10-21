@@ -433,7 +433,7 @@ const OrganizationManagement = () => {
         icon={<BusinessIcon />}
       />
       <PageTabs tabs={tabs}>
-        <Card sx={{ p: 2 }}>
+        <Card sx={{ p: { xs: 1.5, sm: 2 } }}>
           <Typography variant="h2" sx={{ mb: 1 }}>
             {formatMessage({ id: 'Organizations to classify' })}
           </Typography>
@@ -516,7 +516,7 @@ const OrganizationManagement = () => {
               </Button>
             )}
         </Card>
-        <Card sx={{ p: 2 }}>
+        <Card sx={{ p: { xs: 1.5, sm: 2 } }}>
           <DuplicatesSection
             organizations={scanCompleted ? scan.data : []}
             deletedIds={deletedIds}
@@ -534,7 +534,7 @@ const OrganizationManagement = () => {
             }
           />
         </Card>
-        <Card sx={{ p: 2 }}>
+        <Card sx={{ p: { xs: 1.5, sm: 2 } }}>
           <DeletedOrganizationsSection
             enabled={canAccess && activeTab === 'deleted'}
             onPreview={setPreviewId}

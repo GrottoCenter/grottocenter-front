@@ -61,11 +61,15 @@ describe('Required organization classification', () => {
       'Research organization'
     );
 
-    selectType('LIBRARY');
+    selectType('OTHER');
     cy.contains('button', 'Create').click();
     cy.wait('@createOrganization')
       .its('request.body.type')
-      .should('eq', 'LIBRARY');
+      .should('eq', 'OTHER');
+    cy.get('[data-testid="organization-type-field"] [role="combobox"]').should(
+      'contain',
+      'Other'
+    );
   });
 
   it('requires classification before saving the name and organization together', () => {
@@ -103,11 +107,11 @@ describe('Required organization classification', () => {
     cy.contains('Choose an organization type.').should('be.visible');
     cy.get('@updateName.all').should('have.length', 0);
     cy.get('@updateOrganization.all').should('have.length', 0);
-    selectType('CAVE_RESCUE');
+    selectType('OTHER');
     cy.contains('button', 'Update').click();
     cy.wait('@updateOrganization')
       .its('request.body')
-      .should('include', { type: 'CAVE_RESCUE' })
+      .should('include', { type: 'OTHER' })
       .and('have.property', 'name')
       .and('deep.equal', { text: 'Renamed organization', language: 'eng' });
     cy.get('@updateName.all').should('have.length', 0);

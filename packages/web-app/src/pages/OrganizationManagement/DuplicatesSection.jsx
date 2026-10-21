@@ -23,6 +23,7 @@ import { organizationKeys } from '@/api/queryKeys';
 import { getOrganizationUrl } from '@/conf/apiRoutes';
 import { STALE } from '@/conf/queryClient';
 import { useDeleteOrganization, useOnlineStatus } from '@/hooks';
+import useLocalStorage from '@/hooks/useLocalStorage';
 import FormSubmissionError from '@/components/common/FormSubmissionError';
 import StandardDialog from '@/components/common/StandardDialog';
 import AppLink from '@/components/common/AppLink';
@@ -53,6 +54,14 @@ const RESULT_FORMATTERS = {
       {chunks}
     </Typography>
   )
+};
+
+const GROUP_ACTIONS_SX = {
+  display: { xs: 'grid', sm: 'flex' },
+  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+  flexWrap: 'wrap',
+  gap: 1,
+  '& > button': { minWidth: 0 }
 };
 
 const COMPARISON_FIELDS = [
@@ -104,9 +113,8 @@ const Comparison = ({
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        flex: '1 1 18rem',
         minWidth: 0,
-        p: 1.5,
+        p: { xs: 1, sm: 1.5 },
         border: 2,
         borderColor: isKept ? 'success.main' : 'divider',
         borderRadius: 1
@@ -278,8 +286,12 @@ const DuplicateComparison = ({
       <Stack
         role="group"
         aria-label={formatMessage({ id: 'duplicates.keep' })}
-        direction={{ xs: 'column', md: 'row' }}
-        spacing={2}>
+        sx={{
+          display: 'grid',
+          gridTemplateColumns:
+            'repeat(auto-fit, minmax(min(100%, 18rem), 1fr))',
+          gap: { xs: 1, sm: 2 }
+        }}>
         {group.organizations.map((org, index) => {
           const isKept = String(org.id) === targetId;
           return (
@@ -343,9 +355,7 @@ const DuplicateComparison = ({
           );
         })}
       </Stack>
-      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 2 }}>
-        {actions}
-      </Box>
+      <Box sx={{ ...GROUP_ACTIONS_SX, mt: 2 }}>{actions}</Box>
       {error && <FormSubmissionError error={error} />}
       <StandardDialog
         open={isConfirming}
@@ -474,8 +484,9 @@ const DuplicateGroup = ({
         variant="outlined"
         color="secondary"
         startIcon={<DoNotDisturbIcon />}
+        aria-describedby="duplicate-ignore-notice"
         onClick={() => onIgnored(group.key)}>
-        {formatMessage({ id: 'duplicates.ignoreForSession' })}
+        {formatMessage({ id: 'duplicates.ignoreInBrowser' })}
       </Button>
     </>
   );
@@ -485,7 +496,7 @@ const DuplicateGroup = ({
       variant="outlined"
       data-testid={`duplicate-group-${group.key}`}
       sx={{
-        p: 2,
+        p: { xs: 1.5, sm: 2 },
         mb: 1,
         borderColor: hasCandidates ? 'divider' : 'success.main'
       }}>
@@ -502,45 +513,53 @@ const DuplicateGroup = ({
               )}`}
           </Typography>
           {!isExpanded &&
-            group.organizations.map(org => (
-              <Box
-                key={org.id}
-                sx={{
-                  display: 'flex',
-                  gap: 1,
-                  py: 0.5,
-                  flexWrap: 'wrap',
-                  alignItems: 'center'
-                }}>
-                <Typography
+            group.organizations.map(org => {
+              const details = [org.city, org.country, org.mail, org.url]
+                .map(value => value?.trim())
+                .filter(value => value && !/^[-–—]+$/.test(value));
+              return (
+                <Box
+                  key={org.id}
+                  data-testid={`duplicate-summary-${org.id}`}
                   sx={{
-                    fontWeight: 600,
-                    minWidth: 0,
-                    overflowWrap: 'anywhere'
+                    display: 'grid',
+                    gridTemplateColumns: 'minmax(0, 1fr) auto',
+                    alignItems: 'baseline',
+                    columnGap: 1,
+                    rowGap: 0.25,
+                    py: 0.5,
+                    minWidth: 0
                   }}>
-                  {org.name}{' '}
-                  <Box
-                    component="span"
-                    sx={{ fontWeight: 400, color: 'text.secondary' }}>
-                    #{org.id}
-                  </Box>
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ overflowWrap: 'anywhere' }}>
-                  {[org.city, org.country, org.mail, org.url]
-                    .filter(Boolean)
-                    .join(' · ')}
-                  {org.nbCavers != null &&
-                    ` · ${formatMessage({ id: 'members' })}: ${org.nbCavers}`}
-                </Typography>
-              </Box>
-            ))}
+                  <Typography
+                    sx={{ fontWeight: 600, overflowWrap: 'anywhere' }}>
+                    {org.name}{' '}
+                    <Box
+                      component="span"
+                      sx={{ fontWeight: 400, color: 'text.secondary' }}>
+                      #{org.id}
+                    </Box>
+                  </Typography>
+                  {org.nbCavers != null && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ whiteSpace: 'nowrap' }}>
+                      {formatMessage({ id: 'members' })}: {org.nbCavers}
+                    </Typography>
+                  )}
+                  {details.length > 0 && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ gridColumn: '1 / -1', overflowWrap: 'anywhere' }}>
+                      {details.join(' · ')}
+                    </Typography>
+                  )}
+                </Box>
+              );
+            })}
           {!isExpanded && (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-              {actions}
-            </Box>
+            <Box sx={{ ...GROUP_ACTIONS_SX, mt: 1 }}>{actions}</Box>
           )}
           {isExpanded && (
             <DuplicateComparison
@@ -599,11 +618,7 @@ DuplicateGroup.propTypes = {
   onAcknowledge: PropTypes.func.isRequired
 };
 
-const SESSION_KEY = 'organizationManagement.ignoredDuplicates';
-const readIgnored = () => {
-  const value = sessionStorage.getItem(SESSION_KEY);
-  return new Set(value ? value.split(',') : []);
-};
+const IGNORED_DUPLICATES_KEY = 'organizationManagement.ignoredDuplicates';
 
 const DuplicatesSection = ({
   organizations,
@@ -620,7 +635,14 @@ const DuplicatesSection = ({
   onDeleted
 }) => {
   const { formatMessage } = useIntl();
-  const [ignored, setIgnored] = useState(readIgnored);
+  const [ignored, setIgnored] = useLocalStorage(
+    IGNORED_DUPLICATES_KEY,
+    new Set(),
+    {
+      serialize: value => [...value].join(','),
+      deserialize: value => new Set(value.split(',').filter(Boolean))
+    }
+  );
   const [visibleCount, setVisibleCount] = useState(10);
   const [completed, setCompleted] = useState([]);
   const allGroups = useMemo(
@@ -645,9 +667,7 @@ const DuplicatesSection = ({
   const hasIgnored = allGroups.some(group => ignored.has(group.key));
 
   const handleIgnore = key => {
-    const next = new Set(ignored).add(key);
-    sessionStorage.setItem(SESSION_KEY, [...next].join(','));
-    setIgnored(next);
+    setIgnored(previous => new Set(previous).add(key));
   };
 
   const handleDeleted = (groupKey, source, target) => {
@@ -665,6 +685,13 @@ const DuplicatesSection = ({
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         {formatMessage({ id: 'duplicates.suggestionsNotice' })}
+      </Typography>
+      <Typography
+        id="duplicate-ignore-notice"
+        variant="body2"
+        color="text.secondary"
+        sx={{ mb: 2 }}>
+        {formatMessage({ id: 'duplicates.ignoreNotice' })}
       </Typography>
       {isLoading && (
         <Box sx={{ mb: 2 }}>
@@ -696,7 +723,14 @@ const DuplicatesSection = ({
         </Typography>
       )}
       {!isLoading && (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            flexWrap: 'wrap',
+            gap: 1,
+            mb: 2
+          }}>
           <Button onClick={onAnalyze} disabled={!isOnline}>
             {formatMessage({ id: 'duplicates.analyze' })}
           </Button>
@@ -704,20 +738,25 @@ const DuplicatesSection = ({
             variant="outlined"
             color="secondary"
             disabled={!hasIgnored}
-            onClick={() => {
-              sessionStorage.removeItem(SESSION_KEY);
-              setIgnored(new Set());
-            }}>
+            onClick={() => setIgnored(new Set())}>
             {formatMessage({ id: 'duplicates.showIgnored' })}
           </Button>
         </Box>
       )}
       {error && <FormSubmissionError error={error} />}
       {hasCompleted && (
-        <Typography variant="body2" sx={{ mb: 2 }}>
+        <Typography
+          variant="body2"
+          data-testid="duplicate-scan-summary"
+          sx={{ mb: 2 }}>
           {formatMessage(
             { id: 'duplicates.scanComplete' },
-            { count: progress.loaded }
+            {
+              count: progress.loaded,
+              suggestions: candidates.filter(
+                group => group.organizations.length > 1
+              ).length
+            }
           )}
         </Typography>
       )}

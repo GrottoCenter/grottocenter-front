@@ -1,6 +1,6 @@
 const source = {
   id: 42,
-  name: 'Deleted club',
+  name: 'Deleted club with a very long organization name for narrow screens',
   type: 'SPELEOLOGY',
   isDeleted: true,
   redirectTo: 43,
@@ -22,7 +22,7 @@ const visitDeleted = () => {
 };
 
 describe('Deleted organizations', () => {
-  [390, 1280].forEach(width => {
+  [320, 390, 768, 1280].forEach(width => {
     it(`previews deleted organizations and confirms permanent deletion at ${width}px`, () => {
       cy.viewport(width, 900);
       cy.mockApiCatchAll();
@@ -59,23 +59,59 @@ describe('Deleted organizations', () => {
         }
       ).as('permanentDelete');
       visitDeleted();
-      cy.wait('@deletedOrganizations');
+      cy.wait('@deletedOrganizations', { requestTimeout: 30000 });
       cy.get('[data-testid="deleted-organizations-count"]').should(
         'contain.text',
-        'Soft-deleted organizations: 1'
+        '1 result'
       );
       cy.get('[data-testid="deleted-organization-42"]').within(() => {
+        cy.contains('p', source.name).should($name => {
+          const nameBounds = $name[0].getBoundingClientRect();
+          const row = $name[0].parentElement;
+          const button = row.querySelector(
+            '[data-testid="permanent-delete-organization-42"]'
+          );
+          const buttonBounds = button.getBoundingClientRect();
+          expect(row.scrollWidth).to.be.at.most(row.clientWidth);
+          if (width < 900) {
+            expect(buttonBounds.top).to.be.at.least(nameBounds.bottom);
+            expect(buttonBounds.width).to.be.closeTo(row.clientWidth, 1);
+          } else {
+            expect(buttonBounds.left).to.be.at.least(nameBounds.right);
+          }
+        });
         cy.get('[data-testid="open-organization-42"]')
           .should('have.attr', 'href', '/ui/organizations/42')
           .and('have.attr', 'target', '_blank');
         cy.get('a[href$="/edit"]').should('not.exist');
-        cy.get('[data-testid="preview-organization-42"]').click();
       });
+      cy.document().should(doc => {
+        expect(doc.documentElement.scrollWidth).to.be.at.most(
+          doc.documentElement.clientWidth
+        );
+      });
+      cy.screenshot(`deleted-organizations-list-${width}`, {
+        capture: 'viewport'
+      });
+      cy.get('[data-testid="preview-organization-42"]').click();
       cy.get('[role="dialog"]:visible').should('contain.text', source.name);
+      cy.get('[role="dialog"]:visible [data-testid="organization-type"] img')
+        .invoke('attr', 'src')
+        .as('sourceIcon', { type: 'static' });
       cy.get('[role="dialog"]:visible button[aria-label="close"]').click();
       cy.get('[role="dialog"]:visible').should('not.exist');
+      // Restored preview focus can leave its tooltip over the delete button.
+      cy.get('[data-testid="preview-organization-42"]').trigger('mouseout');
+      cy.get('[data-testid="permanent-delete-organization-42"]').focus();
+      cy.get('[role="tooltip"]').should('not.exist');
       cy.get('[data-testid="permanent-delete-organization-42"]').click();
       cy.get('[role="dialog"]:visible').within(() => {
+        cy.get('@sourceIcon').then(iconSrc => {
+          cy.contains('p', source.name)
+            .parent()
+            .find('img')
+            .should('have.attr', 'src', iconSrc);
+        });
         cy.contains(target.name).should('be.visible');
         cy.get('a[href="/ui/organizations/43"]').should('not.exist');
         cy.screenshot(`deleted-organization-confirmation-${width}`, {
@@ -90,7 +126,7 @@ describe('Deleted organizations', () => {
       cy.get('[data-testid="deleted-organization-42"]').should('not.exist');
       cy.get('[data-testid="deleted-organizations-count"]').should(
         'contain.text',
-        'Soft-deleted organizations: 0'
+        '0 results'
       );
     });
   });

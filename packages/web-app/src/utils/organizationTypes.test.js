@@ -11,12 +11,15 @@ import {
 } from './organizationIcons';
 
 describe('organization type vocabulary', () => {
-  it('provides seven distinct pictograms with a safe generic fallback', () => {
+  it('provides eight distinct pictograms with a safe generic fallback', () => {
     expect(
       new Set(ORGANIZATION_TYPE_VALUES.map(getOrganizationIconSource)).size
-    ).toBe(7);
-    [null, 'FUTURE', 'constructor'].forEach(type => {
+    ).toBe(8);
+    ['OTHER', null, 'FUTURE', 'constructor'].forEach(type => {
       expect(getOrganizationIconType(type)).toBe('organization');
+      expect(getOrganizationIconSource(type)).toBe(
+        getOrganizationIconSource(null)
+      );
     });
   });
 

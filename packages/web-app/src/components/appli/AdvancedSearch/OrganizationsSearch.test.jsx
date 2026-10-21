@@ -38,15 +38,18 @@ it('defaults to All and does not send a type field before migration', () => {
   );
 });
 
-it('searches the explicit type immediately and clears back to All', () => {
+it.each([
+  ['Publisher', 'EDITION'],
+  ['Other', 'OTHER']
+])('searches %s immediately and clears back to All', (label, type) => {
   renderSearch(<OrganizationsSearch />);
-  fireEvent.click(screen.getByRole('button', { name: 'Publisher' }));
+  fireEvent.click(screen.getByRole('button', { name: label }));
   expect(startAdvancedSearch).toHaveBeenLastCalledWith(
     expect.objectContaining({
-      filter: expect.objectContaining({ type: 'EDITION' })
+      filter: expect.objectContaining({ type })
     })
   );
-  expect(screen.getByText('Organization type: Publisher')).toBeInTheDocument();
+  expect(screen.getByText(`Organization type: ${label}`)).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'All' }));
   expect(startAdvancedSearch.mock.lastCall[0].filter).not.toHaveProperty(
     'type'

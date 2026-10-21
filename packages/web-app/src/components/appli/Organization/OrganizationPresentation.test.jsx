@@ -144,6 +144,7 @@ it.each([
   'LIBRARY',
   'ADMINISTRATION',
   'NATURE_CONSERVATION',
+  'OTHER',
   'FUTURE'
 ])(
   'hides membership and exploration without discarding document roles for %s',

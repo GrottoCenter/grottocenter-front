@@ -17,6 +17,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import ContributionMetadata from '@/components/common/Contribution/ContributionMetadata';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { canOrganizationExplore } from '@/utils/organizationTypes';
+import { getOrganizationIconType } from '@/utils/organizationIcons';
 import AppLink from '../../common/AppLink';
 import StandardDialog from '../../common/StandardDialog';
 import PageContainer from '../../common/Layouts/PageContainer';
@@ -322,6 +323,7 @@ const Organization = ({
               entityType={DELETED_ENTITIES.organization}
               entityId={organization.id}
               entityName={organization.name}
+              entityIconType={getOrganizationIconType(organization.type)}
               existingRedirectId={
                 organization.isDeleted ? organization.redirectTo : null
               }

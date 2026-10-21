@@ -24,6 +24,7 @@ import {
 } from '@/hooks';
 import { useDeletedOrganizations } from '@/hooks/queries/useDeletedOrganizations';
 import { useNotification } from '@/hooks/useNotification';
+import { getOrganizationIconType } from '@/utils/organizationIcons';
 import OrganizationActionButtons from './OrganizationActionButtons';
 
 const DeletedOrganizationsSection = ({ enabled, onPreview }) => {
@@ -125,9 +126,12 @@ const DeletedOrganizationsSection = ({ enabled, onPreview }) => {
             key={organization.id}
             data-testid={`deleted-organization-${organization.id}`}
             sx={{
-              display: 'flex',
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: 'minmax(0, 1fr) auto',
+                md: 'auto minmax(0, 1fr) auto'
+              },
               alignItems: 'center',
-              flexWrap: 'wrap',
               gap: 1,
               py: 1,
               borderBottom: 1,
@@ -141,8 +145,16 @@ const DeletedOrganizationsSection = ({ enabled, onPreview }) => {
               showEditLink={false}
             />
             <Typography
-              sx={{ flex: '1 1 12rem', overflowWrap: 'anywhere', minWidth: 0 }}>
-              {organization.name} (#{organization.id})
+              sx={{
+                gridColumn: { xs: 1, md: 2 },
+                gridRow: 1,
+                overflowWrap: 'anywhere',
+                minWidth: 0
+              }}>
+              {organization.name}{' '}
+              <Box component="span" sx={{ color: 'text.secondary' }}>
+                #{organization.id}
+              </Box>
             </Typography>
             {isAdmin && (
               <Button
@@ -151,6 +163,11 @@ const DeletedOrganizationsSection = ({ enabled, onPreview }) => {
                 startIcon={<DeleteForeverIcon />}
                 disabled={!isOnline || isPreparing || mutation.isPending}
                 data-testid={`permanent-delete-organization-${organization.id}`}
+                sx={{
+                  gridColumn: { xs: '1 / -1', md: 3 },
+                  gridRow: { xs: 2, md: 1 },
+                  minWidth: 0
+                }}
                 onClick={() => {
                   mutation.reset();
                   setSelected(organization);
@@ -179,6 +196,7 @@ const DeletedOrganizationsSection = ({ enabled, onPreview }) => {
           entityType={DELETED_ENTITIES.organization}
           entityId={source.id}
           entityName={source.name}
+          entityIconType={getOrganizationIconType(source.type)}
           existingRedirectId={source.redirectTo}
           isOpen
           isLoading={mutation.isPending || !isOnline}

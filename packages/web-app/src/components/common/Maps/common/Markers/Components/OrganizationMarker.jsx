@@ -43,7 +43,7 @@ const createOrganizationMarker = (type = null) =>
 
 export const OrganizationMarker = createOrganizationMarker();
 
-// Cache the seven typed icons instead of rebuilding SVGs for each marker.
+// Cache the typed icons instead of rebuilding SVGs for each marker.
 const typedMarkers = new Map(
   ORGANIZATION_TYPE_VALUES.map(type => [type, createOrganizationMarker(type)])
 );

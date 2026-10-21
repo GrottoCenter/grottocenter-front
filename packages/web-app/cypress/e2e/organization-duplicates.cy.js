@@ -1,7 +1,24 @@
 const organizations = [
-  { id: 1, name: 'Alpha group', mail: 'alpha@example.org' },
-  { id: 2, name: 'Alpha duplicate', mail: 'alpha@example.org' },
-  { id: 3, name: 'Beta group', mail: 'beta@example.org' },
+  {
+    id: 1,
+    name: 'Alpha group',
+    mail: 'alpha@example.org',
+    city: ' - ',
+    country: '—',
+    nbCavers: 0
+  },
+  {
+    id: 2,
+    name: 'Alpha duplicate',
+    mail: 'alpha@example.org',
+    city: 'Apt',
+    nbCavers: 3
+  },
+  {
+    id: 3,
+    name: 'Beta group with a very long organization name for narrow screens',
+    mail: 'beta@example.org'
+  },
   { id: 4, name: 'Beta duplicate', mail: 'beta@example.org' },
   { id: 5, name: 'Another beta duplicate', mail: 'beta@example.org' },
   { id: 6, name: 'Gamma group', mail: 'gamma@example.org' },
@@ -23,7 +40,45 @@ const expectGroupOrder = () => {
 };
 
 describe('Organization duplicate processing', () => {
-  [390, 1280].forEach(width => {
+  it('remembers ignored groups in this browser and persists their reset', () => {
+    cy.mockApiCatchAll();
+    cy.intercept(
+      { method: 'POST', pathname: '/api/v1/advanced-search' },
+      { body: { results: organizations, totalResults: organizations.length } }
+    );
+    cy.loginAs({ groups: ['User', 'Moderator'] });
+    cy.visit('/organizations/management?tab=duplicates', {
+      onBeforeLoad: win => {
+        win.localStorage.setItem('selectedLanguage', 'en');
+        win.localStorage.removeItem('organizationManagement.ignoredDuplicates');
+      }
+    });
+    cy.contains('button', 'Analyze', { timeout: 15000 }).click();
+    cy.get('[data-testid="duplicate-group-1:2"]')
+      .contains('button', 'Ignore')
+      .click();
+    cy.get('[data-testid="duplicate-group-3:4:5"]')
+      .contains('button', 'Ignore')
+      .click();
+    cy.get('[data-testid^="duplicate-group-"]').should('have.length', 1);
+
+    cy.window().then(win => win.sessionStorage.clear());
+    cy.reload();
+    cy.contains('button', 'Analyze', { timeout: 15000 }).click();
+    cy.contains('7 scanned · 1 suggestion').should('be.visible');
+    cy.get('[data-testid="duplicate-group-1:2"]').should('not.exist');
+    cy.get('[data-testid="duplicate-group-3:4:5"]').should('not.exist');
+    cy.get('[data-testid="duplicate-group-6:7"]').should('be.visible');
+    cy.contains('button', 'Show ignored').click();
+    expectGroupOrder();
+
+    cy.reload();
+    cy.contains('button', 'Analyze', { timeout: 15000 }).click();
+    expectGroupOrder();
+    cy.contains('button', 'Show ignored').should('be.disabled');
+  });
+
+  [320, 390, 768, 1280].forEach(width => {
     it(`keeps a partially processed group open and in place at ${width}px`, () => {
       const deletedIds = new Set();
       cy.viewport(width, 900);
@@ -59,17 +114,61 @@ describe('Organization duplicate processing', () => {
       cy.visit('/organizations/management?tab=duplicates', {
         onBeforeLoad: win => {
           win.localStorage.setItem('selectedLanguage', 'en');
-          win.sessionStorage.removeItem(
+          win.localStorage.removeItem(
             'organizationManagement.ignoredDuplicates'
           );
         }
       });
-      cy.contains('button', 'Analyze duplicates', { timeout: 15000 }).click();
+      cy.contains('button', 'Analyze', { timeout: 15000 }).click();
       expectGroupOrder();
+      cy.get('[data-testid="duplicate-summary-1"]')
+        .should('contain.text', 'Members: 0')
+        .and('not.contain.text', '—')
+        .and('not.contain.text', ' - ');
+      cy.get('[data-testid="duplicate-summary-2"]').within(() => {
+        cy.contains('p', 'Apt · alpha@example.org').should('be.visible');
+        cy.contains('p', 'Members: 3').should('be.visible');
+      });
+      cy.get('[data-testid="duplicate-summary-1"]').should($first => {
+        const first = $first[0];
+        const second = first.nextElementSibling;
+        const firstBounds = first.getBoundingClientRect();
+        const secondBounds = second.getBoundingClientRect();
+        const members = first.querySelectorAll('p')[1];
+        expect(secondBounds.top).to.be.at.least(firstBounds.bottom);
+        expect(members.getBoundingClientRect().right).to.be.closeTo(
+          firstBounds.right,
+          1
+        );
+      });
+      cy.document().should(doc => {
+        expect(doc.documentElement.scrollWidth).to.be.at.most(
+          doc.documentElement.clientWidth
+        );
+      });
+      if (width < 600) {
+        cy.get('#page-tab-1').should('have.text', 'Duplicates');
+        cy.get('#page-tab-1 span').should($label => {
+          expect(
+            parseFloat(getComputedStyle($label[0]).fontSize)
+          ).to.be.at.least(12);
+        });
+      }
+      cy.screenshot(`organization-duplicates-list-${width}`, {
+        capture: 'viewport'
+      });
       cy.get('[data-testid="duplicate-group-3:4:5"]').within(() => {
         cy.get('a').should('not.exist');
-        cy.get('[data-testid="VisibilityIcon"]').should('not.exist');
+        cy.get('[data-testid^="preview-organization-"]').should('not.exist');
         cy.contains('button', 'Compare').click();
+        cy.get('[role="group"]').should($group => {
+          const bounds = $group[0].getBoundingClientRect();
+          [...$group[0].children].forEach(card => {
+            const rect = card.getBoundingClientRect();
+            expect(rect.width).to.be.at.least(Math.min(288, bounds.width) - 1);
+            expect(rect.right).to.be.at.most(bounds.right + 1);
+          });
+        });
         cy.get('[data-testid="duplicate-comparison-3"]').within(() => {
           cy.get('[data-testid="comparison-field-documents"] strong').should(
             'have.text',
@@ -93,7 +192,7 @@ describe('Organization duplicate processing', () => {
             'target',
             '_blank'
           );
-          cy.get('[data-testid="VisibilityIcon"]').should('exist');
+          cy.get('[data-testid="preview-organization-3"]').should('be.visible');
           cy.contains('button', 'Keep').click();
         });
         cy.get('[role="status"]')
@@ -152,8 +251,8 @@ describe('Organization duplicate processing', () => {
             'target',
             '_blank'
           );
-          cy.get('[data-testid="VisibilityIcon"]').should('not.exist');
-          cy.get('[data-testid="EditIcon"]').should('not.exist');
+          cy.get('[data-testid^="preview-organization-"]').should('not.exist');
+          cy.get('a[href$="/edit"]').should('not.exist');
         });
         cy.screenshot(`organization-duplicates-completed-${width}`, {
           capture: 'viewport'

@@ -7,6 +7,11 @@ import { apiDelete, apiGet, apiGetWithRange } from '@/api/client';
 import { useOnlineStatus, usePermissions } from '@/hooks';
 import { getOrganizationUrl, getOrganizationsUrl } from '@/conf/apiRoutes';
 import { organizationKeys } from '@/api/queryKeys';
+import {
+  organizationClubIcon,
+  organizationResearchIcon,
+  organizationIcon
+} from '@/assets/icons';
 import DeletedOrganizationsSection from './DeletedOrganizationsSection';
 
 vi.mock('@/api/client', () => ({
@@ -64,7 +69,7 @@ it('shows the server total, preview and a new-tab link, without edit actions', a
   const { onPreview } = renderSection();
   const row = within(await screen.findByTestId('deleted-organization-42'));
   expect(screen.getByTestId('deleted-organizations-count')).toHaveTextContent(
-    'Soft-deleted organizations: 1'
+    '1 result'
   );
   expect(apiGetWithRange).toHaveBeenCalledWith(
     `${getOrganizationsUrl}?isDeleted=true&limit=50&skip=0`
@@ -114,6 +119,22 @@ it('loads every page using skip and keeps the total distinct from the loaded cou
   expect(screen.queryByRole('button', { name: 'Load more' })).toBeNull();
 });
 
+it.each([
+  ['SPELEOLOGY', organizationClubIcon],
+  ['RESEARCH', organizationResearchIcon],
+  ['OTHER', organizationIcon],
+  [null, organizationIcon]
+])(
+  'uses the freshly loaded source type %s for the confirmation icon',
+  async (type, iconSrc) => {
+    apiGet.mockResolvedValue({ ...source, type });
+    renderSection();
+    const dialog = await openConfirmation();
+    const sourceCard = within(dialog).getByText(source.name).parentElement;
+    expect(sourceCard.querySelector('img')).toHaveAttribute('src', iconSrc);
+  }
+);
+
 it('confirms without a redirect, then refreshes the list and total after permanent deletion', async () => {
   renderSection();
   const dialog = within(await openConfirmation());
@@ -132,7 +153,7 @@ it('confirms without a redirect, then refreshes the list and total after permane
   );
   await screen.findByText('No soft-deleted organizations.');
   expect(screen.getByTestId('deleted-organizations-count')).toHaveTextContent(
-    'Soft-deleted organizations: 0'
+    '0 results'
   );
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(screen.queryByTestId('deleted-organization-42')).toBeNull();

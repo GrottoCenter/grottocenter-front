@@ -59,9 +59,7 @@ const renderManagement = (initialEntry = '/ui/organizations/management') =>
   );
 
 const openDuplicatesTab = () =>
-  fireEvent.click(
-    screen.getByRole('tab', { name: 'Manage duplicate organizations' })
-  );
+  fireEvent.click(screen.getByRole('tab', { name: 'Duplicates' }));
 
 const keepOrganization = id =>
   fireEvent.click(
@@ -74,6 +72,7 @@ const keepOrganization = id =>
 beforeEach(() => {
   vi.clearAllMocks();
   sessionStorage.clear();
+  localStorage.removeItem('organizationManagement.ignoredDuplicates');
   usePermissions.mockReturnValue({ isAuth: true, isModerator: true });
   useOnlineStatus.mockReturnValue(true);
   useOrganization.mockReturnValue({ data: null, isFetching: true });
@@ -242,12 +241,10 @@ it('starts duplicate analysis only on request and reuses already loaded pages', 
   await waitFor(() => expect(apiPost).toHaveBeenCalledTimes(2));
   openDuplicatesTab();
   const section = await screen.findByRole('region', {
-    name: 'Manage duplicate organizations'
+    name: 'Duplicates'
   });
   expect(within(section).queryByText('Same name, city and country')).toBeNull();
-  fireEvent.click(
-    within(section).getByRole('button', { name: 'Analyze duplicates' })
-  );
+  fireEvent.click(within(section).getByRole('button', { name: 'Analyze' }));
   expect(
     await within(section).findByText('Same name, city and country')
   ).toBeInTheDocument();
@@ -294,15 +291,56 @@ it('starts duplicate analysis only on request and reuses already loaded pages', 
     within(screen.getByRole('dialog')).getByRole('button', { name: 'close' })
   );
   await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-  expect(
-    within(section).getByRole('button', { name: 'Ignore for this session' })
-  ).toHaveClass('MuiButton-outlined', 'MuiButton-colorSecondary');
+  expect(within(section).getByRole('button', { name: 'Ignore' })).toHaveClass(
+    'MuiButton-outlined',
+    'MuiButton-colorSecondary'
+  );
   expect(
     within(section)
-      .getByRole('button', { name: 'Ignore for this session' })
+      .getByRole('button', { name: 'Ignore' })
       .querySelector('[data-testid="DoNotDisturbIcon"]')
   ).toBeInTheDocument();
   expect(apiPost).toHaveBeenCalledTimes(2);
+});
+
+it('shows membership separately from missing or available contact details', async () => {
+  apiPost.mockResolvedValue({
+    results: [
+      {
+        ...first,
+        name: 'COLLECTIF',
+        city: ' - ',
+        country: '—',
+        mail: ' – ',
+        url: ' ',
+        nbCavers: 0
+      },
+      {
+        ...second,
+        name: 'COLLECTIF KHAMMMOUANE 2002-2003-2004',
+        city: ' Apt ',
+        country: 'FR',
+        nbCavers: 3
+      }
+    ],
+    totalResults: 2
+  });
+  renderManagement('/ui/organizations/management?tab=duplicates');
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
+
+  const sparse = await screen.findByTestId('duplicate-summary-42');
+  expect(sparse).toHaveTextContent('COLLECTIF #42');
+  expect(within(sparse).getByText('Members: 0')).toBeInTheDocument();
+  expect(within(sparse).queryByText(/^[-–—]+$/)).toBeNull();
+  const populated = within(screen.getByTestId('duplicate-summary-43'));
+  expect(populated.getByText('Apt · FR')).toBeInTheDocument();
+  expect(populated.getByText('Members: 3')).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole('button', { name: 'Compare' }));
+  const comparison = within(screen.getByTestId('duplicate-comparison-42'));
+  expect(
+    await comparison.findByTestId('comparison-field-members')
+  ).toHaveTextContent('Members: 0');
 });
 
 it('shows a named similarity score for close names in the same city', async () => {
@@ -324,10 +362,10 @@ it('shows a named similarity score for close names in the same city', async () =
     totalResults: 2
   });
   renderManagement('/ui/organizations/management?tab=duplicates');
-  fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
 
   const section = screen.getByRole('region', {
-    name: 'Manage duplicate organizations'
+    name: 'Duplicates'
   });
   expect(
     await within(section).findByText(/Similar names in the same city/)
@@ -356,10 +394,10 @@ it('shows CNRS variants even when their location and contact details are missing
     totalResults: 4
   });
   renderManagement('/ui/organizations/management?tab=duplicates');
-  fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
 
   const section = screen.getByRole('region', {
-    name: 'Manage duplicate organizations'
+    name: 'Duplicates'
   });
   expect(
     await within(section).findByText(
@@ -372,7 +410,7 @@ it('shows CNRS variants even when their location and contact details are missing
   ).toHaveLength(4);
 });
 
-it('ignores a group for this tab session and lets the moderator show it again', async () => {
+it('persists ignored groups across browser sessions and lets the moderator reset them', async () => {
   apiPost.mockResolvedValue({
     results: [
       { ...first, mail: 'club@example.org' },
@@ -383,27 +421,25 @@ it('ignores a group for this tab session and lets the moderator show it again', 
   const view = renderManagement();
   openDuplicatesTab();
   const section = await screen.findByRole('region', {
-    name: 'Manage duplicate organizations'
+    name: 'Duplicates'
   });
   expect(
     within(section).getByRole('button', {
-      name: 'Show suggestions ignored for this session'
+      name: 'Show ignored'
     })
   ).toBeDisabled();
-  fireEvent.click(
-    within(section).getByRole('button', { name: 'Analyze duplicates' })
-  );
+  fireEvent.click(within(section).getByRole('button', { name: 'Analyze' }));
   fireEvent.click(
     await within(section).findByRole('button', {
-      name: 'Ignore for this session'
+      name: 'Ignore'
     })
   );
   expect(within(section).queryByRole('button', { name: 'Compare' })).toBeNull();
   expect(
-    sessionStorage.getItem('organizationManagement.ignoredDuplicates')
+    localStorage.getItem('organizationManagement.ignoredDuplicates')
   ).toContain('42:43');
   const showIgnored = within(section).getByRole('button', {
-    name: 'Show suggestions ignored for this session'
+    name: 'Show ignored'
   });
   expect(showIgnored).toBeEnabled();
   expect(showIgnored).toHaveClass(
@@ -411,23 +447,31 @@ it('ignores a group for this tab session and lets the moderator show it again', 
     'MuiButton-colorSecondary'
   );
   expect(showIgnored.parentElement).toBe(
-    within(section).getByRole('button', { name: 'Analyze duplicates' })
-      .parentElement
+    within(section).getByRole('button', { name: 'Analyze' }).parentElement
   );
   view.unmount();
-  renderManagement();
+  sessionStorage.clear();
+  const nextView = renderManagement();
   openDuplicatesTab();
   expect(screen.queryByRole('button', { name: 'Compare' })).toBeNull();
-  fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
+  await screen.findByText('2 scanned · 0 suggestions');
+  expect(screen.queryByRole('button', { name: 'Compare' })).toBeNull();
   fireEvent.click(
     await screen.findByRole('button', {
-      name: 'Show suggestions ignored for this session'
+      name: 'Show ignored'
     })
   );
   expect(screen.getByRole('button', { name: 'Compare' })).toBeInTheDocument();
+  expect(localStorage.getItem('organizationManagement.ignoredDuplicates')).toBe(
+    ''
+  );
+  nextView.unmount();
+  renderManagement('/ui/organizations/management?tab=duplicates');
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
   expect(
-    sessionStorage.getItem('organizationManagement.ignoredDuplicates')
-  ).toBeNull();
+    await screen.findByRole('button', { name: 'Compare' })
+  ).toBeInTheDocument();
 });
 
 it.each([2, 3])(
@@ -466,7 +510,7 @@ it.each([2, 3])(
       )
     );
     renderManagement('/ui/organizations/management?tab=duplicates');
-    fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
     fireEvent.click(await screen.findByRole('button', { name: 'Compare' }));
 
     const firstCard = within(screen.getByTestId('duplicate-comparison-42'));
@@ -523,9 +567,7 @@ it('requires an explicit direction and confirms a soft delete with redirect only
   renderManagement();
   expect(screen.getByTestId('BusinessIcon')).toBeInTheDocument();
   openDuplicatesTab();
-  fireEvent.click(
-    await screen.findByRole('button', { name: 'Analyze duplicates' })
-  );
+  fireEvent.click(await screen.findByRole('button', { name: 'Analyze' }));
   fireEvent.click(await screen.findByRole('button', { name: 'Compare' }));
   expect(
     screen.getByRole('button', {
@@ -571,10 +613,9 @@ it('requires an explicit direction and confirms a soft delete with redirect only
       .getByRole('button', { name: 'Close' })
       .querySelector('[data-testid="CloseIcon"]')
   ).toBeInTheDocument();
-  expect(
-    screen.getByRole('button', { name: 'Ignore for this session' })
-      .parentElement
-  ).toBe(screen.getByRole('button', { name: 'Close' }).parentElement);
+  expect(screen.getByRole('button', { name: 'Ignore' }).parentElement).toBe(
+    screen.getByRole('button', { name: 'Close' }).parentElement
+  );
   fireEvent.click(action);
   const dialog = screen.getByRole('dialog');
   expect(dialog).toHaveTextContent(
@@ -623,9 +664,7 @@ it('requires an explicit direction and confirms a soft delete with redirect only
     'MuiButton-outlined',
     'MuiButton-colorSuccess'
   );
-  fireEvent.click(
-    screen.getByRole('tab', { name: 'Organizations to classify' })
-  );
+  fireEvent.click(screen.getByRole('tab', { name: 'To classify' }));
   openDuplicatesTab();
   expect(screen.getByTestId('duplicate-success-42')).toBeInTheDocument();
   fireEvent.click(acknowledge);
@@ -661,7 +700,7 @@ it('offers one delete action per other organization in a larger group', async ()
   useDeleteOrganization.mockReturnValue({ mutateAsync, isPending: false });
   renderManagement('/ui/organizations/management?tab=duplicates');
 
-  fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
   fireEvent.click(await screen.findByRole('button', { name: 'Compare' }));
   expect(
     screen.queryByRole('radiogroup', { name: 'Organization to remove' })
@@ -757,7 +796,7 @@ it('keeps completed groups in their original position until acknowledged', async
   const mutateAsync = vi.fn().mockResolvedValue({});
   useDeleteOrganization.mockReturnValue({ mutateAsync, isPending: false });
   renderManagement('/ui/organizations/management?tab=duplicates');
-  fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
   const middleGroup = await screen.findByTestId('duplicate-group-3:4');
   const initialGroups = screen.getAllByTestId(/^duplicate-group-/);
   fireEvent.click(within(middleGroup).getByRole('button', { name: 'Compare' }));
@@ -773,9 +812,7 @@ it('keeps completed groups in their original position until acknowledged', async
   const success = await screen.findByTestId('duplicate-success-3');
   expect(middleGroup).toContainElement(success);
   expect(screen.getAllByTestId(/^duplicate-group-/)).toEqual(initialGroups);
-  fireEvent.click(
-    screen.getByRole('tab', { name: 'Organizations to classify' })
-  );
+  fireEvent.click(screen.getByRole('tab', { name: 'To classify' }));
   openDuplicatesTab();
   expect(screen.getAllByTestId(/^duplicate-group-/)).toEqual(initialGroups);
   fireEvent.click(within(success).getByRole('button', { name: 'Got it' }));
@@ -826,7 +863,7 @@ it('shows ten duplicate groups at a time with a full-width load-more button', as
     totalResults: 22
   });
   renderManagement('/ui/organizations/management?tab=duplicates');
-  fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
 
   await waitFor(() =>
     expect(screen.getAllByRole('button', { name: 'Compare' })).toHaveLength(10)
@@ -867,10 +904,8 @@ it('cancels an in-flight duplicate request and never shows partial matches', asy
     });
   });
   renderManagement('/ui/organizations/management?tab=duplicates');
-  const section = within(
-    screen.getByRole('region', { name: 'Manage duplicate organizations' })
-  );
-  fireEvent.click(section.getByRole('button', { name: 'Analyze duplicates' }));
+  const section = within(screen.getByRole('region', { name: 'Duplicates' }));
+  fireEvent.click(section.getByRole('button', { name: 'Analyze' }));
   expect(
     await section.findByText('Organizations scanned: 100 of 200')
   ).toBeInTheDocument();
@@ -892,9 +927,9 @@ it('cancels an in-flight duplicate request and never shows partial matches', asy
   ).toBeInTheDocument();
   expect(apiPost).toHaveBeenCalledTimes(2);
   expect(section.queryByRole('button', { name: 'Compare' })).toBeNull();
-  fireEvent.click(section.getByRole('button', { name: 'Analyze duplicates' }));
+  fireEvent.click(section.getByRole('button', { name: 'Analyze' }));
   expect(
-    await section.findByText('Analysis complete: 200 organizations examined.')
+    await section.findByText('200 scanned · 1 suggestion')
   ).toBeInTheDocument();
   expect(apiPost).toHaveBeenCalledTimes(4);
   expect(section.getByRole('button', { name: 'Compare' })).toBeInTheDocument();
@@ -924,19 +959,17 @@ it('keeps an in-flight duplicate scan running when switching tabs', async () => 
   renderManagement();
   const tabs = within(screen.getByRole('tablist'));
   const duplicatesTab = tabs.getByRole('tab', {
-    name: 'Manage duplicate organizations'
+    name: 'Duplicates'
   });
   const classifyTab = tabs.getByRole('tab', {
-    name: 'Organizations to classify'
+    name: 'To classify'
   });
   await screen.findByTestId('organization-row-1');
   fireEvent.click(duplicatesTab);
   // The classification tab keeps 50 MUI rows mounted while hidden. Scope
   // queries to the scan controls to avoid repeatedly traversing those rows.
-  const section = within(
-    screen.getByRole('region', { name: 'Manage duplicate organizations' })
-  );
-  fireEvent.click(section.getByRole('button', { name: 'Analyze duplicates' }));
+  const section = within(screen.getByRole('region', { name: 'Duplicates' }));
+  fireEvent.click(section.getByRole('button', { name: 'Analyze' }));
   await waitFor(() => expect(apiPost).toHaveBeenCalledTimes(2));
   fireEvent.click(classifyTab);
   expect(scanSignal.aborted).toBe(false);
@@ -953,10 +986,11 @@ it('keeps an in-flight duplicate scan running when switching tabs', async () => 
 it('opens either tab directly without scanning until requested', async () => {
   renderManagement('/ui/organizations/management?tab=duplicates');
 
-  expect(
-    screen.getByRole('tab', { name: 'Manage duplicate organizations' })
-  ).toHaveAttribute('aria-selected', 'true');
+  expect(screen.getByRole('tab', { name: 'Duplicates' })).toHaveAttribute(
+    'aria-selected',
+    'true'
+  );
   expect(apiPost).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole('button', { name: 'Analyze duplicates' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
   await waitFor(() => expect(apiPost).toHaveBeenCalled());
 });

@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { useSearchParams } from 'react-router-dom';
+import { useMeasuredHeight } from '@/hooks/useMeasuredHeight';
 
 const BOTTOM_NAV_HEIGHT = 56;
 
@@ -47,6 +48,7 @@ const PageTabs = ({ tabs, children }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const sentinelRef = useRef(null);
   const [isStuck, setIsStuck] = useState(false);
+  const [bottomNavRef, bottomNavHeight] = useMeasuredHeight();
   const childrenArray = React.Children.toArray(children);
   const slugParam = searchParams.get('tab') ?? tabs?.[0]?.id ?? '0';
   const activeTab = Math.max(0, tabs?.findIndex(t => t.id === slugParam) ?? 0);
@@ -180,7 +182,7 @@ const PageTabs = ({ tabs, children }) => {
             // Mobile keeps clearance for the fixed bottom nav; desktop adds
             // nothing — PageContainer's frame already provides the bottom gutter.
             pb: isMobile
-              ? `calc(${BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom) + 4px)`
+              ? `calc(${bottomNavHeight || BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom) + ${theme.spacing(0.5)})`
               : 0
           }}>
           {child}
@@ -199,10 +201,17 @@ const PageTabs = ({ tabs, children }) => {
             '@media print': { display: 'none' }
           }}>
           <BottomNavigation
+            ref={bottomNavRef}
+            data-testid="page-bottom-navigation"
             value={activeTab}
             onChange={handleChange}
             showLabels
-            sx={{ height: BOTTOM_NAV_HEIGHT, bgcolor: 'primary.main' }}>
+            sx={{
+              height: 'auto',
+              minHeight: BOTTOM_NAV_HEIGHT,
+              alignItems: 'stretch',
+              bgcolor: 'primary.main'
+            }}>
             {tabs.map((tab, i) => (
               <BottomNavigationAction
                 key={tab.id}
@@ -215,10 +224,16 @@ const PageTabs = ({ tabs, children }) => {
                 sx={{
                   color: 'primary.contrastText',
                   minWidth: 0,
+                  px: 0.5,
+                  py: 0.75,
+                  gap: 0.25,
+                  justifyContent: 'flex-start',
                   '& svg': { width: '1.375rem', height: '1.375rem' },
-                  '& .MuiBottomNavigationAction-label': {
-                    fontSize: '0.5625rem !important'
-                  },
+                  '& .MuiBottomNavigationAction-label, & .MuiBottomNavigationAction-label.Mui-selected':
+                    {
+                      typography: 'caption',
+                      overflowWrap: 'anywhere'
+                    },
                   '&.Mui-selected': { color: 'secondary.main' },
                   '&.Mui-disabled': {
                     opacity: 0.35,

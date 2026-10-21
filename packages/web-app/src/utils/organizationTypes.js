@@ -5,7 +5,8 @@ export const ORGANIZATION_TYPE_LABELS = Object.freeze({
   RESEARCH: 'organizationType.research',
   ADMINISTRATION: 'organizationType.administration',
   NATURE_CONSERVATION: 'organizationType.natureConservation',
-  LIBRARY: 'organizationType.library'
+  LIBRARY: 'organizationType.library',
+  OTHER: 'organizationType.other'
 });
 
 export const ORGANIZATION_TYPE_VALUES = Object.freeze(

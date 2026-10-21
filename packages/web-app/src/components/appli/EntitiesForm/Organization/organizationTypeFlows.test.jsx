@@ -180,49 +180,62 @@ describe('organization editor classification', () => {
     }
   );
 
-  it('prefills and retains an already classified organization', async () => {
-    renderForm(
-      <OrganizationForm
-        organizationValues={makeOrganizationValueData({
-          ...existingOrganization,
-          type: 'CAVE_RESCUE'
-        })}
-      />
-    );
-    expect(
-      screen.getByRole('combobox', { name: /Organization type/ })
-    ).toHaveTextContent('Cave rescue');
-    fireEvent.click(screen.getByRole('button', { name: 'Update' }));
-    await screen.findByText('Organization saved');
-    expect(apiPut).toHaveBeenCalledTimes(1);
-    expect(apiPut).toHaveBeenCalledWith(
-      expect.stringContaining('/organizations/42'),
-      expect.objectContaining({ type: 'CAVE_RESCUE' })
-    );
-  });
+  it.each([
+    ['CAVE_RESCUE', 'Cave rescue'],
+    ['OTHER', 'Other']
+  ])(
+    'prefills and retains an organization classified as %s',
+    async (type, label) => {
+      renderForm(
+        <OrganizationForm
+          organizationValues={makeOrganizationValueData({
+            ...existingOrganization,
+            type
+          })}
+        />
+      );
+      expect(
+        screen.getByRole('combobox', { name: /Organization type/ })
+      ).toHaveTextContent(label);
+      fireEvent.click(screen.getByRole('button', { name: 'Update' }));
+      await screen.findByText('Organization saved');
+      expect(apiPut).toHaveBeenCalledTimes(1);
+      expect(apiPut).toHaveBeenCalledWith(
+        expect.stringContaining('/organizations/42'),
+        expect.objectContaining({ type })
+      );
+    }
+  );
 
-  it('does not preselect a type for creation and sends the explicit choice', async () => {
-    renderForm(<OrganizationForm />);
-    fireEvent.change(screen.getByLabelText(/Organization name/), {
-      target: { value: 'New organization' }
-    });
-    fireEvent.mouseDown(screen.getByRole('combobox', { name: /Country/ }));
-    fireEvent.click(screen.getByRole('option', { name: 'none' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
-    await screen.findByText('Choose an organization type.');
-    expect(apiPost).not.toHaveBeenCalled();
-    selectType('Library / documentation centre');
-    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
-    await screen.findByText('Organization saved');
-    expect(apiPost).toHaveBeenCalledWith(
-      expect.stringContaining('/organizations'),
-      expect.objectContaining({
-        type: 'LIBRARY',
-        customMessage: '',
-        country: { id: null }
-      })
-    );
-  });
+  it.each([
+    ['LIBRARY', 'Library / documentation centre'],
+    ['OTHER', 'Other']
+  ])(
+    'requires an explicit choice and creates an organization of type %s',
+    async (type, label) => {
+      apiPost.mockResolvedValue({ id: 42, name: 'New organization', type });
+      renderForm(<OrganizationForm />);
+      fireEvent.change(screen.getByLabelText(/Organization name/), {
+        target: { value: 'New organization' }
+      });
+      fireEvent.mouseDown(screen.getByRole('combobox', { name: /Country/ }));
+      fireEvent.click(screen.getByRole('option', { name: 'none' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+      await screen.findByText('Choose an organization type.');
+      expect(apiPost).not.toHaveBeenCalled();
+      selectType(label);
+      fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+      await screen.findByText('Organization saved');
+      expect(apiPost).toHaveBeenCalledWith(
+        expect.stringContaining('/organizations'),
+        expect.objectContaining({
+          type,
+          customMessage: '',
+          country: { id: null }
+        })
+      );
+    }
+  );
 
   it('prevents a direct editor submission while offline', async () => {
     state.isOnline = false;
