@@ -20,15 +20,6 @@ import './commands';
 // Tests can override the language in their visit's onBeforeLoad callback.
 beforeEach(() => {
   localStorage.setItem('selectedLanguage', 'en');
-  if (Cypress.isBrowser({ family: 'chromium' })) {
-    // Keep module/CSS loads out of Chrome's cross-test HTTP cache.
-    cy.then(() =>
-      Cypress.automation('remote:debugger:protocol', {
-        command: 'Network.setCacheDisabled',
-        params: { cacheDisabled: true }
-      })
-    );
-  }
   localStorage.setItem('mapTourSeen_v2', 'true');
   let appWindow = null;
   const consoleErrors = [];
