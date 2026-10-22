@@ -42,10 +42,10 @@ jobs:
       - name: List E2E specs
         id: specs
         run: |
-          # Isolate each browser/spec pair. Firefox can fail to reconnect
-          # between specs, while Chrome can retain failed lazy-resource loads.
+          # A separate Firefox runner per spec avoids the browser reconnect
+          # failure seen between specs; Chrome can run the whole suite at once.
           # The action resolves spec paths from the repository root.
-          include=$(find packages/web-app/cypress/e2e -type f \( -name '*.cy.js' -o -name '*.cy.jsx' -o -name '*.cy.ts' -o -name '*.cy.tsx' \) | sort | jq -R . | jq -s -c 'map(. as $spec | ["firefox", "chrome"][] | {browser: ., spec: $spec})')
+          include=$(find packages/web-app/cypress/e2e -type f \( -name '*.cy.js' -o -name '*.cy.jsx' -o -name '*.cy.ts' -o -name '*.cy.tsx' \) | sort | jq -R . | jq -s -c 'map({browser: "firefox", spec: .}) + [{browser: "chrome", spec: ""}]')
           echo "include=$include" >> "$GITHUB_OUTPUT"
       - name: Install dependencies
         run: yarn
