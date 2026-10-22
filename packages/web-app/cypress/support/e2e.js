@@ -22,8 +22,20 @@ beforeEach(() => {
   localStorage.setItem('selectedLanguage', 'en');
   localStorage.setItem('mapTourSeen_v2', 'true');
   let appWindow = null;
+  const consoleErrors = [];
   cy.on('window:before:load', win => {
     appWindow = win;
+    const appConsole = win.console;
+    const originalError = appConsole.error.bind(appConsole);
+    appConsole.error = (...args) => {
+      consoleErrors.push(
+        args
+          .map(value => value?.stack ?? value?.message ?? String(value))
+          .join(' ')
+          .slice(0, 2000)
+      );
+      originalError(...args);
+    };
   });
   cy.on('fail', error => {
     let context = { beforeLoadObserved: Boolean(appWindow) };
@@ -36,7 +48,8 @@ beforeEach(() => {
             appWindow.localStorage.getItem('grottocenter_token')
           ),
           online: appWindow.navigator.onLine,
-          title: appWindow.document.querySelector('h1')?.textContent
+          title: appWindow.document.querySelector('h1')?.textContent,
+          consoleErrors: consoleErrors.slice(-3)
         };
       }
     } catch {
