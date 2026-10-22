@@ -60,6 +60,9 @@ packages/web-app/dist/
 packages/web-app/.vite/
 *.local
 
+# Local 3D samples; application and test assets belong under packages/.
+/*.glb
+
 # Storybook build
 packages/web-app/storybook-static/
 

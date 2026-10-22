@@ -131,7 +131,7 @@ export const DOCUMENT_TYPE_ACCEPT = {
     extensions: ['avi', 'gif', 'mp4', 'mpeg']
   },
   [DocumentTypes.TOPOGRAPHIC_DATA]: {
-    mime: 'image/*,application/pdf,.th,.th2,.thconfig,.lox,.dxf,.cxf,.dpt,.xyz,.xvi,.zip,.gz',
+    mime: 'image/*,application/pdf,model/gltf-binary,model/gltf+json,.th,.th2,.thconfig,.lox,.dxf,.cxf,.dpt,.xyz,.xvi,.zip,.gz',
     extensions: [
       'bmp',
       'cxf',
@@ -139,6 +139,8 @@ export const DOCUMENT_TYPE_ACCEPT = {
       'dxf',
       'eps',
       'gif',
+      'glb',
+      'gltf',
       'gpx',
       'gz',
       'jpeg',
