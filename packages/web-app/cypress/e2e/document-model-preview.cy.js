@@ -388,7 +388,34 @@ describe('Document 3D preview', () => {
     );
   });
 
-  it('keeps icon tooltips, long press and fullscreen usable on mobile', () => {
+  it('keeps the viewer usable when the browser rejects fullscreen', () => {
+    cy.intercept(modelRequest, modelResponse).as('modelFile');
+    visitDocument();
+    cy.get('[data-testid="model-preview-start"]').click();
+    cy.wait('@modelFile', { requestTimeout: 30000 });
+    cy.get('[data-testid="model-preview"]', { timeout: 30000 }).should(
+      'have.attr',
+      'data-status',
+      'ready'
+    );
+    cy.get('[data-testid="model-preview-frame"]').then(([frame]) => {
+      cy.stub(frame, 'requestFullscreen')
+        .rejects(new TypeError('Fullscreen request denied'))
+        .as('requestFullscreen');
+    });
+    cy.get('[data-testid="model-preview-fullscreen"]').click();
+    cy.get('@requestFullscreen').should('have.been.calledOnce');
+    cy.get('[data-testid="model-preview-fullscreen"]').should('not.exist');
+    cy.get('[data-testid="model-preview"]').should(
+      'have.attr',
+      'data-status',
+      'ready'
+    );
+    cy.get('[data-testid="model-preview-zoom-in"]').should('be.enabled');
+    cy.contains('a', 'cave-scan.glb').should('have.attr', 'download');
+  });
+
+  it('keeps icon tooltips, long press and fullscreen controls usable on mobile', () => {
     cy.viewport(390, 844);
     cy.intercept(modelRequest, modelResponse).as('modelFile');
     visitDocument();
@@ -400,6 +427,24 @@ describe('Document 3D preview', () => {
       'data-status',
       'ready'
     );
+    // Native fullscreen rejects synthetic clicks in CI browsers. Simulate the
+    // browser API so requests, fullscreenchange events and controls stay tested.
+    cy.get('[data-testid="model-preview-frame"]').then(([frame]) => {
+      const doc = frame.ownerDocument;
+      let fullscreenElement = null;
+      const changeFullscreen = element => {
+        fullscreenElement = element;
+        doc.dispatchEvent(new doc.defaultView.Event('fullscreenchange'));
+        return Promise.resolve();
+      };
+      cy.stub(doc, 'fullscreenElement').get(() => fullscreenElement);
+      cy.stub(frame, 'requestFullscreen')
+        .callsFake(() => changeFullscreen(frame))
+        .as('requestFullscreen');
+      cy.stub(doc, 'exitFullscreen')
+        .callsFake(() => changeFullscreen(null))
+        .as('exitFullscreen');
+    });
     cy.get('[data-testid="model-preview-zoom-in"]').trigger('touchstart', {
       touches: [{ clientX: 200, clientY: 400 }],
       changedTouches: [{ clientX: 200, clientY: 400 }]
@@ -410,15 +455,16 @@ describe('Document 3D preview', () => {
       changedTouches: [{ clientX: 200, clientY: 400 }]
     });
     cy.get('[data-testid="model-preview-fullscreen"]').click();
+    cy.get('@requestFullscreen').should('have.been.calledOnce');
     cy.document().should(doc => {
-      expect(doc.fullscreenElement).to.have.attr(
-        'data-testid',
-        'model-preview-frame'
+      expect(doc.fullscreenElement, 'active fullscreen frame').to.equal(
+        doc.querySelector('[data-testid="model-preview-frame"]')
       );
     });
     cy.get('[data-testid="model-preview-fullscreen"]')
       .should('have.attr', 'aria-label', 'Exit full screen')
       .click();
+    cy.get('@exitFullscreen').should('have.been.calledOnce');
     cy.document().should(doc => expect(doc.fullscreenElement).to.eq(null));
     cy.get('[data-testid="model-preview-controls"]').should(([controls]) => {
       const frame = controls.parentElement.getBoundingClientRect();
