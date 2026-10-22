@@ -128,13 +128,3 @@ jobs:
           start: >
             yarn preview --host 0.0.0.0 --port 3000 --strictPort
           wait-on: 'http://localhost:3000'
-      - name: Upload E2E failure screenshots
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-${{ matrix.browser }}-${{ strategy.job-index }}-screenshots
-          path: |
-            packages/web-app/cypress/screenshots
-            packages/web-app/cypress/chrome-network-errors.log
-          if-no-files-found: ignore
-          retention-days: 7

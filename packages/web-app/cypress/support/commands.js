@@ -15,8 +15,7 @@ const createFakeJwt = payload => {
 };
 
 /**
- * Simulate an authenticated session in the next application window before
- * startup reads localStorage. Also update the current window for in-page use.
+ * Simulate an authenticated session by injecting a JWT into localStorage.
  *
  * @param {object} [options]
  * @param {number} [options.id=1] - User ID
@@ -24,10 +23,9 @@ const createFakeJwt = payload => {
  * @param {string[]} [options.groups=['User']] - Role names
  *
  * Usage:
- *   cy.loginAs();
- *   cy.visit('/some-page');
- *   // or combine both:
- *   cy.visitAuthenticated('/some-page');
+ *   cy.visit('/some-page', { onBeforeLoad: win => cy.loginAs().call(win) });
+ *   // or inside beforeEach:
+ *   cy.loginAs(); // sets token for subsequent visits via cy.visit wrapper
  */
 Cypress.Commands.add(
   'loginAs',
@@ -39,11 +37,6 @@ Cypress.Commands.add(
       exp: Math.floor(Date.now() / 1000) + 86400 * 30
     });
     localStorage.setItem('grottocenter_token', token);
-    // Chrome may clear/swap storage during navigation and test isolation.
-    // Bind to the incoming window, once, so later logout/navigation stays intact.
-    cy.once('window:before:load', win => {
-      win.localStorage.setItem('grottocenter_token', token);
-    });
   }
 );
 
