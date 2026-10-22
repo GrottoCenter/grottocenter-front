@@ -17,10 +17,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-      - name: Use Node.js 24
+      - name: Use the project Node.js version
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: '.nvmrc'
           cache: 'yarn'
       - name: Install dependencies
         run: yarn
@@ -34,10 +34,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-      - name: Use Node.js 24
+      - name: Use the project Node.js version
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: '.nvmrc'
           cache: 'yarn'
       - name: List E2E specs
         id: specs
@@ -96,10 +96,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-      - name: Use Node.js 24
+      - name: Use the project Node.js version
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: '.nvmrc'
           cache: 'yarn'
       - name: Restore built app
         uses: actions/download-artifact@v4
@@ -120,6 +120,9 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v7
         with:
+          # Run the CLI with setup-node's Node instead of the action's runtime.
+          # Prevent npx from downloading a different Cypress version.
+          command-prefix: '--no-install'
           browser: ${{ steps.chrome.outputs.chrome-path || matrix.browser }}
           spec: ${{ matrix.spec }}
           project: packages/web-app

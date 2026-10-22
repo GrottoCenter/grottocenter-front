@@ -2,7 +2,7 @@
 
 [![Lint](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/lint.yml/badge.svg?branch=develop)](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/lint.yml)
 [![Test](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/test.yml/badge.svg?branch=develop)](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/test.yml)
-[![Node](https://img.shields.io/badge/node-%3E%3D24.15-brightgreen)](https://nodejs.org/)
+[![Node](https://img.shields.io/badge/node-24.22.1_LTS-brightgreen)](https://nodejs.org/)
 [![Uptime](https://uptime.betterstack.com/status-badges/v2/monitor/29ko2.svg)](https://wikicaves.betteruptime.com)
 
 Web app frontend for [Grottocenter](https://fr.wikicaves.org/), the Wiki database made by cavers for cavers, maintained by [Wikicaves](https://fr.wikicaves.org/).
@@ -14,10 +14,20 @@ This project uses [Yarn](https://yarnpkg.com/) & [Yarn workspaces](https://yarnp
 
 ## 🚀 Getting Started
 
-- Install [Node.js](https://nodejs.org) (v24.15 minimum, v24.20.0 recommended) and [Yarn](https://yarnpkg.com/getting-started/install)
+- Install [Node.js](https://nodejs.org) (use the version in [`.nvmrc`](.nvmrc), currently v24.22.1) and [Yarn](https://yarnpkg.com/getting-started/install)
 - Install [Git](https://git-scm.com/downloads) (v2.32.0 minimum for the commit hooks)
 - Run `yarn` to install dependencies
 - Run `yarn start` to launch the app
+
+Node 24.22.1+ within the 24.x line and Node 26.12.1+ are accepted; Node 25 is
+excluded because it is end-of-life. CI uses the exact version in `.nvmrc`.
+For a Node security update, update `.nvmrc` and both `engines.node` fields
+(`package.json` and `packages/web-app/package.json`), then verify the runtime
+versions in the CI logs. GitHub Actions also have their own Node runtimes,
+which are supplied by the runner and are not changed by `setup-node`.
+Cypress/Electron also bundles Node separately. Check its version with
+`npx --no-install cypress version` when updating Cypress; `.nvmrc` does not
+update that runtime.
 
 ### Configuration
 
@@ -68,6 +78,10 @@ guide: PWA/service-worker setup, keystore generation, Play App Signing,
 `assetlinks.json`, the CI build workflow, and secret sharing.
 
 ## ☁️ Production deployment (Azure)
+
+The workflow builds with the Node version from `.nvmrc` and the committed Yarn
+release, then uploads `packages/web-app/dist` with `skip_app_build: true`.
+This avoids Oryx selecting an older Node version in the deployment container.
 
 [Full wiki article](https://github.com/GrottoCenter/grottocenter-front/wiki/Production-deployment-(Azure))
 
