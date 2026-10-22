@@ -7,6 +7,7 @@ import { EventAvailable, InsertDriveFile } from '@mui/icons-material';
 import Linkify from 'linkify-react';
 
 import PdfPreview from '@/components/common/PdfPreview';
+import ModelPreview from '@/components/common/ModelPreview';
 import AppLink from '../../components/common/AppLink';
 import linkifyOptions from '../../helpers/linkifyOptions';
 import Property from '../../components/common/Properties/Property';
@@ -270,8 +271,13 @@ export const FilesSection = ({ files, externalPdfUrl }) => {
           !isImageFile(f.fileName) &&
           !isVideoFile(f.fileName) &&
           !isAudioFile(f.fileName) &&
-          getFileExtension(f.fileName) !== '.pdf'
+          !['.pdf', '.glb'].includes(getFileExtension(f.fileName))
       ),
+    [fileList]
+  );
+
+  const models = useMemo(
+    () => fileList.filter(f => getFileExtension(f.fileName) === '.glb'),
     [fileList]
   );
 
@@ -370,6 +376,28 @@ export const FilesSection = ({ files, externalPdfUrl }) => {
           ))}
         </Stack>
       )}
+      {models.map(file => (
+        <Box key={file.completePath}>
+          <FileRow sx={{ mb: 0.5 }}>
+            {getFileIcon(file.fileName)}
+            <AppLink
+              href={new URL(file.completePath, window.location.href).href}
+              download={decodeFileName(file.fileName)}
+              sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
+              {decodeFileName(file.fileName)}
+            </AppLink>
+          </FileRow>
+          <ModelPreview
+            src={file.completePath}
+            title={decodeFileName(file.fileName)}
+            poster={
+              file.thumbnails?.large ||
+              file.thumbnails?.medium ||
+              file.thumbnails?.small
+            }
+          />
+        </Box>
+      ))}
       {lightboxIndex !== null && (
         <ImageLightbox
           open={lightboxIndex !== null}
