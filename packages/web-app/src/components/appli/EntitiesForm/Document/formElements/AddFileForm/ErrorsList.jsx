@@ -5,6 +5,7 @@ const ErrorsList = ({ errors }) => (
   <List>
     {errors.map(error => (
       <ListItemText
+        key={error}
         slotProps={{
           primary: { color: 'error' }
         }}>

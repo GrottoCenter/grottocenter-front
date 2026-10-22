@@ -14,7 +14,7 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import TouchAppIcon from '@mui/icons-material/TouchApp';
-import ViewInArIcon from '@mui/icons-material/ViewInAr';
+import CategoryIcon from '@mui/icons-material/Category';
 import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices';
 import TerminalIcon from '@mui/icons-material/Terminal';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
@@ -61,7 +61,7 @@ export const DOCUMENT_TYPE_ICONS = {
   [DocumentTypes.TEXT]: DescriptionIcon,
   [DocumentTypes.STILL_IMAGE]: PhotoLibraryIcon,
   [DocumentTypes.INTERACTIVE_RESOURCE]: TouchAppIcon,
-  [DocumentTypes.PHYSICAL_OBJECT]: ViewInArIcon,
+  [DocumentTypes.PHYSICAL_OBJECT]: CategoryIcon,
   [DocumentTypes.SERVICE]: MiscellaneousServicesIcon,
   [DocumentTypes.REPORT]: SummarizeIcon,
   [DocumentTypes.SOFTWARE]: TerminalIcon
@@ -131,7 +131,7 @@ export const DOCUMENT_TYPE_ACCEPT = {
     extensions: ['avi', 'gif', 'mp4', 'mpeg']
   },
   [DocumentTypes.TOPOGRAPHIC_DATA]: {
-    mime: 'image/*,application/pdf,.th,.th2,.thconfig,.lox,.dxf,.cxf,.dpt,.xyz,.xvi,.zip,.gz',
+    mime: 'image/*,application/pdf,model/gltf-binary,model/gltf+json,.th,.th2,.thconfig,.lox,.dxf,.cxf,.dpt,.xyz,.xvi,.zip,.gz',
     extensions: [
       'bmp',
       'cxf',
@@ -139,6 +139,8 @@ export const DOCUMENT_TYPE_ACCEPT = {
       'dxf',
       'eps',
       'gif',
+      'glb',
+      'gltf',
       'gpx',
       'gz',
       'jpeg',

@@ -197,6 +197,7 @@ const Document = ({
               files={document.files}
               description={document.description}
               documentTitle={document.title}
+              documentUrl={`/ui/documents/${document.id}`}
               onImageClick={onImageClick}
               imageIndexOffset={imageIndexOffset}
             />
