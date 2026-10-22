@@ -101,7 +101,7 @@ describe('Document 3D preview', () => {
             id: 42,
             name: 'Test entrance',
             isDeleted: false,
-            documents: [{ ...document, type: 'Physical Object' }],
+            documents: [document],
             massifs: [],
             locations: [],
             descriptions: [],
@@ -311,7 +311,7 @@ describe('Document 3D preview', () => {
               ...modelFile
             },
             {
-              fileName: 'physical-object.GLB',
+              fileName: 'second-scan.GLB',
               completePath: 'https://models.example.org/documents/object.GLB',
               thumbnails: null
             }
@@ -323,7 +323,7 @@ describe('Document 3D preview', () => {
     visitDocument();
     cy.get('[data-testid="model-preview"]').should('have.length', 2);
     cy.contains('a', 'cave-scan.glb').should('be.visible');
-    cy.contains('a', 'physical-object.GLB').should('be.visible');
+    cy.contains('a', 'second-scan.GLB').should('be.visible');
     cy.get('[data-testid="model-preview-start"]').first().click();
     cy.wait('@firstModel', { requestTimeout: 30000 });
     cy.get('[data-testid="model-preview"]', { timeout: 30000 })
@@ -363,13 +363,13 @@ describe('Document 3D preview', () => {
     cy.contains('a', 'survey.th').should('be.visible');
   });
 
-  it('opens a physical-object GLB without a generated thumbnail', () => {
+  it('opens a dataset GLB without a generated thumbnail', () => {
     cy.intercept(
       { method: 'GET', pathname: '/api/v1/documents/1' },
       {
         body: {
           ...document,
-          type: 'Physical Object',
+          type: 'Dataset',
           files: [{ ...modelFile, thumbnails: null }]
         }
       }

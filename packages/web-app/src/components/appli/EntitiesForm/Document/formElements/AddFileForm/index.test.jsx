@@ -13,8 +13,18 @@ import AddFileForm from './index';
 
 vi.mock('@/hooks', () => ({
   useFileFormats: () => ({
-    mimeTypes: ['model/gltf-binary', 'model/gltf+json', 'model/obj'],
-    extensions: ['glb         ', 'gltf        ', 'obj         '],
+    mimeTypes: [
+      'model/gltf-binary',
+      'model/gltf+json',
+      'model/obj',
+      'image/png'
+    ],
+    extensions: [
+      'glb         ',
+      'gltf        ',
+      'obj         ',
+      'png         '
+    ],
     isLoading: false
   }),
   useLicenses: () => ({ data: [] }),
@@ -44,23 +54,37 @@ const UploadForm = ({ type }) => {
   );
 };
 
-describe('3D document uploads', () => {
-  it.each([DocumentTypes.TOPOGRAPHIC_DATA, DocumentTypes.PHYSICAL_OBJECT])(
-    'accepts GLB and glTF for %s when MIME types are missing or generic',
-    async type => {
-      const user = userEvent.setup({ applyAccept: false });
-      const { container } = render(<UploadForm type={type} />);
-      const input = container.querySelector('input[type="file"]');
-      expect(input.accept).toContain('.glb');
-      expect(input.accept).toContain('.gltf');
-      await user.upload(input, [
-        new File(['glb'], 'scan.glb', { type: '' }),
-        new File(['{}'], 'object.gltf', { type: 'application/json' })
-      ]);
-      expect(await screen.findByText('scan.glb')).toBeInTheDocument();
-      expect(await screen.findByText('object.gltf')).toBeInTheDocument();
-    }
-  );
+describe('document uploads', () => {
+  it('accepts topographic GLB and glTF when MIME types are missing or generic', async () => {
+    const user = userEvent.setup({ applyAccept: false });
+    const { container } = render(
+      <UploadForm type={DocumentTypes.TOPOGRAPHIC_DATA} />
+    );
+    const input = container.querySelector('input[type="file"]');
+    expect(input.accept).toContain('.glb');
+    expect(input.accept).toContain('.gltf');
+    await user.upload(input, [
+      new File(['glb'], 'scan.glb', { type: '' }),
+      new File(['{}'], 'object.gltf', { type: 'application/json' })
+    ]);
+    expect(await screen.findByText('scan.glb')).toBeInTheDocument();
+    expect(await screen.findByText('object.gltf')).toBeInTheDocument();
+  });
+
+  it('uses backend formats for physical objects without a 3D-only restriction', async () => {
+    const user = userEvent.setup({ applyAccept: false });
+    const { container } = render(
+      <UploadForm type={DocumentTypes.PHYSICAL_OBJECT} />
+    );
+    const input = container.querySelector('input[type="file"]');
+    expect(input.accept).toContain('.png');
+    await user.upload(
+      input,
+      new File(['photo'], 'specimen.png', { type: 'image/png' })
+    );
+    expect(await screen.findByText('specimen.png')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
 
   it('keeps non-topographic formats out of the restricted topographic picker', async () => {
     const user = userEvent.setup({ applyAccept: false });

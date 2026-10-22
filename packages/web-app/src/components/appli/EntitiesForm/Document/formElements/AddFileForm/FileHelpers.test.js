@@ -7,7 +7,7 @@ import { validateAndBuildFileEntries } from './FileHelpers';
 const formatMessage = ({ id }, values) => `${id}: ${values?.limit ?? ''}`;
 
 describe('validateAndBuildFileEntries', () => {
-  it('enforces the 3D extension restriction independently of browser MIME types', () => {
+  it('enforces the topographic extension restriction independently of browser MIME types', () => {
     const files = [
       new File(['model'], 'cave.GLB', { type: 'application/octet-stream' }),
       new File(['model'], 'cave.pdf', { type: 'application/pdf' }),
@@ -19,7 +19,7 @@ describe('validateAndBuildFileEntries', () => {
       files,
       [],
       ({ id }, values) => `${id}: ${values.file}`,
-      DOCUMENT_TYPE_ACCEPT[DocumentTypes.PHYSICAL_OBJECT].extensions
+      DOCUMENT_TYPE_ACCEPT[DocumentTypes.TOPOGRAPHIC_DATA].extensions
     );
 
     expect(result.entries.map(entry => entry.fileName)).toEqual([

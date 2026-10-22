@@ -14,7 +14,7 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import TouchAppIcon from '@mui/icons-material/TouchApp';
-import ViewInArIcon from '@mui/icons-material/ViewInAr';
+import CategoryIcon from '@mui/icons-material/Category';
 import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices';
 import TerminalIcon from '@mui/icons-material/Terminal';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
@@ -61,7 +61,7 @@ export const DOCUMENT_TYPE_ICONS = {
   [DocumentTypes.TEXT]: DescriptionIcon,
   [DocumentTypes.STILL_IMAGE]: PhotoLibraryIcon,
   [DocumentTypes.INTERACTIVE_RESOURCE]: TouchAppIcon,
-  [DocumentTypes.PHYSICAL_OBJECT]: ViewInArIcon,
+  [DocumentTypes.PHYSICAL_OBJECT]: CategoryIcon,
   [DocumentTypes.SERVICE]: MiscellaneousServicesIcon,
   [DocumentTypes.REPORT]: SummarizeIcon,
   [DocumentTypes.SOFTWARE]: TerminalIcon
@@ -129,24 +129,6 @@ export const DOCUMENT_TYPE_ACCEPT = {
   [DocumentTypes.MOVING_IMAGE]: {
     mime: 'video/mp4,video/x-msvideo,video/mpeg,image/gif',
     extensions: ['avi', 'gif', 'mp4', 'mpeg']
-  },
-  [DocumentTypes.PHYSICAL_OBJECT]: {
-    // API-supported 3D formats and containers. PDF may embed a 3D model;
-    // ZIP/GZ and KMZ can preserve a model with its dependent resources.
-    mime: 'model/gltf-binary,model/gltf+json,model/obj,application/pdf,application/zip,application/gzip,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,image/vnd.dxf,chemical/x-xyz',
-    extensions: [
-      'dxf',
-      'glb',
-      'gltf',
-      'gz',
-      'kml',
-      'kmz',
-      'lox',
-      'obj',
-      'pdf',
-      'xyz',
-      'zip'
-    ]
   },
   [DocumentTypes.TOPOGRAPHIC_DATA]: {
     mime: 'image/*,application/pdf,model/gltf-binary,model/gltf+json,.th,.th2,.thconfig,.lox,.dxf,.cxf,.dpt,.xyz,.xvi,.zip,.gz',
