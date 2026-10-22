@@ -1,11 +1,8 @@
 describe('Administrator role preview', () => {
   beforeEach(() => {
     cy.mockApiCatchAll();
-    cy.loginAs({
+    cy.visitAuthenticated('/dashboard', {
       groups: ['Administrator', 'User']
-    });
-    cy.visit('/dashboard', {
-      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
     cy.location('pathname').should('eq', '/ui/dashboard');
   });
