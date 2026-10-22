@@ -39,21 +39,35 @@ module.exports = defineConfig({
                   socket.send(
                     JSON.stringify({ id: 2, method: 'Network.enable' })
                   );
+                  socket.send(JSON.stringify({ id: 3, method: 'Page.enable' }));
                 });
                 socket.addEventListener('message', event => {
                   const message = JSON.parse(event.data);
                   const { method, params } = message;
                   if (method === 'Network.requestWillBeSent') {
-                    requests.set(params.requestId, params.request.url);
+                    requests.set(params.requestId, {
+                      url: params.request.url,
+                      documentURL: params.documentURL,
+                      loaderId: params.loaderId,
+                      frameId: params.frameId
+                    });
                   }
                   if (method === 'Network.loadingFailed') {
-                    const url = requests.get(params.requestId);
-                    if (url?.includes('/assets/'))
-                      writeError({ url, ...params });
+                    const request = requests.get(params.requestId);
+                    if (request?.url.includes('/assets/')) {
+                      writeError({ ...request, ...params, time: Date.now() });
+                    }
                     requests.delete(params.requestId);
                   }
                   if (method === 'Network.loadingFinished') {
                     requests.delete(params.requestId);
+                  }
+                  if (
+                    method === 'Page.frameNavigated' ||
+                    method === 'Page.frameStartedNavigating' ||
+                    method === 'Page.frameRequestedNavigation'
+                  ) {
+                    writeError({ method, ...params, time: Date.now() });
                   }
                   if (
                     method === 'Log.entryAdded' &&
