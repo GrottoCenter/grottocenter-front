@@ -2,7 +2,7 @@
 
 [![Lint](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/lint.yml/badge.svg?branch=develop)](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/lint.yml)
 [![Test](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/test.yml/badge.svg?branch=develop)](https://github.com/GrottoCenter/grottocenter-front/actions/workflows/test.yml)
-[![Node](https://img.shields.io/badge/node-%3E%3D24.15-brightgreen)](https://nodejs.org/)
+[![Node](https://img.shields.io/badge/node-LTS-brightgreen)](.nvmrc)
 [![Uptime](https://uptime.betterstack.com/status-badges/v2/monitor/29ko2.svg)](https://wikicaves.betteruptime.com)
 
 Web app frontend for [Grottocenter](https://fr.wikicaves.org/), the Wiki database made by cavers for cavers, maintained by [Wikicaves](https://fr.wikicaves.org/).
@@ -14,10 +14,20 @@ This project uses [Yarn](https://yarnpkg.com/) & [Yarn workspaces](https://yarnp
 
 ## 🚀 Getting Started
 
-- Install [Node.js](https://nodejs.org) (v24.15 minimum, v24.20.0 recommended) and [Yarn](https://yarnpkg.com/getting-started/install)
+- Install [Node.js](https://nodejs.org) (use the version in [`.nvmrc`](.nvmrc)) and [Yarn](https://yarnpkg.com/getting-started/install)
 - Install [Git](https://git-scm.com/downloads) (v2.32.0 minimum for the commit hooks)
 - Run `yarn` to install dependencies
 - Run `yarn start` to launch the app
+
+The root [`package.json`](package.json) defines the supported Node versions in
+`engines.node` for this Yarn monorepo, including its private web-app workspace.
+CI uses the exact version in [`.nvmrc`](.nvmrc). For a Node security update,
+update `.nvmrc` and the root `engines.node`, then verify the runtime versions in
+the CI logs. GitHub Actions also have their own Node runtimes,
+which are supplied by the runner and are not changed by `setup-node`.
+Cypress/Electron also bundles Node separately. Check its version with
+`npx --no-install cypress version` when updating Cypress; `.nvmrc` does not
+update that runtime.
 
 ### Configuration
 
@@ -56,6 +66,10 @@ GitHub Actions runs on push and pull requests targeting `develop`:
 - Azure Static Web Apps deploy
 - Release (tag + changelog on every merge into `develop`)
 
+The lint and translation job names (`build (24)` and `check-translations (24)`)
+are kept stable for branch protection, independently of the version in `.nvmrc`.
+Coordinate any rename with the required checks configured on `develop`.
+
 Only on `app-x.y.z` tags:
 
 - TWA build
@@ -68,6 +82,16 @@ guide: PWA/service-worker setup, keystore generation, Play App Signing,
 `assetlinks.json`, the CI build workflow, and secret sharing.
 
 ## ☁️ Production deployment (Azure)
+
+The workflow builds with the Node version from `.nvmrc` and the repository's Yarn
+configuration, then uploads `packages/web-app/dist` with `skip_app_build: true`.
+This avoids Oryx selecting an older Node version in the deployment container.
+
+The current Azure plan allows at most three preview environments. If deployment
+reports that this limit is reached, free an unused preview in Azure and rerun
+the failed deployment job. Before merging deployment changes, verify that
+the preview loads and that refreshing a client-side route such as `/ui/entrances`
+works.
 
 [Full wiki article](https://github.com/GrottoCenter/grottocenter-front/wiki/Production-deployment-(Azure))
 

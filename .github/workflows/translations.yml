@@ -9,18 +9,17 @@ on:
 
 jobs:
   check-translations:
+    # Preserve the existing check name without a single-version matrix.
+    name: check-translations (24)
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [24]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node }}
+      - name: Use the project Node.js version
         uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node }}
+          node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Install dependencies

@@ -34,6 +34,11 @@ jobs:
           # the last release, neither of which exist in a shallow clone.
           fetch-depth: 0
 
+      - name: Use the project Node.js version
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+
       - name: Compute the version
         id: next
         run: |
