@@ -21,6 +21,23 @@ import './commands';
 beforeEach(() => {
   localStorage.setItem('selectedLanguage', 'en');
   localStorage.setItem('mapTourSeen_v2', 'true');
+
+  // React's error boundary catches failed lazy imports, leaving Cypress to
+  // report a missing element or API request. Preserve the original load error.
+  const preloadErrors = [];
+  cy.on('window:before:load', win => {
+    win.addEventListener('vite:preloadError', event => {
+      preloadErrors.push(event.payload?.message ?? String(event.payload));
+    });
+  });
+  cy.on('fail', error => {
+    if (preloadErrors.length) {
+      Object.assign(error, {
+        message: `${error.message}\nVite preload errors:\n${preloadErrors.join('\n')}`
+      });
+    }
+    throw error;
+  });
 });
 
 // Alternatively you can use CommonJS syntax:
