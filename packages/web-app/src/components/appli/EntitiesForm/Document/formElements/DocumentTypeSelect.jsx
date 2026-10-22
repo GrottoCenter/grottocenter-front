@@ -81,7 +81,7 @@ const TYPE_DESCRIPTIONS = {
   [DocumentTypes.MOVING_IMAGE]: 'Video, animation',
   [DocumentTypes.PHYSICAL_OBJECT]: 'Material object, sample',
   [DocumentTypes.REPORT]: 'Exploration, study, expedition',
-  [DocumentTypes.SERVICE]: 'Online service',
+  [DocumentTypes.SERVICE]: 'Web portal, online tool',
   [DocumentTypes.SOFTWARE]: 'Program, source code',
   [DocumentTypes.SOUND]: 'Recording, interview',
   [DocumentTypes.STILL_IMAGE]: 'Photo, sketch, diagram',
