@@ -133,6 +133,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e2e-${{ matrix.browser }}-${{ strategy.job-index }}-screenshots
-          path: packages/web-app/cypress/screenshots
+          path: |
+            packages/web-app/cypress/screenshots
+            packages/web-app/cypress/chrome-network-errors.log
           if-no-files-found: ignore
           retention-days: 7
