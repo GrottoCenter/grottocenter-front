@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
+  DEFAULT_ORGANIZATION_TYPE,
   getOrganizationTypeLabelId,
   ORGANIZATION_TYPE_VALUES
 } from '@/utils/organizationTypes';
@@ -32,7 +34,7 @@ const FILTER_LABELS = {
 };
 
 const initialFilterState = {
-  type: '',
+  type: DEFAULT_ORGANIZATION_TYPE,
   city: '',
   county: '',
   country: '',
@@ -48,10 +50,10 @@ const TYPE_OPTIONS = [
   }))
 ];
 
-const OrganizationsSearch = () => {
+const OrganizationsSearch = ({ initialType = DEFAULT_ORGANIZATION_TYPE }) => {
   const { formatMessage } = useIntl();
   const { filterState, updateFilter, handleRemoveFilter, resetFilter } =
-    useSearchFilter(initialFilterState);
+    useSearchFilter({ ...initialFilterState, type: initialType });
   const [query, setQuery] = useState('');
   const [matchAllFields, setMatchAllFields] = useState(true);
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
@@ -82,12 +84,15 @@ const OrganizationsSearch = () => {
   const effectiveFilter = organizationType ? filterState : locationFilters;
   const advancedFilterCount = countActiveFilters(locationFilters);
   const hasClearableFilters =
-    query !== '' || advancedFilterCount > 0 || !!organizationType;
+    query !== '' ||
+    advancedFilterCount > 0 ||
+    organizationType !== DEFAULT_ORGANIZATION_TYPE;
 
   const handleClearAll = () => {
     setQuery('');
     setMatchAllFields(true);
     resetFilter();
+    updateFilter('type', DEFAULT_ORGANIZATION_TYPE);
     setAdvancedExpanded(false);
     resetAdvancedSearch();
     // Override params are required: React state updates from the calls above are async,
@@ -184,6 +189,10 @@ const OrganizationsSearch = () => {
       <SearchActionButtons />
     </SearchForm>
   );
+};
+
+OrganizationsSearch.propTypes = {
+  initialType: PropTypes.oneOf(['', ...ORGANIZATION_TYPE_VALUES])
 };
 
 export default OrganizationsSearch;
