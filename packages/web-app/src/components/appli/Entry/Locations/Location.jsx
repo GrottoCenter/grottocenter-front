@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Box, ListItem, ListItemText } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
@@ -35,12 +35,6 @@ const Location = ({
   const deleteMutation = useDeleteLocation();
   const restoreMutation = useRestoreLocation();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
-
-  useEffect(() => {
-    setWantedDeletedState(location.isDeleted);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const onSubmitForm = data => {
     updateMutation.mutate({
@@ -52,16 +46,13 @@ const Location = ({
     setIsUpdateFormVisible(false);
   };
 
-  const onDeletePress = isPermanent => {
-    setWantedDeletedState(true);
-    deleteMutation.mutate({ id: location.id, isPermanent });
-  };
+  const onDeletePress = isPermanent =>
+    deleteMutation.mutateAsync({ id: location.id, isPermanent });
   const onRestorePress = () => {
-    setWantedDeletedState(false);
     restoreMutation.mutate({ id: location.id });
   };
 
-  const isActionLoading = wantedDeletedState !== location.isDeleted;
+  const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
   return (
     <ListItemStyled disableGutters>
@@ -72,7 +63,18 @@ const Location = ({
           setIsUpdating={setIsUpdateFormVisible}
           isDeleted={location.isDeleted}
           canEdit={isEditAllowed && permissions.isAuth}
-          canDelete={isEditAllowed && permissions.isModerator}
+          canDelete={
+            isEditAllowed &&
+            permissions.isAuth &&
+            (permissions.isModerator || permissions.isAdmin)
+          }
+          canPermanentlyDelete={
+            isEditAllowed && permissions.isAuth && permissions.isAdmin
+          }
+          deleteError={deleteMutation.error}
+          restoreError={restoreMutation.error}
+          onDeleteReset={deleteMutation.reset}
+          entityName={location.title}
           snapshotProps={{
             id: location.id,
             type: 'locations',

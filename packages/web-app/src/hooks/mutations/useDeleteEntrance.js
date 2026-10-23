@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { completeEntityDeletion } from '@/utils/entityDeletionCache';
 
 import { deleteEntranceUrl } from '../../conf/apiRoutes';
 import { apiDelete } from '../../api/client';
@@ -10,14 +11,12 @@ import { invalidateAll } from '../../utils/mapTileCache';
 export const useDeleteEntrance = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { errorPresentation: 'inline' },
+    networkMode: 'always',
     mutationFn: ({ id, entityId, isPermanent }) =>
       apiDelete(deleteEntranceUrl(id, { entityId, isPermanent })),
-    onSuccess: (_data, { id, isPermanent }) => {
-      if (isPermanent) {
-        queryClient.removeQueries({ queryKey: entranceKeys.detail(id) });
-      } else {
-        queryClient.invalidateQueries({ queryKey: entranceKeys.detail(id) });
-      }
+    onSuccess: async (data, variables) => {
+      await completeEntityDeletion(queryClient, entranceKeys, data, variables);
       invalidateAll('entrances');
       invalidateAll('networks');
     }

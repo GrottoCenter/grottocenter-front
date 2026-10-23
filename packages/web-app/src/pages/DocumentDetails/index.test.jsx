@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import {
   useDocument,
   usePermissions,
+  useRestoreDocument,
   useUnlinkDocumentToEntrance,
   useUnlinkDocumentToMassif
 } from '@/hooks';
@@ -21,7 +22,7 @@ vi.mock('@/hooks', () => ({
   findLicenseByName: () => undefined,
   usePermissions: vi.fn(),
   useDeleteDocument: () => ({ mutate: vi.fn() }),
-  useRestoreDocument: () => ({ mutate: vi.fn() }),
+  useRestoreDocument: vi.fn(),
   useLinkDocumentToEntrances: () => ({ mutateAsync: vi.fn() }),
   useUnlinkDocumentToEntrance: vi.fn(),
   useUnlinkDocumentToMassif: vi.fn(),
@@ -100,6 +101,7 @@ beforeEach(() => {
     refetch: vi.fn()
   });
   usePermissions.mockReturnValue({ isAuth: true, isModerator: true });
+  useRestoreDocument.mockReturnValue({ mutate: vi.fn() });
   useUnlinkDocumentToEntrance.mockReturnValue({
     mutateAsync: vi.fn().mockResolvedValue(undefined),
     isPending: false
@@ -109,6 +111,44 @@ beforeEach(() => {
     isPending: false
   });
 });
+
+it.each([
+  ['administrator only', { isAdmin: true, isModerator: false }],
+  ['moderator only', { isAdmin: false, isModerator: true }]
+])('allows %s to restore a deleted document', async (_role, roles) => {
+  const user = userEvent.setup();
+  usePermissions.mockReturnValue({ isAuth: true, ...roles });
+  useDocument.mockReturnValue({
+    data: { ...document, isDeleted: true },
+    isPending: false,
+    refetch: vi.fn()
+  });
+  const restore = useRestoreDocument().mutate;
+  renderPage();
+
+  await user.click(screen.getByRole('button', { name: 'Restore' }));
+  expect(restore).toHaveBeenCalledExactlyOnceWith({ id: document.id });
+});
+
+it.each([true, false])(
+  'does not offer document restoration to ordinary readers (authenticated: %s)',
+  isAuth => {
+    usePermissions.mockReturnValue({
+      isAuth,
+      isAdmin: false,
+      isModerator: false
+    });
+    useDocument.mockReturnValue({
+      data: { ...document, isDeleted: true },
+      isPending: false,
+      refetch: vi.fn()
+    });
+    renderPage();
+    expect(
+      screen.queryByRole('button', { name: 'Restore' })
+    ).not.toBeInTheDocument();
+  }
+);
 
 it.each(['EDITION', 'SPELEOLOGY', null, undefined, 'FUTURE'])(
   'uses the editor organization type %s for its icon and keeps its link',

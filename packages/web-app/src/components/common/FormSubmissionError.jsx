@@ -8,15 +8,18 @@ const FormSubmissionError = ({ error = null }) => {
 
   // Server failures must not expose internal messages or validation metadata.
   const isServerError = error.status >= 500;
+  const isRateLimited = error.status === 429;
   const code = error.body?.code ?? error.code;
+  let fallbackId = 'An error occurred while saving.';
+  if (isServerError) fallbackId = 'A server error occurred';
+  else if (isRateLimited) fallbackId = 'Too many requests';
   const fallback = formatMessage({
-    id: isServerError
-      ? 'A server error occurred'
-      : 'An error occurred while saving.'
+    id: fallbackId
   });
-  const message = isServerError
-    ? fallback
-    : error.body?.message || error.message || fallback;
+  const message =
+    isServerError || isRateLimited
+      ? fallback
+      : error.body?.message || error.message || fallback;
   const details = isServerError ? [] : (error.body?.metadata?.details ?? []);
   const detailMessages = [
     ...new Set(
@@ -28,7 +31,7 @@ const FormSubmissionError = ({ error = null }) => {
 
   return (
     <Alert severity="error" sx={{ my: 1 }}>
-      {code && !isServerError
+      {code && !isServerError && !isRateLimited
         ? formatMessage({ id: code, defaultMessage: message })
         : message}
       {detailMessages.length > 0 && (

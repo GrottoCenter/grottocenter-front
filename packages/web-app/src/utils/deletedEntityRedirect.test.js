@@ -10,8 +10,8 @@ describe('deleted entity navigation', () => {
     expect(getPostDeletionUrl(entityType, 42, 43)).toBe('/ui/entrances/42');
   });
 
-  it('uses the stored redirect when permanently deleting a deleted entity', () => {
-    expect(getPostDeletionUrl(entityType, null, 43)).toBe('/ui/entrances/43');
+  it('does not use the stored banner redirect as a navigation fallback', () => {
+    expect(getPostDeletionUrl(entityType, null, 43)).toBe('/');
     expect(getDeletedEntityRedirectUrl(entityType, 43)).toBe(
       '/ui/entrances/43'
     );

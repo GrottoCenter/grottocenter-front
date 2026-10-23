@@ -1,9 +1,14 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, act } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
+import messages from '@/../public/lang/en.json';
 
 import Person from './Person';
 
-const state = vi.hoisted(() => ({ mutate: vi.fn(), navigate: vi.fn() }));
+const state = vi.hoisted(() => ({
+  mutateAsync: vi.fn(),
+  navigate: vi.fn(),
+  permissions: { isAuth: true, isAdmin: true, isModerator: true }
+}));
 
 vi.mock('@tanstack/react-query', async importOriginal => ({
   ...(await importOriginal()),
@@ -16,9 +21,9 @@ vi.mock('react-router-dom', async importOriginal => ({
 }));
 
 vi.mock('@/hooks', () => ({
-  useDeletePerson: () => ({ mutate: state.mutate }),
+  useDeletePerson: () => ({ mutateAsync: state.mutateAsync }),
   useUserProperties: () => ({ id: 9 }),
-  usePermissions: () => ({ isAdmin: true, isModerator: true }),
+  usePermissions: () => state.permissions,
   useSharePage: () => vi.fn()
 }));
 
@@ -55,15 +60,19 @@ vi.mock('./CaverBody', () => ({ default: () => null }));
 
 describe('Person permanent deletion', () => {
   beforeEach(() => {
-    state.mutate.mockReset();
+    state.mutateAsync.mockReset();
     state.navigate.mockReset();
+    state.permissions = { isAuth: true, isAdmin: true, isModerator: true };
   });
 
-  it('opens the replacement only after the deletion succeeds', () => {
+  it('opens the replacement only after the deletion succeeds', async () => {
+    let resolveDeletion;
+    const deletion = new Promise(resolve => {
+      resolveDeletion = resolve;
+    });
+    state.mutateAsync.mockReturnValue(deletion);
     render(
-      <IntlProvider
-        locale="en"
-        messages={{ Delete: 'Delete', 'Copy link': 'Copy link' }}>
+      <IntlProvider locale="en" messages={messages}>
         <Person
           isLoading={false}
           person={{ id: 42, name: 'Current', type: 'AUTHOR' }}
@@ -74,16 +83,47 @@ describe('Person permanent deletion', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
     fireEvent.click(screen.getByRole('button', { name: 'Confirm deletion' }));
 
-    expect(state.mutate).toHaveBeenCalledWith(
-      { id: 42, entityId: 43, isPermanent: true },
-      expect.objectContaining({ onSuccess: expect.any(Function) })
-    );
+    expect(state.mutateAsync).toHaveBeenCalledWith({
+      id: 42,
+      entityId: 43,
+      isPermanent: true
+    });
     expect(state.navigate).not.toHaveBeenCalled();
 
-    const [, { onSuccess }] = state.mutate.mock.calls[0];
-    onSuccess();
+    await act(async () => resolveDeletion());
     expect(state.navigate).toHaveBeenCalledWith('/ui/persons/43', {
       replace: true
     });
+  });
+  it.each([
+    ['CAVER', true, false, true],
+    ['CAVER', false, true, false],
+    ['AUTHOR', true, false, false],
+    ['AUTHOR', false, true, true]
+  ])(
+    'matches API permissions for %s (admin=%s, moderator=%s)',
+    (type, isAdmin, isModerator, canDelete) => {
+      state.permissions = { isAuth: true, isAdmin, isModerator };
+      render(
+        <IntlProvider locale="en" messages={messages}>
+          <Person
+            isLoading={false}
+            person={{ id: 42, name: 'Current', type }}
+          />
+        </IntlProvider>
+      );
+      expect(!!screen.queryByRole('button', { name: 'Delete' })).toBe(
+        canDelete
+      );
+    }
+  );
+
+  it('never offers deletion of the reserved deleted-person record', () => {
+    render(
+      <IntlProvider locale="en" messages={messages}>
+        <Person isLoading={false} person={{ id: 8, type: 'CAVER' }} />
+      </IntlProvider>
+    );
+    expect(screen.queryByRole('button', { name: 'Delete' })).toBeNull();
   });
 });

@@ -1,5 +1,5 @@
 import { ListItem, Box, ListItemText } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
@@ -45,12 +45,6 @@ const Comment = ({
   const deleteMutation = useDeleteComment();
   const restoreMutation = useRestoreComment();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
-
-  useEffect(() => {
-    setWantedDeletedState(comment.isDeleted);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const onSubmitForm = data => {
     updateMutation.mutate({
@@ -67,16 +61,13 @@ const Comment = ({
     setIsUpdateFormVisible(false);
   };
 
-  const onDeletePress = isPermanent => {
-    setWantedDeletedState(true);
-    deleteMutation.mutate({ id: comment.id, isPermanent });
-  };
+  const onDeletePress = isPermanent =>
+    deleteMutation.mutateAsync({ id: comment.id, isPermanent });
   const onRestorePress = () => {
-    setWantedDeletedState(false);
     restoreMutation.mutate({ id: comment.id });
   };
 
-  const isActionLoading = wantedDeletedState !== comment.isDeleted;
+  const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
   const userId = useUserProperties()?.id ?? null;
   const canEdit =
@@ -98,7 +89,18 @@ const Comment = ({
           setIsUpdating={setIsUpdateFormVisible}
           isDeleted={comment.isDeleted}
           canEdit={isEditAllowed && permissions.isAuth && canEdit}
-          canDelete={isEditAllowed && permissions.isModerator}
+          canDelete={
+            isEditAllowed &&
+            permissions.isAuth &&
+            (permissions.isModerator || permissions.isAdmin)
+          }
+          canPermanentlyDelete={
+            isEditAllowed && permissions.isAuth && permissions.isAdmin
+          }
+          deleteError={deleteMutation.error}
+          restoreError={restoreMutation.error}
+          onDeleteReset={deleteMutation.reset}
+          entityName={comment.title}
           snapshotProps={{
             id: comment.id,
             type: 'comments',

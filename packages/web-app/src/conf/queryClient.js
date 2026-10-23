@@ -51,6 +51,9 @@ const notifyError = (error, meta) => {
     }
     return;
   }
+  // Dialogs owning their errors also own rate-limit feedback; keep 401 global.
+  if (meta?.errorPresentation === 'inline') return;
+
   // Use the same translated "Too many requests" message as the legacy Redux
   // ErrorHandler on 429 rather than the generic fallback. The API's
   // body.code is not standardized across endpoints for rate-limiting, so

@@ -120,24 +120,13 @@ const GuidelinePage = () => {
     isDeleted
   });
 
-  // The confirmation dialog supplies a redirect target, which guidelines do
-  // not support. It closes immediately; errors are reported through a toast.
-  const handleDelete = async _selectedEntity => {
-    try {
-      await deleteMutation.mutateAsync({
-        id: guidelineId,
-        isPermanent: isDeletePermanent
-      });
-      if (isDeletePermanent) {
-        navigate('/ui/guidelines', { replace: true });
-      }
-    } catch {
-      onError(
-        formatMessage({
-          id: 'guidelines.delete_error',
-          defaultMessage: 'Failed to delete the guideline'
-        })
-      );
+  const handleDelete = async () => {
+    await deleteMutation.mutateAsync({
+      id: guidelineId,
+      isPermanent: isDeletePermanent
+    });
+    if (isDeletePermanent) {
+      navigate('/ui/guidelines', { replace: true });
     }
   };
 
@@ -215,8 +204,12 @@ const GuidelinePage = () => {
         entityName={data?.title}
         isOpen={isDeleteDialogOpen}
         isLoading={deleteMutation.isPending}
+        error={deleteMutation.error}
         isPermanent={isDeletePermanent}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          deleteMutation.reset();
+        }}
         onConfirmation={handleDelete}
       />
       <SectionStack>

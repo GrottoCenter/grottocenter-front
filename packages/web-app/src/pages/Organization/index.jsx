@@ -17,7 +17,9 @@ const OrganizationPage = () => {
     isPaused
   } = useOrganization(organizationId);
 
-  return organization?.isDeleted && !permissions.isModerator ? (
+  return organization?.isDeleted &&
+    !permissions.isModerator &&
+    !permissions.isAdmin ? (
     <Deleted entityType={DELETED_ENTITIES.organization} entity={organization} />
   ) : (
     <Organization

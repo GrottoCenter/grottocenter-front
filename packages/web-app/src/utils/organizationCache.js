@@ -19,7 +19,7 @@ export const subscribeOrganizationMapChanges = listener => {
   return () => mapListeners.delete(listener);
 };
 
-export const invalidateOrganizationCaches = queryClient => {
+export const invalidateOrganizationCaches = (queryClient, excludedKey) => {
   [
     organizationKeys,
     documentKeys,
@@ -29,7 +29,14 @@ export const invalidateOrganizationCaches = queryClient => {
     countryKeys,
     regionKeys,
     massifKeys
-  ].forEach(keys => queryClient.invalidateQueries({ queryKey: keys.all }));
+  ].forEach(keys =>
+    queryClient.invalidateQueries({
+      queryKey: keys.all,
+      predicate: query =>
+        !excludedKey ||
+        !excludedKey.every((part, index) => query.queryKey[index] === part)
+    })
+  );
   queryClient.invalidateQueries({
     predicate: query => {
       const [domain, , params] = query.queryKey;

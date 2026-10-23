@@ -11,7 +11,7 @@ const NetworkPage = () => {
   const permissions = usePermissions();
   const { data: cave, isPending, isPaused, error, refetch } = useCave(caveId);
 
-  return cave?.isDeleted && !permissions.isModerator ? (
+  return cave?.isDeleted && !permissions.isModerator && !permissions.isAdmin ? (
     <Deleted entityType={DELETED_ENTITIES.network} entity={cave} />
   ) : (
     <Network
