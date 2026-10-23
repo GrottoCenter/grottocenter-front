@@ -10,6 +10,7 @@ import {
 } from '@/hooks';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
+import { getOrganizationIconSource } from '@/utils/organizationIcons';
 import DocumentDetails from './index';
 
 vi.mock('@/hooks', () => ({
@@ -38,7 +39,6 @@ vi.mock('@/components/common/PdfPreview', () => ({ default: () => null }));
 vi.mock('@/components/appli/SearchEntranceForm', () => ({
   default: () => null
 }));
-vi.mock('@/components/common/CustomIcon', () => ({ default: () => null }));
 
 // Importing the icon barrel opens thousands of modules on Windows. Keep the
 // actual page, linked cards and confirmation dialog, with inert icon artwork.
@@ -110,10 +110,30 @@ beforeEach(() => {
   });
 });
 
+it.each(['EDITION', 'SPELEOLOGY', null, undefined, 'FUTURE'])(
+  'uses the editor organization type %s for its icon and keeps its link',
+  type => {
+    useDocument.mockReturnValue({
+      data: {
+        ...document,
+        editor: { id: 42, name: 'Document publisher', type }
+      },
+      isPending: false,
+      refetch: vi.fn()
+    });
+    renderPage();
+    const link = screen.getByRole('link', { name: 'Document publisher' });
+    expect(link).toHaveAttribute('href', '/ui/organizations/42');
+    const icon = link.parentElement.querySelector('img');
+    expect(icon).toHaveAttribute('src', getOrganizationIconSource(type));
+    expect(icon).toHaveAttribute('alt', '');
+  }
+);
+
 it('offers unlink actions for massifs and entrances, but not caves', () => {
   renderPage();
   expect(
-    screen.getByRole('heading', { level: 1, name: 'Cave survey' })
+    screen.getByRole('heading', { level: 1, name: /Cave survey$/ })
   ).toBeVisible();
 
   expect(screen.getByRole('link', { name: /Survey network/ })).toHaveAttribute(

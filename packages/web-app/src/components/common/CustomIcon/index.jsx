@@ -24,6 +24,14 @@ import {
   massifIcon,
   networkIcon,
   organizationIcon,
+  organizationAdministrationIcon,
+  organizationClubIcon,
+  organizationConservationIcon,
+  organizationLibraryIcon,
+  organizationPublisherIcon,
+  organizationRescueIcon,
+  organizationResearchIcon,
+  personIcon,
   pollutionIcon,
   rockfallIcon,
   rulesIcon,
@@ -44,6 +52,7 @@ const Icon = styled('span')`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: ${({ size }) => size}px;
   height: ${({ size }) => size}px;
   margin: 0px 4px 0px 0px;
@@ -82,6 +91,14 @@ const iconSources = {
   massif: massifIcon,
   network: networkIcon,
   organization: organizationIcon,
+  organization_administration: organizationAdministrationIcon,
+  organization_club: organizationClubIcon,
+  organization_conservation: organizationConservationIcon,
+  organization_library: organizationLibraryIcon,
+  organization_publisher: organizationPublisherIcon,
+  organization_rescue: organizationRescueIcon,
+  organization_research: organizationResearchIcon,
+  person: personIcon,
   pollution: pollutionIcon,
   rockfall: rockfallIcon,
   rules: rulesIcon,
@@ -117,6 +134,14 @@ const altTexts = {
   massif: 'Massif',
   network: 'Network',
   organization: 'Organization',
+  organization_administration: 'Administration',
+  organization_club: 'Caving group',
+  organization_conservation: 'Nature conservation',
+  organization_library: 'Library',
+  organization_publisher: 'Publisher',
+  organization_rescue: 'Cave rescue',
+  organization_research: 'Research organization',
+  person: 'Person',
   pollution: 'Pollution',
   rockfall: 'Rockfall',
   rules: 'Rules',

@@ -16,6 +16,8 @@ const meta = {
 
 export default meta;
 
+export const Person = { args: { type: 'person' } };
+
 export const Default = {
   render: () => (
     <Wrapper>

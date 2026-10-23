@@ -306,6 +306,7 @@ export const unarchiveConversationUrl = id =>
 export const countUnreadMessagesUrl = `${API_BASE_PATH}/messages/unread/count`;
 
 // ===== Organizations urls
+export const getOrganizationsUrl = `${API_BASE_PATH}/organizations`;
 export const getOrganizationUrl = `${API_BASE_PATH}/organizations/`;
 export const postOrganizationUrl = `${API_BASE_PATH}/organizations`;
 export const putOrganizationUrl = organizationId =>

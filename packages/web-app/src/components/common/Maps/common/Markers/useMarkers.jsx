@@ -15,11 +15,13 @@ const useMarkers = ({
   onPopupOpen = null,
   onPopupClose = null,
   shouldFitMapBound = false,
+  shouldReplaceMarker = null,
   markerOptions = null
 }) => {
   const map = useMap();
   // Map<id, L.Marker> for O(1) lookups during diff
   const markersRef = useRef(new Map());
+  const recordsRef = useRef(new Map());
   const renderPopup = useRenderPopup();
   const isTouch = useMediaQuery('(pointer: coarse)');
 
@@ -35,7 +37,10 @@ const useMarkers = ({
             : circleMarkerStyle;
         markerEl = L.circleMarker([latitude, longitude], style);
       } else {
-        markerEl = L.marker([latitude, longitude], { icon, ...markerOptions });
+        markerEl = L.marker([latitude, longitude], {
+          icon: typeof icon === 'function' ? icon(marker) : icon,
+          ...markerOptions
+        });
       }
 
       // Lazy popup: content is rendered only when the popup is opened
@@ -64,10 +69,8 @@ const useMarkers = ({
         markerEl.on('click', () => onMarkerClick(marker));
       }
 
-      // Listeners are cleaned up by Leaflet when markerEl.remove() is called.
-      // This relies on callbacks being stable references (useCallback with stable
-      // deps in Markers.jsx). If deps ever change identity, existing markers won't
-      // get updated listeners — updateMarkers only adds/removes, never replaces.
+      // Callbacks must stay stable: retained markers keep their event closures.
+      // Callers can opt into replacing changed records with shouldReplaceMarker.
       if (onMarkerOver) markerEl.on('mouseover', () => onMarkerOver(marker));
       if (onMarkerOut) markerEl.on('mouseout', () => onMarkerOut(marker));
       if (onPopupOpen) markerEl.on('popupopen', () => onPopupOpen(marker));
@@ -99,6 +102,7 @@ const useMarkers = ({
         // Remove all markers
         for (const m of currentMap.values()) m.remove();
         currentMap.clear();
+        recordsRef.current.clear();
         return;
       }
 
@@ -110,12 +114,21 @@ const useMarkers = ({
         if (!newIds.has(id)) {
           leafletMarker.remove();
           currentMap.delete(id);
+          recordsRef.current.delete(id);
         }
       }
 
       // Add markers that are new
       let addedCount = 0;
       for (const marker of newMarkers) {
+        if (shouldReplaceMarker) {
+          const previous = recordsRef.current.get(marker.id);
+          if (previous && shouldReplaceMarker(previous, marker)) {
+            currentMap.get(marker.id)?.remove();
+            currentMap.delete(marker.id);
+          }
+          recordsRef.current.set(marker.id, marker);
+        }
         if (!currentMap.has(marker.id)) {
           const leafletMarker = createLeafletMarker(marker);
           leafletMarker.addTo(map);
@@ -136,15 +149,17 @@ const useMarkers = ({
         );
       }
     },
-    [map, createLeafletMarker, shouldFitMapBound]
+    [map, createLeafletMarker, shouldFitMapBound, shouldReplaceMarker]
   );
 
   // Cleanup all markers on unmount
   useEffect(() => {
     const currentMarkers = markersRef.current;
+    const currentRecords = recordsRef.current;
     return () => {
       for (const m of currentMarkers.values()) m.remove();
       currentMarkers.clear();
+      currentRecords.clear();
     };
   }, []);
 

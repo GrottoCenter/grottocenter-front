@@ -32,7 +32,10 @@ const InputText = ({
         validate: value =>
           validatorFn ? validatorFn(value, formatMessage) : undefined
       }}
-      render={({ field: { ref, value, onChange, onBlur }, fieldState }) => {
+      render={({
+        field: { ref, name, value, onChange, onBlur },
+        fieldState
+      }) => {
         const characterCount = String(value ?? '').length;
         const limit = characterLimit ?? maxLength;
         const isTooLong = limit !== undefined && characterCount > limit;
@@ -74,6 +77,7 @@ const InputText = ({
 
         return (
           <TextField
+            name={name}
             data-testid={testId}
             fullWidth
             label={formatMessage({ id: labelName })}

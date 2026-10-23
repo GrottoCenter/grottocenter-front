@@ -5,10 +5,20 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
 import PublishIcon from '@mui/icons-material/Publish';
 import { useIntl } from 'react-intl';
+import {
+  canOrganizationExplore,
+  getOrganizationTypeLabelId,
+  isOrganizationType
+} from '@/utils/organizationTypes';
+import PersonType from '@/components/common/Person/PersonType';
+import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
+import IconLabel from '@/components/common/IconLabel';
+import { isPersonType } from '@/utils/personTypes';
 import AppLink from '../AppLink';
 import Translate from '../Translate';
 import DataQualityBadge from '../DataQualityBadge';
 import CustomIcon from '../CustomIcon';
+import OrganizationIcon from '../OrganizationIcon';
 import * as CSV from '../../appli/ImportCSV/constants';
 
 // React component (uses useIntl hook) — must be rendered as JSX, not called as a function
@@ -133,18 +143,18 @@ const cellsRender = {
   // iconPath empty. The presenter picks its own MUI icon + type label to keep
   // the column visually consistent with entity rows on either side.
   notificationEntityType: (value, doc) => (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      {doc.notificationType === 'IMPORT_COMPLETE' ? (
-        <PublishIcon fontSize="small" />
-      ) : (
-        <img src={doc.iconPath} alt="icon" style={{ width: '24px' }} />
-      )}
-      <span>
-        <Translate>
-          {doc.notificationType === 'IMPORT_COMPLETE' ? 'import' : value}
-        </Translate>
-      </span>
-    </Box>
+    <IconLabel
+      icon={
+        doc.notificationType === 'IMPORT_COMPLETE' ? (
+          <PublishIcon fontSize="small" />
+        ) : (
+          <img src={doc.iconPath} alt="" width={24} height={24} />
+        )
+      }>
+      <Translate>
+        {doc.notificationType === 'IMPORT_COMPLETE' ? 'import' : value}
+      </Translate>
+    </IconLabel>
   ),
   // Non-entity notifications carry no entity name — surface a translated
   // label so the "Name" column still reads at a glance.
@@ -169,11 +179,25 @@ const cellsRender = {
   // (`authorsOrganization`) — merge both into a single column, same as the
   // "Authors" field on the document details page.
   documentAuthors: (_value, doc) => {
-    const names = [
-      ...(doc.authors ?? []).map(a => a.nickname),
-      ...(doc.authorsOrganization ?? []).map(o => o.name)
+    const authors = [
+      ...(doc.authors ?? []).map(author => ({ author, entityType: 'persons' })),
+      ...(doc.authorsOrganization ?? []).map(author => ({
+        author,
+        entityType: 'organizations'
+      }))
     ];
-    return names.length ? names.join(', ') : null;
+    return authors.length ? (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        {authors.map(({ author, entityType }) => (
+          <DocumentAuthorLabel
+            key={`${entityType}-${author.id ?? author.nickname ?? author.name}`}
+            author={author}
+            entityType={entityType}
+            alignToFirstLine
+          />
+        ))}
+      </Box>
+    ) : null;
   },
   translate: value => (!value ? null : <Translate>{value}</Translate>),
   ellipsis: value =>
@@ -299,10 +323,29 @@ const massifs = {
 };
 
 const organizations = {
-  icon: <CustomIcon type="organization" size={16} />,
   columns: [
     { visible: false, field: 'id', label: 'Id', sortable: false },
-    { visible: true, field: 'name', label: 'Name', sortable: true },
+    {
+      visible: true,
+      field: 'name',
+      label: 'Name',
+      sortable: true
+    },
+    {
+      visible: true,
+      field: 'type',
+      label: 'Type',
+      sortable: false,
+      render: type => {
+        if (!isOrganizationType(type)) return null;
+        return (
+          <IconLabel
+            icon={<OrganizationIcon organizationType={type} size={20} />}>
+            <Translate>{getOrganizationTypeLabelId(type)}</Translate>
+          </IconLabel>
+        );
+      }
+    },
     { visible: false, field: 'language', label: 'Language', sortable: true },
     { visible: true, field: 'mail', label: 'Email', sortable: false },
     { visible: false, field: 'url', label: 'URL', sortable: false },
@@ -323,7 +366,14 @@ const organizations = {
     { visible: true, field: 'county', label: 'County', sortable: true },
     { visible: true, field: 'region', label: 'Region', sortable: true },
     { visible: true, field: 'country', label: 'Country', sortable: true },
-    { visible: true, field: 'nbCavers', label: 'Cavers', sortable: true },
+    {
+      visible: true,
+      field: 'nbCavers',
+      label: 'Cavers',
+      sortable: true,
+      render: (value, organization) =>
+        canOrganizationExplore(organization.type) ? value : null
+    },
     { visible: false, field: 'iso3166', label: 'ISO code', sortable: true },
     {
       visible: false,
@@ -335,12 +385,8 @@ const organizations = {
   link: doc => `/ui/organizations/${doc.id}`
 };
 
-const PERSON_TYPE_LABEL = { CAVER: 'Caver', AUTHOR: 'Author' };
-
 const persons = {
-  icon: doc => (
-    <CustomIcon type={doc?.type === 'AUTHOR' ? 'author' : 'caver'} size={16} />
-  ),
+  icon: <CustomIcon type="person" size={16} alt="" />,
   columns: [
     { visible: true, field: 'id', label: 'Id', sortable: false },
     {
@@ -353,16 +399,12 @@ const persons = {
     { visible: true, field: 'name', label: 'First name', sortable: true },
     { visible: true, field: 'surname', label: 'Last name', sortable: true },
     {
-      visible: false,
+      visible: true,
       field: 'type',
       label: 'Type',
       sortable: true,
       render: value =>
-        value && PERSON_TYPE_LABEL[value] ? (
-          <Translate>{PERSON_TYPE_LABEL[value]}</Translate>
-        ) : (
-          value || null
-        )
+        isPersonType(value) ? <PersonType type={value} /> : null
     }
   ],
   link: doc => `/ui/persons/${doc.id}`
@@ -535,7 +577,22 @@ const documents = {
       sortField: 'authorsSort'
     },
     { visible: false, field: 'library.name', label: 'Library', sortable: true },
-    { visible: false, field: 'editor.name', label: 'Editor', sortable: true },
+    {
+      visible: false,
+      field: 'editor.name',
+      label: 'Editor',
+      sortable: true,
+      render: (value, doc) =>
+        value ? (
+          <IconLabel
+            alignToFirstLine
+            icon={
+              <OrganizationIcon organizationType={doc.editor.type} size={18} />
+            }>
+            {value}
+          </IconLabel>
+        ) : null
+    },
     { visible: true, field: 'parent.title', label: 'Parent', sortable: true },
     { visible: false, field: 'issue', label: 'Issue', sortable: true },
     { visible: false, field: 'pages', label: 'Pages', sortable: true },

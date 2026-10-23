@@ -5,6 +5,7 @@ import { Box, Button } from '@mui/material';
 
 import OfflineDisabled from '@/components/common/OfflineDisabled';
 import { useOnlineStatus, resetAdvancedSearch } from '@/hooks';
+import { canOrganizationExplore } from '@/utils/organizationTypes';
 import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
 import OrganizationsSearch from '../../AdvancedSearch/OrganizationsSearch';
 import SearchResults from '../../AdvancedSearch/SearchResults';
@@ -20,10 +21,20 @@ const SearchOrganizationForm = ({ onSubmit }) => {
   };
 
   const handleSelection = (ids, results) => {
-    setSelectedOrganizations(results.filter(r => ids.includes(r.id)));
+    setSelectedOrganizations(
+      results.filter(r => ids.includes(r.id) && canOrganizationExplore(r.type))
+    );
   };
 
   const handleOnSubmit = () => {
+    if (
+      !isOnline ||
+      !selectedOrganizations.length ||
+      selectedOrganizations.some(
+        organization => !canOrganizationExplore(organization.type)
+      )
+    )
+      return;
     onSubmit(selectedOrganizations);
     resetForm();
   };

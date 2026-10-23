@@ -23,6 +23,9 @@ import './App.css';
 
 const Api = lazy(() => import('./components/appli/Api'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const OrganizationManagement = lazy(
+  () => import('./pages/OrganizationManagement')
+);
 const ApiDoc = lazy(() => import('./pages/ApiDoc'));
 const DocumentDetails = lazy(() => import('./pages/DocumentDetails'));
 const DuplicateImportHandle = lazy(
@@ -92,6 +95,10 @@ const router = createBrowserRouter(
       <Route exact path="/" element={<HomePage />} />
       <Route exact path="/ui" element={<Navigate to="/" replace />} />
       <Route path="/ui/dashboard" element={<Dashboard />} />
+      <Route
+        path="/ui/organizations/management"
+        element={<OrganizationManagement />}
+      />
       <Route path="/ui/admin/users" element={<ManageUsers />} />
       <Route path="/ui/entrances" element={<EntrancesSearchPage />} />
       <Route path="/ui/documents" element={<DocumentsSearchPage />} />

@@ -74,7 +74,7 @@ export const DELETED_ENTITIES = {
     searchType: ADVANCED_SEARCH_TYPES.CAVES
   },
   person: {
-    iconType: 'caver',
+    iconType: 'person',
     str: 'Person',
     url: '/ui/persons/',
     searchType: 'persons'

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
+import { OrganizationSimplePropTypes } from '@/types/organization.type';
 import CustomIcon from '../CustomIcon';
 import { Property } from '../Properties';
 
@@ -81,7 +82,7 @@ export const OrganizationProperty = ({ organization }) => (
     key={organization.id}
     value={organization.name}
     url={`/ui/organizations/${organization.id}`}
-    icon={<CustomIcon type="organization" />}
+    icon={<CustomIcon type="organization" alt="" />}
     secondary
   />
 );
@@ -231,10 +232,7 @@ MassifProperty.propTypes = {
 };
 
 OrganizationProperty.propTypes = {
-  organization: PropTypes.shape({
-    id: PropTypes.number,
-    name: PropTypes.string
-  }).isRequired
+  organization: OrganizationSimplePropTypes.isRequired
 };
 
 DivingProperty.propTypes = {

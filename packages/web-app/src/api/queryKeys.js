@@ -66,7 +66,13 @@ export const personKeys = {
 
 export const organizationKeys = {
   all: ['organization'],
+  list: criteria => ['organization', 'list', criteria],
   detail: detailKey('organization')
+};
+
+export const organizationManagementKeys = {
+  unclassified: ['organizationManagement', 'unclassified'],
+  duplicates: ['organizationManagement', 'duplicates']
 };
 
 export const countryKeys = {

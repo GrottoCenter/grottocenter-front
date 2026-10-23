@@ -1,21 +1,18 @@
-import { useContext, useEffect, useRef, useState } from 'react';
-import { isEmpty, isNil } from 'ramda';
-import { TextField } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { useContext, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { Box } from '@mui/material';
 import { useIntl } from 'react-intl';
 import AddIcon from '@mui/icons-material/Add';
 import PropTypes from 'prop-types';
 
-import { useCreateOrganization } from '../../../../../../hooks';
-import ActionButton from '../../../../../common/ActionButton';
+import { useCreateOrganization, useOnlineStatus } from '@/hooks';
+import ActionButton from '@/components/common/ActionButton';
+import FormSubmissionError from '@/components/common/FormSubmissionError';
+import OrganizationTypeField from '@/components/common/OrganizationTypeField';
+import InputText from '@/components/appli/EntitiesForm/utils/InputText';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import { getDefaultOrganizationType } from '@/utils/organizationTypes';
 import { DocumentFormContext } from '../../Provider';
-
-const Wrapper = styled('div')`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-`;
 
 const CreateNewOrganization = ({
   defaultValue = '',
@@ -24,36 +21,42 @@ const CreateNewOrganization = ({
   contextValueName = null
 }) => {
   const {
-    isPending: isLoading,
+    isPending,
     error,
-    data: organization,
-    mutate
+    mutateAsync,
+    reset: resetMutation
   } = useCreateOrganization();
   const { updateAttribute } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
-  const inputRef = useRef(null);
-  const [organizationName, setOrganizationName] = useState(defaultValue);
-  const handleChange = event => {
-    setOrganizationName(event.target.value);
-  };
+  const isOnline = useOnlineStatus();
+  const defaultType = getDefaultOrganizationType(contextValueName);
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setFocus,
+    formState: { errors, isSubmitting }
+  } = useForm({
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
+    defaultValues: { name: defaultValue, type: defaultType }
+  });
 
-  const handleSubmit = () => {
-    mutate({ name: { text: organizationName } });
-  };
-
-  useEffect(() => {
-    setOrganizationName(defaultValue);
-  }, [defaultValue]);
-
-  // Handle autofocus when opened
   useEffect(() => {
     if (enabled) {
-      inputRef.current.focus();
+      reset({ name: defaultValue, type: defaultType });
+      resetMutation();
+      setFocus('name');
     }
-  }, [enabled, inputRef]);
+  }, [enabled, defaultValue, defaultType, reset, resetMutation, setFocus]);
 
-  useEffect(() => {
-    if (!isNil(organization) && !isEmpty(organizationName)) {
+  const handleCreate = handleSubmit(async ({ name, type }) => {
+    if (!enabled || !isOnline || isPending) return;
+    try {
+      const organization = await mutateAsync({
+        name: { text: name.trim() },
+        type
+      });
       if (contextValueName) {
         updateAttribute(contextValueName, organization);
         if (contextValueName === 'partOf') {
@@ -61,40 +64,62 @@ const CreateNewOrganization = ({
           updateAttribute('library', organization.library ?? null);
         }
       }
+      reset({ name: '', type: defaultType });
       onCreateSuccess(organization);
-      setOrganizationName('');
+    } catch {
+      // Keep the input and structured mutation error available for correction.
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organization]);
+  });
 
   return (
-    <Wrapper>
-      <TextField
-        error={!isNil(error) && !isEmpty(organizationName)}
-        inputRef={inputRef}
-        variant="standard"
-        disabled={isLoading}
-        label={formatMessage({ id: 'Name' })}
-        value={organizationName}
-        onChange={handleChange}
-        fullWidth
+    <Box
+      data-testid="create-organization-panel"
+      sx={{ display: 'grid', gap: 1, width: '100%' }}
+      onKeyDown={event => {
+        // This panel is inside the document form: Enter in the name input must
+        // create the organization without submitting the surrounding document.
+        if (event.key === 'Enter' && event.target.name === 'name') {
+          event.preventDefault();
+          event.stopPropagation();
+          handleCreate();
+        }
+      }}>
+      <InputText
+        control={control}
+        formKey="name"
+        labelName="Name"
+        testId="inline-organization-name"
+        isError={!!errors.name}
+        isRequired
+        isDisabled={!enabled || isPending}
+        maxLength={TEXT_LENGTH_LIMITS.ENTITY_NAME}
+        validatorFn={value =>
+          !!value?.trim() || formatMessage({ id: 'Required' })
+        }
       />
+      <OrganizationTypeField
+        control={control}
+        name="type"
+        disabled={isPending}
+      />
+      <FormSubmissionError error={error} />
       <ActionButton
         color="secondary"
+        type="button"
         label={formatMessage({ id: 'create' })}
-        onClick={handleSubmit}
-        disabled={isEmpty(organizationName) || isLoading}
-        loading={isLoading}
+        onClick={handleCreate}
+        disabled={!enabled || !isOnline || isPending || isSubmitting}
+        loading={isPending || isSubmitting}
         icon={<AddIcon />}
       />
-    </Wrapper>
+    </Box>
   );
 };
 
 CreateNewOrganization.propTypes = {
   defaultValue: PropTypes.string,
-  enabled: PropTypes.bool,
-  onCreateSuccess: PropTypes.func,
+  enabled: PropTypes.bool.isRequired,
+  onCreateSuccess: PropTypes.func.isRequired,
   contextValueName: PropTypes.string
 };
 

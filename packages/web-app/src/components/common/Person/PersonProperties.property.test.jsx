@@ -16,7 +16,9 @@ const messages = {
   Mail: 'Mail',
   Administrator: 'Administrator',
   Moderator: 'Moderator',
-  Leader: 'Leader'
+  Leader: 'Leader',
+  Type: 'Type',
+  unknown: 'unknown'
 };
 
 const renderPersonProperties = person =>

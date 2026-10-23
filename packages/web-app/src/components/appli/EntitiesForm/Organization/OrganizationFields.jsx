@@ -1,14 +1,30 @@
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import OrganizationTypeField from '@/components/common/OrganizationTypeField';
 
+import { isValidEmail } from '@/conf/config';
+import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import InputText from '../utils/InputText';
 import InputCountry from '../utils/InputCountry';
 import InputLanguage from '../utils/InputLanguage';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormRow, FormSectionLabel } from '../utils/FormContainers';
 
-const OrganizationFields = ({ control, errors, isNewOrganization }) => {
+const validateEmail = (value, formatMessage) =>
+  !value ||
+  isValidEmail(value) ||
+  formatMessage({ id: 'The email must be valid.' });
+
+const validateUrl = (value, formatMessage) => {
+  if (!value) return true;
+  try {
+    return Boolean(new URL(value));
+  } catch {
+    return formatMessage({ id: 'The URL must be valid.' });
+  }
+};
+
+const OrganizationFields = ({ control, errors }) => {
   const { formatMessage } = useIntl();
   return (
     <>
@@ -17,6 +33,7 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
         <InputText
           formKey="organization.name"
           labelName="Organization name"
+          testId="organization-name"
           control={control}
           isError={!!errors?.organization?.name}
           isRequired
@@ -27,9 +44,10 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
           formKey="organization.language"
           control={control}
           isError={!!errors?.organization?.language}
-          disabled={!isNewOrganization}
         />
       </FormRow>
+
+      <OrganizationTypeField control={control} name="organization.type" />
 
       {/* To uncomment to use description instead of customMessage when API will be ready
         <FormLabel>
@@ -57,7 +75,6 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
         control={control}
         isError={!!errors?.organization?.customMessage}
         minRows={6}
-        isRequired
         characterLimit={TEXT_LENGTH_LIMITS.ORGANIZATION_MESSAGE}
       />
 
@@ -71,6 +88,7 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
           control={control}
           isError={!!errors?.organization?.mail}
           type="email"
+          validatorFn={validateEmail}
           maxLength={TEXT_LENGTH_LIMITS.EMAIL}
         />
         <InputText
@@ -79,6 +97,7 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
           control={control}
           isError={!!errors?.organization?.url}
           type="url"
+          validatorFn={validateUrl}
           maxLength={TEXT_LENGTH_LIMITS.URL}
         />
       </FormRow>
@@ -122,7 +141,11 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
           isError={!!errors?.organization?.city}
           maxLength={TEXT_LENGTH_LIMITS.CITY}
         />
-        <InputCountry control={control} formKey="organization.country" />
+        <InputCountry
+          control={control}
+          formKey="organization.country"
+          isRequired={false}
+        />
       </FormRow>
 
       <CoordinateFormSection
@@ -156,8 +179,7 @@ OrganizationFields.propTypes = {
       latitude: PropTypes.shape({ message: PropTypes.string }),
       longitude: PropTypes.shape({ message: PropTypes.string })
     })
-  }),
-  isNewOrganization: PropTypes.bool
+  })
 };
 
 export default OrganizationFields;

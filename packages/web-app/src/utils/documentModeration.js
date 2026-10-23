@@ -89,6 +89,9 @@ export const prepareDocumentPreview = (current, proposed) => ({
   ),
   authors: (proposed.authors ?? []).map(author => ({
     ...author,
+    type:
+      author.type ??
+      current.authors?.find(old => String(old.id) === String(author.id))?.type,
     nickname: author.nickname || String(author.id)
   })),
   authorsOrganization: (proposed.authorsOrganization ?? []).map(author =>

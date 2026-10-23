@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, Chip } from '@mui/material';
-import CheckIcon from '@mui/icons-material/Check';
+import { DEFAULT_PERSON_TYPE } from '@/utils/personTypes';
+import EntityTypeFilter from './EntityTypeFilter';
 
 import { startAdvancedSearch, resetAdvancedSearch } from '../../../hooks';
 import {
@@ -14,18 +15,16 @@ import SearchInput from '../../common/SearchInput';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 import { getStoredRowsPerPage } from '../../common/EntityTable';
 
-const DEFAULT_PERSON_TYPE = 'CAVER';
-
 const TYPE_OPTIONS = [
   { value: null, labelId: 'All' },
   { value: 'CAVER', labelId: 'Cavers' },
   { value: 'AUTHOR', labelId: 'Authors' }
 ];
 
-const PersonSearch = () => {
+const PersonSearch = ({ initialType = DEFAULT_PERSON_TYPE }) => {
   const { formatMessage } = useIntl();
   const [query, setQuery] = useState('');
-  const [personType, setPersonType] = useState(DEFAULT_PERSON_TYPE);
+  const [personType, setPersonType] = useState(initialType);
 
   const startAdvancedsearch = (overrideQuery, overrideType) => {
     const type = overrideType !== undefined ? overrideType : personType;
@@ -60,20 +59,11 @@ const PersonSearch = () => {
         placeholder={formatMessage({ id: 'Search for a person...' })}
       />
       <SearchFieldset title="Type">
-        <Box sx={{ display: 'flex' }}>
-          {TYPE_OPTIONS.map(opt => (
-            <Chip
-              key={String(opt.value)}
-              label={formatMessage({ id: opt.labelId })}
-              size="small"
-              clickable
-              color={personType === opt.value ? 'primary' : 'default'}
-              variant={personType === opt.value ? 'filled' : 'outlined'}
-              icon={personType === opt.value ? <CheckIcon /> : undefined}
-              onClick={() => handleTypeChange(opt.value)}
-            />
-          ))}
-        </Box>
+        <EntityTypeFilter
+          options={TYPE_OPTIONS}
+          value={personType}
+          onChange={handleTypeChange}
+        />
       </SearchFieldset>
       <ActiveFilterChips
         query={query}
@@ -85,5 +75,7 @@ const PersonSearch = () => {
     </SearchForm>
   );
 };
+
+PersonSearch.propTypes = { initialType: PropTypes.oneOf(['CAVER', 'AUTHOR']) };
 
 export default PersonSearch;

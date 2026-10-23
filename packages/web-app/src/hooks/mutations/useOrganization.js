@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { invalidateOrganizationCaches } from '@/utils/organizationCache';
 import {
   deleteOrganizationUrl,
   restoreOrganizationUrl,
@@ -10,12 +11,6 @@ import {
 } from '../../conf/apiRoutes';
 import { apiPost, apiPut, apiDelete } from '../../api/client';
 import { organizationKeys, personKeys } from '../../api/queryKeys';
-import { invalidateAll } from '../../utils/mapTileCache';
-
-const invalidateOrganizationsAndMap = queryClient => {
-  queryClient.invalidateQueries({ queryKey: organizationKeys.all });
-  invalidateAll('organizations');
-};
 
 export const useDeleteOrganization = () => {
   const queryClient = useQueryClient();
@@ -30,8 +25,7 @@ export const useDeleteOrganization = () => {
           queryKey: organizationKeys.detail(id)
         });
       }
-      queryClient.invalidateQueries({ queryKey: organizationKeys.all });
-      invalidateAll('organizations');
+      invalidateOrganizationCaches(queryClient);
     }
   });
 };
@@ -40,7 +34,7 @@ export const useRestoreOrganization = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id }) => apiPost(restoreOrganizationUrl(id)),
-    onSuccess: () => invalidateOrganizationsAndMap(queryClient)
+    onSuccess: () => invalidateOrganizationCaches(queryClient)
   });
 };
 

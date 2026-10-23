@@ -14,6 +14,7 @@ import {
   useSearchParams
 } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { subscribeOrganizationMapChanges } from '@/utils/organizationCache';
 import PageLoader from '../components/common/PageLoader';
 
 import {
@@ -209,6 +210,14 @@ const Map = () => {
     dispatch(fetchAllMassifsCoordinates());
     dispatch(fetchAllOrganizationsCoordinates());
   }, [dispatch]);
+
+  useEffect(
+    () =>
+      subscribeOrganizationMapChanges(() => {
+        dispatch(fetchAllOrganizationsCoordinates());
+      }),
+    [dispatch]
+  );
 
   useEffect(() => {
     loadMapData();

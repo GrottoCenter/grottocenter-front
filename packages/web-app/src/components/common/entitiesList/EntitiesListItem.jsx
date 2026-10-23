@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { Box, Chip, Paper, Typography } from '@mui/material';
+import OrganizationIcon from '@/components/common/OrganizationIcon';
+import { OrganizationSimplePropTypes } from '@/types/organization.type';
 import { depthIcon, lengthIcon } from '../../../assets/icons';
 import CustomIcon from '../CustomIcon';
 import AppLink from '../AppLink';
@@ -197,7 +199,7 @@ EntranceCard.propTypes = {
 export const PersonCard = ({ person, itemActionButton }) => (
   <EntityCard
     to={`/ui/persons/${person.id}`}
-    icon={<CustomIcon type="caver" size={32} />}
+    icon={<CustomIcon type="person" size={32} alt="" />}
     itemActionButton={itemActionButton}>
     <CardLabel>{person.nickname}</CardLabel>
   </EntityCard>
@@ -223,7 +225,9 @@ export const OrganizationCard = ({ organization, itemActionButton }) => {
     return (
       <EntityCard
         to={to}
-        icon={<CustomIcon type="organization" size={32} />}
+        icon={
+          <OrganizationIcon organizationType={organization.type} size={32} />
+        }
         itemActionButton={itemActionButton}>
         <Box
           sx={{
@@ -259,7 +263,7 @@ export const OrganizationCard = ({ organization, itemActionButton }) => {
   return (
     <EntityCard
       to={`/ui/organizations/${organization.id}`}
-      icon={<CustomIcon type="organization" size={32} />}
+      icon={<OrganizationIcon organizationType={organization.type} size={32} />}
       itemActionButton={itemActionButton}>
       <CardLabel>{organization.name}</CardLabel>
     </EntityCard>
@@ -267,11 +271,6 @@ export const OrganizationCard = ({ organization, itemActionButton }) => {
 };
 
 OrganizationCard.propTypes = {
-  organization: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    name: PropTypes.string,
-    isDeleted: PropTypes.bool,
-    redirectTo: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  }),
+  organization: OrganizationSimplePropTypes,
   itemActionButton: PropTypes.node
 };

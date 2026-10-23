@@ -1,48 +1,37 @@
-export const makePostOrganizationData = data => ({
-  address: data.organization.address,
-  city: data.organization.city,
-  country: { id: data.organization.country },
-  customMessage: data.organization.customMessage,
-  latitude: data.organization.latitude,
-  longitude: data.organization.longitude,
-  mail: data.organization.mail,
+import { normelizeCoordinate } from '../utils/InputCoordinate';
+
+export const makeOrganizationData = ({ organization }) => ({
+  ...(organization.organizationId != null && {
+    id: organization.organizationId
+  }),
+  type: organization.type,
+  address: organization.address,
+  city: organization.city,
+  country: { id: organization.country || null },
+  customMessage: organization.customMessage,
+  latitude: normelizeCoordinate(organization.latitude),
+  longitude: normelizeCoordinate(organization.longitude),
+  mail: organization.mail,
   name: {
-    text: data.organization.name,
-    language: data.organization.language
+    text: organization.name,
+    language: organization.language
   },
-  postalCode: data.organization.zipCode,
-  url: data.organization.url
+  postalCode: organization.zipCode,
+  url: organization.url
 });
 
-export const makePutOrganizationData = (data, defaultValues) => {
-  const myObj = {};
-  myObj.id = defaultValues.organizationId;
-  myObj.address = data.organization.address;
-  myObj.city = data.organization.city;
-  myObj.country = { id: data.organization.country };
-  myObj.customMessage = data.organization.customMessage;
-  myObj.latitude = data.organization.latitude;
-  myObj.longitude = data.organization.longitude;
-  myObj.mail = data.organization.mail;
-  myObj.postalCode = data.organization.zipCode;
-  myObj.url = data.organization.url;
-
-  return myObj;
-};
-
 export const makeOrganizationValueData = data => ({
+  type: data.type ?? '',
   name: data.name,
-  isPartner: data.isOfficialPartner,
-  customMessage: data.customMessage,
+  customMessage: data.customMessage ?? '',
   language: data.language,
-  nameId: data.nameId,
-  address: data.address || null,
-  zipCode: data.postalCode || null,
-  city: data.city || null,
+  address: data.address ?? '',
+  zipCode: data.postalCode ?? '',
+  city: data.city ?? '',
   country: data.country || null,
-  mail: data.mail || null,
-  url: data.url || null,
-  latitude: data.latitude || null,
-  longitude: data.longitude || null,
+  mail: data.mail ?? '',
+  url: data.url ?? '',
+  latitude: data.latitude ?? '',
+  longitude: data.longitude ?? '',
   organizationId: data.id
 });

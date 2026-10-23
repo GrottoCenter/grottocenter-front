@@ -68,6 +68,28 @@ describe('mapTileCache', () => {
     });
 
   describe('computeUnion dedup', () => {
+    it('discards old eligibility data and ignores late pre-invalidation responses', async () => {
+      registerEntity(ENTITY, CONFIG);
+      let resolveOld;
+      fetchMock.mockImplementationOnce(
+        () =>
+          new Promise(resolve => {
+            resolveOld = resolve;
+          })
+      );
+      fetchForBounds(ENTITY, singleTileBounds(100, 100), 13, dispatch);
+      fetchMock.mockReturnValue(fetchOk([]));
+      invalidateAll(ENTITY, { discardData: true });
+      await flushPromises();
+      resolveOld(await fetchOk([{ id: 42, type: 'SPELEOLOGY' }]));
+      await flushPromises();
+      const successes = dispatch.mock.calls
+        .map(([action]) => action)
+        .filter(action => action.type === CONFIG.successType);
+      expect(successes.at(-1).data).toEqual([]);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
     it('dedupes items with the same id across tiles', async () => {
       registerEntity(ENTITY, CONFIG);
       // Two adjacent tiles each carrying an overlapping id.

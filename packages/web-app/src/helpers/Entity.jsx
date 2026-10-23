@@ -1,11 +1,21 @@
+import { createElement } from 'react';
 import { styled } from '@mui/material/styles';
+import { getOrganizationIconSource } from '@/utils/organizationIcons';
 import {
-  authorIcon,
+  getOrganizationTypeLabelId,
+  isOrganizationType
+} from '@/utils/organizationTypes';
+import {
+  getPersonIconSource,
+  getPersonTypeLabelId,
+  isPersonType
+} from '@/utils/personTypes';
+import Translate from '@/components/common/Translate';
+import {
   bibliographyIcon,
   entranceIcon,
   networkIcon,
-  organizationIcon,
-  caverIcon,
+  personIcon,
   massifIcon
 } from '../assets/icons';
 
@@ -48,7 +58,7 @@ export const nomelizeSearchEntity = option => {
         if (title !== option.nickname) subtitle = option.nickname;
       }
 
-      iconSrc = option.type === 'AUTHOR' ? authorIcon : caverIcon;
+      iconSrc = personIcon;
       break;
 
     case 'documents': {
@@ -78,7 +88,7 @@ export const nomelizeSearchEntity = option => {
     }
 
     case 'organizations':
-      iconSrc = organizationIcon;
+      iconSrc = getOrganizationIconSource(option.type);
       break;
 
     case 'massifs':
@@ -91,18 +101,37 @@ export const nomelizeSearchEntity = option => {
   return { iconSrc, title, subtitle, id: option.id };
 };
 
-export const entityOptionForSelector = (props, option) => {
-  const { iconSrc, title, subtitle, id } = nomelizeSearchEntity(option);
+export const entityOptionForSelector = (
+  props,
+  option,
+  { showPersonType = false } = {}
+) => {
+  const normalized = nomelizeSearchEntity(option);
+  const { title, subtitle, id } = normalized;
+  const isPerson = option._type === 'persons';
+  const iconSrc =
+    isPerson && showPersonType
+      ? getPersonIconSource(option.type)
+      : normalized.iconSrc;
+  let typeLabelId = null;
+  if (isPerson && isPersonType(option.type))
+    typeLabelId = getPersonTypeLabelId(option.type);
+  if (option._type === 'organizations' && isOrganizationType(option.type))
+    typeLabelId = getOrganizationTypeLabelId(option.type);
   const { key, ...otherProps } = props;
-  return (
-    <li key={key || `${option._type}-${id}`} {...otherProps}>
-      {iconSrc && <EntityIcon src={iconSrc} alt={`${option.type} icon`} />}
-      <div>
-        <EntityTitle>
-          {title} <EntityId>{id}</EntityId>
-        </EntityTitle>
-        <EntitySubtitle>{subtitle}</EntitySubtitle>
-      </div>
-    </li>
+  return createElement(
+    'li',
+    { ...otherProps, key: key || `${option._type}-${id}` },
+    iconSrc && <EntityIcon src={iconSrc} alt="" />,
+    <div>
+      <EntityTitle>
+        {title} <EntityId>{id}</EntityId>
+      </EntityTitle>
+      <EntitySubtitle>
+        {subtitle}
+        {subtitle && typeLabelId && ' · '}
+        {typeLabelId && <Translate>{typeLabelId}</Translate>}
+      </EntitySubtitle>
+    </div>
   );
 };
