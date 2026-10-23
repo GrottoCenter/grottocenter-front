@@ -219,6 +219,9 @@ const PageTabs = ({ tabs, children }) => {
                 aria-controls={`page-tabpanel-${i}`}
                 aria-label={tab.label}
                 label={tab.label}
+                slotProps={{
+                  label: { 'data-testid': `page-tab-label-${i}` }
+                }}
                 icon={badgeIcon(tab)}
                 disabled={tab.disabled}
                 sx={{
