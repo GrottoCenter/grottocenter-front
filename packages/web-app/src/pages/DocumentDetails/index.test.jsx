@@ -33,9 +33,11 @@ vi.mock('@/hooks', () => ({
   useQuickSearch: () => ({ data: { results: [] }, isFetching: false })
 }));
 
-// These previews/searches are unrelated to linked-card actions. Avoid loading
-// PDF workers and the advanced search dependency tree in this focused test.
-vi.mock('@/components/common/PdfPreview', () => ({ default: () => null }));
+// Keep source selection observable without loading PDF workers or making
+// external requests. The search dependency tree is unrelated to these tests.
+vi.mock('@/components/common/PdfPreview', () => ({
+  default: ({ src }) => <div data-testid="pdf-preview" data-src={src} />
+}));
 vi.mock('@/components/appli/SearchEntranceForm', () => ({
   default: () => null
 }));
@@ -129,6 +131,131 @@ it.each(['EDITION', 'SPELEOLOGY', null, undefined, 'FUTURE'])(
     expect(icon).toHaveAttribute('alt', '');
   }
 );
+
+describe('external PDF fallback', () => {
+  const ownUrl = 'https://example.org/article.pdf';
+  const parentUrl = 'https://example.org/issue.pdf?download=1';
+  const parent = {
+    id: 456,
+    type: 'Issue',
+    title: 'Parent issue',
+    identifier: parentUrl,
+    identifierType: 'url'
+  };
+
+  it.each([
+    ['parent URL identifier', { parent }, parentUrl],
+    [
+      'parent URL at the article page',
+      { parent, pages: '12-18' },
+      `${parentUrl}#page=12`
+    ],
+    [
+      'first article range',
+      { parent, pages: '12-18, 24-26' },
+      `${parentUrl}#page=12`
+    ],
+    ['single article page', { parent, pages: '12' }, `${parentUrl}#page=12`],
+    ['invalid article pages', { parent, pages: 'iv, 0, 18-12' }, parentUrl],
+    [
+      'parent URL with an existing destination',
+      {
+        parent: { ...parent, identifier: `${parentUrl}#page=4&zoom=125` },
+        pages: '12-18'
+      },
+      `${parentUrl}#page=12&zoom=125`
+    ],
+    [
+      'parent description at the article page',
+      { parent: { id: 456, description: parentUrl }, pages: '12-18' },
+      `${parentUrl}#page=12`
+    ],
+    [
+      'parent description without the new API fields',
+      { parent: { id: 456, description: `Read ${parentUrl}.` } },
+      parentUrl
+    ],
+    [
+      'document URL before parent URL',
+      { parent, identifier: ownUrl, identifierType: 'url', pages: '12-18' },
+      ownUrl
+    ],
+    [
+      'document description before parent URL',
+      { parent, description: `Read ${ownUrl}.`, pages: '12-18' },
+      ownUrl
+    ],
+    [
+      'parent description after a non-PDF identifier',
+      {
+        parent: {
+          ...parent,
+          identifier: 'https://example.org/catalogue',
+          description: parentUrl
+        }
+      },
+      parentUrl
+    ]
+  ])('uses the %s', (_label, data, expectedUrl) => {
+    useDocument.mockReturnValue({ data: { ...document, ...data } });
+    renderPage();
+
+    expect(screen.getByTestId('pdf-preview')).toHaveAttribute(
+      'data-src',
+      expectedUrl
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      messages[
+        'This PDF is displayed from an external website. Grottocenter does not host it and claims no rights over it.'
+      ]
+    );
+  });
+
+  it.each([
+    ['no parent', {}],
+    ['missing parent identifier fields', { parent: { id: 456 } }],
+    [
+      'non-URL parent identifier',
+      { parent: { ...parent, identifierType: 'doi' } }
+    ]
+  ])('renders no external preview with %s', (_label, data) => {
+    useDocument.mockReturnValue({ data: { ...document, ...data } });
+    renderPage();
+
+    expect(screen.queryByTestId('pdf-preview')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('No files attached to this document.')
+    ).toBeVisible();
+  });
+
+  it.each([
+    [
+      'document attachment',
+      { files: [{ fileName: 'article.pdf', completePath: ownUrl }] },
+      ownUrl
+    ],
+    [
+      'parent attachment with article pages',
+      {
+        pages: '12-18',
+        parent: {
+          ...parent,
+          files: [{ fileName: 'issue.pdf', completePath: parentUrl }]
+        }
+      },
+      `${parentUrl}#page=12`
+    ]
+  ])('keeps the %s ahead of external links', (_label, data, expectedUrl) => {
+    useDocument.mockReturnValue({ data: { ...document, parent, ...data } });
+    renderPage();
+
+    expect(screen.getByTestId('pdf-preview')).toHaveAttribute(
+      'data-src',
+      expectedUrl
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+});
 
 it('offers unlink actions for massifs and entrances, but not caves', () => {
   renderPage();
