@@ -1,5 +1,5 @@
 describe('Page tabs on narrow screens', () => {
-  it('keeps translated labels readable and reserves space for a taller navigation', () => {
+  it('keeps translated labels and nonzero badges inside the navigation', () => {
     cy.viewport(320, 740);
     cy.mockApiCatchAll();
     cy.intercept(
@@ -9,12 +9,24 @@ describe('Page tabs on narrow screens', () => {
           id: 35120,
           name: 'Responsive entrance',
           cave: { id: 1, name: 'Responsive cave', entrances: [{ id: 35120 }] },
-          documents: [],
+          documents: Array.from({ length: 4 }, (_, index) => ({
+            id: index + 1,
+            title: `Responsive document ${index + 1}`,
+            type: 'Article',
+            authors: [],
+            authorsOrganization: []
+          })),
           locations: [],
           descriptions: [],
           riggings: [],
           histories: [],
-          comments: []
+          comments: Array.from({ length: 3 }, (_, index) => ({
+            id: index + 1,
+            title: `Responsive comment ${index + 1}`,
+            body: 'Test comment',
+            language: 'eng',
+            isDeleted: false
+          }))
         }
       }
     ).as('entrance');
@@ -30,7 +42,17 @@ describe('Page tabs on narrow screens', () => {
         timeout: 30000
       }).should($nav => {
         const nav = $nav[0];
+        const navBounds = nav.getBoundingClientRect();
         expect(nav.children).to.have.length(4);
+        const badges = nav.querySelectorAll('[data-testid^="page-tab-badge-"]');
+        expect(badges).to.have.length(2);
+        [...badges].forEach(badge => {
+          const bounds = badge.getBoundingClientRect();
+          expect(bounds.top).to.be.at.least(navBounds.top);
+          expect(bounds.bottom).to.be.at.most(navBounds.bottom);
+          expect(bounds.left).to.be.at.least(navBounds.left);
+          expect(bounds.right).to.be.at.most(navBounds.right);
+        });
         [...nav.children].forEach(button => {
           const label = button.querySelector(
             '[data-testid^="page-tab-label-"]'

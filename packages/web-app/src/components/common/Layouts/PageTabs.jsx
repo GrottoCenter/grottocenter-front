@@ -106,6 +106,9 @@ const PageTabs = ({ tabs, children }) => {
     tab.count != null ? (
       <Badge
         badgeContent={tab.count}
+        slotProps={{
+          badge: { 'data-testid': `page-tab-badge-${tab.id}` }
+        }}
         sx={{
           '& .MuiBadge-badge': {
             bgcolor: 'grey.200',
@@ -228,7 +231,8 @@ const PageTabs = ({ tabs, children }) => {
                   color: 'primary.contrastText',
                   minWidth: 0,
                   px: 0.5,
-                  py: 0.75,
+                  pt: 1.5,
+                  pb: 0.75,
                   gap: 0.25,
                   justifyContent: 'flex-start',
                   '& svg': { width: '1.375rem', height: '1.375rem' },
