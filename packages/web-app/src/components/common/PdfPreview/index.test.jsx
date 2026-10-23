@@ -6,11 +6,13 @@ const {
   mockDestroy,
   mockGetDocument,
   mockGlobalWorkerOptions,
+  mockHasNativePdfViewer,
   pendingDocument
 } = vi.hoisted(() => ({
   mockDestroy: vi.fn(),
   mockGetDocument: vi.fn(),
   mockGlobalWorkerOptions: {},
+  mockHasNativePdfViewer: vi.fn(),
   pendingDocument: new Promise(() => {})
 }));
 
@@ -27,6 +29,7 @@ vi.mock('@mui/icons-material', () => {
   return {
     ChevronLeft: MockIcon,
     ChevronRight: MockIcon,
+    PictureAsPdf: MockIcon,
     ZoomIn: MockIcon,
     ZoomOut: MockIcon
   };
@@ -35,7 +38,7 @@ vi.mock('@/hooks', () => ({
   useMeasuredWidth: () => [() => {}, 0]
 }));
 vi.mock('@/utils/pdfViewerSupport', () => ({
-  hasNativePdfViewer: () => false
+  hasNativePdfViewer: mockHasNativePdfViewer
 }));
 
 const messages = {
@@ -43,13 +46,17 @@ const messages = {
   'Previous page': 'Previous page',
   'Next page': 'Next page',
   'Zoom in': 'Zoom in',
-  'Zoom out': 'Zoom out'
+  'Zoom out': 'Zoom out',
+  'Open PDF': 'Open PDF',
+  'PDF preview unavailable.': 'PDF preview unavailable.',
+  'Opens in a new tab': 'Opens in a new tab'
 };
 
 describe('PdfPreview', () => {
   beforeEach(() => {
     mockDestroy.mockReset();
     mockGetDocument.mockReset();
+    mockHasNativePdfViewer.mockReturnValue(false);
     mockGetDocument.mockReturnValue({
       promise: pendingDocument,
       destroy: mockDestroy
@@ -92,6 +99,49 @@ describe('PdfPreview', () => {
     expect(canvas).toHaveStyle({ marginInline: 'auto' });
   });
 
+  it('offers one direct link preserving the article page after a network failure', async () => {
+    const src = 'https://example.org/issue.pdf?download=1#page=12';
+    mockGetDocument.mockImplementation(() => ({
+      promise: Promise.reject(new TypeError('Failed to fetch')),
+      destroy: mockDestroy
+    }));
+    render(
+      <IntlProvider locale="en" messages={messages}>
+        <PdfPreview src={src} />
+      </IntlProvider>
+    );
+
+    const link = await screen.findByRole('link', { name: 'Open PDF' });
+    expect(link).toHaveAttribute('href', src);
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'PDF preview unavailable.'
+    );
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('provides the same direct link inside the native viewer fallback', () => {
+    mockHasNativePdfViewer.mockReturnValue(true);
+    const src = 'https://example.org/issue.pdf#page=12';
+    const { container } = render(
+      <IntlProvider locale="en" messages={messages}>
+        <PdfPreview src={src} />
+      </IntlProvider>
+    );
+
+    // JSDOM exposes object children but cannot simulate native PDF rendering.
+    const viewer = container.querySelector('object');
+    const link = screen.getByRole('link', { name: 'Open PDF' });
+    expect(viewer).toContainElement(link);
+    expect(link).toHaveAttribute('href', src);
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(mockGetDocument).not.toHaveBeenCalled();
+  });
+
   it.each([
     ['#page=12&zoom=125', 12],
     ['#page=999', 20],
@@ -114,6 +164,9 @@ describe('PdfPreview', () => {
       );
 
       expect(await screen.findByText(`Page ${page} of 20`)).toBeVisible();
+      expect(
+        screen.queryByRole('link', { name: 'Open PDF' })
+      ).not.toBeInTheDocument();
       expect(
         screen.getByRole('button', { name: 'Previous page' }).disabled
       ).toBe(page === 1);

@@ -244,7 +244,10 @@ describe('external PDF fallback', () => {
       'data-src',
       expectedUrl
     );
-    expect(screen.getByRole('alert')).toHaveTextContent(
+    const metadataSection = screen
+      .getByRole('heading', { name: 'Metadata' })
+      .closest('section');
+    expect(within(metadataSection).getByRole('alert')).toHaveTextContent(
       messages[
         'This PDF is displayed from an external website. Grottocenter does not host it and claims no rights over it.'
       ]
