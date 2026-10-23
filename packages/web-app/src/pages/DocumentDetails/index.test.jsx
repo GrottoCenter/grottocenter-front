@@ -166,35 +166,14 @@ describe('external PDF fallback', () => {
       `${parentUrl}#page=12&zoom=125`
     ],
     [
-      'parent description at the article page',
-      { parent: { id: 456, description: parentUrl }, pages: '12-18' },
-      `${parentUrl}#page=12`
-    ],
-    [
-      'parent description without the new API fields',
-      { parent: { id: 456, description: `Read ${parentUrl}.` } },
-      parentUrl
-    ],
-    [
       'document URL before parent URL',
       { parent, identifier: ownUrl, identifierType: 'url', pages: '12-18' },
       ownUrl
     ],
     [
-      'document description before parent URL',
+      'parent URL despite a PDF link in the document description',
       { parent, description: `Read ${ownUrl}.`, pages: '12-18' },
-      ownUrl
-    ],
-    [
-      'parent description after a non-PDF identifier',
-      {
-        parent: {
-          ...parent,
-          identifier: 'https://example.org/catalogue',
-          description: parentUrl
-        }
-      },
-      parentUrl
+      `${parentUrl}#page=12`
     ]
   ])('uses the %s', (_label, data, expectedUrl) => {
     useDocument.mockReturnValue({ data: { ...document, ...data } });
@@ -217,6 +196,21 @@ describe('external PDF fallback', () => {
   it.each([
     ['no parent', {}],
     ['missing parent identifier fields', { parent: { id: 456 } }],
+    ['document description only', { description: ownUrl }],
+    [
+      'parent description only',
+      { parent: { id: 456, description: parentUrl }, pages: '12-18' }
+    ],
+    [
+      'parent description with a non-PDF identifier',
+      {
+        parent: {
+          ...parent,
+          identifier: 'https://example.org/catalogue',
+          description: parentUrl
+        }
+      }
+    ],
     [
       'non-URL parent identifier',
       { parent: { ...parent, identifierType: 'doi' } }
@@ -258,6 +252,38 @@ describe('external PDF fallback', () => {
     );
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
+
+  it.each([undefined, '', 'iv, 0, 18-12'])(
+    'uses a hosted parent PDF without valid article pages (%s)',
+    pages => {
+      const hostedUrl = '/files/parent.pdf';
+      useDocument.mockReturnValue({
+        data: {
+          ...document,
+          pages,
+          identifier: ownUrl,
+          identifierType: 'url',
+          parent: {
+            ...parent,
+            files: [
+              { fileName: 'cover.jpg', completePath: '/files/cover.jpg' },
+              { fileName: 'issue.PDF', completePath: hostedUrl }
+            ]
+          }
+        }
+      });
+      renderPage();
+      expect(screen.getByTestId('pdf-preview')).toHaveAttribute(
+        'data-src',
+        hostedUrl
+      );
+      expect(screen.getByRole('link', { name: 'issue.PDF' })).toHaveAttribute(
+        'href',
+        hostedUrl
+      );
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    }
+  );
 });
 
 it('offers unlink actions for massifs and entrances, but not caves', () => {

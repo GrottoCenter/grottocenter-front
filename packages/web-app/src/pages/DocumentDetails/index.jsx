@@ -24,6 +24,7 @@ import {
 import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
 import { formatDocumentReference } from '@/utils/documentReference';
 import { findDocumentPdfUrl, withPdfPage } from '@/utils/pdfUrl';
+import { getFileExtension } from '@/components/common/DocumentsList/utils/imageUtils';
 import {
   getDocumentModerationStatus,
   getDocumentSubmissionKind
@@ -317,6 +318,13 @@ const Document = ({
 
   const pageFiles = useMemo(() => {
     if (!documentData?.parent?.files?.length) return [];
+    // Without usable article pages, still prefer a hosted parent PDF.
+    if (pageRanges.length === 0) {
+      const parentPdf = documentData.parent.files.find(
+        file => getFileExtension(file.fileName) === '.pdf'
+      );
+      return parentPdf ? [parentPdf] : [];
+    }
     const file = documentData.parent.files[0];
     const parentExt = file.fileName?.match(/\.[^.]+$/)?.[0] ?? '';
     return pageRanges.map(({ start, end }) => {

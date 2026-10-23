@@ -280,7 +280,7 @@ const PdfJsViewer = ({ src }) => {
 
   if (hasError) {
     return (
-      <Frame sx={{ height: { xs: 'auto', sm: 'auto', md: 'auto' } }}>
+      <Frame sx={{ height: 'auto' }}>
         <PdfFallback src={src} />
       </Frame>
     );
@@ -379,25 +379,43 @@ PdfJsViewer.propTypes = {
  * and falls back to rendering the pages ourselves with PDF.js everywhere else,
  * which in practice means every phone and tablet.
  */
-const PdfPreview = ({ src }) => {
+const PdfPreview = ({ src, isExternal = false }) => {
+  const { formatMessage } = useIntl();
   // Read once per mount: neither the platform nor the plugin registry changes
   // under a live page, and re-reading it on every render would re-mount the
   // viewer if it ever did.
   const [isNativeViewerUsed] = useState(hasNativePdfViewer);
 
+  // HTTP sources cannot be embedded on our HTTPS site; keep direct access.
+  if (isExternal && new URL(src).protocol === 'http:') {
+    return (
+      <Frame sx={{ height: 'auto' }}>
+        <PdfFallback src={src} />
+      </Frame>
+    );
+  }
+
   if (!isNativeViewerUsed) return <PdfJsViewer src={src} />;
 
   return (
-    <Frame>
-      <NativeViewer data={src} type="application/pdf">
-        <PdfFallback src={src} />
-      </NativeViewer>
-    </Frame>
+    <Box>
+      {isExternal && (
+        <Typography variant="body2" sx={{ mb: 0.5 }}>
+          <AppLink href={src}>{formatMessage({ id: 'Open PDF' })}</AppLink>
+        </Typography>
+      )}
+      <Frame>
+        <NativeViewer data={src} type="application/pdf">
+          {!isExternal && <PdfFallback src={src} />}
+        </NativeViewer>
+      </Frame>
+    </Box>
   );
 };
 
 PdfPreview.propTypes = {
-  src: PropTypes.string.isRequired
+  src: PropTypes.string.isRequired,
+  isExternal: PropTypes.bool
 };
 
 export default PdfPreview;

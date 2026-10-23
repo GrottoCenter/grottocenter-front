@@ -277,7 +277,7 @@ export const FilesSection = ({ files, externalPdfUrl }) => {
 
   if (fileList.length === 0) {
     if (externalPdfUrl) {
-      return <PdfPreview src={externalPdfUrl} />;
+      return <PdfPreview src={externalPdfUrl} isExternal />;
     }
     return (
       <EmptySection

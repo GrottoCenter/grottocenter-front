@@ -142,6 +142,44 @@ describe('PdfPreview', () => {
     expect(mockGetDocument).not.toHaveBeenCalled();
   });
 
+  it('keeps a direct external link outside the native viewer', () => {
+    mockHasNativePdfViewer.mockReturnValue(true);
+    const src = 'https://example.org/issue.pdf#page=12';
+    const { container } = render(
+      <IntlProvider locale="en" messages={messages}>
+        <PdfPreview src={src} isExternal />
+      </IntlProvider>
+    );
+    const viewer = container.querySelector('object');
+    const link = screen.getByRole('link', { name: 'Open PDF' });
+    expect(viewer).toHaveAttribute('data', src);
+    expect(viewer).not.toContainElement(link);
+    expect(link).toHaveAttribute('href', src);
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(mockGetDocument).not.toHaveBeenCalled();
+  });
+
+  it.each([true, false])(
+    'opens HTTP sources directly without embedding (native viewer: %s)',
+    isNative => {
+      mockHasNativePdfViewer.mockReturnValue(isNative);
+      const src = 'http://example.org/issue.pdf#page=12';
+      const { container } = render(
+        <IntlProvider locale="en" messages={messages}>
+          <PdfPreview src={src} isExternal />
+        </IntlProvider>
+      );
+      expect(screen.getByRole('link', { name: 'Open PDF' })).toHaveAttribute(
+        'href',
+        src
+      );
+      expect(container.querySelector('object')).toBeNull();
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      expect(mockGetDocument).not.toHaveBeenCalled();
+    }
+  );
+
   it.each([
     ['#page=12&zoom=125', 12],
     ['#page=999', 20],
