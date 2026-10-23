@@ -102,15 +102,26 @@ const Person = ({
   }, [queryClient, person?.id, navigate]);
 
   let onDelete = null;
-  if (person && (permissions.isAdmin || permissions.isModerator)) {
+  if (
+    permissions.isAuth &&
+    person &&
+    Number(person.id) !== 8 &&
+    ((person.type === 'CAVER' && permissions.isAdmin) ||
+      (person.type === 'AUTHOR' && permissions.isModerator))
+  ) {
     onDelete = () => setIsDeleteConfirmationOpen(true);
   }
-  const { onDeletePress } = usePostDeletion({
-    entityType: DELETED_ENTITIES.person,
-    id: person?.id,
-    entity: person,
-    deleteMutation
+  const { onDeleted } = usePostDeletion({
+    entityType: DELETED_ENTITIES.person
   });
+  const onDeletePress = async entityId => {
+    await deleteMutation.mutateAsync({
+      id: person.id,
+      entityId,
+      isPermanent: true
+    });
+    onDeleted(entityId);
+  };
 
   let title = '';
   if (person) {
@@ -228,9 +239,13 @@ const Person = ({
             entityName={title}
             entityIconType="person"
             isOpen={isDeleteConfirmationOpen}
-            isLoading={false}
+            isLoading={deleteMutation.isPending}
+            error={deleteMutation.error}
             isPermanent
-            onClose={() => setIsDeleteConfirmationOpen(false)}
+            onClose={() => {
+              setIsDeleteConfirmationOpen(false);
+              deleteMutation.reset();
+            }}
             onConfirmation={entity => onDeletePress(entity?.id)}
           />
           {isAuthor ? (

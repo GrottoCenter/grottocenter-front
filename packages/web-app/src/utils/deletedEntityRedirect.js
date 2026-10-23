@@ -11,10 +11,5 @@ export const getDeletedEntityRedirectUrl = (entityType, redirectId) => {
   return `${entityType.url}${redirectId}`;
 };
 
-export const getPostDeletionUrl = (
-  entityType,
-  selectedId,
-  existingRedirectId
-) =>
-  getDeletedEntityRedirectUrl(entityType, selectedId ?? existingRedirectId) ??
-  '/';
+export const getPostDeletionUrl = (entityType, selectedId) =>
+  getDeletedEntityRedirectUrl(entityType, selectedId) ?? '/';

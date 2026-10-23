@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { CircularProgress } from '@mui/material';
 import { useIntl } from 'react-intl';
@@ -9,8 +10,14 @@ import RestoreIcon from '@mui/icons-material/RestoreFromTrashRounded';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
 
-import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
+import FormSubmissionError from '@/components/common/FormSubmissionError';
+import {
+  DELETED_ENTITIES,
+  DeleteConfirmationDialog
+} from '@/components/common/card/Deleted';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import OfflineDisabled from '../../common/OfflineDisabled';
+import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import { useSnapshotUrl } from './Snapshots/UtilityFunction';
 
 const ActionButtons = ({
@@ -20,11 +27,11 @@ const ActionButtons = ({
   isDeleted,
   canEdit,
   canDelete,
-  // Permission to hard-delete an already soft-deleted entity. Defaults to
-  // `canDelete` so existing callers keep their behaviour; callers whose API
-  // restricts permanent deletion further (e.g. guidelines: admin-only) pass a
-  // narrower value.
-  canPermanentlyDelete = canDelete,
+  canPermanentlyDelete = false,
+  deleteError = null,
+  restoreError = null,
+  onDeleteReset,
+  entityName,
   snapshotProps,
   onDeletePress,
   onRestorePress,
@@ -35,22 +42,20 @@ const ActionButtons = ({
   isMoveLoading
 }) => {
   const { formatMessage } = useIntl();
+  const isOnline = useOnlineStatus();
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
+  const entityType = {
+    comments: DELETED_ENTITIES.comment,
+    descriptions: DELETED_ENTITIES.description,
+    histories: DELETED_ENTITIES.history,
+    locations: DELETED_ENTITIES.location,
+    riggings: DELETED_ENTITIES.rigging
+  }[snapshotProps?.type];
   // The `?? { id: 0, type: '' }` keeps the destructuring inside useSnapshotUrl
   // safe when the caller has no snapshot to link to — the resulting URL is
   // ignored because the `snapshot` item is hidden below.
   const snapshotUrl = useSnapshotUrl(snapshotProps ?? { id: 0, type: '' });
-
-  if (isLoading) {
-    return (
-      <OfflineDisabled>
-        <ResponsiveActions
-          loading
-          size="small"
-          loadingLabel={formatMessage({ id: 'Loading ...' })}
-        />
-      </OfflineDisabled>
-    );
-  }
 
   const showReorder = Boolean(onMoveUp && onMoveDown);
 
@@ -60,6 +65,7 @@ const ActionButtons = ({
       icon: <RestoreIcon />,
       label: formatMessage({ id: 'Restore' }),
       onClick: onRestorePress,
+      disabled: !isOnline,
       // Secondary so restore reads as the discreet counterpart to the
       // red "Permanently delete" sitting next to it on a deleted item,
       // matching the hierarchy used by the entity-level DeletedCard.
@@ -71,6 +77,7 @@ const ActionButtons = ({
       icon: <EditIcon />,
       label: formatMessage({ id: 'Edit' }),
       onClick: () => setIsUpdating(true),
+      disabled: !isOnline,
       hidden: !(!isDeleted && canEdit && !isUpdating)
     },
     {
@@ -86,6 +93,7 @@ const ActionButtons = ({
       icon: <ArrowUpward fontSize="small" />,
       label: formatMessage({ id: 'Move up' }),
       onClick: onMoveUp,
+      disabled: !isOnline,
       hidden: !(showReorder && !isUpdating && !isMoveLoading && !isFirst)
     },
     {
@@ -93,6 +101,7 @@ const ActionButtons = ({
       icon: <ArrowDownward fontSize="small" />,
       label: formatMessage({ id: 'Move down' }),
       onClick: onMoveDown,
+      disabled: !isOnline,
       hidden: !(showReorder && !isUpdating && !isMoveLoading && !isLast)
     },
     {
@@ -108,16 +117,41 @@ const ActionButtons = ({
       label: formatMessage({
         id: isDeleted ? 'Permanently delete' : 'Delete'
       }),
-      onClick: () => onDeletePress(isDeleted),
+      onClick: () => setIsDeleteConfirmationOpen(true),
+      disabled: !isOnline,
       destructive: true,
       hidden: !(!isUpdating && (isDeleted ? canPermanentlyDelete : canDelete))
     }
   ];
 
   return (
-    <OfflineDisabled>
-      <ResponsiveActions items={items} size="small" />
-    </OfflineDisabled>
+    <>
+      <FormSubmissionError error={restoreError} />
+      <OfflineDisabled>
+        <ResponsiveActions
+          items={items}
+          loading={isLoading}
+          loadingLabel={formatMessage({ id: 'Loading ...' })}
+          size="small"
+        />
+      </OfflineDisabled>
+      {entityType && isDeleteConfirmationOpen && (
+        <DeleteConfirmationDialog
+          entityType={entityType}
+          entityId={snapshotProps.id}
+          entityName={entityName ?? formatMessage({ id: entityType.str })}
+          isOpen={isDeleteConfirmationOpen}
+          isLoading={isLoading}
+          error={deleteError}
+          isPermanent={isDeleted}
+          onClose={() => {
+            setIsDeleteConfirmationOpen(false);
+            onDeleteReset?.();
+          }}
+          onConfirmation={() => onDeletePress(isDeleted)}
+        />
+      )}
+    </>
   );
 };
 
@@ -131,6 +165,10 @@ ActionButtons.propTypes = {
   canEdit: PropTypes.bool.isRequired,
   canDelete: PropTypes.bool.isRequired,
   canPermanentlyDelete: PropTypes.bool,
+  deleteError: FormSubmissionError.propTypes.error,
+  restoreError: FormSubmissionError.propTypes.error,
+  onDeleteReset: PropTypes.func,
+  entityName: PropTypes.string,
   // Everything the snapshot page needs to build its URL. Omit entirely to hide
   // the history action.
   snapshotProps: PropTypes.shape({

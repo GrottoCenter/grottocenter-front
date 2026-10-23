@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   useUpdateRigging,
@@ -31,12 +31,6 @@ const Rigging = ({
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [isDiscardDialogOpen, setIsDiscardDialogOpen] = useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
-
-  useEffect(() => {
-    setWantedDeletedState(rigging.isDeleted);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const closeForm = () => {
     setIsUpdateFormVisible(false);
@@ -54,16 +48,13 @@ const Rigging = ({
     updateMutation.mutate({ ...data, language: data.language });
     closeForm();
   };
-  const onDeletePress = isPermanent => {
-    setWantedDeletedState(true);
-    deleteMutation.mutate({ id: rigging.id, isPermanent });
-  };
+  const onDeletePress = isPermanent =>
+    deleteMutation.mutateAsync({ id: rigging.id, isPermanent });
   const onRestorePress = () => {
-    setWantedDeletedState(false);
     restoreMutation.mutate({ id: rigging.id });
   };
 
-  const isActionLoading = wantedDeletedState !== rigging.isDeleted;
+  const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
   return (
     <Box
@@ -82,7 +73,18 @@ const Rigging = ({
           setIsUpdating={setIsUpdateFormVisible}
           isDeleted={rigging.isDeleted}
           canEdit={isEditAllowed && permissions.isAuth}
-          canDelete={isEditAllowed && permissions.isModerator}
+          canDelete={
+            isEditAllowed &&
+            permissions.isAuth &&
+            (permissions.isModerator || permissions.isAdmin)
+          }
+          canPermanentlyDelete={
+            isEditAllowed && permissions.isAuth && permissions.isAdmin
+          }
+          deleteError={deleteMutation.error}
+          restoreError={restoreMutation.error}
+          onDeleteReset={deleteMutation.reset}
+          entityName={rigging.title}
           snapshotProps={{
             id: rigging.id,
             type: 'riggings',

@@ -244,18 +244,15 @@ it.each([
   }
 );
 
-it('shows deletion failures in the list and allows retrying through the shared dialog', async () => {
+it('keeps deletion failures in the confirmation and allows retrying without reopening', async () => {
   apiDelete.mockRejectedValueOnce(new Error('Deletion failed'));
   renderSection();
   const dialog = within(await openConfirmation());
   fireEvent.click(dialog.getByRole('button', { name: 'Permanently delete' }));
   await screen.findByRole('alert');
-  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(screen.getByRole('dialog')).toBeVisible();
   expect(screen.getByTestId('deleted-organization-42')).toBeVisible();
-  const reopenedDialog = within(await openConfirmation());
-  fireEvent.click(
-    reopenedDialog.getByRole('button', { name: 'Permanently delete' })
-  );
+  fireEvent.click(dialog.getByRole('button', { name: 'Permanently delete' }));
   await waitFor(() => expect(apiDelete).toHaveBeenCalledTimes(2));
   await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
 });

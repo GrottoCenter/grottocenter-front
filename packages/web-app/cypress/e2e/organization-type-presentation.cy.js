@@ -223,7 +223,33 @@ describe('Organization type presentation', () => {
     });
   });
 
-  it('defaults search to All and sends or clears the explicit API type filter', () => {
+  ['CAVE_RESCUE', 'ALL'].forEach(type => {
+    it(`initializes organization search from the URL type ${type}`, () => {
+      cy.intercept(
+        { method: 'POST', pathname: '/api/v1/advanced-search' },
+        {
+          body: {
+            results: [],
+            totalResults: 0,
+            totalEntities: 0,
+            page: 1
+          }
+        }
+      ).as('searchOrganizations');
+      visit(`/organizations?type=${type}`);
+      cy.wait('@searchOrganizations')
+        .its('request.body.filter')
+        .should(filter => {
+          if (type === 'ALL') expect(filter).not.to.have.property('type');
+          else expect(filter).to.have.property('type', type);
+        });
+      cy.get('[data-testid="entity-type-filter"]')
+        .contains('[role="button"]', type === 'ALL' ? 'All' : 'Cave rescue')
+        .should('have.attr', 'aria-pressed', 'true');
+    });
+  });
+
+  it('defaults search to caving groups and sends or clears the explicit API type filter', () => {
     cy.intercept(
       { method: 'POST', pathname: '/api/v1/advanced-search' },
       req => {
@@ -241,13 +267,13 @@ describe('Organization type presentation', () => {
     ).as('searchOrganizations');
     visit('/organizations');
     cy.wait('@searchOrganizations')
-      .its('request.body.filter')
-      .should('not.have.property', 'type');
+      .its('request.body.filter.type')
+      .should('eq', 'SPELEOLOGY');
     cy.get('[data-testid="entity-type-filter"]')
       .find('img')
       .should('not.exist');
     cy.get('[data-testid="entity-type-filter"]')
-      .contains('[role="button"]', 'All')
+      .contains('[role="button"]', 'Caving group')
       .should('have.attr', 'aria-pressed', 'true');
     cy.get('[data-testid="entity-type-filter"]')
       .contains('[role="button"]', 'Publisher')

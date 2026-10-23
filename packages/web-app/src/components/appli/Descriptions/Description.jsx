@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, ListItem, ListItemText } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -36,12 +36,6 @@ const Description = ({
   const deleteMutation = useDeleteDescription();
   const restoreMutation = useRestoreDescription();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
-
-  useEffect(() => {
-    setWantedDeletedState(description.isDeleted);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const onSubmitForm = data => {
     updateMutation.mutate({
@@ -53,16 +47,13 @@ const Description = ({
     setIsUpdateFormVisible(false);
   };
 
-  const onDeletePress = isPermanent => {
-    setWantedDeletedState(true);
-    deleteMutation.mutate({ id: description.id, isPermanent });
-  };
+  const onDeletePress = isPermanent =>
+    deleteMutation.mutateAsync({ id: description.id, isPermanent });
   const onRestorePress = () => {
-    setWantedDeletedState(false);
     restoreMutation.mutate({ id: description.id });
   };
 
-  const isActionLoading = wantedDeletedState !== description.isDeleted;
+  const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
   return (
     <ListItemStyled disableGutters>
@@ -73,7 +64,18 @@ const Description = ({
           setIsUpdating={setIsUpdateFormVisible}
           isDeleted={description.isDeleted}
           canEdit={isEditAllowed && permissions.isAuth}
-          canDelete={isEditAllowed && permissions.isModerator}
+          canDelete={
+            isEditAllowed &&
+            permissions.isAuth &&
+            (permissions.isModerator || permissions.isAdmin)
+          }
+          canPermanentlyDelete={
+            isEditAllowed && permissions.isAuth && permissions.isAdmin
+          }
+          deleteError={deleteMutation.error}
+          restoreError={restoreMutation.error}
+          onDeleteReset={deleteMutation.reset}
+          entityName={description.title}
           snapshotProps={{
             id: description.id,
             type: 'descriptions',

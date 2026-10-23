@@ -16,9 +16,7 @@ vi.mock('@/hooks', () => ({
 }));
 vi.mock('@/hooks/usePostDeletion', () => ({
   usePostDeletion: () => ({
-    wantedDeletedState: false,
-    onDeletePress: vi.fn(),
-    setWantedDeletedState: vi.fn()
+    onDeleted: vi.fn()
   })
 }));
 vi.mock('@/components/common/card/Deleted', () => ({

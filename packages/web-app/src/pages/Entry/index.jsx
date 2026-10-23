@@ -20,7 +20,7 @@ const EntryPage = () => {
   const { data: networkCave } = useCave(networkCaveId);
   const networkDescriptionsCount = networkCave?.descriptions?.length ?? 0;
 
-  return data?.isDeleted && !permissions.isModerator ? (
+  return data?.isDeleted && !permissions.isModerator && !permissions.isAdmin ? (
     <Deleted entityType={DELETED_ENTITIES.entrance} entity={data} />
   ) : (
     <Entry

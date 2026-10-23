@@ -1,4 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  act
+} from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import frenchMessages from '@/../public/lang/fr.json';
 import { entranceIcon, networkIcon } from '@/assets/icons';
@@ -7,6 +13,7 @@ import { DeleteConfirmationDialog, DELETED_ENTITIES } from './Deleted';
 
 const searchState = vi.hoisted(() => ({ results: [], error: null }));
 const viewportState = vi.hoisted(() => ({ isNarrow: false }));
+const networkState = vi.hoisted(() => ({ isOnline: true }));
 
 vi.mock('@mui/material/useMediaQuery', () => ({
   default: () => viewportState.isNarrow
@@ -24,12 +31,16 @@ vi.mock('@/hooks/useDeletedEntityRedirectTarget', () => ({
 }));
 
 vi.mock('@/hooks', () => ({
+  useOnlineStatus: () => networkState.isOnline,
   useDebounce: value => value,
   useQuickSearch: () => ({
     data: { results: searchState.results },
     error: searchState.error,
     isFetching: false
   })
+}));
+vi.mock('@/hooks/useNotification', () => ({
+  useNotification: () => ({ onSuccess: vi.fn() })
 }));
 
 vi.mock('../StandardDialog', () => ({
@@ -81,6 +92,7 @@ const renderDialog = (entityId = 42, onConfirmation = vi.fn()) => (
 
 describe('DeleteConfirmationDialog replacement selection', () => {
   beforeEach(() => {
+    networkState.isOnline = true;
     viewportState.isNarrow = false;
     Object.assign(redirectState, {
       data: null,
@@ -95,7 +107,124 @@ describe('DeleteConfirmationDialog replacement selection', () => {
       { id: 43, name: 'Other massif', _type: 'massifs' }
     ];
   });
+  it('waits for success, locks target changes and prevents double submission', async () => {
+    let resolveDeletion;
+    const deletion = new Promise(resolve => {
+      resolveDeletion = resolve;
+    });
+    const onConfirmation = vi.fn(() => deletion);
+    const onClose = vi.fn();
+    redirectState.data = { id: 43, name: 'Existing target' };
+    const lifecycleDialog = isLoading => (
+      <IntlProvider locale="fr" messages={frenchMessages}>
+        <DeleteConfirmationDialog
+          entityType={DELETED_ENTITIES.organization}
+          entityId={42}
+          existingRedirectId={43}
+          isOpen
+          isPermanent
+          isLoading={isLoading}
+          onConfirmation={onConfirmation}
+          onClose={onClose}
+        />
+      </IntlProvider>
+    );
+    const { rerender } = render(lifecycleDialog(false));
+    const confirm = screen.getByRole('button', {
+      name: 'Fusionner et supprimer définitivement'
+    });
+    fireEvent.click(confirm);
+    fireEvent.click(confirm);
+    expect(onConfirmation).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ id: 43 })
+    );
+    expect(onClose).not.toHaveBeenCalled();
+    rerender(lifecycleDialog(true));
+    expect(screen.getByRole('progressbar')).toBeVisible();
+    expect(confirm).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Annuler' })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: frenchMessages.remove })
+    ).toBeDisabled();
+    await act(async () => resolveDeletion());
+    expect(onClose).toHaveBeenCalledOnce();
+  });
 
+  it('keeps the target and inline error after rejection, then permits retry', async () => {
+    const failure = { status: 409, message: 'Already changed' };
+    const onConfirmation = vi
+      .fn()
+      .mockRejectedValueOnce(failure)
+      .mockResolvedValueOnce({});
+    const onClose = vi.fn();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    redirectState.data = { id: 43, name: 'Existing target' };
+    const lifecycleDialog = error => (
+      <IntlProvider locale="fr" messages={frenchMessages}>
+        <DeleteConfirmationDialog
+          entityType={DELETED_ENTITIES.organization}
+          entityId={42}
+          existingRedirectId={43}
+          isOpen
+          isPermanent
+          isLoading={false}
+          error={error}
+          onConfirmation={onConfirmation}
+          onClose={onClose}
+        />
+      </IntlProvider>
+    );
+    const { rerender } = render(lifecycleDialog(null));
+    await act(async () =>
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: 'Fusionner et supprimer définitivement'
+        })
+      )
+    );
+    expect(onClose).not.toHaveBeenCalled();
+    rerender(lifecycleDialog(failure));
+    expect(screen.getByRole('alert')).toHaveTextContent('Already changed');
+    expect(screen.getByText('Existing target')).toBeVisible();
+    await act(async () =>
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: 'Fusionner et supprimer définitivement'
+        })
+      )
+    );
+    expect(onConfirmation).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ id: 43 })
+    );
+    expect(onClose).toHaveBeenCalledOnce();
+    vi.restoreAllMocks();
+  });
+
+  it('blocks offline submission while retaining cancellation', () => {
+    networkState.isOnline = false;
+    const onConfirmation = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <IntlProvider locale="fr" messages={frenchMessages}>
+        <DeleteConfirmationDialog
+          entityType={DELETED_ENTITIES.organization}
+          entityId={42}
+          isOpen
+          isPermanent
+          isLoading={false}
+          onConfirmation={onConfirmation}
+          onClose={onClose}
+        />
+      </IntlProvider>
+    );
+    expect(
+      screen.getByRole('button', { name: 'Supprimer définitivement' })
+    ).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Annuler' }));
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(onConfirmation).not.toHaveBeenCalled();
+  });
   it.each([42, '42'])(
     'excludes the current entity (%s) and lets users select another result',
     async entityId => {
@@ -175,7 +304,7 @@ describe('DeleteConfirmationDialog replacement selection', () => {
     ]
   ])(
     'renders a compact French soft-delete confirmation for a %s',
-    (type, description, searchLabel, effect) => {
+    async (type, description, searchLabel, effect) => {
       const onConfirmation = vi.fn();
       const onClose = vi.fn();
       const { container } = render(
@@ -212,7 +341,7 @@ describe('DeleteConfirmationDialog replacement selection', () => {
 
       fireEvent.click(screen.getByRole('button', { name: 'Supprimer' }));
       expect(onConfirmation).toHaveBeenCalledWith(null);
-      expect(onClose).toHaveBeenCalledOnce();
+      await waitFor(() => expect(onClose).toHaveBeenCalledOnce());
     }
   );
 

@@ -131,6 +131,67 @@ describe('Deleted organizations', () => {
     });
   });
 
+  it('retains the selected target after failure and locks the dialog until a retry succeeds', () => {
+    cy.mockApiCatchAll();
+    let isPermanentlyDeleted = false;
+    let attempts = 0;
+    cy.intercept({ method: 'GET', pathname: '/api/v1/organizations' }, req => {
+      req.reply({
+        statusCode: isPermanentlyDeleted ? 200 : 206,
+        headers: isPermanentlyDeleted ? {} : { 'Content-Range': '0-1/1' },
+        body: { organizations: isPermanentlyDeleted ? [] : [source] }
+      });
+    });
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/organizations/42' },
+      { body: source }
+    );
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/organizations/43' },
+      { body: target }
+    );
+    cy.intercept(
+      { method: 'DELETE', pathname: '/api/v1/organizations/42' },
+      req => {
+        expect(req.query).to.include({ isPermanent: '1', entityId: '43' });
+        attempts += 1;
+        if (attempts === 1) {
+          req.reply({
+            statusCode: 409,
+            body: { message: 'Merge target changed. Please retry.' }
+          });
+        } else {
+          isPermanentlyDeleted = true;
+          req.reply({ delay: 1500, body: source });
+        }
+      }
+    ).as('deleteAttempt');
+    visitDeleted();
+    cy.get('[data-testid="permanent-delete-organization-42"]').click();
+    cy.get('[role="dialog"]:visible').within(() => {
+      cy.contains(target.name).should('be.visible');
+      cy.contains('button', /^Merge and permanently delete$/).click();
+    });
+    cy.wait('@deleteAttempt');
+    cy.get('[role="dialog"]:visible').within(() => {
+      cy.get('[role="alert"]').should('contain.text', 'Merge target changed');
+      cy.contains(target.name).should('be.visible');
+      cy.contains('button', /^Merge and permanently delete$/)
+        .should('be.enabled')
+        .click();
+      cy.get('[role="progressbar"]').should('be.visible');
+      cy.contains('button', /^Cancel$/).should('be.disabled');
+      cy.get('fieldset').should('be.disabled');
+      cy.get('button[aria-label="close"]').should('not.exist');
+    });
+    cy.get('body').type('{esc}');
+    cy.get('[role="dialog"]:visible').should('exist');
+    cy.wait('@deleteAttempt');
+    cy.get('[role="dialog"]:visible').should('not.exist');
+    cy.get('[data-testid="deleted-organization-42"]').should('not.exist');
+    cy.location('pathname').should('match', /\/organizations\/management$/);
+  });
+
   it('does not present active organizations returned by an outdated API as deleted', () => {
     cy.mockApiCatchAll();
     cy.intercept(

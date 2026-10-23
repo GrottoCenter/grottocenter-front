@@ -74,13 +74,17 @@ const Organization = ({
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
-  const { onDeletePress, wantedDeletedState, setWantedDeletedState } =
-    usePostDeletion({
-      entityType: DELETED_ENTITIES.organization,
+  const { onDeleted } = usePostDeletion({
+    entityType: DELETED_ENTITIES.organization
+  });
+  const onDeletePress = async (entityId, isPermanent) => {
+    await deleteOrganizationMutation.mutateAsync({
       id: organizationId,
-      entity: organization,
-      deleteMutation: deleteOrganizationMutation
+      entityId,
+      isPermanent
     });
+    onDeleted(entityId, isPermanent);
+  };
   const [isJoining, setIsJoining] = useState(false);
   const [joinLeaveError, setJoinLeaveError] = useState(null);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
@@ -107,7 +111,7 @@ const Organization = ({
     onEdit = () => {
       navigate(`/ui/organizations/${organizationId}/edit`);
     };
-    if (isModerator) {
+    if (isModerator || isAdmin) {
       onDelete = () => {
         setIsDeleteConfirmationPermanent(false);
         setIsDeleteConfirmationOpen(true);
@@ -116,7 +120,6 @@ const Organization = ({
   }
 
   const onRestorePress = () => {
-    setWantedDeletedState(false);
     restoreOrganizationMutation.mutate({ id: organizationId });
   };
 
@@ -182,7 +185,9 @@ const Organization = ({
     }
   }, [pendingRemoveMember, organizationId, leaveOrganizationMutation]);
 
-  const isActionLoading = wantedDeletedState !== organization?.isDeleted;
+  const isActionLoading =
+    deleteOrganizationMutation.isPending ||
+    restoreOrganizationMutation.isPending;
 
   const authoredCount = organization?.authoredCount ?? 0;
   const publishedCount = organization?.publishedCount ?? 0;
@@ -307,14 +312,19 @@ const Organization = ({
               entityType={DELETED_ENTITIES.organization}
               entity={organization}
               isLoading={isActionLoading}
-              onRestorePress={isPreview ? null : onRestorePress}
+              error={restoreOrganizationMutation.error}
+              onRestorePress={
+                !isPreview && isAuth && (isAdmin || isModerator)
+                  ? onRestorePress
+                  : null
+              }
               onPermanentDeletePress={
-                isPreview
-                  ? null
-                  : () => {
+                !isPreview && isAuth && isAdmin
+                  ? () => {
                       setIsDeleteConfirmationPermanent(true);
                       setIsDeleteConfirmationOpen(true);
                     }
+                  : null
               }
             />
           )}
@@ -329,11 +339,15 @@ const Organization = ({
               }
               isOpen={isDeleteConfirmationOpen}
               isLoading={isActionLoading}
+              error={deleteOrganizationMutation.error}
               isPermanent={isDeleteConfirmationPermanent}
-              onClose={() => setIsDeleteConfirmationOpen(false)}
-              onConfirmation={entity => {
-                onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+              onClose={() => {
+                setIsDeleteConfirmationOpen(false);
+                deleteOrganizationMutation.reset();
               }}
+              onConfirmation={entity =>
+                onDeletePress(entity?.id, isDeleteConfirmationPermanent)
+              }
             />
           )}
           <ScrollableContent

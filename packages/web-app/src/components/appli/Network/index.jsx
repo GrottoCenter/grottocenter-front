@@ -76,21 +76,21 @@ export const Network = ({
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
-  const { onDeletePress, wantedDeletedState, setWantedDeletedState } =
-    usePostDeletion({
-      entityType: DELETED_ENTITIES.network,
-      id: caveId,
-      entity: cave,
-      deleteMutation
-    });
+  const { onDeleted } = usePostDeletion({
+    entityType: DELETED_ENTITIES.network
+  });
+  const onDeletePress = async (entityId, isPermanent) => {
+    await deleteMutation.mutateAsync({ id: caveId, entityId, isPermanent });
+    onDeleted(entityId, isPermanent);
+  };
   const handleShare = useSharePage();
   const handlePrint = useReactToPrint({ contentRef: componentRef });
 
-  const isActionLoading = wantedDeletedState !== cave?.isDeleted;
+  const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
   const country = cave?.entrances?.[0]?.country;
 
   let onDelete = null;
-  if (!cave?.isDeleted && isModerator) {
+  if (!cave?.isDeleted && isAuth && (isModerator || isAdmin)) {
     onDelete = () => {
       setIsDeleteConfirmationPermanent(false);
       setIsDeleteConfirmationOpen(true);
@@ -98,7 +98,6 @@ export const Network = ({
   }
 
   const onRestorePress = () => {
-    setWantedDeletedState(false);
     restoreMutation.mutate({ id: caveId });
   };
 
@@ -251,11 +250,18 @@ export const Network = ({
                     entityType={DELETED_ENTITIES.network}
                     entity={cave}
                     isLoading={isActionLoading}
-                    onRestorePress={onRestorePress}
-                    onPermanentDeletePress={() => {
-                      setIsDeleteConfirmationPermanent(true);
-                      setIsDeleteConfirmationOpen(true);
-                    }}
+                    error={restoreMutation.error}
+                    onRestorePress={
+                      isAuth && (isAdmin || isModerator) ? onRestorePress : null
+                    }
+                    onPermanentDeletePress={
+                      isAuth && isAdmin
+                        ? () => {
+                            setIsDeleteConfirmationPermanent(true);
+                            setIsDeleteConfirmationOpen(true);
+                          }
+                        : null
+                    }
                   />
                 )}
                 <DeleteConfirmationDialog
@@ -265,15 +271,19 @@ export const Network = ({
                   existingRedirectId={cave.isDeleted ? cave.redirectTo : null}
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
+                  error={deleteMutation.error}
                   isPermanent={isDeleteConfirmationPermanent}
                   isSearchMandatory={
                     isDeleteConfirmationPermanent &&
                     (cave?.entrances ?? []).length > 0
                   }
-                  onClose={() => setIsDeleteConfirmationOpen(false)}
-                  onConfirmation={entity => {
-                    onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                  onClose={() => {
+                    setIsDeleteConfirmationOpen(false);
+                    deleteMutation.reset();
                   }}
+                  onConfirmation={entity =>
+                    onDeletePress(entity?.id, isDeleteConfirmationPermanent)
+                  }
                 />
                 <ScrollableContent
                   content={
