@@ -84,10 +84,63 @@ describe('Article PDF from its parent', () => {
           'This PDF is displayed from an external website.'
         ).should('be.visible');
       });
-    // The only direct link is the viewer fallback, not a duplicate URL row.
+    // Native viewer failures do not reveal object children. Keep this link
+    // visible outside the object even when the browser has a PDF handler.
     cy.get(`a[href="${parentUrl}#page=2"]`)
       .should('have.length', 1)
+      .and('be.visible')
       .and('contain', 'Open PDF');
+  });
+
+  it('keeps direct access when the native preview fails to load', () => {
+    cy.intercept(parentUrl, { forceNetworkError: true });
+    visitArticle();
+    cy.get(`a[href="${parentUrl}#page=2"]`)
+      .should('be.visible')
+      .and('have.attr', 'target', '_blank');
+  });
+
+  it('uses the hosted parent PDF even without valid article pages', () => {
+    const hostedUrl = 'https://documents.example.org/hosted.pdf';
+    visitArticle({
+      pages: 'iv',
+      parent: {
+        ...document.parent,
+        files: [{ fileName: 'hosted.pdf', completePath: hostedUrl }]
+      }
+    });
+    cy.get('object[type="application/pdf"]').should(
+      'have.attr',
+      'data',
+      hostedUrl
+    );
+    cy.contains('This PDF is displayed from an external website.').should(
+      'not.exist'
+    );
+  });
+
+  it('ignores PDF links cited in document and parent descriptions', () => {
+    visitArticle({
+      description: `See also ${articleUrl}`,
+      parent: {
+        id: 8,
+        type: 'Issue',
+        title: 'Parent issue',
+        description: parentUrl
+      }
+    });
+    cy.get('object[type="application/pdf"]').should('not.exist');
+    cy.contains('No files attached to this document.').should('be.visible');
+  });
+
+  it('opens HTTP identifiers directly without mixed-content embedding', () => {
+    const httpUrl = 'http://documents.example.org/article.pdf';
+    visitArticle({ identifier: httpUrl, identifierType: ' URL ' });
+    cy.get('[data-testid="pdf-fallback-open"]')
+      .should('be.visible')
+      .and('have.attr', 'href', httpUrl);
+    cy.get('object[type="application/pdf"]').should('not.exist');
+    cy.get('canvas').should('not.exist');
   });
 
   it('prefers the article URL over its parent URL', () => {

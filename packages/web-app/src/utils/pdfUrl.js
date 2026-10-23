@@ -1,25 +1,24 @@
-const URL_REGEX = /https?:\/\/[^\s<>"']+/gi;
-// Exclude sentence punctuation when extracting a link from a description.
-const TRAILING_PUNCTUATION_REGEX = /[.,;:!?)\]}]+$/;
+import { normalizeIdentifierType } from './documentIdentifier';
 
 const isPdfUrl = url => {
   try {
     // Query strings and viewer fragments may follow the extension.
-    return new URL(url).pathname.toLowerCase().endsWith('.pdf');
+    const parsedUrl = new URL(url);
+    return (
+      ['http:', 'https:'].includes(parsedUrl.protocol) &&
+      parsedUrl.pathname.toLowerCase().endsWith('.pdf')
+    );
   } catch {
     return false;
   }
 };
 
-// Prefer a URL identifier to links embedded in the document description.
-export const findDocumentPdfUrl = document =>
-  [
-    document?.identifierType === 'url' ? document.identifier : null,
-    document?.description
-  ]
-    .flatMap(text => text?.match(URL_REGEX) ?? [])
-    .map(url => url.replace(TRAILING_PUNCTUATION_REGEX, ''))
-    .find(isPdfUrl) ?? null;
+// Descriptions may cite other publications and cannot identify this PDF.
+export const findDocumentPdfUrl = document => {
+  if (normalizeIdentifierType(document?.identifierType) !== 'url') return null;
+  const url = document.identifier?.trim();
+  return isPdfUrl(url) ? url : null;
+};
 
 // Keep query strings and other viewer options when targeting an article page.
 export const withPdfPage = (url, page) => {
