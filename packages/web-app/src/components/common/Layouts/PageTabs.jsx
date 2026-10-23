@@ -232,6 +232,7 @@ const PageTabs = ({ tabs, children }) => {
                   '& .MuiBottomNavigationAction-label, & .MuiBottomNavigationAction-label.Mui-selected':
                     {
                       typography: 'caption',
+                      fontSize: theme.typography.pxToRem(9),
                       overflowWrap: 'anywhere'
                     },
                   '&.Mui-selected': { color: 'secondary.main' },

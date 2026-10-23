@@ -35,9 +35,7 @@ describe('Page tabs on narrow screens', () => {
           const label = button.querySelector(':scope > span:last-child');
           const bounds = button.getBoundingClientRect();
           const labelBounds = label.getBoundingClientRect();
-          expect(parseFloat(getComputedStyle(label).fontSize)).to.be.at.least(
-            12
-          );
+          expect(parseFloat(getComputedStyle(label).fontSize)).to.equal(9);
           expect(labelBounds.left).to.be.at.least(bounds.left);
           expect(labelBounds.right).to.be.at.most(bounds.right + 1);
           expect(labelBounds.bottom).to.be.at.most(bounds.bottom + 1);
@@ -60,6 +58,9 @@ describe('Page tabs on narrow screens', () => {
     });
     cy.get('#page-tab-1').click();
     cy.get('#page-tabpanel-1').should('be.visible');
+    cy.get('#page-tab-1 > span:last-child').should($label => {
+      expect(parseFloat(getComputedStyle($label[0]).fontSize)).to.equal(9);
+    });
     cy.screenshot('page-tabs-translated-mobile', { capture: 'viewport' });
 
     cy.viewport(1280, 900);
