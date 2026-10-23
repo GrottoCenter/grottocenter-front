@@ -9,10 +9,10 @@ import {
   ZoomIn,
   ZoomOut
 } from '@mui/icons-material';
-// `?url` keeps the 1.2 MB worker out of the bundle graph: Vite emits it as a
+// `?url` keeps the worker out of the bundle graph: Vite emits it as a
 // hashed asset and this import is just the string. It is only ever fetched when
 // a Worker is constructed, i.e. when the fallback viewer actually runs.
-import PDF_WORKER_URL from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import PDF_WORKER_URL from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url';
 import { useMeasuredWidth } from '@/hooks';
 import { hasNativePdfViewer } from '@/utils/pdfViewerSupport';
 import AppLink from '../AppLink';
@@ -123,7 +123,9 @@ const PdfJsViewer = ({ src }) => {
 
     const load = async () => {
       try {
-        const pdfjs = await import('pdfjs-dist');
+        // The legacy build supplies missing JavaScript features on mobile
+        // browsers and WebViews; keep its worker on the same build.
+        const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
         // Idempotent, and cheap enough not to be worth guarding: the worker is
         // spawned by getDocument, not by this assignment.
         pdfjs.GlobalWorkerOptions.workerSrc = PDF_WORKER_URL;
@@ -141,6 +143,14 @@ const PdfJsViewer = ({ src }) => {
         }
         const doc = await loadingTask.promise;
         if (isCancelled) return;
+        // PDF.js does not apply native viewer URL fragments itself.
+        const requestedPage = Number(
+          new URLSearchParams(src.split('#')[1]).get('page')
+        );
+        const initialPage = Number.isSafeInteger(requestedPage)
+          ? Math.min(doc.numPages, Math.max(1, requestedPage))
+          : 1;
+        setPageNumber(initialPage);
         setPdf(doc);
         setPageCount(doc.numPages);
       } catch (_error) {

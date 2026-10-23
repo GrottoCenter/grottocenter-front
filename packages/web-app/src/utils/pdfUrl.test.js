@@ -1,49 +1,78 @@
-import { findPdfUrl } from './pdfUrl';
+import { findDocumentPdfUrl, withPdfPage } from './pdfUrl';
 
-describe('findPdfUrl', () => {
-  it('returns a bare PDF url', () => {
-    const url = 'https://cds38.org/wp/uploads/scialet-32.pdf';
-    expect(findPdfUrl(url)).toBe(url);
-  });
+describe('findDocumentPdfUrl', () => {
+  const url = 'https://example.org/a.pdf';
 
-  it('extracts a PDF url from surrounding text', () => {
-    expect(
-      findPdfUrl('Compte rendu disponible sur https://example.org/a.pdf merci')
-    ).toBe('https://example.org/a.pdf');
-  });
-
-  it('drops the punctuation closing the sentence', () => {
-    expect(findPdfUrl('Voir https://example.org/a.pdf.')).toBe(
-      'https://example.org/a.pdf'
+  it('reads a URL identifier', () => {
+    expect(findDocumentPdfUrl({ identifier: url, identifierType: 'url' })).toBe(
+      url
     );
   });
 
-  it('accepts a query string after the extension', () => {
-    const url = 'https://example.org/a.pdf?dl=1';
-    expect(findPdfUrl(url)).toBe(url);
+  it.each([
+    ['a bare URL', url, url],
+    ['surrounding text', `Read ${url} please`, url],
+    ['sentence punctuation', `See ${url}.`, url],
+    ['query and fragment', `${url}?dl=1#page=12`, `${url}?dl=1#page=12`],
+    ['a non-PDF URL', 'https://example.org/page.html', null],
+    ['a host mentioning PDF', 'https://pdf.example.org/page', null]
+  ])('handles %s in the description', (_label, description, expected) => {
+    expect(findDocumentPdfUrl({ description })).toBe(expected);
   });
 
-  it('scans sources in order', () => {
+  it('prefers the URL identifier over the description', () => {
     expect(
-      findPdfUrl('https://first.org/a.pdf', 'https://second.org/b.pdf')
+      findDocumentPdfUrl({
+        identifier: 'https://first.org/a.pdf',
+        identifierType: 'url',
+        description: 'https://second.org/b.pdf'
+      })
     ).toBe('https://first.org/a.pdf');
   });
 
-  it('skips nullish sources', () => {
-    expect(findPdfUrl(null, undefined, 'https://example.org/a.pdf')).toBe(
-      'https://example.org/a.pdf'
+  it.each([undefined, null, {}])(
+    'returns null without a source (%s)',
+    document => {
+      expect(findDocumentPdfUrl(document)).toBeNull();
+    }
+  );
+
+  it.each(['doi', undefined])(
+    'ignores non-URL identifier types (%s)',
+    identifierType => {
+      expect(
+        findDocumentPdfUrl({
+          identifier: url,
+          identifierType
+        })
+      ).toBeNull();
+    }
+  );
+});
+
+describe('withPdfPage', () => {
+  it('preserves the query and other viewer options while replacing the page', () => {
+    expect(
+      withPdfPage('https://example.org/issue.pdf?dl=1#page=4&zoom=125', 12)
+    ).toBe('https://example.org/issue.pdf?dl=1#page=12&zoom=125');
+  });
+
+  it('also handles relative attachment paths', () => {
+    expect(withPdfPage('/files/issue.pdf', 12)).toBe(
+      '/files/issue.pdf#page=12'
     );
   });
 
-  it('ignores non-PDF urls', () => {
-    expect(findPdfUrl('https://example.org/page.html')).toBeNull();
-  });
+  it.each([undefined, null, 0, -1, 1.5, Infinity])(
+    'keeps the existing destination for an invalid page (%s)',
+    page => {
+      expect(withPdfPage('https://example.org/a.pdf#page=3', page)).toBe(
+        'https://example.org/a.pdf#page=3'
+      );
+    }
+  );
 
-  it('ignores a url whose host merely mentions pdf', () => {
-    expect(findPdfUrl('https://pdf.example.org/page')).toBeNull();
-  });
-
-  it('returns null without any source', () => {
-    expect(findPdfUrl()).toBeNull();
+  it('does not create a URL when no PDF was found', () => {
+    expect(withPdfPage(null, 12)).toBeNull();
   });
 });

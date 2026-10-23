@@ -19,8 +19,12 @@ export const FilePropTypes = PropTypes.shape({
 
 export const DocumentSimplePropTypes = PropTypes.shape({
   id: PropTypes.number.isRequired,
+  type: PropTypes.string,
   title: PropTypes.string,
-  description: PropTypes.string
+  description: PropTypes.string,
+  identifier: PropTypes.string,
+  identifierType: PropTypes.string,
+  files: PropTypes.arrayOf(FilePropTypes)
 });
 
 const CitationParentPropTypes = PropTypes.shape({
