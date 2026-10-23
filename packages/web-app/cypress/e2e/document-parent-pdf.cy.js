@@ -76,10 +76,14 @@ describe('Article PDF from its parent', () => {
       'data',
       `${parentUrl}#page=2`
     );
-    cy.contains(
-      '[role="alert"]',
-      'This PDF is displayed from an external website.'
-    ).should('be.visible');
+    cy.contains('h2', 'Metadata')
+      .parent('section')
+      .within(() => {
+        cy.contains(
+          '[role="alert"]',
+          'This PDF is displayed from an external website.'
+        ).should('be.visible');
+      });
     // The only direct link is the viewer fallback, not a duplicate URL row.
     cy.get(`a[href="${parentUrl}#page=2"]`)
       .should('have.length', 1)
@@ -123,5 +127,32 @@ describe('Article PDF from its parent', () => {
       });
     cy.contains('Page 2 of 3').should('be.visible');
     cy.get('object[type="application/pdf"]').should('not.exist');
+    cy.get('[data-testid="pdf-fallback-open"]').should('not.exist');
+  });
+
+  it('offers a single compact fallback when the remote PDF cannot be fetched', () => {
+    cy.viewport(390, 844);
+    cy.intercept(parentUrl, { forceNetworkError: true });
+    visitArticle({}, false);
+
+    cy.contains('[role="status"]', 'PDF preview unavailable.').should(
+      'be.visible'
+    );
+    cy.get('[data-testid="pdf-fallback-open"]')
+      .should('have.length', 1)
+      .and('be.visible')
+      .and('have.attr', 'href', `${parentUrl}#page=2`)
+      .and('have.attr', 'target', '_blank')
+      .and('have.attr', 'rel', 'noopener noreferrer');
+    cy.get('[data-testid="pdf-fallback-open"] svg').should('have.length', 1);
+    cy.get(`a[href="${parentUrl}#page=2"]`).should('have.length', 1);
+    cy.contains('Opens in a new tab').should('be.visible');
+    cy.get('[data-testid="pdf-fallback-open"]')
+      .parent()
+      .parent()
+      .invoke('outerHeight')
+      .should('be.lessThan', 260);
+    cy.get('canvas').should('not.exist');
+    cy.screenshot('pdf-fallback-mobile');
   });
 });

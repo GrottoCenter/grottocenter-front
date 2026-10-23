@@ -558,6 +558,12 @@ const Document = ({
     bodySection = <EventDateSection date={documentData.datePublication} />;
   }
 
+  const shouldShowExternalPdfNotice =
+    allFiles.length === 0 &&
+    Boolean(externalPdfUrl) &&
+    !isCollection(docType) &&
+    !isEvent(docType);
+
   const DocumentContainer = isPreview ? Box : PageContainer;
   const DocumentSections = isPreview ? PreviewSections : SectionStack;
 
@@ -903,6 +909,17 @@ const Document = ({
                               : null
                           }
                         />
+                        {shouldShowExternalPdfNotice && (
+                          <Box sx={{ gridColumn: '1 / -1', mt: 1 }}>
+                            <Alert
+                              disableMargins
+                              severity="info"
+                              content={formatMessage({
+                                id: 'This PDF is displayed from an external website. Grottocenter does not host it and claims no rights over it.'
+                              })}
+                            />
+                          </Box>
+                        )}
                       </DetailsList>
                     </SideColumn>
                   </HalfSplitContainer>

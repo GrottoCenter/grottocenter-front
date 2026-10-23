@@ -1,11 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Typography
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
   ChevronLeft,
   ChevronRight,
+  PictureAsPdf,
   ZoomIn,
   ZoomOut
 } from '@mui/icons-material';
@@ -93,6 +100,53 @@ const ControlGroup = styled('div')({
   display: 'flex',
   alignItems: 'center'
 });
+
+const PdfFallback = ({ src }) => {
+  const { formatMessage } = useIntl();
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 2,
+        p: 2,
+        minHeight: 200,
+        height: '100%',
+        textAlign: 'center'
+      }}>
+      <Typography variant="body2" color="text.secondary" role="status">
+        {formatMessage({ id: 'PDF preview unavailable.' })}
+      </Typography>
+      <Button
+        component={AppLink}
+        nativeButton={false}
+        href={src}
+        variant="contained"
+        startIcon={<PictureAsPdf />}
+        data-testid="pdf-fallback-open"
+        sx={{
+          width: 'fit-content',
+          borderRadius: 8,
+          px: 3,
+          py: 1.5,
+          textTransform: 'none',
+          boxShadow: 4
+        }}>
+        {formatMessage({ id: 'Open PDF' })}
+      </Button>
+      <Typography variant="body2" color="text.secondary">
+        {formatMessage({ id: 'Opens in a new tab' })}
+      </Typography>
+    </Box>
+  );
+};
+
+PdfFallback.propTypes = {
+  src: PropTypes.string.isRequired
+};
 
 /**
  * PDF.js viewer: renders one page at a time onto a canvas.
@@ -226,19 +280,8 @@ const PdfJsViewer = ({ src }) => {
 
   if (hasError) {
     return (
-      <Frame>
-        <Centered>
-          <Typography
-            variant="body2"
-            sx={{
-              color: 'text.secondary'
-            }}>
-            {formatMessage({ id: 'Unable to display this PDF.' })}
-          </Typography>
-          <Typography variant="body2">
-            <AppLink href={src}>{formatMessage({ id: 'Open PDF' })}</AppLink>
-          </Typography>
-        </Centered>
+      <Frame sx={{ height: { xs: 'auto', sm: 'auto', md: 'auto' } }}>
+        <PdfFallback src={src} />
       </Frame>
     );
   }
@@ -337,7 +380,6 @@ PdfJsViewer.propTypes = {
  * which in practice means every phone and tablet.
  */
 const PdfPreview = ({ src }) => {
-  const { formatMessage } = useIntl();
   // Read once per mount: neither the platform nor the plugin registry changes
   // under a live page, and re-reading it on every render would re-mount the
   // viewer if it ever did.
@@ -348,9 +390,7 @@ const PdfPreview = ({ src }) => {
   return (
     <Frame>
       <NativeViewer data={src} type="application/pdf">
-        <Typography variant="body2">
-          <AppLink href={src}>{formatMessage({ id: 'Open PDF' })}</AppLink>
-        </Typography>
+        <PdfFallback src={src} />
       </NativeViewer>
     </Frame>
   );

@@ -6,7 +6,6 @@ import { styled } from '@mui/material/styles';
 import { EventAvailable, InsertDriveFile } from '@mui/icons-material';
 import Linkify from 'linkify-react';
 
-import Alert from '@/components/common/Alert';
 import PdfPreview from '@/components/common/PdfPreview';
 import AppLink from '../../components/common/AppLink';
 import linkifyOptions from '../../helpers/linkifyOptions';
@@ -278,18 +277,7 @@ export const FilesSection = ({ files, externalPdfUrl }) => {
 
   if (fileList.length === 0) {
     if (externalPdfUrl) {
-      return (
-        <Stack spacing={1}>
-          <Alert
-            disableMargins
-            severity="info"
-            content={formatMessage({
-              id: 'This PDF is displayed from an external website. Grottocenter does not host it and claims no rights over it.'
-            })}
-          />
-          <PdfPreview src={externalPdfUrl} />
-        </Stack>
-      );
+      return <PdfPreview src={externalPdfUrl} />;
     }
     return (
       <EmptySection
