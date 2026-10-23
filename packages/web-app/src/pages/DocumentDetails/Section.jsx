@@ -6,6 +6,7 @@ import { styled } from '@mui/material/styles';
 import { EventAvailable, InsertDriveFile } from '@mui/icons-material';
 import Linkify from 'linkify-react';
 
+import Alert from '@/components/common/Alert';
 import PdfPreview from '@/components/common/PdfPreview';
 import AppLink from '../../components/common/AppLink';
 import linkifyOptions from '../../helpers/linkifyOptions';
@@ -241,7 +242,48 @@ export const EventDateSection = ({ date }) => {
 };
 EventDateSection.propTypes = { date: PropTypes.string };
 
-export const FilesSection = ({ files }) => {
+// A PDF that lives on another website: framed read-only, never re-hosted.
+//
+// The link sits above the frame rather than only inside the `<object>` fallback,
+// because that fallback shows up solely when the browser cannot render PDFs at
+// all. A remote server refusing to be framed (X-Frame-Options, CSP
+// frame-ancestors), an http:// link blocked as mixed content, a dead link, or a
+// mobile browser that renders the first page and nothing else all leave the
+// frame unusable with no cross-origin event we can catch — the visible link is
+// what covers those cases.
+export const ExternalPdfSection = ({ url }) => {
+  const { formatMessage } = useIntl();
+  return (
+    <Stack spacing={1}>
+      <Alert
+        disableMargins
+        severity="info"
+        content={formatMessage({
+          id: 'This PDF is displayed from an external website. Grottocenter does not host it and claims no rights over it.'
+        })}
+      />
+      <Box>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            mb: 0.5,
+            minWidth: 0
+          }}>
+          {getFileIcon('.pdf')}
+          <Box sx={{ minWidth: 0, wordBreak: 'break-all' }}>
+            <AppLink href={url}>{url}</AppLink>
+          </Box>
+        </Box>
+        <PdfPreview src={url} />
+      </Box>
+    </Stack>
+  );
+};
+ExternalPdfSection.propTypes = { url: PropTypes.string.isRequired };
+
+export const FilesSection = ({ files, externalPdfUrl }) => {
   const { formatMessage } = useIntl();
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
@@ -276,6 +318,9 @@ export const FilesSection = ({ files }) => {
   );
 
   if (fileList.length === 0) {
+    // An attached file always wins: it is the copy Grottocenter hosts, and the
+    // one whose licence the page shows.
+    if (externalPdfUrl) return <ExternalPdfSection url={externalPdfUrl} />;
     return (
       <EmptySection
         message={formatMessage({ id: 'No files attached to this document.' })}
@@ -386,5 +431,6 @@ FilesSection.propTypes = {
       description: PropTypes.string,
       thumbnails: ThumbnailsPropTypes
     })
-  )
+  ),
+  externalPdfUrl: PropTypes.string
 };
