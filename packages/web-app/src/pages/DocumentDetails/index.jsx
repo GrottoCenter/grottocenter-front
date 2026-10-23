@@ -23,6 +23,7 @@ import {
 } from '@/utils/documentSort';
 import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
 import { formatDocumentReference } from '@/utils/documentReference';
+import { findPdfUrl } from '@/utils/pdfUrl';
 import {
   getDocumentModerationStatus,
   getDocumentSubmissionKind
@@ -330,6 +331,17 @@ const Document = ({
     [documentData, pageFiles]
   );
 
+  // Fallback for documents with no file of their own: the identifier field when
+  // it holds a URL, then the description, where older records buried the link.
+  const externalPdfUrl = useMemo(
+    () =>
+      findPdfUrl(
+        documentData?.identifierType === 'url' ? documentData.identifier : null,
+        documentData?.description
+      ),
+    [documentData]
+  );
+
   const childIssues = useMemo(
     () => (documentChildren ?? []).filter(d => d.type === 'Issue'),
     [documentChildren]
@@ -497,7 +509,9 @@ const Document = ({
   // What sits under the description depends on the document type: a
   // collection lists its issues, an event shows its date, anything else
   // shows the attached files.
-  let bodySection = <FilesSection files={allFiles} />;
+  let bodySection = (
+    <FilesSection files={allFiles} externalPdfUrl={externalPdfUrl} />
+  );
   if (isCollection(docType)) {
     bodySection = (
       <Box>
