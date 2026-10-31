@@ -23,7 +23,6 @@ import {
   usePermissions
 } from '@/hooks';
 import { useDeletedOrganizations } from '@/hooks/queries/useDeletedOrganizations';
-import { useNotification } from '@/hooks/useNotification';
 import { getOrganizationIconType } from '@/utils/organizationIcons';
 import OrganizationActionButtons from './OrganizationActionButtons';
 
@@ -31,7 +30,6 @@ const DeletedOrganizationsSection = ({ enabled, onPreview }) => {
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
   const { isAdmin } = usePermissions();
-  const { onSuccess } = useNotification();
   const mutation = useDeleteOrganization();
   const [selected, setSelected] = useState(null);
   // The list omits redirectTo. Load fresh details before opening the shared
@@ -56,16 +54,12 @@ const DeletedOrganizationsSection = ({ enabled, onPreview }) => {
   } = useDeletedOrganizations({ enabled });
   const organizations = data?.organizations ?? [];
 
-  const handleConfirm = entity => {
-    if (!isOnline || !isAdmin || !isSourceValid || mutation.isPending) return;
-    mutation.mutate(
-      { id: source.id, entityId: entity?.id, isPermanent: true },
-      {
-        onSuccess: () =>
-          onSuccess(formatMessage({ id: 'deletedOrganizations.success' }))
-      }
-    );
-  };
+  const handleConfirm = entity =>
+    mutation.mutateAsync({
+      id: source.id,
+      entityId: entity?.id,
+      isPermanent: true
+    });
 
   return (
     <Box
@@ -101,7 +95,6 @@ const DeletedOrganizationsSection = ({ enabled, onPreview }) => {
           {formatMessage({ id: 'deletedOrganizations.changed' })}
         </Alert>
       )}
-      {mutation.error && <FormSubmissionError error={mutation.error} />}
       {error && (
         <Box>
           <FormSubmissionError error={error} />
@@ -199,7 +192,9 @@ const DeletedOrganizationsSection = ({ enabled, onPreview }) => {
           entityIconType={getOrganizationIconType(source.type)}
           existingRedirectId={source.redirectTo}
           isOpen
-          isLoading={mutation.isPending || !isOnline}
+          isLoading={mutation.isPending}
+          error={mutation.error}
+          successMessageId="deletedOrganizations.success"
           isPermanent
           onClose={() => setSelected(null)}
           onConfirmation={handleConfirm}

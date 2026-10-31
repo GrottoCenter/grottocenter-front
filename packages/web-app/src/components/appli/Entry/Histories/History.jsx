@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Box, ListItem, ListItemText } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
@@ -37,11 +37,6 @@ const History = ({
   const deleteMutation = useDeleteHistory();
   const restoreMutation = useRestoreHistory();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
-
-  useEffect(() => {
-    setWantedDeletedState(history.isDeleted);
-  }, [history.isDeleted]);
 
   const onSubmitForm = data => {
     updateMutation.mutate({
@@ -52,16 +47,13 @@ const History = ({
     setIsUpdateFormVisible(false);
   };
 
-  const onDeletePress = isPermanent => {
-    setWantedDeletedState(true);
-    deleteMutation.mutate({ id: history.id, isPermanent });
-  };
+  const onDeletePress = isPermanent =>
+    deleteMutation.mutateAsync({ id: history.id, isPermanent });
   const onRestorePress = () => {
-    setWantedDeletedState(false);
     restoreMutation.mutate({ id: history.id });
   };
 
-  const isActionLoading = wantedDeletedState !== history.isDeleted;
+  const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
   return (
     <ListItemStyled disableGutters>
@@ -98,7 +90,17 @@ const History = ({
           setIsUpdating={setIsUpdateFormVisible}
           isDeleted={history.isDeleted}
           canEdit={isEditAllowed && permissions.isAuth}
-          canDelete={isEditAllowed && permissions.isModerator}
+          canDelete={
+            isEditAllowed &&
+            permissions.isAuth &&
+            (permissions.isModerator || permissions.isAdmin)
+          }
+          canPermanentlyDelete={
+            isEditAllowed && permissions.isAuth && permissions.isAdmin
+          }
+          deleteError={deleteMutation.error}
+          restoreError={restoreMutation.error}
+          onDeleteReset={deleteMutation.reset}
           snapshotProps={{
             id: history.id,
             type: 'histories',

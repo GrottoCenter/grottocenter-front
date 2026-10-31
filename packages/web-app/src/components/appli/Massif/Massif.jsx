@@ -72,13 +72,13 @@ const Massif = ({
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
-  const { onDeletePress, wantedDeletedState, setWantedDeletedState } =
-    usePostDeletion({
-      entityType: DELETED_ENTITIES.massif,
-      id: massifId,
-      entity: massif,
-      deleteMutation
-    });
+  const { onDeleted } = usePostDeletion({
+    entityType: DELETED_ENTITIES.massif
+  });
+  const onDeletePress = async (entityId, isPermanent) => {
+    await deleteMutation.mutateAsync({ id: massifId, entityId, isPermanent });
+    onDeleted(entityId, isPermanent);
+  };
   const handleShare = useSharePage();
   const handlePrint = useReactToPrint({ contentRef: componentRef });
 
@@ -91,7 +91,7 @@ const Massif = ({
     onEdit = () => {
       navigate(`/ui/massifs/${massifId}/edit`);
     };
-    if (permissions.isModerator) {
+    if (permissions.isModerator || permissions.isAdmin) {
       onDelete = () => {
         setIsDeleteConfirmationPermanent(false);
         setIsDeleteConfirmationOpen(true);
@@ -100,7 +100,6 @@ const Massif = ({
   }
 
   const onRestorePress = () => {
-    setWantedDeletedState(false);
     restoreMutation.mutate({ id: massifId });
   };
 
@@ -118,7 +117,7 @@ const Massif = ({
     }
   };
 
-  const isActionLoading = wantedDeletedState !== massif?.isDeleted;
+  const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
   const canSubscribe =
     permissions.isLeader && massif && !massif.isDeleted && !error;
 
@@ -231,11 +230,21 @@ const Massif = ({
                     entityType={DELETED_ENTITIES.massif}
                     entity={massif}
                     isLoading={isActionLoading}
-                    onRestorePress={onRestorePress}
-                    onPermanentDeletePress={() => {
-                      setIsDeleteConfirmationPermanent(true);
-                      setIsDeleteConfirmationOpen(true);
-                    }}
+                    error={restoreMutation.error}
+                    onRestorePress={
+                      permissions.isAuth &&
+                      (permissions.isAdmin || permissions.isModerator)
+                        ? onRestorePress
+                        : null
+                    }
+                    onPermanentDeletePress={
+                      permissions.isAuth && permissions.isAdmin
+                        ? () => {
+                            setIsDeleteConfirmationPermanent(true);
+                            setIsDeleteConfirmationOpen(true);
+                          }
+                        : null
+                    }
                   />
                 )}
                 <DeleteConfirmationDialog
@@ -247,11 +256,15 @@ const Massif = ({
                   }
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
+                  error={deleteMutation.error}
                   isPermanent={isDeleteConfirmationPermanent}
-                  onClose={() => setIsDeleteConfirmationOpen(false)}
-                  onConfirmation={entity => {
-                    onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                  onClose={() => {
+                    setIsDeleteConfirmationOpen(false);
+                    deleteMutation.reset();
                   }}
+                  onConfirmation={entity =>
+                    onDeletePress(entity?.id, isDeleteConfirmationPermanent)
+                  }
                 />
                 {(massif?.geogPolygon ||
                   massif?.author ||

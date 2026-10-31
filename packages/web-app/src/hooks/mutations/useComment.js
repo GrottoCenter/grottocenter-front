@@ -1,5 +1,3 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-
 import {
   postCommentUrl,
   putCommentUrl,
@@ -8,8 +6,8 @@ import {
   moveCommentRelevanceUrl
 } from '../../conf/apiRoutes';
 import { apiPost, apiPatch, apiDelete } from '../../api/client';
-import { entranceKeys } from '../../api/queryKeys';
 import { minutesToDurationString } from '../../utils/dateTimeDuration';
+import { useEntranceContentMutation } from './useEntranceContentMutation';
 
 // Comments carry two duration fields the UI stores in minutes but the API
 // expects as ISO-8601 duration strings — the old thunks did the conversion,
@@ -20,34 +18,28 @@ const withDurations = ({ eTTrail, eTUnderground, ...rest }) => ({
   eTUnderground: minutesToDurationString(eTUnderground) ?? null
 });
 
-const useCommentMutation = mutationFn => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: entranceKeys.all })
-  });
-};
-
 export const useCreateComment = () =>
-  useCommentMutation(({ entrance, ...rest }) =>
+  useEntranceContentMutation(({ entrance, ...rest }) =>
     apiPost(postCommentUrl, { entrance, ...withDurations(rest) })
   );
 
 export const useUpdateComment = () =>
-  useCommentMutation(({ id, ...rest }) =>
+  useEntranceContentMutation(({ id, ...rest }) =>
     apiPatch(putCommentUrl(id), withDurations(rest))
   );
 
 export const useDeleteComment = () =>
-  useCommentMutation(({ id, isPermanent }) =>
-    apiDelete(deleteCommentUrl(id, isPermanent))
+  useEntranceContentMutation(
+    ({ id, isPermanent }) => apiDelete(deleteCommentUrl(id, isPermanent)),
+    { isInline: true }
   );
 
 export const useRestoreComment = () =>
-  useCommentMutation(({ id }) => apiPost(restoreCommentUrl(id)));
+  useEntranceContentMutation(({ id }) => apiPost(restoreCommentUrl(id)), {
+    isInline: true
+  });
 
 export const useMoveCommentRelevance = () =>
-  useCommentMutation(({ id, direction }) =>
+  useEntranceContentMutation(({ id, direction }) =>
     apiPatch(moveCommentRelevanceUrl(id), { direction })
   );

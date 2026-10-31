@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { completeEntityDeletion } from '@/utils/entityDeletionCache';
 
 import {
   postPersonUrl,
@@ -30,14 +31,19 @@ export const useUpdatePerson = () => {
   });
 };
 
-// Person delete is admin-only and always permanent (the API has no soft
-// delete for cavers). `entityId` names the moderator taking the action.
+// Always permanent: CAVER requires Administrator, AUTHOR requires Moderator.
+// `entityId` is the optional person to merge into, not the acting moderator.
 export const useDeletePerson = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { errorPresentation: 'inline' },
+    networkMode: 'always',
     mutationFn: ({ id, entityId }) => apiDelete(deletePersonUrl(id, entityId)),
-    onSuccess: (_data, { id }) =>
-      queryClient.removeQueries({ queryKey: personKeys.detail(id) })
+    onSuccess: (data, variables) =>
+      completeEntityDeletion(queryClient, personKeys, data, {
+        ...variables,
+        isPermanent: true
+      })
   });
 };
 

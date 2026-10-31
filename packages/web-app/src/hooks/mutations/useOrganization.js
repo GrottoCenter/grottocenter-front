@@ -2,6 +2,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { invalidateOrganizationCaches } from '@/utils/organizationCache';
 import {
+  completeEntityDeletion,
+  completeEntityRestoration
+} from '@/utils/entityDeletionCache';
+import {
   deleteOrganizationUrl,
   restoreOrganizationUrl,
   joinOrganizationUrl,
@@ -10,22 +14,32 @@ import {
   unlinkCaveFromOrganizationUrl
 } from '../../conf/apiRoutes';
 import { apiPost, apiPut, apiDelete } from '../../api/client';
-import { organizationKeys, personKeys } from '../../api/queryKeys';
+import {
+  organizationKeys,
+  personKeys,
+  snapshotKeys,
+  statsKeys
+} from '../../api/queryKeys';
 
 export const useDeleteOrganization = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { errorPresentation: 'inline' },
+    networkMode: 'always',
     mutationFn: ({ id, entityId, isPermanent }) =>
       apiDelete(deleteOrganizationUrl(id, { entityId, isPermanent })),
-    onSuccess: (_data, { id, isPermanent }) => {
-      if (isPermanent) {
-        queryClient.removeQueries({ queryKey: organizationKeys.detail(id) });
-      } else {
-        queryClient.invalidateQueries({
-          queryKey: organizationKeys.detail(id)
-        });
-      }
-      invalidateOrganizationCaches(queryClient);
+    onSuccess: async (data, variables) => {
+      await completeEntityDeletion(
+        queryClient,
+        organizationKeys,
+        data,
+        variables,
+        [snapshotKeys.all, statsKeys.all]
+      );
+      invalidateOrganizationCaches(
+        queryClient,
+        organizationKeys.detail(variables.id)
+      );
     }
   });
 };
@@ -33,8 +47,22 @@ export const useDeleteOrganization = () => {
 export const useRestoreOrganization = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { errorPresentation: 'inline' },
+    networkMode: 'always',
     mutationFn: ({ id }) => apiPost(restoreOrganizationUrl(id)),
-    onSuccess: () => invalidateOrganizationCaches(queryClient)
+    onSuccess: async (data, variables) => {
+      await completeEntityRestoration(
+        queryClient,
+        organizationKeys,
+        data,
+        variables,
+        [snapshotKeys.all, statsKeys.all]
+      );
+      invalidateOrganizationCaches(
+        queryClient,
+        organizationKeys.detail(variables.id)
+      );
+    }
   });
 };
 

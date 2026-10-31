@@ -84,7 +84,7 @@ describe('Deletion with an existing redirect', () => {
           request.reply({ body: current });
         }
       ).as('delete');
-      cy.loginAs({ groups: ['User', 'Moderator'] });
+      cy.loginAs({ groups: ['User', 'Administrator'] });
       cy.visit(`/${path}/42`, {
         onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
       });
@@ -116,7 +116,8 @@ describe('Deletion with an existing redirect', () => {
         expect(request.query.entityId).to.equal('43');
         expect(request.query).not.to.have.property('isPermanent');
       });
-      cy.wait('@source');
+      cy.get('[role="dialog"]').should('not.exist');
+      cy.location('pathname').should('equal', `/ui/${path}/42`);
 
       cy.contains('button', /^Permanently delete$/).click();
       cy.wait('@target');

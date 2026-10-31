@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { completeEntityDeletion } from '@/utils/entityDeletionCache';
 
 import { deleteCaveUrl } from '../../conf/apiRoutes';
 import { apiDelete } from '../../api/client';
@@ -11,14 +12,12 @@ import { invalidateAll } from '../../utils/mapTileCache';
 export const useDeleteCave = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { errorPresentation: 'inline' },
+    networkMode: 'always',
     mutationFn: ({ id, entityId, isPermanent }) =>
       apiDelete(deleteCaveUrl(id, { entityId, isPermanent })),
-    onSuccess: (_data, { id, isPermanent }) => {
-      if (isPermanent) {
-        queryClient.removeQueries({ queryKey: caveKeys.detail(id) });
-      } else {
-        queryClient.invalidateQueries({ queryKey: caveKeys.detail(id) });
-      }
+    onSuccess: async (data, variables) => {
+      await completeEntityDeletion(queryClient, caveKeys, data, variables);
       invalidateAll('networks');
     }
   });

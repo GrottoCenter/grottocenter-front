@@ -202,20 +202,24 @@ const Document = ({
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
-  const { onDeletePress, wantedDeletedState, setWantedDeletedState } =
-    usePostDeletion({
-      entityType: DELETED_ENTITIES.document,
-      id: documentData?.id,
-      entity: documentData,
-      deleteMutation
+  const { onDeleted } = usePostDeletion({
+    entityType: DELETED_ENTITIES.document
+  });
+  const onDeletePress = async (entityId, isPermanent) => {
+    await deleteMutation.mutateAsync({
+      id: documentData.id,
+      entityId,
+      isPermanent
     });
+    onDeleted(entityId, isPermanent);
+  };
   const handleShare = useSharePage();
 
   const canAssociateEntrances =
     permissions.isAuth &&
     !!documentData &&
     !documentData.isDeleted &&
-    !wantedDeletedState &&
+    !deleteMutation.isPending &&
     !hideActions;
   // Both entrance/unlink-document.js and massif/unlink-document.js in
   // grottocenter-api require a moderator to unlink a document.
@@ -244,7 +248,7 @@ const Document = ({
         navigate(`/ui/documents/${documentData.id}/edit`);
       };
     }
-    if (permissions.isModerator) {
+    if (permissions.isModerator || permissions.isAdmin) {
       onDelete = () => {
         setIsDeleteConfirmationPermanent(false);
         setIsDeleteConfirmationOpen(true);
@@ -253,7 +257,6 @@ const Document = ({
   }
 
   const onRestorePress = () => {
-    setWantedDeletedState(false);
     restoreMutation.mutate({ id: documentData.id });
   };
 
@@ -405,7 +408,7 @@ const Document = ({
   const hasLinkedEntities = linkedEntities.length > 0;
   const docType = documentData?.type;
 
-  const isActionLoading = wantedDeletedState !== documentData?.isDeleted;
+  const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
   const snapshotUrl = documentData
     ? `/ui/documents/${documentData.id}/snapshots`
@@ -574,11 +577,15 @@ const Document = ({
         }
         isOpen={isDeleteConfirmationOpen}
         isLoading={isActionLoading}
+        error={deleteMutation.error}
         isPermanent={isDeleteConfirmationPermanent}
-        onClose={() => setIsDeleteConfirmationOpen(false)}
-        onConfirmation={entity => {
-          onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+        onClose={() => {
+          setIsDeleteConfirmationOpen(false);
+          deleteMutation.reset();
         }}
+        onConfirmation={entity =>
+          onDeletePress(entity?.id, isDeleteConfirmationPermanent)
+        }
       />
       {/* One stack for the whole body rather than one per branch: a deleted
           document still renders its sections underneath the notice, and an
@@ -592,12 +599,27 @@ const Document = ({
                 entityType={DELETED_ENTITIES.document}
                 entity={documentData}
                 isLoading={isActionLoading}
+                error={restoreMutation.error}
                 standalone={false}
-                onRestorePress={onRestorePress}
-                onPermanentDeletePress={() => {
-                  setIsDeleteConfirmationPermanent(true);
-                  setIsDeleteConfirmationOpen(true);
-                }}
+                onRestorePress={
+                  !hideActions &&
+                  !isPreview &&
+                  permissions.isAuth &&
+                  (permissions.isAdmin || permissions.isModerator)
+                    ? onRestorePress
+                    : null
+                }
+                onPermanentDeletePress={
+                  !hideActions &&
+                  !isPreview &&
+                  permissions.isAuth &&
+                  permissions.isAdmin
+                    ? () => {
+                        setIsDeleteConfirmationPermanent(true);
+                        setIsDeleteConfirmationOpen(true);
+                      }
+                    : null
+                }
               />
             }
           />
@@ -1073,7 +1095,9 @@ const DocumentDetails = ({
     refetchChildren();
   }, [refetchDetails, refetchChildren]);
 
-  return details?.isDeleted && !permissions.isModerator ? (
+  return details?.isDeleted &&
+    !permissions.isModerator &&
+    !permissions.isAdmin ? (
     <Deleted entityType={DELETED_ENTITIES.document} entity={details} />
   ) : (
     <Document

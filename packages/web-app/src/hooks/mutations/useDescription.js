@@ -49,6 +49,8 @@ export const useUpdateDescription = () => {
 export const useDeleteDescription = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { errorPresentation: 'inline' },
+    networkMode: 'always',
     mutationFn: ({ id, isPermanent }) =>
       apiDelete(deleteDescriptionUrl(id, isPermanent)),
     onSuccess: () => invalidateAllEntityDetails(queryClient)
@@ -58,6 +60,8 @@ export const useDeleteDescription = () => {
 export const useRestoreDescription = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { errorPresentation: 'inline' },
+    networkMode: 'always',
     mutationFn: ({ id }) => apiPost(restoreDescriptionUrl(id)),
     onSuccess: () => invalidateAllEntityDetails(queryClient)
   });

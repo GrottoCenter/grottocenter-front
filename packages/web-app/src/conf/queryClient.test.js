@@ -121,4 +121,23 @@ describe('global query and mutation error notifications', () => {
       { variant: 'error', preventDuplicate: true }
     );
   });
+  it.each([403, 429, 500])(
+    'does not duplicate inline mutation errors for HTTP %s',
+    status => {
+      queryClient.getMutationCache().config.onError({ status }, null, null, {
+        meta: { errorPresentation: 'inline' }
+      });
+      expect(enqueueSnackbar).not.toHaveBeenCalled();
+    }
+  );
+
+  it('retains session-loss handling for inline deletion errors', () => {
+    queryClient.getMutationCache().config.onError({ status: 401 }, null, null, {
+      meta: { errorPresentation: 'inline' }
+    });
+    expect(store.dispatch).toHaveBeenCalledExactlyOnceWith({
+      type: 'POST_LOGOUT'
+    });
+    expect(enqueueSnackbar).not.toHaveBeenCalled();
+  });
 });

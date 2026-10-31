@@ -26,6 +26,7 @@ import FetchErrorState from '@/components/common/FetchErrorState';
 import { apiGetWithRange } from '@/api/client';
 import { getConversationsUrl } from '@/conf/apiRoutes';
 import { makeUrl } from '@/actions/utils';
+import { DEFAULT_DELETED_CAVER_ID } from '@/utils/personConstants';
 
 import {
   DeleteConfirmationDialog,
@@ -102,15 +103,26 @@ const Person = ({
   }, [queryClient, person?.id, navigate]);
 
   let onDelete = null;
-  if (person && (permissions.isAdmin || permissions.isModerator)) {
+  if (
+    permissions.isAuth &&
+    person &&
+    Number(person.id) !== DEFAULT_DELETED_CAVER_ID &&
+    ((person.type === 'CAVER' && permissions.isAdmin) ||
+      (person.type === 'AUTHOR' && permissions.isModerator))
+  ) {
     onDelete = () => setIsDeleteConfirmationOpen(true);
   }
-  const { onDeletePress } = usePostDeletion({
-    entityType: DELETED_ENTITIES.person,
-    id: person?.id,
-    entity: person,
-    deleteMutation
+  const { onDeleted } = usePostDeletion({
+    entityType: DELETED_ENTITIES.person
   });
+  const onDeletePress = async entityId => {
+    await deleteMutation.mutateAsync({
+      id: person.id,
+      entityId,
+      isPermanent: true
+    });
+    onDeleted(entityId);
+  };
 
   let title = '';
   if (person) {
@@ -228,9 +240,13 @@ const Person = ({
             entityName={title}
             entityIconType="person"
             isOpen={isDeleteConfirmationOpen}
-            isLoading={false}
+            isLoading={deleteMutation.isPending}
+            error={deleteMutation.error}
             isPermanent
-            onClose={() => setIsDeleteConfirmationOpen(false)}
+            onClose={() => {
+              setIsDeleteConfirmationOpen(false);
+              deleteMutation.reset();
+            }}
             onConfirmation={entity => onDeletePress(entity?.id)}
           />
           {isAuthor ? (

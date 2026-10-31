@@ -13,6 +13,8 @@ export const ORGANIZATION_TYPE_VALUES = Object.freeze(
   Object.keys(ORGANIZATION_TYPE_LABELS)
 );
 
+export const DEFAULT_ORGANIZATION_TYPE = 'SPELEOLOGY';
+
 export const isOrganizationType = type =>
   ORGANIZATION_TYPE_VALUES.includes(type);
 

@@ -55,6 +55,8 @@ export const usePatchGuideline = () =>
 export const useDeleteGuideline = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { errorPresentation: 'inline' },
+    networkMode: 'always',
     mutationFn: ({ id, isPermanent }) =>
       apiDelete(deleteGuidelineUrl(id, isPermanent)),
     onSuccess: () => invalidateGuidelineHosts(queryClient)

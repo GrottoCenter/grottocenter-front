@@ -359,7 +359,7 @@ const DuplicateComparison = ({
       {error && <FormSubmissionError error={error} />}
       <StandardDialog
         open={isConfirming}
-        onClose={isBusy ? undefined : () => setIsConfirming(false)}
+        onClose={isBusy ? null : () => setIsConfirming(false)}
         title={formatMessage({ id: 'duplicates.confirmTitle' })}
         actions={
           <>

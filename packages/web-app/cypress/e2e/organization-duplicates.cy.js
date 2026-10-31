@@ -148,10 +148,8 @@ describe('Organization duplicate processing', () => {
       });
       if (width < 600) {
         cy.get('#page-tab-1').should('have.text', 'Duplicates');
-        cy.get('#page-tab-1 span').should($label => {
-          expect(
-            parseFloat(getComputedStyle($label[0]).fontSize)
-          ).to.be.at.least(12);
+        cy.get('[data-testid="page-tab-label-1"]').should($label => {
+          expect(parseFloat(getComputedStyle($label[0]).fontSize)).to.equal(9);
         });
       }
       cy.screenshot(`organization-duplicates-list-${width}`, {

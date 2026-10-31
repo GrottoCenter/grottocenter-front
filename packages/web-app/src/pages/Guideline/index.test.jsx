@@ -1,5 +1,10 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useMutation
+} from '@tanstack/react-query';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
@@ -12,6 +17,12 @@ import {
   useRestoreGuideline
 } from '@/hooks';
 import GuidelinePage from './index';
+
+const notificationState = vi.hoisted(() => ({ onSuccess: vi.fn() }));
+
+vi.mock('@/hooks/useNotification', () => ({
+  useNotification: () => ({ onSuccess: notificationState.onSuccess })
+}));
 
 vi.mock('@/hooks', () => ({
   useDebounce: value => value,
@@ -109,7 +120,7 @@ const messages = {
   Unlink: 'Unlink',
   No: 'No',
   'Are you sure you want to unlink {name}?': 'Unlink {name}?',
-  'guidelines.delete_error': 'Delete failed'
+  'An error occurred while saving.': 'An error occurred while saving.'
 };
 
 const guideline = {
@@ -137,7 +148,7 @@ const setGuidelineResult = data => {
   });
 };
 
-const renderPage = (initialEntry = '/ui/guidelines/42') =>
+const renderPage = (initialEntry = '/ui/guidelines/42', options = {}) =>
   render(
     <MemoryRouter initialEntries={[initialEntry]}>
       <IntlProvider locale="en" messages={messages}>
@@ -149,7 +160,8 @@ const renderPage = (initialEntry = '/ui/guidelines/42') =>
           <Route path="/ui/guidelines" element={<div>Guidelines list</div>} />
         </Routes>
       </IntlProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
+    options
   );
 
 beforeEach(() => {
@@ -162,7 +174,8 @@ beforeEach(() => {
   });
   useDeleteGuideline.mockReturnValue({
     mutateAsync: vi.fn(),
-    isPending: false
+    isPending: false,
+    reset: vi.fn()
   });
   useRestoreGuideline.mockReturnValue({
     mutateAsync: vi.fn(),
@@ -265,7 +278,8 @@ it('keeps a deleted guideline available for moderators to restore', async () => 
   });
   useDeleteGuideline.mockReturnValue({
     mutateAsync: deleteGuideline,
-    isPending: false
+    isPending: false,
+    reset: vi.fn()
   });
   useRestoreGuideline.mockReturnValue({
     mutateAsync: restoreGuideline,
@@ -329,7 +343,8 @@ it('permanently deletes an already soft-deleted guideline', async () => {
   });
   useDeleteGuideline.mockReturnValue({
     mutateAsync: deleteGuideline,
-    isPending: false
+    isPending: false,
+    reset: vi.fn()
   });
   setGuidelineResult({ ...guideline, isDeleted: true });
   renderPage();
@@ -362,7 +377,8 @@ it('stops showing action loading when a soft delete returns stale data', async (
   });
   useDeleteGuideline.mockReturnValue({
     mutateAsync: deleteGuideline,
-    isPending: false
+    isPending: false,
+    reset: vi.fn()
   });
   setGuidelineResult(guideline);
   renderPage();
@@ -396,6 +412,72 @@ it('uses the standard fetch error state', () => {
     'Unable to load guideline'
   );
 });
+
+it.each([false, true])(
+  'keeps the dialog open after deletion fails and allows retry (permanent: %s)',
+  async isPermanent => {
+    const user = userEvent.setup();
+    const failure = Object.assign(new Error('Guideline is still referenced'), {
+      status: 409,
+      body: { message: 'Guideline is still referenced' }
+    });
+    const deleteGuideline = vi
+      .fn()
+      .mockRejectedValueOnce(failure)
+      .mockResolvedValue(undefined);
+    const queryClient = new QueryClient({
+      defaultOptions: { mutations: { retry: false } }
+    });
+    useDeleteGuideline.mockImplementation(() =>
+      useMutation({ mutationFn: variables => deleteGuideline(variables) })
+    );
+    usePermissions.mockReturnValue({
+      isAuth: true,
+      isModerator: true,
+      isAdmin: true
+    });
+    setGuidelineResult({ ...guideline, isDeleted: isPermanent });
+    const { unmount } = renderPage('/ui/guidelines/42', {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      )
+    });
+    const action = isPermanent ? 'Permanently delete' : 'Delete';
+    await user.click(screen.getByRole('button', { name: action }));
+    const dialog = screen.getByRole('dialog');
+    await user.click(within(dialog).getByRole('button', { name: action }));
+
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'Guideline is still referenced'
+    );
+    expect(screen.getByRole('dialog')).toBeVisible();
+    expect(screen.queryByText('Guidelines list')).not.toBeInTheDocument();
+    expect(notificationState.onSuccess).not.toHaveBeenCalled();
+    expect(useNotification().onError).not.toHaveBeenCalled();
+
+    await user.click(within(dialog).getByRole('button', { name: action }));
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    );
+    expect(deleteGuideline).toHaveBeenCalledTimes(2);
+    expect(deleteGuideline).toHaveBeenLastCalledWith({
+      id: '42',
+      isPermanent
+    });
+    expect(notificationState.onSuccess).toHaveBeenCalledOnce();
+    if (isPermanent) {
+      expect(screen.getByText('Guidelines list')).toBeVisible();
+    } else {
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+        guideline.title
+      );
+    }
+    unmount();
+    queryClient.clear();
+  }
+);
 
 it('keeps the scope placeholder visible while data is unavailable', () => {
   setGuidelineResult(null);

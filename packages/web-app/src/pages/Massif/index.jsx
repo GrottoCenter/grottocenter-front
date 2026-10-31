@@ -18,7 +18,9 @@ const MassifPage = () => {
     refetch
   } = useMassif(massifId);
 
-  return massif?.isDeleted && !permissions.isModerator ? (
+  return massif?.isDeleted &&
+    !permissions.isModerator &&
+    !permissions.isAdmin ? (
     <Deleted entityType={DELETED_ENTITIES.massif} entity={massif} />
   ) : (
     <Massif

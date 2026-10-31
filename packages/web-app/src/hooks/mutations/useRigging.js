@@ -1,5 +1,3 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-
 import {
   postRiggingsUrl,
   putRiggingsUrl,
@@ -8,36 +6,30 @@ import {
   moveRiggingRelevanceUrl
 } from '../../conf/apiRoutes';
 import { apiPost, apiPatch, apiDelete } from '../../api/client';
-import { entranceKeys } from '../../api/queryKeys';
-
-const useRiggingMutation = mutationFn => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: entranceKeys.all })
-  });
-};
+import { useEntranceContentMutation } from './useEntranceContentMutation';
 
 export const useCreateRigging = () =>
-  useRiggingMutation(({ entrance, title, obstacles, language }) =>
+  useEntranceContentMutation(({ entrance, title, obstacles, language }) =>
     apiPost(postRiggingsUrl, { entrance, title, obstacles, language })
   );
 
 export const useUpdateRigging = () =>
-  useRiggingMutation(({ id, title, obstacles, language }) =>
+  useEntranceContentMutation(({ id, title, obstacles, language }) =>
     apiPatch(putRiggingsUrl(id), { title, obstacles, language })
   );
 
 export const useDeleteRigging = () =>
-  useRiggingMutation(({ id, isPermanent }) =>
-    apiDelete(deleteRiggingsUrl(id, isPermanent))
+  useEntranceContentMutation(
+    ({ id, isPermanent }) => apiDelete(deleteRiggingsUrl(id, isPermanent)),
+    { isInline: true }
   );
 
 export const useRestoreRigging = () =>
-  useRiggingMutation(({ id }) => apiPost(restoreRiggingsUrl(id)));
+  useEntranceContentMutation(({ id }) => apiPost(restoreRiggingsUrl(id)), {
+    isInline: true
+  });
 
 export const useMoveRiggingRelevance = () =>
-  useRiggingMutation(({ id, direction }) =>
+  useEntranceContentMutation(({ id, direction }) =>
     apiPatch(moveRiggingRelevanceUrl(id), { direction })
   );

@@ -2,6 +2,7 @@ import { Box, Grid, Skeleton, Typography, useMediaQuery } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { useQueries } from '@tanstack/react-query';
 import { useIntl } from 'react-intl';
+import { DEFAULT_ORGANIZATION_TYPE } from '@/utils/organizationTypes';
 import CustomIcon from '../../components/common/CustomIcon';
 import AppLink from '../../components/common/AppLink';
 import { dynamicNumbersUrl } from '../../conf/apiRoutes';
@@ -65,9 +66,11 @@ const STATS = [
   },
   {
     key: 'organizations',
-    iconType: 'organization',
-    labelId: 'organizations',
-    href: '/ui/organizations'
+    iconType: 'organization_club',
+    labelId: 'groups',
+    // /organizations/count includes SPELEOLOGY and CAVE_RESCUE. The link
+    // intentionally opens caving groups only, so its results can be fewer.
+    href: `/ui/organizations?type=${DEFAULT_ORGANIZATION_TYPE}`
   }
 ];
 

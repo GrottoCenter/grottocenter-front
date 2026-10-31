@@ -153,8 +153,10 @@ query response. Confirmation is blocked while resolving. If resolution fails or
 the user interrupts loading by searching for another destination, confirmation
 stays blocked until a valid replacement is selected or the user explicitly
 continues without merging (only when merging is optional). Closing or changing
-source/mode resets the selection. Post-deletion navigation retains its existing
-redirect fallback.
+source/mode resets the selection. After successful permanent deletion on a
+detail page, navigate to the selected destination or `/` with history
+replacement. Never fall back to the source's previous `redirectTo`; it only
+prefills the merge selection. Management lists stay on their current page.
 Below the `sm` breakpoint, the dialog is fullscreen with scrollable content and
 full-width bottom actions (primary above Cancel); desktop keeps a compact dialog
 with right-aligned actions.

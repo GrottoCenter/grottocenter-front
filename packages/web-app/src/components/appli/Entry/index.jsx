@@ -92,13 +92,13 @@ export const Entry = ({
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
-  const { onDeletePress, wantedDeletedState, setWantedDeletedState } =
-    usePostDeletion({
-      entityType: DELETED_ENTITIES.entrance,
-      id: entranceId,
-      entity: entrance,
-      deleteMutation
-    });
+  const { onDeleted } = usePostDeletion({
+    entityType: DELETED_ENTITIES.entrance
+  });
+  const onDeletePress = async (entityId, isPermanent) => {
+    await deleteMutation.mutateAsync({ id: entranceId, entityId, isPermanent });
+    onDeleted(entityId, isPermanent);
+  };
   const userId = useUserProperties()?.id ?? null;
   const { isExplored, isExploredLoading, handleToggleExplored } = useExplored({
     entranceId: entrance?.id,
@@ -106,10 +106,10 @@ export const Entry = ({
   });
   const mapPositions = useMemo(() => (entrance ? [entrance] : []), [entrance]);
 
-  const isActionLoading = wantedDeletedState !== entrance?.isDeleted;
+  const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
   let onDelete = null;
-  if (!entrance?.isDeleted && isModerator) {
+  if (!entrance?.isDeleted && isAuth && (isModerator || isAdmin)) {
     onDelete = () => {
       setIsDeleteConfirmationPermanent(false);
       setIsDeleteConfirmationOpen(true);
@@ -117,7 +117,6 @@ export const Entry = ({
   }
 
   const onRestorePress = () => {
-    setWantedDeletedState(false);
     restoreMutation.mutate({ id: entranceId });
   };
 
@@ -340,11 +339,18 @@ export const Entry = ({
                     entityType={DELETED_ENTITIES.entrance}
                     entity={entrance}
                     isLoading={isActionLoading}
-                    onRestorePress={onRestorePress}
-                    onPermanentDeletePress={() => {
-                      setIsDeleteConfirmationPermanent(true);
-                      setIsDeleteConfirmationOpen(true);
-                    }}
+                    error={restoreMutation.error}
+                    onRestorePress={
+                      isAuth && (isAdmin || isModerator) ? onRestorePress : null
+                    }
+                    onPermanentDeletePress={
+                      isAuth && isAdmin
+                        ? () => {
+                            setIsDeleteConfirmationPermanent(true);
+                            setIsDeleteConfirmationOpen(true);
+                          }
+                        : null
+                    }
                   />
                 )}
                 <DeleteConfirmationDialog
@@ -356,11 +362,15 @@ export const Entry = ({
                   }
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
+                  error={deleteMutation.error}
                   isPermanent={isDeleteConfirmationPermanent}
-                  onClose={() => setIsDeleteConfirmationOpen(false)}
-                  onConfirmation={entity => {
-                    onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                  onClose={() => {
+                    setIsDeleteConfirmationOpen(false);
+                    deleteMutation.reset();
                   }}
+                  onConfirmation={entity =>
+                    onDeletePress(entity?.id, isDeleteConfirmationPermanent)
+                  }
                 />
                 <ScrollableContent
                   content={

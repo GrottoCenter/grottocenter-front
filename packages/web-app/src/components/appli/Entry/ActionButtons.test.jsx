@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
 import ActionButtons from './ActionButtons';
@@ -31,14 +32,38 @@ const baseProps = {
   onRestorePress: vi.fn()
 };
 
-const renderActionButtons = (props = {}) =>
-  render(
-    <MemoryRouter>
-      <IntlProvider locale="en" messages={messages}>
-        <ActionButtons {...baseProps} {...props} />
-      </IntlProvider>
-    </MemoryRouter>
+const renderActionButtons = (props = {}) => {
+  const client = new QueryClient();
+  return render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter>
+        <IntlProvider locale="en" messages={messages}>
+          <ActionButtons {...baseProps} {...props} />
+        </IntlProvider>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
+};
+
+it('requires explicit confirmation for subcontent soft deletion', async () => {
+  const onDeletePress = vi.fn().mockResolvedValue({});
+  renderActionButtons({ onDeletePress });
+  fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+  expect(onDeletePress).not.toHaveBeenCalled();
+  const dialog = within(screen.getByRole('dialog'));
+  await act(async () =>
+    fireEvent.click(dialog.getByRole('button', { name: 'Delete' }))
+  );
+  expect(onDeletePress).toHaveBeenCalledExactlyOnceWith(false);
+});
+
+it('does not infer permanent-delete rights from soft-delete rights', () => {
+  renderActionButtons({ isDeleted: true, canDelete: true });
+  expect(
+    screen.queryByRole('button', { name: 'Permanently delete' })
+  ).toBeNull();
+  expect(screen.getByRole('button', { name: 'Restore' })).toBeVisible();
+});
 
 /**
  * Unit tests for ActionButtons reorder integration
