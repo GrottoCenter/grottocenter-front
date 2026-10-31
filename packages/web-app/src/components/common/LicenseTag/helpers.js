@@ -68,7 +68,7 @@ export const parseCcClauses = name => {
   return tokens.slice(1).filter(token => CC_CLAUSE_DESCRIPTIONS[token]);
 };
 
-const getLicenseName = license =>
+export const getLicenseName = license =>
   typeof license === 'string' ? license : (license?.name ?? '');
 
 // Single source of truth for everything the LicenseTag components need from a
