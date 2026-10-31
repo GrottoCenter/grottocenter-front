@@ -1296,7 +1296,6 @@
   "guidelines.create_new": "Buat pedoman baru",
   "guidelines.creation_association": "Pedoman ini akan dikaitkan dengan {entityName}.",
   "guidelines.dashboard.description": "Telusuri panduan dan cakupan geografisnya.",
-  "guidelines.delete_error": "Gagal menghapus pedoman",
   "guidelines.description": "Petunjuk",
   "guidelines.fetch_error": "Gagal memuat pedoman",
   "guidelines.instructions_required": "Petunjuk wajib diisi.",

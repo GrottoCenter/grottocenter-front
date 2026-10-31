@@ -51,7 +51,9 @@ const notifyError = (error, meta) => {
     }
     return;
   }
-  // Dialogs owning their errors also own rate-limit feedback; keep 401 global.
+  // errorPresentation: 'inline' suppresses all global error toasts except the
+  // 401 handling above. Every consumer of a hook using it must render the
+  // mutation error itself, including rate-limit feedback, to avoid silent failures.
   if (meta?.errorPresentation === 'inline') return;
 
   // Use the same translated "Too many requests" message as the legacy Redux

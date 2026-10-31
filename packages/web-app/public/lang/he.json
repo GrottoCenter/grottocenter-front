@@ -1296,7 +1296,6 @@
   "guidelines.create_new": "צור הנחיה חדשה",
   "guidelines.creation_association": "הנחיה זו תשויך אל {entityName}.",
   "guidelines.dashboard.description": "עיון בהנחיות ובהיקף הגאוגרפי שלהן.",
-  "guidelines.delete_error": "מחיקת ההנחיה נכשלה",
   "guidelines.description": "הנחיות",
   "guidelines.fetch_error": "טעינת ההנחיות נכשלה",
   "guidelines.instructions_required": "יש להזין הנחיות.",

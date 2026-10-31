@@ -23,8 +23,8 @@ import {
   getDeletedEntityRedirectUrl
 } from '@/utils/deletedEntityRedirect';
 import { useDeletedEntityRedirectTarget } from '@/hooks/useDeletedEntityRedirectTarget';
-import { useOnlineStatus, useDebounce, useQuickSearch } from '@/hooks';
 import { useNotification } from '@/hooks/useNotification';
+import { useOnlineStatus, useDebounce, useQuickSearch } from '../../../hooks';
 
 import StandardDialog from '../StandardDialog';
 import ActionButton from '../ActionButton';

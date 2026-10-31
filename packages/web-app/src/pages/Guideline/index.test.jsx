@@ -120,7 +120,6 @@ const messages = {
   Unlink: 'Unlink',
   No: 'No',
   'Are you sure you want to unlink {name}?': 'Unlink {name}?',
-  'guidelines.delete_error': 'Delete failed',
   'An error occurred while saving.': 'An error occurred while saving.'
 };
 

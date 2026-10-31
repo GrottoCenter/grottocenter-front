@@ -1296,7 +1296,6 @@
   "guidelines.create_new": "新しいガイドラインを作成",
   "guidelines.creation_association": "このガイドラインは{entityName}に関連付けられます。",
   "guidelines.dashboard.description": "ガイドラインとその地理的範囲を閲覧します。",
-  "guidelines.delete_error": "ガイドラインの削除に失敗しました",
   "guidelines.description": "指示",
   "guidelines.fetch_error": "ガイドラインの読み込みに失敗しました",
   "guidelines.instructions_required": "指示は必須です。",

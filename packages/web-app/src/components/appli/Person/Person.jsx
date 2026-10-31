@@ -26,6 +26,7 @@ import FetchErrorState from '@/components/common/FetchErrorState';
 import { apiGetWithRange } from '@/api/client';
 import { getConversationsUrl } from '@/conf/apiRoutes';
 import { makeUrl } from '@/actions/utils';
+import { DEFAULT_DELETED_CAVER_ID } from '@/utils/personConstants';
 
 import {
   DeleteConfirmationDialog,
@@ -105,7 +106,7 @@ const Person = ({
   if (
     permissions.isAuth &&
     person &&
-    Number(person.id) !== 8 &&
+    Number(person.id) !== DEFAULT_DELETED_CAVER_ID &&
     ((person.type === 'CAVER' && permissions.isAdmin) ||
       (person.type === 'AUTHOR' && permissions.isModerator))
   ) {

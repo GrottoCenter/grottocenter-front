@@ -1296,7 +1296,6 @@
   "guidelines.create_new": "Създаване на нова насока",
   "guidelines.creation_association": "Тази насока ще бъде свързана с {entityName}.",
   "guidelines.dashboard.description": "Преглед на указанията и техния географски обхват.",
-  "guidelines.delete_error": "Неуспешно изтриване на насоката",
   "guidelines.description": "Инструкции",
   "guidelines.fetch_error": "Неуспешно зареждане на насоките",
   "guidelines.instructions_required": "Инструкциите са задължителни.",

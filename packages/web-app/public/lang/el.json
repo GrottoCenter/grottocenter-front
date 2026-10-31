@@ -1296,7 +1296,6 @@
   "guidelines.create_new": "Δημιουργία νέας κατευθυντήριας γραμμής",
   "guidelines.creation_association": "Αυτή η κατευθυντήρια γραμμή θα συσχετιστεί με {entityName}.",
   "guidelines.dashboard.description": "Περιηγηθείτε στις οδηγίες και τη γεωγραφική τους εμβέλεια.",
-  "guidelines.delete_error": "Αποτυχία διαγραφής της κατευθυντήριας γραμμής",
   "guidelines.description": "Οδηγίες",
   "guidelines.fetch_error": "Αποτυχία φόρτωσης κατευθυντήριων γραμμών",
   "guidelines.instructions_required": "Οι οδηγίες είναι υποχρεωτικές.",

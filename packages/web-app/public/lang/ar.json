@@ -1296,7 +1296,6 @@
   "guidelines.create_new": "إنشاء دليل جديد",
   "guidelines.creation_association": "سيتم ربط هذا الدليل الإرشادي بـ {entityName}.",
   "guidelines.dashboard.description": "تصفّح الإرشادات ونطاقها الجغرافي.",
-  "guidelines.delete_error": "فشل حذف الدليل",
   "guidelines.description": "التعليمات",
   "guidelines.fetch_error": "فشل في تحميل الأدلة",
   "guidelines.instructions_required": "التعليمات مطلوبة.",

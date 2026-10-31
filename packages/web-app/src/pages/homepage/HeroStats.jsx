@@ -68,6 +68,8 @@ const STATS = [
     key: 'organizations',
     iconType: 'organization_club',
     labelId: 'groups',
+    // /organizations/count includes SPELEOLOGY and CAVE_RESCUE. The link
+    // intentionally opens caving groups only, so its results can be fewer.
     href: `/ui/organizations?type=${DEFAULT_ORGANIZATION_TYPE}`
   }
 ];

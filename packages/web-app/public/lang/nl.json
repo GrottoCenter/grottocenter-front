@@ -1296,7 +1296,6 @@
   "guidelines.create_new": "Maak een nieuwe richtlijn",
   "guidelines.creation_association": "Deze richtlijn wordt gekoppeld aan {entityName}.",
   "guidelines.dashboard.description": "Bekijk richtlijnen en hun geografische toepassingsgebied.",
-  "guidelines.delete_error": "Kan richtlijn niet verwijderen",
   "guidelines.description": "Instructies",
   "guidelines.fetch_error": "Kan richtlijnen niet laden",
   "guidelines.instructions_required": "Instructies zijn verplicht.",

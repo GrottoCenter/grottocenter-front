@@ -1296,7 +1296,6 @@
   "guidelines.create_new": "Creați o nouă directivă",
   "guidelines.creation_association": "Această directivă va fi asociată cu {entityName}.",
   "guidelines.dashboard.description": "Consultați ghidurile și aria lor geografică.",
-  "guidelines.delete_error": "Eroare la ștergerea directivei",
   "guidelines.description": "Instrucțiuni",
   "guidelines.fetch_error": "Eroare la încărcarea directivelor",
   "guidelines.instructions_required": "Instrucțiunile sunt obligatorii.",

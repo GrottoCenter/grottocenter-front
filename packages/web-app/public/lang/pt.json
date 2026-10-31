@@ -1296,7 +1296,6 @@
   "guidelines.create_new": "Criar uma nova diretriz",
   "guidelines.creation_association": "Esta diretriz será associada a {entityName}.",
   "guidelines.dashboard.description": "Consulte as orientações e o seu âmbito geográfico.",
-  "guidelines.delete_error": "Falha ao excluir a diretriz",
   "guidelines.description": "Instruções",
   "guidelines.fetch_error": "Falha ao carregar as diretrizes",
   "guidelines.instructions_required": "As instruções são obrigatórias.",
