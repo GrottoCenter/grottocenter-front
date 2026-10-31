@@ -288,9 +288,9 @@ describe('Document 3D preview', () => {
     cy.get('[data-testid="model-preview-start"]').should('have.text', 'Retry');
     cy.contains('a', 'cave-scan.glb')
       .should('be.visible')
-      .and('have.attr', 'download', 'cave-scan.glb')
-      .and('have.attr', 'href')
-      .and('eq', modelUrl);
+      .and('have.attr', 'href', modelUrl)
+      .and('have.attr', 'target', '_blank')
+      .and('not.have.attr', 'download');
     cy.intercept(modelRequest, modelResponse);
     cy.get('[data-testid="model-preview-start"]').click();
     cy.get('[data-testid="model-preview"]', { timeout: 30000 }).should(
@@ -378,7 +378,9 @@ describe('Document 3D preview', () => {
     visitDocument();
     cy.get('[data-testid="model-preview-poster"]').should('not.exist');
     cy.get('@modelFile.all').should('have.length', 0);
-    cy.contains('a', 'cave-scan.glb').should('have.attr', 'download');
+    cy.contains('a', 'cave-scan.glb')
+      .should('have.attr', 'href', modelUrl)
+      .and('have.attr', 'target', '_blank');
     cy.get('[data-testid="model-preview-start"]').click();
     cy.wait('@modelFile', { requestTimeout: 30000 });
     cy.get('[data-testid="model-preview"]', { timeout: 30000 }).should(
@@ -412,7 +414,9 @@ describe('Document 3D preview', () => {
       'ready'
     );
     cy.get('[data-testid="model-preview-zoom-in"]').should('be.enabled');
-    cy.contains('a', 'cave-scan.glb').should('have.attr', 'download');
+    cy.contains('a', 'cave-scan.glb')
+      .should('have.attr', 'href', modelUrl)
+      .and('have.attr', 'target', '_blank');
   });
 
   it('keeps icon tooltips, long press and fullscreen controls usable on mobile', () => {

@@ -110,7 +110,8 @@ const TypeLabel = ({ docType, isFeatured = false }) => {
           typography: isFeatured ? { xs: 'body2', sm: 'subtitle1' } : undefined,
           color: 'text.primary',
           display: 'block',
-          fontWeight: isFeatured ? { xs: 600, sm: 600 } : 600,
+          // Match typography's breakpoints so variant weights cannot override it.
+          fontWeight: { xs: 600, sm: 600 },
           overflowWrap: 'anywhere',
           alignSelf: 'start'
         }}>
@@ -245,6 +246,11 @@ const DocumentTypeSelect = () => {
         (SECONDARY_TYPE_ORDER.get(b.name) ?? Number.MAX_SAFE_INTEGER)
     );
 
+  const selectedOther = others.find(dt => dt.name === document.type);
+  const SelectedOtherIcon = selectedOther
+    ? (DOCUMENT_TYPE_ICONS[selectedOther.name] ?? DOCUMENT_TYPE_FALLBACK_ICON)
+    : null;
+
   if (isPending) {
     return (
       <Box sx={{ mt: 1 }}>
@@ -305,24 +311,25 @@ const DocumentTypeSelect = () => {
                 gap: 0.5,
                 cursor: 'pointer',
                 border: '1px solid',
-                borderColor: 'divider',
-                color: 'text.primary',
+                borderColor: selectedOther ? 'primary.main' : 'divider',
+                color: selectedOther ? 'primary.main' : 'text.primary',
                 boxShadow: 'none',
                 borderRadius: 1,
                 px: 1,
                 py: 0.5,
-                bgcolor: 'background.paper',
+                bgcolor: selectedOther ? 'action.selected' : 'background.paper',
                 '&:hover': {
-                  borderColor: 'text.secondary',
+                  borderColor: selectedOther
+                    ? 'primary.main'
+                    : 'text.secondary',
                   bgcolor: 'action.hover'
                 },
                 userSelect: 'none',
                 mb: 0.5
               }}>
-              <Typography
-                variant="body2"
-                sx={{ color: 'text.primary', flex: 1, textAlign: 'start' }}>
-                {formatMessage({ id: 'Other types' })}
+              {SelectedOtherIcon && <SelectedOtherIcon fontSize="small" />}
+              <Typography variant="body2" sx={{ flex: 1, textAlign: 'start' }}>
+                {formatMessage({ id: selectedOther?.name ?? 'Other types' })}
               </Typography>
               <Typography
                 variant="caption"

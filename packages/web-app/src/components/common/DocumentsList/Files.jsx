@@ -6,7 +6,7 @@ import ImageThumbnail, { ThumbnailsGrid } from './ImageThumbnail';
 import ImageLightbox from './ImageLightbox';
 import {
   isImageFile,
-  getFileExtension,
+  isModelPreview,
   decodeFileName,
   getThumbnailSources
 } from './utils/imageUtils';
@@ -38,15 +38,7 @@ const Files = ({
   const imageFiles = files.filter(file => isImageFile(file.fileName));
   const otherFiles = files.filter(file => !isImageFile(file.fileName));
   // A model is never an image fallback: only use API-generated thumbnails.
-  const modelFiles = documentUrl
-    ? otherFiles.filter(
-        file =>
-          ['.glb', '.gltf'].includes(getFileExtension(file.fileName)) &&
-          (file.thumbnails?.small ||
-            file.thumbnails?.medium ||
-            file.thumbnails?.large)
-      )
-    : [];
+  const modelFiles = documentUrl ? otherFiles.filter(isModelPreview) : [];
   const previewFiles = [...imageFiles, ...modelFiles];
 
   const handleThumbnailClick = index => {

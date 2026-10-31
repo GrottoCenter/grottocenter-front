@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import { Description } from '@mui/icons-material';
 import AppLink from '@/components/common/AppLink';
 
-// Image count at which tiles stop sharing one card and get a tiling of their
+// Preview count at which tiles stop sharing one card and get a tiling of their
 // own. DocumentsList imports it to give those documents the full row, so the
 // two layouts switch on the same number rather than on two literals.
 export const GALLERY_MIN_IMAGES = 4;

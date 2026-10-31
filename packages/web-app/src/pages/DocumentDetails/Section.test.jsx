@@ -65,6 +65,13 @@ describe('GLB attachment thumbnails', () => {
         'href',
         source
       );
+      expect(screen.getByRole('link', { name: 'scan.GLB' })).toHaveAttribute(
+        'target',
+        '_blank'
+      );
+      expect(
+        screen.getByRole('link', { name: 'scan.GLB' })
+      ).not.toHaveAttribute('download');
       expect(screen.queryByTestId('model-viewer')).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'View in 3D' })).toBeEnabled();
     }

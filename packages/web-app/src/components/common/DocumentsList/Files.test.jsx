@@ -23,6 +23,21 @@ const renderFiles = ({ files, onImageClick, imageIndexOffset }) =>
   );
 
 describe('Document file thumbnails', () => {
+  it('keeps glTF download-only even when the API provides a thumbnail', () => {
+    const file = {
+      fileName: 'terrain.gltf',
+      completePath: 'https://files.example.org/terrain.gltf',
+      thumbnails: { small: 'https://files.example.org/terrain.webp' }
+    };
+    renderFiles({ files: [file] });
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: file.fileName })).toHaveAttribute(
+      'href',
+      file.completePath
+    );
+  });
+
   it.each(['small', 'medium', 'large'])(
     'links a model %s thumbnail to its document and keeps the download link',
     size => {

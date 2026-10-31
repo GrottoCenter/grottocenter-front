@@ -175,8 +175,13 @@ describe('Document type descriptions', () => {
       if (width < 600) {
         cy.get('[data-testid="document-other-types-toggle"]')
           .should('have.attr', 'aria-expanded', 'true')
-          .and('contain.text', 'Autres types')
-          .and('not.contain.text', 'Jeu de données');
+          .and('contain.text', 'Jeu de données')
+          .click();
+        cy.get('[data-testid="document-other-types-toggle"]')
+          .should('have.attr', 'aria-expanded', 'false')
+          .and('contain.text', 'Jeu de données');
+        cy.get('[data-testid="document-type-2"]').should('not.be.visible');
+        cy.get('[data-testid="document-other-types-toggle"]').click();
       }
       cy.get('[data-testid="document-type-2"]')
         .should('be.visible')

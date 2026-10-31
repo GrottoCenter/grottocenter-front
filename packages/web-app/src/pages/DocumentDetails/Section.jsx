@@ -381,8 +381,7 @@ export const FilesSection = ({ files, externalPdfUrl }) => {
           <FileRow sx={{ mb: 0.5 }}>
             {getFileIcon(file.fileName)}
             <AppLink
-              href={new URL(file.completePath, window.location.href).href}
-              download={decodeFileName(file.fileName)}
+              href={file.completePath}
               sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
               {decodeFileName(file.fileName)}
             </AppLink>
