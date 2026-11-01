@@ -1,4 +1,5 @@
 import { DocumentTypes } from './documentTypeHelpers';
+import { normalizeIdentifierType } from './documentIdentifier';
 
 const REFERENCE_TYPES = new Set([
   DocumentTypes.ARTICLE,
@@ -45,9 +46,6 @@ const isPublisherSoleCorporateAuthor = document => {
     organizationAuthors[0].id === document.editor.id
   );
 };
-
-const normalizeIdentifierType = identifierType =>
-  identifierType?.trim().toLowerCase() ?? '';
 
 const formatIdentifier = (document, labels) => {
   const type = normalizeIdentifierType(document.identifierType);

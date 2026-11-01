@@ -23,6 +23,8 @@ import {
 } from '@/utils/documentSort';
 import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
 import { formatDocumentReference } from '@/utils/documentReference';
+import { findDocumentPdfUrl, withPdfPage } from '@/utils/pdfUrl';
+import { getFileExtension } from '@/components/common/DocumentsList/utils/imageUtils';
 import {
   getDocumentModerationStatus,
   getDocumentSubmissionKind
@@ -301,36 +303,59 @@ const Document = ({
     });
   }, [documentData]);
 
-  const pageFiles = useMemo(() => {
-    if (!documentData?.parent?.files?.length) return [];
-    const file = documentData.parent.files[0];
-    const parentExt = file.fileName?.match(/\.[^.]+$/)?.[0] ?? '';
+  const pageRanges = useMemo(() => {
     const pageRegex = /^(\d+)(?:-(\d+))?$/;
-    return String(documentData.pages ?? '')
+    return String(documentData?.pages ?? '')
       .split(',')
-      .map(s => s.trim())
-      .filter(Boolean)
       .flatMap(segment => {
-        const match = segment.match(pageRegex);
+        const match = segment.trim().match(pageRegex);
         if (!match) return [];
         const start = parseInt(match[1], 10);
         const end = match[2] ? parseInt(match[2], 10) : null;
-        const completePath = `${file.completePath}#page=${start}`;
-        const label = formatMessage(
-          {
-            id: end
-              ? 'Pages {start}-{end} of {title}'
-              : 'Page {start} of {title}'
-          },
-          { start, end, title: documentData.parent.title }
-        );
-        return [{ fileName: `${label}${parentExt}`, completePath }];
+        if (!Number.isSafeInteger(start) || start < 1) return [];
+        if (end !== null && (!Number.isSafeInteger(end) || end < start))
+          return [];
+        return [{ start, end }];
       });
-  }, [documentData, formatMessage]);
+  }, [documentData?.pages]);
+
+  const pageFiles = useMemo(() => {
+    if (!documentData?.parent?.files?.length) return [];
+    // Without usable article pages, still prefer a hosted parent PDF.
+    if (pageRanges.length === 0) {
+      const parentPdf = documentData.parent.files.find(
+        file => getFileExtension(file.fileName) === '.pdf'
+      );
+      return parentPdf ? [parentPdf] : [];
+    }
+    const file = documentData.parent.files[0];
+    const parentExt = file.fileName?.match(/\.[^.]+$/)?.[0] ?? '';
+    return pageRanges.map(({ start, end }) => {
+      const completePath = withPdfPage(file.completePath, start);
+      const label = formatMessage(
+        {
+          id: end ? 'Pages {start}-{end} of {title}' : 'Page {start} of {title}'
+        },
+        { start, end, title: documentData.parent.title }
+      );
+      return { fileName: `${label}${parentExt}`, completePath };
+    });
+  }, [documentData, formatMessage, pageRanges]);
 
   const allFiles = useMemo(
     () => [...(documentData?.files ?? []), ...pageFiles],
     [documentData, pageFiles]
+  );
+
+  // Article page numbers apply only to the parent publication's PDF.
+  const externalPdfUrl = useMemo(
+    () =>
+      findDocumentPdfUrl(documentData) ??
+      withPdfPage(
+        findDocumentPdfUrl(documentData?.parent),
+        pageRanges[0]?.start
+      ),
+    [documentData, pageRanges]
   );
 
   const childIssues = useMemo(
@@ -500,7 +525,9 @@ const Document = ({
   // What sits under the description depends on the document type: a
   // collection lists its issues, an event shows its date, anything else
   // shows the attached files.
-  let bodySection = <FilesSection files={allFiles} />;
+  let bodySection = (
+    <FilesSection files={allFiles} externalPdfUrl={externalPdfUrl} />
+  );
   if (isCollection(docType)) {
     bodySection = (
       <Box>
@@ -541,6 +568,12 @@ const Document = ({
   } else if (isEvent(docType)) {
     bodySection = <EventDateSection date={documentData.datePublication} />;
   }
+
+  const shouldShowExternalPdfNotice =
+    allFiles.length === 0 &&
+    Boolean(externalPdfUrl) &&
+    !isCollection(docType) &&
+    !isEvent(docType);
 
   const DocumentContainer = isPreview ? Box : PageContainer;
   const DocumentSections = isPreview ? PreviewSections : SectionStack;
@@ -906,6 +939,17 @@ const Document = ({
                               : null
                           }
                         />
+                        {shouldShowExternalPdfNotice && (
+                          <Box sx={{ gridColumn: '1 / -1', mt: 1 }}>
+                            <Alert
+                              disableMargins
+                              severity="info"
+                              content={formatMessage({
+                                id: 'This PDF is displayed from an external website. Grottocenter does not host it and claims no rights over it.'
+                              })}
+                            />
+                          </Box>
+                        )}
                       </DetailsList>
                     </SideColumn>
                   </HalfSplitContainer>

@@ -241,7 +241,7 @@ export const EventDateSection = ({ date }) => {
 };
 EventDateSection.propTypes = { date: PropTypes.string };
 
-export const FilesSection = ({ files }) => {
+export const FilesSection = ({ files, externalPdfUrl }) => {
   const { formatMessage } = useIntl();
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
@@ -276,6 +276,9 @@ export const FilesSection = ({ files }) => {
   );
 
   if (fileList.length === 0) {
+    if (externalPdfUrl) {
+      return <PdfPreview src={externalPdfUrl} isExternal />;
+    }
     return (
       <EmptySection
         message={formatMessage({ id: 'No files attached to this document.' })}
@@ -386,5 +389,6 @@ FilesSection.propTypes = {
       description: PropTypes.string,
       thumbnails: ThumbnailsPropTypes
     })
-  )
+  ),
+  externalPdfUrl: PropTypes.string
 };

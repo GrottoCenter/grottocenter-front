@@ -1,18 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Typography
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
   ChevronLeft,
   ChevronRight,
+  PictureAsPdf,
   ZoomIn,
   ZoomOut
 } from '@mui/icons-material';
-// `?url` keeps the 1.2 MB worker out of the bundle graph: Vite emits it as a
+// `?url` keeps the worker out of the bundle graph: Vite emits it as a
 // hashed asset and this import is just the string. It is only ever fetched when
 // a Worker is constructed, i.e. when the fallback viewer actually runs.
-import PDF_WORKER_URL from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import PDF_WORKER_URL from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url';
 import { useMeasuredWidth } from '@/hooks';
 import { hasNativePdfViewer } from '@/utils/pdfViewerSupport';
 import AppLink from '../AppLink';
@@ -94,6 +101,53 @@ const ControlGroup = styled('div')({
   alignItems: 'center'
 });
 
+const PdfFallback = ({ src }) => {
+  const { formatMessage } = useIntl();
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 2,
+        p: 2,
+        minHeight: 200,
+        height: '100%',
+        textAlign: 'center'
+      }}>
+      <Typography variant="body2" color="text.secondary" role="status">
+        {formatMessage({ id: 'PDF preview unavailable.' })}
+      </Typography>
+      <Button
+        component={AppLink}
+        nativeButton={false}
+        href={src}
+        variant="contained"
+        startIcon={<PictureAsPdf />}
+        data-testid="pdf-fallback-open"
+        sx={{
+          width: 'fit-content',
+          borderRadius: 8,
+          px: 3,
+          py: 1.5,
+          textTransform: 'none',
+          boxShadow: 4
+        }}>
+        {formatMessage({ id: 'Open PDF' })}
+      </Button>
+      <Typography variant="body2" color="text.secondary">
+        {formatMessage({ id: 'Opens in a new tab' })}
+      </Typography>
+    </Box>
+  );
+};
+
+PdfFallback.propTypes = {
+  src: PropTypes.string.isRequired
+};
+
 /**
  * PDF.js viewer: renders one page at a time onto a canvas.
  *
@@ -123,7 +177,9 @@ const PdfJsViewer = ({ src }) => {
 
     const load = async () => {
       try {
-        const pdfjs = await import('pdfjs-dist');
+        // The legacy build supplies missing JavaScript features on mobile
+        // browsers and WebViews; keep its worker on the same build.
+        const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
         // Idempotent, and cheap enough not to be worth guarding: the worker is
         // spawned by getDocument, not by this assignment.
         pdfjs.GlobalWorkerOptions.workerSrc = PDF_WORKER_URL;
@@ -141,6 +197,14 @@ const PdfJsViewer = ({ src }) => {
         }
         const doc = await loadingTask.promise;
         if (isCancelled) return;
+        // PDF.js does not apply native viewer URL fragments itself.
+        const requestedPage = Number(
+          new URLSearchParams(src.split('#')[1]).get('page')
+        );
+        const initialPage = Number.isSafeInteger(requestedPage)
+          ? Math.min(doc.numPages, Math.max(1, requestedPage))
+          : 1;
+        setPageNumber(initialPage);
         setPdf(doc);
         setPageCount(doc.numPages);
       } catch (_error) {
@@ -216,19 +280,8 @@ const PdfJsViewer = ({ src }) => {
 
   if (hasError) {
     return (
-      <Frame>
-        <Centered>
-          <Typography
-            variant="body2"
-            sx={{
-              color: 'text.secondary'
-            }}>
-            {formatMessage({ id: 'Unable to display this PDF.' })}
-          </Typography>
-          <Typography variant="body2">
-            <AppLink href={src}>{formatMessage({ id: 'Open PDF' })}</AppLink>
-          </Typography>
-        </Centered>
+      <Frame sx={{ height: 'auto' }}>
+        <PdfFallback src={src} />
       </Frame>
     );
   }
@@ -326,28 +379,43 @@ PdfJsViewer.propTypes = {
  * and falls back to rendering the pages ourselves with PDF.js everywhere else,
  * which in practice means every phone and tablet.
  */
-const PdfPreview = ({ src }) => {
+const PdfPreview = ({ src, isExternal = false }) => {
   const { formatMessage } = useIntl();
   // Read once per mount: neither the platform nor the plugin registry changes
   // under a live page, and re-reading it on every render would re-mount the
   // viewer if it ever did.
   const [isNativeViewerUsed] = useState(hasNativePdfViewer);
 
+  // HTTP sources cannot be embedded on our HTTPS site; keep direct access.
+  if (isExternal && new URL(src).protocol === 'http:') {
+    return (
+      <Frame sx={{ height: 'auto' }}>
+        <PdfFallback src={src} />
+      </Frame>
+    );
+  }
+
   if (!isNativeViewerUsed) return <PdfJsViewer src={src} />;
 
   return (
-    <Frame>
-      <NativeViewer data={src} type="application/pdf">
-        <Typography variant="body2">
+    <Box>
+      {isExternal && (
+        <Typography variant="body2" sx={{ mb: 0.5 }}>
           <AppLink href={src}>{formatMessage({ id: 'Open PDF' })}</AppLink>
         </Typography>
-      </NativeViewer>
-    </Frame>
+      )}
+      <Frame>
+        <NativeViewer data={src} type="application/pdf">
+          {!isExternal && <PdfFallback src={src} />}
+        </NativeViewer>
+      </Frame>
+    </Box>
   );
 };
 
 PdfPreview.propTypes = {
-  src: PropTypes.string.isRequired
+  src: PropTypes.string.isRequired,
+  isExternal: PropTypes.bool
 };
 
 export default PdfPreview;
