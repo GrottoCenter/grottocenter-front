@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
@@ -46,6 +46,10 @@ const PdfPageOffsetEditor = ({ value = null, onChange, src }) => {
     name: ['printedPage', 'pdfPage']
   });
   const offset = getPdfPageOffset(printedPage, pdfPage);
+  const renderPdfLink = useCallback(
+    chunks => (src ? <AppLink href={src}>{chunks}</AppLink> : chunks),
+    [src]
+  );
 
   useEffect(() => {
     if (!isExpanded) return;
@@ -131,13 +135,15 @@ const PdfPageOffsetEditor = ({ value = null, onChange, src }) => {
             <Stack
               direction="row"
               spacing={1}
-              alignItems="center"
-              sx={{ mb: 2 }}>
+              sx={{ mb: 2, alignItems: 'center' }}>
               <Typography
                 variant="body2"
                 color="text.secondary"
                 sx={{ flex: 1 }}>
-                {formatMessage({ id: 'pdfPagination.instructions' })}
+                {formatMessage(
+                  { id: 'pdfPagination.instructions' },
+                  { pdf: renderPdfLink }
+                )}
               </Typography>
               <Tooltip title={formatMessage({ id: 'Information' })}>
                 <IconButton
@@ -170,22 +176,7 @@ const PdfPageOffsetEditor = ({ value = null, onChange, src }) => {
             <Stack
               direction={{ xs: 'column', sm: 'row' }}
               spacing={1.5}
-              alignItems={{ xs: 'stretch', sm: 'flex-start' }}>
-              <NumberField
-                name="pdfPage"
-                control={control}
-                label="pdfPagination.pdfPage"
-                size="small"
-                variant="outlined"
-                min={1}
-                max={2147483647}
-                rules={requiredPage('printedPage')}
-                sx={{ flex: '1 1 0', minWidth: 0 }}
-              />
-              <ArrowForward
-                aria-hidden="true"
-                sx={{ display: { xs: 'none', sm: 'block' }, mt: 1 }}
-              />
+              sx={{ alignItems: { xs: 'stretch', sm: 'flex-start' } }}>
               <NumberField
                 name="printedPage"
                 control={control}
@@ -197,14 +188,33 @@ const PdfPageOffsetEditor = ({ value = null, onChange, src }) => {
                 rules={requiredPage('pdfPage')}
                 sx={{ flex: '1 1 0', minWidth: 0 }}
               />
+              <ArrowForward
+                aria-hidden="true"
+                sx={{ display: { xs: 'none', sm: 'block' }, mt: 1 }}
+              />
+              <NumberField
+                name="pdfPage"
+                control={control}
+                label="pdfPagination.pdfPage"
+                size="small"
+                variant="outlined"
+                min={1}
+                max={2147483647}
+                rules={requiredPage('printedPage')}
+                sx={{ flex: '1 1 0', minWidth: 0 }}
+              />
             </Stack>
             <Stack
               direction="row"
               spacing={1}
               useFlexGap
-              flexWrap="wrap"
               data-testid="pdf-pagination-actions"
-              sx={{ mt: 2, alignItems: 'center', justifyContent: 'flex-end' }}>
+              sx={{
+                mt: 2,
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                flexWrap: 'wrap'
+              }}>
               {canTest && (
                 <Button
                   variant="outlined"

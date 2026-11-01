@@ -46,7 +46,7 @@ const enterPages = (printed, pdf) => {
     { target: { value: printed } }
   );
   fireEvent.change(
-    screen.getByRole('spinbutton', { name: 'Position de la page dans le PDF' }),
+    screen.getByRole('spinbutton', { name: 'Page du PDF correspondante' }),
     {
       target: { value: pdf }
     }
@@ -83,6 +83,24 @@ it.each([
   }
 );
 
+it('shows printed pages first and links the instructions to the PDF in a new tab', () => {
+  renderForm();
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Ajuster les numéros de page' })
+  );
+  expect(screen.getAllByRole('spinbutton').map(input => input.name)).toEqual([
+    'printedPage',
+    'pdfPage'
+  ]);
+  const link = screen.getByRole('link', { name: 'Ouvrez le PDF' });
+  expect(link).toHaveAttribute(
+    'href',
+    'https://example.org/bulletin.pdf?dl=1#zoom=100'
+  );
+  expect(link).toHaveAttribute('target', '_blank');
+  expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+});
+
 it('blocks an incomplete correspondence and clears it without restoring the saved offset', async () => {
   renderForm(1);
   fireEvent.click(screen.getByRole('button', { name: 'Pagination ajustée' }));
@@ -117,7 +135,7 @@ it.each(['0', '-1', '1.5'])(
     enterPages('29', invalid);
     fireEvent.blur(
       screen.getByRole('spinbutton', {
-        name: 'Position de la page dans le PDF'
+        name: 'Page du PDF correspondante'
       })
     );
     await waitFor(() =>
@@ -127,7 +145,7 @@ it.each(['0', '-1', '1.5'])(
     );
     expect(
       screen.getByRole('spinbutton', {
-        name: 'Position de la page dans le PDF'
+        name: 'Page du PDF correspondante'
       })
     ).toHaveAttribute('aria-invalid', 'true');
     enterPages('29', '30');
