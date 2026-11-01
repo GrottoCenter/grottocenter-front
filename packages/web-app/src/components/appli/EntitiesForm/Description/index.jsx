@@ -63,7 +63,6 @@ const CreateDescriptionForm = ({
           isNew={isNewDescription}
           isSubmitting={isSubmitting}
           onCancel={closeForm}
-          isCenter
         />
       </form>
     </FormContainer>

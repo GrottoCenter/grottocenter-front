@@ -47,7 +47,6 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
           isNew={isNewHistory}
           isSubmitting={isSubmitting}
           onCancel={closeForm}
-          isCenter
         />
       </form>
     </FormContainer>

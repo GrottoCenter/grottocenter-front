@@ -339,7 +339,6 @@ const GuidelineForm = ({
           isSubmitting={isSubmitting}
           disabled={!isFormValid}
           onCancel={hideCancel ? undefined : closeForm}
-          isCenter
         />
       </form>
     </FormContainer>
