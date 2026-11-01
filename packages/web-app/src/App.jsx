@@ -28,6 +28,7 @@ const OrganizationManagement = lazy(
 );
 const ApiDoc = lazy(() => import('./pages/ApiDoc'));
 const DocumentDetails = lazy(() => import('./pages/DocumentDetails'));
+const DocumentManagement = lazy(() => import('./pages/DocumentManagement'));
 const DuplicateImportHandle = lazy(
   () => import('./pages/DuplicateImportHandle')
 );
@@ -102,6 +103,7 @@ const router = createBrowserRouter(
       <Route path="/ui/admin/users" element={<ManageUsers />} />
       <Route path="/ui/entrances" element={<EntrancesSearchPage />} />
       <Route path="/ui/documents" element={<DocumentsSearchPage />} />
+      <Route path="/ui/documents/management" element={<DocumentManagement />} />
       <Route path="/ui/massifs" element={<MassifsSearchPage />} />
       <Route path="/ui/organizations" element={<OrganizationsSearchPage />} />
       <Route path="/ui/persons" element={<PersonsSearchPage />} />

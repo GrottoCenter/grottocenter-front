@@ -42,8 +42,11 @@ export const apiGet = async url => {
  * Used by paginated lists whose total count lives in the response header
  * (notifications, documents queue, …).
  */
-export const apiGetWithRange = async url => {
-  const response = await fetch(url, { headers: authHeaders() });
+export const apiGetWithRange = async (url, { signal } = {}) => {
+  const response = await fetch(url, {
+    headers: authHeaders(),
+    ...(signal && { signal })
+  });
   await checkAndGetStatus(response);
   const contentRange = response.headers.get('Content-Range');
   const data = await parseJsonOr204(response);
