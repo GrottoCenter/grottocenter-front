@@ -50,14 +50,21 @@ const buildDocumentFormData = docAttributes => {
   return { formData, files };
 };
 
-const appendNewFile = (formData, file, index) => {
-  // Files share one key so the parser groups them together server-side.
-  formData.append('files', file.file, file.fileName);
+const appendNewFiles = (formData, files) => {
+  if (!files.length) return;
+  // Keep one metadata entry per upload so multipart parsers cannot shift an
+  // offset onto another file by compacting sparse indices. Send all text fields
+  // before the binaries, including existing-file changes in update requests.
   buildFormData(
     formData,
-    { pdfPageOffset: file.pdfPageOffset },
-    `newFilesMetadata[${index}]`
+    files.map(file => ({
+      fileName: file.fileName,
+      pdfPageOffset: file.pdfPageOffset ?? ''
+    })),
+    'newFilesMetadata'
   );
+  // Files share one key so the parser groups them together server-side.
+  files.forEach(file => formData.append('files', file.file, file.fileName));
 };
 
 // Document creation: FormData multipart POST (files upload alongside the
@@ -68,7 +75,7 @@ export const useCreateDocument = () => {
   return useMutation({
     mutationFn: async docAttributes => {
       const { formData, files } = buildDocumentFormData(docAttributes);
-      files.forEach((file, index) => appendNewFile(formData, file, index));
+      appendNewFiles(formData, files);
       try {
         const body = await apiPostForm(postDocumentUrl, formData);
         return body?.document;
@@ -93,13 +100,12 @@ export const useUpdateDocument = () => {
       const { formData, files } = buildDocumentFormData(docAttributes);
       let indexDeleted = 0;
       let indexModified = 0;
-      let indexNew = 0;
+      const newFiles = [];
       for (const file of files) {
         const { file: _fileObjectJS, state, ...baseFile } = file;
         switch (state) {
           case IS_NEW:
-            appendNewFile(formData, file, indexNew);
-            indexNew += 1;
+            newFiles.push(file);
             break;
           case IS_MODIFIED:
             buildFormData(
@@ -116,6 +122,7 @@ export const useUpdateDocument = () => {
           default:
         }
       }
+      appendNewFiles(formData, newFiles);
       try {
         return await apiPutForm(putDocumentUrl(docAttributes.id), formData);
       } catch (err) {

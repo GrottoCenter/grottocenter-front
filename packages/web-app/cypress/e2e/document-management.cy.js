@@ -133,6 +133,13 @@ describe('Document PDF offset management', () => {
       ).as('documents');
       cy.visit('/documents/management', {
         onBeforeLoad: win => {
+          if (width === 390) {
+            Object.defineProperty(win.navigator, 'userAgent', {
+              value:
+                'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1',
+              configurable: true
+            });
+          }
           win.localStorage.setItem('selectedLanguage', 'en');
           win.localStorage.removeItem('documentManagement.ignoredPdfOffsets');
         }
@@ -143,11 +150,19 @@ describe('Document PDF offset management', () => {
       cy.get('[data-testid="document-offset-row-1"]').within(() => {
         cy.contains('a', 'Linked PDF')
           .should('have.attr', 'href', '/ui/documents/1')
-          .and('have.attr', 'target', '_blank');
+          .and(
+            width === 390 ? 'not.have.attr' : 'have.attr',
+            'target',
+            '_blank'
+          );
         cy.contains('a', 'https://example.org/book.pdf').should('not.exist');
         cy.contains('a', 'Edit document')
           .should('have.attr', 'href', '/ui/documents/1/edit')
-          .and('have.attr', 'target', '_blank');
+          .and(
+            width === 390 ? 'not.have.attr' : 'have.attr',
+            'target',
+            '_blank'
+          );
       });
       cy.get('[data-testid="document-offset-row-2"]').should('be.visible');
       cy.get('[data-testid="document-offset-row-3"]').should('not.exist');
