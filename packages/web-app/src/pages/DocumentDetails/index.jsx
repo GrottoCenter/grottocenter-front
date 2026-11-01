@@ -432,6 +432,8 @@ const Document = ({
   const { isCollection, isEvent } = documentTypeHelpers;
   const hasLinkedEntities = linkedEntities.length > 0;
   const docType = documentData?.type;
+  const DocumentTypeIcon =
+    DOCUMENT_TYPE_ICONS[docType] ?? DOCUMENT_TYPE_FALLBACK_ICON;
 
   const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
@@ -605,6 +607,7 @@ const Document = ({
         entityType={DELETED_ENTITIES.document}
         entityId={documentData?.id}
         entityName={documentData?.title}
+        entityIcon={<DocumentTypeIcon color="primary" sx={{ fontSize: 28 }} />}
         existingRedirectId={
           documentData?.isDeleted ? documentData.redirectTo : null
         }

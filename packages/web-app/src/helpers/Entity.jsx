@@ -12,7 +12,10 @@ import {
 } from '@/utils/personTypes';
 import Translate from '@/components/common/Translate';
 import {
-  bibliographyIcon,
+  DOCUMENT_TYPE_ICONS,
+  DOCUMENT_TYPE_FALLBACK_ICON
+} from '@/utils/documentTypeHelpers';
+import {
   entranceIcon,
   networkIcon,
   personIcon,
@@ -44,6 +47,7 @@ const EntitySubtitle = styled('div')`
 
 export const nomelizeSearchEntity = option => {
   let iconSrc;
+  let IconComponent;
   let title = option.name; // Default for all entities
   let subtitle = '';
   switch (option._type) {
@@ -62,8 +66,9 @@ export const nomelizeSearchEntity = option => {
       break;
 
     case 'documents': {
-      iconSrc = bibliographyIcon;
-      title = `[${option.type}] ${option.title}`;
+      const type = option.type?.name ?? option.type;
+      IconComponent = DOCUMENT_TYPE_ICONS[type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
+      title = option.title;
       const maxSubTitleLength = Math.max((title.length - 3) * 1.2, 80);
       subtitle = (option.description ?? '').slice(0, maxSubTitleLength);
       if (option.description?.length > maxSubTitleLength) subtitle += '...';
@@ -98,7 +103,7 @@ export const nomelizeSearchEntity = option => {
     default:
       break;
   }
-  return { iconSrc, title, subtitle, id: option.id };
+  return { iconSrc, IconComponent, title, subtitle, id: option.id };
 };
 
 export const entityOptionForSelector = (
@@ -107,7 +112,7 @@ export const entityOptionForSelector = (
   { showPersonType = false } = {}
 ) => {
   const normalized = nomelizeSearchEntity(option);
-  const { title, subtitle, id } = normalized;
+  const { title, subtitle, id, IconComponent } = normalized;
   const isPerson = option._type === 'persons';
   const iconSrc =
     isPerson && showPersonType
@@ -123,6 +128,7 @@ export const entityOptionForSelector = (
     'li',
     { ...otherProps, key: key || `${option._type}-${id}` },
     iconSrc && <EntityIcon src={iconSrc} alt="" />,
+    IconComponent && <EntityIcon as={IconComponent} color="primary" />,
     <div>
       <EntityTitle>
         {title} <EntityId>{id}</EntityId>
