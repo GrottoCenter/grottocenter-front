@@ -107,6 +107,7 @@ export const FormActionRow = ({
       variant="outlined"
       disabled={isCancelDisabled}
       onClick={onCancel}
+      disabled={isCancelDisabled}
       sx={{ width: { xs: '100%', sm: 'auto' } }}>
       {formatMessage({ id: 'Cancel' })}
     </MuiButton>

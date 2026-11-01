@@ -99,7 +99,7 @@ describe('CreateCommentForm', () => {
     expect(screen.getByText(/2\/5.*Difficult/)).toBeInTheDocument();
     expect(screen.getByText(/5\/5.*Very easy/)).toBeInTheDocument();
     expect(screen.getByText('4/5 · Remarkable')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Publish my comment' }));
 
     await waitFor(() =>
       expect(onSubmit).toHaveBeenCalledWith(
@@ -146,7 +146,7 @@ describe('CreateCommentForm', () => {
       screen.getByRole('textbox', { name: 'Underground time — Hours' })
     ).toHaveValue('26');
     expect(screen.getByText(/3.5\/5.*Intermediate.*Easy/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Update' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() =>
       expect(onSubmit).toHaveBeenCalledWith(
@@ -178,7 +178,7 @@ describe('CreateCommentForm', () => {
     });
     fireEvent.change(minutes, { target: { value: '60' } });
     expect(minutes).toHaveValue('');
-    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Publish my comment' }));
 
     await waitFor(() =>
       expect(onSubmit).toHaveBeenCalledWith(

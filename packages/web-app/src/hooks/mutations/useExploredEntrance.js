@@ -13,9 +13,11 @@ import { entranceKeys, personKeys } from '../../api/queryKeys';
  * explored-entrances list changes) so any open view re-fetches with fresh
  * data.
  */
-export const useLinkExploredEntrance = () => {
+export const useLinkExploredEntrance = ({ isInline = false } = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: isInline ? { errorPresentation: 'inline' } : undefined,
+    networkMode: isInline ? 'always' : undefined,
     mutationFn: ({ entranceId, caverId }) =>
       apiPut(linkExploredEntranceUrl(entranceId, caverId)),
     onSuccess: (_data, { entranceId, caverId }) => {
