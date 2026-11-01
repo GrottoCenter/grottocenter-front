@@ -1,7 +1,12 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, act, waitFor, cleanup } from '@testing-library/react';
+import {
+  QueryClient,
+  QueryClientProvider,
+  onlineManager
+} from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 
+import productionQueryClient from '@/conf/queryClient';
 import { createTestQueryClient } from '../../test/renderWithProviders';
 import {
   useAdvancedSearch,
@@ -143,5 +148,122 @@ describe('useAdvancedSearch (module singleton semantics)', () => {
       expect(a.result.current.params).toEqual({ entity: 'entrance' });
       expect(b.result.current.params).toEqual({ entity: 'entrance' });
     });
+  });
+});
+
+describe('useAdvancedSearch offline lifecycle', () => {
+  let queryClient;
+  let onlineStatus;
+
+  const setConnectivity = isOnline => {
+    onlineStatus.mockReturnValue(isOnline);
+    act(() => {
+      window.dispatchEvent(new Event(isOnline ? 'online' : 'offline'));
+    });
+  };
+
+  beforeEach(() => {
+    onlineManager.setOnline(true);
+    onlineStatus = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          ...productionQueryClient.getDefaultOptions().queries,
+          retryDelay: 0,
+          gcTime: Infinity
+        }
+      }
+    });
+    resetAdvancedSearch();
+    vi.spyOn(apiClient, 'apiPost').mockResolvedValue({ results: [] });
+  });
+
+  afterEach(() => {
+    cleanup();
+    queryClient.clear();
+    resetAdvancedSearch();
+    onlineManager.setOnline(true);
+    vi.restoreAllMocks();
+  });
+
+  it.each(['entrances', 'documents'])(
+    'defers an offline %s search until reconnection, even if Query thinks it is online',
+    async entity => {
+      onlineStatus.mockReturnValue(false);
+      const params = { entity, query: 'test', page: 1 };
+      startAdvancedSearch(params);
+      const { result } = renderHook(() => useAdvancedSearch(), {
+        wrapper: makeWrapper(queryClient)
+      });
+
+      expect(onlineManager.isOnline()).toBe(true);
+      expect(apiClient.apiPost).not.toHaveBeenCalled();
+      expect(result.current.isNewQuery).toBe(true);
+
+      setConnectivity(true);
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+      expect(apiClient.apiPost).toHaveBeenCalledExactlyOnceWith(
+        expect.any(String),
+        params
+      );
+      expect(result.current.isNewQuery).toBe(false);
+    }
+  );
+
+  it('keeps cached results and defers offline refinements and new searches', async () => {
+    const data = { results: [{ id: 1 }], totalResults: 40 };
+    apiClient.apiPost.mockResolvedValue(data);
+    startAdvancedSearch({ entity: 'entrances', page: 1 });
+    const { result } = renderHook(() => useAdvancedSearch(), {
+      wrapper: makeWrapper(queryClient)
+    });
+    await waitFor(() => expect(result.current.data).toEqual(data));
+
+    setConnectivity(false);
+    expect(result.current.data).toEqual(data);
+
+    act(() => refineAdvancedSearch({ entity: 'entrances', page: 2 }));
+    // The view hides this placeholder offline while keeping its controls mounted.
+    expect(result.current.data).toEqual(data);
+    expect(result.current.isPlaceholderData).toBe(true);
+    expect(apiClient.apiPost).toHaveBeenCalledTimes(1);
+
+    act(() => startAdvancedSearch({ entity: 'entrances', query: 'new' }));
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.isNewQuery).toBe(true);
+
+    setConnectivity(true);
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(apiClient.apiPost).toHaveBeenCalledTimes(2);
+    expect(apiClient.apiPost).toHaveBeenLastCalledWith(expect.any(String), {
+      entity: 'entrances',
+      query: 'new'
+    });
+  });
+
+  it('pauses an in-flight failure and resumes its retry once on reconnect', async () => {
+    let rejectRequest;
+    apiClient.apiPost.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectRequest = reject;
+        })
+    );
+    startAdvancedSearch({ entity: 'documents', query: 'test' });
+    const { result } = renderHook(() => useAdvancedSearch(), {
+      wrapper: makeWrapper(queryClient)
+    });
+    await waitFor(() => expect(apiClient.apiPost).toHaveBeenCalledTimes(1));
+
+    setConnectivity(false);
+    act(() => rejectRequest(new TypeError('Failed to fetch')));
+    await waitFor(() => expect(result.current.fetchStatus).toBe('paused'));
+    expect(result.current.isNewQuery).toBe(true);
+    expect(result.current.error).toBeNull();
+
+    setConnectivity(true);
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(apiClient.apiPost).toHaveBeenCalledTimes(2);
+    expect(result.current.isNewQuery).toBe(false);
   });
 });

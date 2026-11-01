@@ -8,7 +8,12 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { EXPORT_FORMATS } from '../../../conf/exportFormats';
 import ToolbarActionButton from './ToolbarActionButton';
 
-const ExportFormatDropdown = ({ disabled, onExport, iconOnly = false }) => {
+const ExportFormatDropdown = ({
+  disabled,
+  disabledReason = null,
+  onExport,
+  iconOnly = false
+}) => {
   const { formatMessage } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -17,13 +22,16 @@ const ExportFormatDropdown = ({ disabled, onExport, iconOnly = false }) => {
   // the name of an icon that carries no text.
   let tooltip = null;
   if (disabled) {
-    tooltip = formatMessage({ id: 'Export unavailable above 10000 results' });
+    tooltip =
+      disabledReason ??
+      formatMessage({ id: 'Export unavailable above 10000 results' });
   } else if (iconOnly) {
     tooltip = exportLabel;
   }
 
   const handleSelect = value => {
     setAnchorEl(null);
+    if (disabled) return;
     onExport(value);
   };
 
@@ -42,7 +50,10 @@ const ExportFormatDropdown = ({ disabled, onExport, iconOnly = false }) => {
         open={!!anchorEl}
         onClose={() => setAnchorEl(null)}>
         {EXPORT_FORMATS.map(({ value, label }) => (
-          <MenuItem key={value} onClick={() => handleSelect(value)}>
+          <MenuItem
+            key={value}
+            disabled={disabled}
+            onClick={() => handleSelect(value)}>
             {label}
           </MenuItem>
         ))}
@@ -53,6 +64,7 @@ const ExportFormatDropdown = ({ disabled, onExport, iconOnly = false }) => {
 
 ExportFormatDropdown.propTypes = {
   disabled: PropTypes.bool.isRequired,
+  disabledReason: PropTypes.string,
   onExport: PropTypes.func.isRequired,
   iconOnly: PropTypes.bool
 };

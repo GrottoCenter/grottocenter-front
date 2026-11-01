@@ -49,6 +49,7 @@ const EntityTable = ({
   entityType,
   entityColumnsModifier,
   isLoading = true,
+  isOffline = false,
   onSelected,
   selectedIds,
   pageRows,
@@ -103,6 +104,7 @@ const EntityTable = ({
     );
 
     const handleMobileSortFieldChange = e => {
+      if (isOffline) return;
       const field = e.target.value;
       if (!field) {
         setMobileOrderBy('');
@@ -118,6 +120,7 @@ const EntityTable = ({
     };
 
     const handleMobileSortDirToggle = () => {
+      if (isOffline) return;
       if (!mobileOrderBy) return;
       const apiField =
         SORT_FIELD_MAP[entityType]?.[mobileOrderBy] ?? mobileOrderBy;
@@ -126,7 +129,11 @@ const EntityTable = ({
       if (onSortChange) onSortChange(`${apiField}:${newOrder}`);
     };
 
-    const exportDisabled = nbTotalRows != null && nbTotalRows > MAX_EXPORT_ROWS;
+    const exportDisabled =
+      isOffline || (nbTotalRows != null && nbTotalRows > MAX_EXPORT_ROWS);
+    const exportDisabledReason = isOffline
+      ? formatMessage({ id: 'offlineActionUnavailable' })
+      : null;
     const exportCols = visibleColumns.map(c => c.apiField || c.field);
     const exportLabels = visibleColumns.map(c => c.label);
     let exportSlot;
@@ -135,6 +142,7 @@ const EntityTable = ({
         exportSlot = (
           <ExportFormatDropdown
             disabled={exportDisabled}
+            disabledReason={exportDisabledReason}
             onExport={format => onExport(exportCols, exportLabels, format)}
             iconOnly
           />
@@ -143,11 +151,14 @@ const EntityTable = ({
         exportSlot = (
           <ToolbarActionButton
             icon={FileDownloadIcon}
-            tooltip={formatMessage({
-              id: exportDisabled
-                ? 'Export unavailable above 10000 results'
-                : 'Export'
-            })}
+            tooltip={
+              exportDisabledReason ??
+              formatMessage({
+                id: exportDisabled
+                  ? 'Export unavailable above 10000 results'
+                  : 'Export'
+              })
+            }
             disabled={exportDisabled}
             onClick={() => onExport(exportCols, exportLabels)}
           />
@@ -161,6 +172,7 @@ const EntityTable = ({
           <>
             <MobileToolbar
               sortableColumns={onSortChange ? sortableColumns : []}
+              isSortDisabled={isOffline}
               order={mobileOrder}
               orderBy={mobileOrderBy}
               onSortFieldChange={handleMobileSortFieldChange}
@@ -182,6 +194,7 @@ const EntityTable = ({
           columns={visibleColumns}
           totalRows={nbTotalRows}
           isLoading={isLoading}
+          isPaginationDisabled={isOffline}
           isNewQuery={isNewQuery}
           onPageChange={
             onPageChange
@@ -206,6 +219,7 @@ const EntityTable = ({
       entityColumns={entityColumns}
       setEntityColumns={setEntityColumns}
       isLoading={isLoading}
+      isOffline={isOffline}
       onSelected={onSelected}
       selectedIds={selectedIds}
       pageRows={pageRows}
@@ -228,6 +242,7 @@ EntityTable.propTypes = {
   entityType: PropTypes.string,
   entityColumnsModifier: PropTypes.func,
   isLoading: PropTypes.bool,
+  isOffline: PropTypes.bool,
   onSelected: PropTypes.func,
   selectedIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.number, PropTypes.string])

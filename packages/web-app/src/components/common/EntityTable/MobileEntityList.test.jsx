@@ -28,6 +28,23 @@ const renderList = props =>
   );
 
 describe('MobileEntityList - Controlled selection', () => {
+  it('keeps cards selectable while remote pagination is disabled', () => {
+    const onSelected = vi.fn();
+    const onPageChange = vi.fn();
+    renderList({
+      totalRows: 40,
+      onSelected,
+      onPageChange,
+      isPaginationDisabled: true
+    });
+    const loadMore = screen.getByRole('button', { name: /Load more/ });
+    expect(loadMore).toBeDisabled();
+    fireEvent.click(loadMore);
+    expect(onPageChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('checkbox'));
+    expect(onSelected).toHaveBeenCalledWith([1]);
+  });
+
   it('retains selected cards while loading and appending the next page', () => {
     const onSelected = vi.fn();
     const onPageChange = vi.fn();
