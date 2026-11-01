@@ -2,7 +2,13 @@ import { useContext } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { DocumentTypes } from '@/utils/documentTypeHelpers';
-import { IS_NEW } from './formElements/AddFileForm/FileHelpers';
+import {
+  AUTHORIZATION_FROM_AUTHOR,
+  DOCUMENT_AUTHORIZE_TO_PUBLISH,
+  IS_DELETED,
+  IS_NEW,
+  LICENSE_IN_FILE
+} from './formElements/AddFileForm/FileHelpers';
 import DocumentFormProvider, {
   DocumentFormContext,
   getDocumentLengthErrors
@@ -16,6 +22,11 @@ const ValidationState = () => {
 const FileStates = () => {
   const { document } = useContext(DocumentFormContext);
   return <span>{document.files.map(file => file.state).join(',')}</span>;
+};
+
+const PublicationOption = () => {
+  const { document } = useContext(DocumentFormContext);
+  return <span>{document.selectOptionAuthorizationDocument ?? 'unset'}</span>;
 };
 
 const validDocument = {
@@ -160,6 +171,97 @@ describe('DocumentFormProvider length validation', () => {
       pages: 'x'.repeat(101)
     });
 
+    await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
+  });
+});
+
+describe('DocumentFormProvider publication authorization', () => {
+  it.each([null, { id: 41, title: 'Collection' }])(
+    'deduces the missing option from an authorization (parent: %j)',
+    parent => {
+      render(
+        <DocumentFormProvider
+          initialValues={{
+            ...validDocument,
+            parent,
+            authorizationDocument: { id: 99, title: 'Permission' }
+          }}>
+          <PublicationOption />
+        </DocumentFormProvider>
+      );
+      expect(
+        screen.getByText(DOCUMENT_AUTHORIZE_TO_PUBLISH)
+      ).toBeInTheDocument();
+    }
+  );
+
+  it.each([AUTHORIZATION_FROM_AUTHOR, LICENSE_IN_FILE])(
+    'preserves the explicit option %s',
+    option => {
+      render(
+        <DocumentFormProvider
+          initialValues={{
+            ...validDocument,
+            option,
+            authorizationDocument: { id: 99, title: 'Permission' }
+          }}>
+          <PublicationOption />
+        </DocumentFormProvider>
+      );
+      expect(screen.getByText(option)).toBeInTheDocument();
+    }
+  );
+
+  it('leaves the option unset when no authorization is supplied', () => {
+    render(
+      <DocumentFormProvider initialValues={validDocument}>
+        <PublicationOption />
+      </DocumentFormProvider>
+    );
+    expect(screen.getByText('unset')).toBeInTheDocument();
+  });
+
+  it.each(['CC-BY', { name: 'CC-BY' }, null])(
+    'rejects a file publication until its license has an id (%j)',
+    async license => {
+      renderValidation({
+        ...validDocument,
+        license,
+        authorizationDocument: { id: 99, title: 'Permission' },
+        files: [{ fileName: 'issue.pdf' }]
+      });
+      await waitFor(() =>
+        expect(screen.getByText('invalid')).toBeInTheDocument()
+      );
+    }
+  );
+
+  it('accepts a resolved license and a deduced authorization option', async () => {
+    renderValidation({
+      ...validDocument,
+      license: { id: 2, name: 'CC-BY' },
+      authorizationDocument: { id: 99, title: 'Permission' },
+      files: [{ fileName: 'issue.pdf' }]
+    });
+    await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
+  });
+
+  it('does not require a resolved license when all files are deleted', async () => {
+    renderValidation({
+      ...validDocument,
+      license: 'CC-BY',
+      files: [{ fileName: 'issue.pdf', state: IS_DELETED }]
+    });
+    await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
+  });
+
+  it('does not require a license for an authorization document', async () => {
+    renderValidation({
+      ...validDocument,
+      type: DocumentTypes.AUTHORIZATION_TO_PUBLISH,
+      license: null,
+      files: [{ fileName: 'permission.pdf' }]
+    });
     await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
   });
 });

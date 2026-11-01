@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 
 import LicenseTag from '@/components/common/LicenseTag';
+import { getLicenseName } from '@/components/common/LicenseTag/helpers';
 import AppLink from '@/components/common/AppLink';
 import InternationalizedLink from '@/components/common/InternationalizedLink';
 import { licenceLinks } from '@/conf/externalLinks';
@@ -150,15 +151,21 @@ const AddFileForm = ({
   const showAuthDocSelect = option === DOCUMENT_AUTHORIZE_TO_PUBLISH;
   const visibleFiles = files.filter(f => f.state !== IS_DELETED);
 
-  const documentLicenseName = document.license?.name;
+  const documentLicenseName = getLicenseName(document.license);
   useEffect(() => {
     if (!showAuthorization || !licenses) return;
-    const licenseName = documentLicenseName ?? DEFAULT_LICENSE;
+    // Resolve existing API names before considering a default. An unknown
+    // existing license must never be replaced by a different license.
+    const licenseName = documentLicenseName || DEFAULT_LICENSE;
     const selected = findLicenseByName(licenses, licenseName);
-    if (selected) setLicense(selected);
-    // setLicense is an inline arrow function prop — excluding it from deps is intentional
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showAuthorization, licenses, documentLicenseName]);
+    if (selected && selected !== document.license) setLicense(selected);
+  }, [
+    showAuthorization,
+    licenses,
+    documentLicenseName,
+    document.license,
+    setLicense
+  ]);
 
   const updateOption = newOption => {
     setOption(newOption);
@@ -352,11 +359,17 @@ const AddFileForm = ({
                     : formatMessage({ id: 'License' })}
                 </InputLabel>
                 <Select
-                  value={document.license?.name ?? ''}
+                  value={documentLicenseName}
                   renderValue={() => <LicenseTag license={document.license} />}
                   onChange={e =>
                     setLicense(findLicenseByName(licenses, e.target.value))
                   }>
+                  {documentLicenseName &&
+                    !findLicenseByName(licenses, documentLicenseName) && (
+                      <MenuItem disabled value={documentLicenseName}>
+                        <LicenseTag license={document.license} />
+                      </MenuItem>
+                    )}
                   {licensesLoading && (
                     <MenuItem disabled>
                       <CircularProgress size={16} />

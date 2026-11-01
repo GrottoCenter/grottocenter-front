@@ -133,7 +133,8 @@ const checkFormValidation = document => {
     document.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH;
   if (requiresAuthorization && hasVisibleFile) {
     if (!document.selectOptionAuthorizationDocument) isValid = false;
-    if (!document.license) isValid = false;
+    // The API expects license[id], not the name returned by document details.
+    if (!document.license?.id) isValid = false;
     if (
       document.selectOptionAuthorizationDocument ===
         DOCUMENT_AUTHORIZE_TO_PUBLISH &&
@@ -161,7 +162,9 @@ const normalizeInitialValues = values => {
   const { option, files, authorsOrganization, ...rest } = values;
   return {
     ...rest,
-    selectOptionAuthorizationDocument: option ?? null,
+    selectOptionAuthorizationDocument:
+      option ??
+      (values.authorizationDocument?.id ? DOCUMENT_AUTHORIZE_TO_PUBLISH : null),
     files: (files ?? []).map(f => ({ ...f, state: f.state ?? IS_INTACT })),
     authorsOrganization: authorsOrganization ?? []
   };
