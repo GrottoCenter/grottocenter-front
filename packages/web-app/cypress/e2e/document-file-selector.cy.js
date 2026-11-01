@@ -124,9 +124,13 @@ describe('Document attachment list', () => {
           cy.get('[data-testid="pdf-pagination-toggle"]').click();
           cy.get('input[type="number"]')
             .first()
-            .should('have.attr', 'name', 'pdfPage');
-          cy.get('input[name="pdfPage"]').type('11');
+            .should('have.attr', 'name', 'printedPage');
+          cy.contains('a', 'Ouvrez le PDF')
+            .should('have.attr', 'href', files[1].completePath)
+            .and('have.attr', 'target', '_blank');
+          cy.contains('Page du PDF correspondante').should('be.visible');
           cy.get('input[name="printedPage"]').type('10');
+          cy.get('input[name="pdfPage"]').type('11');
           cy.get('[data-testid="pdf-pagination-actions"]')
             .find('a, button')
             .should(elements => {
