@@ -1,5 +1,4 @@
 import { createElement } from 'react';
-import { FormattedMessage } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { getOrganizationIconSource } from '@/utils/organizationIcons';
 import {
@@ -12,14 +11,11 @@ import {
   isPersonType
 } from '@/utils/personTypes';
 import Translate from '@/components/common/Translate';
-import { getDocumentTypeIcon } from '@/utils/documentTypeHelpers';
 import {
-  bibliographyIcon,
-  entranceIcon,
-  networkIcon,
-  personIcon,
-  massifIcon
-} from '../assets/icons';
+  DOCUMENT_TYPE_ICONS,
+  DOCUMENT_TYPE_FALLBACK_ICON
+} from '@/utils/documentTypeHelpers';
+import { entranceIcon, networkIcon, personIcon, massifIcon } from '../assets/icons';
 
 export const EntityIcon = styled('img')`
   height: 30px;
@@ -55,6 +51,7 @@ const EntitySubtitle = styled('div')`
 
 export const nomelizeSearchEntity = option => {
   let iconSrc;
+  let IconComponent;
   let title = option.name; // Default for all entities
   let subtitle = '';
   switch (option._type) {
@@ -73,8 +70,9 @@ export const nomelizeSearchEntity = option => {
       break;
 
     case 'documents': {
-      iconSrc = bibliographyIcon;
-      title = `[${option.type}] ${option.title ?? ''}`;
+      const type = option.type?.name ?? option.type;
+      IconComponent = DOCUMENT_TYPE_ICONS[type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
+      title = option.title ?? '';
       const maxSubTitleLength = Math.max((title.length - 3) * 1.2, 80);
       subtitle = (option.description ?? '').slice(0, maxSubTitleLength);
       if (option.description?.length > maxSubTitleLength) subtitle += '...';
@@ -109,7 +107,7 @@ export const nomelizeSearchEntity = option => {
     default:
       break;
   }
-  return { iconSrc, title, subtitle, id: option.id };
+  return { iconSrc, IconComponent, title, subtitle, id: option.id };
 };
 
 export const entityOptionForSelector = (
@@ -118,12 +116,8 @@ export const entityOptionForSelector = (
   { showPersonType = false } = {}
 ) => {
   const normalized = nomelizeSearchEntity(option);
-  const { subtitle, id } = normalized;
-  const title =
-    option._type === 'documents' ? (option.title ?? '') : normalized.title;
+  const { title, subtitle, id, IconComponent } = normalized;
   const isPerson = option._type === 'persons';
-  const DocumentIcon =
-    option._type === 'documents' ? getDocumentTypeIcon(option.type) : null;
   const iconSrc =
     isPerson && showPersonType
       ? getPersonIconSource(option.type)
@@ -137,21 +131,13 @@ export const entityOptionForSelector = (
   return createElement(
     'li',
     { ...otherProps, key: key || `${option._type}-${id}` },
-    DocumentIcon ? (
-      <FormattedMessage
-        id={option.type || 'Document'}
-        defaultMessage={option.type || 'Document'}>
-        {([typeLabel]) => (
-          <EntityIcon
-            as={DocumentIcon}
-            color="primary"
-            titleAccess={typeLabel}
-            data-testid="document-type-icon"
-          />
-        )}
-      </FormattedMessage>
-    ) : (
-      iconSrc && <EntityIcon src={iconSrc} alt="" />
+    iconSrc && <EntityIcon src={iconSrc} alt="" />,
+    IconComponent && (
+      <EntityIcon
+        as={IconComponent}
+        color="primary"
+        data-testid="document-type-icon"
+      />
     ),
     <EntityContent>
       <EntityTitle title={title}>
