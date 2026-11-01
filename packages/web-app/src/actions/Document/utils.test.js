@@ -3,6 +3,17 @@ import { buildFormData } from './utils';
 const entries = formData => Array.from(formData.entries());
 
 describe('buildFormData', () => {
+  it('preserves zero offsets', () => {
+    const formData = new FormData();
+    buildFormData(formData, {
+      identifierPdfPageOffset: 0,
+      files: [{ pdfPageOffset: 0 }]
+    });
+    expect(entries(formData)).toEqual([
+      ['identifierPdfPageOffset', '0'],
+      ['files[0][pdfPageOffset]', '0']
+    ]);
+  });
   it('flattens nested objects with bracket notation', () => {
     const formData = new FormData();
     buildFormData(formData, { title: 'Cave map', editor: { id: 12 } });

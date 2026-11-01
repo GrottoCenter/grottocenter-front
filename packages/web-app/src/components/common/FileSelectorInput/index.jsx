@@ -5,7 +5,6 @@ import { ErrorCode, useDropzone } from 'react-dropzone';
 import {
   Box,
   Button,
-  Chip,
   Stack,
   Typography,
   useMediaQuery,
@@ -13,6 +12,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import SelectedFile from './SelectedFile';
 
 // Internal, stable rejection reasons. These values intentionally differ from
 // react-dropzone's code enum; DROPZONE_REJECTION_MAP owns that boundary.
@@ -125,7 +125,8 @@ const FileSelectorInput = ({
   disabled = false,
   multiple = true,
   maxSize,
-  maxFiles
+  maxFiles,
+  renderFileDetails
 }) => {
   const { formatMessage } = useIntl();
   const theme = useTheme();
@@ -189,35 +190,67 @@ const FileSelectorInput = ({
     }
   });
 
-  const extensionsLabel = displayedExtensions.length > 0 && (
+  const areExtensionsCollapsible = isMobile && displayedExtensions.length > 3;
+  const extensionsList = displayedExtensions.length > 0 && (
     <Typography
+      component="div"
       variant="caption"
-      onClick={e => e.stopPropagation()}
+      onClick={event => event.stopPropagation()}
       sx={{
-        color: 'text.disabled',
+        color: 'text.secondary',
         display: 'block'
       }}>
       {[...displayedExtensions].sort().join(', ')}
     </Typography>
   );
+  const extensionsLabel = areExtensionsCollapsible ? (
+    <Box component="details" sx={{ mt: 0.5 }}>
+      <Typography
+        component="summary"
+        variant="caption"
+        data-testid="accepted-formats-toggle"
+        sx={{
+          display: 'list-item',
+          width: 'fit-content',
+          color: 'text.secondary',
+          cursor: 'pointer',
+          py: 0.5,
+          '&:focus-visible': {
+            outline: '2px solid',
+            outlineColor: 'primary.main',
+            outlineOffset: 2,
+            borderRadius: 0.5
+          }
+        }}>
+        {formatMessage({ id: 'fileSelector.acceptedFormats' })}
+      </Typography>
+      {extensionsList}
+    </Box>
+  ) : (
+    extensionsList
+  );
 
-  const fileChips = files.length > 0 && (
+  const selectedFiles = files.length > 0 && (
     <Box
-      onClick={e => e.stopPropagation()}
+      component="ul"
+      data-testid="selected-files"
       sx={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 0.5,
-        mt: 1
+        listStyle: 'none',
+        display: 'grid',
+        gap: 1.5,
+        width: '100%',
+        maxWidth: theme.spacing(112),
+        p: 0,
+        m: 0,
+        mt: 1.5
       }}>
       {files.map(f => (
-        <Chip
-          key={f.fileName}
-          data-testid={`selected-file-${f.fileName}`}
-          label={f.fileName}
-          size="small"
-          color="primary"
-          onDelete={onFileRemove ? () => onFileRemove(f.fileName) : undefined}
+        <SelectedFile
+          key={f.id ?? f.fileName}
+          file={f}
+          onRemove={onFileRemove}
+          disabled={disabled}
+          renderFileDetails={renderFileDetails}
         />
       ))}
     </Box>
@@ -239,11 +272,14 @@ const FileSelectorInput = ({
           fullWidth
           startIcon={<CloudUploadIcon />}
           disabled={disabled}
-          onClick={open}>
-          {t('Upload files', 'Upload a file')}
+          onClick={open}
+          type="button"
+          data-testid="file-picker"
+          sx={{ textTransform: 'uppercase', minHeight: 48 }}>
+          {t('fileSelector.addFiles', 'fileSelector.addFile')}
         </Button>
         {extensionsLabel}
-        {fileChips}
+        {selectedFiles}
       </Stack>
     );
   }
@@ -259,54 +295,63 @@ const FileSelectorInput = ({
   });
 
   return (
-    <DropZone
-      {...rootProps}
-      $isDragging={isDragActive}
-      $isDragAccept={isDragAccept}
-      $isDragReject={isDragReject}>
-      {inputEl}
-      <CloudUploadIcon
-        sx={{
-          fontSize: 40,
-          color: isDragActive ? 'primary.main' : 'text.disabled',
-          mb: 0.5
-        }}
-      />
-      <Typography
-        variant="body2"
-        sx={{
-          color: isDragActive ? 'primary.main' : 'text.secondary',
-          fontWeight: 500
-        }}>
-        {t('Drag and drop files here', 'Drag and drop a file here')}
-      </Typography>
-      <Typography
-        variant="caption"
-        sx={{
-          color: 'text.disabled',
-          display: 'block'
-        }}>
-        {formatMessage({ id: 'or' })}
-      </Typography>
-      <Button
-        size="small"
-        variant="outlined"
-        disabled={disabled}
-        aria-hidden="true"
-        tabIndex={-1}
-        sx={{ mt: 0.5, pointerEvents: 'none' }}>
-        {t('Choose files', 'Choose a file')}
-      </Button>
-      {extensionsLabel}
-      {fileChips}
-    </DropZone>
+    <Stack>
+      <DropZone
+        {...rootProps}
+        $isDragging={isDragActive}
+        $isDragAccept={isDragAccept}
+        $isDragReject={isDragReject}
+        data-testid="file-dropzone">
+        {inputEl}
+        <CloudUploadIcon
+          sx={{
+            fontSize: 40,
+            color: isDragActive ? 'primary.main' : 'text.disabled',
+            mb: 0.5
+          }}
+        />
+        <Typography
+          variant="body2"
+          sx={{
+            color: isDragActive ? 'primary.main' : 'text.secondary',
+            fontWeight: 500
+          }}>
+          {t('Drag and drop files here', 'Drag and drop a file here')}
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.disabled',
+            display: 'block'
+          }}>
+          {formatMessage({ id: 'or' })}
+        </Typography>
+        <Button
+          size="small"
+          variant="outlined"
+          disabled={disabled}
+          aria-hidden="true"
+          tabIndex={-1}
+          type="button"
+          sx={{ mt: 0.5, pointerEvents: 'none', textTransform: 'none' }}>
+          {t('Choose files', 'Choose a file')}
+        </Button>
+        {extensionsList}
+      </DropZone>
+      {selectedFiles}
+    </Stack>
   );
 };
 
 FileSelectorInput.propTypes = {
   extensions: PropTypes.arrayOf(PropTypes.string),
   files: PropTypes.arrayOf(
-    PropTypes.shape({ fileName: PropTypes.string.isRequired })
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      fileName: PropTypes.string.isRequired,
+      completePath: PropTypes.string,
+      file: PropTypes.instanceOf(File)
+    })
   ),
   onFilesAdd: PropTypes.func.isRequired,
   onFileRemove: PropTypes.func,
@@ -318,7 +363,8 @@ FileSelectorInput.propTypes = {
   disabled: PropTypes.bool,
   multiple: PropTypes.bool,
   maxSize: PropTypes.number,
-  maxFiles: PropTypes.number
+  maxFiles: PropTypes.number,
+  renderFileDetails: PropTypes.func
 };
 
 export default FileSelectorInput;
