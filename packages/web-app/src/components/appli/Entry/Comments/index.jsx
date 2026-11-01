@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Box, Divider, Paper } from '@mui/material';
 
 import SectionCreateButton from '@/components/common/SectionCreateButton';
+import { createRetryAction } from '@/components/common/snackbarActions';
+import { useNotification } from '@/hooks/useNotification';
+import { usePerson } from '@/hooks/queries/usePerson';
+import { useLinkExploredEntrance } from '@/hooks/mutations/useExploredEntrance';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { CommentPropTypes } from '../../../../types/entrance.type';
 import Comment from './Comment';
@@ -11,7 +15,8 @@ import CreateCommentForm from '../../EntitiesForm/Comment';
 import {
   useCreateComment,
   useMoveCommentRelevance,
-  usePermissions
+  usePermissions,
+  useUserProperties
 } from '../../../../hooks';
 import { useMoveRelevanceWithUndo } from '../../../../hooks/useMoveRelevanceWithUndo';
 import { sortByRelevance } from '../../../../helpers/sortByRelevance';
@@ -20,13 +25,30 @@ import Alert from '../../../common/Alert';
 const Comments = ({ entranceId, comments, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
+  const { onSuccess, onWarning, onClose } = useNotification();
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const createMutation = useCreateComment();
+  const createMutation = useCreateComment({ isInline: true });
+  const userId = useUserProperties()?.id;
+  const personQuery = usePerson(userId);
+  const linkExploredMutation = useLinkExploredEntrance({ isInline: true });
+  const isExplored = personQuery.data?.exploredEntrances?.some(
+    entrance => String(entrance.id) === String(entranceId)
+  );
+  const explorationSnackbarKey = `comment-exploration-${userId}-${entranceId}`;
+  useEffect(() => {
+    if (isExplored) onClose(explorationSnackbarKey);
+  }, [isExplored, explorationSnackbarKey, onClose]);
+  let explorationStatus = null;
+  if (userId && personQuery.isSuccess)
+    explorationStatus = isExplored ? 'explored' : 'unexplored';
   const moveMutation = useMoveCommentRelevance();
   const { movingId, handleMove } = useMoveRelevanceWithUndo(moveMutation);
 
-  const onSubmitForm = data => {
-    createMutation.mutate({
+  const handleMarkExplored = () =>
+    linkExploredMutation.mutateAsync({ entranceId, caverId: userId });
+
+  const onSubmitForm = async data => {
+    await createMutation.mutateAsync({
       entrance: entranceId,
       title: data.title,
       body: data.body,
@@ -38,6 +60,43 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
       language: data.language
     });
     setIsFormVisible(false);
+    if (data.shouldMarkExplored && explorationStatus === 'unexplored') {
+      try {
+        await handleMarkExplored();
+        onClose(explorationSnackbarKey);
+      } catch (error) {
+        onWarning(
+          <>
+            <FormattedMessage id="Comment published, but the entrance could not be added to your explored entrances." />
+            {error?.status === 429 && (
+              <>
+                {' '}
+                <FormattedMessage id="Too many requests" />
+              </>
+            )}
+          </>,
+          {
+            key: explorationSnackbarKey,
+            persist: true,
+            preventDuplicate: true,
+            action: createRetryAction({
+              onRetry: handleMarkExplored,
+              onClose,
+              labelId: 'Retry adding'
+            })
+          }
+        );
+        return;
+      }
+    }
+    onSuccess(<FormattedMessage id="Comment published." />);
+  };
+
+  const handleToggleForm = () => {
+    if (createMutation.isPending || linkExploredMutation.isPending) return;
+    createMutation.reset();
+    linkExploredMutation.reset();
+    setIsFormVisible(!isFormVisible);
   };
 
   return (
@@ -50,8 +109,12 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
         permissions.isAuth &&
         isEditAllowed && (
           <SectionCreateButton
+            testId="create-comment"
             isOpen={isFormVisible}
-            onToggle={() => setIsFormVisible(!isFormVisible)}
+            onToggle={handleToggleForm}
+            disabled={
+              createMutation.isPending || linkExploredMutation.isPending
+            }
             label={formatMessage({ id: 'New' })}
             tooltip={formatMessage({ id: 'Add a new comment' })}
             openTooltip={formatMessage({ id: 'Cancel adding a new comment' })}
@@ -62,7 +125,13 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
         <>
           {isFormVisible && (
             <>
-              <CreateCommentForm isNewComment onSubmit={onSubmitForm} />
+              <CreateCommentForm
+                isNewComment
+                onSubmit={onSubmitForm}
+                closeForm={handleToggleForm}
+                error={createMutation.error}
+                explorationStatus={explorationStatus}
+              />
               <Divider sx={{ my: 2 }} />
             </>
           )}

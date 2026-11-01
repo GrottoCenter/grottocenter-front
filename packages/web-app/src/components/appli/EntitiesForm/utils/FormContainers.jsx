@@ -84,6 +84,7 @@ export const FormActionRow = ({
   isSubmitting,
   isCenter = false,
   disabled = false,
+  isCancelDisabled = false,
   onCancel,
   submitLabel
 }) => {
@@ -105,6 +106,7 @@ export const FormActionRow = ({
         <MuiButton
           variant="outlined"
           onClick={onCancel}
+          disabled={isCancelDisabled}
           sx={{ width: { xs: '100%', sm: 'auto' } }}>
           {formatMessage({ id: 'Cancel' })}
         </MuiButton>
@@ -133,6 +135,7 @@ FormActionRow.propTypes = {
   isSubmitting: PropTypes.bool.isRequired,
   isCenter: PropTypes.bool,
   disabled: PropTypes.bool,
+  isCancelDisabled: PropTypes.bool,
   onCancel: PropTypes.func,
   submitLabel: PropTypes.string
 };

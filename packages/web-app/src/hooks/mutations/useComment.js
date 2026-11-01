@@ -18,14 +18,17 @@ const withDurations = ({ eTTrail, eTUnderground, ...rest }) => ({
   eTUnderground: minutesToDurationString(eTUnderground) ?? null
 });
 
-export const useCreateComment = () =>
-  useEntranceContentMutation(({ entrance, ...rest }) =>
-    apiPost(postCommentUrl, { entrance, ...withDurations(rest) })
+export const useCreateComment = options =>
+  useEntranceContentMutation(
+    ({ entrance, ...rest }) =>
+      apiPost(postCommentUrl, { entrance, ...withDurations(rest) }),
+    options
   );
 
-export const useUpdateComment = () =>
-  useEntranceContentMutation(({ id, ...rest }) =>
-    apiPatch(putCommentUrl(id), withDurations(rest))
+export const useUpdateComment = options =>
+  useEntranceContentMutation(
+    ({ id, ...rest }) => apiPatch(putCommentUrl(id), withDurations(rest)),
+    options
   );
 
 export const useDeleteComment = () =>
