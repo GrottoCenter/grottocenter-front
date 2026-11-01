@@ -21,6 +21,7 @@ import DocumentListIcon from '@mui/icons-material/PlaylistAddCheck';
 import PublishIcon from '@mui/icons-material/Publish';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import BusinessIcon from '@mui/icons-material/Business';
+import PermMediaIcon from '@mui/icons-material/PermMedia';
 import { styled } from '@mui/material/styles';
 
 import {
@@ -324,12 +325,21 @@ const Dashboard = () => {
                 />
                 <ToolCard
                   icon={<BusinessIcon />}
-                  title={formatMessage({ id: 'Organization management' })}
+                  title={formatMessage({ id: 'Organizations' })}
                   description={formatMessage({
                     id: 'Organization management description'
                   })}
                   roleId="Moderator"
                   to="/ui/organizations/management"
+                />
+                <ToolCard
+                  icon={<PermMediaIcon />}
+                  title={formatMessage({ id: 'Documents' })}
+                  description={formatMessage({
+                    id: 'Document management description'
+                  })}
+                  roleId="Moderator"
+                  to="/ui/documents/management"
                 />
               </ToolGrid>
             </Section>
