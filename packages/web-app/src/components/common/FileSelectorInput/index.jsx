@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useDropzone } from 'react-dropzone';
+import { ErrorCode, useDropzone } from 'react-dropzone';
 import {
   Box,
   Button,
@@ -167,6 +167,22 @@ const FileSelectorInput = ({
     // browser's picker is the only intake path we support besides drag/drop.
     noPaste: true,
     onDrop: (acceptedFiles, fileRejections) => {
+      // Dropzone 19+ accepts the in-limit files from an oversized batch.
+      // Keep our all-or-nothing limit so import forms cannot start parsing
+      // one file while also handling a rejection from the same drop.
+      const hasOverflow = fileRejections.some(({ errors }) =>
+        errors.some(({ code }) => code === ErrorCode.TooManyFiles)
+      );
+      if (hasOverflow) {
+        const rejectedAcceptedFiles = acceptedFiles.map(file => ({
+          file,
+          errors: [{ code: ErrorCode.TooManyFiles }]
+        }));
+        onFileRejections?.(
+          normalizeRejections([...rejectedAcceptedFiles, ...fileRejections])
+        );
+        return;
+      }
       if (acceptedFiles.length > 0) onFilesAdd(acceptedFiles);
       if (fileRejections.length > 0 && onFileRejections)
         onFileRejections(normalizeRejections(fileRejections));
@@ -234,6 +250,7 @@ const FileSelectorInput = ({
 
   const rootProps = getRootProps({
     role: 'button',
+    'data-testid': 'file-dropzone',
     'aria-label': t(
       'Drop files here or click to select',
       'Drop a file here or click to select'

@@ -16,10 +16,10 @@
 // Import commands.js using ES2015 syntax:
 import './commands';
 
-// Suppress guided tours across all tests.
-// Tours read localStorage on mount — pre-setting the key prevents them from auto-launching
-// and avoids overlay interference with Cypress selectors.
+// Keep the UI independent of browser language and suppress guided tours.
+// Tests can override the language in their visit's onBeforeLoad callback.
 beforeEach(() => {
+  localStorage.setItem('selectedLanguage', 'en');
   localStorage.setItem('mapTourSeen_v2', 'true');
 });
 

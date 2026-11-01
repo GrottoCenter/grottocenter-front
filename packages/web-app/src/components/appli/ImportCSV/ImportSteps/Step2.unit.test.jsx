@@ -159,6 +159,9 @@ describe('Step2 (CSV import)', () => {
     );
 
     fireEvent.drop(dropzone, createDataTransfer([first]));
+    // Dropzone cancels an earlier drop that has not reached onDrop yet.
+    // Start the first read before replacing it to exercise the form's guard.
+    await waitFor(() => expect(first.text).toHaveBeenCalledOnce());
     fireEvent.drop(dropzone, createDataTransfer([second]));
 
     await waitFor(() => {
