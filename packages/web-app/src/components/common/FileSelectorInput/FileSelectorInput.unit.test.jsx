@@ -1,4 +1,10 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  within,
+  waitFor
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from '@mui/material/styles';
@@ -19,6 +25,11 @@ const messages = {
   'Upload a file': 'Upload a file',
   'Choose files': 'Choose files',
   'Choose a file': 'Choose a file',
+  'fileSelector.open': 'Open',
+  'fileSelector.acceptedFormats': 'Accepted formats',
+  'fileSelector.addFile': 'Add a file',
+  'fileSelector.addFiles': 'Add files',
+  Remove: 'Remove',
   or: 'or'
 };
 
@@ -50,9 +61,48 @@ const createDataTransfer = files => ({
 });
 
 describe('FileSelectorInput', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  test('reveals long format lists on mobile without opening the file picker', async () => {
+    vi.spyOn(window, 'matchMedia').mockImplementation(query => ({
+      matches: query.includes('max-width'),
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {}
+    }));
+    const { container } = renderIn(
+      <FileSelectorInput
+        onFilesAdd={vi.fn()}
+        accept={{
+          'application/pdf': ['.pdf'],
+          'application/zip': ['.zip'],
+          'image/png': ['.png'],
+          'image/jpeg': ['.jpg']
+        }}
+      />
+    );
+    const clickSpy = vi.spyOn(container.querySelector('input'), 'click');
+    const toggle = screen.getByText('Accepted formats');
+    const list = screen.getByText('.jpg, .pdf, .png, .zip');
+    expect(list).not.toBeVisible();
+    expect(screen.getByTestId('file-picker')).not.toContainElement(toggle);
+    await userEvent.click(toggle);
+    expect(list).toBeVisible();
+    await userEvent.click(toggle);
+    expect(list).not.toBeVisible();
+    expect(clickSpy).not.toHaveBeenCalled();
+  });
+
   test('opens the file picker on click', async () => {
     const onFilesAdd = vi.fn();
-    renderIn(<FileSelectorInput onFilesAdd={onFilesAdd} />);
+    renderIn(
+      <FileSelectorInput
+        onFilesAdd={onFilesAdd}
+        extensions={['.pdf', '.zip', '.png', '.jpg']}
+      />
+    );
+    expect(screen.queryByText('Accepted formats')).not.toBeInTheDocument();
+    expect(screen.getByText('.jpg, .pdf, .png, .zip')).toBeVisible();
     const dropzone = screen.getByRole('button', {
       name: /Drop files here or click to select/i
     });
@@ -282,7 +332,7 @@ describe('FileSelectorInput', () => {
     }
   );
 
-  test('renders one chip per file and calls onFileRemove when a chip is deleted', async () => {
+  test('lists files outside the drop zone and removes the named file', async () => {
     const onFilesAdd = vi.fn();
     const onFileRemove = vi.fn();
     renderIn(
@@ -293,8 +343,98 @@ describe('FileSelectorInput', () => {
       />
     );
     expect(screen.getByText('existing.txt')).toBeInTheDocument();
-    const removeButton = screen.getByTestId('CancelIcon').closest('svg');
+    const dropzone = screen.getByTestId('file-dropzone');
+    const row = screen.getByTestId('selected-file-existing.txt');
+    expect(dropzone).not.toContainElement(row);
+    const removeButton = screen.getByRole('button', {
+      name: 'Remove existing.txt'
+    });
     await userEvent.click(removeButton);
     expect(onFileRemove).toHaveBeenCalledWith('existing.txt');
+  });
+
+  test('opens existing files in a new tab and keeps actions out of the picker', async () => {
+    renderIn(
+      <FileSelectorInput
+        onFilesAdd={vi.fn()}
+        files={[
+          {
+            fileName: 'notes.pdf',
+            completePath: 'https://example.org/notes.pdf'
+          },
+          {
+            fileName: 'survey.pdf',
+            completePath: 'https://example.org/survey.pdf'
+          }
+        ]}
+        renderFileDetails={file => <span>Details for {file.fileName}</span>}
+      />
+    );
+    const link = screen.getByRole('link', { name: 'Open notes.pdf' });
+    expect(link).toHaveAttribute('href', 'https://example.org/notes.pdf');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(
+      within(screen.getByTestId('selected-file-notes.pdf')).getByText(
+        'Details for notes.pdf'
+      )
+    ).toBeVisible();
+    const input = screen.getByTestId('file-dropzone').querySelector('input');
+    const clickSpy = vi.spyOn(input, 'click');
+    await userEvent.click(screen.getByText('Details for notes.pdf'));
+    expect(clickSpy).not.toHaveBeenCalled();
+  });
+
+  test('keeps removal disabled while the selector is disabled', () => {
+    const onFileRemove = vi.fn();
+    renderIn(
+      <FileSelectorInput
+        disabled
+        onFilesAdd={vi.fn()}
+        onFileRemove={onFileRemove}
+        files={[{ fileName: 'locked.pdf' }]}
+      />
+    );
+    const remove = screen.getByRole('button', { name: 'Remove locked.pdf' });
+    expect(remove).toBeDisabled();
+    fireEvent.click(remove);
+    expect(onFileRemove).not.toHaveBeenCalled();
+  });
+
+  test('shares the local preview URL with file details and releases it on removal', async () => {
+    const createObjectURL = vi.fn(() => 'blob:local-preview');
+    const revokeObjectURL = vi.fn();
+    vi.stubGlobal(
+      'URL',
+      new Proxy(URL, {
+        get: (target, key) => {
+          if (key === 'createObjectURL') return createObjectURL;
+          if (key === 'revokeObjectURL') return revokeObjectURL;
+          return Reflect.get(target, key);
+        }
+      })
+    );
+    try {
+      const { unmount } = renderIn(
+        <FileSelectorInput
+          onFilesAdd={vi.fn()}
+          files={[{ fileName: 'local.pdf', file: makeFile('local.pdf') }]}
+          renderFileDetails={(_file, url) => <a href={url}>Test pagination</a>}
+        />
+      );
+      expect(
+        screen.getByRole('link', { name: 'Test pagination' })
+      ).toHaveAttribute('href', 'blob:local-preview');
+      await waitFor(() =>
+        expect(
+          screen.getByRole('link', { name: 'Open local.pdf' })
+        ).toHaveAttribute('href', 'blob:local-preview')
+      );
+      expect(createObjectURL).toHaveBeenCalledTimes(1);
+      unmount();
+      expect(revokeObjectURL).toHaveBeenCalledWith('blob:local-preview');
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

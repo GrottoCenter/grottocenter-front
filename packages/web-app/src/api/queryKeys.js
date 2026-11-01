@@ -41,7 +41,13 @@ export const documentKeys = {
   all: ['document'],
   detail: detailKey('document'),
   children: id => [...documentKeys.all, 'children', id],
-  list: criteria => [...documentKeys.all, 'list', criteria]
+  list: criteria => [...documentKeys.all, 'list', criteria],
+  missingPdfOffsets: types => [
+    ...documentKeys.all,
+    'missingPdfOffsets',
+    'thousandDocumentChunks',
+    types
+  ]
 };
 
 export const massifKeys = {

@@ -174,7 +174,7 @@ const CreateRiggingsForm = ({
         {fields.length > 0 &&
           (isMobile ? (
             <Stack spacing={1} sx={{ mt: 1 }}>
-              <Stack direction="row" flexWrap="wrap" gap={1}>
+              <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
                 {RIGGING_COLUMNS.map(field => (
                   <Box key={field}>{columnCount(field, true)}</Box>
                 ))}

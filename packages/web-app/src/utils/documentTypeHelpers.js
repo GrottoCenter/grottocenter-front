@@ -236,6 +236,7 @@ const ADVANCED_PAYLOAD_FIELDS = [
   'datePublication',
   'identifier',
   'identifierType',
+  'identifierPdfPageOffset',
   'editor',
   'iso3166',
   'subjects',

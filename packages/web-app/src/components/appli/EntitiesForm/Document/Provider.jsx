@@ -7,6 +7,7 @@ import {
 } from 'react';
 import PropTypes from 'prop-types';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import { isPdfPageOffsetValid } from '@/utils/pdfUrl';
 import {
   DocumentTypes,
   filterDocumentPayload,
@@ -24,6 +25,7 @@ export const defaultDocAttributes = {
   id: null,
   identifier: null,
   identifierType: null,
+  identifierPdfPageOffset: null,
   datePublication: '',
   creatorComment: '',
   authors: [],
@@ -84,6 +86,14 @@ const checkFormValidation = document => {
   let isValid = true;
 
   const payload = filterDocumentPayload(document);
+  if (!isPdfPageOffsetValid(payload.identifierPdfPageOffset)) isValid = false;
+  if (
+    (payload.files ?? []).some(
+      file =>
+        file.state !== IS_DELETED && !isPdfPageOffsetValid(file.pdfPageOffset)
+    )
+  )
+    isValid = false;
   if (getDocumentLengthErrors(document).length > 0) isValid = false;
   if (
     document.files.some(
@@ -133,7 +143,8 @@ const checkFormValidation = document => {
     document.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH;
   if (requiresAuthorization && hasVisibleFile) {
     if (!document.selectOptionAuthorizationDocument) isValid = false;
-    if (!document.license) isValid = false;
+    // The API expects license[id], not the name returned by document details.
+    if (!document.license?.id) isValid = false;
     if (
       document.selectOptionAuthorizationDocument ===
         DOCUMENT_AUTHORIZE_TO_PUBLISH &&
@@ -161,7 +172,9 @@ const normalizeInitialValues = values => {
   const { option, files, authorsOrganization, ...rest } = values;
   return {
     ...rest,
-    selectOptionAuthorizationDocument: option ?? null,
+    selectOptionAuthorizationDocument:
+      option ??
+      (values.authorizationDocument?.id ? DOCUMENT_AUTHORIZE_TO_PUBLISH : null),
     files: (files ?? []).map(f => ({ ...f, state: f.state ?? IS_INTACT })),
     authorsOrganization: authorsOrganization ?? []
   };

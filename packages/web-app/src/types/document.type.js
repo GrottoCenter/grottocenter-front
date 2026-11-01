@@ -14,6 +14,7 @@ export const FilePropTypes = PropTypes.shape({
   id: PropTypes.number,
   fileName: PropTypes.string,
   completePath: PropTypes.string,
+  pdfPageOffset: PropTypes.number,
   thumbnails: ThumbnailsPropTypes
 });
 
@@ -24,6 +25,7 @@ export const DocumentSimplePropTypes = PropTypes.shape({
   description: PropTypes.string,
   identifier: PropTypes.string,
   identifierType: PropTypes.string,
+  identifierPdfPageOffset: PropTypes.number,
   files: PropTypes.arrayOf(FilePropTypes)
 });
 
@@ -100,6 +102,7 @@ export const DocumentPropTypes = PropTypes.shape({
   languages: PropTypes.arrayOf(PropTypes.string),
   identifier: PropTypes.string,
   identifierType: PropTypes.string,
+  identifierPdfPageOffset: PropTypes.number,
   library: OrganizationSimplePropTypes,
   editor: OrganizationSimplePropTypes,
   subjects: PropTypes.arrayOf(

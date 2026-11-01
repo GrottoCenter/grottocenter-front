@@ -48,7 +48,10 @@ const getProposedDocumentFiles = (current, proposed) => {
         // toFile fills missing rename metadata with null or an undefined path.
         // Keep the original download, thumbnails and metadata for this file.
         ...old,
-        fileName: file.fileName
+        fileName: file.fileName,
+        pdfPageOffset: Object.hasOwn(file, 'pdfPageOffset')
+          ? file.pdfPageOffset
+          : old?.pdfPageOffset
       };
     }),
     ...(proposed.newFiles ?? [])
@@ -132,6 +135,7 @@ const TEXT_FIELDS = [
   ['datePublication', 'Publication Date'],
   ['identifier', 'Identifier'],
   ['identifierType', 'Identifier type'],
+  ['identifierPdfPageOffset', 'pdfPagination.adjust'],
   ['pages', 'Pages'],
   ['issue', 'Issue'],
   ['license', 'License'],
@@ -232,6 +236,18 @@ export const getDocumentChanges = (current, proposed) => {
           field === 'newFiles' ? '' : old?.fileName || file.fileName || '',
         newText: field === 'deletedFiles' ? '' : file.fileName || ''
       });
+      if (
+        field === 'modifiedFiles' &&
+        Object.hasOwn(file, 'pdfPageOffset') &&
+        (old?.pdfPageOffset ?? null) !== file.pdfPageOffset
+      ) {
+        changes.push({
+          field: `pdfPageOffset-${file.id}`,
+          label: 'pdfPagination.adjust',
+          oldText: String(old?.pdfPageOffset ?? ''),
+          newText: String(file.pdfPageOffset ?? '')
+        });
+      }
     });
   });
   return changes;

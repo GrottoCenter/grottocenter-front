@@ -31,6 +31,8 @@ const messages = {
   'Drag and drop a file here': 'Drag and drop a file here',
   'Choose a file': 'Choose a file',
   'Upload a file': 'Upload a file',
+  'fileSelector.open': 'Open',
+  Remove: 'Remove',
   or: 'or'
 };
 
@@ -213,9 +215,11 @@ describe('Step2 (CSV import)', () => {
     ctx.updateAttribute.mockClear();
     ctx.importSession.reset.mockClear();
 
-    const chip = screen.getByTestId('selected-file-good.csv');
-    const removeIcon = within(chip).getByTestId('CancelIcon');
-    await userEvent.click(removeIcon);
+    const row = screen.getByTestId('selected-file-good.csv');
+    const removeButton = within(row).getByRole('button', {
+      name: 'Remove good.csv'
+    });
+    await userEvent.click(removeButton);
 
     expect(ctx.updateAttribute).toHaveBeenCalledWith('importData', undefined);
     expect(ctx.updateAttribute).toHaveBeenCalledWith('fileImported', false);
