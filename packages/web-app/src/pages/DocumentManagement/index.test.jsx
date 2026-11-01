@@ -12,6 +12,13 @@ import { apiGetWithRange } from '@/api/client';
 import { useOnlineStatus, usePermissions } from '@/hooks';
 import DocumentManagement from './index';
 
+const device = vi.hoisted(() => ({ isMobile: false }));
+vi.mock('react-device-detect', async importOriginal => ({
+  ...(await importOriginal()),
+  get isMobile() {
+    return device.isMobile;
+  }
+}));
 vi.mock('@/api/client', () => ({ apiGetWithRange: vi.fn() }));
 vi.mock('@/hooks', async importOriginal => ({
   ...(await importOriginal()),
@@ -63,6 +70,7 @@ const renderAnalysis = () => {
 };
 
 beforeEach(() => {
+  device.isMobile = false;
   vi.resetAllMocks();
   apiGetWithRange.mockImplementation((url, options) =>
     new URL(url).searchParams.get('documentType') === 'Book'
@@ -154,6 +162,22 @@ it('lists only PDFs missing their own offset and preserves zero and negative off
   expect(screen.getByTestId('documents-type-breakdown')).toHaveTextContent(
     'Issue: 1 · Book: 2'
   );
+});
+
+it('keeps document and edit links in-app on mobile', async () => {
+  device.isMobile = true;
+  getBookPage.mockResolvedValue(makePage([document]));
+  renderAnalysis();
+  const row = await screen.findByTestId('document-offset-row-1');
+  const links = within(row).getAllByRole('link');
+  expect(links.map(link => link.getAttribute('href'))).toEqual([
+    '/ui/documents/1',
+    '/ui/documents/1/edit'
+  ]);
+  links.forEach(link => {
+    expect(link).not.toHaveAttribute('target');
+    expect(link).not.toHaveAttribute('title', 'Opens in a new tab');
+  });
 });
 
 it('continues past pages with no matches and stops at the reported total', async () => {

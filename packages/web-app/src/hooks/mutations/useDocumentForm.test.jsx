@@ -26,8 +26,8 @@ const renderMutation = hook => {
   return renderHook(hook, { wrapper: Wrapper });
 };
 
-const newFile = (name, pdfPageOffset) => ({
-  file: new File(['PDF'], name, { type: 'application/pdf' }),
+const newFile = (name, pdfPageOffset, type = 'application/pdf') => ({
+  file: new File(['content'], name, { type }),
   fileName: name,
   state: IS_NEW,
   pdfPageOffset
@@ -65,11 +65,56 @@ describe('document PDF pagination uploads', () => {
         'zero.pdf',
         'shifted.pdf'
       ]);
-      expect(formData.has('newFilesMetadata[0][pdfPageOffset]')).toBe(false);
+      expect(formData.get('newFilesMetadata[0][pdfPageOffset]')).toBe('');
       expect(formData.get('newFilesMetadata[1][pdfPageOffset]')).toBe('0');
       expect(formData.get('newFilesMetadata[2][pdfPageOffset]')).toBe('-126');
+      expect(
+        [0, 1, 2].map(index =>
+          formData.get(`newFilesMetadata[${index}][fileName]`)
+        )
+      ).toEqual(['unmapped.pdf', 'zero.pdf', 'shifted.pdf']);
+      const keys = [...formData.keys()];
+      const firstFile = keys.indexOf('files');
+      expect(keys.slice(firstFile)).toEqual(['files', 'files', 'files']);
     }
   );
+
+  it('keeps mixed uploads aligned after an intact file and sends every text field first', async () => {
+    const { result } = renderMutation(useUpdateDocument);
+    await act(async () =>
+      result.current.mutateAsync({
+        id: 42,
+        type: DocumentTypes.BOOK,
+        files: [
+          { id: 1, fileName: 'intact.pdf', state: IS_INTACT },
+          newFile('map.jpg', undefined, 'image/jpeg'),
+          newFile('lpu339_anonyme.pdf', 3),
+          {
+            id: 2,
+            fileName: 'modified.pdf',
+            state: IS_MODIFIED,
+            pdfPageOffset: 0
+          }
+        ]
+      })
+    );
+
+    const formData = apiPutForm.mock.calls[0][1];
+    expect(formData.getAll('files').map(file => file.name)).toEqual([
+      'map.jpg',
+      'lpu339_anonyme.pdf'
+    ]);
+    expect(formData.get('newFilesMetadata[0][fileName]')).toBe('map.jpg');
+    expect(formData.get('newFilesMetadata[0][pdfPageOffset]')).toBe('');
+    expect(formData.get('newFilesMetadata[1][fileName]')).toBe(
+      'lpu339_anonyme.pdf'
+    );
+    expect(formData.get('newFilesMetadata[1][pdfPageOffset]')).toBe('3');
+    expect(formData.has('newFilesMetadata[2][fileName]')).toBe(false);
+    expect(formData.get('modifiedFiles[0][id]')).toBe('2');
+    const keys = [...formData.keys()];
+    expect(keys.slice(keys.indexOf('files'))).toEqual(['files', 'files']);
+  });
 
   it('indexes only uploaded files and explicitly clears existing offsets', async () => {
     const { result } = renderMutation(useUpdateDocument);

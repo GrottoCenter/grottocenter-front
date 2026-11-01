@@ -308,9 +308,7 @@ const DocumentManagement = () => {
                     }}>
                     <AppLink
                       to={`/ui/documents/${document.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={formatMessage({ id: 'Opens in a new tab' })}>
+                      openInNewTabDesktop>
                       {document.title || `#${document.id}`}
                     </AppLink>{' '}
                     <Box
@@ -331,9 +329,7 @@ const DocumentManagement = () => {
                   <Button
                     component={AppLink}
                     to={`/ui/documents/${document.id}/edit`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title={formatMessage({ id: 'Opens in a new tab' })}
+                    openInNewTabDesktop
                     variant="contained"
                     startIcon={<EditIcon />}
                     sx={{ minWidth: 0 }}>
