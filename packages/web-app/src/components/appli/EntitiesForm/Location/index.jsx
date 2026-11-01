@@ -58,7 +58,6 @@ const CreateLocationForm = ({ closeForm, onSubmit, values, isNewLocation }) => {
           isNew={isNewLocation}
           isSubmitting={isSubmitting}
           onCancel={closeForm}
-          isCenter
         />
       </form>
     </FormContainer>

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import { FormActionRow } from './FormContainers';
 
@@ -55,5 +56,46 @@ describe('FormActionRow', () => {
   it('still honours its own disabled prop while online', () => {
     renderRow({ disabled: true });
     expect(screen.getByRole('button', { name: 'Create' })).toBeDisabled();
+  });
+
+  describe.each([
+    { layout: 'mobile', isMobile: true, labels: ['Create', 'Cancel'] },
+    { layout: 'desktop', isMobile: false, labels: ['Cancel', 'Create'] }
+  ])('$layout keyboard navigation', ({ isMobile, labels }) => {
+    beforeEach(() => {
+      vi.spyOn(window, 'matchMedia').mockImplementation(query => ({
+        matches: isMobile,
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn()
+      }));
+    });
+
+    afterEach(() => vi.restoreAllMocks());
+
+    it('tabs through the actions in visual order and back', async () => {
+      const user = userEvent.setup();
+      renderRow();
+
+      expect(
+        screen.getAllByRole('button').map(button => button.textContent)
+      ).toEqual(labels);
+      await user.tab();
+      expect(screen.getByRole('button', { name: labels[0] })).toHaveFocus();
+      await user.tab();
+      expect(screen.getByRole('button', { name: labels[1] })).toHaveFocus();
+      await user.tab({ shift: true });
+      expect(screen.getByRole('button', { name: labels[0] })).toHaveFocus();
+    });
+
+    it('skips the unavailable submit and keeps Cancel reachable offline', async () => {
+      const user = userEvent.setup();
+      setOnLine(false);
+      renderRow();
+
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus();
+      expect(screen.getByRole('button', { name: 'Create' })).toBeDisabled();
+    });
   });
 });

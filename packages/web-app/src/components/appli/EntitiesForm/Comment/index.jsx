@@ -170,7 +170,6 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
           isNew={isNewComment}
           isSubmitting={isSubmitting}
           onCancel={closeForm}
-          isCenter
         />
       </form>
     </FormContainer>
