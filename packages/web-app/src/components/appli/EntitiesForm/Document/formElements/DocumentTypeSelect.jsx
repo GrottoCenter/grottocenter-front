@@ -3,20 +3,20 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
   Box,
+  Button,
   Card,
   CardActionArea,
   CardContent,
   Collapse,
   Grid,
   Skeleton,
-  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import {
   DocumentTypes,
@@ -35,133 +35,184 @@ const FEATURED_TYPES = [
   DocumentTypes.REPORT
 ];
 
+// Keep related choices together in the four-column desktop grid and in pairs
+// on mobile. This order serves type selection, rather than document-list sorting.
+const SECONDARY_TYPE_ORDER = new Map(
+  [
+    DocumentTypes.ARTICLE,
+    DocumentTypes.BOOK,
+    DocumentTypes.COLLECTION,
+    DocumentTypes.ISSUE,
+
+    DocumentTypes.TEXT,
+    DocumentTypes.MAP,
+    DocumentTypes.TOPOGRAPHIC_DATA,
+    DocumentTypes.DATASET,
+
+    DocumentTypes.MOVING_IMAGE,
+    DocumentTypes.SOUND,
+    DocumentTypes.INTERACTIVE_RESOURCE,
+    DocumentTypes.SOFTWARE,
+
+    DocumentTypes.PHYSICAL_OBJECT,
+    DocumentTypes.EVENT,
+    DocumentTypes.SERVICE,
+    DocumentTypes.AUTHORIZATION_TO_PUBLISH
+  ].map((type, index) => [type, index])
+);
+
 const docTypePropType = PropTypes.shape({
   id: PropTypes.number,
   name: PropTypes.string.isRequired,
   comment: PropTypes.string
 });
 
-const FeaturedCard = ({ docType, selected, onClick }) => {
+const TYPE_DESCRIPTIONS = {
+  [DocumentTypes.ARTICLE]: 'Journal article',
+  [DocumentTypes.AUTHORIZATION_TO_PUBLISH]: 'Publishing permission and license',
+  [DocumentTypes.BOOK]: '',
+  [DocumentTypes.COLLECTION]: 'Collection of journals',
+  [DocumentTypes.DATASET]: 'Measurements, surveys, tables…',
+  [DocumentTypes.EVENT]: 'Conference, meeting…',
+  [DocumentTypes.IMAGE]: 'Photo, sketch, diagram',
+  [DocumentTypes.INTERACTIVE_RESOURCE]: '3D view, virtual tour',
+  [DocumentTypes.ISSUE]: 'Journal or magazine issue',
+  [DocumentTypes.MAP]: 'A geographical map',
+  [DocumentTypes.MOVING_IMAGE]: 'Video, animation',
+  [DocumentTypes.PHYSICAL_OBJECT]: 'Material object, sample',
+  [DocumentTypes.REPORT]: 'Exploration, study, expedition',
+  [DocumentTypes.SERVICE]: 'Web portal, online tool',
+  [DocumentTypes.SOFTWARE]: 'Program, source code',
+  [DocumentTypes.SOUND]: 'Recording, interview',
+  [DocumentTypes.STILL_IMAGE]: 'Photo, sketch, diagram',
+  [DocumentTypes.TEXT]: 'Notice, fact sheet, standalone document…',
+  [DocumentTypes.TOPOGRAPHIC_DATA]: 'Survey measurements and files',
+  [DocumentTypes.TOPOGRAPHIC_DRAWING]: 'Cave plan, cross-section'
+};
+
+const TypeLabel = ({ docType, isFeatured = false }) => {
   const { formatMessage } = useIntl();
+  const descriptionId = TYPE_DESCRIPTIONS[docType.name] ?? docType.comment;
+
+  return (
+    <Box
+      sx={{
+        display: isFeatured ? 'contents' : 'block',
+        minWidth: 0,
+        flex: 1,
+        textAlign: isFeatured ? 'center' : 'start'
+      }}>
+      <Typography
+        data-testid="document-type-name"
+        variant={isFeatured ? 'subtitle1' : 'body2'}
+        component="span"
+        sx={{
+          typography: isFeatured ? { xs: 'body2', sm: 'subtitle1' } : undefined,
+          color: 'text.primary',
+          display: 'block',
+          // Match typography's breakpoints so variant weights cannot override it.
+          fontWeight: { xs: 600, sm: 600 },
+          overflowWrap: 'anywhere',
+          alignSelf: 'start'
+        }}>
+        {formatMessage({ id: docType.name })}
+      </Typography>
+      {descriptionId && (
+        <Typography
+          data-testid="document-type-description"
+          variant="caption"
+          component="span"
+          sx={{
+            color: 'text.secondary',
+            display: 'block',
+            overflowWrap: 'anywhere',
+            alignSelf: 'start'
+          }}>
+          {formatMessage({ id: descriptionId })}
+        </Typography>
+      )}
+    </Box>
+  );
+};
+
+TypeLabel.propTypes = {
+  docType: docTypePropType.isRequired,
+  isFeatured: PropTypes.bool
+};
+
+const TypeCard = ({ docType, selected, onClick, isFeatured = false }) => {
   const Icon = DOCUMENT_TYPE_ICONS[docType.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
 
   return (
-    <Tooltip
-      title={docType.comment ? formatMessage({ id: docType.comment }) : ''}
-      placement="top">
-      <Card
-        variant="outlined"
+    <Card
+      variant="outlined"
+      sx={{
+        borderColor: selected ? 'primary.main' : 'divider',
+        boxShadow: selected
+          ? theme => `inset 0 0 0 1px ${theme.palette.primary.main}`
+          : 'none',
+        bgcolor: selected ? 'action.selected' : 'background.paper',
+        transition: 'border-color 0.15s, background-color 0.15s',
+        height: '100%'
+      }}>
+      <CardActionArea
+        data-testid={`document-type-${docType.id}`}
+        aria-pressed={selected}
+        onClick={onClick}
         sx={{
-          borderColor: selected ? 'primary.main' : 'divider',
-          borderWidth: selected ? 2 : 1,
-          bgcolor: selected ? 'action.selected' : 'background.paper',
-          transition: 'border-color 0.15s, background-color 0.15s',
-          height: '100%'
+          height: '100%',
+          color: selected ? 'primary.main' : 'text.primary'
         }}>
-        <CardActionArea onClick={onClick} sx={{ height: '100%' }}>
-          <CardContent
+        <CardContent
+          sx={{
+            display: isFeatured ? 'grid' : 'flex',
+            gridTemplateRows: isFeatured ? 'auto 1fr auto' : undefined,
+            justifyItems: isFeatured ? 'center' : undefined,
+            textAlign: isFeatured ? 'center' : 'start',
+            height: '100%',
+            alignItems: 'flex-start',
+            gap: isFeatured ? 0.5 : 1,
+            p: 1,
+            '&:last-child': { pb: 1 }
+          }}>
+          <Box
+            data-testid="document-type-icon"
             sx={{
+              color: selected ? 'primary.main' : 'text.secondary',
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 0.5,
-              py: 2,
-              position: 'relative'
+              flexShrink: 0,
+              '& svg': { fontSize: isFeatured ? 40 : 20 }
             }}>
-            <Box
-              sx={{
-                color: selected ? 'primary.main' : 'text.secondary',
-                display: 'flex',
-                '& svg': { fontSize: 40 }
-              }}>
+            {selected && !isFeatured ? (
+              <CheckCircleIcon data-testid="document-type-selected" />
+            ) : (
               <Icon />
-            </Box>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                color: selected ? 'primary.main' : 'text.primary',
-                fontWeight: 600
-              }}>
-              {formatMessage({ id: docType.name })}
-            </Typography>
-            {selected && (
-              <CheckCircleIcon
-                sx={{
-                  position: 'absolute',
-                  top: 8,
-                  right: 8,
-                  fontSize: 18,
-                  color: 'primary.main'
-                }}
-              />
             )}
-          </CardContent>
-        </CardActionArea>
-      </Card>
-    </Tooltip>
+          </Box>
+          <TypeLabel docType={docType} isFeatured={isFeatured} />
+          {selected && isFeatured && (
+            <CheckCircleIcon
+              data-testid="document-type-selected"
+              sx={{
+                position: 'absolute',
+                top: theme => theme.spacing(0.5),
+                right: theme => theme.spacing(0.5),
+                fontSize: 18,
+                color: 'primary.main'
+              }}
+            />
+          )}
+        </CardContent>
+      </CardActionArea>
+    </Card>
   );
 };
 
-FeaturedCard.propTypes = {
+TypeCard.propTypes = {
   docType: docTypePropType.isRequired,
   selected: PropTypes.bool.isRequired,
-  onClick: PropTypes.func.isRequired
-};
-
-const SecondaryCard = ({ docType, selected, onClick }) => {
-  const { formatMessage } = useIntl();
-  const Icon = DOCUMENT_TYPE_ICONS[docType.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
-
-  return (
-    <Tooltip
-      title={docType.comment ? formatMessage({ id: docType.comment }) : ''}
-      placement="top">
-      <Card
-        variant="outlined"
-        sx={{
-          borderColor: selected ? 'primary.main' : 'divider',
-          borderWidth: selected ? 2 : 1,
-          bgcolor: selected ? 'action.selected' : 'background.paper',
-          transition: 'border-color 0.15s, background-color 0.15s'
-        }}>
-        <CardActionArea onClick={onClick}>
-          <CardContent
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              py: 1.5,
-              '&:last-child': {}
-            }}>
-            <Box
-              sx={{
-                color: selected ? 'primary.main' : 'text.secondary',
-                display: 'flex',
-                flexShrink: 0,
-                mr: 0.5,
-                '& svg': { fontSize: 20 }
-              }}>
-              <Icon />
-            </Box>
-            <Typography
-              variant="body2"
-              noWrap
-              sx={{
-                color: selected ? 'primary.main' : 'text.primary',
-                fontWeight: selected ? 600 : 400
-              }}>
-              {formatMessage({ id: docType.name })}
-            </Typography>
-          </CardContent>
-        </CardActionArea>
-      </Card>
-    </Tooltip>
-  );
-};
-
-SecondaryCard.propTypes = {
-  docType: docTypePropType.isRequired,
-  selected: PropTypes.bool.isRequired,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
+  isFeatured: PropTypes.bool
 };
 
 const DocumentTypeSelect = () => {
@@ -172,7 +223,6 @@ const DocumentTypeSelect = () => {
   const { data: documentTypes = [], isPending } = useDocumentTypes();
   const [othersOpen, setOthersOpen] = useState(false);
 
-  // Open others section if selected type is not featured
   useEffect(() => {
     if (document.type !== -1 && !FEATURED_TYPES.includes(document.type)) {
       setOthersOpen(true);
@@ -188,8 +238,15 @@ const DocumentTypeSelect = () => {
   };
 
   const featured = documentTypes.filter(dt => FEATURED_TYPES.includes(dt.name));
-  const others = documentTypes.filter(dt => !FEATURED_TYPES.includes(dt.name));
-  const selectedOther = others.find(dt => dt.name === document.type) ?? null;
+  const others = documentTypes
+    .filter(dt => !FEATURED_TYPES.includes(dt.name))
+    .sort(
+      (a, b) =>
+        (SECONDARY_TYPE_ORDER.get(a.name) ?? Number.MAX_SAFE_INTEGER) -
+        (SECONDARY_TYPE_ORDER.get(b.name) ?? Number.MAX_SAFE_INTEGER)
+    );
+
+  const selectedOther = others.find(dt => dt.name === document.type);
   const SelectedOtherIcon = selectedOther
     ? (DOCUMENT_TYPE_ICONS[selectedOther.name] ?? DOCUMENT_TYPE_FALLBACK_ICON)
     : null;
@@ -198,9 +255,9 @@ const DocumentTypeSelect = () => {
     return (
       <Box sx={{ mt: 1 }}>
         <Grid container spacing={1}>
-          {[0, 1].map(i => (
-            <Grid size={6} key={i}>
-              <Skeleton variant="rounded" height={110} />
+          {[0, 1, 2].map(i => (
+            <Grid size={4} key={i}>
+              <Skeleton variant="rounded" height={160} />
             </Grid>
           ))}
         </Grid>
@@ -215,19 +272,20 @@ const DocumentTypeSelect = () => {
         component="p"
         sx={{ mb: 0.5, color: 'text.secondary' }}>
         {formatMessage({ id: 'Document type' })}
-        <Box component="span" sx={{ color: 'error.main', ml: '4px' }}>
+        <Box component="span" sx={{ color: 'error.main', ml: 0.5 }}>
           *
         </Box>
       </Typography>
       <Grid
         container
-        spacing={1}
+        spacing={0.5}
         sx={{
           alignItems: 'stretch'
         }}>
         {featured.map(dt => (
           <Grid size={4} key={dt.id}>
-            <FeaturedCard
+            <TypeCard
+              isFeatured
               docType={dt}
               selected={document.type === dt.name}
               onClick={() => handleSelect(dt.name)}
@@ -238,15 +296,24 @@ const DocumentTypeSelect = () => {
       {others.length > 0 && (
         <Box sx={{ mt: 1 }}>
           {isMobile && (
-            <Box
+            <Button
+              variant="outlined"
+              color="inherit"
+              data-testid="document-other-types-toggle"
+              aria-expanded={othersOpen}
+              aria-controls="document-other-types"
               onClick={() => setOthersOpen(o => !o)}
               sx={{
                 display: 'flex',
+                width: '100%',
+                textTransform: 'none',
                 alignItems: 'center',
                 gap: 0.5,
                 cursor: 'pointer',
                 border: '1px solid',
                 borderColor: selectedOther ? 'primary.main' : 'divider',
+                color: selectedOther ? 'primary.main' : 'text.primary',
+                boxShadow: 'none',
                 borderRadius: 1,
                 px: 1,
                 py: 0.5,
@@ -260,26 +327,9 @@ const DocumentTypeSelect = () => {
                 userSelect: 'none',
                 mb: 0.5
               }}>
-              {selectedOther && (
-                <Box
-                  sx={{
-                    color: 'primary.main',
-                    display: 'flex',
-                    '& svg': { fontSize: 20 }
-                  }}>
-                  {SelectedOtherIcon && <SelectedOtherIcon />}
-                </Box>
-              )}
-              <Typography
-                variant="body2"
-                sx={{
-                  color: selectedOther ? 'primary.main' : 'text.primary',
-                  fontWeight: 500,
-                  flex: 1
-                }}>
-                {selectedOther
-                  ? formatMessage({ id: selectedOther.name })
-                  : formatMessage({ id: 'Other types' })}
+              {SelectedOtherIcon && <SelectedOtherIcon fontSize="small" />}
+              <Typography variant="body2" sx={{ flex: 1, textAlign: 'start' }}>
+                {formatMessage({ id: selectedOther?.name ?? 'Other types' })}
               </Typography>
               <Typography
                 variant="caption"
@@ -302,14 +352,14 @@ const DocumentTypeSelect = () => {
                   sx={{ color: 'text.secondary' }}
                 />
               )}
-            </Box>
+            </Button>
           )}
 
-          <Collapse in={isMobile ? othersOpen : true}>
+          <Collapse id="document-other-types" in={isMobile ? othersOpen : true}>
             <Grid container spacing={0.5}>
               {others.map(dt => (
                 <Grid size={{ xs: 6, sm: 4, md: 3 }} key={dt.id}>
-                  <SecondaryCard
+                  <TypeCard
                     docType={dt}
                     selected={document.type === dt.name}
                     onClick={() => handleSelect(dt.name)}
