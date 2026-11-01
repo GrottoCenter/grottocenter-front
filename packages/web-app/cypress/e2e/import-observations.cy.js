@@ -52,6 +52,33 @@ describe('Import Observations Wizard', () => {
       cy.checkPageLoaded();
     });
 
+    it('rejects a batch of files and still accepts a subsequent single file', () => {
+      cy.fixture('sample-observations.csv').then(contents => {
+        const csv = Cypress.Buffer.from(contents);
+        cy.get(OBSERVATION_FILE_SELECTOR)
+          .find('[data-testid="file-dropzone"]')
+          .selectFile(
+            [
+              { contents: csv, fileName: 'first.csv', mimeType: 'text/csv' },
+              { contents: csv, fileName: 'second.csv', mimeType: 'text/csv' }
+            ],
+            { action: 'drag-drop' }
+          );
+      });
+
+      cy.contains(
+        '[role="alert"]',
+        'Only .csv, .tsv, or .txt files are accepted.'
+      ).should('be.visible');
+      cy.get('[data-testid="file-info"]').should('not.exist');
+      cy.get('[data-testid="file-preview-table"]').should('not.exist');
+      cy.get('[data-testid="next-button"]').should('be.disabled');
+
+      selectObservationsFile();
+      cy.get('[data-testid="file-preview-table"]').should('be.visible');
+      cy.get('[data-testid="next-button"]').should('not.be.disabled');
+    });
+
     it('completes full wizard flow, exports profile, and redirects to document page', () => {
       // Requirement 1.1: Wizard is accessible
       // Step 0: Upload

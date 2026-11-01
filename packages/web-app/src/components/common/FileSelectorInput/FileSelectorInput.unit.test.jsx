@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from '@mui/material/styles';
@@ -197,6 +197,90 @@ describe('FileSelectorInput', () => {
       )
     ).toBe(true);
   });
+
+  test('rejects an oversized multi-file batch and preserves type errors', async () => {
+    const onFilesAdd = vi.fn();
+    const onFileRejections = vi.fn();
+    renderIn(
+      <FileSelectorInput
+        onFilesAdd={onFilesAdd}
+        onFileRejections={onFileRejections}
+        maxFiles={2}
+        accept={{ 'text/plain': ['.txt'] }}
+      />
+    );
+    const validFiles = ['a.txt', 'b.txt', 'c.txt'].map(name => makeFile(name));
+    const wrongType = makeFile('wrong.pdf', { type: 'application/pdf' });
+    fireEvent.drop(
+      screen.getByTestId('file-dropzone'),
+      createDataTransfer([...validFiles, wrongType])
+    );
+
+    await waitFor(() => expect(onFileRejections).toHaveBeenCalledOnce());
+    expect(onFilesAdd).not.toHaveBeenCalled();
+    const rejections = onFileRejections.mock.calls[0][0];
+    expect(rejections).toHaveLength(4);
+    for (const file of validFiles) {
+      expect(rejections).toContainEqual({
+        file,
+        fileName: file.name,
+        reasons: [REJECTION_REASONS.TOO_MANY_FILES]
+      });
+    }
+    expect(rejections).toContainEqual({
+      file: wrongType,
+      fileName: 'wrong.pdf',
+      reasons: [REJECTION_REASONS.TYPE_NOT_ACCEPTED]
+    });
+  });
+
+  test('accepts valid files from a mixed batch within the file limit', async () => {
+    const onFilesAdd = vi.fn();
+    const onFileRejections = vi.fn();
+    renderIn(
+      <FileSelectorInput
+        onFilesAdd={onFilesAdd}
+        onFileRejections={onFileRejections}
+        maxFiles={2}
+        accept={{ 'text/plain': ['.txt'] }}
+      />
+    );
+    const validFile = makeFile('valid.txt');
+    const wrongType = makeFile('wrong.pdf', { type: 'application/pdf' });
+    fireEvent.drop(
+      screen.getByTestId('file-dropzone'),
+      createDataTransfer([validFile, wrongType])
+    );
+
+    await waitFor(() => expect(onFileRejections).toHaveBeenCalledOnce());
+    expect(onFilesAdd).toHaveBeenCalledExactlyOnceWith([validFile]);
+    expect(onFileRejections.mock.calls[0][0]).toEqual([
+      {
+        file: wrongType,
+        fileName: 'wrong.pdf',
+        reasons: [REJECTION_REASONS.TYPE_NOT_ACCEPTED]
+      }
+    ]);
+  });
+
+  test.each(['survey.th2', 'outline.geojson'])(
+    'accepts %s by extension when the browser provides no MIME type',
+    async fileName => {
+      const onFilesAdd = vi.fn();
+      renderIn(
+        <FileSelectorInput onFilesAdd={onFilesAdd} accept=".th2,.geojson" />
+      );
+      const file = makeFile(fileName, { type: '' });
+      fireEvent.drop(
+        screen.getByTestId('file-dropzone'),
+        createDataTransfer([file])
+      );
+
+      await waitFor(() =>
+        expect(onFilesAdd).toHaveBeenCalledExactlyOnceWith([file])
+      );
+    }
+  );
 
   test('renders one chip per file and calls onFileRemove when a chip is deleted', async () => {
     const onFilesAdd = vi.fn();
