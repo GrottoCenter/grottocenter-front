@@ -20,7 +20,10 @@ import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { useTheme } from '@mui/material/styles';
 
 import { OBSTACLE_LEGEND, ANCHOR_LEGEND } from '@/utils/riggingLegends';
-import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import {
+  isNearLengthLimit,
+  TEXT_LENGTH_LIMITS
+} from '@/utils/textLengthLimits';
 import {
   RIGGING_COLUMNS,
   getRiggingColumnLengths,
@@ -100,6 +103,9 @@ const CreateRiggingsForm = ({
   const watchedTitle = useWatch({ control, name: 'title' });
   const watchedObstacles = useWatch({ control, name: 'obstacles' });
   const columnLengths = getRiggingColumnLengths(watchedObstacles);
+  const nearLimitColumns = RIGGING_COLUMNS.filter(field =>
+    isNearLengthLimit(columnLengths[field], TEXT_LENGTH_LIMITS.RIGGING_COLUMN)
+  );
   const isFormInvalid =
     !watchedTitle?.trim() ||
     (watchedTitle?.length ?? 0) > TEXT_LENGTH_LIMITS.TITLE ||
@@ -139,19 +145,6 @@ const CreateRiggingsForm = ({
     />
   );
 
-  const columnCount = (field, showLabel = false) => (
-    <Typography
-      variant="caption"
-      color={
-        columnLengths[field] > TEXT_LENGTH_LIMITS.RIGGING_COLUMN
-          ? 'error'
-          : 'text.secondary'
-      }>
-      {showLabel && `${formatMessage({ id: HEADER_KEYS[field] })}: `}
-      {columnLengths[field]} / {TEXT_LENGTH_LIMITS.RIGGING_COLUMN}
-    </Typography>
-  );
-
   return (
     <FormContainer sx={{ marginTop: 1 }}>
       <form autoComplete="off" onSubmit={handleSubmit(handleValidSubmit)}>
@@ -174,11 +167,6 @@ const CreateRiggingsForm = ({
         {fields.length > 0 &&
           (isMobile ? (
             <Stack spacing={1} sx={{ mt: 1 }}>
-              <Stack direction="row" flexWrap="wrap" gap={1}>
-                {RIGGING_COLUMNS.map(field => (
-                  <Box key={field}>{columnCount(field, true)}</Box>
-                ))}
-              </Stack>
               {fields.map((item, index) => (
                 <ObstacleCard
                   key={item.id}
@@ -210,7 +198,6 @@ const CreateRiggingsForm = ({
                       <TableCell key={field} width={COLUMN_WIDTHS[field]}>
                         <LegendHeader>
                           {formatMessage({ id: HEADER_KEYS[field] })}
-                          {columnCount(field)}
                           {HEADER_LEGENDS[field] && (
                             <ColumnLegend
                               titleKey={HEADER_LEGENDS[field].titleKey}
@@ -255,7 +242,46 @@ const CreateRiggingsForm = ({
               </Table>
             </TableContainer>
           ))}
-        <Box sx={{ mt: 1, mb: 1 }}>
+        {nearLimitColumns.length > 0 && (
+          <Stack spacing={0.5} sx={{ mt: 0.5 }}>
+            {nearLimitColumns.map(field => {
+              const count = columnLengths[field];
+              const limit = TEXT_LENGTH_LIMITS.RIGGING_COLUMN;
+              const isTooLong = count > limit;
+              return (
+                <Box key={field}>
+                  <Typography
+                    component="div"
+                    variant="caption"
+                    color={isTooLong ? 'error' : 'text.secondary'}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: 1
+                    }}>
+                    <span>{formatMessage({ id: HEADER_KEYS[field] })}</span>
+                    <Box component="span" sx={{ whiteSpace: 'nowrap' }}>
+                      {count} / {limit}
+                    </Box>
+                  </Typography>
+                  {isTooLong && (
+                    <Typography
+                      role="alert"
+                      variant="caption"
+                      color="error"
+                      sx={{ display: 'block', textAlign: 'right' }}>
+                      {formatMessage(
+                        { id: 'form.maxLength' },
+                        { count, limit }
+                      )}
+                    </Typography>
+                  )}
+                </Box>
+              );
+            })}
+          </Stack>
+        )}
+        <Box sx={{ mt: 1 }}>
           <Button
             onClick={handleAppend}
             color="secondary"
