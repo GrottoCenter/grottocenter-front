@@ -1,4 +1,4 @@
-import { findDocumentPdfUrl, withPdfPage } from './pdfUrl';
+import { findDocumentPdfUrl, getPdfPageOffset, withPdfPage } from './pdfUrl';
 
 describe('findDocumentPdfUrl', () => {
   const url = 'https://example.org/a.pdf';
@@ -89,6 +89,24 @@ describe('findDocumentPdfUrl', () => {
 });
 
 describe('withPdfPage', () => {
+  it.each([
+    [29, 1, 30],
+    [129, -126, 3],
+    [29, 0, 29],
+    [29, null, 29]
+  ])(
+    'converts printed page %i with offset %s to PDF page %i',
+    (page, offset, target) => {
+      expect(withPdfPage('https://example.org/a.pdf', page, offset)).toBe(
+        `https://example.org/a.pdf#page=${target}`
+      );
+    }
+  );
+  it('keeps the original URL for a destination before the PDF starts', () => {
+    expect(withPdfPage('https://example.org/a.pdf', 1, -2)).toBe(
+      'https://example.org/a.pdf'
+    );
+  });
   it('preserves the query and other viewer options while replacing the page', () => {
     expect(
       withPdfPage('https://example.org/issue.pdf?dl=1#page=4&zoom=125', 12)
@@ -112,5 +130,13 @@ describe('withPdfPage', () => {
 
   it('does not create a URL when no PDF was found', () => {
     expect(withPdfPage(null, 12)).toBeNull();
+  });
+});
+
+describe('getPdfPageOffset', () => {
+  it('distinguishes an empty correspondence from an incomplete draft', () => {
+    expect(getPdfPageOffset('', '')).toBeNull();
+    expect(getPdfPageOffset('29', '')).toBeNaN();
+    expect(getPdfPageOffset('1.5', '30')).toBeNaN();
   });
 });

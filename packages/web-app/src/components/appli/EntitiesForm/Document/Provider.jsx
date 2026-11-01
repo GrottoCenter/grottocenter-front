@@ -7,6 +7,7 @@ import {
 } from 'react';
 import PropTypes from 'prop-types';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import { isPdfPageOffsetValid } from '@/utils/pdfUrl';
 import {
   DocumentTypes,
   filterDocumentPayload,
@@ -24,6 +25,7 @@ export const defaultDocAttributes = {
   id: null,
   identifier: null,
   identifierType: null,
+  identifierPdfPageOffset: null,
   datePublication: '',
   creatorComment: '',
   authors: [],
@@ -84,6 +86,14 @@ const checkFormValidation = document => {
   let isValid = true;
 
   const payload = filterDocumentPayload(document);
+  if (!isPdfPageOffsetValid(payload.identifierPdfPageOffset)) isValid = false;
+  if (
+    (payload.files ?? []).some(
+      file =>
+        file.state !== IS_DELETED && !isPdfPageOffsetValid(file.pdfPageOffset)
+    )
+  )
+    isValid = false;
   if (getDocumentLengthErrors(document).length > 0) isValid = false;
   if (
     document.files.some(

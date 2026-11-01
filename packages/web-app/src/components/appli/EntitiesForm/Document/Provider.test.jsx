@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { DocumentTypes } from '@/utils/documentTypeHelpers';
 import {
@@ -27,6 +27,25 @@ const FileStates = () => {
 const PublicationOption = () => {
   const { document } = useContext(DocumentFormContext);
   return <span>{document.selectOptionAuthorizationDocument ?? 'unset'}</span>;
+};
+
+const DocumentTypeSelector = () => {
+  const { updateAttribute } = useContext(DocumentFormContext);
+  return (
+    <>
+      {[DocumentTypes.BOOK, DocumentTypes.COLLECTION, DocumentTypes.EVENT].map(
+        type => (
+          <button
+            key={type}
+            type="button"
+            onClick={() => updateAttribute('type', type)}>
+            {type}
+          </button>
+        )
+      )}
+      <ValidationState />
+    </>
+  );
 };
 
 const validDocument = {
@@ -264,4 +283,36 @@ describe('DocumentFormProvider publication authorization', () => {
     });
     await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
   });
+});
+
+describe('DocumentFormProvider PDF pagination validation', () => {
+  it.each([DocumentTypes.COLLECTION, DocumentTypes.EVENT])(
+    'ignores an invalid file offset when switching to %s and validates it again on return',
+    async type => {
+      render(
+        <DocumentFormProvider
+          initialValues={{
+            ...validDocument,
+            type: DocumentTypes.BOOK,
+            datePublication: '2026-01-01',
+            option: AUTHORIZATION_FROM_AUTHOR,
+            license: { id: 2, name: 'CC-BY-SA' },
+            files: [{ fileName: 'book.pdf', pdfPageOffset: NaN }]
+          }}>
+          <DocumentTypeSelector />
+        </DocumentFormProvider>
+      );
+      expect(screen.getByText('invalid')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: type }));
+      await waitFor(() =>
+        expect(screen.getByText('valid')).toBeInTheDocument()
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: DocumentTypes.BOOK }));
+      await waitFor(() =>
+        expect(screen.getByText('invalid')).toBeInTheDocument()
+      );
+    }
+  );
 });

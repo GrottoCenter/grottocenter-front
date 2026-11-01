@@ -321,17 +321,19 @@ const Document = ({
 
   const pageFiles = useMemo(() => {
     if (!documentData?.parent?.files?.length) return [];
+    const file = documentData.parent.files.find(
+      parentFile => getFileExtension(parentFile.fileName) === '.pdf'
+    );
+    if (!file) return [];
     // Without usable article pages, still prefer a hosted parent PDF.
-    if (pageRanges.length === 0) {
-      const parentPdf = documentData.parent.files.find(
-        file => getFileExtension(file.fileName) === '.pdf'
-      );
-      return parentPdf ? [parentPdf] : [];
-    }
-    const file = documentData.parent.files[0];
+    if (pageRanges.length === 0) return [file];
     const parentExt = file.fileName?.match(/\.[^.]+$/)?.[0] ?? '';
     return pageRanges.map(({ start, end }) => {
-      const completePath = withPdfPage(file.completePath, start);
+      const completePath = withPdfPage(
+        file.completePath,
+        start,
+        file.pdfPageOffset
+      );
       const label = formatMessage(
         {
           id: end ? 'Pages {start}-{end} of {title}' : 'Page {start} of {title}'
@@ -348,15 +350,18 @@ const Document = ({
   );
 
   // Article page numbers apply only to the parent publication's PDF.
-  const externalPdfUrl = useMemo(
-    () =>
-      findDocumentPdfUrl(documentData) ??
-      withPdfPage(
-        findDocumentPdfUrl(documentData?.parent),
-        pageRanges[0]?.start
-      ),
-    [documentData, pageRanges]
-  );
+  const externalPdfUrl = useMemo(() => {
+    const ownPdfUrl = findDocumentPdfUrl(documentData);
+    if (ownPdfUrl) return ownPdfUrl;
+
+    const parent = documentData?.parent;
+    const parentPdfUrl = findDocumentPdfUrl(parent);
+    const offset =
+      parent?.identifierType === 'url' && parentPdfUrl === parent.identifier
+        ? parent.identifierPdfPageOffset
+        : null;
+    return withPdfPage(parentPdfUrl, pageRanges[0]?.start, offset);
+  }, [documentData, pageRanges]);
 
   const childIssues = useMemo(
     () => (documentChildren ?? []).filter(d => d.type === 'Issue'),

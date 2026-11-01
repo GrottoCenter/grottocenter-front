@@ -14,7 +14,11 @@ export default meta;
 const StatefulSelector = ({
   initialFiles,
   initialRejections = [],
-  ...props
+  accept,
+  extensions,
+  disabled = false,
+  multiple = true,
+  maxSize
 }) => {
   const [files, setFiles] = useState(initialFiles ?? []);
   const [rejections, setRejections] = useState(initialRejections);
@@ -42,9 +46,13 @@ const StatefulSelector = ({
   };
 
   return (
-    <Box sx={{ maxWidth: 480 }}>
+    <Box sx={{ maxWidth: theme => theme.spacing(112) }}>
       <FileSelectorInput
-        {...props}
+        accept={accept}
+        extensions={extensions}
+        disabled={disabled}
+        multiple={multiple}
+        maxSize={maxSize}
         files={files}
         onFilesAdd={onFilesAdd}
         onFileRemove={onFileRemove}
@@ -61,18 +69,55 @@ StatefulSelector.propTypes = {
   initialFiles: PropTypes.arrayOf(
     PropTypes.shape({ fileName: PropTypes.string.isRequired })
   ),
-  initialRejections: PropTypes.arrayOf(PropTypes.string)
+  initialRejections: PropTypes.arrayOf(PropTypes.string),
+  accept: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.objectOf(PropTypes.arrayOf(PropTypes.string))
+  ]),
+  extensions: PropTypes.arrayOf(PropTypes.string),
+  disabled: PropTypes.bool,
+  multiple: PropTypes.bool,
+  maxSize: PropTypes.number
 };
 
 export const Empty = {
   render: () => <StatefulSelector extensions={['.pdf', '.txt']} />
 };
 
+export const ManyFormats = {
+  render: () => (
+    <StatefulSelector
+      extensions={[
+        '.pdf',
+        '.doc',
+        '.docx',
+        '.epub',
+        '.jpg',
+        '.png',
+        '.svg',
+        '.mp3',
+        '.mp4',
+        '.zip'
+      ]}
+    />
+  )
+};
+
 export const WithSelectedFiles = {
   render: () => (
     <StatefulSelector
       extensions={['.pdf', '.txt']}
-      initialFiles={[{ fileName: 'photo.jpg' }, { fileName: 'notes.pdf' }]}
+      initialFiles={[
+        {
+          fileName: 'Bulletin_CNM_1990.pdf',
+          completePath: 'https://example.org/bulletin.pdf'
+        },
+        {
+          fileName:
+            'Applications of Electronic-Nose Technologies for Noninvasive Earl.pdf',
+          completePath: 'https://example.org/article.pdf'
+        }
+      ]}
     />
   )
 };

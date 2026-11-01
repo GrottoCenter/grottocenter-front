@@ -10,6 +10,8 @@ import {
 } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import { isPdfUrl } from '@/utils/pdfUrl';
+import PdfPageOffsetEditor from './PdfPageOffsetEditor';
 
 import Translate from '../../../../common/Translate';
 import { DocumentFormContext } from '../Provider';
@@ -52,6 +54,8 @@ const IdentifierEditor = () => {
     regexp === null ? true : new RegExp(regexp).test(document.identifier);
 
   const handleIdentifierChange = newIdentifier => {
+    if (newIdentifier !== document.identifier)
+      updateAttribute('identifierPdfPageOffset', null);
     if (newIdentifier === '') {
       updateAttribute('identifier', null);
       updateAttribute('identifierType', null);
@@ -60,6 +64,8 @@ const IdentifierEditor = () => {
   };
 
   const handleIdentifierTypeChange = newIdentifierTypeId => {
+    if (newIdentifierTypeId !== identifierType?.id)
+      updateAttribute('identifierPdfPageOffset', null);
     const newIdType =
       allIdentifierTypes.find(idType => idType.id === newIdentifierTypeId) ??
       null;
@@ -144,6 +150,16 @@ const IdentifierEditor = () => {
           </Fade>
         )}
       </InlineWrapper>
+      {identifierType?.id === 'url' && isPdfUrl(document.identifier) && (
+        <PdfPageOffsetEditor
+          key={document.identifier}
+          src={document.identifier}
+          value={document.identifierPdfPageOffset}
+          onChange={offset =>
+            updateAttribute('identifierPdfPageOffset', offset)
+          }
+        />
+      )}
     </>
   );
 };

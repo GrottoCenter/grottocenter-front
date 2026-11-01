@@ -35,6 +35,7 @@ import ErrorsList from './ErrorsList';
 import {
   IS_DELETED,
   IS_NEW,
+  IS_MODIFIED,
   AUTHORIZATION_FROM_AUTHOR,
   LICENSE_IN_FILE,
   DOCUMENT_AUTHORIZE_TO_PUBLISH,
@@ -44,6 +45,7 @@ import FileSelectorInput, {
   REJECTION_REASONS
 } from '../../../../../common/FileSelectorInput';
 import { DocumentFormContext } from '../../Provider';
+import PdfPageOffsetEditor from '../PdfPageOffsetEditor';
 
 const DEFAULT_LICENSE = 'CC-BY-SA';
 
@@ -260,6 +262,29 @@ const AddFileForm = ({
     }
   };
 
+  const renderFileDetails = (file, url) => {
+    if (!/\.pdf$/i.test(file.fileName)) return null;
+    return (
+      <PdfPageOffsetEditor
+        src={url}
+        value={file.pdfPageOffset}
+        onChange={offset =>
+          setFiles(
+            files.map(item =>
+              item === file
+                ? {
+                    ...item,
+                    pdfPageOffset: offset,
+                    state: item.state === IS_NEW ? IS_NEW : IS_MODIFIED
+                  }
+                : item
+            )
+          )
+        }
+      />
+    );
+  };
+
   return (
     <>
       <FileSelectorInput
@@ -271,6 +296,7 @@ const AddFileForm = ({
         extensions={extensions}
         maxSize={MAX_SIZE_OF_UPLOADED_FILES}
         disabled={isLoading}
+        renderFileDetails={renderFileDetails}
       />
       {showAuthorization && visibleFiles.length > 0 && (
         <Box sx={{ mt: 1 }}>

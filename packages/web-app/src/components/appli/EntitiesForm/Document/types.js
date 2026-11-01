@@ -36,13 +36,15 @@ export const fileType = PropTypes.shape({
   dateInscription: PropTypes.string,
   isValidated: PropTypes.bool,
   fileName: PropTypes.string,
-  completePath: PropTypes.string
+  completePath: PropTypes.string,
+  pdfPageOffset: PropTypes.number
 });
 
 export const defaultDocumentValuesTypes = PropTypes.shape({
   id: PropTypes.number,
   identifier: PropTypes.string,
   identifierType: PropTypes.string,
+  identifierPdfPageOffset: PropTypes.number,
   datePublication: PropTypes.string,
   creatorComment: PropTypes.string,
   authors: PropTypes.arrayOf(simpleCaverType),
