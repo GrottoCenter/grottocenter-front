@@ -105,6 +105,7 @@ const EntityTableHead = ({
   order,
   orderBy,
   onRequestSort,
+  isSortDisabled = false,
   numSelected,
   rowCount,
   onSelectAllClick,
@@ -131,6 +132,7 @@ const EntityTableHead = ({
             sortDirection={orderBy === headCell.field ? order : false}>
             {onRequestSort && headCell.sortable ? (
               <TableSortLabel
+                disabled={isSortDisabled}
                 active={orderBy === headCell.field && order}
                 direction={order || undefined}
                 onClick={event => onRequestSort(event, headCell.field)}>
@@ -145,6 +147,7 @@ const EntityTableHead = ({
   </TableHead>
 );
 EntityTableHead.propTypes = {
+  isSortDisabled: PropTypes.bool,
   columns: PropTypes.arrayOf(PropTypes.shape({})),
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
@@ -184,7 +187,13 @@ const EmptyState = () => (
   </Box>
 );
 
-const JumpToPage = ({ page, totalPages, onPageChange, showLabel = true }) => {
+const JumpToPage = ({
+  page,
+  totalPages,
+  onPageChange,
+  showLabel = true,
+  disabled = false
+}) => {
   const { formatMessage } = useIntl();
   const [inputValue, setInputValue] = useState(String(page + 1));
 
@@ -196,6 +205,7 @@ const JumpToPage = ({ page, totalPages, onPageChange, showLabel = true }) => {
   // back to the current page leaves no way to tell a rejected entry from an
   // applied one. Only non-numeric input restores what was there.
   const commit = value => {
+    if (disabled) return;
     if (!/^\d+$/.test(value)) {
       setInputValue(String(page + 1));
       return;
@@ -218,6 +228,7 @@ const JumpToPage = ({ page, totalPages, onPageChange, showLabel = true }) => {
         </Typography>
       )}
       <TextField
+        disabled={disabled}
         size="small"
         value={inputValue}
         onChange={e => setInputValue(e.target.value)}
@@ -255,6 +266,7 @@ const JumpToPage = ({ page, totalPages, onPageChange, showLabel = true }) => {
   );
 };
 JumpToPage.propTypes = {
+  disabled: PropTypes.bool,
   page: PropTypes.number.isRequired,
   totalPages: PropTypes.number.isRequired,
   onPageChange: PropTypes.func.isRequired,
@@ -266,6 +278,7 @@ const DesktopEntityTable = ({
   entityColumns,
   setEntityColumns,
   isLoading,
+  isOffline = false,
   onSelected,
   selectedIds: controlledSelectedIds,
   pageRows,
@@ -343,12 +356,14 @@ const DesktopEntityTable = ({
   };
 
   const handleChangePage = (event, newPage) => {
+    if (isOffline) return;
     setPage(newPage);
     keepTableTopOnReload();
     if (onPageChange) onPageChange(newPage, rowsPerPage);
   };
 
   const handleChangeRowsPerPage = event => {
+    if (isOffline) return;
     const nbRowPerPage = parseInt(event.target.value, 10);
     setRowsPerPage(nbRowPerPage);
     localStorage.setItem('entityTable_rowsPerPage', nbRowPerPage);
@@ -396,6 +411,7 @@ const DesktopEntityTable = ({
   };
 
   const handleRequestSort = (event, property) => {
+    if (isOffline) return;
     const fieldMap = SORT_FIELD_MAP[entityType];
     if (!fieldMap || !(property in fieldMap)) {
       console.warn(
@@ -589,12 +605,14 @@ const DesktopEntityTable = ({
                   flexShrink: 0
                 }}>
                 <JumpToPage
+                  disabled={isOffline}
                   page={page}
                   totalPages={totalPages}
                   onPageChange={handleChangePage}
                   showLabel={!isSmall}
                 />
                 <TablePagination
+                  disabled={isOffline}
                   showFirstButton={!isSmall}
                   showLastButton={!isSmall}
                   // Empty on purpose: the page-size selector lives in the
@@ -645,6 +663,7 @@ const DesktopEntityTable = ({
                 // sit between the page number and the arrows it has nothing to
                 // do with.
                 <Select
+                  disabled={isOffline}
                   variant="standard"
                   value={rowsPerPage}
                   onChange={handleChangeRowsPerPage}
@@ -673,7 +692,14 @@ const DesktopEntityTable = ({
               )}
               {onExport && entityType === 'entrances' && (
                 <ExportFormatDropdown
-                  disabled={nbTotalRows > MAX_DOCUMENTS_TO_EXPORT_IN_CSV}
+                  disabled={
+                    isOffline || nbTotalRows > MAX_DOCUMENTS_TO_EXPORT_IN_CSV
+                  }
+                  disabledReason={
+                    isOffline
+                      ? formatMessage({ id: 'offlineActionUnavailable' })
+                      : null
+                  }
                   iconOnly={isSmall}
                   onExport={format => {
                     onExport(exportColumns, exportColumnLabels, format);
@@ -684,8 +710,12 @@ const DesktopEntityTable = ({
                 <ToolbarActionButton
                   icon={FileDownloadIcon}
                   label={isSmall ? null : csvLabel}
-                  tooltip={csvTooltip}
-                  disabled={isCsvExportDisabled}
+                  tooltip={
+                    isOffline
+                      ? formatMessage({ id: 'offlineActionUnavailable' })
+                      : csvTooltip
+                  }
+                  disabled={isOffline || isCsvExportDisabled}
                   onClick={() => {
                     onExport(exportColumns, exportColumnLabels);
                   }}
@@ -751,6 +781,7 @@ const DesktopEntityTable = ({
             <LoadingTableHead stickyTop={stickyHeaderTop} />
           ) : (
             <EntityTableHead
+              isSortDisabled={isOffline}
               stickyTop={stickyHeaderTop}
               columns={entityColumns}
               numSelected={selected.length}
@@ -775,6 +806,7 @@ DesktopEntityTable.propTypes = {
   entityColumns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   setEntityColumns: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
+  isOffline: PropTypes.bool,
   onSelected: PropTypes.func,
   selectedIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.number, PropTypes.string])

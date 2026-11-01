@@ -5,6 +5,7 @@ import { advancedSearchUrl } from '../../conf/apiRoutes';
 import { apiPost } from '../../api/client';
 import { advancedSearchKeys } from '../../api/queryKeys';
 import { STALE } from '../../conf/queryClient';
+import { useOnlineStatus } from '../useOnlineStatus';
 
 // Small pub/sub for the "currently displayed" search params. Forms submit
 // params via startAdvancedSearch/refineAdvancedSearch; SearchResults reads
@@ -52,10 +53,12 @@ const useSearchState = () =>
  */
 export const useAdvancedSearch = () => {
   const { params, isNewQuery } = useSearchState();
+  const isOnline = useOnlineStatus();
   const query = useQuery({
     queryKey: advancedSearchKeys.results(params),
     queryFn: () => apiPost(advancedSearchUrl, params),
-    enabled: !!params?.entity,
+    // Searches use POST and cannot fall back to the service worker's GET cache.
+    enabled: !!params?.entity && isOnline,
     // Pagination and sorting change the query key. Keep the current page in
     // place while its continuation loads so EntityTable is not unmounted and
     // does not lose its local page state. A genuinely new search deliberately
@@ -68,13 +71,18 @@ export const useAdvancedSearch = () => {
   // The legacy reducer returned isNewQuery to false on
   // FETCH_ADVANCEDSEARCH_SUCCESS so the next form submit could flip it back
   // to true and re-fire the DesktopEntityTable reset effect. Match that
-  // here — clear the flag once a fetch has landed (or the query is not
-  // currently fetching).
+  // here, but keep it while an offline search is disabled or its retry paused.
+  // Otherwise reconnecting would restore the previous search as placeholder data.
   useEffect(() => {
-    if (isNewQuery && !query.isFetching) {
+    if (
+      isNewQuery &&
+      state.params === params &&
+      query.fetchStatus === 'idle' &&
+      !query.isPending
+    ) {
       emit({ ...state, isNewQuery: false });
     }
-  }, [isNewQuery, query.isFetching]);
+  }, [isNewQuery, params, query.fetchStatus, query.isPending]);
 
   return { ...query, isNewQuery, params };
 };
