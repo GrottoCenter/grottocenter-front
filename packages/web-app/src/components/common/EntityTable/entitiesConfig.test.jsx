@@ -15,19 +15,6 @@ it('offers entrance coordinates as optional columns', () => {
   });
 });
 
-it('keeps redacted entrance coordinates empty and retains altitude', () => {
-  const entrance = {
-    isSensitive: true,
-    latitude: null,
-    longitude: null,
-    altitude: 0
-  };
-
-  expect(renderCell(entrance, 'latitude')).toBe('-');
-  expect(renderCell(entrance, 'longitude')).toBe('-');
-  expect(renderCell(entrance, 'altitude')).toBe(0);
-});
-
 it.each(['EDITION', 'SPELEOLOGY', null, undefined, 'FUTURE'])(
   'uses the editor organization type %s in document table cells',
   type => {

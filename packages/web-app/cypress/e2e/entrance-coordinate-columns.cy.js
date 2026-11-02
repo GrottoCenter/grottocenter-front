@@ -29,6 +29,12 @@ const selectCoordinates = menuLabel => {
   cy.get('[role="menu"]').type('{esc}');
 };
 
+const cellUnder = (row, header) =>
+  cy
+    .contains('th', new RegExp(`^${header}$`))
+    .invoke('index')
+    .then(index => cy.contains('tr', row).find('td').eq(index));
+
 const assertCsvRequest = () => {
   cy.wait('@export').then(({ request }) => {
     const body =
@@ -74,21 +80,24 @@ describe('Entrance coordinate columns', () => {
     cy.contains('th', 'Latitude').should('not.exist');
     selectCoordinates('Change columns');
 
-    cy.contains('tr', 'Public entrance').within(() => {
-      cy.get('td').should(
-        'have.text',
-        'Public entrance45.123456789-0.123456789-120-'
-      );
-    });
-    cy.contains('tr', 'Zero entrance')
-      .find('td')
-      .should('have.text', 'Zero entrance000-');
-    cy.contains('tr', 'Sensitive entrance')
-      .find('td')
-      .should('have.text', 'Sensitive entrance--1800-');
-    cy.contains('tr', 'Missing coordinates')
-      .find('td')
-      .should('have.text', 'Missing coordinates----');
+    cellUnder('Public entrance', 'Latitude').should(
+      'have.text',
+      '45.123456789'
+    );
+    cellUnder('Public entrance', 'Longitude').should(
+      'have.text',
+      '-0.123456789'
+    );
+    cellUnder('Public entrance', 'Altitude').should('have.text', '-120');
+    cellUnder('Zero entrance', 'Latitude').should('have.text', '0');
+    cellUnder('Zero entrance', 'Longitude').should('have.text', '0');
+    cellUnder('Zero entrance', 'Altitude').should('have.text', '0');
+    cellUnder('Sensitive entrance', 'Latitude').should('have.text', '-');
+    cellUnder('Sensitive entrance', 'Longitude').should('have.text', '-');
+    cellUnder('Sensitive entrance', 'Altitude').should('have.text', '1800');
+    cellUnder('Missing coordinates', 'Latitude').should('have.text', '-');
+    cellUnder('Missing coordinates', 'Longitude').should('have.text', '-');
+    cellUnder('Missing coordinates', 'Altitude').should('have.text', '-');
 
     cy.reload();
     cy.wait('@search');
