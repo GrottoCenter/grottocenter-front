@@ -115,6 +115,14 @@ it('validates before publishing and focuses the first invalid field', async () =
   expect(apiPost).toHaveBeenCalledTimes(1);
 });
 
+it('loads the profile only when the comment form opens', async () => {
+  renderComments();
+  expect(apiGet).not.toHaveBeenCalled();
+  await openComment();
+  expect(apiGet).toHaveBeenCalledTimes(1);
+  expect(apiGet).toHaveBeenCalledWith(expect.stringContaining('/cavers/7'));
+});
+
 it('retains the draft during publication and on failure, then closes after a successful retry', async () => {
   const response = Promise.withResolvers();
   apiPost.mockReturnValueOnce(response.promise);
@@ -181,7 +189,9 @@ it('adds the exploration only after successful publication and retries it withou
   expect(retryButton).toHaveAttribute('aria-busy', 'true');
   await act(async () => retryResponse.reject(new Error('Still unavailable')));
   expect(retryButton).toBeEnabled();
+  expect(screen.queryByText('Comment published.')).not.toBeInTheDocument();
   fireEvent.click(retryButton);
+  expect(await screen.findByText('Comment published.')).toBeVisible();
   await waitFor(() =>
     expect(
       screen.queryByRole('button', { name: 'Retry adding' })
@@ -240,7 +250,7 @@ it('announces complete success only after the selected exploration has been adde
   expect(screen.getAllByTestId('app-snackbar')).toHaveLength(1);
 });
 
-it('dismisses the exploration warning when the entrance is marked explored elsewhere', async () => {
+it('dismisses the exploration warning on reopening after the entrance is marked explored elsewhere', async () => {
   apiPut.mockRejectedValueOnce(new Error('Association failed'));
   const { queryClient } = renderComments();
   fireEvent.click(await openComment());
@@ -254,6 +264,10 @@ it('dismisses the exploration warning when the entrance is marked explored elsew
       exploredEntrances: [{ id: 42 }]
     })
   );
+  fireEvent.click(screen.getByRole('button', { name: 'Add a new comment' }));
+  expect(
+    await screen.findByText('Already in my explored entrances')
+  ).toBeVisible();
   await waitFor(() =>
     expect(screen.queryByTestId('app-snackbar')).not.toBeInTheDocument()
   );

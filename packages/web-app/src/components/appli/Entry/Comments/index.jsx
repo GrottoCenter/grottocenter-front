@@ -29,7 +29,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const createMutation = useCreateComment({ isInline: true });
   const userId = useUserProperties()?.id;
-  const personQuery = usePerson(userId);
+  const personQuery = usePerson(isFormVisible ? userId : undefined);
   const linkExploredMutation = useLinkExploredEntrance({ isInline: true });
   const isExplored = personQuery.data?.exploredEntrances?.some(
     entrance => String(entrance.id) === String(entranceId)
@@ -80,7 +80,10 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
             persist: true,
             preventDuplicate: true,
             action: createRetryAction({
-              onRetry: handleMarkExplored,
+              onRetry: async () => {
+                await handleMarkExplored();
+                onSuccess(<FormattedMessage id="Comment published." />);
+              },
               onClose,
               labelId: 'Retry adding'
             })

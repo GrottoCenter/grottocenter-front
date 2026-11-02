@@ -119,6 +119,10 @@ export const entityOptionForSelector = (props, option) => {
     typeLabelId = getPersonTypeLabelId(option.type);
   if (option._type === 'organizations' && isOrganizationType(option.type))
     typeLabelId = getOrganizationTypeLabelId(option.type);
+  if (option._type === 'documents') {
+    const type = option.type?.name ?? option.type;
+    if (typeof type === 'string') typeLabelId = type;
+  }
   const { key, ...otherProps } = props;
   return createElement(
     'li',

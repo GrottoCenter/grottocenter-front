@@ -108,9 +108,7 @@ const AuthorsSelect = ({
             inputValue={inputValue}
             loading={isLoading}
             getOptionLabel={option => option.nickname || ''}
-            renderOption={(props, option) =>
-              entityOptionForSelector(props, option, { showPersonType: true })
-            }
+            renderOption={entityOptionForSelector}
             isOptionEqualToValue={(option, val) => option.id === val.id}
             filterSelectedOptions
             renderValue={(selected, getItemProps) =>
