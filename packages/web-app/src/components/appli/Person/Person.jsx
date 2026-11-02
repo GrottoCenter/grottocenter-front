@@ -202,7 +202,7 @@ const Person = ({
       {(isLoading || person) && (
         <PageHeader
           title={isLoading ? undefined : title}
-          icon={<CustomIcon type={getPersonIconType(person?.type)} />}
+          icon={<CustomIcon type="person" />}
           titleAdornment={titleAdornment}
           actions={actions}
         />
