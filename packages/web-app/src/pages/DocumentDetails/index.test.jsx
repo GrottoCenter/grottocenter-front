@@ -186,6 +186,26 @@ describe('external PDF fallback', () => {
   it.each([
     ['parent URL identifier', { parent }, parentUrl],
     [
+      'parent URL with a positive offset',
+      { parent: { ...parent, identifierPdfPageOffset: 1 }, pages: '12-18' },
+      `${parentUrl}#page=13`
+    ],
+    [
+      'parent URL with a negative offset',
+      { parent: { ...parent, identifierPdfPageOffset: -10 }, pages: '12-18' },
+      `${parentUrl}#page=2`
+    ],
+    [
+      'article URL without the parent offset',
+      {
+        parent: { ...parent, identifierPdfPageOffset: 1 },
+        identifier: ownUrl,
+        identifierType: 'url',
+        pages: '12-18'
+      },
+      ownUrl
+    ],
+    [
       'parent URL at the article page',
       { parent, pages: '12-18' },
       `${parentUrl}#page=12`
@@ -290,6 +310,39 @@ describe('external PDF fallback', () => {
       'data-src',
       expectedUrl
     );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it.each([
+    [1, 13],
+    [-10, 2]
+  ])('applies offset %s to the hosted parent PDF', (offset, expectedPage) => {
+    const hostedUrl = '/files/parent.pdf';
+    useDocument.mockReturnValue({
+      data: {
+        ...document,
+        pages: '12-18',
+        parent: {
+          ...parent,
+          files: [
+            { fileName: 'cover.jpg', completePath: '/files/cover.jpg' },
+            {
+              fileName: 'issue.PDF',
+              completePath: hostedUrl,
+              pdfPageOffset: offset
+            }
+          ]
+        }
+      }
+    });
+    renderPage();
+    expect(screen.getByTestId('pdf-preview')).toHaveAttribute(
+      'data-src',
+      `${hostedUrl}#page=${expectedPage}`
+    );
+    expect(
+      screen.getByRole('link', { name: 'Pages 12-18 of Parent issue.PDF' })
+    ).toHaveAttribute('href', `${hostedUrl}#page=${expectedPage}`);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 

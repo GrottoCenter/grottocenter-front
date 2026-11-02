@@ -24,6 +24,7 @@ export { useLanguages } from './queries/useLanguages';
 export { useDocument } from './queries/useDocument';
 export { useDocumentChildren } from './queries/useDocumentChildren';
 export { useDocuments } from './queries/useDocuments';
+export { useDocumentsWithoutPdfOffset } from './queries/useDocumentsWithoutPdfOffset';
 export {
   useAdvancedSearch,
   startAdvancedSearch,

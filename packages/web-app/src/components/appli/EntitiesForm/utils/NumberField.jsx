@@ -23,6 +23,8 @@ const NumberField = ({
   max,
   rules = { valueAsNumber: true },
   inputProps,
+  size,
+  variant,
   sx
 }) => {
   const { formatMessage } = useIntl();
@@ -67,6 +69,8 @@ const NumberField = ({
         const errorMessage = fieldState.error?.message;
         return (
           <TextField
+            size={size}
+            variant={variant}
             sx={{ flex: '1 1 200px', ...sx }}
             disabled={disabled}
             name={name}
@@ -125,6 +129,8 @@ NumberField.propTypes = {
   max: PropTypes.number,
   rules: PropTypes.shape({}),
   inputProps: PropTypes.shape({}),
+  size: PropTypes.oneOf(['small', 'medium']),
+  variant: PropTypes.oneOf(['standard', 'filled', 'outlined']),
   sx: PropTypes.shape({})
 };
 

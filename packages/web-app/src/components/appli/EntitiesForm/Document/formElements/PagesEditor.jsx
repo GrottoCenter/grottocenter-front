@@ -12,9 +12,9 @@ const PagesEditor = () => {
   return (
     <StringInput
       helperText={formatMessage({
-        id: 'The page or the pages interval (using format: start-end, e.g: 10-12) where the article is.'
+        id: 'Enter the page or page range where the article appears, using the page numbers printed in the document.'
       })}
-      valueName={formatMessage({ id: 'Pages' })}
+      valueName={formatMessage({ id: 'Pages (e.g. 10 or 10-12)' })}
       value={pages}
       maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_PAGES}
       hasError={!isDocumentPagesFormatValid(pages)}

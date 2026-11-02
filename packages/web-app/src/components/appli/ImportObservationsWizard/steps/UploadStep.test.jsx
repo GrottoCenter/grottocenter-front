@@ -70,6 +70,8 @@ const messages = {
   'Drag and drop a file here': 'Drag and drop a file here',
   'Upload a file': 'Upload a file',
   'Choose a file': 'Choose a file',
+  'fileSelector.open': 'Open',
+  Remove: 'Remove',
   'Only .csv, .tsv, or .txt files are accepted.':
     'Only .csv, .tsv, or .txt files are accepted.',
   or: 'or'
@@ -194,7 +196,7 @@ describe('UploadStep', () => {
   it('should clear file-derived data when the selected file is removed', () => {
     renderComponent(stateWithFile);
 
-    fireEvent.click(screen.getByTestId('CancelIcon'));
+    fireEvent.click(screen.getByRole('button', { name: 'Remove data.csv' }));
 
     expect(mockDispatch).toHaveBeenCalledWith({
       type: 'SET_FILE',

@@ -20,7 +20,7 @@ export const buildFormData = (formData, data, parentKey) => {
         parentKey ? `${parentKey}[${key}]` : key
       );
     });
-  } else if (data || data === '') {
+  } else if (data || data === '' || data === 0) {
     formData.append(parentKey, data);
   }
 };

@@ -76,11 +76,10 @@ const renderSubmission = (overrides = {}) => {
 
 const addFile = async container => {
   await waitFor(() =>
-    expect(
-      screen.getByRole('button', {
-        name: 'Drop files here or click to select'
-      })
-    ).toHaveAttribute('aria-disabled', 'false')
+    expect(screen.getByTestId('file-dropzone')).toHaveAttribute(
+      'aria-disabled',
+      'false'
+    )
   );
   const input = container.querySelector('input[type="file"]');
   await act(async () => {
@@ -141,16 +140,16 @@ describe('editing document publication rights', () => {
     const { container, onSuccess } = renderSubmission();
     await addFile(container);
 
-    const authorization = screen.getByRole('radio', {
-      name: messages[
+    const authorization = screen.getByLabelText(
+      messages[
         'There is an authorization to publish from the author on Grottocenter'
       ]
-    });
+    );
     expect(authorization).toBeChecked();
     expect(authorization).toBeDisabled();
-    expect(
-      screen.getByRole('combobox', { name: 'Authorization from authors' })
-    ).toHaveValue(permission.title);
+    expect(screen.getByLabelText('Authorization from authors')).toHaveValue(
+      permission.title
+    );
     expect(screen.getByText('Original author')).toBeInTheDocument();
     expect(
       screen.getByTestId('document-license').querySelector('[role="combobox"]')
