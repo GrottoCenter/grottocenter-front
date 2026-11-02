@@ -15,12 +15,7 @@ import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON
 } from '@/utils/documentTypeHelpers';
-import {
-  entranceIcon,
-  networkIcon,
-  personIcon,
-  massifIcon
-} from '../assets/icons';
+import { entranceIcon, networkIcon, massifIcon } from '../assets/icons';
 
 export const EntityIcon = styled('img')`
   height: 30px;
@@ -62,7 +57,7 @@ export const nomelizeSearchEntity = option => {
         if (title !== option.nickname) subtitle = option.nickname;
       }
 
-      iconSrc = personIcon;
+      iconSrc = getPersonIconSource(option.type);
       break;
 
     case 'documents': {
@@ -106,18 +101,10 @@ export const nomelizeSearchEntity = option => {
   return { iconSrc, IconComponent, title, subtitle, id: option.id };
 };
 
-export const entityOptionForSelector = (
-  props,
-  option,
-  { showPersonType = false } = {}
-) => {
-  const normalized = nomelizeSearchEntity(option);
-  const { title, subtitle, id, IconComponent } = normalized;
+export const entityOptionForSelector = (props, option) => {
+  const { title, subtitle, id, iconSrc, IconComponent } =
+    nomelizeSearchEntity(option);
   const isPerson = option._type === 'persons';
-  const iconSrc =
-    isPerson && showPersonType
-      ? getPersonIconSource(option.type)
-      : normalized.iconSrc;
   let typeLabelId = null;
   if (isPerson && isPersonType(option.type))
     typeLabelId = getPersonTypeLabelId(option.type);
