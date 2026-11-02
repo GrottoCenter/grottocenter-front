@@ -578,6 +578,7 @@ const DeleteConfirmationDialogContent = ({
             {!selectedEntity && (
               <>
                 <AutoCompleteSearch
+                  hasFullWidthResults
                   disabled={isLoading}
                   onInputChange={value => {
                     if (value) {
