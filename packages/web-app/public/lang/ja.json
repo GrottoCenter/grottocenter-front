@@ -2717,6 +2717,7 @@
   "This file contains too many polygons to simplify below {count} vertices. Consider splitting or removing polygons before importing.": "このファイルにはポリゴンが多すぎて、{count}頂点以下に簡略化できません。インポート前にポリゴンの分割または削除を検討してください。",
   "This file has many polygons. Minimum achievable vertex count is {count}.": "このファイルには多くのポリゴンがあります。達成可能な最小頂点数は{count}です。",
   "This file has many polygons. Minimum achievable vertex count is {count}. Consider reducing the number of polygons.": "このファイルには多くのポリゴンがあります。達成可能な最小頂点数は{count}です。ポリゴン数の削減を検討してください。",
+  "This file was rejected: {file}.": "このファイルは拒否されました: {file}。",
   "This file was rejected.": "このファイルは拒否されました。",
   "This is some of what the KarstLink project offers.": "これはKarstLinkプロジェクトが提供するものの一部です。",
   "This is the only version of this {type}.": "これは{type}の唯一のバージョンです。",

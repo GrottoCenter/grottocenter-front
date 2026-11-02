@@ -12,6 +12,17 @@ import {
 import { DocumentFormContext } from '@/components/appli/EntitiesForm/Document/Provider';
 import AddFileForm from './index';
 
+const dropzoneOptions = vi.hoisted(() => ({}));
+
+vi.mock('react-dropzone', async importOriginal => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useDropzone: options =>
+      actual.useDropzone({ ...options, ...dropzoneOptions })
+  };
+});
+
 vi.mock('@/hooks', () => ({
   useFileFormats: () => ({
     mimeTypes: [
@@ -56,6 +67,46 @@ const UploadForm = ({ type }) => {
 };
 
 describe('document uploads', () => {
+  afterEach(() => {
+    Object.keys(dropzoneOptions).forEach(key => {
+      delete dropzoneOptions[key];
+    });
+  });
+
+  it.each([
+    ['too small', { minSize: 100 }],
+    ['too many files', { maxFiles: 1 }],
+    [
+      'unknown reason',
+      { validator: () => ({ code: 'custom-rejection', message: 'Rejected' }) }
+    ]
+  ])(
+    'identifies both files rejected for %s with the real message catalogue',
+    async (_reason, options) => {
+      Object.assign(dropzoneOptions, options);
+      const user = userEvent.setup({ applyAccept: false });
+      const { container } = render(<UploadForm type={DocumentTypes.IMAGE} />);
+
+      await user.upload(container.querySelector('input[type="file"]'), [
+        new File(['image'], 'scan.png', { type: 'image/png' }),
+        new File(['image'], 'photo.png', { type: 'image/png' })
+      ]);
+
+      expect(
+        await screen.findByText('This file was rejected: scan.png.')
+      ).toBeInTheDocument();
+      expect(
+        await screen.findByText('This file was rejected: photo.png.')
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText('scan.png', { exact: true })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('photo.png', { exact: true })
+      ).not.toBeInTheDocument();
+    }
+  );
+
   it('identifies both oversized files and the accepted size with the real message catalogue', async () => {
     const user = userEvent.setup({ applyAccept: false });
     const { container } = render(<UploadForm type={DocumentTypes.IMAGE} />);

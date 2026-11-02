@@ -2717,6 +2717,7 @@
   "This file contains too many polygons to simplify below {count} vertices. Consider splitting or removing polygons before importing.": "Този файл съдържа твърде много полигони, за да бъде опростен под {count} върха. Помислете за разделяне или премахване на полигони преди импортирането.",
   "This file has many polygons. Minimum achievable vertex count is {count}.": "Този файл съдържа много полигони. Минималният постижим брой върхове е {count}.",
   "This file has many polygons. Minimum achievable vertex count is {count}. Consider reducing the number of polygons.": "Този файл съдържа много полигони. Минималният постижим брой върхове е {count}. Помислете за намаляване на броя на полигоните.",
+  "This file was rejected: {file}.": "Този файл беше отхвърлен: {file}.",
   "This file was rejected.": "Този файл беше отхвърлен.",
   "This is some of what the KarstLink project offers.": "Това е част от това, което проектът KarstLink предлага.",
   "This is the only version of this {type}.": "Това е единствената версия на този {type}.",

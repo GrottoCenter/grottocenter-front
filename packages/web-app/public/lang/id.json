@@ -2717,6 +2717,7 @@
   "This file contains too many polygons to simplify below {count} vertices. Consider splitting or removing polygons before importing.": "File ini mengandung terlalu banyak poligon untuk disederhanakan di bawah {count} titik sudut. Pertimbangkan untuk membagi atau menghapus poligon sebelum mengimpor.",
   "This file has many polygons. Minimum achievable vertex count is {count}.": "File ini memiliki banyak poligon. Jumlah titik sudut minimum yang dapat dicapai adalah {count}.",
   "This file has many polygons. Minimum achievable vertex count is {count}. Consider reducing the number of polygons.": "File ini memiliki banyak poligon. Jumlah titik sudut minimum yang dapat dicapai adalah {count}. Pertimbangkan untuk mengurangi jumlah poligon.",
+  "This file was rejected: {file}.": "Berkas ini ditolak: {file}.",
   "This file was rejected.": "Berkas ini ditolak.",
   "This is some of what the KarstLink project offers.": "Ini adalah sebagian dari apa yang ditawarkan proyek KarstLink.",
   "This is the only version of this {type}.": "Ini adalah satu-satunya versi dari {type} ini.",

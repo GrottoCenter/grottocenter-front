@@ -2717,6 +2717,7 @@
   "This file contains too many polygons to simplify below {count} vertices. Consider splitting or removing polygons before importing.": "Acest fișier conține prea multe poligoane pentru a fi simplificat sub {count} vârfuri. Luați în considerare împărțirea sau eliminarea poligoanelor înainte de import.",
   "This file has many polygons. Minimum achievable vertex count is {count}.": "Acest fișier are multe poligoane. Numărul minim de vârfuri realizabil este {count}.",
   "This file has many polygons. Minimum achievable vertex count is {count}. Consider reducing the number of polygons.": "Acest fișier are multe poligoane. Numărul minim de vârfuri realizabil este {count}. Luați în considerare reducerea numărului de poligoane.",
+  "This file was rejected: {file}.": "Acest fișier a fost respins: {file}.",
   "This file was rejected.": "Acest fișier a fost respins.",
   "This is some of what the KarstLink project offers.": "Acestea sunt unele din ceea ce oferă proiectul KarstLink.",
   "This is the only version of this {type}.": "Aceasta este singura versiune a acestui {type}.",

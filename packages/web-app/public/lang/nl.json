@@ -2717,6 +2717,7 @@
   "This file contains too many polygons to simplify below {count} vertices. Consider splitting or removing polygons before importing.": "Dit bestand bevat te veel polygonen om te vereenvoudigen tot onder {count} hoekpunten. Overweeg polygonen te splitsen of te verwijderen vóór het importeren.",
   "This file has many polygons. Minimum achievable vertex count is {count}.": "Dit bestand heeft veel polygonen. Het minimaal haalbare aantal hoekpunten is {count}.",
   "This file has many polygons. Minimum achievable vertex count is {count}. Consider reducing the number of polygons.": "Dit bestand heeft veel polygonen. Het minimaal haalbare aantal hoekpunten is {count}. Overweeg het aantal polygonen te verminderen.",
+  "This file was rejected: {file}.": "Dit bestand is geweigerd: {file}.",
   "This file was rejected.": "Dit bestand is geweigerd.",
   "This is some of what the KarstLink project offers.": "Dit is een deel van wat het KarstLink-project biedt.",
   "This is the only version of this {type}.": "Dit is de enige versie van deze {type}.",

@@ -2717,6 +2717,7 @@
   "This file contains too many polygons to simplify below {count} vertices. Consider splitting or removing polygons before importing.": "Este archivo contiene demasiados polígonos para simplificar por debajo de {count} vértices. Considere dividir o eliminar polígonos antes de importar.",
   "This file has many polygons. Minimum achievable vertex count is {count}.": "Este archivo tiene muchos polígonos. El número mínimo de vértices alcanzable es {count}.",
   "This file has many polygons. Minimum achievable vertex count is {count}. Consider reducing the number of polygons.": "Este archivo tiene muchos polígonos. El número mínimo de vértices alcanzable es {count}. Considere reducir el número de polígonos.",
+  "This file was rejected: {file}.": "Este archivo ha sido rechazado: {file}.",
   "This file was rejected.": "Este archivo ha sido rechazado.",
   "This is some of what the KarstLink project offers.": "Esto es algo de lo que ofrece el proyecto KarstLink.",
   "This is the only version of this {type}.": "Esta es la única versión de este {type}.",

@@ -230,10 +230,13 @@ const AddFileForm = ({
           { file: fileName }
         );
       }
-      return formatMessage({
-        id: 'This file was rejected.',
-        defaultMessage: 'This file was rejected.'
-      });
+      return formatMessage(
+        {
+          id: 'This file was rejected: {file}.',
+          defaultMessage: 'This file was rejected: {file}.'
+        },
+        { file: fileName }
+      );
     });
     // Capture before React evaluates the updater, possibly after the microtask.
     const shouldAppend = acceptedInThisDropRef.current;

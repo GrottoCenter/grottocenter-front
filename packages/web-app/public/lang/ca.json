@@ -2717,6 +2717,7 @@
   "This file contains too many polygons to simplify below {count} vertices. Consider splitting or removing polygons before importing.": "Aquest fitxer conté massa polígons per simplificar per sota de {count} vèrtexs. Considereu dividir o eliminar polígons abans d'importar.",
   "This file has many polygons. Minimum achievable vertex count is {count}.": "Aquest fitxer té molts polígons. El nombre mínim de vèrtexs assolible és {count}.",
   "This file has many polygons. Minimum achievable vertex count is {count}. Consider reducing the number of polygons.": "Aquest fitxer té molts polígons. El nombre mínim de vèrtexs assolible és {count}. Considereu reduir el nombre de polígons.",
+  "This file was rejected: {file}.": "Aquest fitxer ha estat rebutjat: {file}.",
   "This file was rejected.": "Aquest fitxer ha estat rebutjat.",
   "This is some of what the KarstLink project offers.": "Això és una mica del que ofereix el projecte KarstLink.",
   "This is the only version of this {type}.": "Aquesta és l'única versió d'aquest {type}.",

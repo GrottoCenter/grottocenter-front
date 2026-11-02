@@ -2717,6 +2717,7 @@
   "This file contains too many polygons to simplify below {count} vertices. Consider splitting or removing polygons before importing.": "This file contains too many polygons to simplify below {count} vertices. Consider splitting or removing polygons before importing.",
   "This file has many polygons. Minimum achievable vertex count is {count}.": "This file has many polygons. Minimum achievable vertex count is {count}.",
   "This file has many polygons. Minimum achievable vertex count is {count}. Consider reducing the number of polygons.": "This file has many polygons. Minimum achievable vertex count is {count}. Consider reducing the number of polygons.",
+  "This file was rejected: {file}.": "This file was rejected: {file}.",
   "This file was rejected.": "This file was rejected.",
   "This is some of what the KarstLink project offers.": "This is some of what the KarstLink project offers.",
   "This is the only version of this {type}.": "This is the only version of this {type}.",

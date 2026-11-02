@@ -2717,6 +2717,7 @@
   "This file contains too many polygons to simplify below {count} vertices. Consider splitting or removing polygons before importing.": "يحتوي هذا الملف على عدد كبير جدًا من المضلعات لتبسيطها إلى أقل من {count} رأس. يُرجى تقسيم أو إزالة المضلعات قبل الاستيراد.",
   "This file has many polygons. Minimum achievable vertex count is {count}.": "يحتوي هذا الملف على العديد من المضلعات. الحد الأدنى لعدد الرؤوس القابل للتحقيق هو {count}.",
   "This file has many polygons. Minimum achievable vertex count is {count}. Consider reducing the number of polygons.": "يحتوي هذا الملف على العديد من المضلعات. الحد الأدنى لعدد الرؤوس القابل للتحقيق هو {count}. يُرجى تقليل عدد المضلعات.",
+  "This file was rejected: {file}.": "تم رفض هذا الملف: {file}.",
   "This file was rejected.": "تم رفض هذا الملف.",
   "This is some of what the KarstLink project offers.": "هذا بعض مما يقدمه مشروع KarstLink.",
   "This is the only version of this {type}.": "هذه هي النسخة الوحيدة من هذا {type}.",

@@ -2717,6 +2717,7 @@
   "This file contains too many polygons to simplify below {count} vertices. Consider splitting or removing polygons before importing.": "קובץ זה מכיל יותר מדי מצולעים כדי לפשט מתחת ל-{count} קודקודים. שקלו לפצל או להסיר מצולעים לפני הייבוא.",
   "This file has many polygons. Minimum achievable vertex count is {count}.": "קובץ זה מכיל מצולעים רבים. מספר הקודקודים המינימלי שניתן להשיג הוא {count}.",
   "This file has many polygons. Minimum achievable vertex count is {count}. Consider reducing the number of polygons.": "קובץ זה מכיל מצולעים רבים. מספר הקודקודים המינימלי שניתן להשיג הוא {count}. שקלו להפחית את מספר המצולעים.",
+  "This file was rejected: {file}.": "קובץ זה נדחה: {file}.",
   "This file was rejected.": "קובץ זה נדחה.",
   "This is some of what the KarstLink project offers.": "זהו חלק ממה שפרויקט KarstLink מציע.",
   "This is the only version of this {type}.": "זוהי הגרסה היחידה של {type} זה.",
