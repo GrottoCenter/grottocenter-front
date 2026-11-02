@@ -1125,7 +1125,7 @@
   "Error loading regions": "Eroare la încărcarea regiunilor",
   "error on file name": "eroare la numele fișierului",
   "error on file size": "eroare la dimensiunea fișierului",
-  "error on file type": "eroare privind tipul fișierului",
+  "error on file type": "Tipul de fișier nu este acceptat: {file}.",
   "Error type": "Tipul erorii",
   "Error while updating the ban status": "Eroare la actualizarea stării de blocare",
   "Error while updating the user groups": "Eroare la actualizarea grupurilor de utilizatori",

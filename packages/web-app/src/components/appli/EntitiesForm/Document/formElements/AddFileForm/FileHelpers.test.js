@@ -1,3 +1,5 @@
+import { createIntl } from 'react-intl';
+import messages from '@/../public/lang/en.json';
 import {
   DOCUMENT_TYPE_ACCEPT,
   DocumentTypes
@@ -18,7 +20,7 @@ describe('validateAndBuildFileEntries', () => {
     const result = validateAndBuildFileEntries(
       files,
       [],
-      ({ id }, values) => `${id}: ${values.file}`,
+      createIntl({ locale: 'en', messages }).formatMessage,
       DOCUMENT_TYPE_ACCEPT[DocumentTypes.TOPOGRAPHIC_DATA].extensions
     );
 
@@ -28,8 +30,8 @@ describe('validateAndBuildFileEntries', () => {
       'cave.zip'
     ]);
     expect(result.errors).toEqual([
-      'error on file type: cave.stl',
-      'error on file type: cave.mp4'
+      'The file type is not accepted: cave.stl.',
+      'The file type is not accepted: cave.mp4.'
     ]);
   });
 

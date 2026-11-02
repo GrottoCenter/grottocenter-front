@@ -1125,7 +1125,7 @@
   "Error loading regions": "Error en carregar les regions",
   "error on file name": "error en el nom del fitxer",
   "error on file size": "error en la mida del fitxer",
-  "error on file type": "error en el tipus de fitxer",
+  "error on file type": "El tipus de fitxer no s'accepta: {file}.",
   "Error type": "Tipus d'error",
   "Error while updating the ban status": "Error en actualitzar l'estat de bloqueig",
   "Error while updating the user groups": "Error en actualitzar els grups d'usuaris",

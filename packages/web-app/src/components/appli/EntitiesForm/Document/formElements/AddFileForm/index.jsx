@@ -235,9 +235,9 @@ const AddFileForm = ({
         defaultMessage: 'This file was rejected.'
       });
     });
-    setErrors(prev =>
-      acceptedInThisDropRef.current ? [...prev, ...messages] : messages
-    );
+    // Capture before React evaluates the updater, possibly after the microtask.
+    const shouldAppend = acceptedInThisDropRef.current;
+    setErrors(prev => (shouldAppend ? [...prev, ...messages] : messages));
   };
 
   const removeFile = fileName => {

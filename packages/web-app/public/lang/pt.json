@@ -1125,7 +1125,7 @@
   "Error loading regions": "Erro ao carregar regiões",
   "error on file name": "erro no nome do arquivo",
   "error on file size": "erro no tamanho do arquivo",
-  "error on file type": "erro no tipo de ficheiro",
+  "error on file type": "O tipo de ficheiro não é aceite: {file}.",
   "Error type": "Tipo de erro",
   "Error while updating the ban status": "Erro ao atualizar o estado de banimento",
   "Error while updating the user groups": "Erro ao atualizar os grupos de utilizadores",

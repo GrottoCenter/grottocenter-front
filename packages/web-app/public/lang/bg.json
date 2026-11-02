@@ -1125,7 +1125,7 @@
   "Error loading regions": "Грешка при зареждане на регионите",
   "error on file name": "грешка в името на файла",
   "error on file size": "грешка в размера на файла",
-  "error on file type": "грешка в типа на файла",
+  "error on file type": "Типът на файла не е разрешен: {file}.",
   "Error type": "Тип на грешката",
   "Error while updating the ban status": "Грешка при актуализиране на статуса на забраната",
   "Error while updating the user groups": "Грешка при актуализиране на потребителските групи",

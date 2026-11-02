@@ -1125,7 +1125,7 @@
   "Error loading regions": "Gagal memuat wilayah",
   "error on file name": "kesalahan pada nama file",
   "error on file size": "kesalahan pada ukuran file",
-  "error on file type": "kesalahan pada jenis berkas",
+  "error on file type": "Jenis berkas tidak diterima: {file}.",
   "Error type": "Jenis kesalahan",
   "Error while updating the ban status": "Kesalahan saat memperbarui status ban",
   "Error while updating the user groups": "Kesalahan saat memperbarui grup pengguna",

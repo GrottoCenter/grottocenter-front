@@ -1125,7 +1125,7 @@
   "Error loading regions": "Σφάλμα φόρτωσης περιοχών",
   "error on file name": "σφάλμα στο όνομα αρχείου",
   "error on file size": "σφάλμα στο μέγεθος αρχείου",
-  "error on file type": "σφάλμα στον τύπο αρχείου",
+  "error on file type": "Ο τύπος αρχείου δεν γίνεται αποδεκτός: {file}.",
   "Error type": "Τύπος σφάλματος",
   "Error while updating the ban status": "Σφάλμα κατά την ενημέρωση κατάστασης αποκλεισμού",
   "Error while updating the user groups": "Σφάλμα κατά την ενημέρωση ομάδων χρηστών",

@@ -1125,7 +1125,7 @@
   "Error loading regions": "שגיאה בטעינת אזורים",
   "error on file name": "שגיאה בשם הקובץ",
   "error on file size": "שגיאה בגודל הקובץ",
-  "error on file type": "שגיאה בסוג הקובץ",
+  "error on file type": "סוג הקובץ אינו מתקבל: {file}.",
   "Error type": "סוג השגיאה",
   "Error while updating the ban status": "שגיאה בעדכון סטטוס החסימה",
   "Error while updating the user groups": "שגיאה בעדכון קבוצות המשתמש",

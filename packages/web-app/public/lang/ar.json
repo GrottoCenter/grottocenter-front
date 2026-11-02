@@ -1125,7 +1125,7 @@
   "Error loading regions": "خطأ في تحميل المناطق",
   "error on file name": "خطأ في اسم الملف",
   "error on file size": "خطأ في حجم الملف",
-  "error on file type": "خطأ في نوع الملف",
+  "error on file type": "نوع الملف غير مقبول: {file}.",
   "Error type": "نوع الخطأ",
   "Error while updating the ban status": "خطأ أثناء تحديث حالة الحظر",
   "Error while updating the user groups": "خطأ أثناء تحديث مجموعات المستخدمين",

@@ -1125,7 +1125,7 @@
   "Error loading regions": "地域の読み込みエラー",
   "error on file name": "ファイル名エラー",
   "error on file size": "ファイルサイズエラー",
-  "error on file type": "ファイル形式のエラー",
+  "error on file type": "このファイル形式は受け付けられません: {file}。",
   "Error type": "エラーの種類",
   "Error while updating the ban status": "禁止ステータス更新エラー",
   "Error while updating the user groups": "ユーザーグループ更新エラー",

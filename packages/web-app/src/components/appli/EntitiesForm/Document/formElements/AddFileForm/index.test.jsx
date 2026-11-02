@@ -86,20 +86,57 @@ describe('document uploads', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('keeps non-topographic formats out of the restricted topographic picker', async () => {
+  it('identifies each rejected file with the real message catalogue', async () => {
     const user = userEvent.setup({ applyAccept: false });
     const { container } = render(
       <UploadForm type={DocumentTypes.TOPOGRAPHIC_DATA} />
     );
+    await user.upload(container.querySelector('input[type="file"]'), [
+      new File(['model'], 'scan.stl', {
+        type: 'application/octet-stream'
+      }),
+      new File(['video'], 'clip.mp4', { type: 'video/mp4' })
+    ]);
+    expect(
+      await screen.findByText('The file type is not accepted: scan.stl.')
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText('The file type is not accepted: clip.mp4.')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('scan.stl', { exact: true })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('clip.mp4', { exact: true })
+    ).not.toBeInTheDocument();
+
     await user.upload(
       container.querySelector('input[type="file"]'),
       new File(['obj'], 'object.obj', { type: 'model/obj' })
     );
     expect(
-      await screen.findByText(messages['error on file type'])
+      await screen.findByText('The file type is not accepted: object.obj.')
     ).toBeInTheDocument();
     expect(
-      screen.queryByText('object.obj', { exact: true })
+      screen.queryByText('The file type is not accepted: scan.stl.')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('The file type is not accepted: clip.mp4.')
+    ).not.toBeInTheDocument();
+  });
+
+  it('rejects an Image extension outside its configured list despite matching image/*', async () => {
+    const user = userEvent.setup({ applyAccept: false });
+    const { container } = render(<UploadForm type={DocumentTypes.IMAGE} />);
+    await user.upload(
+      container.querySelector('input[type="file"]'),
+      new File(['image'], 'photo.webp', { type: 'image/webp' })
+    );
+    expect(
+      await screen.findByText('The file type is not accepted: photo.webp.')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('photo.webp', { exact: true })
     ).not.toBeInTheDocument();
   });
 });
