@@ -229,11 +229,16 @@ describe('Import Observations Wizard', () => {
 
       // Verify the profile file was downloaded
       const downloadsFolder = Cypress.config('downloadsFolder');
-      cy.readFile(`${downloadsFolder}/SalleduChaos-T1_profile.json`).should(
-        'have.property',
-        'pointLabel',
-        'Salle du Chaos - T1'
-      );
+      // Retry incomplete downloads rather than parsing JSON inside readFile.
+      cy.readFile(
+        `${downloadsFolder}/SalleduChaos-T1_profile.json`,
+        null
+      ).should(contents => {
+        expect(JSON.parse(contents.toString('utf8'))).to.have.property(
+          'pointLabel',
+          'Salle du Chaos - T1'
+        );
+      });
 
       // Requirement 12.2: Submit the import
       cy.get('[data-testid="submit-button"]').click();
