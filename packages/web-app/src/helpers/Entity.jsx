@@ -12,12 +12,10 @@ import {
 } from '@/utils/personTypes';
 import Translate from '@/components/common/Translate';
 import {
-  bibliographyIcon,
-  entranceIcon,
-  networkIcon,
-  personIcon,
-  massifIcon
-} from '../assets/icons';
+  DOCUMENT_TYPE_ICONS,
+  DOCUMENT_TYPE_FALLBACK_ICON
+} from '@/utils/documentTypeHelpers';
+import { entranceIcon, networkIcon, massifIcon } from '../assets/icons';
 
 export const EntityIcon = styled('img')`
   height: 30px;
@@ -44,6 +42,7 @@ const EntitySubtitle = styled('div')`
 
 export const nomelizeSearchEntity = option => {
   let iconSrc;
+  let IconComponent;
   let title = option.name; // Default for all entities
   let subtitle = '';
   switch (option._type) {
@@ -58,12 +57,13 @@ export const nomelizeSearchEntity = option => {
         if (title !== option.nickname) subtitle = option.nickname;
       }
 
-      iconSrc = personIcon;
+      iconSrc = getPersonIconSource(option.type);
       break;
 
     case 'documents': {
-      iconSrc = bibliographyIcon;
-      title = `[${option.type}] ${option.title}`;
+      const type = option.type?.name ?? option.type;
+      IconComponent = DOCUMENT_TYPE_ICONS[type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
+      title = option.title;
       const maxSubTitleLength = Math.max((title.length - 3) * 1.2, 80);
       subtitle = (option.description ?? '').slice(0, maxSubTitleLength);
       if (option.description?.length > maxSubTitleLength) subtitle += '...';
@@ -98,21 +98,13 @@ export const nomelizeSearchEntity = option => {
     default:
       break;
   }
-  return { iconSrc, title, subtitle, id: option.id };
+  return { iconSrc, IconComponent, title, subtitle, id: option.id };
 };
 
-export const entityOptionForSelector = (
-  props,
-  option,
-  { showPersonType = false } = {}
-) => {
-  const normalized = nomelizeSearchEntity(option);
-  const { title, subtitle, id } = normalized;
+export const entityOptionForSelector = (props, option) => {
+  const { title, subtitle, id, iconSrc, IconComponent } =
+    nomelizeSearchEntity(option);
   const isPerson = option._type === 'persons';
-  const iconSrc =
-    isPerson && showPersonType
-      ? getPersonIconSource(option.type)
-      : normalized.iconSrc;
   let typeLabelId = null;
   if (isPerson && isPersonType(option.type))
     typeLabelId = getPersonTypeLabelId(option.type);
@@ -123,6 +115,7 @@ export const entityOptionForSelector = (
     'li',
     { ...otherProps, key: key || `${option._type}-${id}` },
     iconSrc && <EntityIcon src={iconSrc} alt="" />,
+    IconComponent && <EntityIcon as={IconComponent} color="primary" />,
     <div>
       <EntityTitle>
         {title} <EntityId>{id}</EntityId>

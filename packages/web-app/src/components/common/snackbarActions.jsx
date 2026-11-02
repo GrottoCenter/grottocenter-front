@@ -1,7 +1,9 @@
+import { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { IconButton } from '@mui/material';
+import { Button, CircularProgress, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 
 /**
  * Dismiss button for a snackbar. A `persist: true` snackbar has no other way to
@@ -45,3 +47,65 @@ export const createCloseAction = onClose =>
   function CloseAction(key) {
     return <CloseSnackbarButton snackbarKey={key} onClose={onClose} />;
   };
+
+const RetrySnackbarActions = ({ snackbarKey, onRetry, onClose, labelId }) => {
+  const { formatMessage } = useIntl();
+  const isOnline = useOnlineStatus();
+  const [isRetrying, setIsRetrying] = useState(false);
+  const isRetryingRef = useRef(false);
+
+  const handleRetry = async () => {
+    if (!isOnline || isRetryingRef.current) return;
+    isRetryingRef.current = true;
+    setIsRetrying(true);
+    try {
+      await onRetry();
+      onClose(snackbarKey);
+    } catch {
+      // Keep the warning and its retry action available after another failure.
+    } finally {
+      isRetryingRef.current = false;
+      setIsRetrying(false);
+    }
+  };
+
+  return (
+    <>
+      <Button
+        color="inherit"
+        size="small"
+        variant="text"
+        disabled={!isOnline || isRetrying}
+        aria-busy={isRetrying}
+        startIcon={
+          isRetrying ? (
+            <CircularProgress size={16} color="inherit" />
+          ) : undefined
+        }
+        sx={{ whiteSpace: 'nowrap' }}
+        onClick={handleRetry}>
+        {formatMessage({ id: labelId })}
+      </Button>
+      <CloseSnackbarButton snackbarKey={snackbarKey} onClose={onClose} />
+    </>
+  );
+};
+
+RetrySnackbarActions.propTypes = {
+  snackbarKey: CloseSnackbarButton.propTypes.snackbarKey,
+  onRetry: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+  labelId: PropTypes.string.isRequired
+};
+
+export const createRetryAction = ({ onRetry, onClose, labelId = 'Retry' }) => {
+  const RetryAction = key => (
+    <RetrySnackbarActions
+      snackbarKey={key}
+      onRetry={onRetry}
+      onClose={onClose}
+      labelId={labelId}
+    />
+  );
+  return RetryAction;
+};

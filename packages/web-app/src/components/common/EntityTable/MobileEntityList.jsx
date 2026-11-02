@@ -256,6 +256,7 @@ const MobileEntityList = ({
   columns,
   totalRows,
   isLoading,
+  isPaginationDisabled = false,
   isNewQuery,
   onPageChange,
   rowsPerPage,
@@ -340,6 +341,7 @@ const MobileEntityList = ({
   );
 
   const handleLoadMore = () => {
+    if (isPaginationDisabled) return;
     isAppending.current = true;
     const nextPage = page + 1;
     setPage(nextPage);
@@ -395,7 +397,10 @@ const MobileEntityList = ({
           {isLoading ? (
             <CircularProgress size={24} color="secondary" />
           ) : (
-            <Button variant="outlined" onClick={handleLoadMore}>
+            <Button
+              variant="outlined"
+              disabled={isPaginationDisabled}
+              onClick={handleLoadMore}>
               <Translate>Load more</Translate>
               {` (${allRows.length} / ${totalRows})`}
             </Button>
@@ -423,6 +428,7 @@ MobileEntityList.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   totalRows: PropTypes.number,
   isLoading: PropTypes.bool,
+  isPaginationDisabled: PropTypes.bool,
   isNewQuery: PropTypes.bool,
   onPageChange: PropTypes.func,
   rowsPerPage: PropTypes.number.isRequired,

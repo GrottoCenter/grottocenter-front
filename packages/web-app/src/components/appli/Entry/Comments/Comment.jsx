@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import { useNotification } from '@/hooks/useNotification';
 import { timeToGoIcon, undergroundTimeIcon } from '../../../../assets/icons';
 import {
   useUpdateComment,
@@ -40,15 +41,16 @@ const Comment = ({
   isLast
 }) => {
   const { formatMessage } = useIntl();
+  const { onSuccess } = useNotification();
   const permissions = usePermissions();
-  const updateMutation = useUpdateComment();
+  const updateMutation = useUpdateComment({ isInline: true });
   const deleteMutation = useDeleteComment();
   const restoreMutation = useRestoreComment();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
 
-  const onSubmitForm = data => {
-    updateMutation.mutate({
-      id: data.id,
+  const onSubmitForm = async data => {
+    await updateMutation.mutateAsync({
+      id: comment.id,
       title: data.title,
       body: data.body,
       aestheticism: data.aestheticism,
@@ -59,6 +61,7 @@ const Comment = ({
       language: data.language
     });
     setIsUpdateFormVisible(false);
+    onSuccess(formatMessage({ id: 'Modification completed' }));
   };
 
   const onDeletePress = isPermanent =>
@@ -126,9 +129,13 @@ const Comment = ({
             width: '100%'
           }}>
           <CreateCommentForm
-            closeForm={() => setIsUpdateFormVisible(false)}
+            closeForm={() => {
+              setIsUpdateFormVisible(false);
+              updateMutation.reset();
+            }}
             isNewComment={false}
             onSubmit={onSubmitForm}
+            error={updateMutation.error}
             values={comment}
           />
         </Box>

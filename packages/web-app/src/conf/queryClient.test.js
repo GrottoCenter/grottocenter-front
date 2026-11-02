@@ -47,6 +47,7 @@ describe('query retry policy', () => {
 describe('global query and mutation error notifications', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
     store.getState.mockReturnValue({
       intl: {
         locale: 'fr',
@@ -54,6 +55,55 @@ describe('global query and mutation error notifications', () => {
       }
     });
   });
+
+  afterEach(() => vi.restoreAllMocks());
+
+  it('silences an uncached read that fails offline', () => {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    queryClient
+      .getQueryCache()
+      .config.onError(new TypeError('Failed to fetch'), {});
+    expect(enqueueSnackbar).not.toHaveBeenCalled();
+    expect(store.dispatch).not.toHaveBeenCalled();
+  });
+
+  it('still reports network failures while online', () => {
+    queryClient
+      .getQueryCache()
+      .config.onError(new TypeError('Failed to fetch'), {});
+    expect(enqueueSnackbar).toHaveBeenCalledExactlyOnceWith(
+      'An unexpected error occurred',
+      { variant: 'error' }
+    );
+  });
+
+  it('still reports a mutation that fails offline', () => {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    queryClient
+      .getMutationCache()
+      .config.onError(new TypeError('Failed to fetch'), null, null, {});
+    expect(enqueueSnackbar).toHaveBeenCalledExactlyOnceWith(
+      'An unexpected error occurred',
+      { variant: 'error' }
+    );
+  });
+
+  it.each([401, 429, 500])(
+    'preserves HTTP %i handling even while offline',
+    status => {
+      vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+      queryClient.getQueryCache().config.onError({ status }, {});
+      if (status === 401) {
+        expect(store.dispatch).toHaveBeenCalledExactlyOnceWith({
+          type: 'POST_LOGOUT'
+        });
+        expect(enqueueSnackbar).not.toHaveBeenCalled();
+      } else {
+        expect(enqueueSnackbar).toHaveBeenCalledTimes(1);
+        expect(store.dispatch).not.toHaveBeenCalled();
+      }
+    }
+  );
 
   it.each(['query', 'mutation'])(
     'shows a translated, deduplicated 429 toast for a %s',

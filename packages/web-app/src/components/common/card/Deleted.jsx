@@ -283,6 +283,7 @@ const DeleteConfirmationDialogContent = ({
   entityType,
   entityId,
   entityName,
+  entityIcon,
   entityIconType = entityType.iconType,
   isOpen,
   isLoading,
@@ -377,6 +378,7 @@ const DeleteConfirmationDialogContent = ({
   };
 
   const entityFmt = formatMessage({ id: entityType.str });
+  const SelectedEntityIcon = selectedEntity?.IconComponent;
   const entityValues = { entityFmt, entityKind: entityType.str };
   let actionButtonTitle = formatMessage({ id: 'Delete' });
   if (isPermanent) {
@@ -489,9 +491,11 @@ const DeleteConfirmationDialogContent = ({
               borderRadius: 1,
               bgcolor: 'background.paper'
             }}>
-            {entityIconType && (
+            {(entityIcon || entityIconType) && (
               <Box aria-hidden="true" sx={{ flexShrink: 0 }}>
-                <CustomIcon type={entityIconType} size={28} alt="" />
+                {entityIcon || (
+                  <CustomIcon type={entityIconType} size={28} alt="" />
+                )}
               </Box>
             )}
             <Typography
@@ -574,6 +578,7 @@ const DeleteConfirmationDialogContent = ({
             {!selectedEntity && (
               <>
                 <AutoCompleteSearch
+                  hasFullWidthResults
                   disabled={isLoading}
                   onInputChange={value => {
                     if (value) {
@@ -618,6 +623,9 @@ const DeleteConfirmationDialogContent = ({
                 }}>
                 {selectedEntity.iconSrc && (
                   <StyledEntityIcon src={selectedEntity.iconSrc} />
+                )}
+                {SelectedEntityIcon && (
+                  <StyledEntityIcon as={SelectedEntityIcon} color="primary" />
                 )}
                 <IconButton
                   disabled={isLoading}
@@ -711,6 +719,7 @@ DeleteConfirmationDialogContent.propTypes = {
   entityType: DeletedCard.propTypes.entityType.isRequired,
   entityId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   entityName: PropTypes.string,
+  entityIcon: PropTypes.node,
   entityIconType: PropTypes.string,
   isOpen: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,

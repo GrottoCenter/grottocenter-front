@@ -38,6 +38,7 @@ const SectionCreateButton = ({
   openTooltip,
   icon = <AddCircleIcon />,
   size = 'small',
+  disabled = false,
   testId = undefined
 }) => {
   const { formatMessage } = useIntl();
@@ -65,7 +66,7 @@ const SectionCreateButton = ({
             color={currentColor}
             size={size}
             variant="outlined"
-            disabled={isBlocked}
+            disabled={isBlocked || disabled}
             onClick={onToggle}
             data-testid={testId}
             startIcon={currentIcon}>
@@ -78,7 +79,7 @@ const SectionCreateButton = ({
             color={currentColor}
             size={size}
             variant="outlined"
-            disabled={isBlocked}
+            disabled={isBlocked || disabled}
             onClick={onToggle}
             data-testid={testId}
             aria-label={currentLabel}
@@ -104,6 +105,7 @@ SectionCreateButton.propTypes = {
   openTooltip: PropTypes.string,
   icon: PropTypes.node,
   size: PropTypes.oneOf(['small', 'medium', 'large']),
+  disabled: PropTypes.bool,
   testId: PropTypes.string
 };
 

@@ -2,31 +2,28 @@ import { useEffect } from 'react';
 import { Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
 
-import {
-  useUserProperties,
-  useAdvancedSearch,
-  startAdvancedSearch,
-  refineAdvancedSearch
-} from '../../hooks';
+import SearchResults from '@/components/appli/AdvancedSearch/SearchResults';
+import { useUserProperties, startAdvancedSearch } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import AuthChecker from '../../components/appli/AuthChecker';
-import EntityTable from '../../components/common/EntityTable';
 import Translate from '../../components/common/Translate';
+
+const showContributionDate = columns => {
+  const column = columns.find(e => e.field === 'dateInscription');
+  column.visible = true;
+};
 
 const ContributionsPage = () => {
   const userId = useUserProperties()?.id;
   const { formatMessage } = useIntl();
-  const { data, isFetching, params } = useAdvancedSearch();
-  const results = data?.results;
-  const totalResults = data?.totalResults ?? 0;
 
   useEffect(() => {
+    if (!userId) return;
     startAdvancedSearch({
       entity: 'documents',
       filter: { creatorId: userId }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userId]);
 
   return (
     <Layout
@@ -38,27 +35,10 @@ const ContributionsPage = () => {
               <Typography variant="h3" component="h2" gutterBottom>
                 <Translate>Documents</Translate>
               </Typography>
-              <EntityTable
+              <SearchResults
                 entityType="documents"
-                entityColumnsModifier={columns => {
-                  const c = columns.find(e => e.field === 'dateInscription');
-                  c.visible = true;
-                }}
-                isLoading={isFetching}
-                pageRows={results}
-                nbTotalRows={totalResults}
-                onPageChange={(pageNum, pageSize) => {
-                  if (!params) return;
-                  refineAdvancedSearch({
-                    ...params,
-                    page: pageNum + 1,
-                    size: pageSize
-                  });
-                }}
-                onSortChange={sort => {
-                  if (!params) return;
-                  refineAdvancedSearch({ ...params, sort });
-                }}
+                entityColumnsModifier={showContributionDate}
+                hideExport
               />
             </>
           }

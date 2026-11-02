@@ -155,9 +155,7 @@ const AuthorsSection = () => {
             inputValue={inputValue}
             loading={isLoading}
             getOptionLabel={getOptionLabel}
-            renderOption={(props, option) =>
-              entityOptionForSelector(props, option, { showPersonType: true })
-            }
+            renderOption={entityOptionForSelector}
             isOptionEqualToValue={(option, val) =>
               option.id === val.id && option._type === val._type
             }
