@@ -156,9 +156,17 @@ describe('Editing a document with publication authorization', () => {
       .should('contain', 'Historical license')
       .click();
     cy.get('[data-testid="document-license-option-2"]').click();
+    cy.get('[data-testid="document-license"]')
+      .find('[role="combobox"]')
+      .should('not.have.attr', 'aria-disabled', 'true')
+      .and('not.have.attr', 'aria-describedby');
+    cy.get('[data-testid="document-license"]')
+      .find('[role="combobox"]')
+      .click();
+    cy.get('[data-testid="document-license-option-1"]').click();
     cy.get('[data-testid="document-submit"]').should('be.enabled').click();
     cy.wait('@save').then(({ request }) => {
-      expectMultipartValue(request.body, 'license[id]', '2');
+      expectMultipartValue(request.body, 'license[id]', '1');
       expectMultipartValue(request.body, 'authorizationDocument[id]', '99');
     });
   });

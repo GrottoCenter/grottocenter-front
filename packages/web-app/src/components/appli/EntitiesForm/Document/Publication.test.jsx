@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
@@ -6,6 +7,8 @@ import { getLicensesUrl, putDocumentUrl } from '@/conf/apiRoutes';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
 import DocumentSubmission from './index';
+import { DocumentFormContext } from './Provider';
+import AddFileForm from './formElements/AddFileForm';
 import {
   AUTHORIZATION_FROM_AUTHOR,
   DOCUMENT_AUTHORIZE_TO_PUBLISH,
@@ -90,6 +93,33 @@ const addFile = async container => {
   await screen.findByTestId('selected-file-issue.pdf');
 };
 
+const LicenseRecoveryForm = ({ parentId }) => {
+  const [license, setLicense] = useState('Historical license');
+  const context = useMemo(
+    () => ({
+      document: {
+        ...initialDocument,
+        parent: { ...initialDocument.parent, id: parentId },
+        license
+      },
+      updateAttribute: vi.fn()
+    }),
+    [license, parentId]
+  );
+  return (
+    <DocumentFormContext.Provider value={context}>
+      <AddFileForm
+        files={[{ id: 10, fileName: 'issue.pdf' }]}
+        setFiles={vi.fn()}
+        option={DOCUMENT_AUTHORIZE_TO_PUBLISH}
+        setOption={vi.fn()}
+        setLicense={setLicense}
+        setAuthorizationDocument={vi.fn()}
+      />
+    </DocumentFormContext.Provider>
+  );
+};
+
 describe('editing document publication rights', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -122,6 +152,9 @@ describe('editing document publication rights', () => {
       screen.getByRole('combobox', { name: 'Authorization from authors' })
     ).toHaveValue(permission.title);
     expect(screen.getByText('Original author')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('document-license').querySelector('[role="combobox"]')
+    ).not.toHaveAttribute('aria-describedby');
 
     const submit = screen.getByRole('button', { name: 'Update' });
     await waitFor(() => expect(submit).toBeEnabled());
@@ -172,6 +205,10 @@ describe('editing document publication rights', () => {
       expect(await screen.findByText('Select a license')).toBeInTheDocument();
       expect(screen.getByText('Historical license')).toBeInTheDocument();
       expect(screen.getByTestId('publication-authorization')).toBeDisabled();
+      const licenseSelect = screen
+        .getByTestId('document-license')
+        .querySelector('[role="combobox"]');
+      expect(licenseSelect).toHaveAccessibleDescription('Select a license');
       const submit = screen.getByRole('button', { name: 'Update' });
       expect(submit).toBeDisabled();
       fireEvent.submit(submit.closest('form'));
@@ -185,13 +222,43 @@ describe('editing document publication rights', () => {
       fireEvent.click(await screen.findByTestId('document-license-option-2'));
       await waitFor(() => expect(submit).toBeEnabled());
       expect(screen.queryByText('Select a license')).not.toBeInTheDocument();
+      expect(licenseSelect).not.toHaveAttribute('aria-disabled', 'true');
+      expect(licenseSelect).not.toHaveAttribute('aria-describedby');
+      expect(licenseSelect).toHaveAccessibleName('License');
+      fireEvent.mouseDown(licenseSelect);
+      fireEvent.click(await screen.findByTestId('document-license-option-1'));
       fireEvent.click(submit);
       await waitFor(() => expect(apiPutForm).toHaveBeenCalledTimes(1));
       const body = apiPutForm.mock.calls[0][1];
-      expect(body.get('license[id]')).toBe('2');
+      expect(body.get('license[id]')).toBe('1');
       expect(body.get('authorizationDocument[id]')).toBe('99');
     }
   );
+
+  it('resets the correction unlock when the parent changes, including switching back', async () => {
+    const { rerender } = renderWithProviders(
+      <LicenseRecoveryForm parentId={41} />,
+      { messages }
+    );
+    await screen.findByText('Select a license');
+    const licenseSelect = screen
+      .getByTestId('document-license')
+      .querySelector('[role="combobox"]');
+    fireEvent.mouseDown(licenseSelect);
+    fireEvent.click(await screen.findByTestId('document-license-option-2'));
+    expect(licenseSelect).not.toHaveAttribute('aria-disabled', 'true');
+
+    rerender(<LicenseRecoveryForm parentId={43} />);
+    expect(licenseSelect).toHaveAttribute('aria-disabled', 'true');
+    expect(licenseSelect).toHaveAccessibleName(
+      messages[
+        'The license of the document has been deduced from the parent document'
+      ]
+    );
+
+    rerender(<LicenseRecoveryForm parentId={41} />);
+    expect(licenseSelect).toHaveAttribute('aria-disabled', 'true');
+  });
 
   it.each(['CC-BY', 'Historical license'])(
     'applies CC-BY-SA to the author-rights option instead of %s',

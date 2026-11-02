@@ -122,10 +122,12 @@ const AddFileForm = ({
   const { document, updateAttribute } = useContext(DocumentFormContext);
 
   const parentId = document.parent?.id ?? null;
+  const [correctedLicenseParentId, setCorrectedLicenseParentId] = useState();
   const prevParentIdRef = useRef(parentId);
   useEffect(() => {
     if (prevParentIdRef.current === parentId) return;
     prevParentIdRef.current = parentId;
+    setCorrectedLicenseParentId(undefined);
     updateAttribute('authorizationDocument', null);
   }, [parentId, updateAttribute]);
 
@@ -158,7 +160,10 @@ const AddFileForm = ({
     !!licenses &&
     !!documentLicenseName &&
     !findLicenseByName(licenses, documentLicenseName);
-  const isLicenseForced = isParentAuthForced && !hasUnknownLicense;
+  const isLicenseForced =
+    isParentAuthForced &&
+    !hasUnknownLicense &&
+    correctedLicenseParentId !== parentId;
   useEffect(() => {
     if (!showAuthorization || !licenses) return;
     // Declaring publication rights applies the license promised by the radio.
@@ -391,12 +396,18 @@ const AddFileForm = ({
                 <Select
                   labelId="document-license-label"
                   data-testid="document-license"
-                  inputProps={{ 'aria-describedby': 'document-license-help' }}
+                  inputProps={
+                    hasUnknownLicense
+                      ? { 'aria-describedby': 'document-license-help' }
+                      : undefined
+                  }
                   value={documentLicenseName}
                   renderValue={() => <LicenseTag license={document.license} />}
-                  onChange={e =>
-                    setLicense(findLicenseByName(licenses, e.target.value))
-                  }>
+                  onChange={e => {
+                    if (hasUnknownLicense)
+                      setCorrectedLicenseParentId(parentId);
+                    setLicense(findLicenseByName(licenses, e.target.value));
+                  }}>
                   {/* Keep the current value in range while loading and when
                       a legacy license is absent from the reference list. */}
                   {documentLicenseName &&
