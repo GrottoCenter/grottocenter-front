@@ -40,6 +40,7 @@ export const renderCell = (doc, key, renderFn) => {
     return rendered != null ? rendered : '-';
   }
   if (v === true || v === false) return <BoolIcon value={v} />;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : '-';
   if (v) return v;
   return '-';
 };

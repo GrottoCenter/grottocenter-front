@@ -427,6 +427,9 @@ const entrances = {
     { visible: false, field: 'region', label: 'Region', sortable: true },
     { visible: true, field: 'country', label: 'Country', sortable: true },
     { visible: false, field: 'iso3166', label: 'ISO code', sortable: true },
+    { visible: false, field: 'latitude', label: 'Latitude', sortable: false },
+    { visible: false, field: 'longitude', label: 'Longitude', sortable: false },
+    { visible: false, field: 'altitude', label: 'Altitude', sortable: false },
     {
       visible: false,
       field: 'massifs',
