@@ -1240,6 +1240,7 @@
   "For security reasons please create a new password.": "لأسباب أمنية، يرجى إنشاء كلمة مرور جديدة.",
   "For somerc projection: ": "لإسقاط somerc: ",
   "Forgot password?": "هل نسيت كلمة المرور؟",
+  "form.columnTooLong": "يتجاوز هذا العمود الحد المسموح به وهو {limit} حرفًا.",
   "form.fileNameTooLong": "اسم الملف {file} يتجاوز الحد الأقصى البالغ {limit} حرفًا.",
   "form.integerRequired": "أدخل عددًا صحيحًا.",
   "form.maxLength": "الحد الأقصى {limit} حرفًا (تم إدخال {count}).",

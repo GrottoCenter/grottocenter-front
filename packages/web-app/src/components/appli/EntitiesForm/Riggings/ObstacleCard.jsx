@@ -25,7 +25,8 @@ const ObstacleCard = ({
   onDelete,
   autoFocus = false,
   legendSections,
-  oversizedColumns = []
+  oversizedColumns = [],
+  columnErrorIds = {}
 }) => {
   const { formatMessage } = useIntl();
 
@@ -71,6 +72,7 @@ const ObstacleCard = ({
               index={index}
               field="obstacle"
               isColumnTooLong={oversizedColumns.includes('obstacle')}
+              columnErrorId={columnErrorIds.obstacle}
               showLabel
               autoFocus={autoFocus}
             />
@@ -81,6 +83,7 @@ const ObstacleCard = ({
               index={index}
               field="rope"
               isColumnTooLong={oversizedColumns.includes('rope')}
+              columnErrorId={columnErrorIds.rope}
               showLabel
             />
           </Box>
@@ -90,6 +93,7 @@ const ObstacleCard = ({
           index={index}
           field="anchor"
           isColumnTooLong={oversizedColumns.includes('anchor')}
+          columnErrorId={columnErrorIds.anchor}
           showLabel
         />
         <ObstacleField
@@ -97,6 +101,7 @@ const ObstacleCard = ({
           index={index}
           field="observation"
           isColumnTooLong={oversizedColumns.includes('observation')}
+          columnErrorId={columnErrorIds.observation}
           showLabel
         />
       </Stack>
@@ -114,7 +119,8 @@ ObstacleCard.propTypes = {
   onDelete: PropTypes.func.isRequired,
   autoFocus: PropTypes.bool,
   legendSections: LegendSectionsShape,
-  oversizedColumns: PropTypes.arrayOf(PropTypes.string)
+  oversizedColumns: PropTypes.arrayOf(PropTypes.string),
+  columnErrorIds: PropTypes.objectOf(PropTypes.string)
 };
 
 export default ObstacleCard;

@@ -1,6 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within
+} from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import CreateRiggingsForm from './index';
 
@@ -11,11 +17,12 @@ vi.mock('../../../common/LanguageSelect', () => ({
 
 const messages = {
   Title: 'Title',
+  Required: 'Required',
   riggings: 'Riggings',
-  obstacles: 'Obstacles',
-  ropes: 'Ropes',
-  anchors: 'Anchors',
-  observations: 'Observations',
+  obstacles: 'obstacles',
+  ropes: 'ropes',
+  anchors: 'anchors',
+  observations: 'observations',
   Obstacle: 'Obstacle',
   Rope: 'Rope',
   Anchors: 'Anchors',
@@ -30,7 +37,8 @@ const messages = {
   'Move this line down': 'Move this line down',
   'Delete this line': 'Delete this line',
   Create: 'Create',
-  'form.maxLength': 'Maximum {limit} characters ({count} entered).'
+  'form.maxLength': 'Maximum {limit} characters ({count} entered).',
+  'form.columnTooLong': 'This column exceeds the {limit}-character limit.'
 };
 
 const renderForm = (values, onSubmit) => {
@@ -85,7 +93,10 @@ describe.each([
 
     const counter = screen.getByText('1600 / 2000');
     expect(screen.getAllByText(/\/ 2000/)).toHaveLength(1);
-    expect(counter.parentElement).toHaveTextContent('Obstacles');
+    expect(counter.parentElement).toHaveTextContent('obstacles');
+    expect(within(counter.parentElement).getByText('obstacles')).toHaveStyle({
+      textTransform: 'capitalize'
+    });
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(obstacle.compareDocumentPosition(counter)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING
@@ -123,9 +134,26 @@ describe.each([
     const submit = screen.getByRole('button', { name: 'Create' });
     expect(screen.getByText('2001 / 2000')).toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent(
-      'Maximum 2000 characters (2001 entered).'
+      'This column exceeds the 2000-character limit.'
     );
     expect(submit).toBeDisabled();
+
+    const alert = screen.getByRole('alert');
+    screen.getAllByRole('textbox', { name: 'Obstacle' }).forEach(input => {
+      expect(input).toHaveAttribute('aria-describedby', alert.id);
+      expect(input).toHaveAccessibleDescription(alert.textContent);
+    });
+    expect(
+      screen.getAllByRole('textbox', { name: 'Rope' })[0]
+    ).not.toHaveAttribute('aria-describedby');
+    fireEvent.change(screen.getAllByRole('textbox', { name: 'Obstacle' })[1], {
+      target: { value: 'b'.repeat(1000) }
+    });
+    expect(screen.getByText('2002 / 2000')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toBe(alert);
+    expect(alert).toHaveTextContent(
+      'This column exceeds the 2000-character limit.'
+    );
 
     fireEvent.change(screen.getAllByRole('textbox', { name: 'Obstacle' })[1], {
       target: { value: 'b'.repeat(998) }
@@ -134,6 +162,9 @@ describe.each([
     await waitFor(() => expect(submit).toBeEnabled());
     expect(screen.getByText('2000 / 2000')).toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    screen.getAllByRole('textbox', { name: 'Obstacle' }).forEach(input => {
+      expect(input).not.toHaveAttribute('aria-describedby');
+    });
     fireEvent.click(submit);
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
   });
