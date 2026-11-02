@@ -115,14 +115,6 @@ it('validates before publishing and focuses the first invalid field', async () =
   expect(apiPost).toHaveBeenCalledTimes(1);
 });
 
-it('loads the profile only when the comment form opens', async () => {
-  renderComments();
-  expect(apiGet).not.toHaveBeenCalled();
-  await openComment();
-  expect(apiGet).toHaveBeenCalledTimes(1);
-  expect(apiGet).toHaveBeenCalledWith(expect.stringContaining('/cavers/7'));
-});
-
 it('retains the draft during publication and on failure, then closes after a successful retry', async () => {
   const response = Promise.withResolvers();
   apiPost.mockReturnValueOnce(response.promise);
@@ -190,8 +182,14 @@ it('adds the exploration only after successful publication and retries it withou
   await act(async () => retryResponse.reject(new Error('Still unavailable')));
   expect(retryButton).toBeEnabled();
   expect(screen.queryByText('Comment published.')).not.toBeInTheDocument();
+  expect(
+    screen.queryByText('Entrance added to your explored entrances.')
+  ).not.toBeInTheDocument();
   fireEvent.click(retryButton);
-  expect(await screen.findByText('Comment published.')).toBeVisible();
+  expect(
+    await screen.findByText('Entrance added to your explored entrances.')
+  ).toBeVisible();
+  expect(screen.queryByText('Comment published.')).not.toBeInTheDocument();
   await waitFor(() =>
     expect(
       screen.queryByRole('button', { name: 'Retry adding' })
@@ -250,7 +248,7 @@ it('announces complete success only after the selected exploration has been adde
   expect(screen.getAllByTestId('app-snackbar')).toHaveLength(1);
 });
 
-it('dismisses the exploration warning on reopening after the entrance is marked explored elsewhere', async () => {
+it('dismisses the exploration warning when the entrance is marked explored elsewhere', async () => {
   apiPut.mockRejectedValueOnce(new Error('Association failed'));
   const { queryClient } = renderComments();
   fireEvent.click(await openComment());
@@ -264,13 +262,10 @@ it('dismisses the exploration warning on reopening after the entrance is marked 
       exploredEntrances: [{ id: 42 }]
     })
   );
-  fireEvent.click(screen.getByRole('button', { name: 'Add a new comment' }));
-  expect(
-    await screen.findByText('Already in my explored entrances')
-  ).toBeVisible();
   await waitFor(() =>
     expect(screen.queryByTestId('app-snackbar')).not.toBeInTheDocument()
   );
+  expect(screen.queryByTestId('comment-form')).not.toBeInTheDocument();
   expect(apiPost).toHaveBeenCalledTimes(1);
   expect(apiPut).toHaveBeenCalledTimes(1);
 });

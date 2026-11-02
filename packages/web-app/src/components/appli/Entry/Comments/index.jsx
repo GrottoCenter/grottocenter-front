@@ -29,7 +29,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const createMutation = useCreateComment({ isInline: true });
   const userId = useUserProperties()?.id;
-  const personQuery = usePerson(isFormVisible ? userId : undefined);
+  const personQuery = usePerson(userId);
   const linkExploredMutation = useLinkExploredEntrance({ isInline: true });
   const isExplored = personQuery.data?.exploredEntrances?.some(
     entrance => String(entrance.id) === String(entranceId)
@@ -82,7 +82,9 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
             action: createRetryAction({
               onRetry: async () => {
                 await handleMarkExplored();
-                onSuccess(<FormattedMessage id="Comment published." />);
+                onSuccess(
+                  <FormattedMessage id="Entrance added to your explored entrances." />
+                );
               },
               onClose,
               labelId: 'Retry adding'

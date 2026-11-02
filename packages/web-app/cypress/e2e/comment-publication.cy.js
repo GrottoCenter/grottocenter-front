@@ -132,7 +132,7 @@ describe('Comment publication and explored entrances', () => {
     cy.contains('button', 'Retry adding').should('not.exist');
     cy.get('[data-testid="app-snackbar"]')
       .should('have.length', 1)
-      .and('contain', 'Comment published.');
+      .and('contain', 'Entrance added to your explored entrances.');
     cy.get('@publish.all').should('have.length', 2);
   });
 
