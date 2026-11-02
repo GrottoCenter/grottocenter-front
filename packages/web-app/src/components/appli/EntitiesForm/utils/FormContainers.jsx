@@ -85,7 +85,8 @@ export const FormActionRow = ({
   isCenter = false,
   disabled = false,
   onCancel,
-  submitLabel
+  submitLabel,
+  submitTestId
 }) => {
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
@@ -122,6 +123,7 @@ export const FormActionRow = ({
           disabled={disabled || !isOnline}
           color="primary"
           type="submit"
+          data-testid={submitTestId}
           sx={{ width: { xs: '100%', sm: 'auto' } }}
         />
       </OfflineDisabled>
@@ -134,5 +136,6 @@ FormActionRow.propTypes = {
   isCenter: PropTypes.bool,
   disabled: PropTypes.bool,
   onCancel: PropTypes.func,
-  submitLabel: PropTypes.string
+  submitLabel: PropTypes.string,
+  submitTestId: PropTypes.string
 };

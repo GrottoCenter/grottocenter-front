@@ -130,6 +130,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
 
   const actionRow = (
     <FormActionRow
+      submitTestId="document-submit"
       isNew={isNewDocument}
       isSubmitting={isSubmitting}
       disabled={!isFormValid}

@@ -110,6 +110,7 @@ const AutoCompleteSearch = ({
   hasFullWidthResults = false,
   autoFocus = false,
   noOptionsText = null,
+  inputTestId,
   value
 }) => {
   const { formatMessage } = useIntl();
@@ -189,7 +190,8 @@ const AutoCompleteSearch = ({
               placeholder={label}
               error={hasError}
               inputProps={{
-                ...params.slotProps.htmlInput
+                ...params.slotProps.htmlInput,
+                'data-testid': inputTestId
               }}
               endAdornment={
                 <InputAdornments isLoading={isLoading} hasError={hasError} />
@@ -226,6 +228,7 @@ AutoCompleteSearch.propTypes = {
   // Overrides the default "no result" wording — e.g. to explain that search
   // needs a connection rather than claim nothing was found.
   noOptionsText: PropTypes.node,
+  inputTestId: PropTypes.string,
   // Whatever shape the caller's options carry; compared by reference.
   value: PropTypes.oneOfType([
     PropTypes.string,
