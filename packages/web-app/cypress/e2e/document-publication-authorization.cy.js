@@ -32,7 +32,7 @@ const licenses = [
 
 const addFile = () =>
   cy
-    .get('[role="button"][aria-label="Drop files here or click to select"]')
+    .get('[data-testid="file-dropzone"]')
     .should('have.attr', 'aria-disabled', 'false')
     .find('input[type="file"]')
     .selectFile(
@@ -92,11 +92,11 @@ describe('Editing a document with publication authorization', () => {
     cy.wait('@formats');
     addFile();
     cy.get('[data-testid="selected-file-issue.pdf"]').should('be.visible');
-    cy.get(`input[type="radio"][value="${authorizationOption}"]`)
+    cy.get('[data-testid="publication-authorization"]')
       .should('be.checked')
       .and('be.disabled');
     cy.wait('@licenses');
-    cy.get('button[type="submit"]').should('be.enabled').click();
+    cy.get('[data-testid="document-submit"]').should('be.enabled').click();
     cy.wait('@save').then(({ request }) => {
       expectMultipartValue(request.body, 'option', authorizationOption);
       expectMultipartValue(request.body, 'license[id]', '2');
@@ -116,17 +116,47 @@ describe('Editing a document with publication authorization', () => {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
     cy.wait('@formats');
-    cy.get('input[placeholder="Search for a document..."]').type(
-      'Test collection'
-    );
+    cy.get('[data-testid="document-parent-search"]').type('Test collection');
     cy.wait('@search');
     cy.contains('[role="option"]', 'Test collection').click();
     cy.wait('@parent');
     addFile();
-    cy.get(`input[type="radio"][value="${authorizationOption}"]`)
+    cy.get('[data-testid="publication-authorization"]')
       .should('be.checked')
       .and('be.disabled');
-    cy.get('button[type="submit"]').should('be.enabled').click();
+    cy.get('[data-testid="document-submit"]').should('be.enabled').click();
+    cy.wait('@save').then(({ request }) => {
+      expectMultipartValue(request.body, 'license[id]', '2');
+      expectMultipartValue(request.body, 'authorizationDocument[id]', '99');
+    });
+  });
+
+  it('allows correcting an unknown license inherited when selecting a parent', () => {
+    cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
+    cy.intercept('GET', '**/api/v1/documents/41', {
+      body: { ...collection, license: 'Historical license' }
+    }).as('unknownParent');
+    cy.intercept('POST', '**/api/v1/search', {
+      body: { results: [{ ...collection, _type: 'documents' }] }
+    }).as('search');
+    cy.visit('/documents/42/edit', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.wait('@formats');
+    cy.get('[data-testid="document-parent-search"]').type('Test collection');
+    cy.wait('@search');
+    cy.contains('[role="option"]', 'Test collection').click();
+    cy.wait('@unknownParent');
+    addFile();
+    cy.get('[data-testid="publication-authorization"]')
+      .should('be.checked')
+      .and('be.disabled');
+    cy.get('[data-testid="document-submit"]').should('be.disabled');
+    cy.get('[data-testid="document-license"]')
+      .should('contain', 'Historical license')
+      .click();
+    cy.get('[data-testid="document-license-option-2"]').click();
+    cy.get('[data-testid="document-submit"]').should('be.enabled').click();
     cy.wait('@save').then(({ request }) => {
       expectMultipartValue(request.body, 'license[id]', '2');
       expectMultipartValue(request.body, 'authorizationDocument[id]', '99');

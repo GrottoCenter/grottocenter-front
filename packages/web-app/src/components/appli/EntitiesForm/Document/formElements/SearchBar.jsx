@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
+import { getLicenseName } from '@/components/common/LicenseTag/helpers';
 
 import { DocumentFormContext } from '../Provider';
 
@@ -96,12 +97,11 @@ const SearchBar = props => {
           }
 
           if (documentDetails.license) {
-            let licenseObject = null;
-
-            if (typeof documentDetails.license === 'string') {
-              licenseObject = getLicenseByName(documentDetails.license);
-            }
-            updateAttribute('license', licenseObject);
+            updateAttribute(
+              'license',
+              getLicenseByName(getLicenseName(documentDetails.license)) ??
+                documentDetails.license
+            );
           }
 
           updateAttribute('editor', documentDetails.editor ?? null);

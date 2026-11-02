@@ -6,7 +6,11 @@ import { getLicensesUrl, putDocumentUrl } from '@/conf/apiRoutes';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
 import DocumentSubmission from './index';
-import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './formElements/AddFileForm/FileHelpers';
+import {
+  AUTHORIZATION_FROM_AUTHOR,
+  DOCUMENT_AUTHORIZE_TO_PUBLISH,
+  LICENSE_IN_FILE
+} from './formElements/AddFileForm/FileHelpers';
 
 vi.mock('@/api/client', () => ({
   apiGet: vi.fn(),
@@ -157,14 +161,74 @@ describe('editing document publication rights', () => {
     expect(apiPutForm.mock.calls[0][1].get('license[id]')).toBe('2');
   });
 
-  it('keeps an unknown existing license instead of applying the default', async () => {
-    const { container } = renderSubmission({ license: 'Historical license' });
+  it.each([false, true])(
+    'allows explicit correction of an unknown inherited license (existing file: %s)',
+    async hasExistingFile => {
+      const { container } = renderSubmission({
+        license: 'Historical license',
+        files: hasExistingFile ? [{ id: 10, fileName: 'issue.pdf' }] : []
+      });
+      if (!hasExistingFile) await addFile(container);
+      expect(await screen.findByText('Select a license')).toBeInTheDocument();
+      expect(screen.getByText('Historical license')).toBeInTheDocument();
+      expect(screen.getByTestId('publication-authorization')).toBeDisabled();
+      const submit = screen.getByRole('button', { name: 'Update' });
+      expect(submit).toBeDisabled();
+      fireEvent.submit(submit.closest('form'));
+      expect(apiPutForm).not.toHaveBeenCalled();
+
+      fireEvent.mouseDown(
+        screen
+          .getByTestId('document-license')
+          .querySelector('[role="combobox"]')
+      );
+      fireEvent.click(await screen.findByTestId('document-license-option-2'));
+      await waitFor(() => expect(submit).toBeEnabled());
+      expect(screen.queryByText('Select a license')).not.toBeInTheDocument();
+      fireEvent.click(submit);
+      await waitFor(() => expect(apiPutForm).toHaveBeenCalledTimes(1));
+      const body = apiPutForm.mock.calls[0][1];
+      expect(body.get('license[id]')).toBe('2');
+      expect(body.get('authorizationDocument[id]')).toBe('99');
+    }
+  );
+
+  it.each(['CC-BY', 'Historical license'])(
+    'applies CC-BY-SA to the author-rights option instead of %s',
+    async license => {
+      const { container } = renderSubmission({
+        license,
+        option: AUTHORIZATION_FROM_AUTHOR,
+        authorizationDocument: null
+      });
+      await addFile(container);
+      const submit = screen.getByRole('button', { name: 'Update' });
+      await waitFor(() => expect(submit).toBeEnabled());
+      expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
+      fireEvent.click(submit);
+      await waitFor(() => expect(apiPutForm).toHaveBeenCalledTimes(1));
+      const body = apiPutForm.mock.calls[0][1];
+      expect(body.get('option')).toBe(AUTHORIZATION_FROM_AUTHOR);
+      expect(body.get('license[id]')).toBe('1');
+    }
+  );
+
+  it('applies CC-BY-SA when switching from a file license to declaring publication rights', async () => {
+    const { container } = renderSubmission({
+      option: LICENSE_IN_FILE,
+      authorizationDocument: null
+    });
     await addFile(container);
-    expect(screen.getByText('Historical license')).toBeInTheDocument();
-    const submit = screen.getByRole('button', { name: 'Update' });
-    expect(submit).toBeDisabled();
-    fireEvent.submit(submit.closest('form'));
-    expect(apiPutForm).not.toHaveBeenCalled();
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Update' })).toBeEnabled()
+    );
+    fireEvent.click(screen.getByTestId('publication-author-rights'));
+    await waitFor(() =>
+      expect(screen.queryByTestId('document-license')).not.toBeInTheDocument()
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Update' }));
+    await waitFor(() => expect(apiPutForm).toHaveBeenCalledTimes(1));
+    expect(apiPutForm.mock.calls[0][1].get('license[id]')).toBe('1');
   });
 
   it('uses the default only when there is no existing license', async () => {

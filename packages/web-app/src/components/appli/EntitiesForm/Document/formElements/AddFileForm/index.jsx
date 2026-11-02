@@ -8,6 +8,7 @@ import {
   CircularProgress,
   FormControl,
   FormControlLabel,
+  FormHelperText,
   FormLabel,
   InputLabel,
   Link,
@@ -130,7 +131,6 @@ const AddFileForm = ({
 
   const isParentAuthForced =
     document.parent !== null && document.authorizationDocument !== null;
-  const isLicenseForced = isParentAuthForced;
   const isAuthForced = isParentAuthForced;
 
   const extensions =
@@ -152,18 +152,29 @@ const AddFileForm = ({
   const visibleFiles = files.filter(f => f.state !== IS_DELETED);
 
   const documentLicenseName = getLicenseName(document.license);
+  const documentLicenseId = document.license?.id;
+  const hasUnknownLicense =
+    !licensesLoading &&
+    !!licenses &&
+    !!documentLicenseName &&
+    !findLicenseByName(licenses, documentLicenseName);
+  const isLicenseForced = isParentAuthForced && !hasUnknownLicense;
   useEffect(() => {
     if (!showAuthorization || !licenses) return;
-    // Resolve existing API names before considering a default. An unknown
-    // existing license must never be replaced by a different license.
-    const licenseName = documentLicenseName || DEFAULT_LICENSE;
+    // Declaring publication rights applies the license promised by the radio.
+    // Other options preserve existing names, including unknown legacy values.
+    const licenseName =
+      option === AUTHORIZATION_FROM_AUTHOR
+        ? DEFAULT_LICENSE
+        : documentLicenseName || DEFAULT_LICENSE;
     const selected = findLicenseByName(licenses, licenseName);
-    if (selected && selected !== document.license) setLicense(selected);
+    if (selected && selected.id !== documentLicenseId) setLicense(selected);
   }, [
     showAuthorization,
     licenses,
+    option,
     documentLicenseName,
-    document.license,
+    documentLicenseId,
     setLicense
   ]);
 
@@ -299,7 +310,14 @@ const AddFileForm = ({
               <FormControlLabel
                 value={AUTHORIZATION_FROM_AUTHOR}
                 disabled={isAuthForced}
-                control={<Radio size="small" />}
+                control={
+                  <Radio
+                    size="small"
+                    slotProps={{
+                      input: { 'data-testid': 'publication-author-rights' }
+                    }}
+                  />
+                }
                 label={
                   <>
                     {formatMessage({
@@ -331,7 +349,14 @@ const AddFileForm = ({
               <FormControlLabel
                 value={DOCUMENT_AUTHORIZE_TO_PUBLISH}
                 disabled={isAuthForced}
-                control={<Radio size="small" />}
+                control={
+                  <Radio
+                    size="small"
+                    slotProps={{
+                      input: { 'data-testid': 'publication-authorization' }
+                    }}
+                  />
+                }
                 label={formatMessage({
                   id: 'There is an authorization to publish from the author on Grottocenter'
                 })}
@@ -353,9 +378,10 @@ const AddFileForm = ({
                 variant="filled"
                 fullWidth
                 required
+                error={hasUnknownLicense}
                 disabled={isLicenseForced}
                 sx={{ mt: 1 }}>
-                <InputLabel>
+                <InputLabel id="document-license-label">
                   {isLicenseForced
                     ? formatMessage({
                         id: 'The license of the document has been deduced from the parent document'
@@ -363,11 +389,16 @@ const AddFileForm = ({
                     : formatMessage({ id: 'License' })}
                 </InputLabel>
                 <Select
+                  labelId="document-license-label"
+                  data-testid="document-license"
+                  inputProps={{ 'aria-describedby': 'document-license-help' }}
                   value={documentLicenseName}
                   renderValue={() => <LicenseTag license={document.license} />}
                   onChange={e =>
                     setLicense(findLicenseByName(licenses, e.target.value))
                   }>
+                  {/* Keep the current value in range while loading and when
+                      a legacy license is absent from the reference list. */}
                   {documentLicenseName &&
                     !findLicenseByName(licenses, documentLicenseName) && (
                       <MenuItem disabled value={documentLicenseName}>
@@ -380,7 +411,10 @@ const AddFileForm = ({
                     </MenuItem>
                   )}
                   {(licenses ?? []).map(l => (
-                    <MenuItem key={l.id} value={l.name}>
+                    <MenuItem
+                      key={l.id}
+                      value={l.name}
+                      data-testid={`document-license-option-${l.id}`}>
                       <LicenseTag
                         license={l}
                         recommended={l.name === DEFAULT_LICENSE}
@@ -388,6 +422,11 @@ const AddFileForm = ({
                     </MenuItem>
                   ))}
                 </Select>
+                {hasUnknownLicense && (
+                  <FormHelperText id="document-license-help">
+                    {formatMessage({ id: 'Select a license' })}
+                  </FormHelperText>
+                )}
               </FormControl>
               {document.license?.url && (
                 <Link

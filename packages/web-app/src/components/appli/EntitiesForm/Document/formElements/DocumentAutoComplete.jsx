@@ -68,6 +68,7 @@ const DocumentAutoComplete = ({
     <FormAutoCompleteComponent
       autoCompleteSearch={
         <SearchBar
+          inputTestId={`document-${contextValueName}-search`}
           fetchSearchResults={fetchSearchResults}
           resetSearchResults={resetSearchResults}
           getOptionLabel={getDocumentName}
