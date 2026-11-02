@@ -14,6 +14,18 @@ describe('EntityTable field mappings', () => {
 });
 
 describe('EntityTable numeric cells', () => {
+  it.each(['cave.depth', 'cave.length', 'cave.temperature', 'nbEntrances'])(
+    'preserves zero in the existing numeric column %s',
+    field => {
+      const entity = {
+        cave: { depth: 0, length: 0, temperature: 0 },
+        nbEntrances: 0
+      };
+
+      expect(renderCell(entity, field)).toBe(0);
+    }
+  );
+
   it.each([0, -0.123456789, 45.123456789, -120, 1800])(
     'preserves the numeric value %s without rounding',
     value => {
