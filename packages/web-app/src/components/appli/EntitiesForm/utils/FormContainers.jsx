@@ -125,6 +125,7 @@ export const FormActionRow = ({
 
   return (
     <Box
+      data-testid="form-action-row"
       sx={{
         display: 'flex',
         flexDirection: { xs: 'column', sm: 'row' },

@@ -50,7 +50,7 @@ describe('Rigging counter accessibility and responsive actions', () => {
       cy.loginAs();
       cy.visit('/entrances/42');
       cy.get('#rigging').within(() => {
-        cy.get('button[aria-label="Edit"]').click();
+        cy.get('[data-testid="action-edit"]').click();
       });
       cy.viewport(width, 900);
       cy.get('[data-testid="rigging-form"]').within(() => {
@@ -93,7 +93,7 @@ describe('Rigging counter accessibility and responsive actions', () => {
           'aria-describedby'
         );
         cy.get('button[type="submit"]').should('be.enabled');
-        cy.get('button[type="submit"]').parent().as('actions');
+        cy.get('[data-testid="form-action-row"]').as('actions');
         cy.get('@actions').should($row => {
           const row = $row[0];
           const style = getComputedStyle(row);
@@ -122,23 +122,26 @@ describe('Rigging counter accessibility and responsive actions', () => {
         cy.get('@actions').find('button').first().focus();
         cy.press(Cypress.Keyboard.Keys.TAB);
         cy.get('@actions').find('button').last().should('be.focused');
-        cy.then(async () => {
-          const params = {
-            key: 'Tab',
-            code: 'Tab',
-            windowsVirtualKeyCode: 9,
-            modifiers: 8
-          };
-          await Cypress.automation('remote:debugger:protocol', {
-            command: 'Input.dispatchKeyEvent',
-            params: { ...params, type: 'keyDown' }
+        // CDP supports native Shift+Tab only in Chromium; forward Tab is shared.
+        if (Cypress.isBrowser({ family: 'chromium' })) {
+          cy.then(async () => {
+            const params = {
+              key: 'Tab',
+              code: 'Tab',
+              windowsVirtualKeyCode: 9,
+              modifiers: 8
+            };
+            await Cypress.automation('remote:debugger:protocol', {
+              command: 'Input.dispatchKeyEvent',
+              params: { ...params, type: 'keyDown' }
+            });
+            await Cypress.automation('remote:debugger:protocol', {
+              command: 'Input.dispatchKeyEvent',
+              params: { ...params, type: 'keyUp' }
+            });
           });
-          await Cypress.automation('remote:debugger:protocol', {
-            command: 'Input.dispatchKeyEvent',
-            params: { ...params, type: 'keyUp' }
-          });
-        });
-        cy.get('@actions').find('button').first().should('be.focused');
+          cy.get('@actions').find('button').first().should('be.focused');
+        }
       });
       cy.document().should(doc => {
         expect(doc.documentElement.scrollWidth).to.be.at.most(
