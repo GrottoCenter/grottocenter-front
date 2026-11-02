@@ -3,8 +3,9 @@ import { List, ListItemText } from '@mui/material';
 
 const ErrorsList = ({ errors }) => (
   <List>
-    {errors.map(error => (
+    {[...new Set(errors)].map(error => (
       <ListItemText
+        key={error}
         slotProps={{
           primary: { color: 'error' }
         }}>

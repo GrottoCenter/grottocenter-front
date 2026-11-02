@@ -6,6 +6,7 @@ import ImageThumbnail, { ThumbnailsGrid } from './ImageThumbnail';
 import ImageLightbox from './ImageLightbox';
 import {
   isImageFile,
+  isModelPreview,
   decodeFileName,
   getThumbnailSources
 } from './utils/imageUtils';
@@ -24,6 +25,7 @@ const Files = ({
   files = [],
   description,
   documentTitle,
+  documentUrl,
   onImageClick,
   imageIndexOffset = 0
 }) => {
@@ -35,6 +37,9 @@ const Files = ({
   // Separate image files from other files
   const imageFiles = files.filter(file => isImageFile(file.fileName));
   const otherFiles = files.filter(file => !isImageFile(file.fileName));
+  // A model is never an image fallback: only use API-generated thumbnails.
+  const modelFiles = documentUrl ? otherFiles.filter(isModelPreview) : [];
+  const previewFiles = [...imageFiles, ...modelFiles];
 
   const handleThumbnailClick = index => {
     if (onImageClick) {
@@ -47,17 +52,22 @@ const Files = ({
 
   return (
     <>
-      {imageFiles.length > 0 && (
-        <ThumbnailsGrid $count={imageFiles.length} sx={{ mb: 1 }}>
-          {imageFiles.map((file, index) => {
+      {previewFiles.length > 0 && (
+        <ThumbnailsGrid $count={previewFiles.length} sx={{ mb: 1 }}>
+          {previewFiles.map((file, index) => {
             const { src, srcSet } = getThumbnailSources(file);
+            const isModel = !isImageFile(file.fileName);
             return (
               <ImageThumbnail
-                key={file.fileName}
+                key={`${file.fileName}:${src}`}
                 src={src}
                 srcSet={srcSet}
                 alt={decodeFileName(file.fileName)}
-                onClick={() => handleThumbnailClick(index)}
+                objectFit={isModel ? 'contain' : 'cover'}
+                to={isModel ? documentUrl : undefined}
+                onClick={
+                  isModel ? undefined : () => handleThumbnailClick(index)
+                }
               />
             );
           })}
@@ -116,6 +126,7 @@ Files.propTypes = {
   ),
   description: PropTypes.string,
   documentTitle: PropTypes.string,
+  documentUrl: PropTypes.string,
   onImageClick: PropTypes.func,
   imageIndexOffset: PropTypes.number
 };

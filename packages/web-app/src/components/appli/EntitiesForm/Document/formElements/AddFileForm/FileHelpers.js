@@ -15,15 +15,16 @@ export const DOCUMENT_AUTHORIZE_TO_PUBLISH =
 
 /**
  * Validates and converts a File[] into the internal file entry format.
- * Size and type are enforced upstream by FileSelectorInput (maxSize / accept);
- * this function keeps only the domain rules FileSelectorInput cannot know
- * about — filenames without an extension, oversized filenames and same-name
- * collisions with a pending entry.
+ * FileSelectorInput handles size and MIME acceptance. A per-type extension
+ * restriction is also enforced here because unrelated binary formats can share
+ * application/octet-stream. Other domain rules cover missing extensions,
+ * oversized filenames and same-name collisions with a pending entry.
  */
 export const validateAndBuildFileEntries = (
   newFiles,
   existingFiles,
-  formatMessage
+  formatMessage,
+  allowedExtensions = null
 ) => {
   const filesArray = Array.from(newFiles);
   const errors = [];
@@ -54,6 +55,21 @@ export const validateAndBuildFileEntries = (
         }
         const name = file.name.slice(0, dotIndex);
         const ext = file.name.slice(dotIndex + 1);
+        if (
+          allowedExtensions &&
+          !allowedExtensions.includes(ext.toLowerCase())
+        ) {
+          errors.push(
+            formatMessage(
+              {
+                id: 'error on file type',
+                defaultMessage: 'The file type is not accepted: {file}.'
+              },
+              { file: file.name }
+            )
+          );
+          return false;
+        }
         return isNil(
           existingFiles.find(
             existing =>

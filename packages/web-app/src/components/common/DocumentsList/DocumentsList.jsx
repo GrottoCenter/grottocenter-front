@@ -21,7 +21,7 @@ import { DocumentChildPropTypes } from '../../../types/document.type';
 import Document from './Document';
 import DocumentReferences from './DocumentReferences';
 import ImageLightbox from './ImageLightbox';
-import { isImageFile } from './utils/imageUtils';
+import { isImageFile, isModelPreview } from './utils/imageUtils';
 import {
   calculateMasonryRowSpan,
   MASONRY_ROW_HEIGHT
@@ -195,7 +195,8 @@ const DocumentsList = ({
       }
       // A gallery earns the full row: past the threshold its tiles no longer
       // fit one card. Derived here rather than recounted at render time.
-      wide.push(images.length - start >= GALLERY_MIN_IMAGES);
+      const modelCount = doc.files?.filter(isModelPreview).length ?? 0;
+      wide.push(images.length - start + modelCount >= GALLERY_MIN_IMAGES);
     });
     return { allImages: images, imageOffsets: offsets, isWide: wide };
   }, [sortedDocuments]);

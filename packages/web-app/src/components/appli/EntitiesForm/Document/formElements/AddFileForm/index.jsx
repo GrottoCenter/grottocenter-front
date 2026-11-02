@@ -199,7 +199,8 @@ const AddFileForm = ({
     const { entries, errors: errorsList } = validateAndBuildFileEntries(
       newFiles,
       files,
-      formatMessage
+      formatMessage,
+      acceptConfig?.extensions
     );
     setErrors(isEmpty(errorsList) ? [] : errorsList);
     setFiles([...files, ...entries]);
@@ -229,14 +230,17 @@ const AddFileForm = ({
           { file: fileName }
         );
       }
-      return formatMessage({
-        id: 'This file was rejected.',
-        defaultMessage: 'This file was rejected.'
-      });
+      return formatMessage(
+        {
+          id: 'This file was rejected: {file}.',
+          defaultMessage: 'This file was rejected: {file}.'
+        },
+        { file: fileName }
+      );
     });
-    setErrors(prev =>
-      acceptedInThisDropRef.current ? [...prev, ...messages] : messages
-    );
+    // Capture before React evaluates the updater, possibly after the microtask.
+    const shouldAppend = acceptedInThisDropRef.current;
+    setErrors(prev => (shouldAppend ? [...prev, ...messages] : messages));
   };
 
   const removeFile = fileName => {

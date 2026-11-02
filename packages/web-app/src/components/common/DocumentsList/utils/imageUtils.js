@@ -102,6 +102,14 @@ const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
 export const isImageFile = fileName =>
   IMAGE_EXTENSIONS.has(getFileExtension(fileName));
 
+// Only GLB files have an interactive preview on the document page. Require an
+// API thumbnail so the original model is never requested as an image fallback.
+export const isModelPreview = file =>
+  getFileExtension(file.fileName) === '.glb' &&
+  Boolean(
+    file.thumbnails?.small || file.thumbnails?.medium || file.thumbnails?.large
+  );
+
 /**
  * Build `src`/`srcSet` for a responsive thumbnail card, falling back to
  * `completePath` when `thumbnails` (or a given variant) is null - e.g.

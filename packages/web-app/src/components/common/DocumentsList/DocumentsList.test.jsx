@@ -6,7 +6,9 @@ import { DOCUMENT_SORT_ORDERS } from '@/utils/documentSort';
 import { DocumentTypes } from '@/utils/documentTypeHelpers';
 import DocumentsList from './DocumentsList';
 
-vi.mock('./Document', () => ({ default: () => null }));
+vi.mock('./Document', () => ({
+  default: ({ document }) => <div data-testid={`document-${document.id}`} />
+}));
 vi.mock('./ImageLightbox', () => ({ default: () => null }));
 vi.mock('./ImageThumbnail', () => ({ GALLERY_MIN_IMAGES: 4 }));
 
@@ -29,6 +31,39 @@ const messages = {
 };
 
 describe('DocumentsList', () => {
+  it.each([
+    ['GLB', { small: '/model.webp' }, '1 / -1'],
+    ['glb', { medium: '/model.webp' }, '1 / -1'],
+    ['glb', { large: '/model.webp' }, '1 / -1'],
+    ['glb', null, 'auto'],
+    ['glb', { small: null, medium: null, large: null }, 'auto'],
+    ['gltf', { small: '/model.webp' }, 'auto']
+  ])(
+    'sizes a card with three images and a %s attachment to match its previews (%j)',
+    (extension, thumbnails, gridColumn) => {
+      const files = [
+        ...[1, 2, 3].map(index => ({
+          fileName: `image-${index}.png`,
+          completePath: `/image-${index}.png`
+        })),
+        {
+          fileName: `model.${extension}`,
+          completePath: `/model.${extension}`,
+          thumbnails
+        }
+      ];
+      renderWithProviders(
+        <DocumentsList documents={[{ id: 1, title: 'Cave', files }]} />,
+        { messages }
+      );
+
+      const card = screen.getByTestId('document-1').parentElement.parentElement;
+      expect(getComputedStyle(card).gridColumn.replace(/\s/g, '')).toBe(
+        gridColumn.replace(/\s/g, '')
+      );
+    }
+  );
+
   it('renders bibliographic references after the document list', () => {
     renderWithProviders(
       <MemoryRouter>
