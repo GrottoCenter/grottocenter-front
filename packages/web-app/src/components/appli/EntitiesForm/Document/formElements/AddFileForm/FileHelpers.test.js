@@ -9,6 +9,20 @@ import { validateAndBuildFileEntries } from './FileHelpers';
 const formatMessage = ({ id }, values) => `${id}: ${values?.limit ?? ''}`;
 
 describe('validateAndBuildFileEntries', () => {
+  it('identifies both extension-less filenames with the real message catalogue', () => {
+    const result = validateAndBuildFileEntries(
+      [new File(['scan'], 'scan'), new File(['notes'], 'notes')],
+      [],
+      createIntl({ locale: 'en', messages }).formatMessage
+    );
+
+    expect(result.entries).toEqual([]);
+    expect(result.errors).toEqual([
+      'The following file name is invalid: scan.',
+      'The following file name is invalid: notes.'
+    ]);
+  });
+
   it('enforces the topographic extension restriction independently of browser MIME types', () => {
     const files = [
       new File(['model'], 'cave.GLB', { type: 'application/octet-stream' }),

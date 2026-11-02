@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 
 import messages from '@/../public/lang/en.json';
+import { MAX_SIZE_OF_UPLOADED_FILES } from '@/conf/config';
 import {
   DOCUMENT_TYPE_ACCEPT,
   DocumentTypes
@@ -55,6 +56,38 @@ const UploadForm = ({ type }) => {
 };
 
 describe('document uploads', () => {
+  it('identifies both oversized files and the accepted size with the real message catalogue', async () => {
+    const user = userEvent.setup({ applyAccept: false });
+    const { container } = render(<UploadForm type={DocumentTypes.IMAGE} />);
+    const files = ['scan.png', 'photo.png'].map(name => {
+      const file = new File(['image'], name, { type: 'image/png' });
+      Object.defineProperty(file, 'size', {
+        value: MAX_SIZE_OF_UPLOADED_FILES + 1
+      });
+      return file;
+    });
+
+    await user.upload(container.querySelector('input[type="file"]'), files);
+
+    const maxSize = `${MAX_SIZE_OF_UPLOADED_FILES / 1000000} Mo`;
+    expect(
+      await screen.findByText(
+        `The following file is too big: scan.png. Max accepted size: ${maxSize}`
+      )
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        `The following file is too big: photo.png. Max accepted size: ${maxSize}`
+      )
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('scan.png', { exact: true })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('photo.png', { exact: true })
+    ).not.toBeInTheDocument();
+  });
+
   it('accepts topographic GLB and glTF when MIME types are missing or generic', async () => {
     const user = userEvent.setup({ applyAccept: false });
     const { container } = render(
