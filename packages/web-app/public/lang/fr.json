@@ -1240,6 +1240,7 @@
   "For security reasons please create a new password.": "Pour des raisons de sécurité, merci de bien vouloir créer un nouveau mot de passe.",
   "For somerc projection: ": "Pour la projection somerc :",
   "Forgot password?": "Mot de passe oublié ?",
+  "form.columnTooLong": "Cette colonne dépasse la limite de {limit} caractères.",
   "form.fileNameTooLong": "Le nom du fichier {file} dépasse la limite de {limit} caractères.",
   "form.integerRequired": "Saisissez un nombre entier.",
   "form.maxLength": "Maximum {limit} caractères ({count} saisis).",

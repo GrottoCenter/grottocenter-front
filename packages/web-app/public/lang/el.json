@@ -1240,6 +1240,7 @@
   "For security reasons please create a new password.": "Για λόγους ασφαλείας δημιουργήστε νέο κωδικό.",
   "For somerc projection: ": "Για προβολή somerc: ",
   "Forgot password?": "Ξεχάσατε τον κωδικό;",
+  "form.columnTooLong": "Αυτή η στήλη υπερβαίνει το όριο των {limit} χαρακτήρων.",
   "form.fileNameTooLong": "Το όνομα αρχείου {file} υπερβαίνει το όριο των {limit} χαρακτήρων.",
   "form.integerRequired": "Εισαγάγετε έναν ακέραιο αριθμό.",
   "form.maxLength": "Μέγιστο {limit} χαρακτήρες ({count} καταχωρίστηκαν).",

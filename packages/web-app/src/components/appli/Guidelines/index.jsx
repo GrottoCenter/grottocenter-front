@@ -181,10 +181,7 @@ const Guidelines = ({ entityType, entityId, entityName, guidelines }) => {
       content={
         <>
           {isGuidelineSearchVisible && (
-            <Box
-              sx={{
-                mb: 1
-              }}>
+            <Box>
               <form autoComplete="off" onSubmit={handleAttachGuideline}>
                 {isLoadingGuidelines ? (
                   <Box
@@ -266,7 +263,6 @@ const Guidelines = ({ entityType, entityId, entityName, guidelines }) => {
                 )}
 
                 <FormActionRow
-                  isCenter
                   isSubmitting={isSubmitting}
                   disabled={!selectedGuideline}
                   submitLabel={formatMessage({ id: 'guidelines.btn_attach' })}

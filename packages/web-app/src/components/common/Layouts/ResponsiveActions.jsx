@@ -58,6 +58,7 @@ const ResponsiveActions = ({ items, loading = false, loadingLabel, size }) => {
   }) => {
     const button = (
       <Button
+        data-testid={`action-${key}`}
         color={color || (destructive ? 'error' : 'primary')}
         onClick={onClick}
         disabled={disabled}
@@ -162,6 +163,7 @@ const ResponsiveActions = ({ items, loading = false, loadingLabel, size }) => {
     menuEntries.push(
       <MenuItem
         key={key}
+        data-testid={`action-${key}`}
         disabled={disabled}
         aria-busy={busy ? 'true' : undefined}
         onClick={() => {

@@ -1240,6 +1240,7 @@
   "For security reasons please create a new password.": "Din motive de securitate, creați o nouă parolă.",
   "For somerc projection: ": "Pentru proiecție somerc:",
   "Forgot password?": "Ați uitat parola?",
+  "form.columnTooLong": "Această coloană depășește limita de {limit} caractere.",
   "form.fileNameTooLong": "Numele fișierului {file} depășește limita de {limit} caractere.",
   "form.integerRequired": "Introduceți un număr întreg.",
   "form.maxLength": "Maximum {limit} caractere ({count} introduse).",

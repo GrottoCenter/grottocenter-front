@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useId, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box, TextField } from '@mui/material';
@@ -19,7 +19,8 @@ const ObstacleField = ({
   field,
   showLabel = false,
   autoFocus = false,
-  isColumnTooLong = false
+  isColumnTooLong = false,
+  columnErrorId
 }) => {
   const { formatMessage } = useIntl();
   const label = formatMessage({ id: LABEL_KEYS[field] });
@@ -31,6 +32,7 @@ const ObstacleField = ({
 
   const inputRef = useRef(null);
   const onChangeRef = useRef(null);
+  const inputId = useId();
 
   const {
     field: rhfField,
@@ -65,6 +67,7 @@ const ObstacleField = ({
   const textField = (
     <TextField
       {...rhfField}
+      id={inputId}
       multiline
       minRows={1}
       size="small"
@@ -85,6 +88,13 @@ const ObstacleField = ({
       slotProps={{
         htmlInput: {
           'aria-label': label,
+          'aria-describedby':
+            [
+              error && `${inputId}-helper-text`,
+              isColumnTooLong && columnErrorId
+            ]
+              .filter(Boolean)
+              .join(' ') || undefined,
           style: inputPadding,
           maxLength: TEXT_LENGTH_LIMITS.RIGGING_COLUMN
         }
@@ -109,7 +119,8 @@ ObstacleField.propTypes = {
   field: PropTypes.oneOf(Object.keys(LABEL_KEYS)).isRequired,
   showLabel: PropTypes.bool,
   autoFocus: PropTypes.bool,
-  isColumnTooLong: PropTypes.bool
+  isColumnTooLong: PropTypes.bool,
+  columnErrorId: PropTypes.string
 };
 
 export default ObstacleField;

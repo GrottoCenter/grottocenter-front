@@ -82,11 +82,7 @@ const AssociationForm = ({ onClose, onSubmit, status, error }) => {
   );
 
   return (
-    <Box
-      component="form"
-      noValidate
-      onSubmit={handleSubmit(handleValidSubmit)}
-      sx={{ mb: 2 }}>
+    <Box component="form" noValidate onSubmit={handleSubmit(handleValidSubmit)}>
       {status === REDUCER_STATUS.FAILED && (
         <FormSubmissionError error={error} />
       )}
@@ -212,7 +208,6 @@ const AssociationForm = ({ onClose, onSubmit, status, error }) => {
           </Alert>
         )}
       <FormActionRow
-        isCenter
         isSubmitting={status === REDUCER_STATUS.LOADING}
         disabled={status === REDUCER_STATUS.LOADING}
         submitLabel={formatMessage({ id: 'Associate' })}

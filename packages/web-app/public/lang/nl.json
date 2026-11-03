@@ -1240,6 +1240,7 @@
   "For security reasons please create a new password.": "Maak om veiligheidsredenen een nieuw wachtwoord.",
   "For somerc projection: ": "Voor de SOMERC projectie: ",
   "Forgot password?": "Wachtwoord vergeten?",
+  "form.columnTooLong": "Deze kolom overschrijdt de limiet van {limit} tekens.",
   "form.fileNameTooLong": "De bestandsnaam {file} overschrijdt de limiet van {limit} tekens.",
   "form.integerRequired": "Voer een geheel getal in.",
   "form.maxLength": "Maximaal {limit} tekens ({count} ingevoerd).",

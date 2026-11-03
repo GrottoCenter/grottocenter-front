@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -20,7 +20,10 @@ import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { useTheme } from '@mui/material/styles';
 
 import { OBSTACLE_LEGEND, ANCHOR_LEGEND } from '@/utils/riggingLegends';
-import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import {
+  isNearLengthLimit,
+  TEXT_LENGTH_LIMITS
+} from '@/utils/textLengthLimits';
 import {
   RIGGING_COLUMNS,
   getRiggingColumnLengths,
@@ -77,6 +80,10 @@ const CreateRiggingsForm = ({
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const errorId = useId();
+  const columnErrorIds = Object.fromEntries(
+    RIGGING_COLUMNS.map(field => [field, `${errorId}-${field}-error`])
+  );
 
   const {
     handleSubmit,
@@ -100,6 +107,9 @@ const CreateRiggingsForm = ({
   const watchedTitle = useWatch({ control, name: 'title' });
   const watchedObstacles = useWatch({ control, name: 'obstacles' });
   const columnLengths = getRiggingColumnLengths(watchedObstacles);
+  const nearLimitColumns = RIGGING_COLUMNS.filter(field =>
+    isNearLengthLimit(columnLengths[field], TEXT_LENGTH_LIMITS.RIGGING_COLUMN)
+  );
   const isFormInvalid =
     !watchedTitle?.trim() ||
     (watchedTitle?.length ?? 0) > TEXT_LENGTH_LIMITS.TITLE ||
@@ -139,22 +149,12 @@ const CreateRiggingsForm = ({
     />
   );
 
-  const columnCount = (field, showLabel = false) => (
-    <Typography
-      variant="caption"
-      color={
-        columnLengths[field] > TEXT_LENGTH_LIMITS.RIGGING_COLUMN
-          ? 'error'
-          : 'text.secondary'
-      }>
-      {showLabel && `${formatMessage({ id: HEADER_KEYS[field] })}: `}
-      {columnLengths[field]} / {TEXT_LENGTH_LIMITS.RIGGING_COLUMN}
-    </Typography>
-  );
-
   return (
     <FormContainer sx={{ marginTop: 1 }}>
-      <form autoComplete="off" onSubmit={handleSubmit(handleValidSubmit)}>
+      <form
+        data-testid="rigging-form"
+        autoComplete="off"
+        onSubmit={handleSubmit(handleValidSubmit)}>
         <FormRow>
           <InputText
             formKey="title"
@@ -174,11 +174,6 @@ const CreateRiggingsForm = ({
         {fields.length > 0 &&
           (isMobile ? (
             <Stack spacing={1} sx={{ mt: 1 }}>
-              <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
-                {RIGGING_COLUMNS.map(field => (
-                  <Box key={field}>{columnCount(field, true)}</Box>
-                ))}
-              </Stack>
               {fields.map((item, index) => (
                 <ObstacleCard
                   key={item.id}
@@ -191,6 +186,7 @@ const CreateRiggingsForm = ({
                   onDelete={() => remove(index)}
                   autoFocus={index === focusIndex}
                   legendSections={LEGEND_SECTIONS}
+                  columnErrorIds={columnErrorIds}
                   oversizedColumns={RIGGING_COLUMNS.filter(
                     field =>
                       columnLengths[field] > TEXT_LENGTH_LIMITS.RIGGING_COLUMN
@@ -210,7 +206,6 @@ const CreateRiggingsForm = ({
                       <TableCell key={field} width={COLUMN_WIDTHS[field]}>
                         <LegendHeader>
                           {formatMessage({ id: HEADER_KEYS[field] })}
-                          {columnCount(field)}
                           {HEADER_LEGENDS[field] && (
                             <ColumnLegend
                               titleKey={HEADER_LEGENDS[field].titleKey}
@@ -238,6 +233,7 @@ const CreateRiggingsForm = ({
                               columnLengths[field] >
                               TEXT_LENGTH_LIMITS.RIGGING_COLUMN
                             }
+                            columnErrorId={columnErrorIds[field]}
                             autoFocus={
                               index === focusIndex && field === 'obstacle'
                             }
@@ -255,7 +251,48 @@ const CreateRiggingsForm = ({
               </Table>
             </TableContainer>
           ))}
-        <Box sx={{ mt: 1, mb: 1 }}>
+        {nearLimitColumns.length > 0 && (
+          <Stack spacing={0.5} sx={{ mt: 0.5 }}>
+            {nearLimitColumns.map(field => {
+              const count = columnLengths[field];
+              const limit = TEXT_LENGTH_LIMITS.RIGGING_COLUMN;
+              const isTooLong = count > limit;
+              return (
+                <Box
+                  key={field}
+                  data-testid={`rigging-column-counter-${field}`}>
+                  <Typography
+                    component="div"
+                    variant="caption"
+                    color={isTooLong ? 'error' : 'text.secondary'}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: 1
+                    }}>
+                    <Box component="span" sx={{ textTransform: 'capitalize' }}>
+                      {formatMessage({ id: HEADER_KEYS[field] })}
+                    </Box>
+                    <Box component="span" sx={{ whiteSpace: 'nowrap' }}>
+                      {count} / {limit}
+                    </Box>
+                  </Typography>
+                  {isTooLong && (
+                    <Typography
+                      id={columnErrorIds[field]}
+                      role="alert"
+                      variant="caption"
+                      color="error"
+                      sx={{ display: 'block', textAlign: 'right' }}>
+                      {formatMessage({ id: 'form.columnTooLong' }, { limit })}
+                    </Typography>
+                  )}
+                </Box>
+              );
+            })}
+          </Stack>
+        )}
+        <Box sx={{ mt: 1 }}>
           <Button
             onClick={handleAppend}
             color="secondary"
