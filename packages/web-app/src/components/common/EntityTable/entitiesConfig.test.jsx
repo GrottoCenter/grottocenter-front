@@ -7,6 +7,14 @@ import messages from '../../../../public/lang/en.json';
 import entitiesConfig from './entitiesConfig';
 import { renderCell } from './tableUtils';
 
+it('offers entrance coordinates as optional columns', () => {
+  ['latitude', 'longitude', 'altitude'].forEach(field => {
+    expect(
+      entitiesConfig.entrances.columns.find(column => column.field === field)
+    ).toMatchObject({ field, visible: false, sortable: false });
+  });
+});
+
 it.each(['EDITION', 'SPELEOLOGY', null, undefined, 'FUTURE'])(
   'uses the editor organization type %s in document table cells',
   type => {

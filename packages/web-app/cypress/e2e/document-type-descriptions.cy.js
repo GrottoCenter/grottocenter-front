@@ -1,6 +1,13 @@
 import messages from '../../public/lang/fr.json';
 import { documentTypes } from '../fixtures/document-types.json';
 
+// Replaying React timers after a screenshot can trigger error #177 on Firefox.
+// Keep timers running for these diagnostic captures.
+const SCREENSHOT_OPTIONS = {
+  capture: 'viewport',
+  disableTimersAndAnimations: false
+};
+
 describe('Document type descriptions', () => {
   beforeEach(() => {
     cy.disableServiceWorker();
@@ -72,9 +79,7 @@ describe('Document type descriptions', () => {
           });
         });
       });
-      cy.screenshot(`document-types-initial-${width}`, {
-        capture: 'viewport'
-      });
+      cy.screenshot(`document-types-initial-${width}`, SCREENSHOT_OPTIONS);
       if (width < 600) {
         cy.get('[data-testid="document-other-types-toggle"]').click();
       }
@@ -164,9 +169,7 @@ describe('Document type descriptions', () => {
         'Objet matériel, échantillon'
       );
       cy.get('[role="tooltip"]').should('not.exist');
-      cy.screenshot(`document-type-descriptions-${width}`, {
-        capture: 'viewport'
-      });
+      cy.screenshot(`document-type-descriptions-${width}`, SCREENSHOT_OPTIONS);
       cy.get('[data-testid="document-type-2"]').click();
       cy.get('[data-testid="document-type-2"]')
         .should('have.attr', 'aria-pressed', 'true')
@@ -191,9 +194,7 @@ describe('Document type descriptions', () => {
             name.ownerDocument.defaultView.getComputedStyle(name).color
           ).to.equal('rgba(0, 0, 0, 0.95)');
         });
-      cy.screenshot(`document-type-selected-${width}`, {
-        capture: 'viewport'
-      });
+      cy.screenshot(`document-type-selected-${width}`, SCREENSHOT_OPTIONS);
     });
   });
 });
