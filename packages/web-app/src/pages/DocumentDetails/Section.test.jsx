@@ -79,6 +79,24 @@ describe('GLB attachment thumbnails', () => {
 });
 
 describe('Video attachments', () => {
+  it.each(['avi', 'MPEG'])('keeps %s attachments as file links', extension => {
+    const fileName = `cave.${extension}`;
+    const source = `https://videos.example.org/${fileName}`;
+    render(
+      <IntlProvider locale="en" messages={messages}>
+        <MemoryRouter>
+          <FilesSection files={[{ fileName, completePath: source }]} />
+        </MemoryRouter>
+      </IntlProvider>
+    );
+
+    expect(screen.getByRole('link', { name: fileName })).toHaveAttribute(
+      'href',
+      source
+    );
+    expect(screen.queryByTestId('video-preview')).not.toBeInTheDocument();
+  });
+
   beforeEach(() => {
     vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
     vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {});
@@ -89,7 +107,7 @@ describe('Video attachments', () => {
     vi.restoreAllMocks();
   });
 
-  it.each(['MP4', 'avi', 'mpeg', 'webm', 'ogv'])(
+  it.each(['MP4', 'webm', 'ogv'])(
     'previews %s attachments and provides an original-file fallback on error',
     extension => {
       const source = `https://videos.example.org/cave.${extension}`;

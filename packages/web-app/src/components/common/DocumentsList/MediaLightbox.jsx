@@ -395,15 +395,19 @@ const MediaLightbox = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [open, handlePrevious, handleNext]);
 
-  if (!open || !currentMedia) return null;
+  if (!currentMedia) return null;
 
   const decodedFileName = decodeFileName(currentMedia.fileName);
   const captionTitle =
     currentMedia.documentTitle || documentTitle || decodedFileName;
   const captionDescription = currentMedia.description || description;
 
-  let captionLabelId = 'media.toggleCaption';
-  if (!hasVideos) {
+  let captionLabelId;
+  if (hasVideos) {
+    captionLabelId = isCaptionVisible
+      ? 'media.hideCaption'
+      : 'media.showCaption';
+  } else {
     captionLabelId = isCaptionVisible
       ? 'Hide image caption'
       : 'Show image caption';
@@ -457,13 +461,15 @@ const MediaLightbox = ({
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-            <VideoPreview
-              key={currentMedia.completePath}
-              src={currentMedia.completePath}
-              title={decodedFileName}
-              poster={getVideoPoster(currentMedia)}
-              isLightbox
-            />
+            {open && (
+              <VideoPreview
+                key={currentMedia.completePath}
+                src={currentMedia.completePath}
+                title={decodedFileName}
+                poster={getVideoPoster(currentMedia)}
+                isLightbox
+              />
+            )}
           </Box>
         ) : (
           <LightboxImage

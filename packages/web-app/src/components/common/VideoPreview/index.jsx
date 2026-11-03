@@ -4,6 +4,13 @@ import { Box, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
 import AppLink from '../AppLink';
 
+const releaseVideo = video => {
+  if (!video) return;
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+};
+
 const VideoPreview = ({ src, title, poster, isLightbox = false }) => {
   const { formatMessage } = useIntl();
   const videoRef = useRef(null);
@@ -11,14 +18,11 @@ const VideoPreview = ({ src, title, poster, isLightbox = false }) => {
 
   useEffect(() => {
     const video = videoRef.current;
+    // Cleanup can remove src while React keeps the element (StrictMode effect
+    // replay or a source change). Restore it when JSX is not applied again.
     if (video && !video.getAttribute('src')) video.setAttribute('src', src);
-    return () => {
-      if (!video) return;
-      video.pause();
-      video.removeAttribute('src');
-      video.load();
-    };
-  }, [src, hasError]);
+    return () => releaseVideo(video);
+  }, [src]);
 
   if (hasError) {
     return (
@@ -50,7 +54,10 @@ const VideoPreview = ({ src, title, poster, isLightbox = false }) => {
       src={src}
       poster={poster}
       aria-label={title}
-      onError={() => setHasError(true)}
+      onError={() => {
+        releaseVideo(videoRef.current);
+        setHasError(true);
+      }}
       sx={{
         width: '100%',
         maxHeight: isLightbox ? '100%' : { xs: 320, sm: 480, md: 600 },

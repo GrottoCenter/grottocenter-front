@@ -9,8 +9,8 @@ import DocumentsList from './DocumentsList';
 vi.mock('./Document', () => ({
   default: ({ document }) => <div data-testid={`document-${document.id}`} />
 }));
-vi.mock('./ImageLightbox', () => ({ default: () => null }));
-vi.mock('./ImageThumbnail', () => ({ GALLERY_MIN_IMAGES: 4 }));
+vi.mock('./MediaLightbox', () => ({ default: () => null }));
+vi.mock('./MediaThumbnail', () => ({ GALLERY_MIN_IMAGES: 4 }));
 
 const messages = {
   Added: 'Added',

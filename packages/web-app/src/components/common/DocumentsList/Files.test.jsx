@@ -27,6 +27,33 @@ const renderFiles = ({ files, onMediaClick, mediaIndexOffset }) =>
   );
 
 describe('Document file thumbnails', () => {
+  it.each(['avi', 'MPEG'])(
+    'keeps %s attachments as file links and out of gallery indexes',
+    extension => {
+      const onMediaClick = vi.fn();
+      const fileName = `video.${extension}`;
+      const { container } = renderFiles({
+        files: [
+          { fileName, completePath: `/video.${extension}` },
+          { fileName: 'plan.png', completePath: '/plan.png' }
+        ],
+        onMediaClick,
+        mediaIndexOffset: 4
+      });
+
+      expect(screen.getByRole('link', { name: fileName })).toHaveAttribute(
+        'href',
+        `/video.${extension}`
+      );
+      expect(container.querySelector('video')).toBeNull();
+      expect(
+        screen.queryByRole('button', { name: `Open video: ${fileName}` })
+      ).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'plan.png' }));
+      expect(onMediaClick).toHaveBeenCalledExactlyOnceWith(4);
+    }
+  );
+
   it('keeps glTF download-only even when the API provides a thumbnail', () => {
     const file = {
       fileName: 'terrain.gltf',
@@ -103,7 +130,7 @@ describe('Document file thumbnails', () => {
     ).toHaveAttribute('href', documentUrl);
   });
 
-  it.each(['MP4', 'avi', 'mpeg', 'webm', 'ogv'])(
+  it.each(['MP4', 'webm', 'ogv'])(
     'opens %s videos in file order without requesting the video as an image',
     extension => {
       const onMediaClick = vi.fn();

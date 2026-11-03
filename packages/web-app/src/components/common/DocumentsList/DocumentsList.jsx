@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { isGalleryFile } from '@/utils/mediaUtils';
+import { GALLERY_MIN_IMAGES } from '@/components/common/DocumentsList/MediaThumbnail';
 import DocumentSortSelect from '../DocumentSortSelect';
 import {
   canSortDocuments,
@@ -27,7 +28,6 @@ import {
   calculateMasonryRowSpan,
   MASONRY_ROW_HEIGHT
 } from './utils/masonryUtils';
-import { GALLERY_MIN_IMAGES } from './ImageThumbnail';
 
 // Documents are wildly uneven: a bare article needn't eat a whole desktop row
 // while a 15-photo gallery legitimately does. The 420px floor is wider than any

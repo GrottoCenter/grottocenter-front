@@ -1,6 +1,6 @@
 const video = {
-  fileName: 'cave.avi',
-  completePath: 'https://videos.example.org/cave.avi'
+  fileName: 'cave.mp4',
+  completePath: 'https://videos.example.org/cave.mp4'
 };
 const playableVideo = {
   fileName: 'playable.webm',
@@ -27,7 +27,9 @@ describe('Entrance mixed media gallery', () => {
               files: [
                 video,
                 { fileName: 'plan.png', completePath: '/video-tests/plan.png' },
-                playableVideo
+                playableVideo,
+                { fileName: 'archive.avi', completePath: '/archive.avi' },
+                { fileName: 'archive.mpeg', completePath: '/archive.mpeg' }
               ]
             }
           ],
@@ -57,13 +59,23 @@ describe('Entrance mixed media gallery', () => {
       cy.visit('/entrances/42?tab=documents', {
         onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
       });
-      cy.get('[aria-label="Open video: cave.avi"]', {
+      cy.get('[aria-label="Open video: cave.mp4"]', {
         timeout: 30000
       }).scrollIntoView();
-      cy.get('[aria-label="Open video: cave.avi"]').should('be.visible');
+      cy.get('[aria-label="Open video: cave.mp4"]').should('be.visible');
+      ['avi', 'mpeg'].forEach(extension => {
+        cy.contains('a', `archive.${extension}`).should(
+          'have.attr',
+          'href',
+          `/archive.${extension}`
+        );
+        cy.get(`[aria-label="Open video: archive.${extension}"]`).should(
+          'not.exist'
+        );
+      });
       cy.get('@video.all').should('have.length', 0);
       cy.get('[data-testid="video-preview"]').should('not.exist');
-      cy.get('[aria-label="Open video: cave.avi"]').click();
+      cy.get('[aria-label="Open video: cave.mp4"]').click();
       cy.wait('@video');
       cy.contains('This video cannot be played in your browser.').should(
         'be.visible'
@@ -78,7 +90,7 @@ describe('Entrance mixed media gallery', () => {
       cy.get('[aria-label="Close"]').focus();
       cy.get('[aria-label="Close"]').type('{esc}');
       cy.get('[role="dialog"][aria-label="plan.png"]').should('not.exist');
-      cy.get('[aria-label="Open video: cave.avi"]').should('have.focus');
+      cy.get('[aria-label="Open video: cave.mp4"]').should('have.focus');
     });
 
     it(`plays supported media and stops it on navigation at ${width}px`, () => {
@@ -122,7 +134,7 @@ describe('Entrance mixed media gallery', () => {
           1
         );
       });
-      cy.get('[aria-label="Show or hide media caption"]').click();
+      cy.get('[aria-label="Hide media caption"]').click();
       cy.get('[data-testid="lightbox-caption"]').should('not.be.visible');
       cy.get('[data-testid="lightbox-video-stage"]').should(([stage]) => {
         expect(stage.getBoundingClientRect().height).to.be.greaterThan(
@@ -135,7 +147,7 @@ describe('Entrance mixed media gallery', () => {
           stage.querySelector('video').getBoundingClientRect().height
         ).to.be.greaterThan(playerHeight);
       });
-      cy.get('[aria-label="Show or hide media caption"]').click();
+      cy.get('[aria-label="Show media caption"]').click();
       cy.get('[data-testid="lightbox-video-stage"]').should(([stage]) => {
         expect(stage.getBoundingClientRect().height).to.be.closeTo(
           stageHeight,

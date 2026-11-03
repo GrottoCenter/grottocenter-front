@@ -16,8 +16,8 @@ const media = [
     documentTitle: 'Synthetic video sample'
   },
   {
-    fileName: 'unsupported.avi',
-    completePath: '/unsupported.avi',
+    fileName: 'unsupported.mp4',
+    completePath: '/unsupported.mp4',
     documentTitle: 'Playback error with original-file fallback'
   }
 ];

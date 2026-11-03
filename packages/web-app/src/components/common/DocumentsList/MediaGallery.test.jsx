@@ -10,7 +10,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-it('keeps mixed-gallery indexes aligned after sorting and across pagination', () => {
+it('keeps mixed-gallery indexes aligned after sorting and across pagination', async () => {
   vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
   vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {});
   const { container } = renderWithProviders(
@@ -29,7 +29,7 @@ it('keeps mixed-gallery indexes aligned after sorting and across pagination', ()
             title: 'A gallery',
             files: [
               { fileName: 'a.jpg', completePath: '/a.jpg' },
-              { fileName: 'a.avi', completePath: '/a.avi' }
+              { fileName: 'a.webm', completePath: '/a.webm' }
             ]
           }
         ]}
@@ -38,12 +38,12 @@ it('keeps mixed-gallery indexes aligned after sorting and across pagination', ()
     { messages }
   );
   expect(container.querySelector('video')).toBeNull();
-  fireEvent.click(screen.getByRole('button', { name: 'Open video: a.avi' }));
-  expect(screen.getByTestId('video-preview')).toHaveAttribute('src', '/a.avi');
+  fireEvent.click(screen.getByRole('button', { name: 'Open video: a.webm' }));
+  expect(screen.getByTestId('video-preview')).toHaveAttribute('src', '/a.webm');
   fireEvent.click(screen.getByRole('button', { name: 'Next media' }));
   expect(screen.getByTestId('video-preview')).toHaveAttribute('src', '/z.mp4');
   fireEvent.click(screen.getByRole('button', { name: 'Close' }));
-  fireEvent.click(screen.getByRole('button', { name: 'Go to page 2' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Go to page 2' }));
   fireEvent.click(screen.getByRole('button', { name: 'Open video: z.mp4' }));
   expect(screen.getByTestId('video-preview')).toHaveAttribute('src', '/z.mp4');
 });

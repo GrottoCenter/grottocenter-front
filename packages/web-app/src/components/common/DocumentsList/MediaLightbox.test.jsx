@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
@@ -8,8 +9,8 @@ import * as imageUtils from './utils/imageUtils';
 const media = [
   { fileName: 'plan.png', completePath: '/plan.png' },
   {
-    fileName: 'cave.avi',
-    completePath: '/cave.avi',
+    fileName: 'cave.webm',
+    completePath: '/cave.webm',
     documentTitle: 'Cave video',
     description: 'Video description'
   },
@@ -35,6 +36,33 @@ afterEach(() => {
 });
 
 describe('Mixed media lightbox', () => {
+  it('restores the video source after StrictMode replays its cleanup', () => {
+    const { rerender } = render(<StrictMode>{viewer()}</StrictMode>);
+    fireEvent.click(screen.getByRole('button', { name: 'Next media' }));
+    const video = screen.getByTestId('video-preview');
+    expect(HTMLMediaElement.prototype.pause).toHaveBeenCalled();
+    expect(video).toHaveAttribute('src', '/cave.webm');
+    rerender(<StrictMode>{viewer(false)}</StrictMode>);
+    expect(video).not.toHaveAttribute('src');
+  });
+
+  it('labels the caption action for its current state across images and videos', () => {
+    render(viewer());
+    const hideButton = screen.getByRole('button', {
+      name: 'Hide media caption'
+    });
+    expect(hideButton).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.click(hideButton);
+    expect(
+      screen.getByRole('button', { name: 'Show media caption' })
+    ).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(screen.getByRole('button', { name: 'Next media' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Show media caption' }));
+    expect(
+      screen.getByRole('button', { name: 'Hide media caption' })
+    ).toHaveAttribute('aria-expanded', 'true');
+  });
+
   it('loads only the active medium and releases videos on navigation and closure', () => {
     const download = vi.spyOn(imageUtils, 'downloadFile').mockResolvedValue();
     const { container, rerender } = render(viewer());
@@ -45,20 +73,20 @@ describe('Mixed media lightbox', () => {
     expect(container.querySelector('video')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Next media' }));
     const video = screen.getByTestId('video-preview');
-    expect(video).toHaveAttribute('src', '/cave.avi');
+    expect(video).toHaveAttribute('src', '/cave.webm');
     expect(video).toHaveAttribute('controls');
     expect(video).toHaveAttribute('playsinline');
     expect(video).not.toHaveAttribute('autoplay');
     expect(screen.queryByTestId('lightbox-image')).toBeNull();
     expect(screen.getByText('Video description')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Download' }));
-    expect(download).toHaveBeenCalledWith('/cave.avi', 'cave.avi');
+    expect(download).toHaveBeenCalledWith('/cave.webm', 'cave.webm');
     expect(screen.queryByRole('progressbar')).toBeNull();
 
     fireEvent.wheel(video, { deltaY: -100 });
     expect(screen.queryByRole('button', { name: 'Reset zoom' })).toBeNull();
     fireEvent.keyDown(video, { key: 'ArrowRight' });
-    expect(video).toHaveAttribute('src', '/cave.avi');
+    expect(video).toHaveAttribute('src', '/cave.webm');
 
     fireEvent.click(screen.getByRole('button', { name: 'Next media' }));
     expect(HTMLMediaElement.prototype.pause).toHaveBeenCalled();
@@ -83,9 +111,9 @@ describe('Mixed media lightbox', () => {
     );
     expect(
       screen.getByRole('link', { name: 'Open the original file' })
-    ).toHaveAttribute('href', '/cave.avi');
+    ).toHaveAttribute('href', '/cave.webm');
     fireEvent.click(screen.getByRole('button', { name: 'Download' }));
-    expect(download).toHaveBeenCalledWith('/cave.avi', 'cave.avi');
+    expect(download).toHaveBeenCalledWith('/cave.webm', 'cave.webm');
     expect(video).not.toHaveAttribute('src');
     fireEvent.click(screen.getByRole('button', { name: 'Next media' }));
     expect(screen.queryByRole('status')).toBeNull();
