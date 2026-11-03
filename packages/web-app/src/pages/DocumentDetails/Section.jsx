@@ -8,6 +8,8 @@ import Linkify from 'linkify-react';
 
 import PdfPreview from '@/components/common/PdfPreview';
 import ModelPreview from '@/components/common/ModelPreview';
+import VideoPreview from '@/components/common/VideoPreview';
+import { getVideoPoster, isVideoFile } from '@/utils/mediaUtils';
 import AppLink from '../../components/common/AppLink';
 import linkifyOptions from '../../helpers/linkifyOptions';
 import Property from '../../components/common/Properties/Property';
@@ -148,22 +150,11 @@ DetailItem.propTypes = {
 // uses at `md`.
 const DOCUMENT_IMAGE_MAX_HEIGHT = 600;
 
-const VideoPreview = styled('video')(({ theme }) => ({
-  width: '100%',
-  maxHeight: 320,
-  display: 'block',
-  background: theme.palette.common.black,
-  borderRadius: theme.spacing(0.5),
-  [theme.breakpoints.up('sm')]: { maxHeight: 480 },
-  [theme.breakpoints.up('md')]: { maxHeight: 600 }
-}));
-
 const AudioPreview = styled('audio')`
   width: 100%;
   display: block;
 `;
 
-const VIDEO_EXTENSIONS = new Set(['.mp4', '.webm', '.ogv']);
 const AUDIO_EXTENSIONS = new Set([
   '.mp3',
   '.ogg',
@@ -174,8 +165,6 @@ const AUDIO_EXTENSIONS = new Set([
   '.opus'
 ]);
 
-const isVideoFile = fileName =>
-  VIDEO_EXTENSIONS.has(getFileExtension(fileName));
 const isAudioFile = fileName =>
   AUDIO_EXTENSIONS.has(getFileExtension(fileName));
 
@@ -342,7 +331,12 @@ export const FilesSection = ({ files, externalPdfUrl }) => {
               {decodeFileName(file.fileName)}
             </AppLink>
           </Box>
-          <VideoPreview controls preload="metadata" src={file.completePath} />
+          <VideoPreview
+            key={file.completePath}
+            src={file.completePath}
+            title={decodeFileName(file.fileName)}
+            poster={getVideoPoster(file)}
+          />
         </Box>
       ))}
       {audios.map(file => (

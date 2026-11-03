@@ -11,6 +11,7 @@ import {
   Skeleton
 } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
+import { isGalleryFile } from '@/utils/mediaUtils';
 import DocumentSortSelect from '../DocumentSortSelect';
 import {
   canSortDocuments,
@@ -20,8 +21,8 @@ import {
 import { DocumentChildPropTypes } from '../../../types/document.type';
 import Document from './Document';
 import DocumentReferences from './DocumentReferences';
-import ImageLightbox from './ImageLightbox';
-import { isImageFile, isModelPreview } from './utils/imageUtils';
+import MediaLightbox from './MediaLightbox';
+import { isModelPreview } from './utils/imageUtils';
 import {
   calculateMasonryRowSpan,
   MASONRY_ROW_HEIGHT
@@ -175,18 +176,18 @@ const DocumentsList = ({
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
-  const { allImages, imageOffsets, isWide } = useMemo(() => {
-    const images = [];
+  const { allMedia, mediaOffsets, isWide } = useMemo(() => {
+    const media = [];
     const offsets = [];
     const wide = [];
     sortedDocuments.forEach(doc => {
-      const start = images.length;
+      const start = media.length;
       offsets.push(start);
       if (doc.files) {
         doc.files
-          .filter(file => isImageFile(file.fileName))
+          .filter(file => isGalleryFile(file.fileName))
           .forEach(file =>
-            images.push({
+            media.push({
               ...file,
               description: doc.description,
               documentTitle: doc.title
@@ -196,12 +197,12 @@ const DocumentsList = ({
       // A gallery earns the full row: past the threshold its tiles no longer
       // fit one card. Derived here rather than recounted at render time.
       const modelCount = doc.files?.filter(isModelPreview).length ?? 0;
-      wide.push(images.length - start + modelCount >= GALLERY_MIN_IMAGES);
+      wide.push(media.length - start + modelCount >= GALLERY_MIN_IMAGES);
     });
-    return { allImages: images, imageOffsets: offsets, isWide: wide };
+    return { allMedia: media, mediaOffsets: offsets, isWide: wide };
   }, [sortedDocuments]);
 
-  const handleImageClick = useCallback(globalIndex => {
+  const handleMediaClick = useCallback(globalIndex => {
     setLightboxIndex(globalIndex);
     setLightboxOpen(true);
   }, []);
@@ -275,8 +276,8 @@ const DocumentsList = ({
                 document={document}
                 hasSnapshotButton={hasSnapshotButton}
                 onUnlink={onUnlink}
-                onImageClick={isOnPage ? handleImageClick : undefined}
-                imageIndexOffset={imageOffsets[i]}
+                onMediaClick={isOnPage ? handleMediaClick : undefined}
+                mediaIndexOffset={mediaOffsets[i]}
               />
             </DocumentsGridItem>
           );
@@ -303,11 +304,11 @@ const DocumentsList = ({
         // own preview/expansion and must not be limited to the visible card page.
         <DocumentReferences documents={sortedDocuments} />
       )}
-      {allImages.length > 0 && (
-        <ImageLightbox
+      {allMedia.length > 0 && (
+        <MediaLightbox
           open={lightboxOpen}
           onClose={() => setLightboxOpen(false)}
-          images={allImages}
+          media={allMedia}
           initialIndex={lightboxIndex}
         />
       )}

@@ -2,14 +2,14 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, ListItem } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import ImageThumbnail, { ThumbnailsGrid } from './ImageThumbnail';
-import ImageLightbox from './ImageLightbox';
 import {
-  isImageFile,
-  isModelPreview,
-  decodeFileName,
-  getThumbnailSources
-} from './utils/imageUtils';
+  getMediaThumbnailSources,
+  isGalleryFile,
+  isVideoFile
+} from '@/utils/mediaUtils';
+import MediaThumbnail, { ThumbnailsGrid } from './MediaThumbnail';
+import MediaLightbox from './MediaLightbox';
+import { isModelPreview, decodeFileName } from './utils/imageUtils';
 import { getFileIcon } from './utils/fileIcons';
 import { ThumbnailsPropTypes } from '../../../types/document.type';
 
@@ -26,24 +26,23 @@ const Files = ({
   description,
   documentTitle,
   documentUrl,
-  onImageClick,
-  imageIndexOffset = 0
+  onMediaClick,
+  mediaIndexOffset = 0
 }) => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
   if (files.length === 0) return null;
 
-  // Separate image files from other files
-  const imageFiles = files.filter(file => isImageFile(file.fileName));
-  const otherFiles = files.filter(file => !isImageFile(file.fileName));
+  const mediaFiles = files.filter(file => isGalleryFile(file.fileName));
+  const otherFiles = files.filter(file => !isGalleryFile(file.fileName));
   // A model is never an image fallback: only use API-generated thumbnails.
   const modelFiles = documentUrl ? otherFiles.filter(isModelPreview) : [];
-  const previewFiles = [...imageFiles, ...modelFiles];
+  const previewFiles = [...mediaFiles, ...modelFiles];
 
   const handleThumbnailClick = index => {
-    if (onImageClick) {
-      onImageClick(imageIndexOffset + index);
+    if (onMediaClick) {
+      onMediaClick(mediaIndexOffset + index);
     } else {
       setLightboxIndex(index);
       setLightboxOpen(true);
@@ -55,14 +54,16 @@ const Files = ({
       {previewFiles.length > 0 && (
         <ThumbnailsGrid $count={previewFiles.length} sx={{ mb: 1 }}>
           {previewFiles.map((file, index) => {
-            const { src, srcSet } = getThumbnailSources(file);
-            const isModel = !isImageFile(file.fileName);
+            const isVideo = isVideoFile(file.fileName);
+            const { src, srcSet } = getMediaThumbnailSources(file);
+            const isModel = isModelPreview(file);
             return (
-              <ImageThumbnail
+              <MediaThumbnail
                 key={`${file.fileName}:${src}`}
                 src={src}
                 srcSet={srcSet}
                 alt={decodeFileName(file.fileName)}
+                isVideo={isVideo}
                 objectFit={isModel ? 'contain' : 'cover'}
                 to={isModel ? documentUrl : undefined}
                 onClick={
@@ -88,25 +89,14 @@ const Files = ({
         </FileListItem>
       ))}
       {/*
-        Fallback lightbox when not managed by a parent component.
-
-        There are two lightbox management patterns in the app:
-        1) Parent-managed (e.g. DocumentsList.jsx):
-           - Uses `onImageClick` and `imageIndexOffset`
-           - Enables cross-document navigation within a shared lightbox
-        2) Self-managed (here in Files.jsx):
-           - Used when `onImageClick` is not provided
-           - Handles its own local lightbox state
-
-        This fallback ensures Files.jsx remains usable in isolation.
-        Note: in this mode, navigation is limited to images within this component only
-        (no cross-document navigation).
+        Standalone callers keep a local gallery; DocumentsList supplies the
+        shared cross-document gallery callback instead.
       */}
-      {!onImageClick && imageFiles.length > 0 && (
-        <ImageLightbox
+      {!onMediaClick && mediaFiles.length > 0 && (
+        <MediaLightbox
           open={lightboxOpen}
           onClose={() => setLightboxOpen(false)}
-          images={imageFiles}
+          media={mediaFiles}
           initialIndex={lightboxIndex}
           description={description}
           documentTitle={documentTitle}
@@ -127,8 +117,8 @@ Files.propTypes = {
   description: PropTypes.string,
   documentTitle: PropTypes.string,
   documentUrl: PropTypes.string,
-  onImageClick: PropTypes.func,
-  imageIndexOffset: PropTypes.number
+  onMediaClick: PropTypes.func,
+  mediaIndexOffset: PropTypes.number
 };
 
 export default Files;
