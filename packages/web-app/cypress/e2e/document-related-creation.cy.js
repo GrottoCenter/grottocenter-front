@@ -60,7 +60,11 @@ describe('Create related entities without leaving a document', () => {
     cy.intercept('GET', '**/api/v1/file-formats', {
       body: { fileFormats: [{ extension: 'pdf', mimeType: 'application/pdf' }] }
     });
-    cy.intercept('POST', '**/api/v1/search', { body: { results: [] } });
+    cy.intercept('POST', '**/api/v1/search', request => {
+      if (/^New (editor|library)$/.test(request.body.query))
+        request.alias = 'relatedOrganizationSearch';
+      request.reply({ body: { results: [] } });
+    });
     cy.intercept('POST', '**/api/v1/organizations', request =>
       request.reply({
         body: { id: 42, name: request.body.name.text, type: request.body.type }
@@ -168,6 +172,7 @@ describe('Create related entities without leaving a document', () => {
         cy.get(
           `[data-testid="document-${context}"] input[role="combobox"]`
         ).should('have.value', `New ${context}`);
+        cy.wait('@relatedOrganizationSearch');
         cy.get(`[data-testid="create-${context}-search-button"]`).click();
         cy.get('[data-testid="organization-name"] input').should(
           'have.value',

@@ -48,6 +48,14 @@ const expectMultipartValue = (body, field, value) => {
   expect(body).to.include(`name="${field}"\r\n\r\n${value}\r\n`);
 };
 
+const mockParentSearch = () =>
+  cy.intercept('POST', '**/api/v1/search', request => {
+    if (request.body.query === 'Test coll') request.alias = 'parentSearch';
+    request.reply({
+      body: { results: [{ ...collection, _type: 'documents' }] }
+    });
+  });
+
 describe('Editing a document with publication authorization', () => {
   beforeEach(() => {
     cy.viewport(1280, 1000);
@@ -112,16 +120,14 @@ describe('Editing a document with publication authorization', () => {
 
   it('keeps publication inheritance working when selecting the parent', () => {
     cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
-    cy.intercept('POST', '**/api/v1/search', {
-      body: { results: [{ ...collection, _type: 'documents' }] }
-    }).as('search');
+    mockParentSearch();
     cy.visit('/documents/42/edit', {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
     cy.wait('@formats');
     cy.get('[data-testid="document-parent-search"]').clear();
     cy.get('[data-testid="document-parent-search"]').type('Test coll');
-    cy.wait('@search');
+    cy.wait('@parentSearch');
     cy.contains('[role="option"]', 'Test collection').click();
     cy.wait('@parent');
     addFile();
@@ -259,16 +265,14 @@ describe('Editing a document with publication authorization', () => {
     cy.intercept('GET', '**/api/v1/documents/41', {
       body: { ...collection, license: 'Historical license' }
     }).as('unknownParent');
-    cy.intercept('POST', '**/api/v1/search', {
-      body: { results: [{ ...collection, _type: 'documents' }] }
-    }).as('search');
+    mockParentSearch();
     cy.visit('/documents/42/edit', {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
     cy.wait('@formats');
     cy.get('[data-testid="document-parent-search"]').clear();
     cy.get('[data-testid="document-parent-search"]').type('Test coll');
-    cy.wait('@search');
+    cy.wait('@parentSearch');
     cy.contains('[role="option"]', 'Test collection').click();
     cy.wait('@unknownParent');
     addFile();
