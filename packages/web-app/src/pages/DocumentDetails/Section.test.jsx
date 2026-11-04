@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -74,6 +74,70 @@ describe('GLB attachment thumbnails', () => {
       ).not.toHaveAttribute('download');
       expect(screen.queryByTestId('model-viewer')).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'View in 3D' })).toBeEnabled();
+    }
+  );
+});
+
+describe('Video attachments', () => {
+  it.each(['avi', 'MPEG'])('keeps %s attachments as file links', extension => {
+    const fileName = `cave.${extension}`;
+    const source = `https://videos.example.org/${fileName}`;
+    render(
+      <IntlProvider locale="en" messages={messages}>
+        <MemoryRouter>
+          <FilesSection files={[{ fileName, completePath: source }]} />
+        </MemoryRouter>
+      </IntlProvider>
+    );
+
+    expect(screen.getByRole('link', { name: fileName })).toHaveAttribute(
+      'href',
+      source
+    );
+    expect(screen.queryByTestId('video-preview')).not.toBeInTheDocument();
+  });
+
+  beforeEach(() => {
+    vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
+    vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it.each(['MP4', 'webm', 'ogv'])(
+    'previews %s attachments and provides an original-file fallback on error',
+    extension => {
+      const source = `https://videos.example.org/cave.${extension}`;
+      render(
+        <IntlProvider locale="en" messages={messages}>
+          <MemoryRouter>
+            <FilesSection
+              files={[
+                {
+                  fileName: `cave.${extension}`,
+                  completePath: source,
+                  thumbnails: { medium: '/poster.png' }
+                }
+              ]}
+            />
+          </MemoryRouter>
+        </IntlProvider>
+      );
+      const player = screen.getByTestId('video-preview');
+      expect(player).toHaveAttribute('src', source);
+      expect(player).toHaveAttribute('poster', '/poster.png');
+      expect(player).not.toHaveAttribute('autoplay');
+      fireEvent.error(player);
+      expect(screen.getByRole('status')).toHaveTextContent(
+        'This video cannot be played in your browser.'
+      );
+      expect(
+        screen.getByRole('link', { name: 'Open the original file' })
+      ).toHaveAttribute('href', source);
+      expect(player).not.toHaveAttribute('src');
     }
   );
 });

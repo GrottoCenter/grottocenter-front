@@ -19,6 +19,8 @@ import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import NavigateBefore from '@mui/icons-material/NavigateBefore';
 import NavigateNext from '@mui/icons-material/NavigateNext';
 import { useIntl } from 'react-intl';
+import VideoPreview from '@/components/common/VideoPreview';
+import { getVideoPoster, isVideoFile } from '@/utils/mediaUtils';
 import { decodeFileName, downloadFile } from './utils/imageUtils';
 import { ThumbnailsPropTypes } from '../../../types/document.type';
 
@@ -118,34 +120,53 @@ const TopBar = styled(Box)`
   z-index: 3;
 `;
 
-const BottomBar = styled(Box)`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: ${({ theme }) => theme.spacing(3, 2, 1.5)};
-  gap: ${({ theme }) => theme.spacing(0.25)};
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.85) 0%,
-    rgba(0, 0, 0, 0.65) 60%,
-    transparent 100%
-  );
-  z-index: 2;
-  pointer-events: none;
-
-  /* Text-shadow is the belt to the gradient's suspenders: a bright pixel at
-     the very top edge of the gradient can still leak through, so we keep the
-     labels legible on any background. */
-  & > * {
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+const BottomBar = styled(Box, {
+  shouldForwardProp: prop => prop[0] !== '$'
+})(({ theme, $isVideo, $isCaptionVisible }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: theme.spacing(0.25),
+  zIndex: 2,
+  opacity: $isCaptionVisible ? 1 : 0,
+  transition: theme.transitions.create('opacity', {
+    duration: theme.transitions.duration.shorter
+  }),
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none'
+  },
+  ...($isVideo
+    ? {
+        position: 'static',
+        flexShrink: 0,
+        display: $isCaptionVisible ? 'flex' : 'none',
+        padding: theme.spacing(1.5, 2),
+        maxHeight: '35%',
+        overflowY: 'auto',
+        pointerEvents: 'auto',
+        background: 'none'
+      }
+    : {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: theme.spacing(3, 2, 1.5),
+        background: `linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.85) 0%,
+          rgba(0, 0, 0, 0.65) 60%,
+          transparent 100%
+        )`,
+        pointerEvents: 'none'
+      }),
+  // Keep labels legible even on bright pixels at the gradient's top edge.
+  '& > *': {
+    textShadow: '0 1px 3px rgba(0, 0, 0, 0.9)'
   }
-`;
+}));
 
-const ImageCounter = styled(Chip)(({ theme }) => ({
+const MediaCounter = styled(Chip)(({ theme }) => ({
   position: 'absolute',
   bottom: theme.spacing(1.5),
   left: '50%',
@@ -167,10 +188,10 @@ const LightboxImage = styled('img')`
   user-select: none;
 `;
 
-const ImageLightbox = ({
+const MediaLightbox = ({
   open,
   onClose,
-  images,
+  media,
   initialIndex = 0,
   description = null,
   documentTitle = null
@@ -208,32 +229,35 @@ const ImageLightbox = ({
     setPosition({ x: 0, y: 0 });
   }, [currentIndex, open]);
 
-  const currentImage = images[currentIndex];
-  const isImageLoading = settledImageSrc !== currentImage?.completePath;
+  const currentMedia = media[currentIndex];
+  const isVideo = isVideoFile(currentMedia?.fileName);
+  const hasVideos = media.some(file => isVideoFile(file.fileName));
+  const isImageLoading =
+    !isVideo && settledImageSrc !== currentMedia?.completePath;
   const imageAspectRatio =
-    loadedImage?.src === currentImage?.completePath
+    loadedImage?.src === currentMedia?.completePath
       ? loadedImage?.aspectRatio
       : null;
-  const hasMultipleImages = images.length > 1;
+  const hasMultipleMedia = media.length > 1;
 
   const handleImageLoad = e => {
-    setSettledImageSrc(currentImage.completePath);
+    setSettledImageSrc(currentMedia.completePath);
     const { naturalWidth, naturalHeight } = e.currentTarget;
     if (naturalWidth > 0 && naturalHeight > 0) {
       setLoadedImage({
-        src: currentImage.completePath,
+        src: currentMedia.completePath,
         aspectRatio: naturalWidth / naturalHeight
       });
     }
   };
 
   const handlePrevious = useCallback(() => {
-    setCurrentIndex(prev => (prev > 0 ? prev - 1 : images.length - 1));
-  }, [images.length]);
+    setCurrentIndex(prev => (prev > 0 ? prev - 1 : media.length - 1));
+  }, [media.length]);
 
   const handleNext = useCallback(() => {
-    setCurrentIndex(prev => (prev < images.length - 1 ? prev + 1 : 0));
-  }, [images.length]);
+    setCurrentIndex(prev => (prev < media.length - 1 ? prev + 1 : 0));
+  }, [media.length]);
 
   // Resetting the pan alongside the zoom: at 100% the image fits the viewport,
   // so a leftover offset would push it off-screen with no way left to drag it
@@ -357,6 +381,8 @@ const ImageLightbox = ({
   useEffect(() => {
     const handleKeyDown = e => {
       if (!open) return;
+      // Arrow keys belong to the native video controls while they have focus.
+      if (e.target instanceof HTMLVideoElement) return;
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
         handlePrevious();
@@ -369,15 +395,28 @@ const ImageLightbox = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [open, handlePrevious, handleNext]);
 
-  if (!currentImage) return null;
+  if (!currentMedia) return null;
 
-  const captionToggleLabel = formatMessage({
-    id: isCaptionVisible ? 'Hide image caption' : 'Show image caption'
-  });
-  const imageCounterLabel = hasMultipleImages
+  const decodedFileName = decodeFileName(currentMedia.fileName);
+  const captionTitle =
+    currentMedia.documentTitle || documentTitle || decodedFileName;
+  const captionDescription = currentMedia.description || description;
+
+  let captionLabelId;
+  if (hasVideos) {
+    captionLabelId = isCaptionVisible
+      ? 'media.hideCaption'
+      : 'media.showCaption';
+  } else {
+    captionLabelId = isCaptionVisible
+      ? 'Hide image caption'
+      : 'Show image caption';
+  }
+  const captionToggleLabel = formatMessage({ id: captionLabelId });
+  const mediaCounterLabel = hasMultipleMedia
     ? formatMessage(
-        { id: 'Image {current} of {total}' },
-        { current: currentIndex + 1, total: images.length }
+        { id: hasVideos ? 'media.counter' : 'Image {current} of {total}' },
+        { current: currentIndex + 1, total: media.length }
       )
     : null;
 
@@ -386,9 +425,9 @@ const ImageLightbox = ({
       open={open}
       onClose={onClose}
       fullScreen
-      aria-label={decodeFileName(currentImage.fileName)}>
+      aria-label={decodedFileName}>
       <Box
-        ref={contentRef}
+        ref={isVideo ? undefined : contentRef}
         aria-busy={isImageLoading}
         sx={{
           position: 'relative',
@@ -396,47 +435,74 @@ const ImageLightbox = ({
           width: '100%',
           height: '100%',
           display: 'flex',
+          flexDirection: isVideo ? 'column' : 'row',
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
-          touchAction: 'none'
+          touchAction: isVideo ? 'auto' : 'none'
         }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
+        onMouseDown={isVideo ? undefined : handleMouseDown}
+        onMouseMove={isVideo ? undefined : handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}>
-        <LightboxImage
-          key={currentImage.completePath}
-          data-testid="lightbox-image"
-          src={currentImage.completePath}
-          alt={decodeFileName(currentImage.fileName)}
-          draggable={false}
-          onLoad={handleImageLoad}
-          onError={() => setSettledImageSrc(currentImage.completePath)}
-          sx={{
-            backgroundColor: imageAspectRatio ? 'common.white' : 'transparent'
-          }}
-          style={{
-            opacity: isImageLoading ? 0 : 1,
-            // The white backing must fit the bitmap, not a full-screen
-            // object-fit box. Container units keep it fitted on resize too.
-            width: imageAspectRatio
-              ? `min(100cqw, ${100 * imageAspectRatio}cqh)`
-              : '100%',
-            height: imageAspectRatio
-              ? `min(100cqh, ${100 / imageAspectRatio}cqw)`
-              : '100%',
-            transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
-              position.y / zoom
-            }px)`,
-            transition:
-              isDragging || isTouchPanning ? 'none' : 'transform 0.2s',
-            transformOrigin: 'center',
-            cursor: panCursor
-          }}
-        />
+        onTouchStart={isVideo ? undefined : handleTouchStart}
+        onTouchEnd={isVideo ? undefined : handleTouchEnd}>
+        {isVideo ? (
+          <Box
+            data-testid="lightbox-video-stage"
+            sx={{
+              width: '100%',
+              flex: '1 1 0',
+              minHeight: 0,
+              px: { xs: 7, sm: 10 },
+              pt: 9,
+              pb: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+            {open && (
+              <VideoPreview
+                key={currentMedia.completePath}
+                src={currentMedia.completePath}
+                title={decodedFileName}
+                poster={getVideoPoster(currentMedia)}
+                isLightbox
+              />
+            )}
+          </Box>
+        ) : (
+          <LightboxImage
+            key={currentMedia.completePath}
+            data-testid="lightbox-image"
+            src={currentMedia.completePath}
+            alt={decodedFileName}
+            draggable={false}
+            onLoad={handleImageLoad}
+            onError={() => setSettledImageSrc(currentMedia.completePath)}
+            sx={{
+              backgroundColor: imageAspectRatio ? 'common.white' : 'transparent'
+            }}
+            style={{
+              opacity: isImageLoading ? 0 : 1,
+              // The white backing must fit the bitmap, not a full-screen
+              // object-fit box. Container units keep it fitted on resize too.
+              width: imageAspectRatio
+                ? `min(100cqw, ${100 * imageAspectRatio}cqh)`
+                : '100%',
+              height: imageAspectRatio
+                ? `min(100cqh, ${100 / imageAspectRatio}cqw)`
+                : '100%',
+              transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
+                position.y / zoom
+              }px)`,
+              transition:
+                isDragging || isTouchPanning ? 'none' : 'transform 0.2s',
+              transformOrigin: 'center',
+              cursor: panCursor
+            }}
+          />
+        )}
 
         {isImageLoading && (
           <Box
@@ -456,7 +522,7 @@ const ImageLightbox = ({
           </Box>
         )}
 
-        {zoom !== MIN_ZOOM && (
+        {!isVideo && zoom !== MIN_ZOOM && (
           <ZoomResetButton
             onClick={handleResetZoom}
             // The image behind reads raw pointer and touch events to pan and to
@@ -484,10 +550,7 @@ const ImageLightbox = ({
           </Tooltip>
           <OverlayButton
             onClick={() =>
-              downloadFile(
-                currentImage.completePath,
-                decodeFileName(currentImage.fileName)
-              )
+              downloadFile(currentMedia.completePath, decodedFileName)
             }
             aria-label={formatMessage({ id: 'Download' })}>
             <Download />
@@ -499,19 +562,23 @@ const ImageLightbox = ({
           </OverlayButton>
         </TopBar>
 
-        {hasMultipleImages && (
+        {hasMultipleMedia && (
           <>
             <NavButton
               className="previous"
               onClick={handlePrevious}
-              aria-label={formatMessage({ id: 'Previous image' })}
+              aria-label={formatMessage({
+                id: hasVideos ? 'media.previous' : 'Previous image'
+              })}
               size="large">
               <NavigateBefore fontSize="large" />
             </NavButton>
             <NavButton
               className="next"
               onClick={handleNext}
-              aria-label={formatMessage({ id: 'Next image' })}
+              aria-label={formatMessage({
+                id: hasVideos ? 'media.next' : 'Next image'
+              })}
               size="large">
               <NavigateNext fontSize="large" />
             </NavButton>
@@ -519,52 +586,56 @@ const ImageLightbox = ({
         )}
 
         <BottomBar
+          $isVideo={isVideo}
+          $isCaptionVisible={isCaptionVisible}
+          data-testid="lightbox-caption"
           id={captionId}
-          aria-hidden={!isCaptionVisible}
-          sx={{
-            opacity: isCaptionVisible ? 1 : 0,
-            transition: theme =>
-              theme.transitions.create('opacity', {
-                duration: theme.transitions.duration.shorter
-              }),
-            '@media (prefers-reduced-motion: reduce)': {
-              transition: 'none'
-            }
-          }}>
+          aria-hidden={!isCaptionVisible}>
           <Typography
             variant="caption"
             sx={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
-            {currentImage.documentTitle ||
-              documentTitle ||
-              decodeFileName(currentImage.fileName)}
+            {captionTitle}
           </Typography>
-          {(currentImage.description || description) && (
+          {captionDescription && (
             <Typography
               variant="body2"
               sx={{ color: 'white', textAlign: 'center' }}>
-              {currentImage.description || description}
+              {captionDescription}
             </Typography>
           )}
-          {hasMultipleImages && (
+          {hasMultipleMedia && (
             <Typography
               variant="caption"
               sx={{ color: 'rgba(255,255,255,0.75)' }}>
-              {imageCounterLabel}
+              {mediaCounterLabel}
             </Typography>
           )}
         </BottomBar>
-        {!isCaptionVisible && hasMultipleImages && (
-          <ImageCounter size="small" label={imageCounterLabel} />
+        {!isCaptionVisible && hasMultipleMedia && (
+          <MediaCounter
+            size="small"
+            label={mediaCounterLabel}
+            sx={
+              isVideo
+                ? {
+                    position: 'static',
+                    transform: 'none',
+                    flexShrink: 0,
+                    mb: 1.5
+                  }
+                : undefined
+            }
+          />
         )}
       </Box>
     </LightboxDialog>
   );
 };
 
-ImageLightbox.propTypes = {
+MediaLightbox.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  images: PropTypes.arrayOf(
+  media: PropTypes.arrayOf(
     PropTypes.shape({
       fileName: PropTypes.string.isRequired,
       completePath: PropTypes.string.isRequired,
@@ -578,4 +649,4 @@ ImageLightbox.propTypes = {
   documentTitle: PropTypes.string
 };
 
-export default ImageLightbox;
+export default MediaLightbox;

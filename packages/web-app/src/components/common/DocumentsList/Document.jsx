@@ -18,10 +18,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useState, useLayoutEffect, useRef } from 'react';
 import Linkify from 'linkify-react';
+import { isGalleryFile } from '@/utils/mediaUtils';
 import DocumentTypeChip from '../DocumentTypeChip';
 import AppLink from '../AppLink';
 import Files from './Files';
-import { isImageFile } from './utils/imageUtils';
 import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
 import Translate from '../Translate';
 import StandardDialog from '../StandardDialog';
@@ -33,8 +33,8 @@ const Document = ({
   document,
   hasSnapshotButton = false,
   onUnlink,
-  onImageClick,
-  imageIndexOffset = 0
+  onMediaClick,
+  mediaIndexOffset = 0
 }) => {
   const { formatMessage } = useIntl();
   const theme = useTheme();
@@ -134,12 +134,9 @@ const Document = ({
           )}
         </Box>
 
-        {/* Description with truncation.
-            Hidden when the document has any image file: the description is
-            already shown in the lightbox next to the image, so repeating it
-            here just eats vertical space. */}
+        {/* Media descriptions are shown in the lightbox instead. */}
         {document.description &&
-          !document.files?.some(f => isImageFile(f.fileName)) && (
+          !document.files?.some(f => isGalleryFile(f.fileName)) && (
             <Box
               sx={{
                 mt: 0.5
@@ -198,8 +195,8 @@ const Document = ({
               description={document.description}
               documentTitle={document.title}
               documentUrl={`/ui/documents/${document.id}`}
-              onImageClick={onImageClick}
-              imageIndexOffset={imageIndexOffset}
+              onMediaClick={onMediaClick}
+              mediaIndexOffset={mediaIndexOffset}
             />
           </Box>
         )}
@@ -242,8 +239,8 @@ const Document = ({
 Document.propTypes = {
   hasSnapshotButton: PropTypes.bool,
   onUnlink: PropTypes.func,
-  onImageClick: PropTypes.func,
-  imageIndexOffset: PropTypes.number,
+  onMediaClick: PropTypes.func,
+  mediaIndexOffset: PropTypes.number,
   document: PropTypes.shape({
     id: PropTypes.number,
     title: PropTypes.string,

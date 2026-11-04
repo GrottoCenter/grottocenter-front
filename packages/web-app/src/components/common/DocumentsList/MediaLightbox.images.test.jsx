@@ -1,6 +1,11 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitForElementToBeRemoved
+} from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
-import ImageLightbox from './ImageLightbox';
+import MediaLightbox from './MediaLightbox';
 
 const messages = {
   Close: 'Close',
@@ -31,12 +36,13 @@ const images = [
   }
 ];
 
-const renderLightbox = () =>
-  render(
-    <IntlProvider locale="en" messages={messages}>
-      <ImageLightbox open onClose={() => {}} images={images} />
-    </IntlProvider>
-  );
+const viewer = (open = true) => (
+  <IntlProvider locale="en" messages={messages}>
+    <MediaLightbox open={open} onClose={() => {}} media={images} />
+  </IntlProvider>
+);
+
+const renderLightbox = () => render(viewer());
 
 const loadImage = (image, width, height) => {
   Object.defineProperties(image, {
@@ -46,7 +52,15 @@ const loadImage = (image, width, height) => {
   fireEvent.load(image);
 };
 
-describe('ImageLightbox original images', () => {
+describe('MediaLightbox original images', () => {
+  it('keeps the image mounted until the dialog exit transition finishes', async () => {
+    const { rerender } = renderLightbox();
+    const image = screen.getByTestId('lightbox-image');
+    rerender(viewer(false));
+    expect(image).toBeInTheDocument();
+    await waitForElementToBeRemoved(image);
+  });
+
   it('loads only the active original and keeps its source while zooming', () => {
     renderLightbox();
 
@@ -99,7 +113,7 @@ describe('ImageLightbox original images', () => {
   });
 });
 
-describe('ImageLightbox image backing', () => {
+describe('MediaLightbox image backing', () => {
   it('does not reuse the previous image dimensions while navigating', () => {
     renderLightbox();
     const firstImage = screen.getByTestId('lightbox-image');
@@ -123,7 +137,7 @@ describe('ImageLightbox image backing', () => {
   });
 });
 
-describe('ImageLightbox captions', () => {
+describe('MediaLightbox image captions', () => {
   it('hides the caption while keeping the image counter available', () => {
     renderLightbox();
 

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardActionArea, Skeleton, Box } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { Description } from '@mui/icons-material';
+import { alpha, styled } from '@mui/material/styles';
+import { Description, PlayArrow } from '@mui/icons-material';
+import PlayCircleOutline from '@mui/icons-material/PlayCircleOutlined';
+import { useIntl } from 'react-intl';
 import AppLink from '@/components/common/AppLink';
 
 // Preview count at which tiles stop sharing one card and get a tiling of their
@@ -64,6 +66,44 @@ const FallbackIconWrapper = styled(Box)`
   border-radius: 4px;
 `;
 
+const VideoFallback = styled(FallbackIconWrapper)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  backgroundImage: `linear-gradient(135deg, ${alpha(
+    theme.palette.primary.main,
+    0.04
+  )}, ${alpha(theme.palette.primary.main, 0.14)})`,
+  '.Mui-focusVisible &': {
+    outline: `3px solid ${theme.palette.primary.main}`,
+    outlineOffset: -3
+  }
+}));
+
+const VideoPlayControl = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: theme.spacing(9),
+  height: theme.spacing(9),
+  borderRadius: '50%',
+  color: theme.palette.primary.contrastText,
+  backgroundColor: theme.palette.primary.main,
+  boxShadow: `0 0 0 ${theme.spacing(1)} ${alpha(
+    theme.palette.primary.main,
+    0.08
+  )}`,
+  transition: theme.transitions.create(['background-color', 'box-shadow']),
+  '.MuiCardActionArea-root:hover &, .Mui-focusVisible &': {
+    backgroundColor: theme.palette.primary.dark,
+    boxShadow: `0 0 0 ${theme.spacing(1.5)} ${alpha(
+      theme.palette.primary.main,
+      0.14
+    )}`
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none'
+  }
+}));
+
 // A tile's rendered width depends on the container *and* on how many columns
 // ThumbnailsGrid derives from the image count, so no call site can state it as
 // a media query. `sizes="auto"` has the browser measure it instead — it needs
@@ -75,7 +115,7 @@ const DEFAULT_SIZES = 'auto, (max-width: 599px) 100vw, 400px';
 // shorter than this at any sensible track width.
 const DEFAULT_MAX_HEIGHT = 340;
 
-const ImageThumbnail = ({
+const MediaThumbnail = ({
   src,
   srcSet,
   sizes = DEFAULT_SIZES,
@@ -83,10 +123,13 @@ const ImageThumbnail = ({
   objectFit = 'cover',
   alt,
   onClick,
-  to
+  to,
+  isVideo = false
 }) => {
+  const { formatMessage } = useIntl();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const Fallback = isVideo ? VideoFallback : FallbackIconWrapper;
 
   const handleLoad = () => {
     setLoading(false);
@@ -103,12 +146,22 @@ const ImageThumbnail = ({
         component={to ? AppLink : 'button'}
         to={to}
         onClick={onClick}
-        aria-label={alt}
+        aria-label={
+          isVideo
+            ? formatMessage({ id: 'media.openVideo' }, { name: alt })
+            : alt
+        }
         sx={{ height: '100%' }}>
-        {error ? (
-          <FallbackIconWrapper>
-            <Description color="action" fontSize="large" />
-          </FallbackIconWrapper>
+        {error || !src ? (
+          <Fallback>
+            {isVideo ? (
+              <VideoPlayControl>
+                <PlayArrow sx={{ fontSize: 40 }} />
+              </VideoPlayControl>
+            ) : (
+              <Description color="action" fontSize="large" />
+            )}
+          </Fallback>
         ) : (
           <>
             {loading && (
@@ -119,6 +172,24 @@ const ImageThumbnail = ({
                 animation="wave"
                 sx={{ position: 'absolute', inset: 0 }}
               />
+            )}
+            {isVideo && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                <PlayCircleOutline
+                  sx={{
+                    fontSize: 64,
+                    color: 'white',
+                    filter: 'drop-shadow(0 1px 3px black)'
+                  }}
+                />
+              </Box>
             )}
             <ThumbnailImage
               src={src}
@@ -141,15 +212,16 @@ const ImageThumbnail = ({
   );
 };
 
-ImageThumbnail.propTypes = {
-  src: PropTypes.string.isRequired,
+MediaThumbnail.propTypes = {
+  src: PropTypes.string,
   srcSet: PropTypes.string,
   sizes: PropTypes.string,
   maxHeight: PropTypes.number,
   objectFit: PropTypes.oneOf(['cover', 'contain']),
   alt: PropTypes.string.isRequired,
   onClick: PropTypes.func,
-  to: PropTypes.string
+  to: PropTypes.string,
+  isVideo: PropTypes.bool
 };
 
-export default ImageThumbnail;
+export default MediaThumbnail;

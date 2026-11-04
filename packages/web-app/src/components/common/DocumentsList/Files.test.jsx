@@ -1,8 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { IntlProvider } from 'react-intl';
+import messages from '@/../public/lang/en.json';
 import Files from './Files';
 
-vi.mock('./ImageLightbox', () => ({ default: () => null }));
+vi.mock('./MediaLightbox', () => ({ default: () => null }));
 
 const modelFile = {
   fileName: 'cave-scan.GLB',
@@ -10,19 +12,48 @@ const modelFile = {
 };
 const documentUrl = '/ui/documents/42';
 
-const renderFiles = ({ files, onImageClick, imageIndexOffset }) =>
+const renderFiles = ({ files, onMediaClick, mediaIndexOffset }) =>
   render(
-    <MemoryRouter>
-      <Files
-        documentUrl={documentUrl}
-        files={files}
-        onImageClick={onImageClick}
-        imageIndexOffset={imageIndexOffset}
-      />
-    </MemoryRouter>
+    <IntlProvider locale="en" messages={messages}>
+      <MemoryRouter>
+        <Files
+          documentUrl={documentUrl}
+          files={files}
+          onMediaClick={onMediaClick}
+          mediaIndexOffset={mediaIndexOffset}
+        />
+      </MemoryRouter>
+    </IntlProvider>
   );
 
 describe('Document file thumbnails', () => {
+  it.each(['avi', 'MPEG'])(
+    'keeps %s attachments as file links and out of gallery indexes',
+    extension => {
+      const onMediaClick = vi.fn();
+      const fileName = `video.${extension}`;
+      const { container } = renderFiles({
+        files: [
+          { fileName, completePath: `/video.${extension}` },
+          { fileName: 'plan.png', completePath: '/plan.png' }
+        ],
+        onMediaClick,
+        mediaIndexOffset: 4
+      });
+
+      expect(screen.getByRole('link', { name: fileName })).toHaveAttribute(
+        'href',
+        `/video.${extension}`
+      );
+      expect(container.querySelector('video')).toBeNull();
+      expect(
+        screen.queryByRole('button', { name: `Open video: ${fileName}` })
+      ).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'plan.png' }));
+      expect(onMediaClick).toHaveBeenCalledExactlyOnceWith(4);
+    }
+  );
+
   it('keeps glTF download-only even when the API provides a thumbnail', () => {
     const file = {
       fileName: 'terrain.gltf',
@@ -76,7 +107,7 @@ describe('Document file thumbnails', () => {
   );
 
   it('keeps image lightbox indexes independent of model thumbnails', () => {
-    const onImageClick = vi.fn();
+    const onMediaClick = vi.fn();
     renderFiles({
       files: [
         {
@@ -86,17 +117,71 @@ describe('Document file thumbnails', () => {
         { fileName: 'plan.png', completePath: '/plan.png' },
         { fileName: 'section.png', completePath: '/section.png' }
       ],
-      onImageClick,
-      imageIndexOffset: 4
+      onMediaClick,
+      mediaIndexOffset: 4
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'section.png' }));
-    expect(onImageClick).toHaveBeenCalledExactlyOnceWith(5);
+    expect(onMediaClick).toHaveBeenCalledExactlyOnceWith(5);
     fireEvent.click(screen.getByRole('button', { name: 'plan.png' }));
-    expect(onImageClick).toHaveBeenLastCalledWith(4);
+    expect(onMediaClick).toHaveBeenLastCalledWith(4);
     expect(
       screen.getByRole('img', { name: modelFile.fileName }).closest('a')
     ).toHaveAttribute('href', documentUrl);
+  });
+
+  it.each(['MP4', 'webm', 'ogv'])(
+    'opens %s videos in file order without requesting the video as an image',
+    extension => {
+      const onMediaClick = vi.fn();
+      const video = {
+        fileName: `video.${extension}`,
+        completePath: `/video.${extension}`
+      };
+      const { container } = renderFiles({
+        files: [
+          { fileName: 'plan.png', completePath: '/plan.png' },
+          video,
+          { fileName: 'animation.gif', completePath: '/animation.gif' }
+        ],
+        onMediaClick,
+        mediaIndexOffset: 4
+      });
+      const button = screen.getByRole('button', {
+        name: `Open video: ${video.fileName}`
+      });
+      expect(button.querySelector('img')).toBeNull();
+      expect(container.querySelector('video')).toBeNull();
+      expect(screen.queryByRole('link', { name: video.fileName })).toBeNull();
+      expect(screen.queryByText(video.fileName)).not.toBeInTheDocument();
+      fireEvent.click(button);
+      expect(onMediaClick).toHaveBeenLastCalledWith(5);
+      fireEvent.click(screen.getByRole('button', { name: 'animation.gif' }));
+      expect(onMediaClick).toHaveBeenLastCalledWith(6);
+    }
+  );
+
+  it('uses a video poster and falls back to a clickable tile if it fails', () => {
+    const onMediaClick = vi.fn();
+    renderFiles({
+      files: [
+        {
+          fileName: 'video.mp4',
+          completePath: '/video.mp4',
+          thumbnails: { medium: '/poster.webp' }
+        }
+      ],
+      onMediaClick
+    });
+    const poster = screen.getByRole('img', { name: 'video.mp4' });
+    expect(poster).toHaveAttribute('src', '/poster.webp');
+    expect(screen.queryByText('video.mp4')).not.toBeInTheDocument();
+    fireEvent.error(poster);
+    expect(screen.queryByText('video.mp4')).not.toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Open video: video.mp4' })
+    );
+    expect(onMediaClick).toHaveBeenCalledExactlyOnceWith(0);
   });
 
   it('keeps the document link accessible if a model thumbnail fails to load', () => {
