@@ -4,6 +4,45 @@ describe('Map API authorization', () => {
     cy.mockApiCatchAll();
   });
 
+  it('clears a rejected session and allows anonymous map browsing after logout', () => {
+    cy.loginAs();
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/geoloc/**' },
+      { body: [] }
+    );
+    cy.intercept(
+      {
+        method: 'GET',
+        pathname: '/api/v1/geoloc/entrancesCoordinates',
+        times: 1
+      },
+      req => {
+        expect(req.headers.authorization).to.match(/^Bearer /);
+        req.reply({
+          statusCode: 401,
+          body: { message: 'Token has been revoked.' }
+        });
+      }
+    ).as('rejectedMapSession');
+
+    cy.visit('/map/45.5,6.5,13');
+    cy.wait('@rejectedMapSession');
+    cy.location('pathname').should('eq', '/');
+    cy.window().should(win => {
+      expect(win.localStorage.getItem('grottocenter_token')).to.eq(null);
+    });
+
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/geoloc/entrancesCoordinates' },
+      req => {
+        expect(req.headers.authorization).to.eq(undefined);
+        req.reply({ body: [] });
+      }
+    ).as('anonymousCoordinates');
+    cy.visit('/map/45.5,6.5,13');
+    cy.wait('@anonymousCoordinates');
+  });
+
   [false, true].forEach(isAuthenticated => {
     it(`sends ${isAuthenticated ? 'the session bearer' : 'no bearer'} on map requests`, () => {
       let authorization;

@@ -1,6 +1,9 @@
 // Client-side LRU + TTL/SWR tile cache for the global map. Keyed by
 // {entity, z, x, y} on a fixed slippy-map grid at CACHE_ZOOM. See
 // utils/tileMath.js for the tile geometry.
+// Shared across sessions: the API's geoloc controllers/GeoLocService do not
+// receive the caller's role and return the same public projection for everyone.
+// If that contract changes, partition both this cache and SW api-map-tiles.
 
 import { apiFetch } from '@/api/client';
 import makeErrorMessage from '../helpers/makeErrorMessage';

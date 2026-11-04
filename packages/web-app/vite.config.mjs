@@ -538,6 +538,9 @@ export default defineConfig(({ mode }) => {
             // StaleWhileRevalidate: paint instantly from cache, refresh in the
             // background. NetworkFirst would add latency to every pan while
             // online; CacheFirst would never refresh a changed tile.
+            // Shared across sessions like utils/mapTileCache.js: geoloc returns
+            // the same public projection regardless of the caller's role. A
+            // backend change to that contract must partition both caches.
             //
             // Without this rule the tile cache lives only in memory
             // (src/utils/mapTileCache.js), so relaunching the PWA offline showed

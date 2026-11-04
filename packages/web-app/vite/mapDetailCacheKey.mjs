@@ -2,7 +2,7 @@
 export const mapDetailCacheKey = async ({ request }) => {
   const url = new globalThis.URL(request.url);
   if (
-    !/^\/api\/v\d+\/(entrances|caves|massifs|organizations)\/\d+$/.test(
+    !/\/api\/v\d+\/(entrances|caves|massifs|organizations)\/\d+$/.test(
       url.pathname
     )
   )

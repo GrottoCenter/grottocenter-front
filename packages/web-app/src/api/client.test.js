@@ -1,6 +1,15 @@
 import store from '@/store';
-import { fetchLoginSuccess, logout } from '@/actions/Login';
+import { fetchLoginSuccess, logout, postLogout } from '@/actions/Login';
 import { apiFetch, apiGetWithRange, apiPost } from './client';
+
+vi.mock('@/actions/Login', async importOriginal => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    // Keep the real session cleanup; navigation is covered in Cypress.
+    postLogout: vi.fn(() => actual.logout())
+  };
+});
 
 it.each(['GET', 'POST', 'raw'])(
   'passes an AbortSignal through to a %s request',
@@ -47,8 +56,77 @@ it.each(['GET', 'POST', 'raw'])(
 describe('raw authenticated transport', () => {
   afterEach(() => {
     store.dispatch(logout());
+    vi.clearAllMocks();
     vi.unstubAllGlobals();
   });
+
+  it('signs out a rejected map session and returns the unconsumed 401 response', async () => {
+    const response = new Response('{"message":"Token has been revoked."}', {
+      status: 401
+    });
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response));
+    store.dispatch(fetchLoginSuccess({ id: 1 }, 'revoked'));
+
+    const result = await apiFetch('/api/v1/geoloc/entrances');
+
+    expect(result).toBe(response);
+    expect(result.bodyUsed).toBe(false);
+    expect(postLogout).toHaveBeenCalledExactlyOnceWith();
+    expect(store.getState().login.authorizationHeader).toBeUndefined();
+    expect(localStorage.getItem('grottocenter_token')).toBeNull();
+  });
+
+  it('does not log out on an anonymous 401', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ status: 401 }));
+    store.dispatch(logout());
+
+    await apiFetch('/api/v1/geoloc/entrances');
+
+    expect(postLogout).not.toHaveBeenCalled();
+  });
+
+  it.each(['new-session', null])(
+    'ignores a late 401 after the session changes to %s',
+    async token => {
+      let respond;
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(
+          () =>
+            new Promise(resolve => {
+              respond = resolve;
+            })
+        )
+      );
+      store.dispatch(fetchLoginSuccess({ id: 1 }, 'old-session'));
+      const request = apiFetch('/api/v1/geoloc/entrances');
+      if (token) store.dispatch(fetchLoginSuccess({ id: 2 }, token));
+      else store.dispatch(logout());
+
+      respond({ status: 401 });
+      await request;
+
+      expect(postLogout).not.toHaveBeenCalled();
+      expect(store.getState().login.authorizationHeader).toEqual(
+        token ? { Authorization: `Bearer ${token}` } : undefined
+      );
+    }
+  );
+
+  it.each([200, 403, 429, 500])(
+    'preserves the signed-in session on HTTP %i',
+    async status => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ status }));
+      store.dispatch(fetchLoginSuccess({ id: 1 }, 'valid-session'));
+
+      await apiFetch('/api/v1/geoloc/entrances');
+
+      expect(postLogout).not.toHaveBeenCalled();
+      expect(store.getState().login.authorizationHeader).toEqual({
+        Authorization: 'Bearer valid-session'
+      });
+    }
+  );
 
   it('reads session changes at request time and preserves request options', async () => {
     const response = { status: 429 };
