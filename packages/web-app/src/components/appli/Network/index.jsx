@@ -13,6 +13,7 @@ import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import BiotechIcon from '@mui/icons-material/Biotech';
 import { useReactToPrint } from 'react-to-print';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
+import NetworkDefinitionHelp from '@/components/common/NetworkDefinitionHelp';
 import AppLink from '../../common/AppLink';
 
 import {
@@ -214,6 +215,7 @@ export const Network = ({
         <PageHeader
           title={cave?.name ?? (isLoading ? undefined : '')}
           icon={<CustomIcon type="network" />}
+          titleAdornment={cave && <NetworkDefinitionHelp />}
           subheader={breadcrumb}
           actions={actions}
         />

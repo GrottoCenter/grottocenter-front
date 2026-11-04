@@ -2,6 +2,7 @@ import { Checkbox, FormControlLabel } from '@mui/material';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import NetworkDefinitionHelp from '@/components/common/NetworkDefinitionHelp';
 import CaveSelection from './CaveSelect';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 
@@ -43,7 +44,7 @@ const NetworkLinkSection = ({
   };
 
   return (
-    <FormSection title="Network">
+    <FormSection title="Network" titleAdornment={<NetworkDefinitionHelp />}>
       <FormControlLabel
         control={
           <Checkbox
