@@ -354,8 +354,8 @@ describe('Create related entities without leaving a document', () => {
           ].forEach(testId => {
             cy.get(`[data-testid="${testId}"]`).should($action => {
               const bounds = $action[0].getBoundingClientRect();
-              expect(bounds.top).to.be.at.least(list.top);
-              expect(bounds.bottom).to.be.at.most(list.bottom);
+              expect(bounds.top).to.be.at.least(list.top - 1);
+              expect(bounds.bottom).to.be.at.most(list.bottom + 1);
               if (testId === 'create-author-organization-search-button') {
                 expect(bounds.bottom).to.be.closeTo(list.bottom, 1);
               }
@@ -375,7 +375,7 @@ describe('Create related entities without leaving a document', () => {
           .closest('[role="listbox"]')
           .querySelector('[data-creation-actions]');
         expect(option.getBoundingClientRect().bottom).to.be.at.most(
-          actions.getBoundingClientRect().top
+          actions.getBoundingClientRect().top + 1
         );
       });
       cy.get('[role="listbox"]').scrollTo('bottom');

@@ -93,7 +93,13 @@ const ParentDocumentSelect = ({
             loading={isLoading}
             testId="document-parent-search"
             selectedIcon={
-              value && <TypeIcon fontSize="small" color="primary" />
+              value && (
+                <TypeIcon
+                  fontSize="small"
+                  color="primary"
+                  data-testid="document-type-icon"
+                />
+              )
             }
           />
         )}

@@ -137,7 +137,12 @@ export const entityOptionForSelector = (
     'li',
     { ...otherProps, key: key || `${option._type}-${id}` },
     DocumentIcon ? (
-      <EntityIcon as={DocumentIcon} color="primary" aria-hidden />
+      <EntityIcon
+        as={DocumentIcon}
+        color="primary"
+        aria-hidden
+        data-testid="document-type-icon"
+      />
     ) : (
       iconSrc && <EntityIcon src={iconSrc} alt="" />
     ),

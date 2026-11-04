@@ -8,7 +8,7 @@ import EntityAutocompleteInput from '@/components/common/AutoCompleteSearch/Enti
 import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
 import { entityOptionForSelector } from '@/helpers/Entity';
 import { useEntitySearch, useUserProperties } from '@/hooks';
-import { restoreFieldFocus } from '@/utils/restoreFieldFocus';
+import { useRestoreFieldFocus } from '@/hooks/useRestoreFieldFocus';
 import { AUTOCOMPLETE_MIN_CHARACTERS } from '@/conf/config';
 import { DocumentFormContext } from '@/components/appli/EntitiesForm/Document/Provider';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../AddFileForm/FileHelpers';
@@ -73,6 +73,7 @@ const AuthorsSection = () => {
   const [creation, setCreation] = useState(null);
   const inputRef = useRef(null);
   const wrapperRef = useRef(null);
+  useRestoreFieldFocus(creation !== null, inputRef, wrapperRef);
 
   const applyValue = newValue => {
     updateAttribute(
@@ -107,7 +108,6 @@ const AuthorsSection = () => {
     }
     setInputValue('');
     setCreation(null);
-    restoreFieldFocus(inputRef.current, wrapperRef.current);
   };
 
   const emptyText =
@@ -169,6 +169,7 @@ const AuthorsSection = () => {
             <Chip
               {...getItemProps({ index })}
               key={`${option._type}-${option.id}`}
+              data-testid={`document-author-${option._type}-${option.id}`}
               color="primary"
               label={
                 <DocumentAuthorLabel
@@ -201,10 +202,7 @@ const AuthorsSection = () => {
           entityType={creation.entityType}
           defaultName={creation.name}
           onSelect={handleEntitySelected}
-          onClose={() => {
-            setCreation(null);
-            restoreFieldFocus(inputRef.current, wrapperRef.current);
-          }}
+          onClose={() => setCreation(null)}
         />
       )}
     </Box>

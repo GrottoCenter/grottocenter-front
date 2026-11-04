@@ -1,4 +1,7 @@
 import { useContext } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
+import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { apiGet, apiPost } from '@/api/client';
@@ -74,6 +77,15 @@ const renderForm = (overrides = {}) =>
 const getDocument = () =>
   JSON.parse(screen.getByTestId('document-state').textContent);
 const input = () => screen.getByRole('combobox', { name: /Parent document/ });
+const expectTypeIcon = (container, Icon) => {
+  const reference = new DOMParser().parseFromString(
+    renderToStaticMarkup(<Icon />),
+    'image/svg+xml'
+  );
+  expect(
+    within(container).getByTestId('document-type-icon').querySelector('path')
+  ).toHaveAttribute('d', reference.querySelector('path').getAttribute('d'));
+};
 const search = async query => {
   const user = userEvent.setup();
   await user.clear(input());
@@ -104,7 +116,7 @@ it('displays an existing parent without inheriting its metadata again', async ()
   renderForm({ parent: firstParent });
   await waitFor(() => expect(input()).toHaveValue(firstParent.title));
   expect(input()).not.toHaveValue(expect.stringContaining('[Issue]'));
-  expect(screen.getByTestId('NewspaperIcon')).toBeInTheDocument();
+  expectTypeIcon(document.body, NewspaperIcon);
   expect(getDocument().editor.name).toBe('Original publisher');
   expect(
     apiGet.mock.calls.some(([url]) => url.startsWith(getDocumentDetailsUrl))
@@ -117,15 +129,15 @@ it.each([undefined, null, ''])(
     renderForm({ parent: { id: 10, type: 'Issue', title } });
     await userEvent.setup().click(input());
     const option = await screen.findByRole('option', { name: /10/ });
-    expect(within(option).getByTestId('NewspaperIcon')).toBeInTheDocument();
+    expectTypeIcon(option, NewspaperIcon);
     expect(input()).toHaveValue('');
     expect(getDocument().parent.id).toBe(10);
   }
 );
 
 it.each([
-  ['Article', 'Issue', 'NewspaperIcon'],
-  ['Issue', 'Collection', 'BookmarksIcon']
+  ['Article', 'Issue', NewspaperIcon],
+  ['Issue', 'Collection', BookmarksIcon]
 ])(
   'searches allowed parents for %s, excludes itself and uses the type icon',
   async (type, parentType, icon) => {
@@ -139,7 +151,7 @@ it.each([
     const user = await search('First');
     const option = await screen.findByRole('option', { name: /First journal/ });
     expect(option).not.toHaveTextContent(`[${parentType}]`);
-    expect(within(option).getByTestId(icon)).toBeInTheDocument();
+    expectTypeIcon(option, icon);
     expect(
       screen.queryByRole('option', { name: /Current document/ })
     ).not.toBeInTheDocument();

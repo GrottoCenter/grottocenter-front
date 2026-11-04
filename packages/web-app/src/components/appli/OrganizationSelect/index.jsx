@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
@@ -10,6 +10,7 @@ import RelatedEntityDialog from '@/components/appli/EntitiesForm/RelatedEntityDi
 import { useEntitySearch } from '@/hooks';
 import { entityOptionForSelector } from '@/helpers/Entity';
 import { restoreFieldFocus } from '@/utils/restoreFieldFocus';
+import { useRestoreFieldFocus } from '@/hooks/useRestoreFieldFocus';
 import { AUTOCOMPLETE_MIN_CHARACTERS } from '@/conf/config';
 import { OrganizationSimplePropTypes } from '@/types/organization.type';
 
@@ -56,13 +57,7 @@ const OrganizationSelect = ({
     [inputRef]
   );
 
-  useEffect(() => {
-    if (creationName === null) return undefined;
-    const container = wrapperRef.current;
-    // Restore after the dialog unmounts and releases its focus trap. This also
-    // works when a form controller defers the selected value's update.
-    return () => restoreFieldFocus(nativeInputRef.current, container);
-  }, [creationName]);
+  useRestoreFieldFocus(creationName !== null, nativeInputRef, wrapperRef);
 
   const handleSelect = organization => {
     onChange(organization);

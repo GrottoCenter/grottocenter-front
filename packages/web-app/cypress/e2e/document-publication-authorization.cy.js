@@ -150,7 +150,7 @@ describe('Editing a document with publication authorization', () => {
         cy.viewport(width, height);
         cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
         const parentType = type === 'Article' ? 'Issue' : 'Collection';
-        const icon = type === 'Article' ? 'NewspaperIcon' : 'BookmarksIcon';
+        const icon = '[data-testid="document-type-icon"]';
         const parent = {
           ...collection,
           id: 44,
@@ -194,10 +194,13 @@ describe('Editing a document with publication authorization', () => {
         cy.contains('[role="option"]', parent.title).as('parentOption');
         cy.get('@parentOption').should('not.contain.text', `[${parentType}]`);
         cy.get('@parentOption')
-          .find(`[data-testid="${icon}"]`)
+          .find(icon)
           .should($icon => {
             expect($icon[0].getBoundingClientRect().width).to.be.closeTo(30, 1);
-          });
+          })
+          .find('path')
+          .invoke('attr', 'd')
+          .as('parentIconPath', { type: 'static' });
         cy.contains('[role="option"]', 'Self parent must be excluded').should(
           'not.exist'
         );
@@ -207,9 +210,11 @@ describe('Editing a document with publication authorization', () => {
           'have.value',
           parent.title
         );
-        cy.get('[data-testid="document-parent"]')
-          .find(`[data-testid="${icon}"]`)
-          .should('exist');
+        cy.get('@parentIconPath').then(path => {
+          cy.get('[data-testid="document-parent"]')
+            .find(`${icon} path`)
+            .should('have.attr', 'd', path);
+        });
         cy.get('[data-testid="document-advanced-metadata"]')
           .contains('button', 'Advanced metadata')
           .click({ scrollBehavior: 'center' });
@@ -254,7 +259,7 @@ describe('Editing a document with publication authorization', () => {
           ''
         );
         cy.get('[data-testid="document-parent"]')
-          .find(`[data-testid="${icon}"]`)
+          .find(icon)
           .should('not.exist');
       });
     });
