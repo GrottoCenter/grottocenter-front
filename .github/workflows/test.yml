@@ -25,7 +25,9 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run unit tests
-        run: yarn test
+        # VM contexts preserve per-file isolation and reuse jsdom per worker.
+        # See docs/vitest-performance-study-1600.md for runner measurements.
+        run: yarn test --pool=vmThreads
 
   e2e-build:
     runs-on: ubuntu-latest

@@ -49,7 +49,7 @@ By default the app uses the production API as backend. To change it, edit the `V
 - `lint:fix` Same as `lint` but will also try to fix errors
 - `e2e:run` Run the end-to-end test suite (_requires a running app_)
 - `e2e:open` Open the end-to-end test suite browser (_requires a running app_)
-- `test` Run unit tests (single run, no watch mode). Filter by pattern: `yarn test -- --testPathPattern=<pattern>`
+- `test` Run unit tests (single run, no watch mode). Filter by filename: `yarn test Publication.test.jsx`
 - `storybook` Start Storybook
 - `translations:sync-with-en` Compare a translation file with `en.json` to check synchronization (usage: `yarn translations:sync-with-en <target-file>`)
 - `translations:update-en` Scan JSX files for translation keys and add missing ones to `packages/web-app/public/lang/en.json` (automatically sorts the file afterwards)
@@ -74,6 +74,25 @@ Only on `app-x.y.z` tags:
 
 - TWA build
 
+### Unit tests
+
+The `unit` job runs `yarn test --pool=vmThreads`, preserving per-file isolation
+and the default worker count. The [runner study](docs/vitest-performance-study-1600.md)
+measured about 70% shorter test execution with higher memory usage. The local
+`yarn test` command keeps its default pool.
+
+Vitest provides console output, GitHub failure annotations and a job summary.
+A failing test fails the `unit` check.
+
+To investigate an intermittent failure, repeat a selected test file locally:
+
+```sh
+yarn test Publication.test.jsx --repeats=20
+```
+
+This repeats every selected test regardless of its result. Repeated runs are
+opt-in diagnostics; required CI checks use no retries or repeats.
+
 ## 📱 Android app (Google Play, TWA)
 
 Grottocenter is packaged for the Google Play Store as a **Trusted Web Activity**
@@ -93,7 +112,7 @@ the failed deployment job. Before merging deployment changes, verify that
 the preview loads and that refreshing a client-side route such as `/ui/entrances`
 works.
 
-[Full wiki article](https://github.com/GrottoCenter/grottocenter-front/wiki/Production-deployment-(Azure))
+[Full wiki article](<https://github.com/GrottoCenter/grottocenter-front/wiki/Production-deployment-(Azure)>)
 
 ## 🤖 AI Agents
 
@@ -111,10 +130,10 @@ These files can and should be updated when conventions change, new patterns are 
 
 Reusable agent workflows are defined in [`.agents/skills/`](.agents/skills/):
 
-| Skill | Invocation | Description |
-| ----- | ---------- | ----------- |
-| `code-review` | `/code-review <PR-number>` | Fetches the diff, reads project conventions, and submits a structured review to GitHub |
-| `github-workflow` | `/github-workflow` | Guides through the Grottocenter commit/branch/PR conventions |
+| Skill             | Invocation                 | Description                                                                            |
+| ----------------- | -------------------------- | -------------------------------------------------------------------------------------- |
+| `code-review`     | `/code-review <PR-number>` | Fetches the diff, reads project conventions, and submits a structured review to GitHub |
+| `github-workflow` | `/github-workflow`         | Guides through the Grottocenter commit/branch/PR conventions                           |
 
 #### Syncing skills to Claude Code
 

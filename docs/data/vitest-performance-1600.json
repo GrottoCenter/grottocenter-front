@@ -1,0 +1,1267 @@
+{
+  "sourceCommit": "bc85f7d4a421851cee7b80b5ae62130fb4359061",
+  "measurementRun": 41822650655,
+  "doctorRun": 41822520866,
+  "validationRuns": {
+    "vmThreads": 41825048451,
+    "vmForks": 41825053098
+  },
+  "measurements": [
+    {
+      "replica": 0,
+      "commit": "c77b543d5e8db81dca84610e419693ca6e24df90",
+      "node": "v24.22.1",
+      "vitest": "vitest/5.0.5 linux-x64 node-v24.22.1",
+      "parallelism": 4,
+      "image": "20261101.186.1",
+      "cpuModel": "AMD EPYC 7763 64-Core Processor",
+      "memoryMiB": 15983.046875,
+      "osRelease": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+      "samples": [
+        {
+          "configuration": "forks-default",
+          "arguments": [],
+          "exitCode": 0,
+          "wallSeconds": 245.301,
+          "durationSummary": [
+            "Duration  244.13s (import 38%, environment 31%, tests 23%, setup 6%, transform 1%)"
+          ],
+          "environmentSummary": [
+            "Environment  jsdom was created 258 times \u00b7 213.55s total, 31% of tracked time"
+          ],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2576.88
+        },
+        {
+          "configuration": "forks-2",
+          "arguments": ["--pool=forks", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 273.807,
+          "durationSummary": [
+            "Duration  272.66s (import 38%, environment 31%, tests 23%, setup 6%, transform 1%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2526.2
+        },
+        {
+          "configuration": "threads-default",
+          "arguments": ["--pool=threads"],
+          "exitCode": 0,
+          "wallSeconds": 227.028,
+          "durationSummary": [
+            "Duration  225.55s (import 38%, environment 30%, tests 24%, setup 6%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2562.93
+        },
+        {
+          "configuration": "threads-2",
+          "arguments": ["--pool=threads", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 255.337,
+          "durationSummary": [
+            "Duration  253.32s (import 37%, environment 30%, tests 24%, setup 6%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2181.05
+        },
+        {
+          "configuration": "vmThreads-default",
+          "arguments": ["--pool=vmThreads"],
+          "exitCode": 0,
+          "wallSeconds": 72.244,
+          "durationSummary": [
+            "Duration  69.71s (tests 62%, import 23%, setup 6%, worker 5%, environment 3%, transform 1%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 5906.62
+        },
+        {
+          "configuration": "vmThreads-2",
+          "arguments": ["--pool=vmThreads", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 77.057,
+          "durationSummary": [
+            "Duration  75.15s (tests 63%, import 23%, setup 5%, worker 5%, environment 3%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 6097.96
+        },
+        {
+          "configuration": "vmForks-default",
+          "arguments": ["--pool=vmForks"],
+          "exitCode": 0,
+          "wallSeconds": 73.315,
+          "durationSummary": [
+            "Duration  71.29s (tests 62%, import 24%, setup 6%, worker 5%, environment 3%, transform 1%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 6574.84
+        },
+        {
+          "configuration": "vmForks-2",
+          "arguments": ["--pool=vmForks", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 77.018,
+          "durationSummary": [
+            "Duration  75.72s (tests 63%, import 22%, setup 6%, worker 5%, environment 3%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 5917.25
+        },
+        {
+          "configuration": "forks-default-end",
+          "arguments": [],
+          "exitCode": 0,
+          "wallSeconds": 245.364,
+          "durationSummary": [
+            "Duration  243.49s (import 38%, environment 31%, tests 23%, setup 6%, transform 1%)"
+          ],
+          "environmentSummary": [
+            "Environment  jsdom was created 258 times \u00b7 213.86s total, 31% of tracked time"
+          ],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2549.11
+        }
+      ]
+    },
+    {
+      "replica": 1,
+      "commit": "c77b543d5e8db81dca84610e419693ca6e24df90",
+      "node": "v24.22.1",
+      "vitest": "vitest/5.0.5 linux-x64 node-v24.22.1",
+      "parallelism": 4,
+      "image": "20261026.180.1",
+      "cpuModel": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "memoryMiB": 15982.05859375,
+      "osRelease": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+      "samples": [
+        {
+          "configuration": "threads-2",
+          "arguments": ["--pool=threads", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 228.611,
+          "durationSummary": [
+            "Duration  226.66s (import 36%, environment 30%, tests 26%, setup 5%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2221.49
+        },
+        {
+          "configuration": "vmThreads-default",
+          "arguments": ["--pool=vmThreads"],
+          "exitCode": 0,
+          "wallSeconds": 64.598,
+          "durationSummary": [
+            "Duration  63.13s (tests 63%, import 22%, setup 6%, worker 5%, environment 4%, transform 1%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 5335.04
+        },
+        {
+          "configuration": "vmThreads-2",
+          "arguments": ["--pool=vmThreads", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 72.495,
+          "durationSummary": [
+            "Duration  70.85s (tests 63%, import 22%, setup 5%, worker 5%, environment 3%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 5733.09
+        },
+        {
+          "configuration": "vmForks-default",
+          "arguments": ["--pool=vmForks"],
+          "exitCode": 0,
+          "wallSeconds": 66.612,
+          "durationSummary": [
+            "Duration  64.64s (tests 63%, import 22%, setup 6%, worker 5%, environment 3%, transform 1%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 6565.14
+        },
+        {
+          "configuration": "vmForks-2",
+          "arguments": ["--pool=vmForks", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 71.455,
+          "durationSummary": [
+            "Duration  69.81s (tests 63%, import 21%, setup 6%, worker 5%, environment 3%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 6318.32
+        },
+        {
+          "configuration": "forks-default",
+          "arguments": [],
+          "exitCode": 0,
+          "wallSeconds": 216.09,
+          "durationSummary": [
+            "Duration  214.82s (import 37%, environment 32%, tests 25%, setup 5%, transform 1%)"
+          ],
+          "environmentSummary": [
+            "Environment  jsdom was created 258 times \u00b7 191.54s total, 32% of tracked time"
+          ],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2760.09
+        },
+        {
+          "configuration": "forks-2",
+          "arguments": ["--pool=forks", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 240.631,
+          "durationSummary": [
+            "Duration  239.49s (import 36%, environment 31%, tests 25%, setup 5%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2397.65
+        },
+        {
+          "configuration": "threads-default",
+          "arguments": ["--pool=threads"],
+          "exitCode": 0,
+          "wallSeconds": 202.847,
+          "durationSummary": [
+            "Duration  201.49s (import 37%, environment 30%, tests 25%, setup 5%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2584.4
+        },
+        {
+          "configuration": "forks-default-end",
+          "arguments": [],
+          "exitCode": 0,
+          "wallSeconds": 215.962,
+          "durationSummary": [
+            "Duration  214.30s (import 37%, environment 32%, tests 24%, setup 5%, transform 2%)"
+          ],
+          "environmentSummary": [
+            "Environment  jsdom was created 258 times \u00b7 191.25s total, 32% of tracked time"
+          ],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2617.05
+        }
+      ]
+    },
+    {
+      "replica": 2,
+      "commit": "c77b543d5e8db81dca84610e419693ca6e24df90",
+      "node": "v24.22.1",
+      "vitest": "vitest/5.0.5 linux-x64 node-v24.22.1",
+      "parallelism": 4,
+      "image": "20261026.180.1",
+      "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+      "memoryMiB": 15983.05078125,
+      "osRelease": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+      "samples": [
+        {
+          "configuration": "vmForks-default",
+          "arguments": ["--pool=vmForks"],
+          "exitCode": 0,
+          "wallSeconds": 55.666,
+          "durationSummary": [
+            "Duration  53.94s (tests 61%, import 23%, setup 6%, worker 5%, environment 3%, transform 1%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 6499.45
+        },
+        {
+          "configuration": "vmForks-2",
+          "arguments": ["--pool=vmForks", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 60.433,
+          "durationSummary": [
+            "Duration  59.36s (tests 63%, import 22%, setup 5%, worker 5%, environment 4%, transform 1%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 6157.12
+        },
+        {
+          "configuration": "forks-default",
+          "arguments": [],
+          "exitCode": 0,
+          "wallSeconds": 186.046,
+          "durationSummary": [
+            "Duration  184.16s (import 37%, environment 32%, tests 23%, setup 6%, transform 2%)"
+          ],
+          "environmentSummary": [
+            "Environment  jsdom was created 258 times \u00b7 163.91s total, 32% of tracked time"
+          ],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2862.05
+        },
+        {
+          "configuration": "forks-2",
+          "arguments": ["--pool=forks", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 211.634,
+          "durationSummary": [
+            "Duration  210.64s (import 37%, environment 32%, tests 23%, setup 6%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2432.27
+        },
+        {
+          "configuration": "threads-default",
+          "arguments": ["--pool=threads"],
+          "exitCode": 0,
+          "wallSeconds": 169.824,
+          "durationSummary": [
+            "Duration  168.18s (import 38%, environment 30%, tests 25%, setup 6%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2522.18
+        },
+        {
+          "configuration": "threads-2",
+          "arguments": ["--pool=threads", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 196.589,
+          "durationSummary": [
+            "Duration  194.82s (import 37%, environment 30%, tests 25%, setup 6%, transform 2%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2201.34
+        },
+        {
+          "configuration": "vmThreads-default",
+          "arguments": ["--pool=vmThreads"],
+          "exitCode": 0,
+          "wallSeconds": 53.541,
+          "durationSummary": [
+            "Duration  52.05s (tests 61%, import 24%, setup 6%, worker 5%, environment 3%, transform 1%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 5922.21
+        },
+        {
+          "configuration": "vmThreads-2",
+          "arguments": ["--pool=vmThreads", "--maxWorkers=2"],
+          "exitCode": 0,
+          "wallSeconds": 60.446,
+          "durationSummary": [
+            "Duration  58.18s (tests 63%, import 22%, setup 5%, worker 5%, environment 3%, transform 1%)"
+          ],
+          "environmentSummary": [],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 5655.7
+        },
+        {
+          "configuration": "forks-default-end",
+          "arguments": [],
+          "exitCode": 0,
+          "wallSeconds": 184.908,
+          "durationSummary": [
+            "Duration  183.49s (import 38%, environment 32%, tests 23%, setup 5%, transform 1%)"
+          ],
+          "environmentSummary": [
+            "Environment  jsdom was created 258 times \u00b7 163.37s total, 32% of tracked time"
+          ],
+          "failures": [],
+          "numTotalTests": 2265,
+          "numPassedTests": 2265,
+          "numFailedTests": 0,
+          "success": true,
+          "testFiles": 258,
+          "failedTests": [],
+          "peakProcessGroupRssMiB": 2700.33
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "vmThreads": [
+      {
+        "replica": 0,
+        "commit": "a977a1a49af9e37faa7f89ee8971d71b9f9b0908",
+        "node": "v24.22.1",
+        "vitest": "vitest/5.0.5 linux-x64 node-v24.22.1",
+        "parallelism": 4,
+        "image": "20261026.180.1",
+        "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+        "memoryMiB": 15983.05078125,
+        "osRelease": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+        "samples": [
+          {
+            "configuration": "validation-1600",
+            "arguments": [
+              "--pool=vmThreads",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=1600"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 53.577,
+            "durationSummary": [
+              "Duration  52.13s (tests 59%, import 25%, setup 5%, worker 5%, environment 3%, transform 2%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 5586.58
+          },
+          {
+            "configuration": "validation-271828",
+            "arguments": [
+              "--pool=vmThreads",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=271828"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 54.507,
+            "durationSummary": [
+              "Duration  52.24s (tests 61%, import 23%, setup 6%, worker 5%, environment 4%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 6384.88
+          },
+          {
+            "configuration": "validation-314159",
+            "arguments": [
+              "--pool=vmThreads",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=314159"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 53.541,
+            "durationSummary": [
+              "Duration  52.13s (tests 59%, import 25%, setup 6%, worker 5%, environment 4%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 5595.59
+          }
+        ]
+      },
+      {
+        "replica": 1,
+        "commit": "a977a1a49af9e37faa7f89ee8971d71b9f9b0908",
+        "node": "v24.22.1",
+        "vitest": "vitest/5.0.5 linux-x64 node-v24.22.1",
+        "parallelism": 4,
+        "image": "20261026.180.1",
+        "cpuModel": "AMD EPYC 7763 64-Core Processor",
+        "memoryMiB": 15983.05078125,
+        "osRelease": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+        "samples": [
+          {
+            "configuration": "validation-1600",
+            "arguments": [
+              "--pool=vmThreads",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=1600"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 74.281,
+            "durationSummary": [
+              "Duration  71.79s (tests 61%, import 24%, setup 6%, worker 5%, environment 4%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 5367.62
+          },
+          {
+            "configuration": "validation-271828",
+            "arguments": [
+              "--pool=vmThreads",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=271828"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 73.391,
+            "durationSummary": [
+              "Duration  71.11s (tests 61%, import 24%, setup 6%, worker 5%, environment 3%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 5792.5
+          },
+          {
+            "configuration": "validation-314159",
+            "arguments": [
+              "--pool=vmThreads",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=314159"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 73.322,
+            "durationSummary": [
+              "Duration  71.05s (tests 61%, import 24%, setup 6%, worker 5%, environment 3%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 5843.61
+          }
+        ]
+      },
+      {
+        "replica": 2,
+        "commit": "a977a1a49af9e37faa7f89ee8971d71b9f9b0908",
+        "node": "v24.22.1",
+        "vitest": "vitest/5.0.5 linux-x64 node-v24.22.1",
+        "parallelism": 4,
+        "image": "20261026.180.1",
+        "cpuModel": "AMD EPYC 7763 64-Core Processor",
+        "memoryMiB": 15983.05078125,
+        "osRelease": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+        "samples": [
+          {
+            "configuration": "validation-1600",
+            "arguments": [
+              "--pool=vmThreads",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=1600"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 72.316,
+            "durationSummary": [
+              "Duration  69.73s (tests 62%, import 24%, setup 6%, worker 5%, environment 3%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 5915.02
+          },
+          {
+            "configuration": "validation-271828",
+            "arguments": [
+              "--pool=vmThreads",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=271828"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 71.177,
+            "durationSummary": [
+              "Duration  69.12s (tests 61%, import 24%, setup 6%, worker 5%, environment 3%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 5543.89
+          },
+          {
+            "configuration": "validation-314159",
+            "arguments": [
+              "--pool=vmThreads",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=314159"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 72.269,
+            "durationSummary": [
+              "Duration  70.43s (tests 60%, import 25%, setup 6%, worker 5%, environment 3%, transform 2%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 5600.64
+          }
+        ]
+      }
+    ],
+    "vmForks": [
+      {
+        "replica": 0,
+        "commit": "a977a1a49af9e37faa7f89ee8971d71b9f9b0908",
+        "node": "v24.22.1",
+        "vitest": "vitest/5.0.5 linux-x64 node-v24.22.1",
+        "parallelism": 4,
+        "image": "20261101.186.1",
+        "cpuModel": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+        "memoryMiB": 15982.0546875,
+        "osRelease": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+        "samples": [
+          {
+            "configuration": "validation-1600",
+            "arguments": [
+              "--pool=vmForks",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=1600"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 73.85,
+            "durationSummary": [
+              "Duration  72.38s (tests 62%, import 23%, setup 6%, worker 5%, environment 3%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 6396.51
+          },
+          {
+            "configuration": "validation-271828",
+            "arguments": [
+              "--pool=vmForks",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=271828"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 74.887,
+            "durationSummary": [
+              "Duration  72.71s (tests 62%, import 23%, setup 5%, worker 5%, environment 3%, transform 2%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 6393.16
+          },
+          {
+            "configuration": "validation-314159",
+            "arguments": [
+              "--pool=vmForks",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=314159"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 76.803,
+            "durationSummary": [
+              "Duration  74.79s (tests 62%, import 24%, setup 6%, worker 5%, environment 3%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 6227.66
+          }
+        ]
+      },
+      {
+        "replica": 1,
+        "commit": "a977a1a49af9e37faa7f89ee8971d71b9f9b0908",
+        "node": "v24.22.1",
+        "vitest": "vitest/5.0.5 linux-x64 node-v24.22.1",
+        "parallelism": 4,
+        "image": "20261026.180.1",
+        "cpuModel": "AMD EPYC 7763 64-Core Processor",
+        "memoryMiB": 15983.05078125,
+        "osRelease": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+        "samples": [
+          {
+            "configuration": "validation-1600",
+            "arguments": [
+              "--pool=vmForks",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=1600"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 74.347,
+            "durationSummary": [
+              "Duration  72.91s (tests 61%, import 24%, setup 5%, worker 5%, environment 3%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 6453.09
+          },
+          {
+            "configuration": "validation-271828",
+            "arguments": [
+              "--pool=vmForks",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=271828"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 75.294,
+            "durationSummary": [
+              "Duration  73.98s (tests 61%, import 24%, setup 6%, worker 5%, environment 3%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 6623.74
+          },
+          {
+            "configuration": "validation-314159",
+            "arguments": [
+              "--pool=vmForks",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=314159"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 75.361,
+            "durationSummary": [
+              "Duration  73.27s (tests 62%, import 23%, setup 6%, worker 5%, environment 3%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 5886.44
+          }
+        ]
+      },
+      {
+        "replica": 2,
+        "commit": "a977a1a49af9e37faa7f89ee8971d71b9f9b0908",
+        "node": "v24.22.1",
+        "vitest": "vitest/5.0.5 linux-x64 node-v24.22.1",
+        "parallelism": 4,
+        "image": "20261101.186.1",
+        "cpuModel": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "memoryMiB": 15982.05859375,
+        "osRelease": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+        "samples": [
+          {
+            "configuration": "validation-1600",
+            "arguments": [
+              "--pool=vmForks",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=1600"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 66.608,
+            "durationSummary": [
+              "Duration  64.79s (tests 62%, import 23%, setup 6%, worker 5%, environment 4%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 6116.84
+          },
+          {
+            "configuration": "validation-271828",
+            "arguments": [
+              "--pool=vmForks",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=271828"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 65.58,
+            "durationSummary": [
+              "Duration  64.02s (tests 62%, import 22%, setup 6%, worker 5%, environment 4%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 6396.3
+          },
+          {
+            "configuration": "validation-314159",
+            "arguments": [
+              "--pool=vmForks",
+              "--maxWorkers=3",
+              "--sequence.shuffle.files",
+              "--sequence.seed=314159"
+            ],
+            "exitCode": 0,
+            "wallSeconds": 67.633,
+            "durationSummary": [
+              "Duration  66.09s (tests 61%, import 23%, setup 6%, worker 5%, environment 3%, transform 1%)"
+            ],
+            "environmentSummary": [],
+            "failures": [],
+            "numTotalTests": 2265,
+            "numPassedTests": 2265,
+            "numFailedTests": 0,
+            "success": true,
+            "testFiles": 258,
+            "failedTests": [],
+            "peakProcessGroupRssMiB": 6895.88
+          }
+        ]
+      }
+    ]
+  },
+  "doctor": {
+    "forksSeconds": 247.6,
+    "threadsSeconds": 228.09,
+    "vmThreadsSeconds": 70.09,
+    "vmForksSeconds": 70.89,
+    "withoutIsolation": "failed",
+    "recommendation": "vmThreads"
+  },
+  "windows": [
+    {
+      "report": "windows-vmThreads",
+      "files": 258,
+      "totalTests": 2259,
+      "passedTests": 2254,
+      "failedTests": 5,
+      "failures": [
+        {
+          "file": "src/pages/DocumentDetails/Section.test.jsx",
+          "collectionError": "Denied ID <shared-dependencies>/node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs?url",
+          "tests": []
+        },
+        {
+          "file": "src/pages/OrganizationManagement/index.test.jsx",
+          "collectionError": "",
+          "tests": [
+            {
+              "name": "loads at least 50 unclassified organizations then waits for Load more",
+              "error": "Error: Test timed out in 5000ms."
+            }
+          ]
+        },
+        {
+          "file": "src/components/appli/EntitiesForm/Document/Publication.test.jsx",
+          "collectionError": "",
+          "tests": [
+            {
+              "name": "editing document publication rights submits a new file with the stored license and inferred authorization without reselecting the parent",
+              "error": "Error: Test timed out in 5000ms."
+            }
+          ]
+        },
+        {
+          "file": "src/components/appli/EntitiesForm/Guideline/index.test.jsx",
+          "collectionError": "",
+          "tests": [
+            {
+              "name": "enables creation only after required fields and scope are valid",
+              "error": "Error: Test timed out in 5000ms."
+            },
+            {
+              "name": "shows the fixed association without scope selectors and submits its id",
+              "error": "Error: Test timed out in 5000ms."
+            },
+            {
+              "name": "requires instructions and applies the message character-limit pattern",
+              "error": "Error: Test timed out in 5000ms."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "report": "windows-forks",
+      "files": 258,
+      "totalTests": 2259,
+      "passedTests": 2257,
+      "failedTests": 2,
+      "failures": [
+        {
+          "file": "src/pages/DocumentDetails/Section.test.jsx",
+          "collectionError": "Denied ID <shared-dependencies>/node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs?url",
+          "tests": []
+        },
+        {
+          "file": "src/components/appli/EntitiesForm/Document/Publication.test.jsx",
+          "collectionError": "",
+          "tests": [
+            {
+              "name": "editing document publication rights submits a new file with the stored license and inferred authorization without reselecting the parent",
+              "error": "Error: Test timed out in 5000ms."
+            },
+            {
+              "name": "editing document publication rights blocks submission while the existing license is being resolved",
+              "error": "Error: Test timed out in 5000ms."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "report": "windows-targeted-vmThreads",
+      "files": 4,
+      "totalTests": 39,
+      "passedTests": 38,
+      "failedTests": 1,
+      "failures": [
+        {
+          "file": "src/pages/OrganizationManagement/index.test.jsx",
+          "collectionError": "",
+          "tests": [
+            {
+              "name": "loads at least 50 unclassified organizations then waits for Load more",
+              "error": "Error: Test timed out in 5000ms."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "report": "windows-targeted-forks",
+      "files": 4,
+      "totalTests": 39,
+      "passedTests": 37,
+      "failedTests": 2,
+      "failures": [
+        {
+          "file": "src/pages/OrganizationManagement/index.test.jsx",
+          "collectionError": "",
+          "tests": [
+            {
+              "name": "loads at least 50 unclassified organizations then waits for Load more",
+              "error": "Error: Test timed out in 5000ms."
+            }
+          ]
+        },
+        {
+          "file": "src/components/appli/EntitiesForm/Document/Publication.test.jsx",
+          "collectionError": "",
+          "tests": [
+            {
+              "name": "editing document publication rights submits a new file with the stored license and inferred authorization without reselecting the parent",
+              "error": "Error: Test timed out in 5000ms."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "comparison": {
+    "forks-default": {
+      "samples": 3,
+      "passed": 3,
+      "medianWallSeconds": 216.09,
+      "minWallSeconds": 186.046,
+      "maxWallSeconds": 245.301,
+      "medianPairedChangePercent": 0.0,
+      "medianPeakProcessGroupRssMiB": 2760.09
+    },
+    "forks-2": {
+      "samples": 3,
+      "passed": 3,
+      "medianWallSeconds": 240.631,
+      "minWallSeconds": 211.634,
+      "maxWallSeconds": 273.807,
+      "medianPairedChangePercent": 11.62,
+      "medianPeakProcessGroupRssMiB": 2432.27
+    },
+    "threads-default": {
+      "samples": 3,
+      "passed": 3,
+      "medianWallSeconds": 202.847,
+      "minWallSeconds": 169.824,
+      "maxWallSeconds": 227.028,
+      "medianPairedChangePercent": -7.45,
+      "medianPeakProcessGroupRssMiB": 2562.93
+    },
+    "threads-2": {
+      "samples": 3,
+      "passed": 3,
+      "medianWallSeconds": 228.611,
+      "minWallSeconds": 196.589,
+      "maxWallSeconds": 255.337,
+      "medianPairedChangePercent": 5.67,
+      "medianPeakProcessGroupRssMiB": 2201.34
+    },
+    "vmThreads-default": {
+      "samples": 3,
+      "passed": 3,
+      "medianWallSeconds": 64.598,
+      "minWallSeconds": 53.541,
+      "maxWallSeconds": 72.244,
+      "medianPairedChangePercent": -70.55,
+      "medianPeakProcessGroupRssMiB": 5906.62
+    },
+    "vmThreads-2": {
+      "samples": 3,
+      "passed": 3,
+      "medianWallSeconds": 72.495,
+      "minWallSeconds": 60.446,
+      "maxWallSeconds": 77.057,
+      "medianPairedChangePercent": -67.51,
+      "medianPeakProcessGroupRssMiB": 5733.09
+    },
+    "vmForks-default": {
+      "samples": 3,
+      "passed": 3,
+      "medianWallSeconds": 66.612,
+      "minWallSeconds": 55.666,
+      "maxWallSeconds": 73.315,
+      "medianPairedChangePercent": -70.08,
+      "medianPeakProcessGroupRssMiB": 6565.14
+    },
+    "vmForks-2": {
+      "samples": 3,
+      "passed": 3,
+      "medianWallSeconds": 71.455,
+      "minWallSeconds": 60.433,
+      "maxWallSeconds": 77.018,
+      "medianPairedChangePercent": -67.52,
+      "medianPeakProcessGroupRssMiB": 6157.12
+    },
+    "forks-default-end": {
+      "samples": 3,
+      "passed": 3,
+      "medianWallSeconds": 215.962,
+      "minWallSeconds": 184.908,
+      "maxWallSeconds": 245.364,
+      "medianPairedChangePercent": -0.06,
+      "medianPeakProcessGroupRssMiB": 2617.05
+    }
+  }
+}
