@@ -25,8 +25,8 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run unit tests
-        # VM contexts preserve per-file isolation and reuse jsdom per worker.
-        # See docs/vitest-performance-study-1600.md for runner measurements.
+        # Isolate each test file in a VM context, within a shared worker process.
+        # Uses more memory than forks; revisit if CI memory usage grows.
         run: yarn test --pool=vmThreads
 
   e2e-build:

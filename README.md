@@ -76,18 +76,25 @@ Only on `app-x.y.z` tags:
 
 ### Unit tests
 
-The `unit` job runs `yarn test --pool=vmThreads`, preserving per-file isolation
-and the default worker count. The [runner study](docs/vitest-performance-study-1600.md)
-measured about 70% shorter test execution with higher memory usage. The local
-`yarn test` command keeps its default pool.
+The `unit` job runs `yarn test --pool=vmThreads`, isolating each test file in a
+VM context within a shared worker process, with the default worker count.
+This uses more memory than the default pool. The local `yarn test` command
+keeps its default pool.
 
 Vitest provides console output, GitHub failure annotations and a job summary.
 A failing test fails the `unit` check.
 
-To investigate an intermittent failure, repeat a selected test file locally:
+To reproduce the CI pool locally:
 
 ```sh
-yarn test Publication.test.jsx --repeats=20
+yarn test --pool=vmThreads
+```
+
+To investigate an intermittent CI failure, repeat a selected test file with
+the same pool:
+
+```sh
+yarn test Publication.test.jsx --pool=vmThreads --repeats=20
 ```
 
 This repeats every selected test regardless of its result. Repeated runs are
@@ -112,7 +119,7 @@ the failed deployment job. Before merging deployment changes, verify that
 the preview loads and that refreshing a client-side route such as `/ui/entrances`
 works.
 
-[Full wiki article](<https://github.com/GrottoCenter/grottocenter-front/wiki/Production-deployment-(Azure)>)
+[Full wiki article](https://github.com/GrottoCenter/grottocenter-front/wiki/Production-deployment-(Azure))
 
 ## 🤖 AI Agents
 
@@ -130,10 +137,10 @@ These files can and should be updated when conventions change, new patterns are 
 
 Reusable agent workflows are defined in [`.agents/skills/`](.agents/skills/):
 
-| Skill             | Invocation                 | Description                                                                            |
-| ----------------- | -------------------------- | -------------------------------------------------------------------------------------- |
-| `code-review`     | `/code-review <PR-number>` | Fetches the diff, reads project conventions, and submits a structured review to GitHub |
-| `github-workflow` | `/github-workflow`         | Guides through the Grottocenter commit/branch/PR conventions                           |
+| Skill | Invocation | Description |
+| ----- | ---------- | ----------- |
+| `code-review` | `/code-review <PR-number>` | Fetches the diff, reads project conventions, and submits a structured review to GitHub |
+| `github-workflow` | `/github-workflow` | Guides through the Grottocenter commit/branch/PR conventions |
 
 #### Syncing skills to Claude Code
 
