@@ -65,11 +65,13 @@ const getRawTokenIfNotExpired = () => {
   return null;
 };
 
+const initialToken = getRawTokenIfNotExpired();
+
 const initialState = {
-  authTokenDecoded: decodeJWT(getRawTokenIfNotExpired()),
-  authorizationHeader: {
-    Authorization: `Bearer ${getRawTokenIfNotExpired()}`
-  },
+  authTokenDecoded: decodeJWT(initialToken),
+  authorizationHeader: initialToken
+    ? { Authorization: `Bearer ${initialToken}` }
+    : undefined,
   enrollmentToken: null,
   error: null,
   impersonatedRole: readImpersonatedRole(),

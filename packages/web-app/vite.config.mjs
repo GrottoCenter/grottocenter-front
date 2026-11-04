@@ -7,6 +7,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA } from 'vite-plugin-pwa';
 import pdfJsWasmAssets from './vite/pdfJsWasmAssets.mjs';
 import serviceWorkerBuildGuard from './vite/serviceWorkerBuildGuard.mjs';
+import { mapDetailCacheKey } from './vite/mapDetailCacheKey.mjs';
 
 const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -537,6 +538,9 @@ export default defineConfig(({ mode }) => {
             // StaleWhileRevalidate: paint instantly from cache, refresh in the
             // background. NetworkFirst would add latency to every pan while
             // online; CacheFirst would never refresh a changed tile.
+            // Shared across sessions like utils/mapTileCache.js: geoloc returns
+            // the same public projection regardless of the caller's role. A
+            // backend change to that contract must partition both caches.
             //
             // Without this rule the tile cache lives only in memory
             // (src/utils/mapTileCache.js), so relaunching the PWA offline showed
@@ -632,6 +636,7 @@ export default defineConfig(({ mode }) => {
                       // this file), so a closure would land as `undefined` in the
                       // service worker and fail silently.
                       plugins: [
+                        { cacheKeyWillBeUsed: mapDetailCacheKey },
                         {
                           cacheWillUpdate: async ({ response }) => {
                             if (

@@ -19,7 +19,7 @@ import {
   FETCH_MAP_START_LOADING,
   FETCH_MAP_END_LOADING,
   LOADINGS
-} from '../actions/Map';
+} from '../actions/mapTypes';
 
 const initialState = {
   networksCoordinates: [],

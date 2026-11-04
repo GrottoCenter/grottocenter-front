@@ -1,4 +1,5 @@
 import store from '../store';
+import { postLogout } from '../actions/Login';
 import { checkAndGetStatus } from '../actions/utils';
 
 // Thin fetch wrapper for React Query's queryFn/mutationFn. Deliberately reuses
@@ -11,6 +12,27 @@ import { checkAndGetStatus } from '../actions/utils';
 // scope: a query mounted before login must still send the header once the
 // session exists.
 const authHeaders = () => store.getState().login.authorizationHeader ?? {};
+
+// Raw transport for map requests, which own their parsing, retries and errors.
+// Only use with Grottocenter API URLs; third-party services stay on fetch.
+export const apiFetch = async (url, { headers, ...options } = {}) => {
+  const requestHeaders = new Headers(headers);
+  Object.entries(authHeaders()).forEach(([name, value]) => {
+    requestHeaders.set(name, value);
+  });
+  const response = await fetch(url, { ...options, headers: requestHeaders });
+  const authorization = requestHeaders.get('Authorization');
+  // Match QueryClient's session-loss flow without letting a late rejection of
+  // an old request sign out a user who has since started a different session.
+  if (
+    response.status === 401 &&
+    authorization &&
+    authorization === authHeaders().Authorization
+  ) {
+    store.dispatch(postLogout());
+  }
+  return response;
+};
 
 const jsonHeaders = () => ({
   'Content-Type': 'application/json',

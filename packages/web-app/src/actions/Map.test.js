@@ -100,7 +100,7 @@ describe('fetchAllNetworksCoordinates retry policy', () => {
     ]);
   };
 
-  it.each([404, 408, 429])(
+  it.each([401, 403, 404, 408, 429])(
     'makes one request for HTTP %i and ends loading',
     async status => {
       mockFetch.mockResolvedValue({ status });
