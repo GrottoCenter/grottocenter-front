@@ -12,6 +12,16 @@ import { checkAndGetStatus } from '../actions/utils';
 // session exists.
 const authHeaders = () => store.getState().login.authorizationHeader ?? {};
 
+// Raw transport for map requests, which own their parsing, retries and errors.
+// Only use with Grottocenter API URLs; third-party services stay on fetch.
+export const apiFetch = (url, { headers, ...options } = {}) => {
+  const requestHeaders = new Headers(headers);
+  Object.entries(authHeaders()).forEach(([name, value]) => {
+    requestHeaders.set(name, value);
+  });
+  return fetch(url, { ...options, headers: requestHeaders });
+};
+
 const jsonHeaders = () => ({
   'Content-Type': 'application/json',
   ...authHeaders()

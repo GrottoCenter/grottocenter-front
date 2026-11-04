@@ -1,3 +1,4 @@
+import { apiFetch } from '@/api/client';
 import { isClientError } from '@/utils/httpErrors';
 import {
   getMapCavesUrl,
@@ -16,44 +17,30 @@ import {
 } from '../utils/mapTileCache';
 import { makeUrl } from './utils';
 
-export const FETCH_MAP_START_LOADING = 'FETCH_MAP_START_LOADING';
-export const FETCH_MAP_END_LOADING = 'FETCH_MAP_END_LOADING';
-export const FETCH_MAP_NETWORKS_SUCCESS = 'FETCH_MAP_NETWORKS_SUCCESS';
-export const FETCH_MAP_NETWORKS_FAILURE = 'FETCH_MAP_NETWORKS_FAILURE';
-export const FETCH_MAP_NETWORKS_COORDINATES_SUCCESS =
-  'FETCH_MAP_NETWORKS_COORDINATES_SUCCESS';
-export const FETCH_MAP_NETWORKS_COORDINATES_FAILURE =
-  'FETCH_MAP_NETWORKS_COORDINATES_FAILURE';
-export const FETCH_MAP_ENTRANCES_SUCCESS = 'FETCH_MAP_ENTRANCES_SUCCESS';
-export const FETCH_MAP_ENTRANCES_FAILURE = 'FETCH_MAP_ENTRANCES_FAILURE';
-export const FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS =
-  'FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS';
-export const FETCH_MAP_ENTRANCES_COORDINATES_FAILURE =
-  'FETCH_MAP_ENTRANCES_COORDINATES_FAILURE';
-export const FETCH_MAP_ORGANIZATIONS_SUCCESS =
-  'FETCH_MAP_ORGANIZATIONS_SUCCESS';
-export const FETCH_MAP_ORGANIZATIONS_FAILURE =
-  'FETCH_MAP_ORGANIZATIONS_FAILURE';
-export const FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS =
-  'FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS';
-export const FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE =
-  'FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE';
-export const FETCH_MAP_MASSIFS_SUCCESS = 'FETCH_MAP_MASSIFS_SUCCESS';
-export const FETCH_MAP_MASSIFS_FAILURE = 'FETCH_MAP_MASSIFS_FAILURE';
-export const FETCH_MAP_MASSIFS_COORDINATES_SUCCESS =
-  'FETCH_MAP_MASSIFS_COORDINATES_SUCCESS';
-export const FETCH_MAP_MASSIFS_COORDINATES_FAILURE =
-  'FETCH_MAP_MASSIFS_COORDINATES_FAILURE';
-export const LOADINGS = {
-  NETWORKS: 'networks',
-  NETWORKS_COORDINATES: 'networks_coordinates',
-  ENTRANCES: 'entrances',
-  ENTRANCES_COORDINATES: 'entrances_coordinates',
-  ORGANIZATIONS: 'organizations',
-  ORGANIZATIONS_COORDINATES: 'organizations_coordinates',
-  MASSIFS: 'massifs',
-  MASSIFS_COORDINATES: 'massifs_coordinates'
-};
+import {
+  FETCH_MAP_START_LOADING,
+  FETCH_MAP_END_LOADING,
+  FETCH_MAP_NETWORKS_SUCCESS,
+  FETCH_MAP_NETWORKS_FAILURE,
+  FETCH_MAP_NETWORKS_COORDINATES_SUCCESS,
+  FETCH_MAP_NETWORKS_COORDINATES_FAILURE,
+  FETCH_MAP_ENTRANCES_SUCCESS,
+  FETCH_MAP_ENTRANCES_FAILURE,
+  FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
+  FETCH_MAP_ENTRANCES_COORDINATES_FAILURE,
+  FETCH_MAP_ORGANIZATIONS_SUCCESS,
+  FETCH_MAP_ORGANIZATIONS_FAILURE,
+  FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS,
+  FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE,
+  FETCH_MAP_MASSIFS_SUCCESS,
+  FETCH_MAP_MASSIFS_FAILURE,
+  FETCH_MAP_MASSIFS_COORDINATES_SUCCESS,
+  FETCH_MAP_MASSIFS_COORDINATES_FAILURE,
+  LOADINGS
+} from './mapTypes';
+
+// Preserve existing imports of map action constants.
+export * from './mapTypes';
 
 // Bulk coordinates are fetched once at startup with world-wide bounds. The
 // supercluster-backed ClusterLayer builds a kD-tree from these points and
@@ -83,7 +70,7 @@ const fetchWithRetry = (url, maxRetries = 3) => {
       ? 0
       : maxRetries;
   const attempt = (retriesLeft, delay) =>
-    fetch(url)
+    apiFetch(url)
       .then(response => {
         if (response.status >= 400) {
           // Carry the HTTP status on the error so the retry filter can read a
@@ -320,7 +307,7 @@ export const fetchAllMassifsCoordinates = () => dispatch => {
 export const fetchMassifs = criteria => dispatch => {
   dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.MASSIFS });
   const completedUrl = makeUrl(getMapMassifsUrl, criteria);
-  return fetch(completedUrl)
+  return apiFetch(completedUrl)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);

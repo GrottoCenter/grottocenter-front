@@ -2,6 +2,7 @@
 // {entity, z, x, y} on a fixed slippy-map grid at CACHE_ZOOM. See
 // utils/tileMath.js for the tile geometry.
 
+import { apiFetch } from '@/api/client';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 import { makeUrl } from '../actions/utils';
 import {
@@ -135,7 +136,7 @@ const fetchTile = (entity, tile, apiZoom) => {
     if (rec && rec.inFlight === promise) delete rec.inFlight;
   };
 
-  promise = fetch(url)
+  promise = apiFetch(url)
     .then(response => {
       if (response.status >= 400) throw new Error(response.status);
       return response.text();

@@ -7,6 +7,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA } from 'vite-plugin-pwa';
 import pdfJsWasmAssets from './vite/pdfJsWasmAssets.mjs';
 import serviceWorkerBuildGuard from './vite/serviceWorkerBuildGuard.mjs';
+import { mapDetailCacheKey } from './vite/mapDetailCacheKey.mjs';
 
 const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -632,6 +633,7 @@ export default defineConfig(({ mode }) => {
                       // this file), so a closure would land as `undefined` in the
                       // service worker and fail silently.
                       plugins: [
+                        { cacheKeyWillBeUsed: mapDetailCacheKey },
                         {
                           cacheWillUpdate: async ({ response }) => {
                             if (

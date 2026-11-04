@@ -15,6 +15,7 @@ import { LocationOn, MyLocation } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import { apiFetch } from '@/api/client';
 import {
   NOMINATIM_API_URL,
   AUTOCOMPLETE_DEBOUNCE_DELAY,
@@ -113,7 +114,7 @@ const EMPTY_RESULTS = {
 };
 
 const fetchAdvancedSearch = (query, entity, size, signal) =>
-  fetch(advancedSearchUrl, {
+  apiFetch(advancedSearchUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -267,7 +268,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
               // 1 search call + up to 3 detail fetches = 4 API calls for this section.
               Promise.all(
                 caves.map(cave =>
-                  fetch(`${getCaveUrl}${cave.id}`, { signal })
+                  apiFetch(`${getCaveUrl}${cave.id}`, { signal })
                     .then(res => res.json())
                     .then(detail => {
                       const entrances = detail.entrances || [];
@@ -307,10 +308,10 @@ const GeocodingControl = ({ onLocationSelect }) => {
               Promise.all(
                 massifs.map(massif =>
                   Promise.all([
-                    fetch(`${getMassifUrl}${massif.id}`, { signal }).then(res =>
-                      res.json()
+                    apiFetch(`${getMassifUrl}${massif.id}`, { signal }).then(
+                      res => res.json()
                     ),
-                    fetch(getStatisticsMassifUrl(massif.id), { signal })
+                    apiFetch(getStatisticsMassifUrl(massif.id), { signal })
                       .then(res => res.json())
                       .catch(() => null)
                   ])

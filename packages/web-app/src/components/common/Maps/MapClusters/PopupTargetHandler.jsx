@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import PropTypes from 'prop-types';
+import { apiFetch } from '@/api/client';
 import {
   EntrancePopup,
   MassifPopup,
@@ -20,10 +21,12 @@ import {
 const fetchPopupData = async (type, id, signal) => {
   switch (type) {
     case 'entrance': {
-      const data = await fetch(`${getEntranceUrl}${id}`, { signal }).then(r => {
-        if (!r.ok) throw new Error(r.status);
-        return r.json();
-      });
+      const data = await apiFetch(`${getEntranceUrl}${id}`, { signal }).then(
+        r => {
+          if (!r.ok) throw new Error(r.status);
+          return r.json();
+        }
+      );
       return {
         lat: data.latitude,
         lng: data.longitude,
@@ -41,7 +44,7 @@ const fetchPopupData = async (type, id, signal) => {
       };
     }
     case 'network': {
-      const data = await fetch(`${getCaveUrl}${id}`, { signal }).then(r => {
+      const data = await apiFetch(`${getCaveUrl}${id}`, { signal }).then(r => {
         if (!r.ok) throw new Error(r.status);
         return r.json();
       });
@@ -55,11 +58,11 @@ const fetchPopupData = async (type, id, signal) => {
     }
     case 'massif': {
       const [detail, stats] = await Promise.all([
-        fetch(`${getMassifUrl}${id}`, { signal }).then(r => {
+        apiFetch(`${getMassifUrl}${id}`, { signal }).then(r => {
           if (!r.ok) throw new Error(r.status);
           return r.json();
         }),
-        fetch(getStatisticsMassifUrl(id), { signal })
+        apiFetch(getStatisticsMassifUrl(id), { signal })
           .then(r => {
             if (!r.ok) throw new Error(r.status);
             return r.json();
@@ -90,12 +93,12 @@ const fetchPopupData = async (type, id, signal) => {
       };
     }
     case 'organization': {
-      const data = await fetch(`${getOrganizationUrl}${id}`, { signal }).then(
-        r => {
-          if (!r.ok) throw new Error(r.status);
-          return r.json();
-        }
-      );
+      const data = await apiFetch(`${getOrganizationUrl}${id}`, {
+        signal
+      }).then(r => {
+        if (!r.ok) throw new Error(r.status);
+        return r.json();
+      });
       return {
         lat: data.latitude,
         lng: data.longitude,
