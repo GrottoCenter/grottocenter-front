@@ -59,22 +59,14 @@ describe('Network definition', () => {
   });
 
   [1280, 390].forEach(width => {
-    [
-      '/entity/add/entrance',
-      '/entrances/1/move',
-      '/caves/2',
-      '/entrances/1/edit'
-    ].forEach(path => {
+    ['/entity/add/entrance', '/caves/2', '/entrances/1/edit'].forEach(path => {
       it(`opens and closes the definition on ${path} at ${width}px`, () => {
         cy.viewport(width, 900);
         visit(path);
-        cy.get('[data-testid="network-definition-help"]', {
-          timeout: 20000
-        }).as('help');
+        cy.get('[data-testid="network-definition-help"]').as('help');
         cy.get('[data-testid="network-definition"]').should('not.exist');
         if (path === '/entity/add/entrance') {
-          cy.contains('label', 'Link to an existing entrance or network')
-            .find('input')
+          cy.get('[data-testid="network-link-checkbox"]')
             .should('not.be.checked')
             .check();
           cy.get('[data-testid="network-definition"]').should('not.exist');
@@ -92,6 +84,36 @@ describe('Network definition', () => {
         cy.get('@help').should('be.focused');
         cy.location('pathname').should('eq', `/ui${path}`);
       });
+    });
+
+    it(`shows the definition directly below the attachment title at ${width}px`, () => {
+      cy.viewport(width, 900);
+      visit('/entrances/1/move');
+      cy.get('h1').should('have.text', 'Attach the entrance');
+      cy.get('[data-testid="network-definition-help"]').should('not.exist');
+      assertDefinition();
+      cy.get('h1').then($heading => {
+        const headingBounds = $heading[0].getBoundingClientRect();
+        cy.get('[data-testid="network-definition"]').should($definition => {
+          const bounds = $definition[0].getBoundingClientRect();
+          expect(bounds.top).to.be.at.least(headingBounds.bottom);
+          expect(bounds.left).to.be.closeTo(headingBounds.left, 1);
+        });
+      });
+      // Capture the page after its initial opacity transition has finished.
+      cy.get('#root').should('have.css', 'opacity', '1');
+      cy.screenshot(`network-definition-attachment-${width}`, {
+        capture: 'viewport',
+        disableTimersAndAnimations: false
+      });
+    });
+
+    it(`keeps the definition off the detach page at ${width}px`, () => {
+      cy.viewport(width, 900);
+      visit('/entrances/1/move?mode=detach');
+      cy.get('h1').should('have.text', 'Detach the entrance');
+      cy.get('[data-testid="network-definition"]').should('not.exist');
+      cy.get('[data-testid="network-definition-help"]').should('not.exist');
     });
   });
 });

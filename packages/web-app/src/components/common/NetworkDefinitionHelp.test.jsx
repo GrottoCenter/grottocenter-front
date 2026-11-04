@@ -2,8 +2,38 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import messages from '@/../public/lang/fr.json';
+import { FormSection } from '@/components/appli/EntitiesForm/utils/FormContainers';
 
 import NetworkDefinitionHelp from './NetworkDefinitionHelp';
+import PageTitle from './Layouts/PageTitle';
+
+it('keeps help buttons outside page and section heading names', () => {
+  render(
+    <IntlProvider locale="fr" messages={messages}>
+      <PageTitle
+        title="Test network"
+        titleAdornment={<NetworkDefinitionHelp />}
+      />
+      <FormSection title="Network" titleAdornment={<NetworkDefinitionHelp />} />
+    </IntlProvider>
+  );
+
+  const pageTitle = screen.getByRole('heading', {
+    level: 1,
+    name: 'Test network'
+  });
+  const sectionTitle = screen.getByRole('heading', {
+    level: 2,
+    name: messages.Network
+  });
+  expect(within(pageTitle).queryByRole('button')).not.toBeInTheDocument();
+  expect(within(sectionTitle).queryByRole('button')).not.toBeInTheDocument();
+  expect(
+    screen.getAllByRole('button', {
+      name: messages['network.definition.title']
+    })
+  ).toHaveLength(2);
+});
 
 it('opens a named help dialog from the keyboard without submitting the form and restores focus', async () => {
   const user = userEvent.setup();

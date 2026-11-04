@@ -4,7 +4,7 @@ import Skeleton from '@mui/material/Skeleton';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { isEmpty } from 'ramda';
 import { Divider } from '@mui/material';
-import NetworkDefinitionHelp from '@/components/common/NetworkDefinitionHelp';
+import NetworkDefinition from '@/components/common/NetworkDefinition';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import { useEntrance } from '../../../hooks';
 import MoveEntranceToCaveForm from './MoveEntranceToCaveForm';
@@ -25,7 +25,7 @@ const MoveEntranceToCave = () => {
 
   return (
     <Layout
-      action={!isDetach && <NetworkDefinitionHelp />}
+      subheader={!isDetach && <NetworkDefinition />}
       title={formatMessage({
         id: isDetach ? 'Detach the entrance' : 'Attach the entrance'
       })}

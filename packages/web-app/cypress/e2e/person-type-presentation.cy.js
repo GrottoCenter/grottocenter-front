@@ -62,7 +62,11 @@ describe('Person family identity and record type', () => {
 
   it('retains the You badge on the current account', () => {
     visitPerson('CAVER', 42);
-    cy.get('h1').should('contain.text', 'YOU');
+    cy.get('h1')
+      .should('not.contain.text', 'YOU')
+      .parent()
+      .contains('YOU')
+      .should('be.visible');
     cy.get('[data-testid="person-type-label"]').should('have.text', 'Caver');
   });
 });

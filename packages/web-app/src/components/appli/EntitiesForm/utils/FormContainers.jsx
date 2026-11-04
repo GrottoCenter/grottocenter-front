@@ -62,10 +62,12 @@ export const FormSection = ({ title, titleAdornment, children }) => (
             right — a section of the form sits under the page title. Assumes the
             form is not nested in a card that already renders an h2 (e.g.
             ScrollableContent); such a caller must override `component`. */}
-        <Typography variant="h5" component="h2">
-          <Translate>{title}</Translate>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Typography variant="h5" component="h2">
+            <Translate>{title}</Translate>
+          </Typography>
           {titleAdornment}
-        </Typography>
+        </Box>
         <Divider
           sx={{
             mb: 2

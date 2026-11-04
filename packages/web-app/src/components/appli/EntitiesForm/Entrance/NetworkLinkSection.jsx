@@ -48,6 +48,7 @@ const NetworkLinkSection = ({
       <FormControlLabel
         control={
           <Checkbox
+            slotProps={{ input: { 'data-testid': 'network-link-checkbox' } }}
             checked={entityType === ENTRANCE_ONLY}
             onChange={handleLinkToggle}
           />

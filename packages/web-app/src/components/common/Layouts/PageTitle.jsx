@@ -9,12 +9,17 @@ const Row = styled('div')(({ theme }) => ({
   gap: theme.spacing(0.5)
 }));
 
-const TitleGroup = styled('div')({
+const TitleGroup = styled('div')(({ theme }) => ({
   flex: 1,
-  minWidth: 0
-});
+  minWidth: 0,
+  display: 'flex',
+  alignItems: 'center',
+  flexWrap: 'wrap',
+  gap: theme.spacing(0.5)
+}));
 
 const TitleHeading = styled(Typography)({
+  minWidth: 0,
   wordBreak: 'break-word',
   // Collapse h1's typographic leading so the inline icon centers on the em-box
   // (≈ the visible letters) instead of on the taller line-height box.
@@ -60,13 +65,13 @@ const PageTitle = ({ title, icon, titleAdornment, subheader, actions }) => {
             <TitleHeading variant="h1" color="secondary">
               {icon && <TitleIcon>{icon}</TitleIcon>}
               {title}
-              {titleAdornment}
             </TitleHeading>
           ) : (
-            <TitleHeading variant="h1">
+            <TitleHeading variant="h1" sx={{ flex: 1 }}>
               <Skeleton variant="text" width="100%" />
             </TitleHeading>
           )}
+          {hasTitle && titleAdornment}
         </TitleGroup>
         {actions && <Actions>{actions}</Actions>}
       </Row>
