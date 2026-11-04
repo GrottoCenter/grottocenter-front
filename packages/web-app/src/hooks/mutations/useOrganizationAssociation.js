@@ -1,8 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { invalidateOrganizationCaches } from '@/utils/organizationCache';
 import {
-  postOrganizationUrl,
   putCountryOrganizationUrl,
   deleteCountryOrganizationUrl,
   putRegionOrganizationUrl,
@@ -10,7 +8,7 @@ import {
   putMassifOrganizationUrl,
   deleteMassifOrganizationUrl
 } from '../../conf/apiRoutes';
-import { apiPost, apiPut, apiDelete } from '../../api/client';
+import { apiPut, apiDelete } from '../../api/client';
 import {
   countryKeys,
   massifKeys,
@@ -19,25 +17,12 @@ import {
 } from '../../api/queryKeys';
 import { invalidateAll } from '../../utils/mapTileCache';
 
-// The AssociationForm accepts either an existing organization (organizationId)
-// or a free-text organizationName. In the second case we first POST a new
-// organization to obtain its id, then PUT the association — same chain as the
-// legacy thunks. Kept here so consumers still call a single mutation.
-const resolveOrganizationId = async ({
-  queryClient,
-  organizationId,
-  organizationName,
-  organizationType
-}) => {
-  if (organizationId) return organizationId;
-  if (!organizationName) throw new Error('Organization ID is missing');
-  const created = await apiPost(postOrganizationUrl, {
-    name: { text: organizationName, language: 'en' },
-    type: organizationType
-  });
-  // Creation succeeded independently of the subsequent association request.
-  invalidateOrganizationCaches(queryClient);
-  return created.id;
+// Creation is handled by the shared related-entity dialog. Associations only
+// accept an existing ID so a failed link can be retried without creating again.
+const requireOrganizationId = organizationId => {
+  if (organizationId == null || organizationId === '')
+    throw new Error('Organization ID is missing');
+  return organizationId;
 };
 
 // Every association mutation invalidates the organization tile cache: the new
@@ -53,20 +38,13 @@ const invalidateOrgKeys = queryClient => {
 export const useSetCountryOrganization = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      countryId,
-      organizationId,
-      organizationName,
-      organizationType
-    }) => {
-      const finalOrgId = await resolveOrganizationId({
-        queryClient,
-        organizationId,
-        organizationName,
-        organizationType
-      });
-      return apiPut(putCountryOrganizationUrl(countryId, finalOrgId));
-    },
+    mutationFn: ({ countryId, organizationId }) =>
+      apiPut(
+        putCountryOrganizationUrl(
+          countryId,
+          requireOrganizationId(organizationId)
+        )
+      ),
     onSuccess: (_data, { countryId }) => {
       queryClient.invalidateQueries({
         queryKey: countryKeys.detail(countryId)
@@ -93,21 +71,14 @@ export const useRemoveCountryOrganization = () => {
 export const useSetRegionOrganization = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      countryId,
-      regionId,
-      organizationId,
-      organizationName,
-      organizationType
-    }) => {
-      const finalOrgId = await resolveOrganizationId({
-        queryClient,
-        organizationId,
-        organizationName,
-        organizationType
-      });
-      return apiPut(putRegionOrganizationUrl(countryId, regionId, finalOrgId));
-    },
+    mutationFn: ({ countryId, regionId, organizationId }) =>
+      apiPut(
+        putRegionOrganizationUrl(
+          countryId,
+          regionId,
+          requireOrganizationId(organizationId)
+        )
+      ),
     onSuccess: (_data, { countryId, regionId }) => {
       queryClient.invalidateQueries({
         queryKey: regionKeys.detail(countryId, regionId)
@@ -136,20 +107,13 @@ export const useRemoveRegionOrganization = () => {
 export const useSetMassifOrganization = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      massifId,
-      organizationId,
-      organizationName,
-      organizationType
-    }) => {
-      const finalOrgId = await resolveOrganizationId({
-        queryClient,
-        organizationId,
-        organizationName,
-        organizationType
-      });
-      return apiPut(putMassifOrganizationUrl(massifId, finalOrgId));
-    },
+    mutationFn: ({ massifId, organizationId }) =>
+      apiPut(
+        putMassifOrganizationUrl(
+          massifId,
+          requireOrganizationId(organizationId)
+        )
+      ),
     onSuccess: (_data, { massifId }) => {
       queryClient.invalidateQueries({ queryKey: massifKeys.detail(massifId) });
       invalidateOrgKeys(queryClient);

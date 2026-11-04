@@ -11,6 +11,7 @@ import {
   isPersonType
 } from '@/utils/personTypes';
 import Translate from '@/components/common/Translate';
+import { getDocumentTypeIcon } from '@/utils/documentTypeHelpers';
 import {
   bibliographyIcon,
   entranceIcon,
@@ -29,6 +30,13 @@ const EntityTitle = styled('div')`
   font-size: 0.9375rem;
   white-space: nowrap;
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const EntityContent = styled('div')`
+  flex: 1;
+  min-width: 0;
 `;
 
 const EntityId = styled('i')`
@@ -40,6 +48,8 @@ const EntitySubtitle = styled('div')`
   font-size: 0.75rem;
   white-space: nowrap;
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const nomelizeSearchEntity = option => {
@@ -63,7 +73,7 @@ export const nomelizeSearchEntity = option => {
 
     case 'documents': {
       iconSrc = bibliographyIcon;
-      title = `[${option.type}] ${option.title}`;
+      title = `[${option.type}] ${option.title ?? ''}`;
       const maxSubTitleLength = Math.max((title.length - 3) * 1.2, 80);
       subtitle = (option.description ?? '').slice(0, maxSubTitleLength);
       if (option.description?.length > maxSubTitleLength) subtitle += '...';
@@ -107,8 +117,12 @@ export const entityOptionForSelector = (
   { showPersonType = false } = {}
 ) => {
   const normalized = nomelizeSearchEntity(option);
-  const { title, subtitle, id } = normalized;
+  const { subtitle, id } = normalized;
+  const title =
+    option._type === 'documents' ? (option.title ?? '') : normalized.title;
   const isPerson = option._type === 'persons';
+  const DocumentIcon =
+    option._type === 'documents' ? getDocumentTypeIcon(option.type) : null;
   const iconSrc =
     isPerson && showPersonType
       ? getPersonIconSource(option.type)
@@ -122,16 +136,20 @@ export const entityOptionForSelector = (
   return createElement(
     'li',
     { ...otherProps, key: key || `${option._type}-${id}` },
-    iconSrc && <EntityIcon src={iconSrc} alt="" />,
-    <div>
-      <EntityTitle>
+    DocumentIcon ? (
+      <EntityIcon as={DocumentIcon} color="primary" aria-hidden />
+    ) : (
+      iconSrc && <EntityIcon src={iconSrc} alt="" />
+    ),
+    <EntityContent>
+      <EntityTitle title={title}>
         {title} <EntityId>{id}</EntityId>
       </EntityTitle>
-      <EntitySubtitle>
+      <EntitySubtitle title={subtitle}>
         {subtitle}
         {subtitle && typeLabelId && ' · '}
         {typeLabelId && <Translate>{typeLabelId}</Translate>}
       </EntitySubtitle>
-    </div>
+    </EntityContent>
   );
 };

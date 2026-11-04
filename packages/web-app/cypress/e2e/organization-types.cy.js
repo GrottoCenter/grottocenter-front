@@ -29,6 +29,79 @@ describe('Required organization classification', () => {
     );
   });
 
+  [
+    [1280, 900, 'desktop'],
+    [390, 844, 'mobile']
+  ].forEach(([width, height, viewport]) => {
+    it(`preserves the classic organization form layout on ${viewport}`, () => {
+      cy.viewport(width, height);
+      visitForm('/entity/add/organization');
+      cy.get('[data-testid="organization-name"]', { timeout: 30000 }).should(
+        'be.visible'
+      );
+      cy.contains('[role="combobox"]', 'English').should('exist');
+      cy.get('[name="organization.name"]').should(
+        'not.have.attr',
+        'aria-invalid',
+        'true'
+      );
+      cy.get('[name="organization.country"]').should('have.value', 'FR');
+      cy.contains('label', 'Country').should('not.contain.text', '*');
+      cy.get('[data-testid="organization-name"]').then($name => {
+        const name = $name[0].getBoundingClientRect();
+        cy.contains('label', 'Language')
+          .parent()
+          .should($language => {
+            const language = $language[0].getBoundingClientRect();
+            if (viewport === 'desktop') {
+              expect(language.top).to.be.closeTo(name.top, 1);
+              expect(language.left).to.be.greaterThan(name.left);
+            } else {
+              expect(language.top).to.be.at.least(name.bottom);
+            }
+          });
+      });
+      cy.get('[name="organization.customMessage"]').should($message => {
+        const message = $message[0].getBoundingClientRect();
+        const mail = $message[0].ownerDocument
+          .querySelector('[name="organization.mail"]')
+          .getBoundingClientRect();
+        expect(message.bottom).to.be.lessThan(mail.top);
+      });
+      cy.get('[name="organization.mail"]').then($mail => {
+        const mail = $mail[0].getBoundingClientRect();
+        cy.get('[name="organization.url"]').should($url => {
+          const url = $url[0].getBoundingClientRect();
+          if (viewport === 'desktop') {
+            expect(url.top).to.be.closeTo(mail.top, 1);
+          } else {
+            expect(url.top).to.be.greaterThan(mail.bottom);
+          }
+        });
+      });
+      cy.get('[name="organization.zipCode"]').then($zip => {
+        const zip = $zip[0].getBoundingClientRect();
+        const zipField = $zip[0].parentElement.getBoundingClientRect();
+        cy.get('[name="organization.city"]').should($city => {
+          const city = $city[0].getBoundingClientRect();
+          if (viewport === 'desktop') {
+            expect(city.top).to.be.closeTo(zip.top, 1);
+          } else {
+            expect(city.top).to.be.greaterThan(zip.bottom);
+          }
+        });
+        if (viewport === 'desktop') {
+          cy.get('[name="organization.country"]').should($country => {
+            const country = $country[0].parentElement.getBoundingClientRect();
+            expect(country.top).to.be.closeTo(zipField.top, 1);
+          });
+        }
+      });
+      cy.get('[data-testid="coordinate-system-selector"]').should('exist');
+      cy.screenshot(`classic-organization-form-${viewport}`);
+    });
+  });
+
   it('requires a type on creation and preserves values after API rejection', () => {
     cy.intercept(
       { method: 'POST', pathname: '/api/v1/organizations' },

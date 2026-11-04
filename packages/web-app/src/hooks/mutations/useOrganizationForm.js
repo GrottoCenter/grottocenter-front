@@ -8,9 +8,10 @@ import { apiPost, apiPut } from '../../api/client';
 // organizations tile cache in addition to the RQ cache — the map is fed by
 // /geoloc, not by the entity endpoint, so RQ invalidation alone would leave
 // the marker stale.
-export const useCreateOrganization = () => {
+export const useCreateOrganization = ({ errorPresentation } = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { errorPresentation },
     mutationFn: body => apiPost(postOrganizationUrl, body),
     onSuccess: () => invalidateOrganizationCaches(queryClient)
   });

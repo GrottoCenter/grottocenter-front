@@ -212,6 +212,7 @@ const DocumentValidationPage = () => {
             onCancel={closeEditView}
             id={editView}
             requireUpdate
+            allowEntityCreation={false}
           />
         )}
       </StandardDialog>

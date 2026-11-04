@@ -20,7 +20,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import OrganizationSelect from '@/components/appli/OrganizationSelect';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import { getDefaultOrganizationType } from '@/utils/organizationTypes';
 
 import { useLanguages } from '../../../../hooks';
 
@@ -28,10 +30,9 @@ import { DocumentFormContext } from './Provider';
 
 import DocumentTypeSelect from './formElements/DocumentTypeSelect';
 import LanguageSelect from '../../../common/LanguageSelect';
-import DocumentAutoComplete from './formElements/DocumentAutoComplete';
+import ParentDocumentSelect from './formElements/ParentDocumentSelect';
 import MultipleISORegionsSelect from './formElements/MultipleISORegionsSelect';
 import MultipleSubjectsSelect from './formElements/MultipleSubjectsSelect';
-import OrganizationAutoComplete from './formElements/OrganizationAutoComplete';
 import PagesEditor from './formElements/PagesEditor';
 import IdentifierEditor from './formElements/IdentifierEditor';
 import AuthorsSection from './formElements/AuthorsSection';
@@ -62,7 +63,8 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
     lengthErrors,
     isNewDocument,
     updateAttribute,
-    linkedEntrance
+    linkedEntrance,
+    allowEntityCreation = true
   } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
@@ -330,8 +332,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
             />
 
             {(isArticle(docType) || isIssue(docType)) && (
-              <DocumentAutoComplete
-                contextValueName="parent"
+              <ParentDocumentSelect
                 helperContent={
                   <Translate>
                     The parent document is the document that contains the
@@ -403,62 +404,48 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
               <IdentifierEditor />
 
               <FormRow>
-                <OrganizationAutoComplete
-                  contextValueName="editor"
-                  helperContent={
-                    <Translate>
-                      The editor is the organization that ensures the
-                      publication of the document. Choose one or more
-                      organizations from those already registered. If the
-                      organization you are looking for does not exist in
-                      Grottocenter, you can add it by using the + button on the
-                      right.
-                    </Translate>
-                  }
-                  helperContentIfValueIsForced={
-                    <Translate>
-                      The editor has been deduced from the parent document.
-                    </Translate>
-                  }
-                  labelText={formatMessage({ id: 'Editor' })}
-                  searchLabelText={formatMessage({
-                    id: 'Search for an editor...'
-                  })}
-                />
-
-                {(isIssue(docType) || isArticle(docType)) && (
-                  <OrganizationAutoComplete
-                    contextValueName="library"
-                    helperContent={
-                      <Translate>
-                        The library is the place where the document can be
-                        consulted. Choose an organization from those already
-                        registered at Grottocenter. If the organization you are
-                        looking for does not exist in Grottocenter, you can add
-                        it by using the + button on the right.
-                      </Translate>
+                <Box
+                  sx={{ width: '100%', minWidth: 0 }}
+                  data-testid="document-editor">
+                  <OrganizationSelect
+                    value={document.editor}
+                    onChange={organization =>
+                      updateAttribute('editor', organization)
                     }
-                    helperContentIfValueIsForced={
-                      <>
-                        <Translate>
-                          The library has been deduced from the parent document.
-                        </Translate>
-                        <br />
-                        <Translate>
-                          The library is the place where the document can be
-                          consulted. Choose an organization from those already
-                          registered at Grottocenter. If the organization you
-                          are looking for does not exist in Grottocenter, you
-                          can add it by using the + button on the right.
-                        </Translate>
-                      </>
-                    }
-                    labelText={formatMessage({ id: 'Library' })}
-                    required={false}
-                    searchLabelText={formatMessage({
-                      id: 'Search for a library...'
+                    allowCreation={allowEntityCreation}
+                    defaultType={getDefaultOrganizationType('editor')}
+                    creationTestId="create-editor-search-button"
+                    helperContent={formatMessage({
+                      id: 'entityCreation.editorHelp'
+                    })}
+                    label={formatMessage({ id: 'Editor' })}
+                    placeholder={formatMessage({
+                      id: 'Search for an editor...'
                     })}
                   />
+                </Box>
+
+                {(isIssue(docType) || isArticle(docType)) && (
+                  <Box
+                    sx={{ width: '100%', minWidth: 0 }}
+                    data-testid="document-library">
+                    <OrganizationSelect
+                      value={document.library}
+                      onChange={organization =>
+                        updateAttribute('library', organization)
+                      }
+                      allowCreation={allowEntityCreation}
+                      defaultType={getDefaultOrganizationType('library')}
+                      creationTestId="create-library-search-button"
+                      helperContent={formatMessage({
+                        id: 'entityCreation.libraryHelp'
+                      })}
+                      label={formatMessage({ id: 'Library' })}
+                      placeholder={formatMessage({
+                        id: 'Search for a library...'
+                      })}
+                    />
+                  </Box>
                 )}
               </FormRow>
 

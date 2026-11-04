@@ -159,6 +159,7 @@ const checkFormValidation = document => {
 export const DocumentFormContext = createContext({
   document: defaultDocAttributes,
   isNewDocument: true,
+  allowEntityCreation: true,
   isFormValid: true,
   lengthErrors: [],
   updateAttribute: (attributeName, newValue) => {}, // eslint-disable-line no-unused-vars
@@ -180,7 +181,7 @@ const normalizeInitialValues = values => {
   };
 };
 
-const Provider = ({ children, initialValues }) => {
+const Provider = ({ children, initialValues, allowEntityCreation = true }) => {
   const [document, setDocument] = useState({
     ...defaultDocAttributes,
     ...normalizeInitialValues(initialValues)
@@ -218,6 +219,7 @@ const Provider = ({ children, initialValues }) => {
     () => ({
       document,
       isNewDocument: !initialValues,
+      allowEntityCreation,
       isFormValid,
       lengthErrors,
       updateAttribute,
@@ -228,6 +230,7 @@ const Provider = ({ children, initialValues }) => {
     [
       document,
       initialValues,
+      allowEntityCreation,
       isFormValid,
       lengthErrors,
       updateAttribute,
@@ -245,7 +248,8 @@ const Provider = ({ children, initialValues }) => {
 
 Provider.propTypes = {
   children: PropTypes.node.isRequired,
-  initialValues: defaultDocumentValuesTypes
+  initialValues: defaultDocumentValuesTypes,
+  allowEntityCreation: PropTypes.bool
 };
 
 export default Provider;

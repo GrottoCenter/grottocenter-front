@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { AUTOCOMPLETE_DEBOUNCE_DELAY } from '../conf/config';
+import {
+  AUTOCOMPLETE_DEBOUNCE_DELAY,
+  AUTOCOMPLETE_MIN_CHARACTERS
+} from '../conf/config';
 import { useDebounce } from './useDebounce';
 import { useQuickSearch } from './queries/useQuickSearch';
 
@@ -25,12 +28,18 @@ import { useQuickSearch } from './queries/useQuickSearch';
  *   setInputValue: (v: string) => void,
  *   results: Array,
  *   isLoading: boolean,
+ *   hasSearched: boolean,
  *   hasError: boolean
  * }}
  */
 export const useEntitySearch = (
   entities,
-  { enabled = true, minChars, filter, skipQuery } = {}
+  {
+    enabled = true,
+    minChars = AUTOCOMPLETE_MIN_CHARACTERS,
+    filter,
+    skipQuery
+  } = {}
 ) => {
   const [inputValue, setInputValue] = useState('');
   const debouncedQuery = useDebounce(
@@ -52,6 +61,12 @@ export const useEntitySearch = (
     setInputValue,
     results: query.data?.results ?? [],
     isLoading: query.isFetching,
+    // A previous query's results must not unlock creation for newly typed text.
+    // Cached results and failed searches also count as completed searches.
+    hasSearched:
+      effectiveQuery.length >= minChars &&
+      debouncedQuery === inputValue.trim() &&
+      query.isFetched,
     hasError: !!query.error
   };
 };
