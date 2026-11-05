@@ -59,6 +59,27 @@ describe('Network definition', () => {
   });
 
   [1280, 390].forEach(width => {
+    it(`keeps help beside the last line of a long network title at ${width}px`, () => {
+      const name = 'A long network name with several words '.repeat(3).trim();
+      cy.intercept('GET', '**/api/v1/caves/2', { ...network, name });
+      cy.viewport(width, 900);
+      visit('/caves/2');
+      cy.get('h1').should('have.text', name);
+      cy.get('[data-testid="network-definition-help"]').should($help => {
+        const heading = $help[0].ownerDocument.querySelector('h1');
+        const range = heading.ownerDocument.createRange();
+        range.selectNodeContents(heading.lastChild);
+        const lines = [...range.getClientRects()];
+        expect(lines.length).to.be.greaterThan(1);
+        const lastLine = lines.at(-1);
+        const help = $help[0].getBoundingClientRect();
+        expect(help.left).to.be.closeTo(lastLine.right + 4, 1);
+        expect(help.top).to.be.lessThan(lastLine.bottom);
+        expect(help.bottom).to.be.greaterThan(lastLine.top);
+        expect(heading.contains($help[0])).to.eq(false);
+      });
+    });
+
     ['/entity/add/entrance', '/caves/2', '/entrances/1/edit'].forEach(path => {
       it(`opens and closes the definition on ${path} at ${width}px`, () => {
         cy.viewport(width, 900);
@@ -115,5 +136,46 @@ describe('Network definition', () => {
       cy.get('[data-testid="network-definition"]').should('not.exist');
       cy.get('[data-testid="network-definition-help"]').should('not.exist');
     });
+  });
+
+  it('scrolls the attachment definition with the form on a short mobile viewport', () => {
+    cy.viewport(390, 600);
+    visit('/entrances/1/move');
+    assertDefinition();
+    cy.get('[data-testid="network-definition"]').then($definition => {
+      const { top } = $definition[0].getBoundingClientRect();
+      cy.get('h1').then($heading => {
+        const headingTop = $heading[0].getBoundingClientRect().top;
+        cy.wrap($definition)
+          .parents()
+          .filter(
+            (_, element) => getComputedStyle(element).overflowY === 'auto'
+          )
+          .first()
+          .scrollTo('bottom');
+        cy.get('[data-testid="network-definition"]').should($scrolled => {
+          expect($scrolled[0].getBoundingClientRect().top).to.be.lessThan(top);
+        });
+        cy.get('h1').should($fixedHeading => {
+          expect($fixedHeading[0].getBoundingClientRect().top).to.eq(
+            headingTop
+          );
+        });
+      });
+    });
+  });
+
+  it('hides the definition when the entrance fails to load', () => {
+    cy.intercept('GET', '**/api/v1/entrances/1', { statusCode: 404, body: {} });
+    visit('/entrances/1/move');
+    cy.get('[role="alert"]').should('be.visible');
+    cy.get('[data-testid="network-definition"]').should('not.exist');
+  });
+
+  it('hides the definition when authentication is required', () => {
+    cy.clearLocalStorage();
+    visit('/entrances/1/move');
+    cy.get('[data-testid="auth-error-alert"]').should('be.visible');
+    cy.get('[data-testid="network-definition"]').should('not.exist');
   });
 });

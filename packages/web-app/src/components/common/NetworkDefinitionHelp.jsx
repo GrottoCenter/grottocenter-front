@@ -23,7 +23,7 @@ const NetworkDefinitionHelp = () => {
           aria-expanded={isOpen}
           data-testid="network-definition-help"
           onClick={() => setIsOpen(true)}
-          sx={{ color: 'text.secondary', verticalAlign: 'middle', ml: 0.5 }}>
+          sx={{ color: 'text.secondary' }}>
           <HelpOutlineOutlinedIcon fontSize="small" />
         </IconButton>
       </Tooltip>
