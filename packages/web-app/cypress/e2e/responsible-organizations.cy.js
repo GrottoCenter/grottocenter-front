@@ -184,4 +184,44 @@ describe('Responsible organizations share contextual organization creation', () 
     cy.get('#organizations').should('contain.text', 'Existing organization');
     cy.get('@createOrganization.all').should('have.length', 0);
   });
+
+  it('clears failed association errors when reopening the form and changing the selection', () => {
+    cy.viewport(1280, 900);
+    setupScope(scopes[0], { rejectFirstAssociation: true });
+    openCreation();
+    createOrganization();
+    cy.get('[data-testid="associate-organization-button"]').click();
+    cy.wait('@associateOrganization');
+    cy.get('[data-testid="organization-association-form"]').should(
+      'contain.text',
+      'A server error occurred'
+    );
+    cy.get('[data-testid="toggle-organization-association"]').click();
+    cy.get('[data-testid="organization-association-form"]').should('not.exist');
+    cy.get('[data-testid="toggle-organization-association"]').click();
+    cy.get('[data-testid="organization-association-form"]').should(
+      'not.contain.text',
+      'A server error occurred'
+    );
+    cy.intercept('POST', '**/api/v1/search', {
+      body: { results: [{ ...createdOrganization, _type: 'organizations' }] }
+    });
+    cy.get('[data-testid="responsible-organization-search"]').type('research');
+    cy.contains('[role="option"]', createdOrganization.name).click();
+    cy.intercept('PUT', '**/api/v1/countries/FR/organizations/42', {
+      statusCode: 500,
+      body: {}
+    });
+    cy.get('[data-testid="associate-organization-button"]').click();
+    cy.get('[data-testid="organization-association-form"]').should(
+      'contain.text',
+      'A server error occurred'
+    );
+    cy.get('[data-testid="responsible-organization-search"]').clear();
+    cy.get('[data-testid="organization-association-form"]').should(
+      'not.contain.text',
+      'A server error occurred'
+    );
+    cy.get('@createOrganization.all').should('have.length', 1);
+  });
 });

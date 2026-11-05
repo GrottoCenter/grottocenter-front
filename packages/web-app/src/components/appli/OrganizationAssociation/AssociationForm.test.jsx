@@ -233,6 +233,23 @@ it('retains a created organization when association fails and retries without cr
   expect(creations()).toHaveLength(1);
 });
 
+it('resets a previous association error when searching or selecting a replacement', async () => {
+  state.results = [
+    { id: 42, name: 'Existing organization', _type: 'organizations' }
+  ];
+  const onResetError = vi.fn();
+  renderForm({ onResetError });
+  await userEvent.setup().type(input(), 'Existing');
+  expect(onResetError).toHaveBeenCalled();
+  onResetError.mockClear();
+  await userEvent
+    .setup()
+    .click(
+      await screen.findByRole('option', { name: /Existing organization/ })
+    );
+  expect(onResetError).toHaveBeenCalledTimes(1);
+});
+
 it('prevents repeated association while pending', async () => {
   state.results = [
     { id: 42, name: 'Existing organization', _type: 'organizations' }

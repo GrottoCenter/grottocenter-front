@@ -234,14 +234,14 @@ it('keeps creation available when the selection search fails', async () => {
   expect(writes()).toHaveLength(0);
 });
 
-it('validates an author, preserves search text without splitting it and adds it without submitting the document', async () => {
+it('prefills the author surname from the search, allows correction and adds it without submitting the document', async () => {
   renderForm();
   const authorsInput = screen.getByRole('combobox', { name: 'Authors' });
   await userEvent.setup().type(authorsInput, 'Jane Doe');
   await openAuthor();
   expect(getDialog().getByText('Searched name: Jane Doe')).toBeVisible();
   expect(getDialog().getByLabelText(/First name/)).toHaveValue('');
-  expect(getDialog().getByLabelText(/Surname/)).toHaveValue('');
+  expect(getDialog().getByLabelText(/Surname/)).toHaveValue('Jane Doe');
   expect(screen.getByTestId('document-form').querySelector('form')).toBeNull();
   submit();
   await waitFor(() =>

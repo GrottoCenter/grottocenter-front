@@ -6,6 +6,7 @@ import FieldHelperText from '@/components/common/Form/FieldHelperText';
 import EntityAutocompleteInput from '@/components/common/AutoCompleteSearch/EntityAutocompleteInput';
 import { entityOptionForSelector } from '@/helpers/Entity';
 import { useEntitySearch } from '@/hooks';
+import { AUTOCOMPLETE_MIN_CHARACTERS } from '@/conf/config';
 import {
   documentTypeHelpers,
   filterParentDocumentResults,
@@ -15,7 +16,6 @@ import { DocumentFormContext } from '../Provider';
 import useParentDocumentSelection from '../useParentDocumentSelection';
 
 const DOCUMENTS = ['documents'];
-const MIN_SEARCH_LENGTH = 3;
 const getDocumentName = document => document.title || '';
 
 const ParentDocumentSelect = ({
@@ -37,7 +37,6 @@ const ParentDocumentSelect = ({
   const { inputValue, setInputValue, results, isLoading, hasError } =
     useEntitySearch(DOCUMENTS, {
       filter,
-      minChars: MIN_SEARCH_LENGTH,
       skipQuery: value?.title
     });
   const options =
@@ -46,11 +45,11 @@ const ParentDocumentSelect = ({
       : results;
   const TypeIcon = getDocumentTypeIcon(value?.type);
   const emptyText =
-    inputValue.trim().length >= MIN_SEARCH_LENGTH
+    inputValue.trim().length >= AUTOCOMPLETE_MIN_CHARACTERS
       ? formatMessage({ id: 'No results' })
       : formatMessage(
           { id: 'Type at least {nbOfChars} character(s)' },
-          { nbOfChars: MIN_SEARCH_LENGTH }
+          { nbOfChars: AUTOCOMPLETE_MIN_CHARACTERS }
         );
 
   return (

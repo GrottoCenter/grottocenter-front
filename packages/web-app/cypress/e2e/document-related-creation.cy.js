@@ -302,9 +302,10 @@ describe('Create related entities without leaving a document', () => {
       cy.get('[data-testid="related-entity-dialog"]').within(() => {
         cy.contains('Searched name: Jane Doe').should('be.visible');
         cy.get('[name="name"]').should('have.value', '');
-        cy.get('[name="surname"]').should('have.value', '');
+        cy.get('[name="surname"]').should('have.value', 'Jane Doe');
         cy.get('[data-testid="create-related-entity"]').click();
         cy.get('[name="name"]').should('have.focus').type('Jane');
+        cy.get('[name="surname"]').clear();
         cy.get('[name="surname"]').type('Doe{enter}');
       });
       cy.wait('@createAuthor')

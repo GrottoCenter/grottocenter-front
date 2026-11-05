@@ -68,7 +68,7 @@ const RelatedEntityDialog = ({
         language: AVAILABLE_LANGUAGES[locale].id
       },
       name: '',
-      surname: ''
+      surname: isOrganization ? '' : defaultName
     }
   });
   const isPending = mutation.isPending || isSubmitting;

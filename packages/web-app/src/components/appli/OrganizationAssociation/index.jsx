@@ -118,7 +118,10 @@ const AssociationSection = ({
   const associateButton = canManageAssociations && (
     <SectionCreateButton
       isOpen={isFormOpen}
-      onToggle={() => setIsFormOpen(o => !o)}
+      onToggle={() => {
+        if (!isFormOpen) setMutation.reset();
+        setIsFormOpen(o => !o);
+      }}
       label={formatMessage({ id: 'Associate' })}
       testId="toggle-organization-association"
       icon={
@@ -153,6 +156,7 @@ const AssociationSection = ({
                 onSubmit={handleSet}
                 isPending={setMutation.isPending}
                 error={setMutation.error}
+                onResetError={setMutation.reset}
               />
             )}
 

@@ -1,4 +1,5 @@
 import { createElement } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { getOrganizationIconSource } from '@/utils/organizationIcons';
 import {
@@ -137,12 +138,18 @@ export const entityOptionForSelector = (
     'li',
     { ...otherProps, key: key || `${option._type}-${id}` },
     DocumentIcon ? (
-      <EntityIcon
-        as={DocumentIcon}
-        color="primary"
-        aria-hidden
-        data-testid="document-type-icon"
-      />
+      <FormattedMessage
+        id={option.type || 'Document'}
+        defaultMessage={option.type || 'Document'}>
+        {([typeLabel]) => (
+          <EntityIcon
+            as={DocumentIcon}
+            color="primary"
+            titleAccess={typeLabel}
+            data-testid="document-type-icon"
+          />
+        )}
+      </FormattedMessage>
     ) : (
       iconSrc && <EntityIcon src={iconSrc} alt="" />
     ),

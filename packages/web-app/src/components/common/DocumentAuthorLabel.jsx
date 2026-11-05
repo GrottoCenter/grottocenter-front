@@ -31,7 +31,11 @@ const DocumentAuthorLabel = ({
           <CustomIcon
             type={getPersonIconType(author.type)}
             size={size}
-            alt=""
+            alt={
+              !showPersonType && isPersonType(author.type)
+                ? formatMessage({ id: getPersonTypeLabelId(author.type) })
+                : ''
+            }
           />
         )
       }>

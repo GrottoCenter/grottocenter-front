@@ -189,6 +189,11 @@ describe('Entity family identities and useful author types', () => {
           `[data-testid="document-author-persons-${id}"]`,
           { CAVER: 'caver', AUTHOR: 'author' }[type] ?? 'person'
         );
+        cy.get(`[data-testid="document-author-persons-${id}"] img`).should(
+          'have.attr',
+          'alt',
+          { CAVER: 'Caver', AUTHOR: 'Author' }[type] ?? ''
+        );
       });
     };
     assertExistingAuthorIcons();
@@ -206,6 +211,11 @@ describe('Entity family identities and useful author types', () => {
       .and('not.contain.text', '(Author)');
     assertExistingAuthorIcons();
     assertIcon('[data-testid="document-author-persons-5"]', 'author');
+    cy.get('[data-testid="document-author-persons-5"] img').should(
+      'have.attr',
+      'alt',
+      'Author'
+    );
     assertNoPersonRequests();
     cy.screenshot('selected-document-author-types', { capture: 'viewport' });
   });

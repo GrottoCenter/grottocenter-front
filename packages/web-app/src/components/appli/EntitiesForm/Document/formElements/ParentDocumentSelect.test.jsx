@@ -148,15 +148,19 @@ it.each([
       ]
     });
     renderForm({ type });
-    const user = await search('First');
+    const user = await search('Fi');
     const option = await screen.findByRole('option', { name: /First journal/ });
     expect(option).not.toHaveTextContent(`[${parentType}]`);
     expectTypeIcon(option, icon);
     expect(
+      within(option).getByRole('img', { name: messages[parentType] })
+    ).toBeInTheDocument();
+    expect(option).toHaveAccessibleName(new RegExp(messages[parentType]));
+    expect(
       screen.queryByRole('option', { name: /Current document/ })
     ).not.toBeInTheDocument();
     expect(apiPost).toHaveBeenCalledWith(expect.any(String), {
-      query: 'First',
+      query: 'Fi',
       entities: ['documents'],
       filter: { type: parentType }
     });

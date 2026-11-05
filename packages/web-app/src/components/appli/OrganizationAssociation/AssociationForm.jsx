@@ -8,7 +8,13 @@ import FormSubmissionError from '@/components/common/FormSubmissionError';
 import { useOnlineStatus } from '@/hooks';
 import { FormActionRow } from '../EntitiesForm/utils/FormContainers';
 
-const AssociationForm = ({ onClose, onSubmit, isPending = false, error }) => {
+const AssociationForm = ({
+  onClose,
+  onSubmit,
+  isPending = false,
+  error,
+  onResetError
+}) => {
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
   const submittingRef = useRef(false);
@@ -53,8 +59,14 @@ const AssociationForm = ({ onClose, onSubmit, isPending = false, error }) => {
       <FormSubmissionError error={error} />
       <OrganizationSelect
         value={field.value}
-        onChange={field.onChange}
-        onSearchChange={() => field.onChange(null)}
+        onChange={organization => {
+          onResetError?.();
+          field.onChange(organization);
+        }}
+        onSearchChange={() => {
+          onResetError?.();
+          field.onChange(null);
+        }}
         clearOnBlur={false}
         disabled={isBusy}
         name={field.name}
@@ -78,6 +90,7 @@ AssociationForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isPending: PropTypes.bool,
+  onResetError: PropTypes.func,
   error: FormSubmissionError.propTypes.error
 };
 
