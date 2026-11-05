@@ -14,8 +14,13 @@ import timeToGo from '@/assets/icons/time-to-go.svg?raw';
 import undergroundTime from '@/assets/icons/underground-time.svg?raw';
 import discoveryDate from '@/assets/icons/discovery-date.svg?raw';
 import category from '@/assets/icons/category.svg?raw';
+import country from '@/assets/icons/country.svg?raw';
+import organization from '@/assets/icons/organization.svg?raw';
 
 const sources = {
+  country,
+  organization,
+  region: location,
   entrance,
   network,
   massif,

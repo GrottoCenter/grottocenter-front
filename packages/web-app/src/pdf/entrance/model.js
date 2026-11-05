@@ -17,12 +17,10 @@ import {
 import {
   active,
   contribution,
-  buildDocumentIndex,
-  getPdfInlineDocuments,
-  getPdfLabels
+  makeEntityPdfModel,
+  getWgs84Coordinates
 } from '../shared/model';
 
-export { parsePdfPages } from '../shared/pages';
 export { getPdfAttachments } from '../shared/model';
 
 export const PDF_SECTIONS = [
@@ -39,15 +37,7 @@ export const PDF_SECTIONS = [
 export const getPdfCoordinates = (entrance, isAdmin) => {
   if ((entrance.isSensitive && !isAdmin) || entrance.precision === 0)
     return null;
-  const { latitude, longitude } = entrance;
-  if (
-    !Number.isFinite(latitude) ||
-    !Number.isFinite(longitude) ||
-    Math.abs(latitude) > 90 ||
-    Math.abs(longitude) > 180
-  )
-    return null;
-  return { latitude, longitude };
+  return getWgs84Coordinates(entrance);
 };
 
 export const getPdfSectionAvailability = (entrance, isAdmin) => ({
@@ -217,6 +207,7 @@ export const buildEntrancePdfModel = ({
       !['properties', 'map', 'documents'].includes(section.key)
   ).map(section => ({
     key: section.key,
+    type: section.key === 'riggings' ? 'rigging' : 'contributions',
     title: t(section.label),
     items: sortByRelevance(active(entrance[section.key])).map(item => ({
       ...contribution(item, intl),
@@ -225,30 +216,22 @@ export const buildEntrancePdfModel = ({
         : {})
     }))
   }));
-  return {
+  return makeEntityPdfModel({
+    entity: entrance,
     entityType: 'entrance',
-    propertiesTitle: t('General Information'),
-    locale: intl.locale,
-    title: entrance.name ?? t('Entrance'),
-    source: `https://grottocenter.org/ui/entrances/${entrance.id}`,
-    generatedAt: intl.formatDate(generatedAt),
-    metadata: contribution(entrance, intl).metadata,
+    route: 'entrances',
+    propertiesTitle: 'General Information',
+    sections,
+    documents,
+    attachments,
+    intl,
+    generatedAt,
     warning: entrance.isSensitive ? t('Sensitive entrance') : '',
-    properties: sections.properties ? properties : [],
+    properties,
     coordinates: sections.map && availability.map ? coordinates : null,
     blocks,
-    ...buildDocumentIndex({
-      documents,
-      attachments,
-      includeReferences: sections.documents,
-      intl
-    }),
-    inlineDocuments: sections.documents
-      ? getPdfInlineDocuments(documents, intl)
-      : [],
-    labels: getPdfLabels(intl),
     legends: [...OBSTACLE_LEGEND, ...ANCHOR_LEGEND]
       .map(item => `${t(item.abbrevKey)} = ${t(item.labelKey)}`)
       .join(' · ')
-  };
+  });
 };

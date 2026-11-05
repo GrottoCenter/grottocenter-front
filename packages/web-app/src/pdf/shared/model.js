@@ -9,6 +9,24 @@ import {
 } from '@/components/common/DocumentsList/utils/imageUtils';
 
 export const active = items => (items ?? []).filter(item => !item.isDeleted);
+export const makePdfLinksBlock = (key, label, items, intl) => ({
+  key,
+  title: intl.formatMessage({ id: label }),
+  type: 'links',
+  items: active(items).map(item => ({
+    id: item.id,
+    title: item.title,
+    source: item.source,
+    details: item.details ?? []
+  }))
+});
+export const getWgs84Coordinates = ({ latitude, longitude }) =>
+  Number.isFinite(latitude) &&
+  Number.isFinite(longitude) &&
+  Math.abs(latitude) <= 90 &&
+  Math.abs(longitude) <= 180
+    ? { latitude, longitude }
+    : null;
 const personName = person =>
   person?.nickname ?? [person?.name, person?.surname].filter(Boolean).join(' ');
 
@@ -74,14 +92,12 @@ const documentMetadata = (document, intl) => {
   return {
     title: document.title ?? '',
     type: document.type ?? '',
-    reference: citation ?? document.title ?? '',
     bibliography: citation,
-    authors: citation ? '' : authors,
+    authors,
     credit: [authors, document.license, document.datePublication]
       .filter(Boolean)
       .join(' · '),
     license: document.license ?? '',
-    date: citation ? '' : (document.datePublication ?? ''),
     source: `https://grottocenter.org/ui/documents/${document.id}`
   };
 };
@@ -158,48 +174,36 @@ export const buildDocumentIndex = ({
     DOCUMENT_SORT_ORDERS.TYPE
   )
     .filter(document => includeReferences || selectedIds.has(document.id))
-    .map((document, index) => {
+    .map(document => {
       const metadata = documentMetadata(document, intl);
       return {
         ...metadata,
         bibliography: includeReferences ? metadata.bibliography : null,
         id: document.id,
-        code: `D${index + 1}`,
-        files: attachments
-          .filter(file => file.documentId === document.id)
-          .map((file, fileIndex) => ({
-            ...file,
-            code: `D${index + 1}.${fileIndex + 1}`
-          }))
+        files: attachments.filter(file => file.documentId === document.id)
       };
     });
-  return {
-    references,
-    annexes: references.flatMap(reference => reference.files)
-  };
+  return { references };
 };
 
 export const getPdfLabels = intl =>
   Object.fromEntries(
     [
-      'Entrance properties',
       'Information',
       'Documents',
       'Bibliographic references',
       'Map',
-      'Author',
-      'License',
       'Text',
       'Data',
       'Source',
-      'Publication date',
+      'Date',
       'Obstacle',
       'Rope',
       'Anchor',
       'Observations',
       'Notation legends',
       'Pages',
-      'pdf.originalSize'
+      'pdf.appendices'
     ].map(id => [id, intl.formatMessage({ id })])
   );
 
@@ -212,6 +216,7 @@ export const getGuidelines = entity => {
 
 export const makePdfBlock = (key, label, items, intl) => ({
   key,
+  type: 'contributions',
   title: intl.formatMessage({ id: label }),
   items: active(items).map(item => contribution(item, intl))
 });
@@ -228,14 +233,24 @@ export const makeEntityPdfModel = ({
   properties,
   blocks,
   coordinates,
-  warning = ''
+  warning = '',
+  propertiesTitle = 'Information',
+  legends = ''
 }) => ({
   entityType,
-  propertiesTitle: intl.formatMessage({ id: 'Information' }),
+  propertiesTitle: intl.formatMessage({ id: propertiesTitle }),
   locale: intl.locale,
   title:
     entity.name ??
-    intl.formatMessage({ id: entityType === 'network' ? 'Network' : 'Massif' }),
+    intl.formatMessage({
+      id: {
+        entrance: 'Entrance',
+        network: 'Network',
+        massif: 'Massif',
+        country: 'Country',
+        region: 'Region'
+      }[entityType]
+    }),
   source: `https://grottocenter.org/ui/${route}/${entity.id}`,
   generatedAt: intl.formatDate(generatedAt),
   metadata: contribution(entity, intl).metadata,
@@ -253,5 +268,5 @@ export const makeEntityPdfModel = ({
     ? getPdfInlineDocuments(documents, intl)
     : [],
   labels: getPdfLabels(intl),
-  legends: ''
+  legends
 });

@@ -5,8 +5,7 @@ import {
   getDefaultPdfSections,
   getPdfAttachments,
   getPdfCoordinates,
-  getPdfSectionAvailability,
-  parsePdfPages
+  getPdfSectionAvailability
 } from './model';
 
 const intl = createIntl({ locale: 'en', messages });
@@ -200,19 +199,4 @@ describe('entrance PDF model', () => {
     ]);
     expect(documents).toEqual(before);
   });
-});
-
-describe('physical PDF page selection', () => {
-  it('selects all pages by default and sorts/deduplicates explicit ranges', () => {
-    expect(parsePdfPages('', 3)).toEqual([0, 1, 2]);
-    expect(parsePdfPages('5, 1, 3-5', 6)).toEqual([0, 2, 3, 4]);
-    expect(parsePdfPages('1-999999999')).toBeNull();
-  });
-
-  it.each(['0', '3-1', '2.5', 'one', '1,', '1-7'])(
-    'rejects invalid or out-of-range pages: %s',
-    value => {
-      expect(() => parsePdfPages(value, 6)).toThrow('pdf.pagesError');
-    }
-  );
 });

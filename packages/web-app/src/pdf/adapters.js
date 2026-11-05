@@ -13,8 +13,29 @@ import {
   buildMassifPdfModel,
   getMassifPdfAvailability
 } from './massif/model';
+import {
+  TERRITORY_PDF_SECTIONS,
+  buildTerritoryPdfModel,
+  getTerritoryPdfAvailability
+} from './territory/model';
 
 export const PDF_ADAPTERS = {
+  country: {
+    sections: TERRITORY_PDF_SECTIONS,
+    availability: (entity, _isAdmin, context) =>
+      getTerritoryPdfAvailability(entity, context.statistics),
+    build: options =>
+      buildTerritoryPdfModel({ ...options, entityType: 'country' }),
+    mapZoom: 4
+  },
+  region: {
+    sections: TERRITORY_PDF_SECTIONS,
+    availability: (entity, _isAdmin, context) =>
+      getTerritoryPdfAvailability(entity, context.statistics),
+    build: options =>
+      buildTerritoryPdfModel({ ...options, entityType: 'region' }),
+    mapZoom: 6
+  },
   entrance: {
     sections: PDF_SECTIONS,
     availability: getPdfSectionAvailability,

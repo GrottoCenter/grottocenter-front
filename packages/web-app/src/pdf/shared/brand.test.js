@@ -25,6 +25,8 @@ it('serializes the existing icons and current palette without caching theme colo
   const { palette } = grottoTheme;
   const brand = await getPdfBrand(new AbortController().signal, palette);
   expect(brand.icons.entrance.children.length).toBeGreaterThan(0);
+  expect(brand.icons.organization.children.length).toBeGreaterThan(0);
+  expect(brand.icons.organization).not.toEqual(brand.icons.author);
   expect(brand.icons.network.children.some(child => child.type === 'g')).toBe(
     true
   );

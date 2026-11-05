@@ -2,8 +2,10 @@ import {
   active,
   getGuidelines,
   makePdfBlock,
+  makePdfLinksBlock,
   makeEntityPdfModel
 } from '../shared/model';
+import { hasPdfStatistics, makeStatisticsPdfBlock } from '../shared/statistics';
 
 export const MASSIF_PDF_SECTIONS = [
   { key: 'properties', label: 'Information' },
@@ -55,7 +57,7 @@ export const getMassifPdfAvailability = (entity, isAdmin, statistics) => ({
   properties: true,
   map: Boolean(getMassifPdfPolygons(entity, isAdmin)),
   descriptions: active(entity.descriptions).length > 0,
-  statistics: statistics?.nb_caves != null,
+  statistics: hasPdfStatistics(statistics),
   guidelines: getGuidelines(entity).length > 0,
   organizations: active(entity.organizations).length > 0,
   networks: active(entity.networks).length > 0,
@@ -74,7 +76,7 @@ export const buildMassifPdfModel = options => {
     {
       label: t('Organizations'),
       value: String(active(entity.organizations).length),
-      icon: 'author'
+      icon: 'organization'
     }
   ];
   const blocks = [];
@@ -82,6 +84,8 @@ export const buildMassifPdfModel = options => {
     blocks.push(
       makePdfBlock('descriptions', 'Descriptions', entity.descriptions, intl)
     );
+  if (sections.statistics && hasPdfStatistics(statistics))
+    blocks.push(makeStatisticsPdfBlock(entity, statistics, intl, 'massif'));
   if (sections.guidelines)
     blocks.push(
       makePdfBlock(
@@ -94,57 +98,50 @@ export const buildMassifPdfModel = options => {
         intl
       )
     );
-  for (const [key, label, route] of [
-    ['organizations', 'Organizations', 'organizations'],
-    ['networks', 'Networks list', 'caves']
-  ])
-    if (sections[key])
-      blocks.push(
-        makePdfBlock(
-          key,
-          label,
-          active(entity[key]).map(item => ({
-            id: item.id,
-            title: item.name ?? String(item.id),
-            body: `https://grottocenter.org/ui/${route}/${item.id}`
-          })),
-          intl
-        )
-      );
-  if (sections.statistics && statistics?.nb_caves != null) {
-    const values = [
-      intl.formatMessage(
-        { id: 'cave_with_entrances' },
-        { count: statistics.nb_caves }
-      ),
-      statistics.nb_networks != null &&
-        intl.formatMessage(
-          { id: 'network_count' },
-          { count: statistics.nb_networks }
-        ),
-      statistics.diving_caves != null &&
-        intl.formatMessage(
-          { id: 'diveable_caves' },
-          { count: statistics.diving_caves }
-        )
-    ].filter(Boolean);
+  if (sections.organizations)
     blocks.push(
-      makePdfBlock(
-        'statistics',
-        'More information',
-        [
-          {
-            id: entity.id,
-            body: values.join('\n'),
-            title: t(
-              'Statistics are recomputed periodically and may not reflect the latest changes.'
-            )
-          }
-        ],
+      makePdfLinksBlock(
+        'organizations',
+        'Organizations',
+        active(entity.organizations).map(item => ({
+          id: item.id,
+          title: item.name ?? String(item.id),
+          source: `https://grottocenter.org/ui/organizations/${item.id}`
+        })),
         intl
       )
     );
-  }
+  if (sections.networks)
+    blocks.push(
+      makePdfLinksBlock(
+        'networks',
+        'Networks list',
+        active(entity.networks)
+          .sort((first, second) =>
+            (first.name ?? '').localeCompare(second.name ?? '', intl.locale)
+          )
+          .map(item => ({
+            id: item.id,
+            title: item.name ?? String(item.id),
+            source: `https://grottocenter.org/ui/caves/${item.id}`,
+            details: [
+              ['depth', 'Depth', 'depth'],
+              ['length', 'Development', 'length']
+            ].flatMap(([field, label, icon]) =>
+              Number.isFinite(item[field])
+                ? [
+                    {
+                      label: t(label),
+                      value: `${intl.formatNumber(item[field])} m`,
+                      icon
+                    }
+                  ]
+                : []
+            )
+          })),
+        intl
+      )
+    );
   const polygons = getMassifPdfPolygons(entity);
   return makeEntityPdfModel({
     ...options,

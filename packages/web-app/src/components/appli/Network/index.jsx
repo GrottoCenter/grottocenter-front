@@ -13,6 +13,7 @@ import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import BiotechIcon from '@mui/icons-material/Biotech';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import NetworkDefinitionHelp from '@/components/common/NetworkDefinitionHelp';
+import { useUserProperties } from '@/hooks/useUserProperties';
 import AppLink from '../../common/AppLink';
 
 import {
@@ -72,6 +73,8 @@ export const Network = ({
   const deleteMutation = useDeleteCave();
   const restoreMutation = useRestoreCave();
   const [isPdfExportOpen, setIsPdfExportOpen] = useState(false);
+  const [hasOpenedPdfExport, setHasOpenedPdfExport] = useState(false);
+  const userId = useUserProperties()?.id ?? null;
   const [isEditing, setEditing] = useState(false);
   const [selectedEntrancesId, setSelectedEntrancesId] = useState([]);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
@@ -117,7 +120,10 @@ export const Network = ({
           key: 'pdf',
           icon: <Download />,
           label: formatMessage({ id: 'pdf.download' }),
-          onClick: () => setIsPdfExportOpen(true)
+          onClick: () => {
+            setHasOpenedPdfExport(true);
+            setIsPdfExportOpen(true);
+          }
         },
         {
           key: 'share',
@@ -361,7 +367,7 @@ export const Network = ({
             </SectionStack>
           )}
         </PageTabs>
-        {isPdfExportOpen && cave && (
+        {hasOpenedPdfExport && cave && (
           <Suspense
             fallback={
               <CircularProgress
@@ -369,7 +375,7 @@ export const Network = ({
               />
             }>
             <PdfExport
-              key={`${cave.id}-${isAdmin}`}
+              key={`${cave.id}-${userId}-${isAdmin}`}
               entity={cave}
               entityType="network"
               isAdmin={isAdmin}

@@ -2,11 +2,20 @@
 import path from 'node:path';
 import sharp from 'sharp';
 import { createIntl } from 'react-intl';
-import { PDFDocument, PDFName, degrees, decodePDFRawStream } from 'pdf-lib';
+import {
+  PDFDocument,
+  PDFName,
+  PDFString,
+  degrees,
+  decodePDFRawStream
+} from 'pdf-lib';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import messages from '../../../public/lang/en.json';
 import { buildEntrancePdfModel } from '../entrance/model';
+import { buildMassifPdfModel } from '../massif/model';
+import { PDF_ADAPTERS } from '../adapters';
 import { generateEntityPdf } from './generateEntityPdf';
+import { PDF_LIMITS } from './limits';
 
 const fontSources = Object.fromEntries(
   Object.entries({
@@ -23,6 +32,98 @@ const fontSources = Object.fromEntries(
   ])
 );
 const intl = createIntl({ locale: 'en', messages });
+
+it.each(['country', 'region'])(
+  'generates a real %s PDF with numeric statistics',
+  async entityType => {
+    const territory = PDF_ADAPTERS[entityType].build({
+      entity: {
+        id: entityType === 'country' ? 'FR' : 'ARA',
+        countryId: 'FR',
+        name: 'Territory export'
+      },
+      statistics: {
+        nb_caves: 1165,
+        nb_networks: 9,
+        diving_caves: 3,
+        avg: { avg_depth: 30, avg_length: 273 },
+        total_length: { value: 299165 }
+      },
+      sections: { statistics: true },
+      documents: [],
+      attachments: [],
+      intl
+    });
+    const task = getDocument({
+      data: await generateEntityPdf(territory, [], { fontSources })
+    });
+    try {
+      const output = await task.promise;
+      expect(output.numPages).toBe(1);
+      const page = await output.getPage(1);
+      const text = (await page.getTextContent()).items
+        .map(item => item.str)
+        .join(' ');
+      expect(text).toContain('1,165');
+      expect(text).toContain('299,165 m');
+      expect(text).toContain('30 m');
+      expect(text).toContain('273 m');
+      expect(text).not.toContain('{count');
+    } finally {
+      await task.destroy();
+    }
+  },
+  20000
+);
+
+it('fits nine linked networks and their dimensions before documents on one page', async () => {
+  const networks = Array.from({ length: 9 }, (_item, index) => ({
+    id: index + 1,
+    name: `Network ${index + 1}`,
+    depth: 100 + index,
+    length: 10000 + index
+  }));
+  const massif = buildMassifPdfModel({
+    entity: { id: 6487, name: 'Compact massif', networks },
+    sections: { networks: true, documents: true },
+    documents: [
+      {
+        id: 12,
+        title: 'Document following the networks',
+        type: 'Book',
+        datePublication: '2026'
+      }
+    ],
+    attachments: [],
+    intl
+  });
+  const task = getDocument({
+    data: await generateEntityPdf(massif, [], { fontSources })
+  });
+  try {
+    const output = await task.promise;
+    expect(output.numPages).toBe(1);
+    const page = await output.getPage(1);
+    const text = (await page.getTextContent()).items
+      .map(item => item.str)
+      .join(' ');
+    expect(text).toContain('100 m');
+    expect(text).toContain('10,000 m');
+    expect(text.indexOf('Document following the networks')).toBeGreaterThan(
+      text.indexOf('Network 9')
+    );
+    expect(text).not.toContain('https://grottocenter.org/ui/caves/');
+    const links = (await page.getAnnotations()).map(
+      annotation => annotation.url
+    );
+    for (const network of networks)
+      expect(links).toContain(
+        `https://grottocenter.org/ui/caves/${network.id}`
+      );
+  } finally {
+    await task.destroy();
+  }
+}, 20000);
 const model = buildEntrancePdfModel({
   entrance: {
     id: 1,
@@ -40,18 +141,15 @@ const model = buildEntrancePdfModel({
   attachments: [],
   intl
 });
+
 const attachment = {
   key: 'survey',
   fileName: 'survey.pdf',
-  isPdf: true,
-  pages: '2'
+  isPdf: true
 };
 
 const makeSurvey = async () => {
   const survey = await PDFDocument.create();
-  survey
-    .addPage([300, 500])
-    .drawRectangle({ x: 5, y: 5, width: 200, height: 400 });
   const rotated = survey.addPage([300, 500]);
   rotated.setCropBox(20, 40, 200, 400);
   rotated.setRotation(degrees(90));
@@ -426,8 +524,8 @@ describe('real entity PDF assembly', () => {
         const page = await document.getPage(number);
         const text = await page.getTextContent();
         contents += text.items.map(item => item.str).join(' ');
-        const footer = text.items.find(item =>
-          item.str.includes('Grottocenter ·')
+        const footer = text.items.find(
+          item => item.str.startsWith('Grottocenter') && item.transform[5] < 36
         );
         expect(footer).toBeDefined();
         expect(footer.transform[5]).toBeGreaterThan(12);
@@ -435,9 +533,10 @@ describe('real entity PDF assembly', () => {
         expect(text.items.map(item => item.str).join('')).toContain(
           `${number} / ${document.numPages}`
         );
-        expect(text.items.map(item => item.str).join(' ')).toContain(
-          'CC BY-SA 3.0 (Text) · ODbL 1.0 (Data)'
-        );
+        const pageText = text.items.map(item => item.str).join(' ');
+        if (number < document.numPages)
+          expect(pageText).toContain('CC BY-SA 3.0 (Text) · ODbL 1.0 (Data)');
+        else expect(pageText).not.toContain('CC BY-SA');
         const annotations = await page.getAnnotations();
         expect(
           annotations.filter(
@@ -465,44 +564,76 @@ describe('real entity PDF assembly', () => {
     }
   }, 20000);
 
-  it('keeps a document-specific licence in appendix footers instead of relicensing it', async () => {
-    const licensedModel = {
-      ...model,
-      references: [
-        {
-          id: 7,
-          title: 'Licensed survey',
-          source: 'https://grottocenter.org/ui/documents/7',
-          license: 'CC BY-NC 4.0',
-          credit: 'Survey author · CC BY-NC 4.0',
-          files: [attachment]
+  it.each(['CC BY-NC 4.0', ''])(
+    'puts authors and the document licence only in every appendix footer: %s',
+    async license => {
+      const file = { ...attachment, documentId: 7 };
+      const licensedModel = buildEntrancePdfModel({
+        entrance: { id: 1, name: 'Appendix credits' },
+        sections: {},
+        documents: [
+          {
+            id: 7,
+            title: 'Licensed survey',
+            authors: [{ nickname: 'Survey author' }],
+            authorsOrganization: [{ name: 'Survey team' }],
+            license,
+            datePublication: '2026-07-18'
+          }
+        ],
+        attachments: [file],
+        intl
+      });
+      const source = await PDFDocument.create();
+      source.addPage([300, 500]).drawText('First source page');
+      source.addPage([300, 500]).drawText('Second source page');
+      const task = getDocument({
+        data: await generateEntityPdf(
+          licensedModel,
+          [{ ...file, bytes: await source.save() }],
+          { fontSources }
+        )
+      });
+      try {
+        const document = await task.promise;
+        expect(document.numPages).toBe(3);
+        // Read each appendix with PDF.js to verify credits repeat only in its footer.
+        /* eslint-disable no-await-in-loop */
+        for (const number of [2, 3]) {
+          const page = await document.getPage(number);
+          const { items } = await page.getTextContent();
+          const footerText = items
+            .filter(item => item.transform[5] < 36)
+            .map(item => item.str)
+            .join(' ');
+          const pageText = items.map(item => item.str).join(' ');
+          expect(footerText).toContain(
+            ['Grottocenter', 'Survey author, Survey team', license]
+              .filter(Boolean)
+              .join(' · ')
+          );
+          expect(footerText).toContain(`${number} / 3`);
+          expect(footerText).not.toContain('CC BY-SA');
+          expect(footerText).not.toContain('ODbL');
+          expect(pageText.split('Survey author')).toHaveLength(2);
+          expect(pageText).not.toContain('2026-07-18');
+          if (license) expect(pageText.split(license)).toHaveLength(2);
+          expect(
+            items
+              .filter(item => item.transform[5] >= 36)
+              .map(item => item.str)
+              .join(' ')
+          ).not.toContain('Survey author');
         }
-      ]
-    };
-    const task = getDocument({
-      data: await generateEntityPdf(
-        licensedModel,
-        [{ ...attachment, documentId: 7, bytes: await makeSurvey() }],
-        { fontSources }
-      )
-    });
-    try {
-      const document = await task.promise;
-      const page = await document.getPage(2);
-      const { items } = await page.getTextContent();
-      const footerText = items
-        .filter(item => item.transform[5] < 36)
-        .map(item => item.str)
-        .join(' ');
-      expect(footerText).toContain('Grottocenter · CC BY-NC 4.0');
-      expect(footerText).not.toContain('CC BY-SA');
-      expect(footerText).not.toContain('ODbL');
-    } finally {
-      await task.destroy();
-    }
-  }, 20000);
+        /* eslint-enable no-await-in-loop */
+      } finally {
+        await task.destroy();
+      }
+    },
+    20000
+  );
 
-  it('renders multilingual text and embeds a selected, cropped, rotated survey as vectors on landscape A4', async () => {
+  it('renders multilingual text and embeds a cropped, rotated survey as vectors on landscape A4', async () => {
     const bytes = await generateEntityPdf(
       model,
       [{ ...attachment, bytes: await makeSurvey() }],
@@ -579,17 +710,307 @@ describe('real entity PDF assembly', () => {
     expect(image.dict.get(PDFName.of('Width')).asNumber()).toBe(90);
     expect(image.dict.get(PDFName.of('Height')).asNumber()).toBe(180);
   }, 20000);
+});
 
-  it('reports an out-of-range physical page with the offending filename', async () => {
+const readPdf = async bytes => {
+  const task = getDocument({ data: bytes });
+  try {
+    const document = await task.promise;
+    const pages = await Promise.all(
+      Array.from({ length: document.numPages }, async (_value, index) => {
+        const page = await document.getPage(index + 1);
+        return {
+          text: (await page.getTextContent()).items
+            .map(item => item.str)
+            .join(' '),
+          annotations: await page.getAnnotations(),
+          size: page.getViewport({ scale: 1 })
+        };
+      })
+    );
+    return pages;
+  } finally {
+    await task.destroy();
+  }
+};
+
+describe('PDF export fidelity regressions', () => {
+  const file = { ...attachment, documentId: 7 };
+  const makeCreditedModel = includeDocuments =>
+    buildEntrancePdfModel({
+      entrance: { id: 1, name: 'Audit cave' },
+      sections: { properties: true, documents: includeDocuments },
+      documents: [
+        {
+          id: 7,
+          title: 'SurveyTitle',
+          type: 'Topographic Drawing',
+          authors: [{ nickname: 'SurveyAuthor' }],
+          license: 'SurveyLicense'
+        }
+      ],
+      attachments: [file],
+      intl,
+      generatedAt: new Date('2026-01-02T12:00:00Z')
+    });
+
+  it.each([false, true])(
+    'keeps native document credits and locates its pages with Documents=%s',
+    async includeDocuments => {
+      const credited = makeCreditedModel(includeDocuments);
+      const pages = await readPdf(
+        await generateEntityPdf(
+          credited,
+          [{ ...file, bytes: await makeSurvey() }],
+          { format: 'original', fontSources }
+        )
+      );
+      const sheet = pages
+        .slice(0, -1)
+        .map(page => page.text)
+        .join(' ');
+      expect(sheet).toContain('SurveyTitle');
+      expect(sheet).toContain('SurveyAuthor');
+      expect(sheet).toContain('SurveyLicense');
+      expect(sheet).toContain(`Pages: ${pages.length}–${pages.length}`);
+      expect(sheet).toContain(`1 / ${pages.length}`);
+      expect(sheet).toContain(credited.generatedAt);
+    }
+  );
+
+  it('keeps image-specific authors and licences beside inline media', async () => {
+    const bytes = new Uint8Array(
+      await sharp({
+        create: { width: 20, height: 10, channels: 3, background: '#789abc' }
+      })
+        .png()
+        .toBuffer()
+    );
+    const imageModel = buildEntrancePdfModel({
+      entrance: { id: 1, name: 'Inline images' },
+      sections: { documents: true },
+      attachments: [],
+      intl,
+      documents: [
+        {
+          id: 8,
+          title: 'InlineTitle',
+          type: 'Photo',
+          authors: [{ nickname: 'InlineAuthor' }],
+          license: 'InlineLicense',
+          files: [
+            {
+              id: 9,
+              fileName: 'photo.png',
+              completePath: 'https://example.org/photo.png'
+            }
+          ]
+        }
+      ]
+    });
+    const image = imageModel.inlineDocuments[0].files[0];
+    const pages = await readPdf(
+      await generateEntityPdf(imageModel, [], {
+        fontSources,
+        inlineImages: [{ ...image, bytes }]
+      })
+    );
+    expect(pages[0].text).toContain('InlineAuthor');
+    expect(pages[0].text).toContain('InlineLicense');
+  });
+
+  it.each(['a4', 'original'])(
+    'preserves blank appendix pages in %s mode',
+    async format => {
+      const source = await PDFDocument.create();
+      source.addPage([300, 500]).drawText('First source page');
+      source.addPage([300, 500]);
+      const pages = await readPdf(
+        await generateEntityPdf(
+          makeCreditedModel(false),
+          [{ ...file, bytes: await source.save() }],
+          { format, fontSources }
+        )
+      );
+      expect(pages).toHaveLength(3);
+      expect(pages[1].text).toContain('First source page');
+      expect(pages[2].text).not.toContain('First source page');
+    }
+  );
+
+  it.each([
+    [0, [20, 40, 100, 120]],
+    [90, [40, 100, 120, 180]],
+    [180, [100, 280, 180, 360]],
+    [270, [280, 20, 360, 100]]
+  ])(
+    'preserves external links through CropBox and %s degree rotation',
+    async (rotation, localRect) => {
+      const source = await PDFDocument.load(await makeSurvey());
+      const page = source.getPage(0);
+      page.setRotation(degrees(rotation));
+      page.node.set(
+        PDFName.of('Annots'),
+        source.context.obj([
+          {
+            Type: 'Annot',
+            Subtype: 'Link',
+            Rect: [40, 80, 120, 160],
+            A: {
+              Type: 'Action',
+              S: 'URI',
+              URI: PDFString.of('https://example.org/source-link')
+            }
+          }
+        ])
+      );
+      const pages = await readPdf(
+        await generateEntityPdf(
+          makeCreditedModel(false),
+          [{ ...file, bytes: await source.save() }],
+          { fontSources }
+        )
+      );
+      const annex = pages[1];
+      const link = annex.annotations.find(
+        item => item.url === 'https://example.org/source-link'
+      );
+      expect(link).toBeDefined();
+      const width = rotation % 180 ? 400 : 200;
+      const height = rotation % 180 ? 200 : 400;
+      const scale = Math.min(
+        (annex.size.width - 72) / width,
+        (annex.size.height - 126) / height
+      );
+      const x = (annex.size.width - width * scale) / 2;
+      const y = 42 + (annex.size.height - 126 - height * scale) / 2;
+      localRect.forEach((value, index) =>
+        expect(link.rect[index]).toBeCloseTo(
+          value * scale + (index % 2 ? y : x),
+          2
+        )
+      );
+    }
+  );
+
+  it('reports unsupported annotations with their source file and allows native export', async () => {
+    const source = await PDFDocument.load(await makeSurvey());
+    source.getPage(0).node.set(
+      PDFName.of('Annots'),
+      source.context.obj([
+        {
+          Type: 'Annot',
+          Subtype: 'Text',
+          Rect: [40, 80, 120, 160],
+          Contents: PDFString.of('Source note')
+        }
+      ])
+    );
+    const bytes = await source.save();
+    await expect(
+      generateEntityPdf(makeCreditedModel(false), [{ ...file, bytes }], {
+        fontSources
+      })
+    ).rejects.toMatchObject({
+      message: 'pdf.annotationError',
+      resource: 'survey.pdf'
+    });
+    const pages = await readPdf(
+      await generateEntityPdf(makeCreditedModel(false), [{ ...file, bytes }], {
+        fontSources,
+        format: 'original'
+      })
+    );
+    expect(pages[1].annotations.some(item => item.subtype === 'Text')).toBe(
+      true
+    );
+  });
+
+  it('sets the language on the final document catalog', async () => {
+    const output = await PDFDocument.load(
+      await generateEntityPdf(makeCreditedModel(false), [], { fontSources })
+    );
+    expect(output.catalog.get(PDFName.of('Lang')).decodeText()).toBe('en');
+  });
+
+  it('rejects excessive appendix pages with the offending filename', async () => {
+    const source = await PDFDocument.create();
+    for (let index = 0; index <= PDF_LIMITS.pages; index++) source.addPage();
     await expect(
       generateEntityPdf(
-        model,
-        [{ ...attachment, pages: '3', bytes: await makeSurvey() }],
+        makeCreditedModel(false),
+        [{ ...file, bytes: await source.save() }],
         { fontSources }
       )
     ).rejects.toMatchObject({
-      message: 'pdf.pagesError',
+      message: 'pdf.resourceLimit',
       resource: 'survey.pdf'
     });
+  });
+
+  it('copies native page resources once and preserves links to another source page', async () => {
+    const source = await PDFDocument.create();
+    const first = source.addPage();
+    const second = source.addPage();
+    const font = source.embedStandardFont('Helvetica');
+    first.drawText('First page', { font });
+    second.drawText('Second page', { font });
+    first.node.set(
+      PDFName.of('Annots'),
+      source.context.obj([
+        {
+          Type: 'Annot',
+          Subtype: 'Link',
+          Rect: [20, 20, 100, 50],
+          Dest: [second.ref, 'Fit']
+        }
+      ])
+    );
+    const outputBytes = await generateEntityPdf(
+      makeCreditedModel(false),
+      [{ ...file, bytes: await source.save() }],
+      { fontSources, format: 'original' }
+    );
+    const output = await PDFDocument.load(outputBytes);
+    const firstFont = output
+      .getPage(1)
+      .node.Resources()
+      .lookup(PDFName.of('Font'))
+      .values()[0];
+    const secondFont = output
+      .getPage(2)
+      .node.Resources()
+      .lookup(PDFName.of('Font'))
+      .values()[0];
+    expect(firstFont.toString()).toBe(secondFont.toString());
+    const task = getDocument({ data: outputBytes });
+    try {
+      const document = await task.promise;
+      const page = await document.getPage(2);
+      const annotations = await page.getAnnotations();
+      expect(await document.getPageIndex(annotations[0].dest[0])).toBe(2);
+    } finally {
+      await task.destroy();
+    }
+  });
+
+  it('reports deferred stream failures with the source filename', async () => {
+    const source = await PDFDocument.create();
+    const page = source.addPage();
+    page.node.set(
+      PDFName.of('Contents'),
+      source.context.register(
+        source.context.stream(new Uint8Array([0xff]), {
+          Filter: 'UnsupportedFilter'
+        })
+      )
+    );
+    await expect(
+      generateEntityPdf(
+        makeCreditedModel(false),
+        [{ ...file, bytes: await source.save() }],
+        { fontSources }
+      )
+    ).rejects.toMatchObject({ resource: 'survey.pdf' });
   });
 });

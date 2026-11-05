@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Marker } from 'react-leaflet';
@@ -6,12 +6,12 @@ import { Button, Card, CircularProgress } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import { Print } from '@mui/icons-material';
+import { Download } from '@mui/icons-material';
 import ShareIcon from '@mui/icons-material/Share';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { useReactToPrint } from 'react-to-print';
 import { isMobile } from 'react-device-detect';
+import { useUserProperties } from '@/hooks/useUserProperties';
 import CustomIcon from '../../common/CustomIcon';
 
 import Guidelines from '../Guidelines';
@@ -34,6 +34,8 @@ import {
 } from '../../../hooks';
 import AssociationSection from '../OrganizationAssociation';
 
+const PdfExport = lazy(() => import('@/components/appli/PdfExport'));
+
 const Region = ({
   canSubscribe,
   region,
@@ -48,11 +50,16 @@ const Region = ({
 }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
-  const componentRef = useRef();
+  const [isPdfExportOpen, setIsPdfExportOpen] = useState(false);
+  const [hasOpenedPdfExport, setHasOpenedPdfExport] = useState(false);
+  const userId = useUserProperties()?.id ?? null;
+  const pdfEntity = useMemo(
+    () => (region ? { ...region, id: regionId, countryId } : null),
+    [region, regionId, countryId]
+  );
   const permissions = usePermissions();
   const isLoading = isFetching && !region;
   const handleShare = useSharePage();
-  const handlePrint = useReactToPrint({ contentRef: componentRef });
 
   const {
     isSubscribed: isSubscribedMethod,
@@ -99,10 +106,13 @@ const Region = ({
           hidden: !canSubscribe
         },
         {
-          key: 'print',
-          icon: <Print />,
-          label: formatMessage({ id: 'Print' }),
-          onClick: handlePrint
+          key: 'pdf',
+          icon: <Download />,
+          label: formatMessage({ id: 'pdf.download' }),
+          onClick: () => {
+            setHasOpenedPdfExport(true);
+            setIsPdfExportOpen(true);
+          }
         },
         {
           key: 'share',
@@ -127,7 +137,7 @@ const Region = ({
 
   return (
     <PageContainer>
-      <div ref={componentRef}>
+      <div>
         <PageHeader
           title={region?.name ?? (isLoading ? undefined : '')}
           subheader={subheader}
@@ -207,6 +217,24 @@ const Region = ({
               isLoading={isLoading}
             />
           </SectionStack>
+        )}
+        {hasOpenedPdfExport && pdfEntity && (
+          <Suspense
+            fallback={
+              <CircularProgress
+                aria-label={formatMessage({ id: 'Loading ...' })}
+              />
+            }>
+            <PdfExport
+              key={`${countryId}-${regionId}-${userId}-${permissions.isAdmin}`}
+              entity={pdfEntity}
+              entityType="region"
+              statistics={dataRegion}
+              isAdmin={permissions.isAdmin}
+              open={isPdfExportOpen}
+              onClose={() => setIsPdfExportOpen(false)}
+            />
+          </Suspense>
         )}
       </div>
     </PageContainer>

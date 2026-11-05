@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
   // Pull VITE_API_URL out of the env file so the SW's runtimeCaching pattern
   // matches whichever backend this build targets (prod, staging, local).
   const env = loadEnv(mode, process.cwd(), '');
+  const shouldAnalyze = env.ANALYZE === 'true';
   const apiOrigin = env.VITE_API_URL
     ? new NodeURL(env.VITE_API_URL).origin
     : null;
@@ -99,11 +100,14 @@ export default defineConfig(({ mode }) => {
       pdfJsWasmAssets(),
       compression({ algorithm: 'gzip' }),
       compression({ algorithm: 'brotliCompress', deleteOriginalAssets: false }),
-      visualizer({
-        filename: 'dist/stats.html',
-        gzipSize: true,
-        brotliSize: true
-      }),
+      // Walking the complete module graph for every chunk is expensive on Rolldown.
+      // Keep bundle reports available through build:analyze without slowing normal builds.
+      shouldAnalyze &&
+        visualizer({
+          filename: 'dist/stats.html',
+          gzipSize: true,
+          brotliSize: true
+        }),
       // PWA / Service Worker (Workbox under the hood). Required to package the
       // app as an Android TWA. The SW is registered by <UpdatePrompt>
       // (src/components/appli/UpdatePrompt.jsx), which also drives the update UI.
@@ -330,7 +334,8 @@ export default defineConfig(({ mode }) => {
             '**/screenshots/**',
             // Loading the static preview must not download the 3D engine,
             // including through the service worker's background installation.
-            '**/modelViewer-*.js'
+            '**/modelViewer-*.js',
+            '**/pdfExport.worker-*.js'
           ],
           // Take control of the page on the very first load so offline works
           // from the first visit (matches the previous CRA SW's clientsClaim()).
@@ -339,6 +344,20 @@ export default defineConfig(({ mode }) => {
           navigateFallbackDenylist: [/^\/api/, /^\/\.well-known/],
           cleanupOutdatedCaches: true,
           runtimeCaching: [
+            {
+              // Generate PDFs only on demand, including during PWA installation.
+              urlPattern: ({ url, sameOrigin }) =>
+                sameOrigin &&
+                /\/assets\/(?:pdfExport\.worker-[^/]+\.js|NotoSans[^/]+\.ttf)$/.test(
+                  url.pathname
+                ),
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'pdf-export-runtime',
+                expiration: { maxEntries: 12, purgeOnQuotaError: true },
+                cacheableResponse: { statuses: [200] }
+              }
+            },
             {
               // The named lazy 3D runtime is fetched only on View in 3D. Keep
               // it available offline after use without downloading it for all

@@ -1,29 +1,28 @@
 import PropTypes from 'prop-types';
 
 export const PdfReferenceType = PropTypes.shape({
-  code: PropTypes.string,
   title: PropTypes.string,
-  reference: PropTypes.string,
   bibliography: PropTypes.string,
   authors: PropTypes.string,
+  credit: PropTypes.string,
   license: PropTypes.string,
-  date: PropTypes.string,
   source: PropTypes.string.isRequired,
   files: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
-      code: PropTypes.string.isRequired,
       fileName: PropTypes.string.isRequired,
       isPdf: PropTypes.bool.isRequired,
-      pages: PropTypes.string
+      firstPage: PropTypes.number,
+      lastPage: PropTypes.number
     })
   )
 });
 
 export const PdfContributionType = PropTypes.shape({
-  id: PropTypes.number,
+  id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   title: PropTypes.string,
   body: PropTypes.string,
+  source: PropTypes.string,
   metadata: PropTypes.string,
   details: PropTypes.arrayOf(
     PropTypes.shape({
@@ -37,12 +36,19 @@ export const PdfContributionType = PropTypes.shape({
 
 export const PdfBlockType = PropTypes.shape({
   key: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(['contributions', 'rigging', 'links']).isRequired,
   title: PropTypes.string.isRequired,
   items: PropTypes.arrayOf(PdfContributionType).isRequired
 });
 
 export const PdfModelType = PropTypes.shape({
-  entityType: PropTypes.oneOf(['entrance', 'network', 'massif']).isRequired,
+  entityType: PropTypes.oneOf([
+    'entrance',
+    'network',
+    'massif',
+    'country',
+    'region'
+  ]).isRequired,
   propertiesTitle: PropTypes.string.isRequired,
   brand: PropTypes.shape({
     colors: PropTypes.objectOf(PropTypes.string),
@@ -70,11 +76,13 @@ export const PdfModelType = PropTypes.shape({
   }),
   blocks: PropTypes.arrayOf(PdfBlockType).isRequired,
   references: PropTypes.arrayOf(PdfReferenceType).isRequired,
+  nativeAnnexes: PropTypes.arrayOf(PdfReferenceType),
   inlineDocuments: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       title: PropTypes.string.isRequired,
       source: PropTypes.string.isRequired,
+      credit: PropTypes.string,
       files: PropTypes.arrayOf(
         PropTypes.shape({
           key: PropTypes.string.isRequired,
@@ -83,12 +91,5 @@ export const PdfModelType = PropTypes.shape({
         })
       ).isRequired
     })
-  ),
-  annexes: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      fileName: PropTypes.string.isRequired,
-      code: PropTypes.string.isRequired
-    })
-  ).isRequired
+  )
 });

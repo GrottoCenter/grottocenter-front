@@ -12,6 +12,7 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ShareIcon from '@mui/icons-material/Share';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
+import { useUserProperties } from '@/hooks/useUserProperties';
 
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
@@ -65,6 +66,8 @@ const Massif = ({
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
   const [isPdfExportOpen, setIsPdfExportOpen] = useState(false);
+  const [hasOpenedPdfExport, setHasOpenedPdfExport] = useState(false);
+  const userId = useUserProperties()?.id ?? null;
   const deleteMutation = useDeleteMassif();
   const restoreMutation = useRestoreMassif();
   const subscribeMutation = useSubscribeToMassif();
@@ -147,7 +150,10 @@ const Massif = ({
           key: 'pdf',
           icon: <Download />,
           label: formatMessage({ id: 'pdf.download' }),
-          onClick: () => setIsPdfExportOpen(true)
+          onClick: () => {
+            setHasOpenedPdfExport(true);
+            setIsPdfExportOpen(true);
+          }
         },
         {
           key: 'share',
@@ -379,7 +385,7 @@ const Massif = ({
             )}
           </div>
         </PageTabs>
-        {isPdfExportOpen && massif && (
+        {hasOpenedPdfExport && massif && (
           <Suspense
             fallback={
               <CircularProgress
@@ -387,7 +393,7 @@ const Massif = ({
               />
             }>
             <PdfExport
-              key={`${massif.id}-${permissions.isAdmin}`}
+              key={`${massif.id}-${userId}-${permissions.isAdmin}`}
               entity={massif}
               entityType="massif"
               statistics={dataMassif}

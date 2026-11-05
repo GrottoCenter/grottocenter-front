@@ -42,7 +42,7 @@ const polygon = JSON.stringify({
   ]
 });
 
-it('credits one document once and gives its two files matching annex codes', () => {
+it('credits one document once and associates its selected files', () => {
   const result = buildDocumentIndex({
     documents: [document, document],
     attachments: getPdfAttachments([document]),
@@ -50,9 +50,8 @@ it('credits one document once and gives its two files matching annex codes', () 
     intl
   });
   expect(result.references).toHaveLength(1);
-  expect(result.references[0].authors).toBe('Surveyor');
-  expect(result.annexes.map(file => file.code)).toEqual(['D1.1', 'D1.2']);
-  expect(result.references[0].files).toEqual(result.annexes);
+  expect(result.references[0].credit).toContain('Surveyor');
+  expect(result.references[0].files).toEqual(getPdfAttachments([document]));
 });
 
 it('includes only selected annex credits when all references are deselected', () => {
@@ -65,7 +64,7 @@ it('includes only selected annex credits when all references are deselected', ()
   expect(result.references.map(reference => reference.title)).toEqual([
     'Survey'
   ]);
-  expect(result.annexes).toHaveLength(1);
+  expect(result.references[0].files).toHaveLength(1);
 });
 
 it('keeps bibliographic references without duplicating their authors and publication date', () => {
@@ -75,11 +74,8 @@ it('keeps bibliographic references without duplicating their authors and publica
     includeReferences: true,
     intl
   });
-  expect(result.references[0].reference).toContain('2020');
   expect(result.references[0].bibliography).toContain('2020');
-  expect(result.references[0].authors).toBe('');
-  expect(result.references[0].date).toBe('');
-  expect(result.annexes).toEqual([]);
+  expect(result.references[0].files).toEqual([]);
 });
 
 it('does not invent bibliography for media documents and exports only their inline previews', () => {

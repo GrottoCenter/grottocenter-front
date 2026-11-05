@@ -69,6 +69,121 @@ describe('entrance PDF download', () => {
     cy.loginAs();
   });
 
+  ['country', 'region'].forEach(entityType => {
+    it(`downloads a ${entityType} through the shared worker with statistics`, () => {
+      const name =
+        entityType === 'country' ? 'France' : `Region export ${Date.now()}`;
+      const path =
+        entityType === 'country'
+          ? '/countries/FR'
+          : '/countries/FR/regions/ARA';
+      cy.intercept(
+        { method: 'GET', pathname: `/api/v1${path}` },
+        {
+          body: {
+            id: entityType === 'country' ? 'FR' : 'FR-ARA',
+            name,
+            nativeName: name,
+            latitude: 45,
+            longitude: 5,
+            guidelines: [],
+            organizations: []
+          }
+        }
+      );
+      cy.intercept(
+        { method: 'GET', pathname: `/api/v1${path}/statistics` },
+        {
+          body: {
+            nb_caves: 1165,
+            nb_networks: 9,
+            diving_caves: 3,
+            avg: { avg_depth: 30, avg_length: 273 },
+            total_length: { value: 299165, nb_data: 1092 }
+          }
+        }
+      ).as('territoryStatistics');
+      cy.intercept(
+        { method: 'POST', pathname: '/api/v1/regions/search/logical/or' },
+        {
+          body: {
+            results: [
+              { type: 'region', iso: 'FR-ARA', name: 'Auvergne-Rhône-Alpes' }
+            ]
+          }
+        }
+      );
+      cy.intercept('https://tile.openstreetmap.org/**', {
+        headers: { 'content-type': 'image/png' },
+        fixture: 'entrance-map-tile.png,null'
+      });
+      cy.visit(path, {
+        onBeforeLoad: win => {
+          win.localStorage.setItem('selectedLanguage', 'en');
+          cy.stub(win, 'print').as('browserPrint');
+        }
+      });
+      cy.wait('@territoryStatistics');
+      cy.get('[data-testid="action-pdf"]', { timeout: 20000 }).click();
+      cy.get('[role="dialog"]', { timeout: 20000 }).should('be.visible');
+      cy.contains('[role="dialog"] label', 'Map').find('input').uncheck();
+      cy.contains('[role="dialog"] label', 'More information')
+        .find('input')
+        .should('be.checked');
+      cy.contains('[role="dialog"] label', 'Regions').should('not.exist');
+      cy.contains('[role="dialog"]', 'Appendices').should('not.exist');
+      cy.get('[data-testid="entrance-pdf-download"]').click();
+      cy.readFile(
+        `${Cypress.config('downloadsFolder')}/${name}.pdf`,
+        'base64',
+        { timeout: 60000 }
+      ).then(async encoded => {
+        const output = await PDFDocument.load(
+          Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
+        );
+        expect(output.getTitle()).to.equal(name);
+        expect(output.getSubject()).to.equal(
+          `https://grottocenter.org/ui${path}`
+        );
+        expect(output.getPageCount()).to.be.greaterThan(0);
+      });
+      cy.get('@browserPrint').should('not.have.been.called');
+    });
+  });
+
+  it('reports an incompatible A4 annotation and retries in original size without losing it', () => {
+    const name = `Annotated export ${Date.now()}`;
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/entrances/1' },
+      { body: { ...entrance, name } }
+    );
+    cy.intercept(originalUrl, {
+      headers: { 'content-type': 'application/pdf' },
+      fixture: 'entrance-pdf-annotated.pdf,null'
+    });
+    visitEntrance();
+    cy.contains('label', 'Original survey').find('input').check();
+    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.contains('[role="alert"]', 'cannot be preserved in A4', {
+      timeout: 20000
+    }).should('contain.text', 'survey.pdf');
+    cy.contains('label', 'Original survey').find('input').should('be.checked');
+    cy.contains('button', 'Original size').click();
+    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
+      timeout: 60000
+    }).then(async encoded => {
+      const output = await PDFDocument.load(
+        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
+      );
+      expect(output.getPage(1).getSize()).to.deep.equal({
+        width: 300,
+        height: 500
+      });
+      expect(output.getPage(1).node.Annots().size()).to.equal(1);
+    });
+  });
+
   it('exports the complete document through the real worker and preserves original size', () => {
     cy.intercept(
       { method: 'GET', pathname: '/api/v1/entrances/1' },
@@ -288,6 +403,65 @@ describe('entrance PDF download', () => {
     cy.get('@unselectedFile.all').should('have.length', 0);
   });
 
+  it('exports a selected document even when an unselected document shares its PDF', () => {
+    const name = `Shared PDF selection ${Date.now()}`;
+    const otherDocument = {
+      ...document,
+      id: 8,
+      title: 'Second survey'
+    };
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/entrances/1' },
+      { body: { ...entrance, name, documents: [document, otherDocument] } }
+    );
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/documents/8' },
+      { body: otherDocument }
+    ).as('otherDocumentDetails');
+    visitEntrance();
+    cy.wait('@otherDocumentDetails');
+    cy.get('[data-testid="pdf-document-3"] input[type="checkbox"]').should(
+      'not.be.checked'
+    );
+    cy.get('[data-testid="pdf-document-8"] input[type="checkbox"]').check();
+    cy.contains('button', 'Original size').click();
+    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
+      timeout: 60000
+    }).then(async encoded => {
+      const output = await PDFDocument.load(
+        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
+      );
+      expect(output.getPageCount()).to.equal(3);
+      expect(output.getPage(1).getSize()).to.deep.equal({
+        width: 300,
+        height: 500
+      });
+    });
+  });
+
+  it('allows deselecting an appendix before its details finish loading', () => {
+    let releaseDetails;
+    const details = new Promise(resolve => {
+      releaseDetails = resolve;
+    });
+    cy.intercept({ method: 'GET', pathname: '/api/v1/documents/3' }, request =>
+      details.then(() => request.reply({ body: document }))
+    ).as('pendingDetails');
+    cy.visit('/entrances/1', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.get('[data-testid="action-pdf"]', { timeout: 20000 }).click();
+    cy.contains('label', 'Documents').find('input').uncheck();
+    cy.get('[data-testid="pdf-document-3"] input[type="checkbox"]').check();
+    cy.get('[data-testid="entrance-pdf-download"]').should('be.disabled');
+    cy.get('[data-testid="pdf-document-3"] input[type="checkbox"]').uncheck();
+    cy.get('[data-testid="entrance-pdf-download"]').should('be.enabled');
+    cy.then(() => releaseDetails());
+    cy.wait('@pendingDetails');
+    cy.get('[data-testid="entrance-pdf-download"]').should('be.enabled');
+  });
+
   it('keeps choices after a map failure and allows retry without the unavailable map', () => {
     cy.intercept(
       { method: 'GET', pathname: '/api/v1/entrances/1' },
@@ -427,6 +601,10 @@ describe('entrance PDF download', () => {
     });
     cy.get('[data-testid="action-pdf"]', { timeout: 20000 }).click();
     cy.contains('label', 'Entrances list').find('input').should('be.checked');
+    cy.contains('label', 'Descriptions').find('input').uncheck();
+    cy.contains('[role="dialog"] button', 'Cancel').click();
+    cy.get('[data-testid="action-pdf"]').click();
+    cy.contains('label', 'Descriptions').find('input').should('not.be.checked');
     cy.contains('[role="dialog"] button', 'Preview').should('not.exist');
     cy.get('[data-testid="entrance-pdf-download"]').click();
     cy.get('[role="dialog"]', { timeout: 20000 }).should('not.exist');
@@ -519,6 +697,15 @@ describe('entrance PDF download', () => {
     cy.get('[data-testid="action-pdf"]', { timeout: 20000 }).click();
     cy.wait('@documentDetails');
     cy.contains('label', 'Original survey').find('input').check();
+    cy.contains('button', 'Original size').click();
+    cy.contains('[role="dialog"] button', 'Cancel').click();
+    cy.get('[data-testid="action-pdf"]').click();
+    cy.contains('label', 'Original survey').find('input').should('be.checked');
+    cy.contains('button', 'Original size').should(
+      'have.attr',
+      'aria-pressed',
+      'true'
+    );
     cy.get('[data-testid="entrance-pdf-download"]').click();
     cy.readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
       timeout: 60000

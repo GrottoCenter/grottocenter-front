@@ -49,7 +49,8 @@ export const buildNetworkPdfModel = options => {
     active(entity.exploringOrganizations)
       .map(item => item.name)
       .filter(Boolean)
-      .join(', ')
+      .join(', '),
+    'organization'
   );
   add(
     'Massifs',

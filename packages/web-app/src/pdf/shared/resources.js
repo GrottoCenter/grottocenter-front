@@ -2,8 +2,13 @@ import { CRS, latLng, point } from 'leaflet';
 import { apiFetch } from '@/api/client';
 import { API_URL } from '@/conf/apiRoutes';
 import mapLayers from '@/components/common/Maps/common/mapLayers';
+import { PDF_LIMITS, checkPdfLimit } from './limits';
 
-export const fetchPdfResource = async (url, signal) => {
+export const fetchPdfResource = async (
+  url,
+  signal,
+  maxBytes = PDF_LIMITS.resourceBytes
+) => {
   const timeout = AbortSignal.timeout(30000);
   const requestSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
   const parsed = new URL(url);
@@ -14,7 +19,37 @@ export const fetchPdfResource = async (url, signal) => {
     ? await apiFetch(url, { signal: requestSignal })
     : await fetch(url, { signal: requestSignal, credentials: 'omit' });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.arrayBuffer();
+  const reader = response.body.getReader();
+  const chunks = [];
+  let size = 0;
+  try {
+    checkPdfLimit(
+      Number(response.headers.get('content-length') ?? 0),
+      maxBytes
+    );
+    // Bound streamed bodies too: Content-Length can be absent or compressed.
+    /* eslint-disable no-await-in-loop */
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      checkPdfLimit(size, maxBytes);
+      chunks.push(value);
+    }
+    /* eslint-enable no-await-in-loop */
+  } catch (error) {
+    await reader.cancel().catch(() => {});
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes.buffer;
 };
 
 export const createPdfMap = async (coordinates, zoom, signal, colors) => {

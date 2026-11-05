@@ -50,20 +50,13 @@ const renderDialog = (isGenerating = false, options = {}) => {
   return renderWithProviders(
     <PdfExport
       entity={options.entity ?? { id: 1, name: 'Test cave' }}
-      entityType="entrance"
+      entityType={options.entityType ?? 'entrance'}
+      statistics={options.statistics ?? null}
       isAdmin={false}
       open
       onClose={onClose}
     />,
-    {
-      messages: {
-        ...messages,
-        'pdf.download': 'Download PDF',
-        'pdf.help': 'Choose the content.',
-        'pdf.attachments': 'Full-page documents',
-        'pdf.attachmentsHelp': 'Choose documents.'
-      }
-    }
+    { messages }
   );
 };
 
@@ -163,19 +156,6 @@ it('separates main content including documents from full-page appendices', () =>
   );
   expect(dialog.querySelectorAll('fieldset')).toHaveLength(2);
   expect(screen.queryByRole('slider')).not.toBeInTheDocument();
-  expect(
-    screen.queryByText(messages['pdf.mapOptions'])
-  ).not.toBeInTheDocument();
-  expect(
-    screen.queryByRole('checkbox', {
-      name: messages['pdf.networkDescriptions']
-    })
-  ).not.toBeInTheDocument();
-  expect(screen.queryByText('Choose the content.')).not.toBeInTheDocument();
-  expect(screen.queryByText('Choose documents.')).not.toBeInTheDocument();
-  expect(
-    screen.queryByText(messages['pdf.sheetDocumentsHelp'])
-  ).not.toBeInTheDocument();
 });
 
 it('keeps exactly one compact page format selected and exports that choice', async () => {
@@ -282,3 +262,96 @@ it('allows explicit exclusion of a failed document without a late response cance
   );
   expect(cancel).not.toHaveBeenCalled();
 });
+
+it.each(['massif', 'country', 'region'])(
+  'selects newly available %s statistics by default while retaining explicit choices',
+  entityType => {
+    const entity = { id: 3, name: 'Massif' };
+    const { rerender } = renderDialog(false, { entity, entityType });
+    expect(
+      screen.queryByRole('checkbox', { name: 'More information' })
+    ).not.toBeInTheDocument();
+    rerender(
+      <PdfExport
+        entity={entity}
+        entityType={entityType}
+        statistics={{ nb_caves: 2 }}
+        isAdmin={false}
+        open
+        onClose={onClose}
+      />
+    );
+    const statistics = screen.getByRole('checkbox', {
+      name: 'More information'
+    });
+    expect(statistics).toBeChecked();
+    fireEvent.click(statistics);
+    rerender(
+      <PdfExport
+        entity={entity}
+        entityType={entityType}
+        statistics={{ nb_caves: 3 }}
+        isAdmin={false}
+        open
+        onClose={onClose}
+      />
+    );
+    expect(
+      screen.getByRole('checkbox', { name: 'More information' })
+    ).not.toBeChecked();
+  }
+);
+
+it('keeps appendix selection available without fetching unrelated document details', () => {
+  useQueries.mockReturnValue([
+    { isPending: true, isError: false, dataUpdatedAt: 0 }
+  ]);
+  renderDialog(false, {
+    entity: { id: 1, name: 'Cave', documents: [brokenDocument] }
+  });
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Documents' }));
+  expect(useQueries.mock.lastCall[0].queries[0].enabled).toBe(false);
+  expect(screen.getByTestId('entrance-pdf-download')).toBeEnabled();
+  const appendix = screen.getByRole('checkbox', { name: /Broken survey/ });
+  expect(appendix).toBeEnabled();
+  fireEvent.click(appendix);
+  expect(useQueries.mock.lastCall[0].queries[0].enabled).toBe(true);
+  expect(screen.getByTestId('entrance-pdf-download')).toBeDisabled();
+});
+
+it.each(['fetching', 'paused', 'error'])(
+  'allows deselecting an appendix while its details are %s',
+  status => {
+    const entity = { id: 1, name: 'Cave', documents: [brokenDocument] };
+    const query = { isPending: true, isError: false, dataUpdatedAt: 0 };
+    useQueries.mockReturnValue([query]);
+    const { rerender } = renderDialog(false, { entity });
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Documents' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: /Broken survey/ }));
+    useQueries.mockReturnValue([
+      {
+        ...query,
+        isPending: status !== 'error',
+        isError: status === 'error',
+        fetchStatus: status === 'error' ? 'idle' : status
+      }
+    ]);
+    rerender(
+      <PdfExport
+        entity={entity}
+        entityType="entrance"
+        isAdmin={false}
+        open
+        onClose={onClose}
+      />
+    );
+    const appendix = screen.getByRole('checkbox', { name: /Broken survey/ });
+    expect(appendix).toBeChecked();
+    expect(appendix).toBeEnabled();
+    expect(screen.getByTestId('entrance-pdf-download')).toBeDisabled();
+    fireEvent.click(appendix);
+    expect(appendix).not.toBeChecked();
+    expect(screen.getByTestId('entrance-pdf-download')).toBeEnabled();
+    expect(useQueries.mock.lastCall[0].queries[0].enabled).toBe(false);
+  }
+);

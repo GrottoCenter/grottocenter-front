@@ -1,7 +1,6 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useQueries } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import {
   Alert,
@@ -25,9 +24,8 @@ import StandardDialog from '@/components/common/StandardDialog';
 import DocumentTypeChip from '@/components/common/DocumentTypeChip';
 import { downloadBlob } from '@/components/common/DocumentsList/utils/imageUtils';
 import { usePdfExport } from '@/hooks/usePdfExport';
-import { documentQueryOptions } from '@/api/documentQueryOptions';
+import { usePdfExportDocuments } from '@/hooks/usePdfExportDocuments';
 import { PDF_ADAPTERS } from '@/pdf/adapters';
-import { buildDocumentIndex, getPdfAttachments } from '@/pdf/shared/model';
 
 const PdfExport = ({
   entity,
@@ -44,12 +42,16 @@ const PdfExport = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { enqueueSnackbar } = useSnackbar();
   const adapter = PDF_ADAPTERS[entityType];
-  const [sections, setSections] = useState(() =>
-    Object.fromEntries(
-      Object.entries(adapter.availability(entity, isAdmin, { statistics })).map(
-        ([key, available]) => [key, available]
-      )
-    )
+  const hasDocumentsSection = adapter.sections.some(
+    section => section.key === 'documents'
+  );
+  const [sectionChoices, setSectionChoices] = useState({});
+  const availability = adapter.availability(entity, isAdmin, { statistics });
+  const sections = Object.fromEntries(
+    Object.entries(availability).map(([key, available]) => [
+      key,
+      available && (sectionChoices[key] ?? true)
+    ])
   );
   const [selectedDocuments, setSelectedDocuments] = useState({});
   const [excludedDocuments, setExcludedDocuments] = useState({});
@@ -59,72 +61,43 @@ const PdfExport = ({
     () => (entity.documents ?? []).filter(document => !document.isDeleted),
     [entity.documents]
   );
-  const queries = useQueries({
-    queries: listedDocuments.map(document => ({
-      ...documentQueryOptions(document.id),
-      enabled: open
-    }))
-  });
-  const documents = queries
-    .map((query, index) => query.data ?? listedDocuments[index])
-    .filter(document => !excludedDocuments[document.id]);
-  const activeQueries = queries.filter(
-    (_query, index) => !excludedDocuments[listedDocuments[index].id]
-  );
-  const failedDocuments = queries.flatMap((query, index) =>
-    query.isError && !excludedDocuments[listedDocuments[index].id]
-      ? [{ document: listedDocuments[index], query }]
-      : []
-  );
-  const attachments = getPdfAttachments(documents);
-  const availability = adapter.availability(entity, isAdmin, {
-    statistics
-  });
-  const documentGroups = buildDocumentIndex({
+  const {
     documents,
+    groups: documentGroups,
     attachments,
-    includeReferences: true,
-    intl
-  }).references.filter(document => document.files.length);
-  const files = attachments
-    .filter(file => selectedDocuments[file.documentId])
-    .map(file => ({ ...file, pages: '' }));
-  const isDocumentsLoading = activeQueries.some(query => query.isPending);
-  const hasDocumentErrors = activeQueries.some(query => query.isError);
-  const needsDocuments = sections.documents || files.length > 0;
+    files,
+    failedDocuments,
+    isLoading: isDocumentsLoading,
+    hasErrors: hasDocumentErrors,
+    isBlocked: areDocumentsBlocked,
+    revision: documentRevision
+  } = usePdfExportDocuments({
+    listedDocuments,
+    includeDocuments: sections.documents,
+    selected: selectedDocuments,
+    excluded: excludedDocuments,
+    open
+  });
   const isEmpty =
     !adapter.sections.some(
       section => sections[section.key] && availability[section.key]
     ) && files.length === 0;
-  const requiredQueries = sections.documents
-    ? activeQueries
-    : queries.filter(
-        (_query, index) =>
-          selectedDocuments[listedDocuments[index].id] &&
-          !excludedDocuments[listedDocuments[index].id]
-      );
-  const isBlocked =
-    isEmpty ||
-    (needsDocuments &&
-      requiredQueries.some(query => query.isPending || query.isError));
-
-  const documentRevision = requiredQueries
-    .map(query => query.dataUpdatedAt)
-    .join(':');
-  const unavailableDocumentIds = new Set(
-    listedDocuments
-      .filter(
-        (_document, index) => queries[index].isPending || queries[index].isError
-      )
-      .map(document => document.id)
-  );
+  const isBlocked = isEmpty || areDocumentsBlocked;
   useEffect(() => {
     cancel();
-  }, [entity, isAdmin, intl.locale, open, documentRevision, cancel]);
+  }, [
+    entity,
+    statistics,
+    isAdmin,
+    intl.locale,
+    open,
+    documentRevision,
+    cancel
+  ]);
 
   const updateSections = (key, checked) => {
     cancel();
-    setSections(previous => ({ ...previous, [key]: checked }));
+    setSectionChoices(previous => ({ ...previous, [key]: checked }));
   };
   const updateDocument = (id, checked) => {
     cancel();
@@ -144,7 +117,12 @@ const PdfExport = ({
       attachments: files,
       intl
     });
-    const blob = await generate({ model, files, format, mapZoom: 14 });
+    const blob = await generate({
+      model,
+      files,
+      format,
+      mapZoom: adapter.mapZoom ?? 14
+    });
     if (!blob) return;
     const name =
       [...(entity.name ?? '')]
@@ -245,134 +223,142 @@ const PdfExport = ({
               ))}
           </FormGroup>
         </FormControl>
-        <FormControl component="fieldset" aria-describedby={appendicesHelpId}>
-          <FormLabel component="legend">
-            {formatMessage({ id: 'pdf.appendices' })}
-          </FormLabel>
-          <Typography
-            id={appendicesHelpId}
-            variant="caption"
-            color="text.secondary"
-            sx={{ mb: 0.5 }}>
-            {formatMessage({ id: 'pdf.appendicesHelp' })}
-          </Typography>
-          {isDocumentsLoading && (
-            <CircularProgress
-              size={24}
-              aria-label={formatMessage({ id: 'Loading ...' })}
-            />
-          )}
-          {failedDocuments.map(({ document, query }) => (
-            <Alert key={document.id} severity="error" sx={{ mb: 1 }}>
-              {formatMessage(
-                { id: 'pdf.exportError' },
-                {
-                  resource: document.title || formatMessage({ id: 'Documents' })
-                }
-              )}
-              <Button disabled={isGenerating} onClick={() => query.refetch()}>
-                {formatMessage({ id: 'Retry' })}
-              </Button>
-              <Button
-                disabled={isGenerating}
-                onClick={() => {
-                  cancel();
-                  setExcludedDocuments(previous => ({
-                    ...previous,
-                    [document.id]: true
-                  }));
-                  setSelectedDocuments(previous => ({
-                    ...previous,
-                    [document.id]: false
-                  }));
-                }}>
-                {formatMessage({ id: 'pdf.excludeDocument' })}
-              </Button>
-            </Alert>
-          ))}
-          {!isDocumentsLoading &&
-            !hasDocumentErrors &&
-            attachments.length === 0 && (
-              <Typography variant="body2">
-                {formatMessage({ id: 'No files attached to this document.' })}
-              </Typography>
-            )}
-          {documentGroups.map(document => (
-            <Box key={document.id} data-testid={`pdf-document-${document.id}`}>
-              <FormControlLabel
-                label={
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
-                      gap: 0.5
-                    }}>
-                    <Typography variant="body2">{document.title}</Typography>
-                    <DocumentTypeChip type={document.type} />
-                  </Box>
-                }
-                control={
-                  <Checkbox
-                    size="small"
-                    disabled={
-                      isGenerating || unavailableDocumentIds.has(document.id)
-                    }
-                    checked={Boolean(selectedDocuments[document.id])}
-                    onChange={event =>
-                      updateDocument(document.id, event.target.checked)
-                    }
-                  />
-                }
+        {hasDocumentsSection && (
+          <FormControl component="fieldset" aria-describedby={appendicesHelpId}>
+            <FormLabel component="legend">
+              {formatMessage({ id: 'pdf.appendices' })}
+            </FormLabel>
+            <Typography
+              id={appendicesHelpId}
+              variant="caption"
+              color="text.secondary"
+              sx={{ mb: 0.5 }}>
+              {formatMessage({ id: 'pdf.appendicesHelp' })}
+            </Typography>
+            {isDocumentsLoading && (
+              <CircularProgress
+                size={24}
+                aria-label={formatMessage({ id: 'Loading ...' })}
               />
-            </Box>
-          ))}
-          {files.some(file => file.isPdf) && (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: 1,
-                mt: 1
-              }}>
-              <Typography variant="body2">
-                {formatMessage({ id: 'pdf.pageFormat' })}
-              </Typography>
-              <ToggleButtonGroup
-                exclusive
-                size="small"
-                disabled={isGenerating}
-                aria-label={formatMessage({ id: 'pdf.pageFormat' })}
-                value={format}
-                onChange={(_event, value) => {
-                  if (!value) return;
-                  cancel();
-                  setFormat(value);
-                }}
-                sx={{
-                  '& .MuiToggleButton-root': {
-                    textTransform: 'none',
-                    px: 1.5,
-                    minHeight: { xs: 44, sm: 36 }
+            )}
+            {failedDocuments.map(({ document, query }) => (
+              <Alert key={document.id} severity="error" sx={{ mb: 1 }}>
+                {formatMessage(
+                  { id: 'pdf.exportError' },
+                  {
+                    resource:
+                      document.title || formatMessage({ id: 'Documents' })
                   }
+                )}
+                <Button disabled={isGenerating} onClick={() => query.refetch()}>
+                  {formatMessage({ id: 'Retry' })}
+                </Button>
+                <Button
+                  disabled={isGenerating}
+                  onClick={() => {
+                    cancel();
+                    setExcludedDocuments(previous => ({
+                      ...previous,
+                      [document.id]: true
+                    }));
+                    setSelectedDocuments(previous => ({
+                      ...previous,
+                      [document.id]: false
+                    }));
+                  }}>
+                  {formatMessage({ id: 'pdf.excludeDocument' })}
+                </Button>
+              </Alert>
+            ))}
+            {!isDocumentsLoading &&
+              !hasDocumentErrors &&
+              attachments.length === 0 && (
+                <Typography variant="body2">
+                  {formatMessage({ id: 'No files attached to this document.' })}
+                </Typography>
+              )}
+            {documentGroups.map(({ document, query, required }) => (
+              <Box
+                key={document.id}
+                data-testid={`pdf-document-${document.id}`}>
+                <FormControlLabel
+                  label={
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: 0.5
+                      }}>
+                      <Typography variant="body2">{document.title}</Typography>
+                      <DocumentTypeChip type={document.type} />
+                    </Box>
+                  }
+                  control={
+                    <Checkbox
+                      size="small"
+                      disabled={
+                        isGenerating ||
+                        (!selectedDocuments[document.id] &&
+                          required &&
+                          (query.isPending || query.isError))
+                      }
+                      checked={Boolean(selectedDocuments[document.id])}
+                      onChange={event =>
+                        updateDocument(document.id, event.target.checked)
+                      }
+                    />
+                  }
+                />
+              </Box>
+            ))}
+            {files.some(file => file.isPdf) && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: 1,
+                  mt: 1
                 }}>
-                <Tooltip
-                  title={formatMessage({ id: 'pdf.fitA4' })}
-                  describeChild>
-                  <ToggleButton value="a4">A4</ToggleButton>
-                </Tooltip>
-                <Tooltip
-                  title={formatMessage({ id: 'pdf.originalSize' })}
-                  describeChild>
-                  <ToggleButton value="original">
-                    {formatMessage({ id: 'pdf.originalSizeShort' })}
-                  </ToggleButton>
-                </Tooltip>
-              </ToggleButtonGroup>
-            </Box>
-          )}
-        </FormControl>
+                <Typography variant="body2">
+                  {formatMessage({ id: 'pdf.pageFormat' })}
+                </Typography>
+                <ToggleButtonGroup
+                  exclusive
+                  size="small"
+                  disabled={isGenerating}
+                  aria-label={formatMessage({ id: 'pdf.pageFormat' })}
+                  value={format}
+                  onChange={(_event, value) => {
+                    if (!value) return;
+                    cancel();
+                    setFormat(value);
+                  }}
+                  sx={{
+                    '& .MuiToggleButton-root': {
+                      textTransform: 'none',
+                      px: 1.5,
+                      minHeight: { xs: 44, sm: 36 }
+                    }
+                  }}>
+                  <Tooltip
+                    title={formatMessage({ id: 'pdf.fitA4' })}
+                    describeChild>
+                    <ToggleButton value="a4">A4</ToggleButton>
+                  </Tooltip>
+                  <Tooltip
+                    title={formatMessage({ id: 'pdf.originalSize' })}
+                    describeChild>
+                    <ToggleButton value="original">
+                      {formatMessage({ id: 'pdf.originalSizeShort' })}
+                    </ToggleButton>
+                  </Tooltip>
+                </ToggleButtonGroup>
+              </Box>
+            )}
+          </FormControl>
+        )}
       </Box>
       {isGenerating && (
         <Box
@@ -403,14 +389,20 @@ const PdfExport = ({
 
 PdfExport.propTypes = {
   entity: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     name: PropTypes.string,
     cave: PropTypes.shape({ id: PropTypes.number }),
     documents: PropTypes.arrayOf(
       PropTypes.shape({ id: PropTypes.number.isRequired })
     )
   }).isRequired,
-  entityType: PropTypes.oneOf(['entrance', 'network', 'massif']).isRequired,
+  entityType: PropTypes.oneOf([
+    'entrance',
+    'network',
+    'massif',
+    'country',
+    'region'
+  ]).isRequired,
   statistics: PropTypes.shape({ nb_caves: PropTypes.number }),
   isAdmin: PropTypes.bool.isRequired,
   open: PropTypes.bool.isRequired,

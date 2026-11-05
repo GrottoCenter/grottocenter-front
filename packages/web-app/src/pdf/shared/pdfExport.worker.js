@@ -1,4 +1,5 @@
 import { generateEntityPdf } from './generateEntityPdf';
+import { PDF_ERROR_IDS } from './limits';
 
 globalThis.onmessage = async ({ data }) => {
   try {
@@ -10,8 +11,9 @@ globalThis.onmessage = async ({ data }) => {
     globalThis.postMessage({ bytes }, [bytes.buffer]);
   } catch (error) {
     globalThis.postMessage({
-      error:
-        error.message === 'pdf.pagesError' ? error.message : 'pdf.exportError',
+      error: PDF_ERROR_IDS.has(error.message)
+        ? error.message
+        : 'pdf.exportError',
       resource: error.resource ?? '',
       cause: error.stack ?? error.message
     });
