@@ -3,7 +3,8 @@ import Skeleton from '@mui/material/Skeleton';
 
 import { useParams, useSearchParams } from 'react-router-dom';
 import { isEmpty } from 'ramda';
-import { Divider } from '@mui/material';
+import { Box, Divider } from '@mui/material';
+import NetworkDefinition from '@/components/common/NetworkDefinition';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import { useEntrance } from '../../../hooks';
 import MoveEntranceToCaveForm from './MoveEntranceToCaveForm';
@@ -51,7 +52,14 @@ const MoveEntranceToCave = () => {
               </>
             ) : (
               !isEmpty(entrance) && (
-                <MoveEntranceToCaveForm entrance={entrance} />
+                <>
+                  {!isDetach && (
+                    <Box sx={{ mb: 2 }}>
+                      <NetworkDefinition />
+                    </Box>
+                  )}
+                  <MoveEntranceToCaveForm entrance={entrance} />
+                </>
               )
             )
           }

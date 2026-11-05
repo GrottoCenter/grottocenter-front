@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { Box, Button } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
+import NetworkDefinitionHelp from '@/components/common/NetworkDefinitionHelp';
 
 import Alert from '../../../common/Alert';
 import { FormSection } from '../utils/FormContainers';
@@ -22,7 +23,7 @@ const NetworkMembershipSection = ({
   const movePath = `/ui/entrances/${entranceId}/move`;
 
   return (
-    <FormSection title="Network">
+    <FormSection title="Network" titleAdornment={<NetworkDefinitionHelp />}>
       <Alert
         severity="info"
         disableMargins

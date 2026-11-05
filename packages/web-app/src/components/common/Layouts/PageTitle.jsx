@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Skeleton, Typography } from '@mui/material';
+import { Box, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 const Row = styled('div')(({ theme }) => ({
@@ -15,6 +15,7 @@ const TitleGroup = styled('div')({
 });
 
 const TitleHeading = styled(Typography)({
+  display: 'inline',
   wordBreak: 'break-word',
   // Collapse h1's typographic leading so the inline icon centers on the em-box
   // (≈ the visible letters) instead of on the taller line-height box.
@@ -60,12 +61,18 @@ const PageTitle = ({ title, icon, titleAdornment, subheader, actions }) => {
             <TitleHeading variant="h1" color="secondary">
               {icon && <TitleIcon>{icon}</TitleIcon>}
               {title}
-              {titleAdornment}
             </TitleHeading>
           ) : (
-            <TitleHeading variant="h1">
+            <TitleHeading variant="h1" sx={{ display: 'block' }}>
               <Skeleton variant="text" width="100%" />
             </TitleHeading>
+          )}
+          {hasTitle && titleAdornment && (
+            <Box
+              component="span"
+              sx={{ display: 'inline-flex', verticalAlign: 'middle', ml: 0.5 }}>
+              {titleAdornment}
+            </Box>
           )}
         </TitleGroup>
         {actions && <Actions>{actions}</Actions>}

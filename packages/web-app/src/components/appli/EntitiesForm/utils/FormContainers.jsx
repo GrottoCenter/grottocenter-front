@@ -53,7 +53,7 @@ FormSectionLabel.propTypes = { label: PropTypes.string.isRequired };
 // Groups related fields under a titled, divided section to give the long
 // creation form a clear visual hierarchy. Responsive: lighter top margin on
 // mobile.
-export const FormSection = ({ title, children }) => (
+export const FormSection = ({ title, titleAdornment, children }) => (
   <Box component="section" sx={{ mt: { xs: 2, sm: 3 } }}>
     {title && (
       <>
@@ -62,9 +62,12 @@ export const FormSection = ({ title, children }) => (
             right — a section of the form sits under the page title. Assumes the
             form is not nested in a card that already renders an h2 (e.g.
             ScrollableContent); such a caller must override `component`. */}
-        <Typography variant="h5" component="h2">
-          <Translate>{title}</Translate>
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Typography variant="h5" component="h2">
+            <Translate>{title}</Translate>
+          </Typography>
+          {titleAdornment}
+        </Box>
         <Divider
           sx={{
             mb: 2
@@ -77,6 +80,7 @@ export const FormSection = ({ title, children }) => (
 );
 FormSection.propTypes = {
   title: PropTypes.string,
+  titleAdornment: PropTypes.node,
   children: PropTypes.node
 };
 

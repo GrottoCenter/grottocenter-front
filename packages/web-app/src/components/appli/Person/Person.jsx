@@ -146,10 +146,8 @@ const Person = ({
         label={formatMessage({ id: 'You' }).toUpperCase()}
         color="secondary"
         sx={{
-          ml: 2,
           fontSize: '0.875rem',
           letterSpacing: 1.5,
-          verticalAlign: 'middle',
           color: '#fff',
           fontWeight: 700
         }}

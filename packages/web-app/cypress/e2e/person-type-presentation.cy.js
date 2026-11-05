@@ -62,7 +62,19 @@ describe('Person family identity and record type', () => {
 
   it('retains the You badge on the current account', () => {
     visitPerson('CAVER', 42);
-    cy.get('h1').should('contain.text', 'YOU');
+    cy.get('h1')
+      .should('not.contain.text', 'YOU')
+      .parent()
+      .contains('YOU')
+      .should('be.visible')
+      .should($badge => {
+        const heading = $badge[0].ownerDocument.querySelector('h1');
+        const badge = $badge[0].getBoundingClientRect();
+        expect(badge.left).to.be.closeTo(
+          heading.getBoundingClientRect().right + 4,
+          1
+        );
+      });
     cy.get('[data-testid="person-type-label"]').should('have.text', 'Caver');
   });
 });
