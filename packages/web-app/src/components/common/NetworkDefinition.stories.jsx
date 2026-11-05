@@ -13,7 +13,7 @@ export const Visible = {};
 
 export const Help = {
   render: () => (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
       <Typography>Network</Typography>
       <NetworkDefinitionHelp />
     </Box>

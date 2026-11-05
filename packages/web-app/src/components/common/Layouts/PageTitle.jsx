@@ -16,7 +16,6 @@ const TitleGroup = styled('div')({
 
 const TitleHeading = styled(Typography)({
   display: 'inline',
-  minWidth: 0,
   wordBreak: 'break-word',
   // Collapse h1's typographic leading so the inline icon centers on the em-box
   // (≈ the visible letters) instead of on the taller line-height box.
@@ -64,7 +63,7 @@ const PageTitle = ({ title, icon, titleAdornment, subheader, actions }) => {
               {title}
             </TitleHeading>
           ) : (
-            <TitleHeading variant="h1" sx={{ flex: 1 }}>
+            <TitleHeading variant="h1" sx={{ display: 'block' }}>
               <Skeleton variant="text" width="100%" />
             </TitleHeading>
           )}

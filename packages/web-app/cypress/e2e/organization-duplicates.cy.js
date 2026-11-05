@@ -135,7 +135,8 @@ describe('Organization duplicate processing', () => {
         const firstBounds = first.getBoundingClientRect();
         const secondBounds = second.getBoundingClientRect();
         const members = first.querySelectorAll('p')[1];
-        expect(secondBounds.top).to.be.at.least(firstBounds.bottom);
+        // Firefox can round adjacent edges to slightly different subpixels.
+        expect(secondBounds.top).to.be.at.least(firstBounds.bottom - 1);
         expect(members.getBoundingClientRect().right).to.be.closeTo(
           firstBounds.right,
           1
