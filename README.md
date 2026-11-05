@@ -49,7 +49,7 @@ By default the app uses the production API as backend. To change it, edit the `V
 - `lint:fix` Same as `lint` but will also try to fix errors
 - `e2e:run` Run the end-to-end test suite (_requires a running app_)
 - `e2e:open` Open the end-to-end test suite browser (_requires a running app_)
-- `test` Run unit tests (single run, no watch mode). Filter by pattern: `yarn test -- --testPathPattern=<pattern>`
+- `test` Run unit tests (single run, no watch mode). Filter by filename: `yarn test Publication.test.jsx`
 - `storybook` Start Storybook
 - `translations:sync-with-en` Compare a translation file with `en.json` to check synchronization (usage: `yarn translations:sync-with-en <target-file>`)
 - `translations:update-en` Scan JSX files for translation keys and add missing ones to `packages/web-app/public/lang/en.json` (automatically sorts the file afterwards)
@@ -73,6 +73,32 @@ Coordinate any rename with the required checks configured on `develop`.
 Only on `app-x.y.z` tags:
 
 - TWA build
+
+### Unit tests
+
+The `unit` job runs `yarn test --pool=vmThreads`, isolating each test file in a
+VM context within a shared worker process, with the default worker count.
+This uses more memory than the default pool. The local `yarn test` command
+keeps its default pool.
+
+Vitest provides console output, GitHub failure annotations and a job summary.
+A failing test fails the `unit` check.
+
+To reproduce the CI pool locally:
+
+```sh
+yarn test --pool=vmThreads
+```
+
+To investigate an intermittent CI failure, repeat a selected test file with
+the same pool:
+
+```sh
+yarn test Publication.test.jsx --pool=vmThreads --repeats=20
+```
+
+This repeats every selected test regardless of its result. Repeated runs are
+opt-in diagnostics; required CI checks use no retries or repeats.
 
 ## 📱 Android app (Google Play, TWA)
 
