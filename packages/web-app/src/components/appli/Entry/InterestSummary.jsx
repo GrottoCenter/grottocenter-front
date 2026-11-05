@@ -8,42 +8,12 @@ import CustomIcon from '@/components/common/CustomIcon';
 import InfoSection from '@/components/common/InfoSection';
 import { Property } from '@/components/common/Properties';
 import { CommentPropTypes } from '@/types/entrance.type';
-import {
-  durationStringToMinutes,
-  formatDurationMinutes
-} from '@/utils/dateTimeDuration';
-
-const getDurationRange = (comments, field, formatNumberToParts) => {
-  const durations = comments
-    .map(comment => durationStringToMinutes(comment[field]))
-    .filter(minutes => Number.isFinite(minutes) && minutes > 0);
-  if (durations.length === 0) return null;
-
-  const minimum = Math.min(...durations);
-  const maximum = Math.max(...durations);
-  if (minimum === maximum)
-    return formatDurationMinutes(minimum, formatNumberToParts);
-  return `${formatDurationMinutes(minimum, formatNumberToParts)}\u00a0– ${formatDurationMinutes(maximum, formatNumberToParts)}`;
-};
+import { getEntranceInterest } from '@/utils/entranceInterest';
 
 const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {
   const { formatMessage, formatNumber, formatNumberToParts } = useIntl();
-  const ratings = comments
-    .map(comment => comment.aestheticism)
-    .filter(value => Number.isFinite(value) && value > 0);
-  const average = ratings.length
-    ? ratings.reduce((sum, value) => sum + value, 0) / ratings.length / 2
-    : null;
-  const approachTime = getDurationRange(
-    comments,
-    'eTTrail',
-    formatNumberToParts
-  );
-  const undergroundTime = getDurationRange(
-    comments,
-    'eTUnderground',
-    formatNumberToParts
-  );
+  const { average, ratingCount, approachTime, undergroundTime } =
+    getEntranceInterest(comments, formatNumberToParts);
   const commentsUrl = `/ui/entrances/${entranceId}?tab=comments`;
 
   return (
@@ -113,7 +83,7 @@ const InterestSummary = ({ entranceId, comments = [], canComment = false }) => {
               <AppLink to={commentsUrl}>
                 {formatMessage(
                   { id: '{count, plural, one {# rating} other {# ratings}}' },
-                  { count: ratings.length }
+                  { count: ratingCount }
                 )}
               </AppLink>
             </>

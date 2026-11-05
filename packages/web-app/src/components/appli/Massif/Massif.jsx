@@ -1,17 +1,16 @@
-import { useState, useRef } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import { Button, Card, CircularProgress } from '@mui/material';
 import { useIntl } from 'react-intl';
-import { Print } from '@mui/icons-material';
+import { Download } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ShareIcon from '@mui/icons-material/Share';
-import { useReactToPrint } from 'react-to-print';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
@@ -51,6 +50,8 @@ import {
 import { MassifTypes } from '../../../types/massif.type';
 import AssociationSection from '../OrganizationAssociation';
 
+const PdfExport = lazy(() => import('@/components/appli/PdfExport'));
+
 const Massif = ({
   isLoading,
   error,
@@ -63,7 +64,7 @@ const Massif = ({
   const navigate = useNavigate();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
-  const componentRef = useRef();
+  const [isPdfExportOpen, setIsPdfExportOpen] = useState(false);
   const deleteMutation = useDeleteMassif();
   const restoreMutation = useRestoreMassif();
   const subscribeMutation = useSubscribeToMassif();
@@ -80,7 +81,6 @@ const Massif = ({
     onDeleted(entityId, isPermanent);
   };
   const handleShare = useSharePage();
-  const handlePrint = useReactToPrint({ contentRef: componentRef });
 
   const { data: dataMassif } = useStatisticsMassif(massifIdInt);
   useScrollToHashOnLoad(dataMassif);
@@ -144,10 +144,10 @@ const Massif = ({
           hidden: !canSubscribe
         },
         {
-          key: 'print',
-          icon: <Print />,
-          label: formatMessage({ id: 'Print' }),
-          onClick: handlePrint
+          key: 'pdf',
+          icon: <Download />,
+          label: formatMessage({ id: 'pdf.download' }),
+          onClick: () => setIsPdfExportOpen(true)
         },
         {
           key: 'share',
@@ -192,7 +192,7 @@ const Massif = ({
 
   return (
     <PageContainer>
-      <div ref={componentRef}>
+      <div>
         <PageHeader
           title={massif?.name ?? (isLoading ? undefined : '')}
           icon={<CustomIcon type="massif" />}
@@ -357,7 +357,6 @@ const Massif = ({
               </SectionStack>
             )}
           </div>
-
           {/* Tab Documents */}
           <div>
             {isLoading && (
@@ -380,6 +379,24 @@ const Massif = ({
             )}
           </div>
         </PageTabs>
+        {isPdfExportOpen && massif && (
+          <Suspense
+            fallback={
+              <CircularProgress
+                aria-label={formatMessage({ id: 'Loading ...' })}
+              />
+            }>
+            <PdfExport
+              key={`${massif.id}-${permissions.isAdmin}`}
+              entity={massif}
+              entityType="massif"
+              statistics={dataMassif}
+              isAdmin={permissions.isAdmin}
+              open={isPdfExportOpen}
+              onClose={() => setIsPdfExportOpen(false)}
+            />
+          </Suspense>
+        )}
       </div>
     </PageContainer>
   );

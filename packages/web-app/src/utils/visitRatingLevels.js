@@ -14,6 +14,27 @@ export const EASE_LEVELS = [
   'Very easy'
 ];
 
+export const VISIT_RATING_DEFINITIONS = [
+  {
+    key: 'interest',
+    field: 'aestheticism',
+    labelId: 'Interest of the visit',
+    levels: INTEREST_LEVELS
+  },
+  {
+    key: 'progression',
+    field: 'caving',
+    labelId: 'Ease of move',
+    levels: EASE_LEVELS
+  },
+  {
+    key: 'access',
+    field: 'approach',
+    labelId: 'Ease of reach',
+    levels: EASE_LEVELS
+  }
+];
+
 export const getRatingLevelIds = (rating, levels) => {
   if (rating == null || rating <= 0 || levels.length === 0) return [];
 

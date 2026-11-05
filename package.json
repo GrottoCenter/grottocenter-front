@@ -65,7 +65,8 @@
   "resolutions": {
     "bfj": "^9.1.3",
     "nth-check": "^2.1.1",
-    "serialize-javascript": "^7.0.3"
+    "serialize-javascript": "^7.0.3",
+    "png-js@npm:^2.0.0": "patch:png-js@npm%3A2.0.0#~/.yarn/patches/png-js-npm-2.0.0-2a60ae96e2.patch"
   },
   "lint-staged": {
     "*.{js,jsx,mjs,cjs,ts,tsx}": [

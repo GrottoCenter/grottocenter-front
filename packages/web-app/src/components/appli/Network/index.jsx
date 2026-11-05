@@ -1,17 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Breadcrumbs, Card } from '@mui/material';
+import { Box, Breadcrumbs, Card, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { NavigateNext, Print } from '@mui/icons-material';
+import { NavigateNext, Download } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import BiotechIcon from '@mui/icons-material/Biotech';
-import { useReactToPrint } from 'react-to-print';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import NetworkDefinitionHelp from '@/components/common/NetworkDefinitionHelp';
 import AppLink from '../../common/AppLink';
@@ -46,6 +45,8 @@ import {
   DELETED_ENTITIES
 } from '../../common/card/Deleted';
 
+const PdfExport = lazy(() => import('@/components/appli/PdfExport'));
+
 const HalfSplitContainer = styled('div')`
   display: flex;
   flex-direction: column;
@@ -70,7 +71,7 @@ export const Network = ({
   const { isAuth, isAdmin, isModerator } = usePermissions();
   const deleteMutation = useDeleteCave();
   const restoreMutation = useRestoreCave();
-  const componentRef = useRef();
+  const [isPdfExportOpen, setIsPdfExportOpen] = useState(false);
   const [isEditing, setEditing] = useState(false);
   const [selectedEntrancesId, setSelectedEntrancesId] = useState([]);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
@@ -85,7 +86,6 @@ export const Network = ({
     onDeleted(entityId, isPermanent);
   };
   const handleShare = useSharePage();
-  const handlePrint = useReactToPrint({ contentRef: componentRef });
 
   const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
   const country = cave?.entrances?.[0]?.country;
@@ -114,10 +114,10 @@ export const Network = ({
     <ResponsiveActions
       items={[
         {
-          key: 'print',
-          icon: <Print />,
-          label: formatMessage({ id: 'Print' }),
-          onClick: handlePrint
+          key: 'pdf',
+          icon: <Download />,
+          label: formatMessage({ id: 'pdf.download' }),
+          onClick: () => setIsPdfExportOpen(true)
         },
         {
           key: 'share',
@@ -211,7 +211,7 @@ export const Network = ({
 
   return (
     <PageContainer>
-      <div ref={componentRef}>
+      <div>
         <PageHeader
           title={cave?.name ?? (isLoading ? undefined : '')}
           icon={<CustomIcon type="network" />}
@@ -350,7 +350,6 @@ export const Network = ({
               </SectionStack>
             )}
           </div>
-
           {/* FIXME: Science panel is admin-only until the Science API is available. */}
           {/* WARNING: this must stay in sync with the 'science' entry in the tabs array above.
             PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
@@ -362,6 +361,23 @@ export const Network = ({
             </SectionStack>
           )}
         </PageTabs>
+        {isPdfExportOpen && cave && (
+          <Suspense
+            fallback={
+              <CircularProgress
+                aria-label={formatMessage({ id: 'Loading ...' })}
+              />
+            }>
+            <PdfExport
+              key={`${cave.id}-${isAdmin}`}
+              entity={cave}
+              entityType="network"
+              isAdmin={isAdmin}
+              open={isPdfExportOpen}
+              onClose={() => setIsPdfExportOpen(false)}
+            />
+          </Suspense>
+        )}
       </div>
     </PageContainer>
   );

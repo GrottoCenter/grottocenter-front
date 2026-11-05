@@ -1,11 +1,11 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { lazy, Suspense, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
 import { Box, Breadcrumbs, Card, CircularProgress } from '@mui/material';
-import { NavigateNext, Print } from '@mui/icons-material';
+import { NavigateNext, Download } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HistoryIcon from '@mui/icons-material/History';
@@ -17,7 +17,6 @@ import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import BiotechIcon from '@mui/icons-material/Biotech';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
-import { useReactToPrint } from 'react-to-print';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import AppLink from '../../common/AppLink';
 
@@ -59,6 +58,8 @@ import {
   DELETED_ENTITIES
 } from '../../common/card/Deleted';
 
+const PdfExport = lazy(() => import('@/components/appli/PdfExport'));
+
 const HalfSplitContainer = styled('div')`
   display: flex;
   flex-direction: column;
@@ -84,7 +85,8 @@ export const Entry = ({
   const openLink = useOpenLink();
   const { entranceId } = useParams();
   const { isAuth, isAdmin, isModerator } = usePermissions();
-  const componentRef = useRef();
+  const [isPdfExportOpen, setIsPdfExportOpen] = useState(false);
+  const [hasOpenedPdfExport, setHasOpenedPdfExport] = useState(false);
   const handleShare = useSharePage();
   const deleteMutation = useDeleteEntrance();
   const restoreMutation = useRestoreEntrance();
@@ -119,8 +121,6 @@ export const Entry = ({
   const onRestorePress = () => {
     restoreMutation.mutate({ id: entranceId });
   };
-
-  const handlePrint = useReactToPrint({ contentRef: componentRef });
 
   let ExploredIcon = <CircularProgress size={20} />;
   if (!isExploredLoading) {
@@ -157,10 +157,13 @@ export const Entry = ({
           hidden: !canToggleExplored
         },
         {
-          key: 'print',
-          icon: <Print />,
-          label: formatMessage({ id: 'Print' }),
-          onClick: handlePrint,
+          key: 'pdf',
+          icon: <Download />,
+          label: formatMessage({ id: 'pdf.download' }),
+          onClick: () => {
+            setHasOpenedPdfExport(true);
+            setIsPdfExportOpen(true);
+          },
           // Splits the user-scoped "Add to my explored entrances" (which
           // renders just above when visible) from the page-level routine
           // actions. Harmless when explored is hidden: `startsGroup` on the
@@ -298,7 +301,7 @@ export const Entry = ({
 
   return (
     <PageContainer>
-      <div ref={componentRef}>
+      <div>
         <PageHeader
           title={entrance?.name ?? (isLoading ? undefined : '')}
           icon={<CustomIcon type="entrance" />}
@@ -452,7 +455,6 @@ export const Entry = ({
               </SectionStack>
             )}
           </div>
-
           {/* Tab 1 — Documents */}
           <div>
             {isLoading && (
@@ -509,6 +511,23 @@ export const Entry = ({
             )}
           </div>
         </PageTabs>
+        {hasOpenedPdfExport && entrance && (
+          <Suspense
+            fallback={
+              <CircularProgress
+                aria-label={formatMessage({ id: 'Loading ...' })}
+              />
+            }>
+            <PdfExport
+              key={`${entrance.id}-${userId}-${isAdmin}`}
+              entity={entrance}
+              entityType="entrance"
+              isAdmin={isAdmin}
+              open={isPdfExportOpen}
+              onClose={() => setIsPdfExportOpen(false)}
+            />
+          </Suspense>
+        )}
       </div>
     </PageContainer>
   );

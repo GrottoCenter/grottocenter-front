@@ -91,7 +91,8 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
-      react(),
+      // PDF components render in a worker, where the DOM-based refresh runtime cannot run.
+      react({ exclude: [/node_modules/, /[\\/]src[\\/]pdf[\\/]/] }),
       // SVG imported with `?react` becomes a React component; a bare `.svg`
       // import stays a URL (keeps src/assets/icons/index.js working untouched).
       svgr(),
@@ -782,7 +783,15 @@ export default defineConfig(({ mode }) => {
     optimizeDeps: {
       // CJS deps that need pre-bundling for ESM interop (notably leaflet-draw,
       // which has no default export but react-leaflet-draw imports one).
-      include: ['swagger-ui-react', 'ramda', 'react-leaflet-draw']
+      include: [
+        'swagger-ui-react',
+        'ramda',
+        'react-leaflet-draw',
+        // Worker-only imports are not discovered by the initial dependency scan.
+        '@react-pdf/renderer',
+        'pdf-lib',
+        'linkifyjs'
+      ]
     },
     test: {
       environment: 'jsdom',

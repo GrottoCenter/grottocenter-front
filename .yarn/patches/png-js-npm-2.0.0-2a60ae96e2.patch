@@ -1,0 +1,57 @@
+diff --git a/lib/png-js.browser.cjs b/lib/png-js.browser.cjs
+index 07a7e40f789124e5ff4c405f20139a8a78f1ca8e..d9a53b34976e4c9131bdbff3794431e4989b2859 100644
+--- a/lib/png-js.browser.cjs
++++ b/lib/png-js.browser.cjs
+@@ -2,7 +2,22 @@
+ 
+ var fflate = require('fflate');
+ 
+-const inflate = fflate.unzlib ;
++const inflate = (data, callback) => {
++  // Already off the UI thread; avoid stalled nested PNG workers in Firefox.
++  if (typeof WorkerGlobalScope !== 'undefined' &&
++      globalThis instanceof WorkerGlobalScope) {
++    let decoded;
++    try {
++      decoded = fflate.unzlibSync(data);
++    } catch (error) {
++      callback(error);
++      return;
++    }
++    callback(null, decoded);
++    return;
++  }
++  return fflate.unzlib(data, callback);
++};
+ 
+ class PNG {
+   static decode(path, fn) {
+diff --git a/lib/png-js.browser.js b/lib/png-js.browser.js
+index 4c044145b32940d72585d62741096ecef718c57e..9cb8447843023550ff7f300fa396b8dd7edcebed 100644
+--- a/lib/png-js.browser.js
++++ b/lib/png-js.browser.js
+@@ -1,6 +1,21 @@
+-import { unzlib } from 'fflate';
+-
+-const inflate = unzlib ;
++import { unzlib, unzlibSync } from 'fflate';
++
++const inflate = (data, callback) => {
++  // Already off the UI thread; avoid stalled nested PNG workers in Firefox.
++  if (typeof WorkerGlobalScope !== 'undefined' &&
++      globalThis instanceof WorkerGlobalScope) {
++    let decoded;
++    try {
++      decoded = unzlibSync(data);
++    } catch (error) {
++      callback(error);
++      return;
++    }
++    callback(null, decoded);
++    return;
++  }
++  return unzlib(data, callback);
++};
+ 
+ class PNG {
+   static decode(path, fn) {

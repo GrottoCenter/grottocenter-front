@@ -30,7 +30,7 @@ if (typeof globalThis.intlBootstrap === 'undefined') {
 // wide desktop viewport: a `min-width` bound matches, a `max-width` bound
 // doesn't, and a compound query needs the max-width side to fail — hence the
 // explicit AND, not just "has min-width".
-if (typeof window.matchMedia === 'undefined') {
+if (typeof window !== 'undefined' && typeof window.matchMedia === 'undefined') {
   window.matchMedia = query => ({
     matches: /min-width/.test(query) && !/max-width/.test(query),
     media: query,
@@ -68,7 +68,10 @@ const createNoopObserver = () =>
 /* eslint-enable class-methods-use-this */
 
 // Used by useMeasuredHeight and the map components.
-if (typeof window.ResizeObserver === 'undefined') {
+if (
+  typeof window !== 'undefined' &&
+  typeof window.ResizeObserver === 'undefined'
+) {
   window.ResizeObserver = createNoopObserver();
 }
 
@@ -76,6 +79,9 @@ if (typeof window.ResizeObserver === 'undefined') {
 // header has scrolled out of view. Nothing intersects in jsdom, so the callback
 // is never invoked and every such flag stays at its initial value — which is the
 // "not scrolled" state the tests want anyway.
-if (typeof window.IntersectionObserver === 'undefined') {
+if (
+  typeof window !== 'undefined' &&
+  typeof window.IntersectionObserver === 'undefined'
+) {
   window.IntersectionObserver = createNoopObserver();
 }
