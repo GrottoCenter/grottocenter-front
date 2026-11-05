@@ -1,3 +1,4 @@
+import { ReadableStream } from 'node:stream/web';
 import { fetchPdfResource } from './resources';
 
 afterEach(() => vi.unstubAllGlobals());

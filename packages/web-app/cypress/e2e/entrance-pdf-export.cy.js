@@ -4,6 +4,34 @@ const originalUrl = new URL(
   '/__pdf-fixtures/survey.pdf',
   Cypress.config('baseUrl')
 ).href;
+// Transitions are disabled below; frame sampling can stall in headless Firefox.
+const PDF_EXPORT_TEST_OPTIONS = { waitForAnimations: false };
+const readDownloadedPdf = (name, timeout = 60000) => {
+  // Closing the dialog signals that generation finished and the download started.
+  cy.get('[data-testid="entrance-pdf-download"]', { timeout }).should(
+    'not.exist'
+  );
+  return (
+    cy
+      .readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
+        timeout
+      })
+      // Firefox creates the destination before writing the PDF. Retry the read
+      // until both the header and end marker exist, then parse the complete file.
+      .should(encoded => {
+        const contents = atob(encoded).trimEnd();
+        expect(contents.startsWith('%PDF-'), 'PDF header').to.equal(true);
+        expect(contents.endsWith('%%EOF'), 'complete PDF trailer').to.equal(
+          true
+        );
+      })
+      .then(encoded =>
+        PDFDocument.load(
+          Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
+        )
+      )
+  );
+};
 const document = {
   id: 3,
   title: 'Original survey',
@@ -47,11 +75,20 @@ const visitEntrance = (isMobile = false, tab = 'information') => {
   });
   if (isMobile) cy.get('button[aria-label="actions"]').first().click();
   cy.get('[data-testid="action-pdf"]', { timeout: 20000 }).click();
+  cy.get('[role="dialog"]', { timeout: 20000 }).should('be.visible');
   cy.wait('@documentDetails');
 };
 
-describe('entrance PDF download', () => {
+describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
   beforeEach(() => {
+    cy.on('window:before:load', win => {
+      // This suite checks PDF contents and dialog actions. Firefox headless can
+      // stall opacity transitions, so keep normal visibility checks without fades.
+      const style = win.document.createElement('style');
+      style.textContent =
+        '*, *::before, *::after { transition: none !important; animation: none !important; }';
+      win.document.head.appendChild(style);
+    });
     cy.disableServiceWorker();
     cy.mockApiCatchAll();
     cy.intercept(
@@ -133,14 +170,7 @@ describe('entrance PDF download', () => {
       cy.contains('[role="dialog"] label', 'Regions').should('not.exist');
       cy.contains('[role="dialog"]', 'Appendices').should('not.exist');
       cy.get('[data-testid="entrance-pdf-download"]').click();
-      cy.readFile(
-        `${Cypress.config('downloadsFolder')}/${name}.pdf`,
-        'base64',
-        { timeout: 60000 }
-      ).then(async encoded => {
-        const output = await PDFDocument.load(
-          Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-        );
+      readDownloadedPdf(name).then(output => {
         expect(output.getTitle()).to.equal(name);
         expect(output.getSubject()).to.equal(
           `https://grottocenter.org/ui${path}`
@@ -170,12 +200,7 @@ describe('entrance PDF download', () => {
     cy.contains('label', 'Original survey').find('input').should('be.checked');
     cy.contains('button', 'Original size').click();
     cy.get('[data-testid="entrance-pdf-download"]').click();
-    cy.readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
-      timeout: 60000
-    }).then(async encoded => {
-      const output = await PDFDocument.load(
-        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-      );
+    readDownloadedPdf(name).then(output => {
       expect(output.getPage(1).getSize()).to.deep.equal({
         width: 300,
         height: 500
@@ -215,14 +240,7 @@ describe('entrance PDF download', () => {
     cy.contains('button', 'Original size').click();
     cy.contains('[role="dialog"] button', 'Preview').should('not.exist');
     cy.get('[data-testid="entrance-pdf-download"]').click();
-    cy.readFile(
-      `${Cypress.config('downloadsFolder')}/${entrance.name}.pdf`,
-      'base64',
-      { timeout: 20000 }
-    ).then(async encoded => {
-      const output = await PDFDocument.load(
-        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-      );
+    readDownloadedPdf(entrance.name, 20000).then(output => {
       expect(output.getTitle()).to.equal(entrance.name);
       expect(output.getPageCount()).to.equal(3);
       const fonts = output
@@ -384,12 +402,7 @@ describe('entrance PDF download', () => {
     cy.get('[data-testid="entrance-pdf-download"]')
       .should('be.enabled')
       .click();
-    cy.readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
-      timeout: 60000
-    }).then(async encoded => {
-      const output = await PDFDocument.load(
-        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-      );
+    readDownloadedPdf(name).then(output => {
       expect(output.getPageCount()).to.equal(5);
       expect(output.getPage(2).getSize()).to.deep.equal({
         width: 300,
@@ -426,12 +439,7 @@ describe('entrance PDF download', () => {
     cy.get('[data-testid="pdf-document-8"] input[type="checkbox"]').check();
     cy.contains('button', 'Original size').click();
     cy.get('[data-testid="entrance-pdf-download"]').click();
-    cy.readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
-      timeout: 60000
-    }).then(async encoded => {
-      const output = await PDFDocument.load(
-        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-      );
+    readDownloadedPdf(name).then(output => {
       expect(output.getPageCount()).to.equal(3);
       expect(output.getPage(1).getSize()).to.deep.equal({
         width: 300,
@@ -440,27 +448,35 @@ describe('entrance PDF download', () => {
     });
   });
 
-  it('allows deselecting an appendix before its details finish loading', () => {
-    let releaseDetails;
-    const details = new Promise(resolve => {
-      releaseDetails = resolve;
-    });
-    cy.intercept({ method: 'GET', pathname: '/api/v1/documents/3' }, request =>
-      details.then(() => request.reply({ body: document }))
-    ).as('pendingDetails');
-    cy.visit('/entrances/1', {
-      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
-    });
-    cy.get('[data-testid="action-pdf"]', { timeout: 20000 }).click();
-    cy.contains('label', 'Documents').find('input').uncheck();
-    cy.get('[data-testid="pdf-document-3"] input[type="checkbox"]').check();
-    cy.get('[data-testid="entrance-pdf-download"]').should('be.disabled');
-    cy.get('[data-testid="pdf-document-3"] input[type="checkbox"]').uncheck();
-    cy.get('[data-testid="entrance-pdf-download"]').should('be.enabled');
-    cy.then(() => releaseDetails());
-    cy.wait('@pendingDetails');
-    cy.get('[data-testid="entrance-pdf-download"]').should('be.enabled');
-  });
+  // The intercepted request stays pending across several UI interactions.
+  it(
+    'allows deselecting an appendix before its details finish loading',
+    {
+      defaultCommandTimeout: 30000
+    },
+    () => {
+      let releaseDetails;
+      const details = new Promise(resolve => {
+        releaseDetails = resolve;
+      });
+      cy.intercept(
+        { method: 'GET', pathname: '/api/v1/documents/3' },
+        request => details.then(() => request.reply({ body: document }))
+      ).as('pendingDetails');
+      cy.visit('/entrances/1', {
+        onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+      });
+      cy.get('[data-testid="action-pdf"]', { timeout: 20000 }).click();
+      cy.contains('label', 'Documents').find('input').uncheck();
+      cy.get('[data-testid="pdf-document-3"] input[type="checkbox"]').check();
+      cy.get('[data-testid="entrance-pdf-download"]').should('be.disabled');
+      cy.get('[data-testid="pdf-document-3"] input[type="checkbox"]').uncheck();
+      cy.get('[data-testid="entrance-pdf-download"]').should('be.enabled');
+      cy.then(() => releaseDetails());
+      cy.wait('@pendingDetails');
+      cy.get('[data-testid="entrance-pdf-download"]').should('be.enabled');
+    }
+  );
 
   it('keeps choices after a map failure and allows retry without the unavailable map', () => {
     cy.intercept(
@@ -476,16 +492,7 @@ describe('entrance PDF download', () => {
     cy.contains('label', 'Comments').find('input').should('be.checked');
     cy.contains('label', /^Map$/).find('input[type="checkbox"]').uncheck();
     cy.get('[data-testid="entrance-pdf-download"]').click();
-    cy.readFile(
-      `${Cypress.config('downloadsFolder')}/${entrance.name}.pdf`,
-      'base64',
-      {
-        timeout: 60000
-      }
-    ).then(async encoded => {
-      const output = await PDFDocument.load(
-        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-      );
+    readDownloadedPdf(entrance.name).then(output => {
       expect(output.getTitle()).to.equal(entrance.name);
     });
   });
@@ -502,12 +509,7 @@ describe('entrance PDF download', () => {
     });
     visitEntrance();
     cy.get('[data-testid="entrance-pdf-download"]').click();
-    cy.readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
-      timeout: 60000
-    }).then(async encoded => {
-      const output = await PDFDocument.load(
-        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-      );
+    readDownloadedPdf(name).then(output => {
       const images = output.getPages().flatMap(page => {
         const objects = page.node.Resources().lookup(PDFName.of('XObject'));
         return (objects?.values() ?? [])
@@ -536,7 +538,8 @@ describe('entrance PDF download', () => {
     );
     cy.intercept(
       { method: 'GET', pathname: '/api/v1/documents/3' },
-      { statusCode: 503 }
+      // A denied document is deterministic: transient 5xx responses trigger retries.
+      { statusCode: 403 }
     ).as('documentDetails');
     visitEntrance(true);
     cy.contains('[role="alert"]', 'Unable to generate the PDF', {
@@ -558,12 +561,7 @@ describe('entrance PDF download', () => {
     cy.get('[data-testid="entrance-pdf-download"]')
       .should('be.enabled')
       .click();
-    cy.readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
-      timeout: 60000
-    }).then(async encoded => {
-      const output = await PDFDocument.load(
-        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-      );
+    readDownloadedPdf(name).then(output => {
       expect(output.getTitle()).to.equal(name);
       expect(output.getPageCount()).to.equal(1);
     });
@@ -608,12 +606,7 @@ describe('entrance PDF download', () => {
     cy.contains('[role="dialog"] button', 'Preview').should('not.exist');
     cy.get('[data-testid="entrance-pdf-download"]').click();
     cy.get('[role="dialog"]', { timeout: 20000 }).should('not.exist');
-    cy.readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
-      timeout: 60000
-    }).then(async encoded => {
-      const output = await PDFDocument.load(
-        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-      );
+    readDownloadedPdf(name).then(output => {
       expect(output.getTitle()).to.equal(name);
       expect(output.getPageCount()).to.be.greaterThan(0);
     });
@@ -646,12 +639,7 @@ describe('entrance PDF download', () => {
     });
     visitEntrance();
     cy.get('[data-testid="entrance-pdf-download"]').click();
-    cy.readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
-      timeout: 60000
-    }).then(async encoded => {
-      const output = await PDFDocument.load(
-        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-      );
+    readDownloadedPdf(name).then(output => {
       expect(output.getPageCount()).to.be.greaterThan(1);
     });
     cy.get('[role="dialog"]').should('not.exist');
@@ -707,12 +695,7 @@ describe('entrance PDF download', () => {
       'true'
     );
     cy.get('[data-testid="entrance-pdf-download"]').click();
-    cy.readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
-      timeout: 60000
-    }).then(async encoded => {
-      const output = await PDFDocument.load(
-        Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-      );
+    readDownloadedPdf(name).then(output => {
       expect(output.getTitle()).to.equal(name);
       expect(output.getPageCount()).to.be.greaterThan(2);
     });
