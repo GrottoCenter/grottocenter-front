@@ -150,18 +150,10 @@ const HydratedMap = ({
     },
     [setSelectedLayers]
   );
-  const {
-    data: pointCoordinates,
-    isFetching: isFetchingPoints,
-    error: pointsError
-  } = useSurfacePointCoordinates({
-    enabled: !!selectedLayers[layerTypes.POINTS]
-  });
-  useEffect(() => {
-    if (pointsError && selectedLayers[layerTypes.POINTS]) {
-      onError(formatMessage({ id: 'points.fetchError' }));
-    }
-  }, [pointsError, selectedLayers, onError, formatMessage]);
+  const { data: pointCoordinates, isFetching: isFetchingPoints } =
+    useSurfacePointCoordinates({
+      enabled: !!selectedLayers[layerTypes.POINTS]
+    });
   const {
     filters: entranceFilters,
     toggleSize,

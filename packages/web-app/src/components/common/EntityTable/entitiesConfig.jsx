@@ -14,7 +14,6 @@ import PersonType from '@/components/common/Person/PersonType';
 import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
 import IconLabel from '@/components/common/IconLabel';
 import { isPersonType } from '@/utils/personTypes';
-import { getPointLocationMessageId } from '@/utils/points';
 import AppLink from '../AppLink';
 import Translate from '../Translate';
 import DataQualityBadge from '../DataQualityBadge';
@@ -870,11 +869,8 @@ const o = {
       {
         visible: true,
         field: 'underground',
-        label: 'Depth',
-        sortable: false,
-        render: value => (
-          <Translate>{getPointLocationMessageId(value)}</Translate>
-        )
+        label: 'points.underground',
+        sortable: false
       },
       {
         visible: true,

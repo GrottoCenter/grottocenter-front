@@ -69,8 +69,10 @@ const notifyError = (error, meta) => {
     return;
   }
   if (meta?.skipErrorNotification) return;
+  // A query can supply a contextual fallback while keeping notification
+  // ownership here, including session loss and rate-limit handling.
   const fallback = translate(
-    'unexpected error',
+    meta?.errorMessageId ?? 'unexpected error',
     'An unexpected error occurred'
   );
   const code = error?.body?.code;

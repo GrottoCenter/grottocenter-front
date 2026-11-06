@@ -48,6 +48,7 @@ export const useSurfacePointCoordinates = ({ enabled }) =>
     queryFn: ({ signal }) =>
       apiGet(`${getMapPointsCoordinatesUrl}?underground=false`, { signal }),
     select: selectSurfacePointCoordinates,
+    meta: { errorMessageId: 'points.fetchError' },
     enabled,
     staleTime: STALE.VOLATILE
   });

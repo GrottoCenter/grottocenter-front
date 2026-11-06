@@ -504,13 +504,27 @@ SearchSlider.propTypes = {
   )
 };
 
-export const SearchBooleanToggle = ({ label, onChange, value, icon }) => {
+export const SearchBooleanToggle = ({
+  label,
+  onChange,
+  value,
+  icon,
+  isInline = false
+}) => {
   const { formatMessage } = useIntl();
   return (
-    <FormControl sx={{ alignItems: 'center', mx: 1 }}>
+    <FormControl
+      role="group"
+      aria-label={formatMessage({ id: label })}
+      sx={{
+        alignItems: 'center',
+        flexDirection: isInline ? 'row' : 'column',
+        mx: 1
+      }}>
       <FormLabel
         sx={{
-          mb: 0.5,
+          mb: isInline ? 0 : 0.5,
+          mr: isInline ? 1 : 0,
           display: 'flex',
           alignItems: 'center'
         }}>
@@ -528,6 +542,7 @@ export const SearchBooleanToggle = ({ label, onChange, value, icon }) => {
           color={value === true ? 'primary' : 'default'}
           variant={value === true ? 'filled' : 'outlined'}
           icon={value === true ? <CheckIcon /> : undefined}
+          aria-pressed={value === true}
           onClick={() => onChange(value === true ? null : true)}
         />
         <Chip
@@ -537,6 +552,7 @@ export const SearchBooleanToggle = ({ label, onChange, value, icon }) => {
           color={value === false ? 'primary' : 'default'}
           variant={value === false ? 'filled' : 'outlined'}
           icon={value === false ? <CheckIcon /> : undefined}
+          aria-pressed={value === false}
           onClick={() => onChange(value === false ? null : false)}
         />
       </Box>
@@ -548,7 +564,8 @@ SearchBooleanToggle.propTypes = {
   label: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-  icon: PropTypes.node
+  icon: PropTypes.node,
+  isInline: PropTypes.bool
 };
 
 export const SearchDivingTypes = ({ onChange, value, icon }) => (

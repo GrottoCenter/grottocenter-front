@@ -86,6 +86,23 @@ describe('Surface points on the global map', () => {
     cy.get('[data-testid="point-cluster"]').should('not.exist');
   });
 
+  it('shows only one contextual error when surface coordinates fail to load', () => {
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/geoloc/pointsCoordinates' },
+      { statusCode: 404, body: {} }
+    ).as('failedCoordinates');
+    visitMap(10, true);
+    cy.wait('@failedCoordinates');
+    cy.get('[role="alert"]')
+      .should('have.length', 1)
+      .and('contain', 'Unable to load the points.');
+    cy.contains('unexpected error').should('not.exist');
+    cy.get('[data-tour="data-control-toggle"]').click();
+    cy.get('input[name="organizations"]').focus();
+    cy.press(Cypress.Keyboard.Keys.SPACE);
+    cy.get('[role="alert"]').should('have.length', 1);
+  });
+
   it('shows filtered markers at detail zoom and opens the point through its popup', () => {
     visitMap(13, true);
     cy.wait('@pointMarkers')

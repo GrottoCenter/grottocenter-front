@@ -2,8 +2,7 @@ import { useMemo, useState } from 'react';
 import { Box, Divider, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
 
-import EntityTypeFilter from '@/components/appli/AdvancedSearch/EntityTypeFilter';
-import { SearchFieldset } from '@/components/appli/AdvancedSearch/SearchElements';
+import { SearchBooleanToggle } from '@/components/appli/AdvancedSearch/SearchElements';
 import CustomIcon from '@/components/common/CustomIcon';
 import EntityTable from '@/components/common/EntityTable';
 import FetchErrorState from '@/components/common/FetchErrorState';
@@ -12,12 +11,6 @@ import NewEntityButton from '@/components/common/NewEntityButton';
 import SearchInput from '@/components/common/SearchInput';
 import { usePoints } from '@/hooks';
 import { EntityIcon } from '@/pages/EntityCreation/entityConfig';
-
-const DEPTH_OPTIONS = [
-  { value: 'all', labelId: 'All' },
-  { value: 'false', labelId: 'points.surface' },
-  { value: 'true', labelId: 'points.underground' }
-];
 
 const normalize = value =>
   String(value ?? '')
@@ -29,15 +22,15 @@ const Points = () => {
   const { formatMessage } = useIntl();
   const { data = [], error, isFetching, isPaused, refetch } = usePoints();
   const [search, setSearch] = useState('');
-  const [depth, setDepth] = useState('all');
+  const [underground, setUnderground] = useState(null);
   const points = useMemo(() => {
     const query = normalize(search.trim());
     return data.filter(point => {
-      const matchesDepth =
-        depth === 'all' || String(point.underground) === depth;
-      return matchesDepth && normalize(point.label).includes(query);
+      const matchesUnderground =
+        underground === null || point.underground === underground;
+      return matchesUnderground && normalize(point.label).includes(query);
     });
-  }, [data, search, depth]);
+  }, [data, search, underground]);
 
   return (
     <Layout
@@ -55,14 +48,15 @@ const Points = () => {
             <Box data-testid="points-search" sx={{ width: '100%' }}>
               <SearchInput value={search} onChange={setSearch} />
             </Box>
-            <SearchFieldset title="Depth">
-              <EntityTypeFilter
-                labelId="Depth"
-                options={DEPTH_OPTIONS}
-                value={depth}
-                onChange={setDepth}
+            <Box data-testid="points-underground-filter">
+              <SearchBooleanToggle
+                label="points.underground"
+                icon={<CustomIcon type="underground" size={24} />}
+                value={underground}
+                onChange={setUnderground}
+                isInline
               />
-            </SearchFieldset>
+            </Box>
           </Box>
           <Divider sx={{ my: 1 }} />
           {error || isPaused ? (

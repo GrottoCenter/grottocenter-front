@@ -303,6 +303,58 @@ describe('Point management', () => {
     cy.get('[data-testid="point-map"]').should('not.exist');
   });
 
+  it('displays underground as a boolean and filters yes and no independently', () => {
+    visit('/points');
+    cy.contains('th', 'Underground').should('be.visible');
+    cy.contains('td', undergroundPoint.label)
+      .parent()
+      .find('td')
+      .eq(1)
+      .find('[data-testid="CheckCircleOutlinedIcon"]')
+      .should('be.visible');
+    cy.contains('td', surfacePoint.label)
+      .parent()
+      .find('td')
+      .eq(1)
+      .find('[data-testid="CancelIcon"]')
+      .should('be.visible');
+    cy.get('[data-testid="points-underground-filter"] [role="button"]')
+      .should('have.length', 2)
+      .and('have.attr', 'aria-pressed', 'false');
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'Yes')
+      .click();
+    cy.contains('td', undergroundPoint.label).should('exist');
+    cy.contains('td', surfacePoint.label).should('not.exist');
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'No')
+      .click();
+    cy.contains('td', surfacePoint.label).should('exist');
+    cy.contains('td', undergroundPoint.label).should('not.exist');
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'No')
+      .click();
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'No')
+      .should('have.attr', 'aria-pressed', 'false');
+    cy.contains('td', undergroundPoint.label).should('exist');
+    cy.contains('td', surfacePoint.label).should('exist');
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'Yes')
+      .click();
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'Yes')
+      .should('have.attr', 'aria-pressed', 'true');
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'Yes')
+      .click();
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'Yes')
+      .should('have.attr', 'aria-pressed', 'false');
+    cy.contains('td', undergroundPoint.label).should('exist');
+    cy.contains('td', surfacePoint.label).should('exist');
+  });
+
   it('loads the entire catalogue and filters later pages locally, including unclassified points', () => {
     const firstPage = Array.from({ length: 100 }, (_, index) => ({
       ...undergroundPoint,
@@ -323,30 +375,37 @@ describe('Point management', () => {
     }).as('allPoints');
     visit('/points');
     cy.get('[role="status"]').should('contain', '101 results');
-    cy.get('[data-testid="entity-type-filter"]')
-      .should('have.attr', 'aria-label', 'Depth')
+    cy.get('[data-testid="points-underground-filter"] [role="group"]')
+      .should('have.attr', 'aria-label', 'Underground')
       .find('[role="button"]')
-      .should('have.length', 3)
+      .should('have.length', 2)
       .then(options => {
         expect([...options].map(option => option.textContent)).to.deep.equal([
-          'All',
-          'Surface',
-          'Underground'
+          'Yes',
+          'No'
         ]);
       });
     cy.get('[data-testid="points-search"] input').type('echo');
     cy.get('[role="status"]').should('contain', '1 result');
     cy.contains('td', 'Écho').should('be.visible');
-    cy.get('[data-testid="entity-type-filter"]')
-      .contains('[role="button"]', 'Surface')
+    cy.contains('td', 'Écho')
+      .parent()
+      .find('td')
+      .eq(1)
+      .should('have.text', '-');
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'No')
       .click();
-    cy.get('[data-testid="entity-type-filter"]')
-      .contains('[role="button"]', 'Surface')
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'No')
       .should('have.attr', 'aria-pressed', 'true');
     cy.contains('td', 'Écho').should('not.exist');
-    cy.get('[data-testid="entity-type-filter"]')
-      .contains('[role="button"]', 'All')
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'No')
       .click();
+    cy.get('[data-testid="points-underground-filter"]')
+      .contains('[role="button"]', 'No')
+      .should('have.attr', 'aria-pressed', 'false');
     cy.contains('td', 'Écho').should('exist');
     cy.get('@allPoints.all').should('have.length', 2);
   });
