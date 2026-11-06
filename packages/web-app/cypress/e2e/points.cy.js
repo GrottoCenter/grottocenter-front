@@ -21,6 +21,16 @@ const surfacePoint = {
   longitude: 0
 };
 
+const cave = {
+  id: 11,
+  name: 'Test cave',
+  entrances: [
+    { id: 101, latitude: 48, longitude: 10, isSensitive: false },
+    { id: 102, latitude: 50, longitude: 12, isSensitive: false },
+    { id: 103, latitude: 5, longitude: 1, isSensitive: true }
+  ]
+};
+
 const document = {
   id: 20,
   title: 'Point survey',
@@ -43,19 +53,23 @@ const visit = (path, { isMobile = false } = {}) =>
     }
   });
 
-const selectDepth = label => {
-  cy.get('[data-testid="point-depth"] [role="combobox"]').click();
-  cy.contains('[role="option"]', label).click();
+const setUnderground = isUnderground => {
+  if (isUnderground) {
+    cy.get('[data-testid="point-underground"]').check();
+  } else {
+    cy.get('[data-testid="point-underground"]').uncheck();
+  }
 };
 
 describe('Point management', () => {
   beforeEach(() => {
     cy.viewport(1280, 900);
+    cy.disableServiceWorker();
     cy.mockApiCatchAll();
     cy.intercept(
       { method: 'GET', pathname: '/api/v1/caves/11' },
       {
-        body: { id: 11, name: 'Test cave', entrances: [] }
+        body: cave
       }
     );
     cy.intercept(
@@ -81,6 +95,212 @@ describe('Point management', () => {
         body: surfacePoint
       }
     ).as('surfacePoint');
+  });
+
+  it('shows surface coordinates beside the map and stacks them on mobile', () => {
+    visit('/points/6');
+    cy.wait('@surfacePoint');
+    cy.get('[data-testid="point-properties"]', { timeout: 15000 }).should(
+      'contain',
+      'Coordinates (WGS84)'
+    );
+    cy.get('[aria-label="Copy coordinates"]').should('be.visible');
+    cy.get('[aria-label="Change coordinate system"]').should('be.visible');
+    cy.get('[aria-label="Open on map"]').should('be.visible');
+    cy.get('[data-testid="point-properties"] img[alt="Underground"]').should(
+      'not.exist'
+    );
+    cy.get('[data-testid="point-properties"]').should('not.contain', 'Depth');
+    cy.get('[data-testid="point-map"]').then(map => {
+      const mapBounds = map[0].getBoundingClientRect();
+      cy.get('[data-testid="point-properties"]').then(properties => {
+        const bounds = properties[0].getBoundingClientRect();
+        expect(bounds.left).to.be.greaterThan(mapBounds.right);
+        expect(bounds.top).to.equal(mapBounds.top);
+      });
+    });
+    cy.viewport('iphone-x');
+    cy.get('[data-testid="point-map"]').then(map => {
+      const mapBounds = map[0].getBoundingClientRect();
+      cy.get('[data-testid="point-properties"]').then(properties => {
+        const bounds = properties[0].getBoundingClientRect();
+        expect(bounds.top).to.be.greaterThan(mapBounds.bottom);
+        expect(bounds.right).to.be.at.most(375);
+      });
+    });
+  });
+
+  it('locates underground points from the cave and replaces the unclassified warning with a placeholder', () => {
+    visit('/points/5');
+    cy.get('[data-testid="point-properties"] img[alt="Underground"]').should(
+      'be.visible'
+    );
+    cy.get('[data-testid="point-properties"]').should('contain', 'Underground');
+    cy.get('[data-testid="point-properties"]').should('not.contain', 'Depth');
+    cy.get('[data-testid="point-properties"] img[alt="Network"]').should(
+      'be.visible'
+    );
+    cy.get('a[href="/ui/caves/11"]').should('contain', 'Test cave');
+    cy.get('[data-testid="point-map"] .point-marker').should('be.visible');
+    cy.get('[aria-label="Copy coordinates"]').should('not.exist');
+
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/points/5' },
+      { body: { ...undergroundPoint, underground: null } }
+    );
+    visit('/points/5');
+    cy.get('[data-testid="point-location"]').should(
+      'contain',
+      'No location is known for this point.'
+    );
+    cy.contains('This point has not yet been classified').should('not.exist');
+    cy.get('[data-testid="point-properties"] img[alt="Underground"]').should(
+      'not.exist'
+    );
+    cy.get('[data-testid="point-map"]').should('not.exist');
+    cy.get('[aria-label="Copy coordinates"]').should('not.exist');
+  });
+
+  it('presents a single-entrance legacy cave as an entrance with its own link and icon', () => {
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/caves/11' },
+      {
+        body: {
+          ...cave,
+          entrances: [{ ...cave.entrances[0], name: 'Single entrance' }]
+        }
+      }
+    );
+    visit('/points/5');
+    cy.get('[data-testid="point-properties"]').should('contain', 'Entrance');
+    cy.get('a[href="/ui/entrances/101"]').should('contain', 'Single entrance');
+    cy.get('[data-testid="point-properties"] img[alt="Entrance"]').should(
+      'be.visible'
+    );
+    cy.get('a[href="/ui/caves/11"]').should('not.exist');
+    cy.get('[data-testid="point-properties"]').should('not.contain', 'Cave');
+  });
+
+  it('reads the future entrance and network associations without a caveId fallback', () => {
+    const entrance = {
+      ...cave.entrances[0],
+      name: 'Associated entrance'
+    };
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/entrances/101' },
+      { body: entrance }
+    );
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/points/5' },
+      {
+        body: {
+          ...undergroundPoint,
+          caveId: undefined,
+          entrance: { id: 101, name: entrance.name },
+          network: null
+        }
+      }
+    );
+    visit('/points/5');
+    cy.get('a[href="/ui/entrances/101"]').should(
+      'contain',
+      'Associated entrance'
+    );
+    cy.get('[data-testid="point-map"] .point-marker').should('be.visible');
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/points/5' },
+      {
+        body: {
+          ...undergroundPoint,
+          caveId: undefined,
+          entrance: null,
+          network: { id: 11, name: 'Associated network' }
+        }
+      }
+    );
+    visit('/points/5');
+    cy.get('a[href="/ui/caves/11"]').should('contain', 'Associated network');
+    cy.get('[data-testid="point-properties"] img[alt="Network"]').should(
+      'be.visible'
+    );
+    cy.get('[data-testid="point-map"] .point-marker').should('be.visible');
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/points/5' },
+      { body: { ...undergroundPoint, entrance: null, network: null } }
+    );
+    visit('/points/5');
+    cy.get('[data-testid="point-location"]').should(
+      'contain',
+      'No location is known for this point.'
+    );
+    cy.get('[data-testid="point-map"]').should('not.exist');
+    cy.get('a[href="/ui/caves/11"]').should('not.exist');
+  });
+
+  it('reuses the protected location lock and exposes a map only to administrators', () => {
+    const protectedCave = {
+      ...cave,
+      entrances: [
+        {
+          id: 101,
+          latitude: 48,
+          longitude: 10,
+          isSensitive: true,
+          isSensitiveLocked: true
+        }
+      ]
+    };
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/caves/11' },
+      { body: protectedCave }
+    );
+    visit('/points/5');
+    cy.get('[data-testid="point-location"]').should(
+      'contain',
+      'Sensitive location'
+    );
+    cy.get(
+      '[data-testid="point-location"] [data-testid="LockOutlinedIcon"]'
+    ).should('be.visible');
+    cy.get('[data-testid="point-map"]').should('not.exist');
+    cy.get('[aria-label="Copy coordinates"]').should('not.exist');
+    cy.loginAs({ groups: ['Administrator'] });
+    visit('/points/5');
+    cy.get('[data-testid="point-location"]').should(
+      'contain',
+      'Sensitive entrance'
+    );
+    cy.get('[data-testid="point-map"] .point-marker').should('be.visible');
+    cy.get(
+      '[aria-label="The sensitivity of this entrance is locked by an administrator."]'
+    ).should('be.visible');
+  });
+
+  it('shows an unknown location without falling back to legacy underground coordinates', () => {
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/points/5' },
+      { body: { ...undergroundPoint, caveId: null } }
+    );
+    visit('/points/5');
+    cy.get('[data-testid="point-location"]').should(
+      'contain',
+      'No location is known for this point.'
+    );
+    cy.get('[data-testid="point-map"]').should('not.exist');
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/points/5' },
+      { body: undergroundPoint }
+    );
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/caves/11' },
+      { body: { ...cave, entrances: [] } }
+    );
+    visit('/points/5');
+    cy.get('[data-testid="point-location"]').should(
+      'contain',
+      'No location is known for this point.'
+    );
+    cy.get('[data-testid="point-map"]').should('not.exist');
   });
 
   it('loads the entire catalogue and filters later pages locally, including unclassified points', () => {
@@ -161,7 +381,8 @@ describe('Point management', () => {
       'be.visible'
     );
     cy.get('[data-testid="point-label"] input').type('Underground station');
-    selectDepth('Underground');
+    setUnderground(false);
+    setUnderground(true);
     cy.get('[name="latitude"]').should('not.exist');
     cy.get('[name="longitude"]').should('not.exist');
     cy.get('[data-testid="point-submit"]').click();
@@ -172,6 +393,18 @@ describe('Point management', () => {
     );
     cy.wait('@caves');
     cy.contains('[role="option"]', 'Test cave').click();
+    cy.get('[data-testid="point-form"] button[aria-label="Clear"]').click();
+    cy.get('[data-testid="point-submit"]').click();
+    cy.get('@create.all').should('have.length', 0);
+    cy.get('[data-testid="point-form"] input[role="combobox"]').should(
+      'have.attr',
+      'aria-invalid',
+      'true'
+    );
+    cy.get('[data-testid="point-form"] input[role="combobox"]').type(
+      'Test cave'
+    );
+    cy.contains('[role="option"]', 'Test cave').click();
     cy.get('[data-testid="point-submit"]').click();
     cy.wait('@create').its('request.body').should('deep.equal', {
       label: 'Underground station',
@@ -179,7 +412,7 @@ describe('Point management', () => {
       caveId: 11
     });
     cy.location('pathname').should('eq', '/ui/points/5');
-    cy.get('[data-testid="point-map"]').should('not.exist');
+    cy.get('[data-testid="point-map"] .point-marker').should('be.visible');
     cy.contains('Test cave').should('exist');
   });
 
@@ -191,7 +424,7 @@ describe('Point management', () => {
     ).as('create');
     visit('/entity/add/point');
     cy.get('[data-testid="point-label"] input').type('Surface station');
-    selectDepth('Surface');
+    setUnderground(false);
     cy.get('[data-testid="point-submit"]').click();
     cy.get('@create.all').should('have.length', 0);
     cy.get('[name="latitude"]').type('91');
@@ -218,6 +451,39 @@ describe('Point management', () => {
     );
   });
 
+  it('blocks editing an underground point when its cave is missing or cleared', () => {
+    cy.loginAs();
+    cy.intercept(
+      { method: 'PATCH', pathname: '/api/v1/points/5' },
+      { body: undergroundPoint }
+    ).as('update');
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/points/5' },
+      { body: { ...undergroundPoint, caveId: null } }
+    );
+    visit('/points/5/edit');
+    cy.get('[data-testid="point-submit"]').click();
+    cy.get('[data-testid="point-form"] input[role="combobox"]').should(
+      'have.attr',
+      'aria-invalid',
+      'true'
+    );
+    cy.get('@update.all').should('have.length', 0);
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/points/5' },
+      { body: undergroundPoint }
+    );
+    visit('/points/5/edit');
+    cy.get('[data-testid="point-form"] input[role="combobox"]').focus();
+    cy.get('[data-testid="point-form"] button[aria-label="Clear"]').click();
+    cy.get('[data-testid="point-submit"]').click();
+    cy.get('[data-testid="point-form"] input[role="combobox"]').should(
+      'have.attr',
+      'aria-invalid',
+      'true'
+    );
+    cy.get('@update.all').should('have.length', 0);
+  });
   it('preserves form values after an API failure and omits underground coordinates on edit', () => {
     cy.loginAs();
     cy.intercept(
@@ -244,7 +510,7 @@ describe('Point management', () => {
     cy.get('[name="latitude"]').should('not.exist');
   });
 
-  it('requires explicit classification of a legacy point and saves without exposing underground coordinates', () => {
+  it('lets a legacy point become underground and saves without exposing its old coordinates', () => {
     cy.loginAs();
     let point = { ...undergroundPoint, underground: null };
     cy.intercept({ method: 'GET', pathname: '/api/v1/points/5' }, req =>
@@ -258,10 +524,8 @@ describe('Point management', () => {
     cy.get('[data-testid="point-form"]', { timeout: 15000 }).should(
       'be.visible'
     );
-    cy.get('[data-testid="point-submit"]').click();
-    cy.get('@classify.all').should('have.length', 0);
-    cy.contains('Required').should('be.visible');
-    selectDepth('Underground');
+    cy.get('[data-testid="point-underground"]').should('not.be.checked');
+    setUnderground(true);
     cy.get('[name="latitude"]').should('not.exist');
     cy.get('[data-testid="point-submit"]').click();
     cy.wait('@classify').its('request.body').should('deep.equal', {
@@ -271,7 +535,74 @@ describe('Point management', () => {
     });
     cy.location('pathname').should('eq', '/ui/points/5');
     cy.contains('Test cave').should('be.visible');
-    cy.get('[data-testid="point-map"]').should('not.exist');
+    cy.get('[data-testid="point-map"] .point-marker').should('be.visible');
+  });
+
+  it('creates a new document from a point and automatically associates it', () => {
+    cy.loginAs();
+    let referencedPoint = {
+      id: undergroundPoint.id,
+      label: undergroundPoint.label
+    };
+    cy.intercept('GET', '**/api/v1/documents/types*', {
+      body: { documentTypes: [{ id: 1, name: 'Topographic Drawing' }] }
+    });
+    cy.intercept('GET', '**/api/v1/languages*', {
+      body: { languages: [{ id: 'eng', part1: 'en', refName: 'English' }] }
+    });
+    cy.intercept('POST', '**/api/v1/documents', {
+      body: {
+        document: { ...document, id: 21, title: 'New point document' }
+      }
+    }).as('createPointDocument');
+    cy.intercept('PUT', '**/api/v1/points/5/documents/21', {
+      body: {}
+    }).as('linkCreatedDocument');
+    cy.intercept('GET', '**/api/v1/documents/21', req =>
+      req.reply({
+        ...document,
+        id: 21,
+        title: 'New point document',
+        point: referencedPoint
+      })
+    );
+    cy.intercept('DELETE', '**/api/v1/points/5/documents/21', req => {
+      referencedPoint = null;
+      req.reply({ statusCode: 200, body: {} });
+    }).as('unlinkCreatedDocument');
+    visit('/points/5');
+    cy.contains('[role="tab"]', 'Documents').click();
+    cy.contains('button', /^New$/).click();
+    cy.location('search').should('eq', '?pointId=5');
+    cy.contains(
+      'This document will be linked to point: Underground station'
+    ).should('be.visible');
+    cy.contains(
+      '[data-testid="document-type-name"]',
+      'Topographic Drawing'
+    ).click();
+    cy.get('[data-testid="document-title"] input').type('New point document');
+    cy.get('[data-testid="document-submit"]').should('be.enabled').click();
+    cy.contains('button', 'Submit anyway').click();
+    cy.wait('@createPointDocument');
+    cy.wait('@linkCreatedDocument');
+    cy.get('@linkCreatedDocument.all').should('have.length', 1);
+    cy.contains('button', /^Finish$/).click();
+    cy.location('pathname').should('eq', '/ui/points/5');
+    visit('/documents/21');
+    cy.get('a[href="/ui/points/5"]').should('contain', undergroundPoint.label);
+    cy.get('a[href="/ui/points/5"] img[alt="Point"]').should('be.visible');
+    cy.get('button[aria-label="unlink Underground station"]').should(
+      'not.exist'
+    );
+    cy.loginAs({ groups: ['Moderator'] });
+    visit('/documents/21');
+    cy.get('button[aria-label="unlink Underground station"]').click();
+    cy.get('[role="dialog"]')
+      .contains('button', /^Unlink$/)
+      .click();
+    cy.wait('@unlinkCreatedDocument');
+    cy.get('a[href="/ui/points/5"]').should('not.exist');
   });
 
   it('associates documents and refreshes the point, then unlinks as moderator', () => {

@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { MenuItem, TextField } from '@mui/material';
+import { Box, Checkbox, FormControlLabel } from '@mui/material';
 
 import CaveAutoCompleteSearch from '@/components/common/AutoCompleteSearch/CaveAutoCompleteSearch';
+import CustomIcon from '@/components/common/CustomIcon';
 import FormSubmissionError from '@/components/common/FormSubmissionError';
 import { useCave } from '@/hooks';
 import pointType from '@/types/point.type';
@@ -24,11 +25,12 @@ const PointForm = ({ values, isNew, onSubmit, onCancel, error }) => {
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm({
-    mode: 'onChange',
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
     shouldUnregister: true,
     defaultValues: {
       label: values?.label ?? '',
-      underground: values?.underground ?? '',
+      underground: values?.underground ?? false,
       cave: values?.caveId
         ? { id: values.caveId, name: String(values.caveId) }
         : null,
@@ -39,6 +41,9 @@ const PointForm = ({ values, isNew, onSubmit, onCancel, error }) => {
   const underground = useWatch({ control, name: 'underground' });
 
   const handleValidSubmit = async data => {
+    // TEMPORARY GrottoCenter/grottocenter-api#1978: replace caveId defaults,
+    // search selection and serialization together with entranceId/networkId.
+    // Remove the legacy field, not a fallback: the new API will reject caveId.
     const body = {
       label: data.label.trim(),
       underground: data.underground,
@@ -80,42 +85,47 @@ const PointForm = ({ values, isNew, onSubmit, onCancel, error }) => {
           <Controller
             control={control}
             name="underground"
-            rules={{
-              validate: value =>
-                typeof value === 'boolean' || formatMessage({ id: 'Required' })
-            }}
-            render={({ field, fieldState }) => (
-              <TextField
-                select
-                fullWidth
-                required
-                label={formatMessage({ id: 'Depth' })}
-                name={field.name}
-                value={field.value === '' ? '' : String(field.value)}
-                onChange={event =>
-                  field.onChange(event.target.value === 'true')
+            render={({ field }) => (
+              <FormControlLabel
+                sx={{ my: 2 }}
+                control={
+                  <Checkbox
+                    name={field.name}
+                    checked={field.value}
+                    onChange={event => field.onChange(event.target.checked)}
+                    onBlur={field.onBlur}
+                    slotProps={{
+                      input: {
+                        ref: field.ref,
+                        'data-testid': 'point-underground'
+                      }
+                    }}
+                  />
                 }
-                onBlur={field.onBlur}
-                inputRef={field.ref}
-                error={Boolean(fieldState.error)}
-                helperText={fieldState.error?.message}
-                data-testid="point-depth"
-                sx={{ my: 2 }}>
-                <MenuItem value="false">
-                  {formatMessage({ id: 'points.surface' })}
-                </MenuItem>
-                <MenuItem value="true">
-                  {formatMessage({ id: 'points.underground' })}
-                </MenuItem>
-              </TextField>
+                label={
+                  <Box
+                    component="span"
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 1
+                    }}>
+                    <span aria-hidden="true">
+                      <CustomIcon type="underground" size={24} />
+                    </span>
+                    {formatMessage({ id: 'points.underground' })}
+                  </Box>
+                }
+              />
             )}
           />
           <Controller
             control={control}
             name="cave"
             rules={{
-              validate: value =>
-                underground !== true ||
+              // Read the submitted classification, not a watched render value.
+              validate: (value, formValues) =>
+                formValues.underground !== true ||
                 Boolean(value?.id) ||
                 formatMessage({ id: 'Required' })
             }}

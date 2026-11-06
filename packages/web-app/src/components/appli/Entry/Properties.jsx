@@ -11,8 +11,7 @@ import {
   Typography
 } from '@mui/material';
 import { WarningAmber, ExpandMore, ExpandLess } from '@mui/icons-material';
-import CoordinateDisplay from '../../common/CoordinateDisplay';
-import { useCoordinatePreference, getCRSLabel } from '../../../hooks';
+import CoordinatesProperty from '@/components/common/Properties/CoordinatesProperty';
 import DataQualityBadge from '../../common/DataQualityBadge';
 import DataQualityHelpButton from '../../common/DataQualityBadge/DataQualityHelpButton';
 import { getDataQualityLabelKey } from '../../../utils/dataQuality';
@@ -77,7 +76,6 @@ const Properties = ({
 }) => {
   const { formatMessage } = useIntl();
   const [categoriesOpen, setCategoriesOpen] = useState(false);
-  const [preferredCRS] = useCoordinatePreference();
   const massifsWithType =
     entrance?.massifs?.filter(m => m.undergroundType) ?? [];
   const cityValue = [entrance?.city, entrance?.region]
@@ -96,23 +94,14 @@ const Properties = ({
               flexDirection: 'column',
               gap: 0.5
             }}>
-            {entrance.latitude && entrance.longitude && (
-              <Property
-                loading={isLoading}
-                label={`${formatMessage({ id: 'Coordinates' })} (${getCRSLabel(preferredCRS)})`}
-                value={
-                  <CoordinateDisplay
-                    latitude={entrance.latitude}
-                    longitude={entrance.longitude}
-                    precision={entrance.precision}
-                    showMapLinks
-                    entityType="entrance"
-                    entityId={entrance.id}
-                  />
-                }
-                icon={<CustomIcon type="coordinates" />}
-              />
-            )}
+            <CoordinatesProperty
+              loading={isLoading}
+              latitude={entrance.latitude}
+              longitude={entrance.longitude}
+              precision={entrance.precision}
+              entityType="entrance"
+              entityId={entrance.id}
+            />
             <Box
               sx={{
                 display: 'grid',

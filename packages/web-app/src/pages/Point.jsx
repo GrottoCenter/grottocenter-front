@@ -1,11 +1,15 @@
 import { useMemo, useState } from 'react';
-import { Alert, Box } from '@mui/material';
+import { Box, CircularProgress, Paper, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useIntl } from 'react-intl';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import PointDocuments from '@/components/appli/Point/PointDocuments';
+import { getUndergroundLocation } from '@/components/appli/Point/location';
+import { getPointAssociation } from '@/components/appli/Point/association';
+import SensitiveCaveWarning from '@/components/appli/Entry/SensitiveCaveWarning';
+import SensitiveLocationPlaceholder from '@/components/appli/Entry/SensitiveLocationPlaceholder';
 import CustomIcon from '@/components/common/CustomIcon';
 import ContributionMetadata from '@/components/common/Contribution/ContributionMetadata';
 import {
@@ -17,41 +21,84 @@ import {
 import PageContainer from '@/components/common/Layouts/PageContainer';
 import PageHeader from '@/components/common/Layouts/PageHeader';
 import EntityPageTabs from '@/components/common/Layouts/EntityPageTabs';
+import FetchErrorState from '@/components/common/FetchErrorState';
 import ResponsiveActions from '@/components/common/Layouts/ResponsiveActions';
 import SectionStack from '@/components/common/Layouts/SectionStack';
 import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
 import Property from '@/components/common/Properties/Property';
+import CoordinatesProperty from '@/components/common/Properties/CoordinatesProperty';
+import InfoSection from '@/components/common/InfoSection';
 import Map from '@/components/common/Maps/MapMultipleMarkers';
 import { PointMarker } from '@/components/common/Maps/common/Markers/Components/PointMarker';
 import { makeIconTooltip } from '@/components/common/Maps/common/Markers/tooltipHelpers';
 import { pointIcon } from '@/assets/icons';
 import {
   useCave,
+  useEntrance,
   useDeletePoint,
   usePoint,
   usePermissions,
   useOnlineStatus
 } from '@/hooks';
-import { getPointLocationMessageId } from '@/utils/points';
 
 const pointTooltip = point => makeIconTooltip(pointIcon, point.label);
 
 const Point = () => {
   const { pointId } = useParams();
   const navigate = useNavigate();
-  const { formatMessage, formatNumber } = useIntl();
+  const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const isOnline = useOnlineStatus();
   const query = usePoint(pointId);
   const point = query.data;
-  const { data: cave } = useCave(point?.caveId);
+  // TEMPORARY https://github.com/GrottoCenter/grottocenter-api/issues/1978:
+  // DELETE legacyCaveId, `?? legacyCaveId` and its hasLocationSource branch.
+  // The new API rejects caveId; use only entrance/network association objects.
+  const legacyCaveId =
+    point && !('entrance' in point || 'network' in point)
+      ? point.caveId
+      : undefined;
+  const caveQuery = useCave(point?.network?.id ?? legacyCaveId);
+  const entranceQuery = useEntrance(point?.entrance?.id);
+  const cave = caveQuery.data;
+  const association = getPointAssociation(point, cave);
+  const locationQuery = point?.entrance ? entranceQuery : caveQuery;
   const deleteMutation = useDeletePoint();
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const isDeleted = Boolean(point?.isDeleted);
   const canModerate = permissions.isModerator || permissions.isAdmin;
-  const positions = useMemo(() => (point ? [point] : []), [point]);
+  const undergroundLocation = useMemo(
+    () =>
+      getUndergroundLocation(
+        point?.entrance
+          ? [entranceQuery.data].filter(Boolean)
+          : cave?.entrances,
+        permissions.isAdmin
+      ),
+    [point?.entrance, entranceQuery.data, cave, permissions.isAdmin]
+  );
   const hasCoordinates =
     Number.isFinite(point?.latitude) && Number.isFinite(point?.longitude);
+  const hasSurfaceLocation = point?.underground === false && hasCoordinates;
+  const isUnderground = point?.underground === true;
+  const location = isUnderground
+    ? undergroundLocation.coordinates
+    : hasSurfaceLocation && point;
+  const positions = useMemo(
+    () => (location ? [{ ...point, ...location }] : []),
+    [point, location]
+  );
+  const hasLocationSource = Boolean(
+    point?.entrance?.id || point?.network?.id || legacyCaveId
+  );
+  const isLocationPending =
+    isUnderground && hasLocationSource && locationQuery.isPending;
+  const hasLocationError =
+    isUnderground &&
+    hasLocationSource &&
+    (locationQuery.error || locationQuery.isPaused);
+  const isLocationProtected = isUnderground && undergroundLocation.isSensitive;
+  const canShowLocation = !isLocationProtected || permissions.isAdmin;
   const hasError = query.error || query.isPaused;
 
   const handleDelete = async () => {
@@ -62,6 +109,51 @@ const Point = () => {
 
   if (isDeleted && !canModerate) {
     return <Deleted entityType={DELETED_ENTITIES.point} entity={point} />;
+  }
+
+  let locationContent = (
+    <Box
+      sx={{
+        flex: 1,
+        display: 'grid',
+        placeItems: 'center',
+        bgcolor: 'secondary.veryLight',
+        borderRadius: 1,
+        p: 2
+      }}>
+      <Typography variant="body2" color="text.secondary">
+        {formatMessage({ id: 'points.noKnownLocation' })}
+      </Typography>
+    </Box>
+  );
+  if (isLocationPending && !hasLocationError) {
+    locationContent = (
+      <Box sx={{ flex: 1, display: 'grid', placeItems: 'center' }}>
+        <CircularProgress aria-label={formatMessage({ id: 'Loading ...' })} />
+      </Box>
+    );
+  } else if (hasLocationError) {
+    locationContent = (
+      <FetchErrorState
+        error={locationQuery.error}
+        isPaused={locationQuery.isPaused}
+        messageId="points.locationFetchError"
+        onRetry={locationQuery.refetch}
+      />
+    );
+  } else if (!canShowLocation) {
+    locationContent = <SensitiveLocationPlaceholder />;
+  } else if (location) {
+    locationContent = (
+      <Box data-testid="point-map" sx={{ flex: 1, display: 'flex' }}>
+        <Map
+          positions={positions}
+          markerIcon={PointMarker}
+          tooltipContent={pointTooltip}
+          style={{ minHeight: 300 }}
+        />
+      </Box>
+    );
   }
 
   // The current Point API exposes documents and SVG positions, but no
@@ -131,28 +223,99 @@ const Point = () => {
                 />
               )}
               <ScrollableContent
-                title={formatMessage({ id: 'Information' })}
                 collapsible={false}
                 content={
                   <>
-                    <Property
-                      label={formatMessage({ id: 'Depth' })}
-                      value={formatMessage({
-                        id: getPointLocationMessageId(point.underground)
-                      })}
-                    />
-                    {point.caveId && (
-                      <Property
-                        label={formatMessage({ id: 'Cave' })}
-                        value={cave?.name ?? String(point.caveId)}
-                        url={`/ui/caves/${point.caveId}`}
-                      />
-                    )}
-                    {point.underground === null && (
-                      <Alert severity="info" sx={{ my: 1 }}>
-                        {formatMessage({ id: 'points.unclassified' })}
-                      </Alert>
-                    )}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: 'stretch',
+                        gap: { xs: 1, sm: 2 }
+                      }}>
+                      <Box
+                        data-testid="point-location"
+                        sx={{
+                          flex: 1,
+                          minWidth: 0,
+                          minHeight: 300,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 1
+                        }}>
+                        {isLocationProtected &&
+                          permissions.isAdmin &&
+                          !isLocationPending &&
+                          !hasLocationError && (
+                            <SensitiveCaveWarning
+                              isLocked={undergroundLocation.isSensitiveLocked}
+                            />
+                          )}
+                        {locationContent}
+                      </Box>
+                      <Box
+                        data-testid="point-properties"
+                        sx={{
+                          flex: 1,
+                          minWidth: 0,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 1
+                        }}>
+                        {hasSurfaceLocation && (
+                          <Paper
+                            variant="outlined"
+                            sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+                            <InfoSection
+                              component="h2"
+                              title={formatMessage({ id: 'Location' })}>
+                              <CoordinatesProperty
+                                latitude={point.latitude}
+                                longitude={point.longitude}
+                              />
+                            </InfoSection>
+                          </Paper>
+                        )}
+                        {(point.underground === true || association) && (
+                          <Paper
+                            variant="outlined"
+                            sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+                            <InfoSection
+                              component="h2"
+                              title={formatMessage({ id: 'Characteristics' })}>
+                              {point.underground === true && (
+                                <Property
+                                  value={formatMessage({
+                                    id: 'points.underground'
+                                  })}
+                                  icon={<CustomIcon type="underground" />}
+                                  secondary
+                                />
+                              )}
+                              {association && (
+                                <Property
+                                  label={formatMessage({
+                                    id:
+                                      association.type === 'entrance'
+                                        ? 'Entrance'
+                                        : 'Network'
+                                  })}
+                                  value={
+                                    association.name ?? String(association.id)
+                                  }
+                                  url={
+                                    association.type === 'entrance'
+                                      ? `/ui/entrances/${association.id}`
+                                      : `/ui/caves/${association.id}`
+                                  }
+                                  icon={<CustomIcon type={association.type} />}
+                                />
+                              )}
+                            </InfoSection>
+                          </Paper>
+                        )}
+                      </Box>
+                    </Box>
                     <ContributionMetadata
                       createdBy={point.author}
                       createdAt={point.dateInscription}
@@ -162,35 +325,6 @@ const Point = () => {
                   </>
                 }
               />
-              {point.underground === false && hasCoordinates && (
-                <ScrollableContent
-                  title={formatMessage({ id: 'Location' })}
-                  collapsible={false}
-                  content={
-                    <>
-                      <Box data-testid="point-map">
-                        <Map
-                          positions={positions}
-                          markerIcon={PointMarker}
-                          tooltipContent={pointTooltip}
-                        />
-                      </Box>
-                      <Property
-                        label={formatMessage({ id: 'Latitude' })}
-                        value={formatNumber(point.latitude, {
-                          maximumFractionDigits: 6
-                        })}
-                      />
-                      <Property
-                        label={formatMessage({ id: 'Longitude' })}
-                        value={formatNumber(point.longitude, {
-                          maximumFractionDigits: 6
-                        })}
-                      />
-                    </>
-                  }
-                />
-              )}
             </SectionStack>
           ),
           documents: point && (

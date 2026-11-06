@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Divider } from '@mui/material';
+import { Alert, Box, Divider } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import { useIntl } from 'react-intl';
 
@@ -8,6 +8,7 @@ import SearchDocumentForm from '@/components/appli/SearchDocumentForm';
 import DocumentsList from '@/components/common/DocumentsList/DocumentsList';
 import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
+import NewEntityButton from '@/components/common/NewEntityButton';
 import {
   useLinkDocumentsToPoint,
   useUnlinkDocumentFromPoint,
@@ -31,21 +32,29 @@ const PointDocuments = ({ pointId, documents, isDeleted }) => {
       collapsible={false}
       icon={
         canAssociate ? (
-          <SectionCreateButton
-            isOpen={isSearchOpen}
-            testId="associate-documents-button"
-            onToggle={() => setSearchOpen(!isSearchOpen)}
-            label={formatMessage({ id: 'Associate' })}
-            tooltip={formatMessage({ id: 'Assign an existing document' })}
-            openTooltip={formatMessage({ id: 'Cancel this search' })}
-            icon={
-              <EntityIcon
-                iconType="bibliography"
-                size={24}
-                BadgeIcon={LinkIcon}
-              />
-            }
-          />
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <SectionCreateButton
+              isOpen={isSearchOpen}
+              testId="associate-documents-button"
+              onToggle={() => setSearchOpen(!isSearchOpen)}
+              label={formatMessage({ id: 'Associate' })}
+              tooltip={formatMessage({ id: 'Assign an existing document' })}
+              openTooltip={formatMessage({ id: 'Cancel this search' })}
+              icon={
+                <EntityIcon
+                  iconType="bibliography"
+                  size={24}
+                  BadgeIcon={LinkIcon}
+                />
+              }
+            />
+            <NewEntityButton
+              to={`/ui/entity/add/document?pointId=${pointId}`}
+              size="small"
+              tooltip={formatMessage({ id: 'Create a new document' })}
+              icon={<EntityIcon iconType="bibliography" size={24} />}
+            />
+          </Box>
         ) : undefined
       }
       content={
@@ -53,7 +62,6 @@ const PointDocuments = ({ pointId, documents, isDeleted }) => {
           {canAssociate && isSearchOpen && (
             <>
               <SearchDocumentForm
-                closeForm={() => setSearchOpen(false)}
                 onSubmit={selected =>
                   linkMutation.mutateAsync({ pointId, documents: selected })
                 }
