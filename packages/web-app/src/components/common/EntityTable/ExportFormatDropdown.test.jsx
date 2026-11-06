@@ -52,6 +52,27 @@ describe('ExportFormatDropdown', () => {
     expect(tooltip).toBeInTheDocument();
   });
 
+  it('explains offline unavailability and blocks an already open menu', () => {
+    const onExport = vi.fn();
+    const { rerender } = renderDropdown({ onExport });
+    fireEvent.click(screen.getByRole('button', { name: /Export/i }));
+
+    rerender(
+      <IntlProvider locale="en" messages={messages}>
+        <ExportFormatDropdown
+          disabled
+          disabledReason="Unavailable offline"
+          onExport={onExport}
+        />
+      </IntlProvider>
+    );
+    expect(screen.getByLabelText('Unavailable offline')).toBeInTheDocument();
+    const csvOption = screen.getByRole('menuitem', { name: 'CSV' });
+    expect(csvOption).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(csvOption);
+    expect(onExport).not.toHaveBeenCalled();
+  });
+
   it('menu closes after selection', () => {
     const onExport = vi.fn();
     renderDropdown({ onExport });

@@ -326,8 +326,10 @@ describe('Document 3D preview', () => {
     cy.contains('a', 'second-scan.GLB').should('be.visible');
     cy.get('[data-testid="model-preview-start"]').first().click();
     cy.wait('@firstModel', { requestTimeout: 30000 });
-    cy.get('[data-testid="model-preview"]', { timeout: 30000 })
-      .first()
+    // The final query owns the assertion timeout; first() otherwise resets
+    // it to 4 seconds, which is too short for the real 3D engine in CI.
+    cy.get('[data-testid="model-preview"]')
+      .first({ timeout: 30000 })
       .should('have.attr', 'data-status', 'ready');
     cy.get('[data-testid="model-preview"]')
       .eq(1)

@@ -17,6 +17,14 @@ export const Disabled = () => (
   <ExportFormatDropdown disabled onExport={action('onExport')} />
 );
 
+export const Offline = () => (
+  <ExportFormatDropdown
+    disabled
+    disabledReason="Unavailable offline"
+    onExport={action('onExport')}
+  />
+);
+
 export const IconOnly = () => (
   <ExportFormatDropdown
     disabled={false}

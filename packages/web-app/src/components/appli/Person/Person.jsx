@@ -27,6 +27,7 @@ import { apiGetWithRange } from '@/api/client';
 import { getConversationsUrl } from '@/conf/apiRoutes';
 import { makeUrl } from '@/actions/utils';
 import { DEFAULT_DELETED_CAVER_ID } from '@/utils/personConstants';
+import { getPersonIconType } from '@/utils/personTypes';
 
 import {
   DeleteConfirmationDialog,
@@ -236,7 +237,7 @@ const Person = ({
             entityType={DELETED_ENTITIES.person}
             entityId={person.id}
             entityName={title}
-            entityIconType="person"
+            entityIconType={getPersonIconType(person.type)}
             isOpen={isDeleteConfirmationOpen}
             isLoading={deleteMutation.isPending}
             error={deleteMutation.error}

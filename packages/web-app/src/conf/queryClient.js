@@ -2,6 +2,7 @@ import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { enqueueSnackbar } from 'notistack';
 
 import { isClientError } from '@/utils/httpErrors';
+import { isNetworkError } from '@/utils/networkError';
 import store from '../store';
 import { postLogout } from '../actions/Login';
 
@@ -80,7 +81,18 @@ const notifyError = (error, meta) => {
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: (error, query) => notifyError(error, query.meta)
+    onError: (error, query) => {
+      // An uncached read is expected to fail offline. Keep mutations and real
+      // HTTP errors visible, including responses received just before disconnecting.
+      if (
+        typeof navigator !== 'undefined' &&
+        navigator.onLine === false &&
+        isNetworkError(error)
+      ) {
+        return;
+      }
+      notifyError(error, query.meta);
+    }
   }),
   mutationCache: new MutationCache({
     onError: (error, _variables, _context, mutation) =>

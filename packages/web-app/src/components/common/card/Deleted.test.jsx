@@ -594,7 +594,8 @@ describe('DeleteConfirmationDialog replacement selection', () => {
   it('uses the document detail title and type for the prefilled card', () => {
     redirectState.data = { id: 43, title: 'Bibliographie', type: 'Book' };
     render(prefilledDialog({ entityType: DELETED_ENTITIES.document }));
-    expect(screen.getByText('[Book] Bibliographie')).toBeVisible();
+    expect(screen.getByText('Bibliographie')).toBeVisible();
+    expect(screen.getByTestId('MenuBookIcon')).toBeVisible();
   });
 
   it.each([

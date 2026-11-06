@@ -38,7 +38,8 @@ const messages = {
   'Next page': 'Next page',
   'Last page': 'Last page',
   page_position: 'Page {page} of {total}',
-  rows_per_page_short: '{count} / page'
+  rows_per_page_short: '{count} / page',
+  offlineActionUnavailable: 'Unavailable offline'
 };
 
 const baseColumns = [
@@ -74,6 +75,35 @@ const paginated = { nbTotalRows: 500, pageSizeOptions: [20, 100] };
 describe('DesktopEntityTable - Pagination', () => {
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  it('blocks remote controls offline while keeping row selection available', () => {
+    const onSelected = vi.fn();
+    const onPageChange = vi.fn();
+    const onSortChange = vi.fn();
+    renderTable({
+      ...paginated,
+      entityType: 'entrances',
+      isOffline: true,
+      onPageChange,
+      onSortChange,
+      onExport: vi.fn(),
+      onSelected
+    });
+    expect(screen.getByLabelText('Go to page')).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
+    expect(screen.getByRole('combobox')).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+    const sort = screen.getByRole('button', { name: 'Name' });
+    expect(sort).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(sort);
+    expect(onSortChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: /Export/i })).toBeDisabled();
+    fireEvent.click(screen.getAllByRole('checkbox').at(-1));
+    expect(onSelected).toHaveBeenCalledWith([1]);
+    expect(onPageChange).not.toHaveBeenCalled();
   });
 
   it('stays usable after submitting the page already displayed', () => {

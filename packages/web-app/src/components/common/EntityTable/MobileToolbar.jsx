@@ -22,6 +22,7 @@ import Translate from '../Translate';
 
 const SortMenu = ({
   sortableColumns,
+  disabled = false,
   order,
   orderBy,
   onSortFieldChange,
@@ -47,6 +48,7 @@ const SortMenu = ({
   return (
     <>
       <Button
+        disabled={disabled}
         variant="outlined"
         size="small"
         startIcon={startIcon}
@@ -70,6 +72,7 @@ const SortMenu = ({
         {sortableColumns.map(col => (
           <MenuItem
             key={col.field}
+            disabled={disabled}
             selected={col.field === orderBy}
             onClick={() => {
               if (col.field === orderBy) {
@@ -94,6 +97,7 @@ const SortMenu = ({
           <>
             <Divider />
             <MenuItem
+              disabled={disabled}
               onClick={() => {
                 onSortFieldChange({ target: { value: '' } });
                 setAnchorEl(null);
@@ -112,6 +116,7 @@ const SortMenu = ({
 
 SortMenu.propTypes = {
   sortableColumns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  disabled: PropTypes.bool,
   order: PropTypes.string.isRequired,
   orderBy: PropTypes.string.isRequired,
   onSortFieldChange: PropTypes.func.isRequired,
@@ -120,6 +125,7 @@ SortMenu.propTypes = {
 
 const MobileToolbar = ({
   sortableColumns,
+  isSortDisabled = false,
   order,
   orderBy,
   onSortFieldChange,
@@ -141,6 +147,7 @@ const MobileToolbar = ({
       sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minHeight: 48 }}>
       {sortableColumns.length > 0 && (
         <SortMenu
+          disabled={isSortDisabled}
           sortableColumns={sortableColumns}
           order={order}
           orderBy={orderBy}
@@ -171,6 +178,7 @@ const MobileToolbar = ({
 };
 
 MobileToolbar.propTypes = {
+  isSortDisabled: PropTypes.bool,
   sortableColumns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   order: PropTypes.string.isRequired,
   orderBy: PropTypes.string.isRequired,
