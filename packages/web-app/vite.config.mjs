@@ -89,6 +89,9 @@ export default defineConfig(({ mode }) => {
         `${apiVersionedPrefix}/geoloc/(entrances|networks|organizations)\\?`
       )
     : null;
+  const pointsMapPattern = apiVersionedPrefix
+    ? new RegExp(`${apiVersionedPrefix}/geoloc/points(Coordinates)?(\\?|$)`)
+    : null;
 
   return {
     plugins: [
@@ -546,6 +549,27 @@ export default defineConfig(({ mode }) => {
                         maxAgeSeconds: 60 * 60 * 24 * 7
                       },
                       cacheableResponse: { statuses: [0, 200] },
+                      matchOptions: { ignoreVary: true }
+                    }
+                  }
+                ]
+              : []),
+            // Points can move or change classification during editing. Read
+            // fresh snapshots and tiles online rather than restoring old markers.
+            ...(pointsMapPattern
+              ? [
+                  {
+                    urlPattern: pointsMapPattern,
+                    handler: 'NetworkFirst',
+                    options: {
+                      cacheName: 'api-map-points',
+                      networkTimeoutSeconds: 3,
+                      expiration: {
+                        maxEntries: 300,
+                        maxAgeSeconds: 60 * 60 * 24 * 7,
+                        purgeOnQuotaError: true
+                      },
+                      cacheableResponse: { statuses: [200] },
                       matchOptions: { ignoreVary: true }
                     }
                   }

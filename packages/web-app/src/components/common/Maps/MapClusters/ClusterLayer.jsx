@@ -29,7 +29,8 @@ const sizeForCount = count => SIZE_BUCKETS.find(b => count < b.max).size;
 const TYPE_OFFSET = {
   network: [14, -10],
   massif: [-14, -10],
-  organization: [0, 14]
+  organization: [0, 14],
+  point: [16, 14]
 };
 
 // Standalone stylesheet — mounted once by the first ClusterLayer via
@@ -49,6 +50,12 @@ export const ClusterGlobalCss = (
         cursor: pointer;
         box-sizing: border-box;
         transition: transform 120ms ease-out, filter 120ms ease-out;
+      }
+      .cluster-bubble[data-type="point"] {
+        background: #7b1fa2;
+        border: ${CSS_MARKER_OUTLINE_WIDTH}px solid ${MAP_MARKER_OUTLINE_COLOR};
+        border-radius: 50% 50% 50% 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
       }
       /* Entrance — circle */
       .cluster-bubble[data-type="entrance"] {

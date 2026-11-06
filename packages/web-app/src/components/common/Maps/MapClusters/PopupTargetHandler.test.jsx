@@ -1,4 +1,4 @@
-import { cleanup, render, waitFor } from '@testing-library/react';
+import { act, cleanup, render, waitFor } from '@testing-library/react';
 import store from '@/store';
 import { fetchLoginSuccess, logout } from '@/actions/Login';
 import PopupTargetHandler from './PopupTargetHandler';
@@ -18,6 +18,8 @@ vi.mock('../common/Markers/Components', () => ({
 const detail = {
   id: 1,
   name: 'Test entity',
+  label: 'Test point',
+  underground: false,
   latitude: 45.5,
   longitude: 6.5,
   entrances: [{ latitude: 45.5, longitude: 6.5 }],
@@ -42,7 +44,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-it.each(['entrance', 'network', 'massif', 'organization'])(
+it.each(['entrance', 'network', 'massif', 'organization', 'point'])(
   'uses the current session for a %s popup without remounting',
   async type => {
     const fetchMock = vi.fn().mockResolvedValue({
@@ -71,6 +73,22 @@ it.each(['entrance', 'network', 'massif', 'organization'])(
         expect(options.signal.aborted).toBe(false);
       });
     }
+  }
+);
+
+it.each([true, null, undefined])(
+  'does not open a point popup with underground=%s',
+  async underground => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ ...detail, underground })
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    await act(async () => {
+      render(<PopupTargetHandler popupTarget={{ type: 'point', id: 1 }} />);
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(map.openPopup).not.toHaveBeenCalled();
   }
 );
 

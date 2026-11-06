@@ -2,8 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 
 import { apiGet } from '@/api/client';
 import { pointKeys } from '@/api/queryKeys';
-import { pointsUrl, pointUrl } from '@/conf/apiRoutes';
+import {
+  pointsUrl,
+  pointUrl,
+  getMapPointsCoordinatesUrl
+} from '@/conf/apiRoutes';
 import { STALE } from '@/conf/queryClient';
+import { selectSurfacePointCoordinates } from '@/utils/points';
 
 const PAGE_SIZE = 100;
 
@@ -35,4 +40,14 @@ export const usePoint = id =>
     queryFn: () => apiGet(pointUrl(id)),
     enabled: id != null && id !== '',
     staleTime: STALE.STANDARD
+  });
+
+export const useSurfacePointCoordinates = ({ enabled }) =>
+  useQuery({
+    queryKey: pointKeys.coordinates(),
+    queryFn: ({ signal }) =>
+      apiGet(`${getMapPointsCoordinatesUrl}?underground=false`, { signal }),
+    select: selectSurfacePointCoordinates,
+    enabled,
+    staleTime: STALE.VOLATILE
   });

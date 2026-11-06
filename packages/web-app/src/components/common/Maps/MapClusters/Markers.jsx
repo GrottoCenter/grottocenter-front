@@ -2,6 +2,12 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { includes, values } from 'ramda';
 import PropTypes from 'prop-types';
 import { getOrganizationIconSource } from '@/utils/organizationIcons';
+import { isSurfaceMapPoint } from '@/utils/points';
+import {
+  PointMarker,
+  shouldReplacePointMarker
+} from '../common/Markers/Components/PointMarker';
+import { PointPopup } from '../common/Markers/Components/PointPopup';
 import { layerTypes } from './DataDisplayControl';
 import useMarkers from '../common/Markers/useMarkers';
 import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
@@ -15,7 +21,7 @@ import {
   NetworkMarker,
   NetworkPopup
 } from '../common/Markers/Components';
-import { entranceIcon, networkIcon } from '../../../../assets/icons';
+import { entranceIcon, networkIcon, pointIcon } from '../../../../assets/icons';
 
 const isEntrances = includes(layerTypes.ENTRANCES);
 const isNetworks = includes(layerTypes.NETWORKS);
@@ -33,12 +39,15 @@ const organizationTip = organization =>
     getOrganizationIconSource(organization?.type),
     organization?.name
   );
+const pointPopup = point => <PointPopup point={point} />;
+const pointTip = point => makeIconTooltip(pointIcon, point.label);
 
 const Markers = ({
   visibleMarkers,
   organizations = [],
   entrances = [],
-  networks = []
+  networks = [],
+  points = []
 }) => {
   const { showHighlight, hideHighlight } = useNetworkHighlight();
   // Keep the highlight visible while a network popup is open (touch devices have
@@ -81,6 +90,20 @@ const Markers = ({
     popupContent: organizationPopup,
     tooltipContent: organizationTip
   });
+  const updatePointMarkers = useMarkers({
+    icon: PointMarker,
+    popupContent: pointPopup,
+    tooltipContent: pointTip,
+    shouldReplaceMarker: shouldReplacePointMarker
+  });
+
+  useEffect(() => {
+    updatePointMarkers(
+      visibleMarkers.includes(layerTypes.POINTS)
+        ? points.filter(isSurfaceMapPoint)
+        : null
+    );
+  }, [points, visibleMarkers, updatePointMarkers]);
 
   useEffect(() => {
     updateEntranceMarkers(isEntrances(visibleMarkers) ? entrances : null);
@@ -111,7 +134,8 @@ Markers.propTypes = {
   visibleMarkers: PropTypes.arrayOf(PropTypes.oneOf(values(layerTypes))),
   organizations: PropTypes.arrayOf(PropTypes.shape({})),
   entrances: PropTypes.arrayOf(PropTypes.shape({})),
-  networks: PropTypes.arrayOf(PropTypes.shape({}))
+  networks: PropTypes.arrayOf(PropTypes.shape({})),
+  points: PropTypes.arrayOf(PropTypes.shape({}))
 };
 MemoizedMarkers.propTypes = Markers.propTypes;
 

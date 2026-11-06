@@ -4,6 +4,7 @@ import { apiPost, apiPatch, apiDelete } from '@/api/client';
 import associateAll from '@/api/associateAll';
 import { documentKeys, pointKeys } from '@/api/queryKeys';
 import { pointsUrl, pointUrl, pointDocumentUrl } from '@/conf/apiRoutes';
+import { invalidateAll } from '@/utils/mapTileCache';
 
 const usePointMutation = mutationFn => {
   const queryClient = useQueryClient();
@@ -11,7 +12,10 @@ const usePointMutation = mutationFn => {
     mutationFn,
     meta: { errorPresentation: 'inline' },
     networkMode: 'always',
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: pointKeys.all })
+    onSuccess: () => {
+      invalidateAll('points', { discardData: true });
+      return queryClient.invalidateQueries({ queryKey: pointKeys.all });
+    }
   });
 };
 

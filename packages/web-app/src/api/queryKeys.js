@@ -68,6 +68,7 @@ export const entranceKeys = {
 export const pointKeys = {
   all: ['point'],
   list: () => [...pointKeys.all, 'list'],
+  coordinates: () => [...pointKeys.all, 'coordinates', { underground: false }],
   detail: detailKey('point')
 };
 

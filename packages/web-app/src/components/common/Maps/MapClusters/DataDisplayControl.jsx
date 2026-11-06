@@ -9,7 +9,8 @@ import {
   entranceIcon,
   networkIcon,
   organizationIcon,
-  massifIcon
+  massifIcon,
+  pointIcon
 } from '../../../../assets/icons';
 import { EXPLORED_PIN_PATH } from './ExploredOverlay';
 import {
@@ -19,20 +20,22 @@ import {
 } from './controlStyles';
 
 // Every dataset the user can toggle on the map. At low zoom each type shows as
-// clusters; at high zoom entrances/networks/organizations switch to real
+// clusters; at high zoom entrances/networks/organizations/points switch to real
 // markers and massifs to polygons — but a single toggle drives both modes.
 export const layerTypes = {
   ENTRANCES: 'entrances',
   NETWORKS: 'networks',
   MASSIFS: 'massifs',
-  ORGANIZATIONS: 'organizations'
+  ORGANIZATIONS: 'organizations',
+  POINTS: 'points'
 };
 
 export const LAYER_TYPES_LIST = [
   layerTypes.ENTRANCES,
   layerTypes.NETWORKS,
   layerTypes.MASSIFS,
-  layerTypes.ORGANIZATIONS
+  layerTypes.ORGANIZATIONS,
+  layerTypes.POINTS
 ];
 
 const ExploredBadgeIcon = () => (
@@ -64,7 +67,8 @@ const MARKER_ICON = {
   [layerTypes.ENTRANCES]: entranceIcon,
   [layerTypes.NETWORKS]: networkIcon,
   [layerTypes.MASSIFS]: massifIcon,
-  [layerTypes.ORGANIZATIONS]: organizationIcon
+  [layerTypes.ORGANIZATIONS]: organizationIcon,
+  [layerTypes.POINTS]: pointIcon
 };
 
 const MarkerIcon = ({ type }) => {
@@ -155,7 +159,9 @@ const DataDisplayControl = ({
                 />
                 <MarkerIcon type={type} />
                 <span style={{ textTransform: 'capitalize' }}>
-                  {formatMessage({ id: type })}
+                  {formatMessage({
+                    id: type === layerTypes.POINTS ? 'Points' : type
+                  })}
                 </span>
               </ControlOptionLabel>
             ))}

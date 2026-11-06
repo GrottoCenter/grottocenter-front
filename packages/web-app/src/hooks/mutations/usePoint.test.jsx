@@ -6,6 +6,7 @@ import { apiPut, apiDelete, apiPatch } from '@/api/client';
 import { documentKeys, pointKeys } from '@/api/queryKeys';
 import { pointDocumentUrl, pointUrl } from '@/conf/apiRoutes';
 import { createTestQueryClient } from '@/test/renderWithProviders';
+import { invalidateAll } from '@/utils/mapTileCache';
 import {
   useLinkDocumentsToPoint,
   useUnlinkDocumentFromPoint,
@@ -19,6 +20,7 @@ vi.mock('@/api/client', () => ({
   apiPatch: vi.fn(),
   apiDelete: vi.fn()
 }));
+vi.mock('@/utils/mapTileCache', () => ({ invalidateAll: vi.fn() }));
 
 let queryClient;
 let invalidate;
@@ -91,6 +93,7 @@ it('soft-deletes without a permanent-delete option and refreshes the catalogue',
   });
   expect(apiDelete).toHaveBeenCalledWith(pointUrl(5));
   expect(invalidate).toHaveBeenCalledWith({ queryKey: pointKeys.all });
+  expect(invalidateAll).toHaveBeenCalledWith('points', { discardData: true });
 });
 
 it('uses a partial update and preserves omitted coordinates', async () => {
@@ -109,4 +112,5 @@ it('uses a partial update and preserves omitted coordinates', async () => {
     underground: true,
     caveId: 7
   });
+  expect(invalidateAll).toHaveBeenCalledWith('points', { discardData: true });
 });

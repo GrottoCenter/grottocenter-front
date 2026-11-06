@@ -1,10 +1,16 @@
 import { act, renderHook } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import L from 'leaflet';
 import useMarkers from './useMarkers';
 import {
   getOrganizationMarker,
   shouldReplaceOrganizationMarker
 } from './Components/OrganizationMarker';
+import {
+  PointMarker,
+  shouldReplacePointMarker
+} from './Components/PointMarker';
+import { PointPopup } from './Components/PointPopup';
 
 const state = vi.hoisted(() => ({ map: null }));
 vi.mock('react-leaflet', () => ({ useMap: () => state.map }));
@@ -104,4 +110,52 @@ it('retains an unchanged organization marker and its open popup', () => {
   act(() => result.current([{ ...record }]));
   expect(markers[0].getPopup()).toBe(popup);
   expect(markers[0].isPopupOpen()).toBe(true);
+});
+
+it('retains repeated point tiles but updates a moved or renamed point and its popup', () => {
+  const point = {
+    id: 6,
+    label: 'Surface station',
+    latitude: 45,
+    longitude: 6,
+    city: 'Original city'
+  };
+  const { result } = renderHook(() =>
+    useMarkers({
+      icon: PointMarker,
+      popupContent: value => (
+        <MemoryRouter>
+          <PointPopup point={value} />
+        </MemoryRouter>
+      ),
+      shouldReplaceMarker: shouldReplacePointMarker
+    })
+  );
+  act(() => result.current([point]));
+  const markers = [];
+  state.map.eachLayer(layer => markers.push(layer));
+  act(() => markers[0].openPopup());
+  const popup = markers[0].getPopup();
+  act(() => result.current([{ ...point }]));
+  expect(markers[0].getPopup()).toBe(popup);
+  expect(markers[0].isPopupOpen()).toBe(true);
+  act(() =>
+    result.current([
+      { ...point, label: 'Moved station', latitude: 46, city: 'New city' }
+    ])
+  );
+  expect(state.map.hasLayer(markers[0])).toBe(false);
+  const updated = [];
+  state.map.eachLayer(layer => {
+    if (layer instanceof L.Marker) updated.push(layer);
+  });
+  expect(updated).toHaveLength(1);
+  expect(updated[0].getLatLng().lat).toBe(46);
+  act(() => updated[0].openPopup());
+  expect(element.querySelector('.leaflet-popup-content')).toHaveTextContent(
+    'Moved station'
+  );
+  expect(element.querySelector('.leaflet-popup-content')).toHaveTextContent(
+    'New city'
+  );
 });

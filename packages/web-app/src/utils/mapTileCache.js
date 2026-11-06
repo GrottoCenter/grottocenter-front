@@ -117,6 +117,7 @@ const fetchTile = (entity, tile, apiZoom) => {
 
   const bounds = tileToBounds(tile.x, tile.y, tile.z);
   const url = makeUrl(s.config.url, {
+    ...s.config.criteria,
     sw_lat: bounds.sw_lat,
     sw_lng: bounds.sw_lng,
     ne_lat: bounds.ne_lat,

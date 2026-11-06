@@ -3,9 +3,13 @@ import { renderHook, waitFor } from '@testing-library/react';
 import PropTypes from 'prop-types';
 
 import { apiGet } from '@/api/client';
-import { pointsUrl, pointUrl } from '@/conf/apiRoutes';
+import {
+  pointsUrl,
+  pointUrl,
+  getMapPointsCoordinatesUrl
+} from '@/conf/apiRoutes';
 import { createTestQueryClient } from '@/test/renderWithProviders';
-import { usePoint, usePoints } from './usePoints';
+import { usePoint, usePoints, useSurfacePointCoordinates } from './usePoints';
 
 vi.mock('@/api/client', () => ({ apiGet: vi.fn() }));
 
@@ -21,6 +25,33 @@ beforeEach(() => {
 });
 
 afterEach(() => queryClient.clear());
+
+it('loads surface coordinates only after enabling the layer and excludes unclassified or invalid locations', async () => {
+  apiGet.mockResolvedValue([
+    [0, 0, false],
+    [6, 45, false],
+    [6, 45, true],
+    [6, 45, null],
+    [6, 45],
+    [181, 45, false],
+    [6, null, false]
+  ]);
+  const { result, rerender } = renderHook(
+    ({ enabled }) => useSurfacePointCoordinates({ enabled }),
+    { wrapper: Wrapper, initialProps: { enabled: false } }
+  );
+  expect(apiGet).not.toHaveBeenCalled();
+  rerender({ enabled: true });
+  await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  expect(apiGet).toHaveBeenCalledWith(
+    `${getMapPointsCoordinatesUrl}?underground=false`,
+    { signal: expect.any(AbortSignal) }
+  );
+  expect(result.current.data).toEqual([
+    [0, 0],
+    [6, 45]
+  ]);
+});
 
 it('loads every API page, including the final partial page, for local search', async () => {
   const first = Array.from({ length: 100 }, (_, index) => ({ id: index + 1 }));

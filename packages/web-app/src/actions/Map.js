@@ -5,6 +5,7 @@ import {
   getMapCavesCoordinatesUrl,
   getMapEntrancesUrl,
   getMapEntrancesCoordinatesUrl,
+  getMapPointsUrl,
   getMapGrottosUrl,
   getMapMassifsUrl,
   getMapMassifsCoordinatesUrl
@@ -26,6 +27,8 @@ import {
   FETCH_MAP_NETWORKS_COORDINATES_FAILURE,
   FETCH_MAP_ENTRANCES_SUCCESS,
   FETCH_MAP_ENTRANCES_FAILURE,
+  FETCH_MAP_POINTS_SUCCESS,
+  FETCH_MAP_POINTS_FAILURE,
   FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
   FETCH_MAP_ENTRANCES_COORDINATES_FAILURE,
   FETCH_MAP_ORGANIZATIONS_SUCCESS,
@@ -197,6 +200,17 @@ registerEntity('entrances', {
 export const fetchEntrances = criteria => dispatch =>
   fetchForBounds('entrances', criteria, criteria.zoom, dispatch);
 
+registerEntity('points', {
+  url: getMapPointsUrl,
+  criteria: { underground: false },
+  successType: FETCH_MAP_POINTS_SUCCESS,
+  failureType: FETCH_MAP_POINTS_FAILURE,
+  label: 'points'
+});
+
+export const fetchPoints = criteria => dispatch =>
+  fetchForBounds('points', criteria, criteria.zoom, dispatch);
+
 registerEntity('organizations', {
   url: getMapGrottosUrl,
   successType: FETCH_MAP_ORGANIZATIONS_SUCCESS,
@@ -213,6 +227,7 @@ export const refetchMapViewport = () => {
   refetchVisibleTiles('entrances');
   refetchVisibleTiles('networks');
   refetchVisibleTiles('organizations');
+  refetchVisibleTiles('points');
 };
 
 // No dedicated /geoloc/organizationsCoordinates endpoint exists, so we hit the
