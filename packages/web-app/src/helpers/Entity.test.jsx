@@ -24,9 +24,10 @@ it.each(['Book', { name: 'Book' }])(
     );
     expect(
       screen.getByRole('option', {
-        name: 'Cave guide 42 A guide to caves · Livre'
+        name: 'Livre Cave guide 42 A guide to caves · Livre'
       })
     ).toBeVisible();
+    expect(screen.getByRole('img', { name: 'Livre' })).toBeVisible();
   }
 );
 

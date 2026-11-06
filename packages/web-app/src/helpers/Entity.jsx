@@ -1,4 +1,5 @@
 import { createElement } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { getOrganizationIconSource } from '@/utils/organizationIcons';
 import {
@@ -128,13 +129,25 @@ export const entityOptionForSelector = (props, option) => {
     'li',
     { ...otherProps, key: key || `${option._type}-${id}` },
     iconSrc && <EntityIcon src={iconSrc} alt="" />,
-    IconComponent && (
-      <EntityIcon
-        as={IconComponent}
-        color="primary"
-        data-testid="document-type-icon"
-      />
-    ),
+    IconComponent &&
+      (typeLabelId ? (
+        <FormattedMessage id={typeLabelId} defaultMessage={typeLabelId}>
+          {([typeLabel]) => (
+            <EntityIcon
+              as={IconComponent}
+              color="primary"
+              titleAccess={typeLabel}
+              data-testid="document-type-icon"
+            />
+          )}
+        </FormattedMessage>
+      ) : (
+        <EntityIcon
+          as={IconComponent}
+          color="primary"
+          data-testid="document-type-icon"
+        />
+      )),
     <EntityContent>
       <EntityTitle title={title}>
         {title} <EntityId>{id}</EntityId>
