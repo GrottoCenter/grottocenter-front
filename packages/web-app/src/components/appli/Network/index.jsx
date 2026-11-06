@@ -2,16 +2,14 @@ import React, { lazy, Suspense, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
-import Skeleton from '@mui/material/Skeleton';
-import { Box, Breadcrumbs, Card, CircularProgress } from '@mui/material';
+import { Box, Breadcrumbs, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { NavigateNext, Download } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
-import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
-import BiotechIcon from '@mui/icons-material/Biotech';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
+import EntityPageTabs from '@/components/common/Layouts/EntityPageTabs';
 import NetworkDefinitionHelp from '@/components/common/NetworkDefinitionHelp';
 import { useUserProperties } from '@/hooks/useUserProperties';
 import AppLink from '../../common/AppLink';
@@ -24,7 +22,6 @@ import {
 } from '../../../hooks';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
-import PageTabs from '../../common/Layouts/PageTabs';
 import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
@@ -36,7 +33,6 @@ import Science from '../Science';
 import { NetworkForm } from '../EntitiesForm';
 import StandardDialog from '../../common/StandardDialog';
 import ContributionMetadata from '../../common/Contribution/ContributionMetadata';
-import FetchErrorState from '../../common/FetchErrorState';
 import EntrancesList from './EntrancesList';
 import Descriptions from '../Descriptions';
 import { CavePropTypes } from '../../../types/cave.type';
@@ -198,18 +194,14 @@ export const Network = ({
 
   const tabs = [
     {
-      id: 'information',
-      label: formatMessage({ id: 'Information' }),
-      icon: <ExploreOutlinedIcon fontSize="small" />
+      id: 'information'
     },
     // FIXME: 'science' tab is admin-only until the Science API is available.
     // Remove the isAdmin filter once the API is integrated.
     ...(isAdmin
       ? [
           {
-            id: 'science',
-            label: formatMessage({ id: 'Science' }),
-            icon: <BiotechIcon fontSize="small" />
+            id: 'science'
           }
         ]
       : [])
@@ -226,32 +218,15 @@ export const Network = ({
           actions={actions}
         />
 
-        <PageTabs tabs={tabs}>
-          {/* Tab 0 — Information */}
-          <div>
-            {isLoading && (
-              <SectionStack>
-                <Card sx={{ p: 2 }}>
-                  <Skeleton height={300} />
-                  <Skeleton height={100} />
-                  <Skeleton height={100} />
-                  <Skeleton height={100} />
-                </Card>
-              </SectionStack>
-            )}
-            {(error || isPaused) && (
-              <SectionStack>
-                <Card sx={{ p: 2 }}>
-                  <FetchErrorState
-                    error={error}
-                    isPaused={isPaused}
-                    onRetry={onRetry}
-                    messageId="Error, the network data you are looking for is not available."
-                  />
-                </Card>
-              </SectionStack>
-            )}
-            {cave && (
+        <EntityPageTabs
+          tabs={tabs}
+          isLoading={isLoading}
+          error={error}
+          isPaused={isPaused}
+          onRetry={onRetry}
+          errorMessageId="Error, the network data you are looking for is not available."
+          panels={{
+            information: cave && (
               <SectionStack>
                 {cave.isDeleted && (
                   <DeletedCard
@@ -354,19 +329,14 @@ export const Network = ({
                   </StandardDialog>
                 )}
               </SectionStack>
-            )}
-          </div>
-          {/* FIXME: Science panel is admin-only until the Science API is available. */}
-          {/* WARNING: this must stay in sync with the 'science' entry in the tabs array above.
-            PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
-            so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
-            silently shift all subsequent tab panels. */}
-          {isAdmin && (
-            <SectionStack>
-              <Science caveId={caveId} />
-            </SectionStack>
-          )}
-        </PageTabs>
+            ),
+            science: cave && (
+              <SectionStack>
+                <Science key={cave.id} caveId={cave.id} networkId={cave.id} />
+              </SectionStack>
+            )
+          }}
+        />
         {hasOpenedPdfExport && cave && (
           <Suspense
             fallback={

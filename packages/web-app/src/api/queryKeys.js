@@ -65,6 +65,25 @@ export const entranceKeys = {
   detail: detailKey('entrance')
 };
 
+export const pointKeys = {
+  all: ['point'],
+  list: () => [...pointKeys.all, 'list'],
+  associated: ({ entranceId, networkId, legacyCaveId, page, size }) => [
+    ...pointKeys.all,
+    'associated',
+    {
+      entranceId: normalizeId(entranceId),
+      networkId: normalizeId(networkId),
+      legacyCaveId: normalizeId(legacyCaveId),
+      page,
+      size
+    }
+  ],
+  coordinates: () => [...pointKeys.all, 'coordinates', { underground: false }],
+  positions: id => [...pointKeys.detail(id), 'positions'],
+  detail: detailKey('point')
+};
+
 export const personKeys = {
   all: ['person'],
   detail: detailKey('person')

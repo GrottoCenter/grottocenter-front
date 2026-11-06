@@ -1,4 +1,86 @@
 describe('Page tabs on narrow screens', () => {
+  [
+    { path: 'entrances', lastTab: 'Comments', label: 'entrance' },
+    { path: 'caves', lastTab: 'Science', label: 'network' },
+    { path: 'points', lastTab: 'Documents', label: 'point' }
+  ].forEach(({ path, lastTab, label }) => {
+    it(`uses the shared tabs and error card for a missing ${label}`, () => {
+      cy.viewport(1280, 900);
+      cy.mockApiCatchAll();
+      cy.loginAs({ groups: ['User', 'Moderator', 'Administrator'] });
+      cy.intercept(
+        { method: 'GET', pathname: `/api/v1/${path}/9999` },
+        { statusCode: 404, body: { message: 'Not found' } }
+      ).as('missingEntity');
+      cy.visit(`/${path}/9999`, {
+        onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+      });
+      cy.wait('@missingEntity');
+      cy.get('[role="tab"][aria-label="Information"]')
+        .find('[data-testid="ExploreOutlinedIcon"]')
+        .should('be.visible');
+      cy.get('[data-testid="entity-page-state"]')
+        .filter(':visible')
+        .find('[data-testid="fetch-error-state"]')
+        .should('be.visible');
+      cy.contains('[role="tab"]', lastTab).click();
+      cy.get('[data-testid="entity-page-state"]')
+        .filter(':visible')
+        .contains('button', 'Retry')
+        .click();
+      cy.wait('@missingEntity');
+      cy.get('@missingEntity.all').should('have.length', 2);
+      cy.get('[data-testid="entity-page-state"]')
+        .filter(':visible')
+        .find('[data-testid="fetch-error-state"]')
+        .should('be.visible');
+    });
+  });
+
+  it('uses the same tabs for a loaded network and keeps the science panel', () => {
+    cy.viewport(1280, 900);
+    cy.mockApiCatchAll();
+    cy.loginAs({ groups: ['User', 'Moderator', 'Administrator'] });
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/caves/11' },
+      {
+        body: {
+          id: 11,
+          name: 'Shared network',
+          language: 'eng',
+          entrances: [
+            { id: 1, name: 'First entrance', latitude: 45, longitude: 5 },
+            {
+              id: 2,
+              name: 'Second entrance',
+              latitude: 45.001,
+              longitude: 5.001
+            }
+          ],
+          massifs: [],
+          descriptions: [],
+          documents: [],
+          exploringOrganizations: []
+        }
+      }
+    ).as('network');
+    cy.visit('/caves/11', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.wait('@network');
+    cy.get('h1').should('contain', 'Shared network');
+    cy.contains('[role="tab"]', 'Science').click();
+    cy.get('[role="tabpanel"]')
+      .filter(':visible')
+      .within(() => {
+        cy.contains('Science data integration in progress.').should(
+          'be.visible'
+        );
+        cy.contains('button', 'New').should('be.visible');
+      });
+    cy.get('[data-testid="entity-page-state"]').should('not.exist');
+  });
+
   it('keeps translated labels and nonzero badges inside the navigation', () => {
     cy.viewport(320, 740);
     cy.mockApiCatchAll();

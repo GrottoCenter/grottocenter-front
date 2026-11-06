@@ -54,7 +54,11 @@ const PublicationDatePicker = React.lazy(
   () => import('./formElements/PublicationDatePicker')
 );
 
-const FormContent = ({ onCancel, isSubmitting = false }) => {
+const FormContent = ({
+  onCancel,
+  isSubmitting = false,
+  linkedPointName = null
+}) => {
   const [isAdditionalInfoExpanded, setIsAdditionalInfoExpanded] =
     useState(false);
   const {
@@ -147,6 +151,14 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
           {formatMessage(
             { id: 'This document will be linked to entrance: {name}' },
             { name: <strong>{linkedEntrance.name}</strong> }
+          )}
+        </Alert>
+      )}
+      {linkedPointName && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          {formatMessage(
+            { id: 'This document will be linked to point: {name}' },
+            { name: <strong>{linkedPointName}</strong> }
           )}
         </Alert>
       )}
@@ -525,5 +537,6 @@ export default FormContent;
 
 FormContent.propTypes = {
   onCancel: PropTypes.func,
-  isSubmitting: PropTypes.bool
+  isSubmitting: PropTypes.bool,
+  linkedPointName: PropTypes.string
 };

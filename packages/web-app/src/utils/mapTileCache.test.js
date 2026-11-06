@@ -67,6 +67,26 @@ describe('mapTileCache', () => {
       text: () => Promise.resolve('')
     });
 
+  it('sends the surface filter on every point tile and retains it when refetching', async () => {
+    registerEntity('points', {
+      ...CONFIG,
+      url: '/api/v1/geoloc/points',
+      criteria: { underground: false }
+    });
+    fetchMock.mockReturnValue(fetchOk([]));
+    fetchForBounds('points', singleTileBounds(100, 100), 13, dispatch);
+    await flushPromises();
+    invalidateAll('points', { discardData: true });
+    await flushPromises();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    fetchMock.mock.calls.forEach(([url]) => {
+      const parsed = new URL(url, 'https://example.org');
+      expect(parsed.pathname).toBe('/api/v1/geoloc/points');
+      expect(parsed.searchParams.get('underground')).toBe('false');
+      expect(parsed.searchParams.has('sw_lat')).toBe(true);
+    });
+  });
+
   describe('computeUnion dedup', () => {
     it('discards old eligibility data and ignores late pre-invalidation responses', async () => {
       registerEntity(ENTITY, CONFIG);

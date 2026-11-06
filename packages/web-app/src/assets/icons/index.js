@@ -29,6 +29,7 @@ export { default as organizationPublisherIcon } from './organization-publisher.s
 export { default as organizationRescueIcon } from './organization-rescue.svg';
 export { default as organizationResearchIcon } from './organization-research.svg';
 export { default as personIcon } from './person.svg';
+export { default as pointIcon } from './point.svg';
 export { default as pollutionIcon } from './pollution.svg';
 export { default as rockfallIcon } from './rockfall.svg';
 export { default as ropeIcon } from './rope.svg';
@@ -38,4 +39,5 @@ export { default as stayOnTrailIcon } from './stay-on-trail.svg';
 export { default as temperatureIcon } from './temperature.svg';
 export { default as timeToGoIcon } from './time-to-go.svg';
 export { default as touristicIcon } from './touristic.svg';
+export { default as undergroundIcon } from './underground.svg';
 export { default as undergroundTimeIcon } from './underground-time.svg';

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import associateAll from '@/api/associateAll';
 import { associateDocumentToEntranceUrl } from '../../conf/apiRoutes';
 import { apiPut, apiDelete } from '../../api/client';
 import { documentKeys, entranceKeys } from '../../api/queryKeys';
@@ -15,26 +16,6 @@ const invalidateEntranceDocuments = (queryClient, entranceId, documentIds) =>
       })
     )
   ]);
-
-const associateAll = async (entities, urlFor) => {
-  // Wait for every request before invalidating. Promise.all would reject on the
-  // first failure while the remaining writes were still running, allowing a
-  // refetch to observe only part of the final server state.
-  const results = await Promise.allSettled(
-    entities.map(entity => apiPut(urlFor(entity)))
-  );
-  const rejections = results
-    .filter(result => result.status === 'rejected')
-    .map(result => result.reason);
-  if (rejections.length > 0) {
-    // Rethrow the first reason so existing notifiers keep working, but expose
-    // the full list so callers/notifiers can count and describe every failure.
-    const error = rejections[0];
-    error.rejections = rejections;
-    throw error;
-  }
-  return results.map(result => result.value);
-};
 
 export const useLinkDocumentToEntrance = () => {
   const queryClient = useQueryClient();

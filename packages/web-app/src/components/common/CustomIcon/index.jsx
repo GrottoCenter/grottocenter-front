@@ -32,6 +32,7 @@ import {
   organizationRescueIcon,
   organizationResearchIcon,
   personIcon,
+  pointIcon,
   pollutionIcon,
   rockfallIcon,
   rulesIcon,
@@ -40,6 +41,7 @@ import {
   temperatureIcon,
   timeToGoIcon,
   touristicIcon,
+  undergroundIcon,
   undergroundTimeIcon
 } from '../../../assets/icons';
 
@@ -99,6 +101,7 @@ const iconSources = {
   organization_rescue: organizationRescueIcon,
   organization_research: organizationResearchIcon,
   person: personIcon,
+  point: pointIcon,
   pollution: pollutionIcon,
   rockfall: rockfallIcon,
   rules: rulesIcon,
@@ -107,6 +110,7 @@ const iconSources = {
   temperature: temperatureIcon,
   time_to_go: timeToGoIcon,
   touristic: touristicIcon,
+  underground: undergroundIcon,
   underground_time: undergroundTimeIcon
 };
 
@@ -142,6 +146,7 @@ const altTexts = {
   organization_rescue: 'Cave rescue',
   organization_research: 'Research organization',
   person: 'Person',
+  point: 'Point',
   pollution: 'Pollution',
   rockfall: 'Rockfall',
   rules: 'Rules',
@@ -150,6 +155,7 @@ const altTexts = {
   temperature: 'Temperature',
   time_to_go: 'Time to go',
   touristic: 'Touristic',
+  underground: 'Underground',
   underground_time: 'Underground time'
 };
 

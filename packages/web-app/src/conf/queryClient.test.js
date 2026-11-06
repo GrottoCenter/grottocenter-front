@@ -77,6 +77,54 @@ describe('global query and mutation error notifications', () => {
     );
   });
 
+  it.each([404, 500])(
+    'shows one contextual query error for HTTP %i',
+    status => {
+      store.getState.mockReturnValue({
+        intl: {
+          locale: 'fr',
+          messages: {
+            fr: { 'points.fetchError': 'Impossible de charger les points.' }
+          }
+        }
+      });
+      queryClient
+        .getQueryCache()
+        .config.onError(
+          { status },
+          { meta: { errorMessageId: 'points.fetchError' } }
+        );
+      expect(enqueueSnackbar).toHaveBeenCalledExactlyOnceWith(
+        'Impossible de charger les points.',
+        { variant: 'error' }
+      );
+    }
+  );
+
+  it.each([401, 429])(
+    'preserves HTTP %i handling when a query provides contextual wording',
+    status => {
+      queryClient
+        .getQueryCache()
+        .config.onError(
+          { status },
+          { meta: { errorMessageId: 'points.fetchError' } }
+        );
+      if (status === 401) {
+        expect(store.dispatch).toHaveBeenCalledExactlyOnceWith({
+          type: 'POST_LOGOUT'
+        });
+        expect(enqueueSnackbar).not.toHaveBeenCalled();
+      } else {
+        expect(enqueueSnackbar).toHaveBeenCalledExactlyOnceWith(
+          'Trop de requêtes',
+          { variant: 'error', preventDuplicate: true }
+        );
+        expect(store.dispatch).not.toHaveBeenCalled();
+      }
+    }
+  );
+
   it('still reports a mutation that fails offline', () => {
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
     queryClient

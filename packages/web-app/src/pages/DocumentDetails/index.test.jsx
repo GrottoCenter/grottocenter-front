@@ -7,7 +7,8 @@ import {
   usePermissions,
   useRestoreDocument,
   useUnlinkDocumentToEntrance,
-  useUnlinkDocumentToMassif
+  useUnlinkDocumentToMassif,
+  useUnlinkDocumentFromPoint
 } from '@/hooks';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
@@ -26,6 +27,7 @@ vi.mock('@/hooks', () => ({
   useLinkDocumentToEntrances: () => ({ mutateAsync: vi.fn() }),
   useUnlinkDocumentToEntrance: vi.fn(),
   useUnlinkDocumentToMassif: vi.fn(),
+  useUnlinkDocumentFromPoint: vi.fn(),
   useSharePage: () => vi.fn(),
   useOnlineStatus: () => true,
   useIsDesktopLayout: () => true,
@@ -75,7 +77,8 @@ const document = {
   authorsOrganization: [],
   massifs: [{ id: 7, name: 'Vercors' }],
   cave: { id: 7, name: 'Survey network' },
-  entrances: [{ id: 7, name: 'Survey entrance' }]
+  entrances: [{ id: 7, name: 'Survey entrance' }],
+  point: { id: 7, label: 'Underground station' }
 };
 
 const renderPage = (hideActions = false, isPreview = false) =>
@@ -109,6 +112,10 @@ beforeEach(() => {
     isPending: false
   });
   useUnlinkDocumentToMassif.mockReturnValue({
+    mutateAsync: vi.fn().mockResolvedValue(undefined),
+    isPending: false
+  });
+  useUnlinkDocumentFromPoint.mockReturnValue({
     mutateAsync: vi.fn().mockResolvedValue(undefined),
     isPending: false
   });
@@ -379,7 +386,65 @@ describe('external PDF fallback', () => {
   );
 });
 
-it('offers unlink actions for massifs and entrances, but not caves', () => {
+it('shows the referenced point beside other linked entities with its own icon and route', () => {
+  useDocument.mockReturnValue({
+    data: { ...document, point: { id: 7, label: 'Underground station' } },
+    isPending: false,
+    refetch: vi.fn()
+  });
+  renderPage();
+  const link = screen.getByRole('link', { name: /Underground station/ });
+  expect(link).toHaveAttribute('href', '/ui/points/7');
+  expect(within(link).getByRole('img', { name: 'Point' })).toBeVisible();
+  expect(screen.getByRole('link', { name: /Survey entrance/ })).toBeVisible();
+  expect(screen.getByRole('link', { name: /Survey network/ })).toBeVisible();
+  expect(
+    screen.getByRole('button', { name: 'unlink Underground station' })
+  ).toBeEnabled();
+});
+
+it.each([false, true])(
+  'shows a point-only linked entity section to readers (hidden actions: %s)',
+  hideActions => {
+    usePermissions.mockReturnValue({ isAuth: false, isModerator: false });
+    useDocument.mockReturnValue({
+      data: {
+        ...document,
+        massifs: [],
+        cave: null,
+        entrances: [],
+        point: { id: 7, label: 'Underground station' }
+      },
+      isPending: false,
+      refetch: vi.fn()
+    });
+    renderPage(hideActions);
+    expect(
+      screen.getByRole('heading', { name: 'Linked entities' })
+    ).toBeVisible();
+    expect(
+      screen.getByRole('link', { name: /Underground station/ })
+    ).toBeVisible();
+  }
+);
+
+it.each([null, undefined])(
+  'does not create an empty linked entity section without a referenced point (%s)',
+  point => {
+    usePermissions.mockReturnValue({ isAuth: false, isModerator: false });
+    useDocument.mockReturnValue({
+      data: { ...document, massifs: [], cave: null, entrances: [], point },
+      isPending: false,
+      refetch: vi.fn()
+    });
+    renderPage();
+    expect(
+      screen.queryByRole('heading', { name: 'Linked entities' })
+    ).not.toBeInTheDocument();
+  }
+);
+
+it('offers unlink actions for massifs, entrances and points, but not caves', () => {
   renderPage();
   expect(
     screen.getByRole('heading', { level: 1, name: /Cave survey$/ })
@@ -396,7 +461,10 @@ it('offers unlink actions for massifs and entrances, but not caves', () => {
   expect(
     screen.getByRole('button', { name: 'unlink Survey entrance' })
   ).toBeEnabled();
-  expect(screen.getAllByRole('button', { name: /^unlink / })).toHaveLength(2);
+  expect(
+    screen.getByRole('button', { name: 'unlink Underground station' })
+  ).toBeEnabled();
+  expect(screen.getAllByRole('button', { name: /^unlink / })).toHaveLength(3);
 });
 
 it('renders the document title as a smaller heading when embedded in the moderation result', () => {
@@ -422,6 +490,12 @@ it.each([
     useUnlinkDocumentToEntrance,
     useUnlinkDocumentToMassif,
     'entranceId'
+  ],
+  [
+    'Underground station',
+    useUnlinkDocumentFromPoint,
+    useUnlinkDocumentToEntrance,
+    'pointId'
   ]
 ])(
   'unlinks %s through its own mutation after confirmation',
@@ -445,6 +519,43 @@ it.each([
       documentId: document.id
     });
     expect(otherMutation).not.toHaveBeenCalled();
+    [
+      useUnlinkDocumentToEntrance,
+      useUnlinkDocumentToMassif,
+      useUnlinkDocumentFromPoint
+    ]
+      .filter(hook => hook !== expectedHook)
+      .forEach(hook => expect(hook().mutateAsync).not.toHaveBeenCalled());
+  }
+);
+
+it('disables unlink actions while a point dissociation is pending', () => {
+  useUnlinkDocumentFromPoint.mockReturnValue({
+    mutateAsync: vi.fn(),
+    isPending: true
+  });
+  renderPage();
+  screen.getAllByRole('button', { name: /^unlink / }).forEach(button => {
+    expect(button).toBeDisabled();
+  });
+});
+
+it.each([
+  ['deleted document', true, false, false],
+  ['hidden actions', false, true, false],
+  ['moderation preview', false, false, true]
+])(
+  'does not offer point dissociation in a %s',
+  (_context, isDeleted, hideActions, isPreview) => {
+    useDocument.mockReturnValue({
+      data: { ...document, isDeleted },
+      isPending: false,
+      refetch: vi.fn()
+    });
+    renderPage(hideActions, isPreview);
+    expect(
+      screen.queryByRole('button', { name: 'unlink Underground station' })
+    ).not.toBeInTheDocument();
   }
 );
 
@@ -588,5 +699,6 @@ it.each([true, false])(
     ).not.toBeInTheDocument();
     expect(useUnlinkDocumentToEntrance().mutateAsync).not.toHaveBeenCalled();
     expect(useUnlinkDocumentToMassif().mutateAsync).not.toHaveBeenCalled();
+    expect(useUnlinkDocumentFromPoint().mutateAsync).not.toHaveBeenCalled();
   }
 );

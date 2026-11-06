@@ -4,22 +4,37 @@ import * as L from 'leaflet';
 import PropTypes from 'prop-types';
 import { apiFetch } from '@/api/client';
 import {
+  pointUrl,
+  getEntranceUrl,
+  getCaveUrl,
+  getMassifUrl,
+  getOrganizationUrl,
+  getStatisticsMassifUrl
+} from '@/conf/apiRoutes';
+import { isSurfaceMapPoint } from '@/utils/points';
+import { PointPopup } from '../common/Markers/Components/PointPopup';
+import {
   EntrancePopup,
   MassifPopup,
   NetworkPopup,
   OrganizationPopup
 } from '../common/Markers/Components';
 import useRenderPopup from '../common/Markers/useRenderPopup';
-import {
-  getEntranceUrl,
-  getCaveUrl,
-  getMassifUrl,
-  getOrganizationUrl,
-  getStatisticsMassifUrl
-} from '../../../../conf/apiRoutes';
 
 const fetchPopupData = async (type, id, signal) => {
   switch (type) {
+    case 'point': {
+      const data = await apiFetch(pointUrl(id), { signal }).then(r => {
+        if (!r.ok) throw new Error(r.status);
+        return r.json();
+      });
+      if (!isSurfaceMapPoint(data)) return null;
+      return {
+        lat: data.latitude,
+        lng: data.longitude,
+        popup: <PointPopup point={data} />
+      };
+    }
     case 'entrance': {
       const data = await apiFetch(`${getEntranceUrl}${id}`, { signal }).then(
         r => {

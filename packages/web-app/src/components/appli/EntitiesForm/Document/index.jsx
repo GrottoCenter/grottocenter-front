@@ -21,10 +21,12 @@ import { styled } from '@mui/material/styles';
 import {
   useEntrance,
   useLinkDocumentToEntrance,
+  usePoint,
+  useLinkDocumentsToPoint,
   usePermissions,
   useCreateDocument,
   useUpdateDocument
-} from '../../../../hooks';
+} from '@/hooks';
 import { documentTypeHelpers } from '../../../../utils/documentTypeHelpers';
 import { displayLoginDialog } from '../../../../actions/Login';
 
@@ -85,6 +87,11 @@ const DocumentSubmission = ({ onCancel, onSuccess }) => {
     : null;
   const { data: linkedEntranceData } = useEntrance(entranceIdParam);
   const linkEntranceMutation = useLinkDocumentToEntrance();
+  const pointIdParam = searchParams.get('pointId')
+    ? parseInt(searchParams.get('pointId'), 10)
+    : null;
+  const { data: linkedPointData } = usePoint(pointIdParam);
+  const linkPointMutation = useLinkDocumentsToPoint();
 
   useEffect(() => {
     if (
@@ -155,15 +162,23 @@ const DocumentSubmission = ({ onCancel, onSuccess }) => {
     setDocSubmittedWithSuccess(true);
     if (
       isNewDocument &&
-      linkedEntrance &&
+      (linkedEntrance || pointIdParam) &&
       createdDocument &&
       !hasLinked.current
     ) {
       hasLinked.current = true;
-      linkEntranceMutation.mutate({
-        entranceId: linkedEntrance.id,
-        document: createdDocument
-      });
+      if (linkedEntrance) {
+        linkEntranceMutation.mutate({
+          entranceId: linkedEntrance.id,
+          document: createdDocument
+        });
+      }
+      if (pointIdParam) {
+        linkPointMutation.mutate({
+          pointId: pointIdParam,
+          documents: [createdDocument]
+        });
+      }
     }
     // In the edit flow the parent (DocumentEdit or DocumentValidation modal)
     // handles success — close the modal or navigate away — so the inline
@@ -176,6 +191,8 @@ const DocumentSubmission = ({ onCancel, onSuccess }) => {
     isNewDocument,
     linkedEntrance,
     linkEntranceMutation,
+    pointIdParam,
+    linkPointMutation,
     onSuccess
   ]);
 
@@ -227,7 +244,15 @@ const DocumentSubmission = ({ onCancel, onSuccess }) => {
           <form
             onSubmit={onFormSubmit}
             style={isSubmitting ? { opacity: '0.6' } : undefined}>
-            <FromContent onCancel={onCancel} isSubmitting={isSubmitting} />
+            <FromContent
+              onCancel={onCancel}
+              isSubmitting={isSubmitting}
+              linkedPointName={
+                isNewDocument && pointIdParam
+                  ? (linkedPointData?.label ?? String(pointIdParam))
+                  : null
+              }
+            />
           </form>
 
           <Dialog

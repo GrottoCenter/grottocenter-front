@@ -50,6 +50,7 @@ const CaveAutoCompleteSearch = ({
       }
       onChange={(_event, newValue) => onSelection(newValue)}
       getOptionLabel={getCaveLabel}
+      getOptionKey={option => String(option.id)}
       renderOption={entityOptionForSelector}
       isOptionEqualToValue={(option, val) =>
         String(option?.id) === String(val?.id)

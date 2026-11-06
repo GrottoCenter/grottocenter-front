@@ -122,7 +122,7 @@ const MenuLinks = ({ toggle, isExpanded = true }) => {
   const { formatMessage } = useIntl();
 
   // Group labels have no icon-only form, so the collapsed rail drops them and
-  // lets the divider between the two lists carry the grouping.
+  // lets the dividers between lists carry the grouping.
   const sectionHeader = labelId =>
     isExpanded ? (
       <SectionHeader disableSticky>
@@ -187,6 +187,16 @@ const MenuLinks = ({ toggle, isExpanded = true }) => {
           icon={<CustomIcon type="person" size={MENU_ICON_SIZE} />}
           label={formatMessage({ id: 'Persons' })}
           href="/ui/persons"
+          onClick={toggle}
+          isExpanded={isExpanded}
+        />
+      </List>
+      <Divider />
+      <List component="nav" subheader={sectionHeader('Analyze')}>
+        <LinkedItem
+          icon={<CustomIcon type="point" size={MENU_ICON_SIZE} />}
+          label={formatMessage({ id: 'Points' })}
+          href="/ui/points"
           onClick={toggle}
           isExpanded={isExpanded}
         />
