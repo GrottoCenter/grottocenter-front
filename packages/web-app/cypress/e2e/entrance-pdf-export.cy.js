@@ -1,4 +1,4 @@
-import { PDFDocument, PDFName } from 'pdf-lib';
+import { PDFDocument, PDFName, decodePDFRawStream } from 'pdf-lib';
 
 const originalUrl = new URL(
   '/__pdf-fixtures/survey.pdf',
@@ -221,7 +221,40 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
         expect(output.getSubject()).to.equal(
           new URL(`/ui${path}`, Cypress.config('baseUrl')).href
         );
-        expect(output.getPageCount()).to.equal(2);
+        cy.fixture('entrance-pdf-survey.pdf', 'base64').then(async encoded => {
+          const survey = await PDFDocument.load(
+            Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
+          );
+          const firstAppendix = output.getPageCount() - survey.getPageCount();
+          expect(firstAppendix, 'dossier body pages').to.be.greaterThan(0);
+          survey.getPages().forEach((page, index) => {
+            const appendix = output.getPage(firstAppendix + index);
+            const forms = appendix.node
+              .Resources()
+              .lookup(PDFName.of('XObject'));
+            const embeddedContents = forms
+              .values()
+              .map(ref =>
+                new TextDecoder().decode(
+                  decodePDFRawStream(output.context.lookup(ref)).decode()
+                )
+              );
+            page.node
+              .Contents()
+              .asArray()
+              .forEach(ref => {
+                const sourceContents = new TextDecoder().decode(
+                  decodePDFRawStream(survey.context.lookup(ref)).decode()
+                );
+                expect(
+                  embeddedContents.some(contents =>
+                    contents.includes(sourceContents)
+                  ),
+                  `survey page ${index + 1} is embedded in its appendix`
+                ).to.equal(true);
+              });
+          });
+        });
       });
       cy.get('@browserPrint').should('not.have.been.called');
     });
