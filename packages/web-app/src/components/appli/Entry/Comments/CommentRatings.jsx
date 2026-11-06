@@ -4,20 +4,9 @@ import { Box, Rating, Typography } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 import {
-  EASE_LEVELS,
-  INTEREST_LEVELS,
+  VISIT_RATING_DEFINITIONS,
   getRatingLevelIds
 } from '@/utils/visitRatingLevels';
-
-const ratingDefinitions = [
-  {
-    key: 'interest',
-    labelId: 'Interest of the visit',
-    levels: INTEREST_LEVELS
-  },
-  { key: 'progression', labelId: 'Ease of move', levels: EASE_LEVELS },
-  { key: 'access', labelId: 'Ease of reach', levels: EASE_LEVELS }
-];
 
 const CommentRatings = ({ interest, progression, access }) => {
   const { formatMessage, formatNumber } = useIntl();
@@ -25,7 +14,7 @@ const CommentRatings = ({ interest, progression, access }) => {
 
   return (
     <>
-      {ratingDefinitions.map(({ key, labelId, levels }) => {
+      {VISIT_RATING_DEFINITIONS.map(({ key, labelId, levels }) => {
         const value = values[key];
         if (value == null || value <= 0) return null;
 

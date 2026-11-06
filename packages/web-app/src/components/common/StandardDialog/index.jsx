@@ -58,6 +58,9 @@ const StandardDialog = ({
   scrollable = false,
   centerContentMobile = false,
   dense = false,
+  dividers = false,
+  showCloseButton = true,
+  stackActionsOnMobile = false,
   maxWidth = 'sm',
   open = false,
   onClose = () => {},
@@ -90,7 +93,7 @@ const StandardDialog = ({
               : undefined
         }
       }}>
-      {onClose && (
+      {onClose && showCloseButton && (
         <CloseButton
           aria-label={formatMessage({ id: 'close' })}
           onClick={onClose}
@@ -119,6 +122,7 @@ const StandardDialog = ({
       </CustomDialogTitle>
       {children && (
         <DialogContent
+          dividers={dividers}
           sx={{
             gridArea: 'content',
             ...(hasHeaderActions && {
@@ -134,9 +138,16 @@ const StandardDialog = ({
       )}
       {actions && (
         <StyledDialogActions
+          disableSpacing={stackActionsOnMobile}
           sx={{
             gridArea: 'actions',
             minWidth: 0,
+            ...(stackActionsOnMobile && {
+              flexDirection: { xs: 'column-reverse', sm: 'row' },
+              alignItems: { xs: 'stretch', sm: 'center' },
+              gap: 1,
+              '& > button': { width: { xs: '100%', sm: 'auto' } }
+            }),
             ...(hasHeaderActions && {
               py: 2,
               pr: 6,
@@ -165,6 +176,9 @@ StandardDialog.propTypes = {
   centerContentMobile: PropTypes.bool,
   children: PropTypes.node,
   dense: PropTypes.bool,
+  dividers: PropTypes.bool,
+  showCloseButton: PropTypes.bool,
+  stackActionsOnMobile: PropTypes.bool,
   fullScreen: PropTypes.bool,
   fullWidth: PropTypes.bool,
   maxWidth: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl']),

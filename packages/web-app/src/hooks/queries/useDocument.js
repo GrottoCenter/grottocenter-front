@@ -1,9 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getDocumentDetailsUrl } from '../../conf/apiRoutes';
-import { apiGet } from '../../api/client';
-import { documentKeys } from '../../api/queryKeys';
-import { STALE } from '../../conf/queryClient';
+import { documentQueryOptions } from '@/api/documentQueryOptions';
 
 /**
  * The full detail payload of a document.
@@ -16,18 +13,6 @@ import { STALE } from '../../conf/queryClient';
  * @param {{ requireUpdate?: boolean }} [options]
  */
 export const useDocument = (documentId, { requireUpdate } = {}) =>
-  useQuery({
-    // Normalize `false` to absent: the queryFn only emits ?requireUpdate=…
-    // when truthy, so `false` and no-opts hit the exact same URL — keying
-    // them separately would double-fetch the same payload and split
-    // invalidations across two cache entries.
-    queryKey: documentKeys.detail(documentId, requireUpdate || undefined),
-    queryFn: () => {
-      const suffix = requireUpdate ? `?requireUpdate=${requireUpdate}` : '';
-      return apiGet(`${getDocumentDetailsUrl}${documentId}${suffix}`);
-    },
-    enabled: Boolean(documentId),
-    staleTime: STALE.STANDARD
-  });
+  useQuery(documentQueryOptions(documentId, { requireUpdate }));
 
 export default useDocument;
