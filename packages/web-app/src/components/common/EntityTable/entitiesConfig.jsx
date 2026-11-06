@@ -14,6 +14,7 @@ import PersonType from '@/components/common/Person/PersonType';
 import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
 import IconLabel from '@/components/common/IconLabel';
 import { isPersonType } from '@/utils/personTypes';
+import { getPointLocationMessageId } from '@/utils/points';
 import AppLink from '../AppLink';
 import Translate from '../Translate';
 import DataQualityBadge from '../DataQualityBadge';
@@ -856,6 +857,34 @@ const duplicate = {
 };
 
 const o = {
+  points: {
+    icon: <CustomIcon type="point" size={16} />,
+    columns: [
+      {
+        visible: true,
+        field: 'label',
+        label: 'Name',
+        sortable: false,
+        isTitle: true
+      },
+      {
+        visible: true,
+        field: 'underground',
+        label: 'Depth',
+        sortable: false,
+        render: value => (
+          <Translate>{getPointLocationMessageId(value)}</Translate>
+        )
+      },
+      {
+        visible: true,
+        field: 'caveId',
+        label: 'Cave',
+        sortable: false
+      }
+    ],
+    link: point => `/ui/points/${point.id}`
+  },
   placeholder,
   persons,
   organizations,

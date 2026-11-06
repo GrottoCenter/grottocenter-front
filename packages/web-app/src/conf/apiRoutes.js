@@ -2,6 +2,12 @@ export const apiVersion = 'v1';
 export const API_URL = import.meta.env.VITE_API_URL;
 const API_BASE_PATH = `${API_URL}/api/${apiVersion}`;
 
+// ===== Points urls
+export const pointsUrl = `${API_BASE_PATH}/points`;
+export const pointUrl = id => `${pointsUrl}/${id}`;
+export const pointDocumentUrl = (pointId, documentId) =>
+  `${pointUrl(pointId)}/documents/${documentId}`;
+
 export const dynamicNumbersUrl = {
   documents: `${API_BASE_PATH}/documents/count`,
   entrances: `${API_BASE_PATH}/entrances/count`,

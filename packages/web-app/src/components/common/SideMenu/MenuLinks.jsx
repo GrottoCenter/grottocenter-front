@@ -163,6 +163,13 @@ const MenuLinks = ({ toggle, isExpanded = true }) => {
           isExpanded={isExpanded}
         />
         <LinkedItem
+          icon={<CustomIcon type="point" size={MENU_ICON_SIZE} />}
+          label={formatMessage({ id: 'Points' })}
+          href="/ui/points"
+          onClick={toggle}
+          isExpanded={isExpanded}
+        />
+        <LinkedItem
           icon={<CustomIcon type="massif" size={MENU_ICON_SIZE} />}
           label={formatMessage({ id: 'Massifs' })}
           href="/ui/massifs"

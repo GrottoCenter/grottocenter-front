@@ -65,6 +65,12 @@ export const entranceKeys = {
   detail: detailKey('entrance')
 };
 
+export const pointKeys = {
+  all: ['point'],
+  list: () => [...pointKeys.all, 'list'],
+  detail: detailKey('point')
+};
+
 export const personKeys = {
   all: ['person'],
   detail: detailKey('person')

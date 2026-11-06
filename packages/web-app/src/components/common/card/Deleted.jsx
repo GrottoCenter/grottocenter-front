@@ -42,6 +42,11 @@ import AutoCompleteSearch from '../AutoCompleteSearch';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 
 export const DELETED_ENTITIES = {
+  point: {
+    iconType: 'point',
+    str: 'Point',
+    url: '/ui/points/'
+  },
   entrance: {
     iconType: 'entrance',
     str: 'Entrance',

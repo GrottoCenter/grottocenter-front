@@ -29,6 +29,7 @@ export { default as organizationPublisherIcon } from './organization-publisher.s
 export { default as organizationRescueIcon } from './organization-rescue.svg';
 export { default as organizationResearchIcon } from './organization-research.svg';
 export { default as personIcon } from './person.svg';
+export { default as pointIcon } from './point.svg';
 export { default as pollutionIcon } from './pollution.svg';
 export { default as rockfallIcon } from './rockfall.svg';
 export { default as ropeIcon } from './rope.svg';

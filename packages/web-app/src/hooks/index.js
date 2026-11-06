@@ -245,6 +245,14 @@ export {
   useRemoveMassifOrganization
 } from './mutations/useOrganizationAssociation';
 export { useNotification } from './useNotification';
+export { usePoints, usePoint } from './queries/usePoints';
+export {
+  useCreatePoint,
+  useUpdatePoint,
+  useDeletePoint,
+  useLinkDocumentsToPoint,
+  useUnlinkDocumentFromPoint
+} from './mutations/usePoint';
 export { usePermissions } from './usePermissions';
 export { useSessionExpiry } from './useSessionExpiry';
 export { useSubscriptions } from './useSubscriptions';

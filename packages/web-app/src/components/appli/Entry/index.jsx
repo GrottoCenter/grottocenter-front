@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
-import Skeleton from '@mui/material/Skeleton';
-import { Box, Breadcrumbs, Card, CircularProgress } from '@mui/material';
+import { Box, Breadcrumbs, CircularProgress } from '@mui/material';
 import { NavigateNext, Download } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -13,16 +12,12 @@ import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ShareIcon from '@mui/icons-material/Share';
-import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
-import BiotechIcon from '@mui/icons-material/Biotech';
-import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
-import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
+import EntityPageTabs from '@/components/common/Layouts/EntityPageTabs';
 import AppLink from '../../common/AppLink';
 
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
-import PageTabs from '../../common/Layouts/PageTabs';
 import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
@@ -49,7 +44,6 @@ import useOpenLink from '../../../hooks/useOpenLink';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
 import SensitiveLocationPlaceholder from './SensitiveLocationPlaceholder';
 import ContributionMetadata from '../../common/Contribution/ContributionMetadata';
-import FetchErrorState from '../../common/FetchErrorState';
 import Map from '../../common/Maps/MapMultipleMarkers';
 import { EntrancePropTypes } from '../../../types/entrance.type';
 import {
@@ -268,14 +262,10 @@ export const Entry = ({
 
   const tabs = [
     {
-      id: 'information',
-      label: formatMessage({ id: 'Information' }),
-      icon: <ExploreOutlinedIcon fontSize="small" />
+      id: 'information'
     },
     {
       id: 'documents',
-      label: formatMessage({ id: 'Documents' }),
-      icon: <PermMediaOutlinedIcon fontSize="small" />,
       count: entrance?.documents?.length,
       disabled: !!entrance && !isAuth && entrance.documents.length === 0
     },
@@ -284,16 +274,12 @@ export const Entry = ({
     ...(isAdmin
       ? [
           {
-            id: 'science',
-            label: formatMessage({ id: 'Science' }),
-            icon: <BiotechIcon fontSize="small" />
+            id: 'science'
           }
         ]
       : []),
     {
       id: 'comments',
-      label: formatMessage({ id: 'Comments' }),
-      icon: <ChatOutlinedIcon fontSize="small" />,
       count: entrance?.comments?.length,
       disabled: !!entrance && !isAuth && entrance.comments.length === 0
     }
@@ -309,33 +295,15 @@ export const Entry = ({
           actions={actions}
         />
 
-        <PageTabs tabs={tabs}>
-          {/* Tab Information */}
-          <div>
-            {isLoading && (
-              <SectionStack>
-                <Card sx={{ p: 2 }}>
-                  <Skeleton height={300} />
-                  <Skeleton height={80} />
-                  <Skeleton height={100} />
-                  <Skeleton height={150} />
-                  <Skeleton height={100} />
-                </Card>
-              </SectionStack>
-            )}
-            {(error || isPaused) && (
-              <SectionStack>
-                <Card sx={{ p: 2 }}>
-                  <FetchErrorState
-                    error={error}
-                    isPaused={isPaused}
-                    onRetry={onRetry}
-                    messageId="Error, the entrance data you are looking for is not available."
-                  />
-                </Card>
-              </SectionStack>
-            )}
-            {entrance && (
+        <EntityPageTabs
+          tabs={tabs}
+          isLoading={isLoading}
+          error={error}
+          isPaused={isPaused}
+          onRetry={onRetry}
+          errorMessageId="Error, the entrance data you are looking for is not available."
+          panels={{
+            information: entrance && (
               <SectionStack>
                 {entrance.isDeleted && (
                   <DeletedCard
@@ -453,21 +421,8 @@ export const Entry = ({
                   isEditAllowed={!entrance.isDeleted}
                 />
               </SectionStack>
-            )}
-          </div>
-          {/* Tab 1 — Documents */}
-          <div>
-            {isLoading && (
-              <SectionStack>
-                <Card sx={{ p: 2 }}>
-                  <Skeleton height={40} width="100%" />
-                  <Skeleton height={60} />
-                  <Skeleton height={60} />
-                  <Skeleton height={60} />
-                </Card>
-              </SectionStack>
-            )}
-            {entrance && (
+            ),
+            documents: entrance && (
               <SectionStack>
                 <Documents
                   documents={entrance.documents}
@@ -475,32 +430,13 @@ export const Entry = ({
                   isEditAllowed={!entrance.isDeleted}
                 />
               </SectionStack>
-            )}
-          </div>
-
-          {/* FIXME: Science panel is admin-only until the Science API is available. */}
-          {/* WARNING: this must stay in sync with the 'science' entry in the tabs array above.
-            PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
-            so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
-            silently shift all subsequent tab panels. */}
-          {isAdmin && entrance?.cave?.id && (
-            <SectionStack>
-              <Science caveId={entrance.cave.id} />
-            </SectionStack>
-          )}
-
-          {/* Tab 3 — Comments */}
-          <div>
-            {isLoading && (
+            ),
+            science: entrance?.cave?.id && (
               <SectionStack>
-                <Card sx={{ p: 2 }}>
-                  <Skeleton height={40} width="100%" />
-                  <Skeleton height={80} />
-                  <Skeleton height={80} />
-                </Card>
+                <Science caveId={entrance.cave.id} />
               </SectionStack>
-            )}
-            {entrance && (
+            ),
+            comments: entrance && (
               <SectionStack>
                 <Comments
                   comments={entrance.comments}
@@ -508,9 +444,9 @@ export const Entry = ({
                   isEditAllowed={!entrance.isDeleted}
                 />
               </SectionStack>
-            )}
-          </div>
-        </PageTabs>
+            )
+          }}
+        />
         {hasOpenedPdfExport && entrance && (
           <Suspense
             fallback={
