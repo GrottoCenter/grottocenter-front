@@ -23,12 +23,34 @@ const readDownloadedPdf = (name, timeout = 60000) => {
           true
         );
       })
-      .then(encoded =>
-        PDFDocument.load(
-          Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-        )
-      )
+      .then(encoded => PDFDocument.load(encoded))
   );
+};
+const decodeStream = (pdf, ref) =>
+  new TextDecoder().decode(
+    decodePDFRawStream(pdf.context.lookup(ref)).decode()
+  );
+const expectFramedAppendix = async (output, encodedSource) => {
+  const source = await PDFDocument.load(encodedSource);
+  const firstAppendix = output.getPageCount() - source.getPageCount();
+  expect(firstAppendix, 'dossier body pages').to.be.greaterThan(0);
+  source.getPages().forEach((page, index) => {
+    const appendix = output.getPage(firstAppendix + index);
+    const forms = appendix.node.Resources().lookup(PDFName.of('XObject'));
+    const embeddedContents = (forms?.values() ?? []).map(ref =>
+      decodeStream(output, ref)
+    );
+    page.node
+      .Contents()
+      .asArray()
+      .forEach(ref => {
+        const sourceContents = decodeStream(source, ref);
+        expect(
+          embeddedContents.some(contents => contents.includes(sourceContents)),
+          `survey page ${index + 1} is embedded in its appendix`
+        ).to.equal(true);
+      });
+  });
 };
 const document = {
   id: 3,
@@ -221,40 +243,9 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
         expect(output.getSubject()).to.equal(
           new URL(`/ui${path}`, Cypress.config('baseUrl')).href
         );
-        cy.fixture('entrance-pdf-survey.pdf', 'base64').then(async encoded => {
-          const survey = await PDFDocument.load(
-            Uint8Array.from(atob(encoded), character => character.charCodeAt(0))
-          );
-          const firstAppendix = output.getPageCount() - survey.getPageCount();
-          expect(firstAppendix, 'dossier body pages').to.be.greaterThan(0);
-          survey.getPages().forEach((page, index) => {
-            const appendix = output.getPage(firstAppendix + index);
-            const forms = appendix.node
-              .Resources()
-              .lookup(PDFName.of('XObject'));
-            const embeddedContents = forms
-              .values()
-              .map(ref =>
-                new TextDecoder().decode(
-                  decodePDFRawStream(output.context.lookup(ref)).decode()
-                )
-              );
-            page.node
-              .Contents()
-              .asArray()
-              .forEach(ref => {
-                const sourceContents = new TextDecoder().decode(
-                  decodePDFRawStream(survey.context.lookup(ref)).decode()
-                );
-                expect(
-                  embeddedContents.some(contents =>
-                    contents.includes(sourceContents)
-                  ),
-                  `survey page ${index + 1} is embedded in its appendix`
-                ).to.equal(true);
-              });
-          });
-        });
+        cy.fixture('entrance-pdf-survey.pdf', 'base64').then(encoded =>
+          expectFramedAppendix(output, encoded)
+        );
       });
       cy.get('@browserPrint').should('not.have.been.called');
     });
