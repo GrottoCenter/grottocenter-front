@@ -12,7 +12,8 @@ const DocumentEdit = ({
   onSuccessfulUpdate,
   onCancel,
   id,
-  requireUpdate = false
+  requireUpdate = false,
+  allowEntityCreation = true
 }) => {
   const { documentId: documentIdFromRoute } = useParams();
   const documentId = documentIdFromRoute || id;
@@ -74,6 +75,7 @@ const DocumentEdit = ({
       title={formatMessage({ id: 'BBS document submission form' })}
       content={
         <DocumentSubmission
+          allowEntityCreation={allowEntityCreation}
           initialValues={
             requireUpdate
               ? prepareDocumentEdit(currentQuery.data, details)
@@ -91,7 +93,8 @@ DocumentEdit.propTypes = {
   onSuccessfulUpdate: PropTypes.func,
   onCancel: PropTypes.func,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  requireUpdate: PropTypes.bool
+  requireUpdate: PropTypes.bool,
+  allowEntityCreation: PropTypes.bool
 };
 
 export default DocumentEdit;

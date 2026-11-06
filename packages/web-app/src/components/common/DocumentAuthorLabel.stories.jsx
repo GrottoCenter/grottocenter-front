@@ -12,6 +12,12 @@ export const Caver = {
 export const Author = {
   args: { author: { nickname: 'Jean Martin', type: 'AUTHOR' } }
 };
+export const SelectedAuthor = {
+  args: {
+    author: { nickname: 'Marie Dupont', type: 'CAVER' },
+    showPersonType: false
+  }
+};
 export const Unknown = {
   args: { author: { nickname: 'Unclassified person' } }
 };

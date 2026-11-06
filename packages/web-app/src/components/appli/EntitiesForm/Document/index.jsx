@@ -281,13 +281,21 @@ DocumentSubmission.propTypes = {
 // Used from:
 // - The Application to add a new document (no initialValues)
 // - DocumentEdit to edit a existing document (with initialValues)
-const HydratedDocumentSubmission = ({ initialValues, onCancel, onSuccess }) => (
-  <DocumentFormProvider initialValues={initialValues}>
+const HydratedDocumentSubmission = ({
+  initialValues,
+  onCancel,
+  onSuccess,
+  allowEntityCreation = true
+}) => (
+  <DocumentFormProvider
+    initialValues={initialValues}
+    allowEntityCreation={allowEntityCreation}>
     <DocumentSubmission onCancel={onCancel} onSuccess={onSuccess} />
   </DocumentFormProvider>
 );
 
 HydratedDocumentSubmission.propTypes = {
+  allowEntityCreation: PropTypes.bool,
   initialValues: defaultDocumentValuesTypes,
   onCancel: PropTypes.func,
   onSuccess: PropTypes.func

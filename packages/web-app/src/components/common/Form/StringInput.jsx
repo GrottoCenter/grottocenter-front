@@ -9,6 +9,7 @@ import {
   Typography
 } from '@mui/material';
 import { isNearLengthLimit } from '@/utils/textLengthLimits';
+import FieldHelperText from './FieldHelperText';
 
 const StringInput = ({
   characterLimit,
@@ -53,14 +54,7 @@ const StringInput = ({
         width: fullWidth ? '100%' : undefined
       }}>
       {helperText && (
-        <Typography
-          id={`${inputId}-help`}
-          variant="caption"
-          sx={{
-            color: 'text.secondary'
-          }}>
-          {helperText}
-        </Typography>
+        <FieldHelperText id={`${inputId}-help`}>{helperText}</FieldHelperText>
       )}
       <FormControl
         variant="filled"

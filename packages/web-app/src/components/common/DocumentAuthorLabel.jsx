@@ -15,7 +15,8 @@ const DocumentAuthorLabel = ({
   author,
   entityType = 'persons',
   size = 18,
-  alignToFirstLine = false
+  alignToFirstLine = false,
+  showPersonType = true
 }) => {
   const { formatMessage } = useIntl();
   const isOrganization = entityType === 'organizations';
@@ -30,12 +31,16 @@ const DocumentAuthorLabel = ({
           <CustomIcon
             type={getPersonIconType(author.type)}
             size={size}
-            alt=""
+            alt={
+              !showPersonType && isPersonType(author.type)
+                ? formatMessage({ id: getPersonTypeLabelId(author.type) })
+                : ''
+            }
           />
         )
       }>
       {name}
-      {!isOrganization && isPersonType(author.type) && (
+      {showPersonType && !isOrganization && isPersonType(author.type) && (
         <Typography
           component="span"
           variant="body2"
@@ -55,7 +60,8 @@ DocumentAuthorLabel.propTypes = {
   }).isRequired,
   entityType: PropTypes.oneOf(['persons', 'organizations']),
   size: PropTypes.number,
-  alignToFirstLine: PropTypes.bool
+  alignToFirstLine: PropTypes.bool,
+  showPersonType: PropTypes.bool
 };
 
 export default DocumentAuthorLabel;

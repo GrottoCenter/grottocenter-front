@@ -460,6 +460,24 @@ describe('Document moderation preview', () => {
 
   it('keeps organization names in the proposed detail, author diff and edit chips', () => {
     const organizations = [{ id: 3714, name: 'Known organization' }];
+    // Issues expose the publisher/library fields in the edit form.
+    cy.intercept('GET', '**/api/v1/documents/types', {
+      body: { documentTypes: [{ id: 3, name: 'Issue' }] }
+    });
+    cy.intercept('GET', '**/api/v1/file-formats', {
+      body: { fileFormats: [{ extension: 'pdf', mimeType: 'application/pdf' }] }
+    });
+    cy.intercept('GET', '**/api/v1/documents/identifierTypes', {
+      body: { identifierTypes: [] }
+    });
+    cy.intercept('GET', '**/api/v1/documents/subjects', {
+      body: { subjects: [] }
+    });
+    cy.intercept('POST', '**/api/v1/search', request => {
+      if (request.body.query === 'Unlisted editor')
+        request.alias = 'moderationOrganizationSearch';
+      request.reply({ body: { results: [] } });
+    });
     cy.intercept(
       { method: 'GET', pathname: '/api/v1/documents/7' },
       request => {
@@ -467,6 +485,8 @@ describe('Document moderation preview', () => {
           request.query.requireUpdate === 'true'
             ? {
                 ...proposal,
+                type: 'Issue',
+                description: 'Proposed description',
                 authorsOrganization: [
                   { id: 3714, name: null },
                   { id: 4000, name: 'New organization' }
@@ -476,6 +496,7 @@ describe('Document moderation preview', () => {
               }
             : {
                 ...current,
+                type: 'Issue',
                 authorsOrganization: organizations,
                 editor: { id: 3715, name: 'Known editor' },
                 library: { id: 3716, name: 'Known library' }
@@ -493,11 +514,28 @@ describe('Document moderation preview', () => {
       .and('contain.text', 'New organization');
     cy.get('[data-testid="preview-edit"]').click();
     cy.contains('[role="dialog"]', 'Edit document').within(() => {
+      cy.contains('button', /^Create/).should('not.exist');
       cy.contains('Known organization').scrollIntoView();
       cy.contains('Known organization').should('be.visible');
       cy.contains('New organization').scrollIntoView();
       cy.contains('New organization').should('be.visible');
     });
+    cy.get('[data-testid="document-authors"] input').click();
+    cy.get('[data-testid="create-author-search-button"]').should('not.exist');
+    cy.get('[data-testid="create-author-organization-search-button"]').should(
+      'not.exist'
+    );
+    cy.get('[data-testid="document-authors"] input').type('{esc}');
+    cy.get('[data-testid="document-advanced-metadata"]')
+      .contains('button', 'Advanced metadata')
+      .click({ scrollBehavior: 'center' });
+    cy.get('[data-testid="document-editor"] input[role="combobox"]').clear();
+    cy.get('[data-testid="document-editor"] input[role="combobox"]').type(
+      'Unlisted editor'
+    );
+    cy.wait('@moderationOrganizationSearch');
+    cy.contains('No results').should('be.visible');
+    cy.get('[data-testid="create-editor-search-button"]').should('not.exist');
   });
 
   it('shows changes to subjects, geographic coverage, additional languages and comments', () => {

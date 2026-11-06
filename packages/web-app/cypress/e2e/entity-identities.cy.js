@@ -179,9 +179,24 @@ describe('Entity family identities and useful author types', () => {
     cy.wait('@document');
     cy.get('[data-testid="document-authors"]')
       .should('contain.text', 'Known caver')
-      .and('contain.text', '(Caver)')
-      .and('contain.text', '(Author)')
+      .and('contain.text', 'Known author')
+      .and('not.contain.text', '(Caver)')
+      .and('not.contain.text', '(Author)')
       .and('not.contain.text', '(unknown)');
+    const assertExistingAuthorIcons = () => {
+      people.forEach(({ id, type }) => {
+        assertIcon(
+          `[data-testid="document-author-persons-${id}"]`,
+          { CAVER: 'caver', AUTHOR: 'author' }[type] ?? 'person'
+        );
+        cy.get(`[data-testid="document-author-persons-${id}"] img`).should(
+          'have.attr',
+          'alt',
+          { CAVER: 'Caver', AUTHOR: 'Author' }[type] ?? ''
+        );
+      });
+    };
+    assertExistingAuthorIcons();
     cy.get('[data-testid="document-authors"] input[role="combobox"]').type(
       'new'
     );
@@ -193,7 +208,14 @@ describe('Entity family identities and useful author types', () => {
     cy.get('[role="listbox"]').contains('New author').click();
     cy.get('[data-testid="document-authors"]')
       .should('contain.text', 'New author')
-      .and('contain.text', '(Author)');
+      .and('not.contain.text', '(Author)');
+    assertExistingAuthorIcons();
+    assertIcon('[data-testid="document-author-persons-5"]', 'author');
+    cy.get('[data-testid="document-author-persons-5"] img').should(
+      'have.attr',
+      'alt',
+      'Author'
+    );
     assertNoPersonRequests();
     cy.screenshot('selected-document-author-types', { capture: 'viewport' });
   });

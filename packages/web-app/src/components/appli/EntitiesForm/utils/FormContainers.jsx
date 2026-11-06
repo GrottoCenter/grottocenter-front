@@ -88,6 +88,7 @@ export const FormActionRow = ({
   isNew,
   isSubmitting,
   disabled = false,
+  isCancelDisabled = false,
   onCancel,
   submitLabel,
   submitTestId
@@ -104,6 +105,7 @@ export const FormActionRow = ({
     <MuiButton
       key="cancel"
       variant="outlined"
+      disabled={isCancelDisabled}
       onClick={onCancel}
       sx={{ width: { xs: '100%', sm: 'auto' } }}>
       {formatMessage({ id: 'Cancel' })}
@@ -147,6 +149,7 @@ FormActionRow.propTypes = {
   isNew: PropTypes.bool,
   isSubmitting: PropTypes.bool.isRequired,
   disabled: PropTypes.bool,
+  isCancelDisabled: PropTypes.bool,
   onCancel: PropTypes.func,
   submitLabel: PropTypes.string,
   submitTestId: PropTypes.string

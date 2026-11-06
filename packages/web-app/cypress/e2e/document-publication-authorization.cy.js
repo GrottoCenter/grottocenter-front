@@ -48,6 +48,14 @@ const expectMultipartValue = (body, field, value) => {
   expect(body).to.include(`name="${field}"\r\n\r\n${value}\r\n`);
 };
 
+const mockParentSearch = () =>
+  cy.intercept('POST', '**/api/v1/search', request => {
+    if (request.body.query === 'Test coll') request.alias = 'parentSearch';
+    request.reply({
+      body: { results: [{ ...collection, _type: 'documents' }] }
+    });
+  });
+
 describe('Editing a document with publication authorization', () => {
   beforeEach(() => {
     cy.viewport(1280, 1000);
@@ -64,10 +72,10 @@ describe('Editing a document with publication authorization', () => {
     cy.intercept('GET', '**/api/v1/documents?*', {
       body: { documents: [permission] }
     });
-    cy.intercept('GET', '**/api/v1/languages?*', {
+    cy.intercept('GET', '**/api/v1/languages*', {
       body: { languages: [{ id: 'eng', part1: 'en', refName: 'English' }] }
     });
-    cy.intercept('GET', '**/api/v1/documents/types', {
+    cy.intercept('GET', '**/api/v1/documents/types*', {
       body: { documentTypes: [{ id: 3, name: 'Issue' }] }
     });
     cy.intercept('GET', '**/api/v1/file-formats', {
@@ -75,6 +83,9 @@ describe('Editing a document with publication authorization', () => {
     }).as('formats');
     cy.intercept('GET', '**/api/v1/documents/subjects', {
       body: { subjects: [] }
+    });
+    cy.intercept('GET', '**/api/v1/documents/identifierTypes', {
+      body: { identifierTypes: [] }
     });
     cy.intercept('PUT', '**/api/v1/documents/42', { body: document }).as(
       'save'
@@ -109,15 +120,14 @@ describe('Editing a document with publication authorization', () => {
 
   it('keeps publication inheritance working when selecting the parent', () => {
     cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
-    cy.intercept('POST', '**/api/v1/search', {
-      body: { results: [{ ...collection, _type: 'documents' }] }
-    }).as('search');
+    mockParentSearch();
     cy.visit('/documents/42/edit', {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
     cy.wait('@formats');
-    cy.get('[data-testid="document-parent-search"]').type('Test collection');
-    cy.wait('@search');
+    cy.get('[data-testid="document-parent-search"]').clear();
+    cy.get('[data-testid="document-parent-search"]').type('Test coll');
+    cy.wait('@parentSearch');
     cy.contains('[role="option"]', 'Test collection').click();
     cy.wait('@parent');
     addFile();
@@ -131,20 +141,143 @@ describe('Editing a document with publication authorization', () => {
     });
   });
 
+  [
+    [1280, 720, 'desktop'],
+    [390, 667, 'mobile']
+  ].forEach(([width, height, viewport]) => {
+    ['Article', 'Issue'].forEach(type => {
+      it(`uses a compact ${type} parent selector with type icons on ${viewport}`, () => {
+        cy.viewport(width, height);
+        cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
+        const parentType = type === 'Article' ? 'Issue' : 'Collection';
+        const icon = '[data-testid="document-type-icon"]';
+        const parent = {
+          ...collection,
+          id: 44,
+          type: parentType,
+          title: `Test parent ${parentType}`,
+          mainLanguage: 'eng',
+          editor: { id: 50, name: 'Inherited publisher' },
+          library: { id: 51, name: 'Inherited library' }
+        };
+        cy.intercept('GET', '**/api/v1/documents/42', {
+          body: { ...document, type, parent: null, authorizationDocument: null }
+        });
+        cy.intercept('GET', '**/api/v1/documents/44', { body: parent }).as(
+          'newParent'
+        );
+        cy.intercept('POST', '**/api/v1/search', request => {
+          expect(request.body.filter).to.deep.equal({ type: parentType });
+          request.reply({
+            body: {
+              results: [
+                { ...parent, _type: 'documents' },
+                {
+                  ...parent,
+                  id: '42',
+                  title: 'Self parent must be excluded',
+                  _type: 'documents'
+                }
+              ]
+            }
+          });
+        }).as('parentSearch');
+        cy.visit('/documents/42/edit', {
+          onBeforeLoad: win =>
+            win.localStorage.setItem('selectedLanguage', 'en')
+        });
+        cy.get('[data-testid="document-parent"]', { timeout: 30000 })
+          .find('input')
+          .should('have.length', 1);
+        cy.get('[data-testid="document-parent-search"]').type('Test parent');
+        cy.wait('@parentSearch');
+        cy.contains('[role="option"]', parent.title).as('parentOption');
+        cy.get('@parentOption').should('not.contain.text', `[${parentType}]`);
+        cy.get('@parentOption')
+          .find(icon)
+          .should($icon => {
+            expect($icon[0].getBoundingClientRect().width).to.be.closeTo(30, 1);
+          })
+          .find('path')
+          .invoke('attr', 'd')
+          .as('parentIconPath', { type: 'static' });
+        cy.contains('[role="option"]', 'Self parent must be excluded').should(
+          'not.exist'
+        );
+        cy.get('@parentOption').click();
+        cy.wait('@newParent');
+        cy.get('[data-testid="document-parent-search"]').should(
+          'have.value',
+          parent.title
+        );
+        cy.get('@parentIconPath').then(path => {
+          cy.get('[data-testid="document-parent"]')
+            .find(`${icon} path`)
+            .should('have.attr', 'd', path);
+        });
+        cy.get('[data-testid="document-advanced-metadata"]')
+          .contains('button', 'Advanced metadata')
+          .click({ scrollBehavior: 'center' });
+        cy.get('[data-testid="document-editor"] input[role="combobox"]').should(
+          'have.value',
+          'Inherited publisher'
+        );
+        cy.get(
+          '[data-testid="document-library"] input[role="combobox"]'
+        ).should('have.value', 'Inherited library');
+        cy.get('[data-testid="document-editor"] input[role="combobox"]').then(
+          $editor => {
+            const editorHeight =
+              $editor[0].parentElement.getBoundingClientRect().height;
+            cy.get('[data-testid="document-parent-search"]').should($input => {
+              const root = $input[0].parentElement;
+              const input = $input[0].getBoundingClientRect();
+              const selectedIcon = root
+                .querySelector('svg')
+                .getBoundingClientRect();
+              expect(root.getBoundingClientRect().height).to.be.closeTo(
+                editorHeight,
+                1
+              );
+              expect(selectedIcon.top + selectedIcon.height / 2).to.be.closeTo(
+                input.top + input.height / 2,
+                1
+              );
+            });
+          }
+        );
+        cy.get('[data-testid="document-parent"]').scrollIntoView();
+        cy.get('[data-testid="document-parent"]').screenshot(
+          `compact-parent-${type}-${viewport}`
+        );
+        cy.get('[data-testid="document-parent-search"]').focus();
+        cy.get(
+          '[data-testid="document-parent"] button[aria-label="Clear"]'
+        ).click();
+        cy.get('[data-testid="document-parent-search"]').should(
+          'have.value',
+          ''
+        );
+        cy.get('[data-testid="document-parent"]')
+          .find(icon)
+          .should('not.exist');
+      });
+    });
+  });
+
   it('allows correcting an unknown license inherited when selecting a parent', () => {
     cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
     cy.intercept('GET', '**/api/v1/documents/41', {
       body: { ...collection, license: 'Historical license' }
     }).as('unknownParent');
-    cy.intercept('POST', '**/api/v1/search', {
-      body: { results: [{ ...collection, _type: 'documents' }] }
-    }).as('search');
+    mockParentSearch();
     cy.visit('/documents/42/edit', {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
     cy.wait('@formats');
-    cy.get('[data-testid="document-parent-search"]').type('Test collection');
-    cy.wait('@search');
+    cy.get('[data-testid="document-parent-search"]').clear();
+    cy.get('[data-testid="document-parent-search"]').type('Test coll');
+    cy.wait('@parentSearch');
     cy.contains('[role="option"]', 'Test collection').click();
     cy.wait('@unknownParent');
     addFile();

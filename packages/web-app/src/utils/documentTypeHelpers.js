@@ -69,6 +69,9 @@ export const DOCUMENT_TYPE_ICONS = {
 
 export const DOCUMENT_TYPE_FALLBACK_ICON = InsertDriveFileIcon;
 
+export const getDocumentTypeIcon = type =>
+  DOCUMENT_TYPE_ICONS[type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
+
 export const hasSameDocumentId = (firstId, secondId) =>
   firstId != null && secondId != null && String(firstId) === String(secondId);
 

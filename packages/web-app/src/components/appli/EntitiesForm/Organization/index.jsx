@@ -11,22 +11,8 @@ import FormSubmissionError from '@/components/common/FormSubmissionError';
 import OrganizationFields from './OrganizationFields';
 import LicenseBox from '../utils/LicenseBox';
 import { makeOrganizationData } from './transformers';
+import { defaultOrganizationValues } from './formValues';
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
-
-const defaultOrganizationValues = {
-  name: '',
-  type: '',
-  customMessage: '',
-  language: '',
-  address: '',
-  zipCode: '',
-  city: '',
-  country: 'FR',
-  mail: '',
-  url: '',
-  latitude: '',
-  longitude: ''
-};
 
 export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
   const isNewOrganization = !organizationValues;
@@ -52,6 +38,7 @@ export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
     defaultValues: {
       organization: {
         ...defaultOrganizationValues,
+        country: 'FR',
         language: AVAILABLE_LANGUAGES[locale].id,
         ...organizationValues,
         type: organizationValues?.type ?? ''

@@ -8,17 +8,21 @@ import {
   postPersonGroupsUrl
 } from '../../conf/apiRoutes';
 import { apiPost, apiPut, apiDelete } from '../../api/client';
-import { listKeys, personKeys } from '../../api/queryKeys';
+import { listKeys, personKeys, quicksearchKeys } from '../../api/queryKeys';
 
 const invalidatePersons = queryClient =>
   queryClient.invalidateQueries({ queryKey: personKeys.all });
 
-export const useCreatePerson = () => {
+export const useCreatePerson = ({ errorPresentation } = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { errorPresentation },
     mutationFn: ({ name, surname }) =>
       apiPost(postPersonUrl, { name, surname }),
-    onSuccess: () => invalidatePersons(queryClient)
+    onSuccess: () => {
+      invalidatePersons(queryClient);
+      queryClient.invalidateQueries({ queryKey: quicksearchKeys.all });
+    }
   });
 };
 

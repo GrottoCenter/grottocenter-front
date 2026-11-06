@@ -1,21 +1,5 @@
 import PropTypes from 'prop-types';
 
-export const FormAutoCompleteTypes = {
-  autoCompleteSearch: PropTypes.node,
-  children: PropTypes.node,
-  getValueName: PropTypes.func.isRequired,
-  hasError: PropTypes.bool.isRequired,
-  helperContent: PropTypes.node,
-  isSideActionOpen: PropTypes.bool,
-  label: PropTypes.string.isRequired,
-  onSideAction: PropTypes.func,
-  required: PropTypes.bool.isRequired,
-  resultEndAdornment: PropTypes.node,
-  sideActionDisabled: PropTypes.bool,
-  sideActionIcon: PropTypes.node,
-  value: PropTypes.any
-};
-
 export const MultipleSelectTypes = {
   children: PropTypes.node,
   computeHasError: PropTypes.func.isRequired,

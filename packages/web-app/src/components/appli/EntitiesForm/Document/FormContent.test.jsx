@@ -16,14 +16,14 @@ vi.mock('@/hooks', () => ({
 
 vi.mock('./formElements/DocumentTypeSelect', () => ({ default: () => null }));
 vi.mock('@/components/common/LanguageSelect', () => ({ default: () => null }));
-vi.mock('./formElements/DocumentAutoComplete', () => ({ default: () => null }));
+vi.mock('./formElements/ParentDocumentSelect', () => ({ default: () => null }));
 vi.mock('./formElements/MultipleISORegionsSelect', () => ({
   default: () => null
 }));
 vi.mock('./formElements/MultipleSubjectsSelect', () => ({
   default: () => null
 }));
-vi.mock('./formElements/OrganizationAutoComplete', () => ({
+vi.mock('@/components/appli/OrganizationSelect', () => ({
   default: () => null
 }));
 vi.mock('./formElements/AuthorsSection', () => ({ default: () => null }));

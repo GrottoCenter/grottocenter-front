@@ -23,7 +23,6 @@ import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import SectionCreateButton from '../../common/SectionCreateButton';
 import StandardDialog from '../../common/StandardDialog';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
-import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 
 // Both set/remove hooks are read for a given entity type; the effective pair
 // is chosen at call time so the same component covers country/region/massif.
@@ -41,9 +40,7 @@ const useAssociationMutations = (entityType, parentEntityId, entityId) => {
       removeMutation: removeCountry,
       makeSetArgs: orgData => ({
         countryId: entityId,
-        organizationId: orgData.id,
-        organizationName: orgData.name,
-        organizationType: orgData.type
+        organizationId: orgData.id
       }),
       makeRemoveArgs: orgId => ({
         countryId: entityId,
@@ -58,9 +55,7 @@ const useAssociationMutations = (entityType, parentEntityId, entityId) => {
       makeSetArgs: orgData => ({
         countryId: parentEntityId,
         regionId: entityId,
-        organizationId: orgData.id,
-        organizationName: orgData.name,
-        organizationType: orgData.type
+        organizationId: orgData.id
       }),
       makeRemoveArgs: orgId => ({
         countryId: parentEntityId,
@@ -74,9 +69,7 @@ const useAssociationMutations = (entityType, parentEntityId, entityId) => {
     removeMutation: removeMassif,
     makeSetArgs: orgData => ({
       massifId: entityId,
-      organizationId: orgData.id,
-      organizationName: orgData.name,
-      organizationType: orgData.type
+      organizationId: orgData.id
     }),
     makeRemoveArgs: orgId => ({
       massifId: entityId,
@@ -105,20 +98,7 @@ const AssociationSection = ({
   const [orgToRemove, setOrgToRemove] = useState(null);
 
   const isPending = setMutation.isPending || removeMutation.isPending;
-  // The AssociationForm expects the legacy REDUCER_STATUS enum. Bridging here
-  // (rather than reshaping the form) keeps the change local.
-  const status = (() => {
-    if (setMutation.isPending) return REDUCER_STATUS.LOADING;
-    if (setMutation.isError) return REDUCER_STATUS.FAILED;
-    if (setMutation.isSuccess) return REDUCER_STATUS.SUCCEEDED;
-    return undefined;
-  })();
-  const error = setMutation.error ?? removeMutation.error;
-
-  const handleSet = orgData => {
-    // AssociationForm renders the structured error beside the preserved fields.
-    setMutation.mutate(makeSetArgs(orgData));
-  };
+  const handleSet = orgData => setMutation.mutateAsync(makeSetArgs(orgData));
 
   const handleRemove = () => {
     if (!orgToRemove) return;
@@ -138,8 +118,12 @@ const AssociationSection = ({
   const associateButton = canManageAssociations && (
     <SectionCreateButton
       isOpen={isFormOpen}
-      onToggle={() => setIsFormOpen(o => !o)}
+      onToggle={() => {
+        if (!isFormOpen) setMutation.reset();
+        setIsFormOpen(o => !o);
+      }}
       label={formatMessage({ id: 'Associate' })}
+      testId="toggle-organization-association"
       icon={
         <EntityIcon iconType="organization" size={20} BadgeIcon={LinkIcon} />
       }
@@ -170,8 +154,9 @@ const AssociationSection = ({
               <AssociationForm
                 onClose={() => setIsFormOpen(false)}
                 onSubmit={handleSet}
-                status={status}
-                error={error}
+                isPending={setMutation.isPending}
+                error={setMutation.error}
+                onResetError={setMutation.reset}
               />
             )}
 

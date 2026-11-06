@@ -1,43 +1,18 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  Autocomplete,
-  Box,
-  Chip,
-  CircularProgress,
-  Collapse,
-  IconButton,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Box, Chip } from '@mui/material';
 import { useIntl } from 'react-intl';
-import AddCircle from '@mui/icons-material/AddCircle';
-import Cancel from '@mui/icons-material/Cancel';
-import CustomIcon from '@/components/common/CustomIcon';
+import FieldHelperText from '@/components/common/Form/FieldHelperText';
+import RelatedEntityDialog from '@/components/appli/EntitiesForm/RelatedEntityDialog';
+import CreatableAutocomplete from '@/components/common/AutoCompleteSearch/CreatableAutocomplete';
+import EntityAutocompleteInput from '@/components/common/AutoCompleteSearch/EntityAutocompleteInput';
 import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
 import { entityOptionForSelector } from '@/helpers/Entity';
 import { useEntitySearch, useUserProperties } from '@/hooks';
+import { useRestoreFieldFocus } from '@/hooks/useRestoreFieldFocus';
+import { AUTOCOMPLETE_MIN_CHARACTERS } from '@/conf/config';
 import { DocumentFormContext } from '@/components/appli/EntitiesForm/Document/Provider';
-import CreateCaverPanel from '@/components/common/AuthorsSelect/CreateCaverPanel';
-import CreateNewOrganization from '../OrganizationAutoComplete/CreateNewOrganization';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../AddFileForm/FileHelpers';
 
-const Wrapper = styled('div')`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const InputWrapper = styled('div')`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-`;
-
-const MIN_SEARCH_LENGTH = 3;
 const MIXED_ENTITIES = ['persons', 'organizations'];
 
 const getOptionLabel = option =>
@@ -50,7 +25,8 @@ const AuthorsSection = () => {
   const {
     document: doc,
     isNewDocument,
-    updateAttribute
+    updateAttribute,
+    allowEntityCreation = true
   } = useContext(DocumentFormContext);
   const currentUser = useUserProperties();
   const hasPrefilledRef = useRef(false);
@@ -85,16 +61,19 @@ const AuthorsSection = () => {
     [doc.authors, doc.authorsOrganization]
   );
 
-  const { inputValue, setInputValue, results, isLoading, hasError } =
-    useEntitySearch(MIXED_ENTITIES, { minChars: MIN_SEARCH_LENGTH });
+  const {
+    inputValue,
+    setInputValue,
+    results,
+    isLoading,
+    hasError,
+    hasSearched
+  } = useEntitySearch(MIXED_ENTITIES);
 
-  const [isCreateOpen, setCreateOpen] = useState(false);
-  const [createMode, setCreateMode] = useState('person');
-  const [sideActionEnabled, setSideActionEnabled] = useState(false);
-
-  useEffect(() => {
-    if (isLoading) setSideActionEnabled(true);
-  }, [isLoading]);
+  const [creation, setCreation] = useState(null);
+  const inputRef = useRef(null);
+  const wrapperRef = useRef(null);
+  useRestoreFieldFocus(creation !== null, inputRef, wrapperRef);
 
   const applyValue = newValue => {
     updateAttribute(
@@ -113,158 +92,119 @@ const AuthorsSection = () => {
     setInputValue(reason === 'reset' || reason === 'clear' ? '' : newValue);
   };
 
-  const handleToggleCreate = () => setCreateOpen(prev => !prev);
-
-  const handleCreateModeChange = (_event, newMode) => {
-    if (newMode) setCreateMode(newMode);
+  const handleOpenCreate = entityType => {
+    setCreation({ entityType, name: inputValue.trim() });
   };
 
-  const handleCaverCreated = caver => {
-    applyValue([...value, { ...caver, _type: 'persons' }]);
-    setCreateOpen(false);
+  const handleEntitySelected = entity => {
+    const typed = { ...entity, _type: creation.entityType };
+    if (
+      !value.some(
+        item =>
+          String(item.id) === String(entity.id) && item._type === typed._type
+      )
+    ) {
+      applyValue([...value, typed]);
+    }
+    setInputValue('');
+    setCreation(null);
   };
 
-  const handleOrganizationCreated = organization => {
-    applyValue([...value, { ...organization, _type: 'organizations' }]);
-    setCreateOpen(false);
-  };
+  const emptyText =
+    inputValue.trim().length >= AUTOCOMPLETE_MIN_CHARACTERS
+      ? formatMessage({ id: 'No results' })
+      : formatMessage(
+          {
+            id: 'Type at least {nbOfChars} character(s)',
+            defaultMessage: 'Type at least {nbOfChars} character(s)'
+          },
+          { nbOfChars: AUTOCOMPLETE_MIN_CHARACTERS }
+        );
 
   return (
-    <Box data-testid="document-authors" sx={{ mt: 2 }}>
-      <Typography
-        variant="caption"
-        sx={{
-          color: 'text.secondary',
-          display: 'block',
-          mb: 0.5
-        }}>
-        {formatMessage({
-          id: 'AuthorsSection.helperText',
-          defaultMessage:
-            'Choose one or more persons or organizations as authors. If the one you are looking for does not exist yet, use the + button to create it.'
-        })}
-      </Typography>
-      <Wrapper>
-        <InputWrapper>
-          <Autocomplete
-            multiple
-            value={value}
-            options={results}
-            onChange={handleChange}
-            onInputChange={handleInputChange}
-            inputValue={inputValue}
-            loading={isLoading}
-            getOptionLabel={getOptionLabel}
-            renderOption={(props, option) =>
-              entityOptionForSelector(props, option, { showPersonType: true })
-            }
-            isOptionEqualToValue={(option, val) =>
-              option.id === val.id && option._type === val._type
-            }
-            filterSelectedOptions
-            filterOptions={options => options}
-            renderValue={(tagValue, getItemProps) =>
-              tagValue.map((option, index) => (
-                <Chip
-                  {...getItemProps({ index })}
-                  key={`${option._type}-${option.id}`}
-                  color="primary"
-                  label={
-                    <DocumentAuthorLabel
-                      author={option}
-                      entityType={option._type}
-                    />
-                  }
-                />
-              ))
-            }
-            noOptionsText={
-              inputValue.length >= MIN_SEARCH_LENGTH
-                ? formatMessage({
-                    id: 'AuthorsSection.noOptions',
-                    defaultMessage:
-                      'No author matches your search (type at least 3 characters)'
-                  })
-                : formatMessage(
-                    {
-                      id: 'Type at least {nbOfChars} character(s)',
-                      defaultMessage: 'Type at least {nbOfChars} character(s)'
-                    },
-                    { nbOfChars: MIN_SEARCH_LENGTH }
-                  )
-            }
-            renderInput={params => (
-              <TextField
-                {...params}
-                variant="filled"
-                label={formatMessage({ id: 'Authors' })}
-                required={value.length === 0}
-                error={hasError}
-                slotProps={{
-                  ...params.slotProps,
+    <Box ref={wrapperRef} data-testid="document-authors" sx={{ mt: 2 }}>
+      <FieldHelperText>
+        {formatMessage({ id: 'entityCreation.authorsHelp' })}
+      </FieldHelperText>
 
-                  input: {
-                    ...params.slotProps.input,
-                    endAdornment: (
-                      <>
-                        {isLoading && <CircularProgress size={16} />}
-                        {params.slotProps.input.endAdornment}
-                      </>
-                    )
-                  }
-                }}
-              />
-            )}
+      <CreatableAutocomplete
+        clearOnBlur={false}
+        creationActions={
+          allowEntityCreation && hasSearched
+            ? [
+                {
+                  id: 'person',
+                  iconType: 'author',
+                  label: formatMessage({ id: 'entityCreation.author' }),
+                  onClick: () => handleOpenCreate('persons'),
+                  testId: 'create-author-search-button'
+                },
+                {
+                  id: 'organization',
+                  iconType: 'organization',
+                  label: formatMessage({ id: 'entityCreation.organization' }),
+                  onClick: () => handleOpenCreate('organizations'),
+                  testId: 'create-author-organization-search-button'
+                }
+              ]
+            : []
+        }
+        multiple
+        value={value}
+        options={results}
+        onChange={handleChange}
+        onInputChange={handleInputChange}
+        inputValue={inputValue}
+        loading={isLoading}
+        getOptionLabel={getOptionLabel}
+        renderOption={(props, option) =>
+          entityOptionForSelector(props, option, { showPersonType: true })
+        }
+        isOptionEqualToValue={(option, val) =>
+          String(option.id) === String(val.id) && option._type === val._type
+        }
+        filterSelectedOptions
+        renderValue={(tagValue, getItemProps) =>
+          tagValue.map((option, index) => (
+            <Chip
+              {...getItemProps({ index })}
+              key={`${option._type}-${option.id}`}
+              data-testid={`document-author-${option._type}-${option.id}`}
+              color="primary"
+              label={
+                <DocumentAuthorLabel
+                  author={option}
+                  entityType={option._type}
+                  showPersonType={false}
+                />
+              }
+            />
+          ))
+        }
+        noOptionsText={
+          hasError
+            ? formatMessage({ id: 'entityCreation.searchFailed' })
+            : emptyText
+        }
+        renderInput={params => (
+          <EntityAutocompleteInput
+            params={params}
+            inputRef={inputRef}
+            label={formatMessage({ id: 'Authors' })}
+            required={value.length === 0}
+            hasError={hasError}
+            loading={isLoading}
           />
-          <Collapse in={isCreateOpen} sx={{ p: 1 }}>
-            <ToggleButtonGroup
-              value={createMode}
-              exclusive
-              onChange={handleCreateModeChange}
-              size="small"
-              aria-label={formatMessage({
-                id: 'AuthorsSection.createEntityType',
-                defaultMessage: 'Type to create'
-              })}
-              sx={{ display: 'flex', width: '100%', mb: 1 }}>
-              <ToggleButton value="person" sx={{ flex: 1, gap: 0.5 }}>
-                <CustomIcon type="person" size={20} alt="" />
-                {formatMessage({ id: 'Person' })}
-              </ToggleButton>
-              <ToggleButton value="organization" sx={{ flex: 1, gap: 0.5 }}>
-                <CustomIcon type="organization" size={20} />
-                {formatMessage({ id: 'Organization' })}
-              </ToggleButton>
-            </ToggleButtonGroup>
-            {createMode === 'person' ? (
-              <CreateCaverPanel
-                enabled={isCreateOpen}
-                onCreateSuccess={handleCaverCreated}
-                defaultName=""
-                defaultSurname={inputValue.trim()}
-              />
-            ) : (
-              <CreateNewOrganization
-                enabled={isCreateOpen}
-                onCreateSuccess={handleOrganizationCreated}
-                defaultValue={inputValue.trim()}
-              />
-            )}
-          </Collapse>
-        </InputWrapper>
-        <IconButton
-          size="small"
-          onClick={handleToggleCreate}
-          disabled={!sideActionEnabled}
-          color="secondary"
-          aria-label={formatMessage({ id: 'new entity' })}>
-          {isCreateOpen ? (
-            <Cancel fontSize="large" />
-          ) : (
-            <AddCircle fontSize="large" />
-          )}
-        </IconButton>
-      </Wrapper>
+        )}
+      />
+      {allowEntityCreation && creation && (
+        <RelatedEntityDialog
+          entityType={creation.entityType}
+          defaultName={creation.name}
+          onSelect={handleEntitySelected}
+          onClose={() => setCreation(null)}
+        />
+      )}
     </Box>
   );
 };
