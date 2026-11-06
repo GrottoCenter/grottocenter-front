@@ -9,47 +9,64 @@ export const fetchPdfResource = async (
   signal,
   maxBytes = PDF_LIMITS.resourceBytes
 ) => {
-  const timeout = AbortSignal.timeout(30000);
-  const requestSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
+  const controller = new AbortController();
+  const requestSignal = signal
+    ? AbortSignal.any([signal, controller.signal])
+    : controller.signal;
+  let timeout;
+  const resetTimeout = () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(
+      () =>
+        controller.abort(new DOMException('Download stalled', 'TimeoutError')),
+      30000
+    );
+  };
   const parsed = new URL(url);
   const api = API_URL ? new URL(API_URL) : null;
   const isApi =
     api && parsed.origin === api.origin && parsed.pathname.startsWith('/api/');
-  const response = isApi
-    ? await apiFetch(url, { signal: requestSignal })
-    : await fetch(url, { signal: requestSignal, credentials: 'omit' });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const reader = response.body.getReader();
-  const chunks = [];
-  let size = 0;
+  resetTimeout();
   try {
-    checkPdfLimit(
-      Number(response.headers.get('content-length') ?? 0),
-      maxBytes
-    );
-    // Bound streamed bodies too: Content-Length can be absent or compressed.
-    /* eslint-disable no-await-in-loop */
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      size += value.byteLength;
-      checkPdfLimit(size, maxBytes);
-      chunks.push(value);
+    const response = isApi
+      ? await apiFetch(url, { signal: requestSignal })
+      : await fetch(url, { signal: requestSignal, credentials: 'omit' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const reader = response.body.getReader();
+    const chunks = [];
+    let size = 0;
+    try {
+      checkPdfLimit(
+        Number(response.headers.get('content-length') ?? 0),
+        maxBytes
+      );
+      // Bound streamed bodies too: Content-Length can be absent or compressed.
+      /* eslint-disable no-await-in-loop */
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        resetTimeout();
+        size += value.byteLength;
+        checkPdfLimit(size, maxBytes);
+        chunks.push(value);
+      }
+      /* eslint-enable no-await-in-loop */
+    } catch (error) {
+      await reader.cancel().catch(() => {});
+      throw error;
+    } finally {
+      reader.releaseLock();
     }
-    /* eslint-enable no-await-in-loop */
-  } catch (error) {
-    await reader.cancel().catch(() => {});
-    throw error;
+    const bytes = new Uint8Array(size);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    return bytes.buffer;
   } finally {
-    reader.releaseLock();
+    clearTimeout(timeout);
   }
-  const bytes = new Uint8Array(size);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  return bytes.buffer;
 };
 
 export const createPdfMap = async (coordinates, zoom, signal, colors) => {

@@ -35,12 +35,6 @@ export const usePdfExport = () => {
       const { signal } = current.controller;
       setIsGenerating(true);
       let resource = model.title ?? '';
-      current.timeout = setTimeout(() => {
-        if (job.current !== current) return;
-        setError({ id: 'pdf.exportError', resource });
-        current.controller.abort();
-        current.worker?.terminate();
-      }, 120000);
       try {
         const prepared = {
           ...model,
@@ -92,6 +86,13 @@ export const usePdfExport = () => {
           new URL('../pdf/shared/pdfExport.worker.js', import.meta.url),
           { type: 'module' }
         );
+        // Bound rendering, not downloads that keep making progress.
+        current.timeout = setTimeout(() => {
+          if (job.current !== current) return;
+          setError({ id: 'pdf.exportError', resource });
+          current.controller.abort();
+          current.worker?.terminate();
+        }, 120000);
         // Termination cannot deliver a reply: resolve the obsolete job on abort.
         const data = await new Promise((resolve, reject) => {
           signal.addEventListener('abort', () => resolve(null), {

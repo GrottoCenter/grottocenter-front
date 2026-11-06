@@ -8,9 +8,7 @@ const originalUrl = new URL(
 const PDF_EXPORT_TEST_OPTIONS = { waitForAnimations: false };
 const readDownloadedPdf = (name, timeout = 60000) => {
   // Closing the dialog signals that generation finished and the download started.
-  cy.get('[data-testid="entrance-pdf-download"]', { timeout }).should(
-    'not.exist'
-  );
+  cy.get('[data-testid="pdf-download"]', { timeout }).should('not.exist');
   return (
     cy
       .readFile(`${Cypress.config('downloadsFolder')}/${name}.pdf`, 'base64', {
@@ -169,13 +167,61 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
         .should('be.checked');
       cy.contains('[role="dialog"] label', 'Regions').should('not.exist');
       cy.contains('[role="dialog"]', 'Appendices').should('not.exist');
-      cy.get('[data-testid="entrance-pdf-download"]').click();
+      cy.get('[data-testid="pdf-download"]').click();
       readDownloadedPdf(name).then(output => {
         expect(output.getTitle()).to.equal(name);
         expect(output.getSubject()).to.equal(
-          `https://grottocenter.org/ui${path}`
+          new URL(`/ui${path}`, Cypress.config('baseUrl')).href
         );
         expect(output.getPageCount()).to.be.greaterThan(0);
+      });
+      cy.get('@browserPrint').should('not.have.been.called');
+    });
+  });
+
+  ['network', 'massif'].forEach(entityType => {
+    it(`downloads a ${entityType} and its selected appendix through the shared worker`, () => {
+      const name = `${entityType} export ${Date.now()}`;
+      const path = entityType === 'network' ? '/caves/2' : '/massifs/2';
+      cy.intercept(
+        { method: 'GET', pathname: `/api/v1${path}` },
+        {
+          body: {
+            id: 2,
+            name,
+            language: 'eng',
+            depth: 30,
+            length: 200,
+            entrances: [],
+            networks: [],
+            massifs: [],
+            descriptions: [],
+            guidelines: [],
+            organizations: [],
+            exploringOrganizations: [],
+            documents: [document]
+          }
+        }
+      );
+      cy.visit(path, {
+        onBeforeLoad: win => {
+          win.localStorage.setItem('selectedLanguage', 'en');
+          cy.stub(win, 'print').as('browserPrint');
+        }
+      });
+      cy.get('[data-testid="action-pdf"]', { timeout: 20000 }).click();
+      cy.get('[role="dialog"]', { timeout: 20000 }).should('be.visible');
+      cy.wait('@documentDetails');
+      cy.contains('[role="dialog"] label', 'Original survey')
+        .find('input')
+        .check();
+      cy.get('[data-testid="pdf-download"]').click();
+      readDownloadedPdf(name).then(output => {
+        expect(output.getTitle()).to.equal(name);
+        expect(output.getSubject()).to.equal(
+          new URL(`/ui${path}`, Cypress.config('baseUrl')).href
+        );
+        expect(output.getPageCount()).to.equal(2);
       });
       cy.get('@browserPrint').should('not.have.been.called');
     });
@@ -193,13 +239,13 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
     });
     visitEntrance();
     cy.contains('label', 'Original survey').find('input').check();
-    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.get('[data-testid="pdf-download"]').click();
     cy.contains('[role="alert"]', 'cannot be preserved in A4', {
       timeout: 20000
     }).should('contain.text', 'survey.pdf');
     cy.contains('label', 'Original survey').find('input').should('be.checked');
     cy.contains('button', 'Original size').click();
-    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.get('[data-testid="pdf-download"]').click();
     readDownloadedPdf(name).then(output => {
       expect(output.getPage(1).getSize()).to.deep.equal({
         width: 300,
@@ -239,7 +285,7 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
     });
     cy.contains('button', 'Original size').click();
     cy.contains('[role="dialog"] button', 'Preview').should('not.exist');
-    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.get('[data-testid="pdf-download"]').click();
     readDownloadedPdf(entrance.name, 20000).then(output => {
       expect(output.getTitle()).to.equal(entrance.name);
       expect(output.getPageCount()).to.equal(3);
@@ -399,9 +445,7 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
     });
     cy.get('[data-testid="pdf-document-8"] input[type="checkbox"]').uncheck();
     cy.contains('button', 'Original size').click();
-    cy.get('[data-testid="entrance-pdf-download"]')
-      .should('be.enabled')
-      .click();
+    cy.get('[data-testid="pdf-download"]').should('be.enabled').click();
     readDownloadedPdf(name).then(output => {
       expect(output.getPageCount()).to.equal(5);
       expect(output.getPage(2).getSize()).to.deep.equal({
@@ -438,7 +482,7 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
     );
     cy.get('[data-testid="pdf-document-8"] input[type="checkbox"]').check();
     cy.contains('button', 'Original size').click();
-    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.get('[data-testid="pdf-download"]').click();
     readDownloadedPdf(name).then(output => {
       expect(output.getPageCount()).to.equal(3);
       expect(output.getPage(1).getSize()).to.deep.equal({
@@ -469,12 +513,12 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
       cy.get('[data-testid="action-pdf"]', { timeout: 20000 }).click();
       cy.contains('label', 'Documents').find('input').uncheck();
       cy.get('[data-testid="pdf-document-3"] input[type="checkbox"]').check();
-      cy.get('[data-testid="entrance-pdf-download"]').should('be.disabled');
+      cy.get('[data-testid="pdf-download"]').should('be.disabled');
       cy.get('[data-testid="pdf-document-3"] input[type="checkbox"]').uncheck();
-      cy.get('[data-testid="entrance-pdf-download"]').should('be.enabled');
+      cy.get('[data-testid="pdf-download"]').should('be.enabled');
       cy.then(() => releaseDetails());
       cy.wait('@pendingDetails');
-      cy.get('[data-testid="entrance-pdf-download"]').should('be.enabled');
+      cy.get('[data-testid="pdf-download"]').should('be.enabled');
     }
   );
 
@@ -485,13 +529,13 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
     );
     cy.intercept('https://tile.openstreetmap.org/**', { statusCode: 503 });
     visitEntrance();
-    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.get('[data-testid="pdf-download"]').click();
     cy.contains('[role="alert"]', 'Unable to generate the PDF', {
       timeout: 20000
     }).should('be.visible');
     cy.contains('label', 'Comments').find('input').should('be.checked');
     cy.contains('label', /^Map$/).find('input[type="checkbox"]').uncheck();
-    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.get('[data-testid="pdf-download"]').click();
     readDownloadedPdf(entrance.name).then(output => {
       expect(output.getTitle()).to.equal(entrance.name);
     });
@@ -508,7 +552,7 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
       fixture: 'entrance-map-tile.png,null'
     });
     visitEntrance();
-    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.get('[data-testid="pdf-download"]').click();
     readDownloadedPdf(name).then(output => {
       const images = output.getPages().flatMap(page => {
         const objects = page.node.Resources().lookup(PDFName.of('XObject'));
@@ -545,8 +589,8 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
     cy.contains('[role="alert"]', 'Unable to generate the PDF', {
       timeout: 20000
     }).should('be.visible');
-    cy.get('[data-testid="entrance-pdf-download"]').should('be.disabled');
-    cy.get('[data-testid="entrance-pdf-download"]').then($download => {
+    cy.get('[data-testid="pdf-download"]').should('be.disabled');
+    cy.get('[data-testid="pdf-download"]').then($download => {
       const primary = $download[0].getBoundingClientRect();
       cy.contains('[role="dialog"] button', /^Cancel$/).then($cancel => {
         const secondary = $cancel[0].getBoundingClientRect();
@@ -558,9 +602,7 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
     });
     cy.screenshot('entrance-pdf-mobile', { capture: 'viewport' });
     cy.contains('[role="dialog"] label', 'Documents').find('input').uncheck();
-    cy.get('[data-testid="entrance-pdf-download"]')
-      .should('be.enabled')
-      .click();
+    cy.get('[data-testid="pdf-download"]').should('be.enabled').click();
     readDownloadedPdf(name).then(output => {
       expect(output.getTitle()).to.equal(name);
       expect(output.getPageCount()).to.equal(1);
@@ -604,7 +646,7 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
     cy.get('[data-testid="action-pdf"]').click();
     cy.contains('label', 'Descriptions').find('input').should('not.be.checked');
     cy.contains('[role="dialog"] button', 'Preview').should('not.exist');
-    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.get('[data-testid="pdf-download"]').click();
     cy.get('[role="dialog"]', { timeout: 20000 }).should('not.exist');
     readDownloadedPdf(name).then(output => {
       expect(output.getTitle()).to.equal(name);
@@ -638,7 +680,7 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
       fixture: 'entrance-map-tile.png,null'
     });
     visitEntrance();
-    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.get('[data-testid="pdf-download"]').click();
     readDownloadedPdf(name).then(output => {
       expect(output.getPageCount()).to.be.greaterThan(1);
     });
@@ -694,7 +736,7 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
       'aria-pressed',
       'true'
     );
-    cy.get('[data-testid="entrance-pdf-download"]').click();
+    cy.get('[data-testid="pdf-download"]').click();
     readDownloadedPdf(name).then(output => {
       expect(output.getTitle()).to.equal(name);
       expect(output.getPageCount()).to.be.greaterThan(2);

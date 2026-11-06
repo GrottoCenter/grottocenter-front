@@ -1,6 +1,7 @@
 import { getPdfCoordinates } from '../entrance/model';
 import {
   active,
+  entityUrl,
   getGuidelines,
   makePdfBlock,
   makeEntityPdfModel
@@ -33,7 +34,7 @@ export const getNetworkPdfAvailability = (entity, isAdmin) => ({
 });
 
 export const buildNetworkPdfModel = options => {
-  const { entity, isAdmin, sections, intl } = options;
+  const { entity, isAdmin, sections, intl, origin } = options;
   const t = id => intl.formatMessage({ id });
   const properties = [];
   const add = (label, value, icon, unit = '') => {
@@ -75,7 +76,7 @@ export const buildNetworkPdfModel = options => {
               coordinates &&
                 `${coordinates.latitude.toFixed(6)}, ${coordinates.longitude.toFixed(6)} (WGS84)`,
               entrance.isSensitive && t('Sensitive entrance'),
-              `https://grottocenter.org/ui/entrances/${entrance.id}`
+              entityUrl('entrances', entrance.id, origin)
             ]
               .filter(Boolean)
               .join('\n')

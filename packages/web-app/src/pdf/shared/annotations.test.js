@@ -1,6 +1,33 @@
 // @vitest-environment node
 import { PDFDocument, PDFDict, PDFName, PDFString, PDFArray } from 'pdf-lib';
-import { retargetNativePageLinks } from './annotations';
+import { getPdfPageLinks, retargetNativePageLinks } from './annotations';
+
+it.each(['Dest', 'GoTo'])(
+  'rejects an internal %s link with visible appearance content',
+  async mode => {
+    const source = await PDFDocument.create();
+    const page = source.addPage();
+    const destination = source.context.obj([page.ref, 'Fit']);
+    const annotation = source.context.obj({
+      Type: 'Annot',
+      Subtype: 'Link',
+      Rect: [20, 20, 100, 50],
+      AP: {
+        N: source.context.register(
+          source.context.flateStream('visible content')
+        )
+      }
+    });
+    if (mode === 'Dest') annotation.set(PDFName.of('Dest'), destination);
+    else
+      annotation.set(
+        PDFName.of('A'),
+        source.context.obj({ S: 'GoTo', D: destination })
+      );
+    page.node.set(PDFName.of('Annots'), source.context.obj([annotation]));
+    expect(() => getPdfPageLinks(page)).toThrow('pdf.annotationError');
+  }
+);
 
 it.each(['explicit', 'legacy name', 'name tree', 'GoTo action'])(
   'retargets a native link using an %s destination',

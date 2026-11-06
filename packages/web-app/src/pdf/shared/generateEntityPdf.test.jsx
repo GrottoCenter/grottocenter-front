@@ -893,6 +893,53 @@ describe('PDF export fidelity regressions', () => {
     }
   );
 
+  it('exports a TOC-style PDF in A4 while dropping only internal links', async () => {
+    const source = await PDFDocument.create();
+    const contents = source.addPage([300, 500]);
+    const chapter = source.addPage([300, 500]);
+    contents.drawText('Contents: First chapter');
+    chapter.drawText('First chapter text');
+    const destination = source.context.obj([chapter.ref, 'Fit']);
+    contents.node.set(
+      PDFName.of('Annots'),
+      source.context.obj([
+        {
+          Type: 'Annot',
+          Subtype: 'Link',
+          Rect: [20, 20, 100, 50],
+          Dest: destination
+        },
+        {
+          Type: 'Annot',
+          Subtype: 'Link',
+          Rect: [20, 60, 100, 90],
+          A: { S: 'GoTo', D: destination }
+        },
+        {
+          Type: 'Annot',
+          Subtype: 'Link',
+          Rect: [20, 100, 100, 130],
+          A: { S: 'URI', URI: PDFString.of('https://example.org/source') }
+        }
+      ])
+    );
+    const pages = await readPdf(
+      await generateEntityPdf(
+        makeCreditedModel(false),
+        [{ ...file, bytes: await source.save() }],
+        { fontSources }
+      )
+    );
+    expect(pages).toHaveLength(3);
+    expect(pages[1].text).toContain('Contents: First chapter');
+    expect(pages[2].text).toContain('First chapter text');
+    const links = pages[1].annotations.filter(item => item.subtype === 'Link');
+    expect(
+      links.filter(link => link.url === 'https://example.org/source')
+    ).toHaveLength(1);
+    expect(links.every(link => !link.dest)).toBe(true);
+  });
+
   it('reports unsupported annotations with their source file and allows native export', async () => {
     const source = await PDFDocument.load(await makeSurvey());
     source.getPage(0).node.set(

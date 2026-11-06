@@ -95,33 +95,45 @@ export const retargetNativePageLinks = (document, copiedPages) => {
 export const getPdfPageLinks = page => {
   const annotations = page.node.Annots();
   if (!annotations) return [];
-  return annotations.asArray().map(ref => {
-    const annotation = page.doc.context.lookup(ref, PDFDict);
-    const action = annotation.lookupMaybe(PDFName.of('A'), PDFDict);
-    const uri = action?.lookup(PDFName.of('URI'));
-    const rect = annotation.lookupMaybe(PDFName.of('Rect'), PDFArray);
-    // Other annotation types need appearance streams, destinations or form state.
-    // Fail explicitly rather than silently dropping visible or interactive content.
-    if (
-      annotation.get(PDFName.of('Subtype')) !== PDFName.of('Link') ||
-      action?.get(PDFName.of('S')) !== PDFName.of('URI') ||
-      !(uri instanceof PDFString || uri instanceof PDFHexString) ||
-      !rect ||
-      rect.size() !== 4 ||
-      rect.asArray().some(value => !(value instanceof PDFNumber)) ||
-      annotation.has(PDFName.of('AP'))
-    )
-      throw new Error('pdf.annotationError');
-    try {
-      // URI actions use byte strings; URL normalizes Unicode paths before writing.
-      return {
-        uri: new URL(uri.decodeText()).href,
-        rect: rect.asArray().map(value => value.asNumber())
-      };
-    } catch {
-      throw new Error('pdf.annotationError');
-    }
-  });
+  return annotations
+    .asArray()
+    .map(ref => {
+      const annotation = page.doc.context.lookup(ref, PDFDict);
+      const action = annotation.lookupMaybe(PDFName.of('A'), PDFDict);
+      // Framed annexes do not preserve internal destinations. Keep rejecting
+      // appearance streams, which may carry visible content.
+      if (
+        annotation.get(PDFName.of('Subtype')) === PDFName.of('Link') &&
+        !annotation.has(PDFName.of('AP')) &&
+        (annotation.has(PDFName.of('Dest')) ||
+          action?.get(PDFName.of('S')) === PDFName.of('GoTo'))
+      )
+        return null;
+      const uri = action?.lookup(PDFName.of('URI'));
+      const rect = annotation.lookupMaybe(PDFName.of('Rect'), PDFArray);
+      // Other annotation types need appearance streams, destinations or form state.
+      // Fail explicitly rather than silently dropping visible or interactive content.
+      if (
+        annotation.get(PDFName.of('Subtype')) !== PDFName.of('Link') ||
+        action?.get(PDFName.of('S')) !== PDFName.of('URI') ||
+        !(uri instanceof PDFString || uri instanceof PDFHexString) ||
+        !rect ||
+        rect.size() !== 4 ||
+        rect.asArray().some(value => !(value instanceof PDFNumber)) ||
+        annotation.has(PDFName.of('AP'))
+      )
+        throw new Error('pdf.annotationError');
+      try {
+        // URI actions use byte strings; URL normalizes Unicode paths before writing.
+        return {
+          uri: new URL(uri.decodeText()).href,
+          rect: rect.asArray().map(value => value.asNumber())
+        };
+      } catch {
+        throw new Error('pdf.annotationError');
+      }
+    })
+    .filter(Boolean);
 };
 
 export const copyPdfPageLinks = (

@@ -44,7 +44,7 @@ it.each(['massif', 'country', 'region'])(
     expect(body).toContain(`${intl.formatNumber(1092)} cavités`);
     expect(body).toContain('Bange · 865 m');
     expect(body).toContain(`Bange · ${intl.formatNumber(53955)} m`);
-    expect(body).toContain('https://grottocenter.org/ui/caves/75263');
+    expect(body).toContain(`${window.location.origin}/ui/caves/75263`);
   }
 );
 
@@ -81,8 +81,8 @@ it('uses canonical country and region routes, keeps valid zero coordinates, and 
     });
     expect(model.source).toBe(
       entityType === 'country'
-        ? 'https://grottocenter.org/ui/countries/FR'
-        : 'https://grottocenter.org/ui/countries/FR/regions/ARA'
+        ? `${window.location.origin}/ui/countries/FR`
+        : `${window.location.origin}/ui/countries/FR/regions/ARA`
     );
     expect(model.coordinates).toEqual({ latitude: 0, longitude: 0 });
     expect(model.blocks).toEqual([]);

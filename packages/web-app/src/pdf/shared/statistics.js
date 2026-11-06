@@ -1,4 +1,4 @@
-import { makePdfBlock } from './model';
+import { entityUrl, makePdfBlock } from './model';
 
 export const hasPdfStatistics = statistics =>
   Number.isFinite(statistics?.nb_caves);
@@ -7,7 +7,8 @@ export const makeStatisticsPdfBlock = (
   entity,
   statistics,
   intl,
-  entityType
+  entityType,
+  origin
 ) => {
   const t = id => intl.formatMessage({ id });
   const values = [
@@ -52,7 +53,7 @@ export const makeStatisticsPdfBlock = (
       `${cave.name_cave ?? ''} · ${intl.formatNumber(cave.value)} m · ${t(label)} ${t(entityType)}`
     );
     if (cave.id_cave != null)
-      values.push(`https://grottocenter.org/ui/caves/${cave.id_cave}`);
+      values.push(entityUrl('caves', cave.id_cave, origin));
   }
   return makePdfBlock(
     'statistics',

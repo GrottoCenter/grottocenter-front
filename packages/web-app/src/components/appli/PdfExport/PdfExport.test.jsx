@@ -192,7 +192,7 @@ it('keeps exactly one compact page format selected and exports that choice', asy
   expect(original).toHaveAttribute('aria-pressed', 'true');
   fireEvent.click(original);
   expect(original).toHaveAttribute('aria-pressed', 'true');
-  fireEvent.click(screen.getByTestId('entrance-pdf-download'));
+  fireEvent.click(screen.getByTestId('pdf-download'));
   await vi.waitFor(() =>
     expect(generate).toHaveBeenCalledWith(
       expect.objectContaining({ format: 'original' })
@@ -204,7 +204,7 @@ it('closes and announces the download only after a PDF is available', async () =
   const blob = new Blob(['%PDF'], { type: 'application/pdf' });
   const generate = vi.fn().mockResolvedValue(blob);
   renderDialog(false, { generate });
-  fireEvent.click(screen.getByTestId('entrance-pdf-download'));
+  fireEvent.click(screen.getByTestId('pdf-download'));
   await vi.waitFor(() => expect(onClose).toHaveBeenCalledOnce());
   expect(downloadBlob).toHaveBeenCalledWith(blob, 'Test cave.pdf');
   expect(enqueueSnackbar).toHaveBeenCalledWith(
@@ -216,7 +216,7 @@ it('closes and announces the download only after a PDF is available', async () =
 it('keeps the dialog and choices when generation fails', async () => {
   const generate = vi.fn().mockResolvedValue(null);
   renderDialog(false, { generate });
-  fireEvent.click(screen.getByTestId('entrance-pdf-download'));
+  fireEvent.click(screen.getByTestId('pdf-download'));
   await vi.waitFor(() => expect(generate).toHaveResolved());
   expect(onClose).not.toHaveBeenCalled();
   expect(downloadBlob).not.toHaveBeenCalled();
@@ -236,14 +236,14 @@ it('allows explicit exclusion of a failed document without a late response cance
   };
   useQueries.mockReturnValue([query]);
   const { rerender } = renderDialog(false, { entity });
-  expect(screen.getByTestId('entrance-pdf-download')).toBeDisabled();
+  expect(screen.getByTestId('pdf-download')).toBeDisabled();
   expect(
     screen.getByRole('checkbox', { name: /Broken survey/ })
   ).toBeDisabled();
   fireEvent.click(
     screen.getByRole('button', { name: messages['pdf.excludeDocument'] })
   );
-  expect(screen.getByTestId('entrance-pdf-download')).toBeEnabled();
+  expect(screen.getByTestId('pdf-download')).toBeEnabled();
   expect(
     screen.queryByRole('checkbox', { name: /Broken survey/ })
   ).not.toBeInTheDocument();
@@ -311,12 +311,12 @@ it('keeps appendix selection available without fetching unrelated document detai
   });
   fireEvent.click(screen.getByRole('checkbox', { name: 'Documents' }));
   expect(useQueries.mock.lastCall[0].queries[0].enabled).toBe(false);
-  expect(screen.getByTestId('entrance-pdf-download')).toBeEnabled();
+  expect(screen.getByTestId('pdf-download')).toBeEnabled();
   const appendix = screen.getByRole('checkbox', { name: /Broken survey/ });
   expect(appendix).toBeEnabled();
   fireEvent.click(appendix);
   expect(useQueries.mock.lastCall[0].queries[0].enabled).toBe(true);
-  expect(screen.getByTestId('entrance-pdf-download')).toBeDisabled();
+  expect(screen.getByTestId('pdf-download')).toBeDisabled();
 });
 
 it.each(['fetching', 'paused', 'error'])(
@@ -348,10 +348,10 @@ it.each(['fetching', 'paused', 'error'])(
     const appendix = screen.getByRole('checkbox', { name: /Broken survey/ });
     expect(appendix).toBeChecked();
     expect(appendix).toBeEnabled();
-    expect(screen.getByTestId('entrance-pdf-download')).toBeDisabled();
+    expect(screen.getByTestId('pdf-download')).toBeDisabled();
     fireEvent.click(appendix);
     expect(appendix).not.toBeChecked();
-    expect(screen.getByTestId('entrance-pdf-download')).toBeEnabled();
+    expect(screen.getByTestId('pdf-download')).toBeEnabled();
     expect(useQueries.mock.lastCall[0].queries[0].enabled).toBe(false);
   }
 );

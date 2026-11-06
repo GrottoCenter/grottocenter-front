@@ -114,6 +114,7 @@ export const buildEntrancePdfModel = ({
   documents,
   attachments,
   intl,
+  origin,
   generatedAt = new Date()
 }) => {
   const t = id => intl.formatMessage({ id });
@@ -225,6 +226,7 @@ export const buildEntrancePdfModel = ({
     documents,
     attachments,
     intl,
+    origin,
     generatedAt,
     warning: entrance.isSensitive ? t('Sensitive entrance') : '',
     properties,

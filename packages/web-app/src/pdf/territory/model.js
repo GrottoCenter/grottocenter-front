@@ -1,6 +1,7 @@
 import getLocalizedCountryName from '@/helpers/countryName';
 import {
   active,
+  entityUrl,
   getGuidelines,
   makePdfBlock,
   makePdfLinksBlock,
@@ -27,7 +28,7 @@ export const getTerritoryPdfAvailability = (entity, statistics) => ({
 });
 
 export const buildTerritoryPdfModel = options => {
-  const { entity, entityType, sections, statistics, intl } = options;
+  const { entity, entityType, sections, statistics, intl, origin } = options;
   const isCountry = entityType === 'country';
   const t = id => intl.formatMessage({ id });
   const coordinates = getWgs84Coordinates(entity);
@@ -58,7 +59,9 @@ export const buildTerritoryPdfModel = options => {
     });
   const blocks = [];
   if (sections.statistics && hasPdfStatistics(statistics))
-    blocks.push(makeStatisticsPdfBlock(entity, statistics, intl, entityType));
+    blocks.push(
+      makeStatisticsPdfBlock(entity, statistics, intl, entityType, origin)
+    );
   if (sections.guidelines)
     blocks.push(
       makePdfBlock(
@@ -79,7 +82,7 @@ export const buildTerritoryPdfModel = options => {
         active(entity.organizations).map(item => ({
           id: item.id,
           title: item.name ?? String(item.id),
-          source: `https://grottocenter.org/ui/organizations/${item.id}`
+          source: entityUrl('organizations', item.id, origin)
         })),
         intl
       )

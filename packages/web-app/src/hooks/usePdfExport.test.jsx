@@ -79,6 +79,36 @@ it('stops an unresponsive worker and allows another attempt', async () => {
   expect(result.current.error.id).toBe('pdf.exportError');
 });
 
+it('allows downloads beyond two minutes before starting the rendering timeout', async () => {
+  vi.useFakeTimers();
+  let completeDownload;
+  fetchPdfResource.mockImplementationOnce(
+    () =>
+      new Promise(resolve => {
+        completeDownload = resolve;
+      })
+  );
+  const { result } = renderHook(usePdfExport);
+  let pending;
+  await act(async () => {
+    pending = result.current.generate({
+      ...request,
+      files: [{ fileName: 'survey.pdf', url: 'https://example.org/survey.pdf' }]
+    });
+  });
+  await act(async () => vi.advanceTimersByTimeAsync(150000));
+  expect(result.current.isGenerating).toBe(true);
+  expect(result.current.error).toBeNull();
+  expect(workers).toHaveLength(0);
+  expect(fetchPdfResource.mock.calls.at(-1)[1].aborted).toBe(false);
+  await act(async () => completeDownload(new ArrayBuffer(8)));
+  expect(workers).toHaveLength(1);
+  await act(async () => {
+    workers[0].onmessage({ data: { bytes: new Uint8Array([37, 80, 68, 70]) } });
+    expect(await pending).toBeInstanceOf(Blob);
+  });
+});
+
 it('returns the generated Blob directly and uses the active theme', async () => {
   const { result } = renderHook(usePdfExport, { wrapper: Wrapper });
   let pending;

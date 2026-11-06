@@ -10,6 +10,7 @@ import {
   getNetworkPdfAvailability
 } from '../network/model';
 import { buildMassifPdfModel, getMassifPdfPolygons } from '../massif/model';
+import { PDF_ADAPTERS } from '../adapters';
 
 const intl = createIntl({ locale: 'en', messages });
 const document = {
@@ -41,6 +42,68 @@ const polygon = JSON.stringify({
     ]
   ]
 });
+
+it.each(['entrance', 'network', 'massif', 'country', 'region'])(
+  'uses the current host or an explicit origin for every %s source link',
+  entityType => {
+    for (const origin of [
+      undefined,
+      'https://preview.example.org',
+      'https://fr.wikicaves.org'
+    ]) {
+      const model = PDF_ADAPTERS[entityType].build({
+        entity: {
+          id: 2,
+          countryId: 'FR',
+          name: 'Entity',
+          entrances: [{ id: 7, name: 'Entrance' }],
+          networks: [{ id: 8, name: 'Network' }],
+          organizations: [{ id: 9, name: 'Club' }]
+        },
+        sections: {
+          entrances: true,
+          networks: true,
+          organizations: true,
+          statistics: true,
+          documents: true
+        },
+        statistics: {
+          nb_caves: 1,
+          cave_with_max_depth: { id_cave: 8, value: 100 }
+        },
+        documents: [document],
+        attachments: [],
+        intl,
+        origin
+      });
+      const expectedOrigin = origin ?? window.location.origin;
+      expect(new URL(model.source).origin).toBe(expectedOrigin);
+      expect(model.references[0].source).toBe(
+        `${expectedOrigin}/ui/documents/1`
+      );
+      expect(model.inlineDocuments[0].source).toBe(
+        `${expectedOrigin}/ui/documents/1`
+      );
+      if (entityType === 'network')
+        expect(model.blocks[0].items[0].body).toContain(
+          `${expectedOrigin}/ui/entrances/7`
+        );
+      if (['massif', 'country', 'region'].includes(entityType)) {
+        expect(
+          model.blocks.find(block => block.key === 'organizations').items[0]
+            .source
+        ).toBe(`${expectedOrigin}/ui/organizations/9`);
+        expect(
+          model.blocks.find(block => block.key === 'statistics').items[0].body
+        ).toContain(`${expectedOrigin}/ui/caves/8`);
+      }
+      if (entityType === 'massif')
+        expect(
+          model.blocks.find(block => block.key === 'networks').items[0].source
+        ).toBe(`${expectedOrigin}/ui/caves/8`);
+    }
+  }
+);
 
 it('credits one document once and associates its selected files', () => {
   const result = buildDocumentIndex({

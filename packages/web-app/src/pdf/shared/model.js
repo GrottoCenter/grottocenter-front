@@ -9,6 +9,11 @@ import {
 } from '@/components/common/DocumentsList/utils/imageUtils';
 
 export const active = items => (items ?? []).filter(item => !item.isDeleted);
+export const entityUrl = (
+  route,
+  id,
+  origin = globalThis.location?.origin ?? 'https://grottocenter.org'
+) => new URL(`/ui/${route}/${id}`, origin).href;
 export const makePdfLinksBlock = (key, label, items, intl) => ({
   key,
   title: intl.formatMessage({ id: label }),
@@ -71,7 +76,7 @@ export const getPdfAttachments = documents => {
   );
 };
 
-const documentMetadata = (document, intl) => {
+const documentMetadata = (document, intl, origin) => {
   const citation = formatDocumentReference(
     {
       ...document,
@@ -98,11 +103,11 @@ const documentMetadata = (document, intl) => {
       .filter(Boolean)
       .join(' · '),
     license: document.license ?? '',
-    source: `https://grottocenter.org/ui/documents/${document.id}`
+    source: entityUrl('documents', document.id, origin)
   };
 };
 
-export const getPdfInlineDocuments = (documents, intl) =>
+export const getPdfInlineDocuments = (documents, intl, origin) =>
   sortDocuments(active(documents), DOCUMENT_SORT_ORDERS.TYPE).flatMap(
     document => {
       const files = (document.files ?? [])
@@ -123,7 +128,13 @@ export const getPdfInlineDocuments = (documents, intl) =>
           ];
         });
       return files.length
-        ? [{ ...documentMetadata(document, intl), id: document.id, files }]
+        ? [
+            {
+              ...documentMetadata(document, intl, origin),
+              id: document.id,
+              files
+            }
+          ]
         : [];
     }
   );
@@ -161,7 +172,8 @@ export const buildDocumentIndex = ({
   documents,
   attachments,
   includeReferences,
-  intl
+  intl,
+  origin
 }) => {
   const byId = new Map(
     active(documents).map(document => [document.id, document])
@@ -175,7 +187,7 @@ export const buildDocumentIndex = ({
   )
     .filter(document => includeReferences || selectedIds.has(document.id))
     .map(document => {
-      const metadata = documentMetadata(document, intl);
+      const metadata = documentMetadata(document, intl, origin);
       return {
         ...metadata,
         bibliography: includeReferences ? metadata.bibliography : null,
@@ -229,6 +241,7 @@ export const makeEntityPdfModel = ({
   documents,
   attachments,
   intl,
+  origin,
   generatedAt = new Date(),
   properties,
   blocks,
@@ -251,7 +264,7 @@ export const makeEntityPdfModel = ({
         region: 'Region'
       }[entityType]
     }),
-  source: `https://grottocenter.org/ui/${route}/${entity.id}`,
+  source: entityUrl(route, entity.id, origin),
   generatedAt: intl.formatDate(generatedAt),
   metadata: contribution(entity, intl).metadata,
   warning,
@@ -262,10 +275,11 @@ export const makeEntityPdfModel = ({
     documents,
     attachments,
     includeReferences: sections.documents,
-    intl
+    intl,
+    origin
   }),
   inlineDocuments: sections.documents
-    ? getPdfInlineDocuments(documents, intl)
+    ? getPdfInlineDocuments(documents, intl, origin)
     : [],
   labels: getPdfLabels(intl),
   legends

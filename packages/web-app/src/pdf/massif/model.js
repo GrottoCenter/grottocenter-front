@@ -1,5 +1,6 @@
 import {
   active,
+  entityUrl,
   getGuidelines,
   makePdfBlock,
   makePdfLinksBlock,
@@ -53,9 +54,9 @@ export const getMassifPdfPolygons = entity => {
   }
 };
 
-export const getMassifPdfAvailability = (entity, isAdmin, statistics) => ({
+export const getMassifPdfAvailability = (entity, _isAdmin, statistics) => ({
   properties: true,
-  map: Boolean(getMassifPdfPolygons(entity, isAdmin)),
+  map: Boolean(getMassifPdfPolygons(entity)),
   descriptions: active(entity.descriptions).length > 0,
   statistics: hasPdfStatistics(statistics),
   guidelines: getGuidelines(entity).length > 0,
@@ -65,7 +66,7 @@ export const getMassifPdfAvailability = (entity, isAdmin, statistics) => ({
 });
 
 export const buildMassifPdfModel = options => {
-  const { entity, sections, intl, statistics } = options;
+  const { entity, sections, intl, statistics, origin } = options;
   const t = id => intl.formatMessage({ id });
   const properties = [
     {
@@ -85,7 +86,9 @@ export const buildMassifPdfModel = options => {
       makePdfBlock('descriptions', 'Descriptions', entity.descriptions, intl)
     );
   if (sections.statistics && hasPdfStatistics(statistics))
-    blocks.push(makeStatisticsPdfBlock(entity, statistics, intl, 'massif'));
+    blocks.push(
+      makeStatisticsPdfBlock(entity, statistics, intl, 'massif', origin)
+    );
   if (sections.guidelines)
     blocks.push(
       makePdfBlock(
@@ -106,7 +109,7 @@ export const buildMassifPdfModel = options => {
         active(entity.organizations).map(item => ({
           id: item.id,
           title: item.name ?? String(item.id),
-          source: `https://grottocenter.org/ui/organizations/${item.id}`
+          source: entityUrl('organizations', item.id, origin)
         })),
         intl
       )
@@ -123,7 +126,7 @@ export const buildMassifPdfModel = options => {
           .map(item => ({
             id: item.id,
             title: item.name ?? String(item.id),
-            source: `https://grottocenter.org/ui/caves/${item.id}`,
+            source: entityUrl('caves', item.id, origin),
             details: [
               ['depth', 'Depth', 'depth'],
               ['length', 'Development', 'length']

@@ -167,7 +167,7 @@ const PdfExport = ({
             }
             disabled={isBlocked || isGenerating}
             onClick={handleGenerate}
-            data-testid="entrance-pdf-download">
+            data-testid="pdf-download">
             {formatMessage({ id: 'pdf.download' })}
           </Button>
         </>
