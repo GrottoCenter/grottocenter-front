@@ -2246,6 +2246,7 @@
   "pdf.annotationError": "{resource} の注釈はA4形式では保持できません。保持するには元のサイズを選択してください。",
   "pdf.appendices": "添付資料",
   "pdf.appendicesHelp": "1ページに1資料。",
+  "pdf.cavesWithKnownLength": "{count, plural, other {総延長が判明している洞窟 # 件}}",
   "pdf.download": "PDFをダウンロード",
   "pdf.downloadStarted": "PDFのダウンロードを開始しました。",
   "pdf.excludeDocument": "PDFから除外",

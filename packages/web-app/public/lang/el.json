@@ -2246,6 +2246,7 @@
   "pdf.annotationError": "Οι σχολιασμοί στο {resource} δεν μπορούν να διατηρηθούν σε A4. Επιλέξτε το αρχικό μέγεθος για να τους διατηρήσετε.",
   "pdf.appendices": "Παραρτήματα",
   "pdf.appendicesHelp": "Ένα έγγραφο ανά σελίδα.",
+  "pdf.cavesWithKnownLength": "{count, plural, one {# σπήλαιο με γνωστό μήκος} other {# σπήλαια με γνωστό μήκος}}",
   "pdf.download": "Λήψη PDF",
   "pdf.downloadStarted": "Η λήψη του PDF σας ξεκίνησε.",
   "pdf.excludeDocument": "Εξαίρεση από το PDF",

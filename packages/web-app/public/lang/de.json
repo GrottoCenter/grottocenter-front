@@ -2246,6 +2246,7 @@
   "pdf.annotationError": "Die Anmerkungen in {resource} können im A4-Format nicht erhalten werden. Wählen Sie die Originalgröße, um sie beizubehalten.",
   "pdf.appendices": "Anhänge",
   "pdf.appendicesHelp": "Ein Dokument pro Seite.",
+  "pdf.cavesWithKnownLength": "{count, plural, one {# Höhle mit bekannter Länge} other {# Höhlen mit bekannter Länge}}",
   "pdf.download": "PDF herunterladen",
   "pdf.downloadStarted": "Der Download Ihrer PDF-Datei wurde gestartet.",
   "pdf.excludeDocument": "Aus PDF ausschließen",

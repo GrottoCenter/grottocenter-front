@@ -2246,6 +2246,7 @@
   "pdf.annotationError": "לא ניתן לשמור את ההערות ב־{resource} בפורמט A4. בחרו בגודל המקורי כדי לשמור עליהן.",
   "pdf.appendices": "נספחים",
   "pdf.appendicesHelp": "מסמך אחד בכל עמוד.",
+  "pdf.cavesWithKnownLength": "{count, plural, one {# מערה שאורכה ידוע} other {# מערות שאורכן ידוע}}",
   "pdf.download": "הורדת PDF",
   "pdf.downloadStarted": "הורדת קובץ ה־PDF שלך החלה.",
   "pdf.excludeDocument": "החרגה מה־PDF",

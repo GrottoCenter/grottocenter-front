@@ -39,14 +39,29 @@ it.each(['massif', 'country', 'region'])(
     expect(body).toContain('Profondeur moyenne: 30 m');
     expect(body).toContain('Développement moyen: 273 m');
     expect(body).toContain(
-      `Développement cumulé: ${intl.formatNumber(299165)} m`
+      `Développement cumulé: ${intl.formatNumber(299165)} m (${intl.formatNumber(1092)} cavités dont le développement est renseigné)`
     );
-    expect(body).toContain(`${intl.formatNumber(1092)} cavités`);
+    expect(body).not.toContain('Calculé à');
     expect(body).toContain('Bange · 865 m');
     expect(body).toContain(`Bange · ${intl.formatNumber(53955)} m`);
     expect(body).toContain(`${window.location.origin}/ui/caves/75263`);
   }
 );
+
+it.each([
+  [0, '0 cavité dont le développement est renseigné'],
+  [1, '1 cavité dont le développement est renseigné']
+])('pluralizes the known-length count of %s caves', (count, label) => {
+  const model = build('country', {
+    statistics: {
+      nb_caves: 1,
+      total_length: { value: 0, nb_data: count }
+    }
+  });
+  expect(model.blocks[0].items[0].body).toContain(
+    `Développement cumulé: 0 m (${label})`
+  );
+});
 
 it('keeps zero statistics, pluralizes counts, and omits unknown measurements', () => {
   const model = build('country', {

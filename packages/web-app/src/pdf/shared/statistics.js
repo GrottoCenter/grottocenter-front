@@ -34,15 +34,19 @@ export const makeStatisticsPdfBlock = (
     ['average length', statistics.avg?.avg_length],
     ['cumulated length', statistics.total_length?.value]
   ]) {
-    if (Number.isFinite(value))
-      values.push(
-        `${t(label)}: ${intl.formatNumber(value, { maximumFractionDigits: 1 })} m`
-      );
+    if (!Number.isFinite(value)) continue;
+    let text = `${t(label)}: ${intl.formatNumber(value, { maximumFractionDigits: 1 })} m`;
+    if (
+      label === 'cumulated length' &&
+      Number.isFinite(statistics.total_length?.nb_data)
+    ) {
+      text += ` (${intl.formatMessage(
+        { id: 'pdf.cavesWithKnownLength' },
+        { count: statistics.total_length.nb_data }
+      )})`;
+    }
+    values.push(text);
   }
-  if (Number.isFinite(statistics.total_length?.nb_data))
-    values.push(
-      `${t('Calculated on')} ${intl.formatNumber(statistics.total_length.nb_data)} ${t('caves')}`
-    );
   for (const [field, label] of [
     ['cave_with_max_depth', 'is the deepest cave of the'],
     ['cave_with_max_length', 'is the longest cave of the']

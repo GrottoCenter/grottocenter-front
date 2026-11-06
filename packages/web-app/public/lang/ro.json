@@ -2246,6 +2246,7 @@
   "pdf.annotationError": "Adnotările din {resource} nu pot fi păstrate în format A4. Alegeți dimensiunea originală pentru a le păstra.",
   "pdf.appendices": "Anexe",
   "pdf.appendicesHelp": "Un document pe pagină.",
+  "pdf.cavesWithKnownLength": "{count, plural, one {# peșteră cu lungime cunoscută} few {# peșteri cu lungime cunoscută} other {# de peșteri cu lungime cunoscută}}",
   "pdf.download": "Descarcă PDF",
   "pdf.downloadStarted": "Descărcarea PDF-ului a început.",
   "pdf.excludeDocument": "Exclude din PDF",

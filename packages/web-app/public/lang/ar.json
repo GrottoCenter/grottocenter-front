@@ -2246,6 +2246,7 @@
   "pdf.annotationError": "لا يمكن الحفاظ على التعليقات التوضيحية في {resource} بحجم A4. اختر الحجم الأصلي للاحتفاظ بها.",
   "pdf.appendices": "المرفقات",
   "pdf.appendicesHelp": "مستند واحد في كل صفحة.",
+  "pdf.cavesWithKnownLength": "{count, plural, zero {# كهوف ذات طول معروف} one {# كهف ذو طول معروف} two {# كهفان ذوا طول معروف} few {# كهوف ذات طول معروف} many {# كهفًا ذا طول معروف} other {# كهف ذو طول معروف}}",
   "pdf.download": "تنزيل ملف PDF",
   "pdf.downloadStarted": "بدأ تنزيل ملف PDF الخاص بك.",
   "pdf.excludeDocument": "استبعاد من PDF",

@@ -2246,6 +2246,7 @@
   "pdf.annotationError": "De annotaties in {resource} kunnen niet behouden blijven op A4. Kies het oorspronkelijke formaat om ze te behouden.",
   "pdf.appendices": "Bijlagen",
   "pdf.appendicesHelp": "Eén document per pagina.",
+  "pdf.cavesWithKnownLength": "{count, plural, one {# grot met bekende lengte} other {# grotten met bekende lengte}}",
   "pdf.download": "PDF downloaden",
   "pdf.downloadStarted": "Het downloaden van uw PDF is gestart.",
   "pdf.excludeDocument": "Uitsluiten van PDF",

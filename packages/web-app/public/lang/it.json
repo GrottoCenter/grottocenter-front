@@ -2246,6 +2246,7 @@
   "pdf.annotationError": "Le annotazioni di {resource} non possono essere conservate in A4. Scegli le dimensioni originali per conservarle.",
   "pdf.appendices": "Allegati",
   "pdf.appendicesHelp": "Un documento per pagina.",
+  "pdf.cavesWithKnownLength": "{count, plural, one {# cavità con sviluppo noto} other {# cavità con sviluppo noto}}",
   "pdf.download": "Scarica PDF",
   "pdf.downloadStarted": "Il download del PDF è iniziato.",
   "pdf.excludeDocument": "Escludi dal PDF",

@@ -2246,6 +2246,7 @@
   "pdf.annotationError": "The annotations in {resource} cannot be preserved in A4. Choose Original size to keep them.",
   "pdf.appendices": "Appendices",
   "pdf.appendicesHelp": "One document per page.",
+  "pdf.cavesWithKnownLength": "{count, plural, one {# cave with known length} other {# caves with known length}}",
   "pdf.download": "Download PDF",
   "pdf.downloadStarted": "Your PDF download has started.",
   "pdf.excludeDocument": "Exclude from PDF",

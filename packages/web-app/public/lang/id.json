@@ -2246,6 +2246,7 @@
   "pdf.annotationError": "Anotasi dalam {resource} tidak dapat dipertahankan dalam format A4. Pilih ukuran asli untuk mempertahankannya.",
   "pdf.appendices": "Lampiran",
   "pdf.appendicesHelp": "Satu dokumen per halaman.",
+  "pdf.cavesWithKnownLength": "{count, plural, other {# gua dengan panjang yang diketahui}}",
   "pdf.download": "Unduh PDF",
   "pdf.downloadStarted": "Unduhan PDF Anda telah dimulai.",
   "pdf.excludeDocument": "Kecualikan dari PDF",

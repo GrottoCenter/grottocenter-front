@@ -124,6 +124,66 @@ it('fits nine linked networks and their dimensions before documents on one page'
     await task.destroy();
   }
 }, 20000);
+
+it.each([24, 28, 32])(
+  'keeps the statistics heading and its contents together after %s description lines',
+  async lines => {
+    const massif = buildMassifPdfModel({
+      entity: {
+        id: 6487,
+        name: 'Statistics pagination',
+        descriptions: [
+          {
+            id: 1,
+            body: Array.from(
+              { length: lines },
+              (_item, index) => `Description line ${index + 1}`
+            ).join('\n')
+          }
+        ]
+      },
+      statistics: {
+        nb_caves: 1165,
+        nb_networks: 9,
+        diving_caves: 3,
+        avg: { avg_depth: 30, avg_length: 273 },
+        total_length: { value: 299165, nb_data: 1092 },
+        cave_with_max_depth: { id_cave: 1, name_cave: 'Deepest', value: 865 },
+        cave_with_max_length: { id_cave: 2, name_cave: 'Longest', value: 53955 }
+      },
+      sections: { descriptions: true, statistics: true },
+      documents: [],
+      attachments: [],
+      intl
+    });
+    const task = getDocument({
+      data: await generateEntityPdf(massif, [], { fontSources })
+    });
+    try {
+      const output = await task.promise;
+      const pages = await Promise.all(
+        Array.from({ length: output.numPages }, async (_item, index) => {
+          const page = await output.getPage(index + 1);
+          return (await page.getTextContent()).items
+            .map(item => item.str)
+            .join(' ');
+        })
+      );
+      const statisticsPage = pages.find(text =>
+        text.includes('More information')
+      );
+      expect(statisticsPage).toContain('1,165');
+      expect(statisticsPage).toContain('299,165 m');
+      expect(statisticsPage).toContain('Longest');
+      expect(
+        pages.filter(text => text.includes('More information'))
+      ).toHaveLength(1);
+    } finally {
+      await task.destroy();
+    }
+  },
+  20000
+);
 const model = buildEntrancePdfModel({
   entrance: {
     id: 1,

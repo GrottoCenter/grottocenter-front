@@ -2246,6 +2246,7 @@
   "pdf.annotationError": "Анотациите в {resource} не могат да бъдат запазени във формат A4. Изберете оригиналния размер, за да ги запазите.",
   "pdf.appendices": "Приложения",
   "pdf.appendicesHelp": "По един документ на страница.",
+  "pdf.cavesWithKnownLength": "{count, plural, one {# пещера с известна дължина} other {# пещери с известна дължина}}",
   "pdf.download": "Изтегляне на PDF",
   "pdf.downloadStarted": "Изтеглянето на вашия PDF започна.",
   "pdf.excludeDocument": "Изключване от PDF",

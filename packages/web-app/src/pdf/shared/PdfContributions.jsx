@@ -85,7 +85,7 @@ EntityLinks.propTypes = {
 export const Blocks = ({ blocks, model }) => {
   const styles = usePdfStyles();
   return blocks.map(block => (
-    <View key={block.key}>
+    <View key={block.key} wrap={block.key !== 'statistics'}>
       {block.type !== 'rigging' && <Heading title={block.title} />}
       {block.type === 'links' ? (
         <EntityLinks items={block.items} model={model} />
