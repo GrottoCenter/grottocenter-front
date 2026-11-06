@@ -5,6 +5,7 @@ const API_BASE_PATH = `${API_URL}/api/${apiVersion}`;
 // ===== Points urls
 export const pointsUrl = `${API_BASE_PATH}/points`;
 export const pointUrl = id => `${pointsUrl}/${id}`;
+export const pointPositionsUrl = id => `${pointUrl(id)}/positions`;
 export const pointDocumentUrl = (pointId, documentId) =>
   `${pointUrl(pointId)}/documents/${documentId}`;
 

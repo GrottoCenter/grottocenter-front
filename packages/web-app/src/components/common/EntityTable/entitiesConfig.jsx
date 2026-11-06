@@ -855,31 +855,37 @@ const duplicate = {
   link: () => false
 };
 
+const points = {
+  icon: <CustomIcon type="point" size={16} />,
+  columns: [
+    {
+      visible: true,
+      field: 'label',
+      label: 'Name',
+      sortable: false,
+      isTitle: true
+    },
+    {
+      visible: true,
+      field: 'underground',
+      label: 'points.underground',
+      sortable: false
+    },
+    {
+      visible: true,
+      field: 'caveId',
+      label: 'Cave',
+      sortable: false
+    }
+  ],
+  link: point => `/ui/points/${point.id}`
+};
+
 const o = {
-  points: {
-    icon: <CustomIcon type="point" size={16} />,
-    columns: [
-      {
-        visible: true,
-        field: 'label',
-        label: 'Name',
-        sortable: false,
-        isTitle: true
-      },
-      {
-        visible: true,
-        field: 'underground',
-        label: 'points.underground',
-        sortable: false
-      },
-      {
-        visible: true,
-        field: 'caveId',
-        label: 'Cave',
-        sortable: false
-      }
-    ],
-    link: point => `/ui/points/${point.id}`
+  points,
+  associatedPoints: {
+    ...points,
+    columns: points.columns.filter(column => column.field !== 'caveId')
   },
   placeholder,
   persons,

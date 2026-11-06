@@ -247,7 +247,9 @@ export {
 export { useNotification } from './useNotification';
 export {
   usePoints,
+  useAssociatedPoints,
   usePoint,
+  usePointPositions,
   useSurfacePointCoordinates
 } from './queries/usePoints';
 export {

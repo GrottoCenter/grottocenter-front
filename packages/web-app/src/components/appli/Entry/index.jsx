@@ -433,7 +433,14 @@ export const Entry = ({
             ),
             science: entrance?.cave?.id && (
               <SectionStack>
-                <Science caveId={entrance.cave.id} />
+                <Science
+                  key={`${entrance.id}-${entrance.cave.id}-${isNetwork}`}
+                  caveId={entrance.cave.id}
+                  entranceId={isNetwork ? null : entrance.id}
+                  networkId={isNetwork ? entrance.cave.id : null}
+                  networkName={entrance.cave.name}
+                  isNetworkEntrance={isNetwork}
+                />
               </SectionStack>
             ),
             comments: entrance && (

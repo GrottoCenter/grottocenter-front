@@ -330,9 +330,9 @@ export const Network = ({
                 )}
               </SectionStack>
             ),
-            science: (
+            science: cave && (
               <SectionStack>
-                <Science caveId={caveId} />
+                <Science key={cave.id} caveId={cave.id} networkId={cave.id} />
               </SectionStack>
             )
           }}

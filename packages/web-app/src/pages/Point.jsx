@@ -11,6 +11,7 @@ import { getPointAssociation } from '@/components/appli/Point/association';
 import SensitiveCaveWarning from '@/components/appli/Entry/SensitiveCaveWarning';
 import SensitiveLocationPlaceholder from '@/components/appli/Entry/SensitiveLocationPlaceholder';
 import CustomIcon from '@/components/common/CustomIcon';
+import AppLink from '@/components/common/AppLink';
 import ContributionMetadata from '@/components/common/Contribution/ContributionMetadata';
 import {
   DeleteConfirmationDialog,
@@ -37,6 +38,7 @@ import {
   useEntrance,
   useDeletePoint,
   usePoint,
+  usePointPositions,
   usePermissions,
   useOnlineStatus
 } from '@/hooks';
@@ -67,6 +69,17 @@ const Point = () => {
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const isDeleted = Boolean(point?.isDeleted);
   const canModerate = permissions.isModerator || permissions.isAdmin;
+  const embeddedPositions = point?.positions ?? [];
+  const hasPartialPositions =
+    (point?.positionCount ?? 0) > embeddedPositions.length;
+  const positionsQuery = usePointPositions(pointId, {
+    enabled: hasPartialPositions && (!isDeleted || canModerate)
+  });
+  const documentPositions = hasPartialPositions
+    ? (positionsQuery.data?.positions ?? embeddedPositions)
+    : embeddedPositions;
+  const hasPositionDocuments =
+    documentPositions.length > 0 || hasPartialPositions;
   const undergroundLocation = useMemo(
     () =>
       getUndergroundLocation(
@@ -276,7 +289,9 @@ const Point = () => {
                             </InfoSection>
                           </Paper>
                         )}
-                        {(point.underground === true || association) && (
+                        {(point.underground === true ||
+                          association ||
+                          hasPositionDocuments) && (
                           <Paper
                             variant="outlined"
                             sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
@@ -309,6 +324,51 @@ const Point = () => {
                                       : `/ui/caves/${association.id}`
                                   }
                                   icon={<CustomIcon type={association.type} />}
+                                />
+                              )}
+                              {hasPositionDocuments && (
+                                <Property
+                                  label={formatMessage({
+                                    id: 'points.appearsOn'
+                                  })}
+                                  icon={<CustomIcon type="bibliography" />}
+                                  value={
+                                    <Box
+                                      data-testid="point-position-documents"
+                                      sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: 0.5
+                                      }}>
+                                      {documentPositions.map(position => (
+                                        <AppLink
+                                          key={position.documentId}
+                                          to={`/ui/documents/${position.documentId}`}>
+                                          {position.document?.title?.trim() ||
+                                            String(position.documentId)}
+                                        </AppLink>
+                                      ))}
+                                      {hasPartialPositions &&
+                                        positionsQuery.isFetching && (
+                                          <CircularProgress
+                                            size={20}
+                                            aria-label={formatMessage({
+                                              id: 'Loading ...'
+                                            })}
+                                          />
+                                        )}
+                                      {hasPartialPositions &&
+                                        (positionsQuery.error ||
+                                          positionsQuery.isPaused) && (
+                                          <FetchErrorState
+                                            error={positionsQuery.error}
+                                            isPaused={positionsQuery.isPaused}
+                                            messageId="points.positionDocumentsFetchError"
+                                            onRetry={positionsQuery.refetch}
+                                          />
+                                        )}
+                                    </Box>
+                                  }
                                 />
                               )}
                             </InfoSection>

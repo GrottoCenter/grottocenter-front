@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Divider } from '@mui/material';
 import { useIntl } from 'react-intl';
 
 import { SearchBooleanToggle } from '@/components/appli/AdvancedSearch/SearchElements';
@@ -67,21 +67,12 @@ const Points = () => {
               onRetry={refetch}
             />
           ) : (
-            <>
-              <Typography variant="body2" sx={{ mb: 1 }} role="status">
-                {formatMessage(
-                  { id: 'results_count' },
-                  { count: points.length }
-                )}
-              </Typography>
-              <EntityTable
-                entityType="points"
-                pageRows={points}
-                nbTotalRows={points.length}
-                isLoading={isFetching}
-                shouldHideFooter
-              />
-            </>
+            <EntityTable
+              entityType="points"
+              pageRows={points}
+              nbTotalRows={points.length}
+              isLoading={isFetching}
+            />
           )}
         </>
       }

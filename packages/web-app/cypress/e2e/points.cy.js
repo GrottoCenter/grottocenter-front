@@ -130,6 +130,114 @@ describe('Point management', () => {
     });
   });
 
+  it('lists the positioning documents in characteristics, including a surface point with no cave', () => {
+    const positions = [
+      { pointId: 6, documentId: 20, document: { id: 20, title: 'Point plan' } },
+      {
+        pointId: 6,
+        documentId: 21,
+        document: { id: 21, title: 'Point section' }
+      },
+      { pointId: 6, documentId: 22, document: { id: 22, title: '   ' } }
+    ];
+    cy.intercept('GET', '**/api/v1/points/6', {
+      body: {
+        ...surfacePoint,
+        positions,
+        positionCount: 3,
+        documents: [{ ...document, id: 99, title: 'Attached report' }]
+      }
+    });
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/points/6/positions' },
+      { body: { positions, total: 3, page: 1, size: 100 } }
+    ).as('positionDocuments');
+    visit('/points/6');
+    cy.get('[data-testid="point-properties"]').within(() => {
+      cy.contains('Characteristics').should('be.visible');
+      cy.contains('Appears on').should('be.visible');
+      cy.get('a[href="/ui/documents/20"]').should('have.text', 'Point plan');
+      cy.get('a[href="/ui/documents/21"]').should('have.text', 'Point section');
+      cy.get('a[href="/ui/documents/22"]').should('have.text', '22');
+      cy.contains('Attached report').should('not.exist');
+    });
+    cy.get('@positionDocuments.all').should('have.length', 0);
+    cy.viewport(390, 844);
+    cy.get('[data-testid="point-position-documents"] a').should('be.visible');
+  });
+
+  it('expands the embedded preview with one request capped at 100 documents', () => {
+    const positions = Array.from({ length: 100 }, (_, index) => ({
+      pointId: 5,
+      documentId: index + 20,
+      document: { id: index + 20, title: `Survey ${index + 1}` }
+    }));
+    cy.intercept('GET', '**/api/v1/points/5', {
+      body: {
+        ...undergroundPoint,
+        positions: positions.slice(0, 20),
+        positionCount: 101
+      }
+    });
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/points/5/positions' },
+      { body: { positions, total: 101, page: 1, size: 100 } }
+    ).as('positionDocuments');
+    visit('/points/5');
+    cy.wait('@positionDocuments').its('request.query').should('deep.equal', {
+      page: '1',
+      size: '100'
+    });
+    cy.get('[data-testid="point-position-documents"] a')
+      .should('have.length', 100)
+      .last()
+      .should('have.text', 'Survey 100');
+    cy.get('@positionDocuments.all').should('have.length', 1);
+  });
+
+  it('keeps the positioning preview visible while a failed full list can be retried', () => {
+    const positions = [
+      { pointId: 5, documentId: 20, document: { id: 20, title: 'Point plan' } },
+      {
+        pointId: 5,
+        documentId: 21,
+        document: { id: 21, title: 'Point section' }
+      }
+    ];
+    cy.intercept('GET', '**/api/v1/points/5', {
+      body: {
+        ...undergroundPoint,
+        positions: positions.slice(0, 1),
+        positionCount: 2
+      }
+    });
+    let shouldFail = true;
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/points/5/positions' },
+      req => {
+        if (shouldFail) {
+          req.reply({ statusCode: 404, body: { message: 'Not found' } });
+        } else {
+          req.reply({ positions, total: 2, page: 1, size: 100 });
+        }
+      }
+    ).as('positionDocuments');
+    visit('/points/5');
+    cy.get('[data-testid="point-position-documents"]').within(() => {
+      cy.contains('Point plan').should('be.visible');
+      cy.contains(
+        'Unable to load the documents on which this point appears.'
+      ).should('be.visible');
+      cy.then(() => {
+        shouldFail = false;
+      });
+      cy.contains('button', 'Retry').click();
+      cy.contains('Point section').should('be.visible');
+      cy.get('[data-testid="fetch-error-state"]').should('not.exist');
+    });
+    cy.get('@positionDocuments.all').should('have.length', 2);
+  });
+
   it('locates underground points from the cave and replaces the unclassified warning with a placeholder', () => {
     visit('/points/5');
     cy.get('[data-testid="point-properties"] img[alt="Underground"]').should(
@@ -374,7 +482,7 @@ describe('Point management', () => {
       });
     }).as('allPoints');
     visit('/points');
-    cy.get('[role="status"]').should('contain', '101 results');
+    cy.contains('101 results').should('be.visible');
     cy.get('[data-testid="points-underground-filter"] [role="group"]')
       .should('have.attr', 'aria-label', 'Underground')
       .find('[role="button"]')
@@ -386,7 +494,7 @@ describe('Point management', () => {
         ]);
       });
     cy.get('[data-testid="points-search"] input').type('echo');
-    cy.get('[role="status"]').should('contain', '1 result');
+    cy.contains('1 result').should('be.visible');
     cy.contains('td', 'Écho').should('be.visible');
     cy.contains('td', 'Écho')
       .parent()
