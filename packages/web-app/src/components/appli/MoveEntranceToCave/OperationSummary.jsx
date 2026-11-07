@@ -197,23 +197,35 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
   );
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' },
-        alignItems: { xs: 'stretch', sm: 'center' },
-        gap: 1
-      }}>
-      {column(formatMessage({ id: 'Now' }), before)}
-      <KeyboardArrowRightIcon
-        fontSize="large"
+    <Box>
+      <Box
         sx={{
-          alignSelf: 'center',
-          color: 'text.secondary',
-          transform: { xs: 'rotate(90deg)', sm: 'none' }
-        }}
-      />
-      {column(formatMessage({ id: 'After' }), after)}
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'stretch', sm: 'center' },
+          gap: 1
+        }}>
+        {column(formatMessage({ id: 'Now' }), before)}
+        <KeyboardArrowRightIcon
+          fontSize="large"
+          sx={{
+            alignSelf: 'center',
+            color: 'text.secondary',
+            transform: { xs: 'rotate(90deg)', sm: 'none' }
+          }}
+        />
+        {column(formatMessage({ id: 'After' }), after)}
+      </Box>
+      {(variant === 'detach' || hasTarget) && (
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          {formatMessage({
+            id:
+              sourceCount === 1
+                ? 'scientificData.moveTransfer'
+                : 'scientificData.moveStay'
+          })}
+        </Typography>
+      )}
     </Box>
   );
 };

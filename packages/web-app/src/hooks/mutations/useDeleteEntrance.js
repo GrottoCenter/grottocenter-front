@@ -3,7 +3,7 @@ import { completeEntityDeletion } from '@/utils/entityDeletionCache';
 
 import { deleteEntranceUrl } from '../../conf/apiRoutes';
 import { apiDelete } from '../../api/client';
-import { entranceKeys } from '../../api/queryKeys';
+import { entranceKeys, pointKeys } from '../../api/queryKeys';
 import { invalidateAll } from '../../utils/mapTileCache';
 
 // Soft- or permanently delete an entrance. Both entrance and network tile
@@ -19,6 +19,8 @@ export const useDeleteEntrance = () => {
       await completeEntityDeletion(queryClient, entranceKeys, data, variables);
       invalidateAll('entrances');
       invalidateAll('networks');
+      invalidateAll('points', { discardData: true });
+      await queryClient.invalidateQueries({ queryKey: pointKeys.all });
     }
   });
 };
