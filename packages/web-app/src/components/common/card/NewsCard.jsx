@@ -87,6 +87,7 @@ const NewsCard = ({
         key={image}
         component="img"
         src={imageSrc}
+        referrerPolicy="no-referrer"
         alt=""
         loading="lazy"
         decoding="async"

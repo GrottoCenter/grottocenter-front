@@ -22,9 +22,12 @@ describe('Homepage blog news', () => {
   beforeEach(() => {
     cy.disableServiceWorker();
     cy.mockApiCatchAll();
-    cy.intercept(article.image, {
-      headers: { 'content-type': 'image/svg+xml' },
-      body: '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="480"><rect width="320" height="480" fill="brown"/></svg>'
+    cy.intercept(article.image, req => {
+      expect(req.headers).not.to.have.property('referer');
+      req.reply({
+        headers: { 'content-type': 'image/svg+xml' },
+        body: '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="480"><rect width="320" height="480" fill="brown"/></svg>'
+      });
     });
   });
 
@@ -37,6 +40,7 @@ describe('Homepage blog news', () => {
       cy.get('[data-testid="news-card-image"]')
         .should('have.attr', 'src', article.image)
         .and('have.attr', 'alt', '')
+        .and('have.attr', 'referrerpolicy', 'no-referrer')
         .and('have.css', 'object-fit', 'contain')
         .should($image => {
           expect($image[0].naturalWidth).to.equal(320);

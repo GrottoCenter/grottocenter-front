@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 
 import { apiGet } from '@/api/client';
+import { DYNAMIC_NEWS_RELOAD_INTERVAL } from '@/conf/config';
 import { createTestQueryClient } from '@/test/renderWithProviders';
 import { useLatestBlogNews } from './useHomepageLists';
 
@@ -27,6 +28,31 @@ beforeEach(() => {
 
 afterEach(() => {
   queryClient.clear();
+  vi.useRealTimers();
+});
+
+it('refreshes automatically at the configured interval and stops after unmount', async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  const nextArticle = { ...article, title: 'New article' };
+  apiGet.mockResolvedValueOnce(article).mockResolvedValue(nextArticle);
+  const { result, unmount } = renderHook(() => useLatestBlogNews(englishFeed), {
+    wrapper: Wrapper
+  });
+
+  await waitFor(() => expect(result.current.data).toEqual(article));
+  expect(apiGet).toHaveBeenCalledTimes(1);
+
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(DYNAMIC_NEWS_RELOAD_INTERVAL);
+  });
+  await waitFor(() => expect(result.current.data).toEqual(nextArticle));
+  expect(apiGet).toHaveBeenCalledTimes(2);
+
+  unmount();
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(DYNAMIC_NEWS_RELOAD_INTERVAL);
+  });
+  expect(apiGet).toHaveBeenCalledTimes(2);
 });
 
 it('retains the article after a failed refresh and recovers on the next refresh', async () => {
