@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
+import { DYNAMIC_NEWS_RELOAD_INTERVAL } from '@/conf/config';
 import {
   getForCarouselUrl,
   getRandomEntranceUrl,
@@ -95,5 +96,7 @@ export const useLatestBlogNews = url =>
     queryKey: listKeys.latestBlogNews(url),
     queryFn: () => apiGet(url),
     enabled: Boolean(url),
-    staleTime: STALE.STANDARD
+    staleTime: STALE.STANDARD,
+    refetchInterval: DYNAMIC_NEWS_RELOAD_INTERVAL,
+    meta: { skipErrorNotification: true }
   });
