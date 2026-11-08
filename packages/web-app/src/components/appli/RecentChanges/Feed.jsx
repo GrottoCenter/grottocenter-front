@@ -12,6 +12,7 @@ const RecentChangesFeed = ({ filters = {} }) => {
     error,
     fetchNextPage,
     hasNextPage,
+    isFetchNextPageError,
     isFetchingNextPage,
     isPending,
     isPaused,
@@ -19,7 +20,7 @@ const RecentChangesFeed = ({ filters = {} }) => {
   } = useRecentChangesFeed({ filters });
   const changes = data?.changes ?? [];
   // A failed next page must retry its offset while retaining the loaded rows.
-  const handleRetry = changes.length > 0 ? fetchNextPage : refetch;
+  const handleRetry = isFetchNextPageError ? fetchNextPage : refetch;
 
   return (
     <Box

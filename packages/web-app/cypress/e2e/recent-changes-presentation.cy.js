@@ -72,8 +72,6 @@ describe('French recent-changes presentation', () => {
       cy.get(
         '[data-testid="page-tab-activities"] [data-testid="activity-tab-icon"]'
       ).should('exist');
-      cy.get('#activities').screenshot(`recent-changes-card-fr-${width}`);
-      cy.screenshot(`recent-changes-page-fr-${width}`);
     });
   });
 });

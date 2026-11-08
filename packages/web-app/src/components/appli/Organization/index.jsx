@@ -311,7 +311,7 @@ const Organization = ({
         </SectionStack>
       )}
       {organization && (
-        <PageTabs tabs={isPreview ? [] : tabs}>
+        <PageTabs tabs={isPreview || organization.isDeleted ? [] : tabs}>
           <SectionStack>
             {organization.isDeleted && (
               <DeletedCard
@@ -539,7 +539,7 @@ const Organization = ({
               />
             )}
           </SectionStack>
-          {!isPreview && (
+          {!isPreview && !organization.isDeleted && (
             <RecentChangesSection
               scopeType="organization"
               scopeId={organization.id}

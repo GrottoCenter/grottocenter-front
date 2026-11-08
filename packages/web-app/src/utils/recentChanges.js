@@ -34,6 +34,14 @@ export const RECENT_CHANGES_SCOPES = {
   }
 };
 
+export const getRegionIsoCode = (countryId, regionId) => {
+  const countryCode = countryId.trim().toUpperCase();
+  const regionCode = regionId.trim().toUpperCase();
+  return regionCode.startsWith(`${countryCode}-`)
+    ? regionCode
+    : `${countryCode}-${regionCode}`;
+};
+
 // Keep URL parameters and query keys in the same canonical shape. Do not drop
 // malformed supplied values: the API must reject them instead of showing an
 // unfiltered feed that could be mistaken for the requested scope.

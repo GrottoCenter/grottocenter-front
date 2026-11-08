@@ -15,6 +15,7 @@ import { useUserProperties } from '@/hooks/useUserProperties';
 import PageTabs from '@/components/common/Layouts/PageTabs';
 import RecentChangesSection from '@/components/appli/RecentChanges/Section';
 import { useRecentChangesTabs } from '@/hooks/useRecentChangesTabs';
+import { getRegionIsoCode } from '@/utils/recentChanges';
 import CustomIcon from '../../common/CustomIcon';
 
 import Guidelines from '../Guidelines';
@@ -225,9 +226,7 @@ const Region = ({
             </SectionStack>
             <RecentChangesSection
               scopeType="region"
-              scopeId={
-                regionId.includes('-') ? regionId : `${countryId}-${regionId}`
-              }
+              scopeId={getRegionIsoCode(countryId, regionId)}
             />
           </PageTabs>
         )}

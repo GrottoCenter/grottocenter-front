@@ -1,10 +1,14 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { onlineManager } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { createIntl } from 'react-intl';
 
 import * as apiClient from '@/api/client';
 import { getRecentChanges } from '@/conf/apiRoutes';
-import { renderWithProviders } from '@/test/renderWithProviders';
+import {
+  createTestQueryClient,
+  renderWithProviders
+} from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
 import frenchMessages from '@/../public/lang/fr.json';
 import PageTabs from '@/components/common/Layouts/PageTabs';
@@ -22,7 +26,7 @@ const change = id => ({
   name: `Entrance ${id}`
 });
 
-const renderSection = scopeType =>
+const renderSection = (scopeType, options = {}) =>
   renderWithProviders(
     <MemoryRouter>
       <RecentChangesSection
@@ -30,14 +34,17 @@ const renderSection = scopeType =>
         scopeId={scopeType === 'country' ? 'FR' : 42}
       />
     </MemoryRouter>,
-    { messages }
+    { messages, ...options }
   );
 
 beforeEach(() => {
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
 });
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  onlineManager.setOnline(true);
+  vi.restoreAllMocks();
+});
 
 it('formats the French period and cap from message parameters', () => {
   const intl = createIntl({ locale: 'fr', messages: frenchMessages });
@@ -183,3 +190,45 @@ it('keeps loaded activity when the next page fails and retries its offset', asyn
     [`${getRecentChanges}?offset=50&limit=51&massifId=42`]
   ]);
 });
+
+it.each([1, 51])(
+  'retries a paused background refetch from the first page with %s available changes',
+  async count => {
+    const apiGet = vi
+      .spyOn(apiClient, 'apiGet')
+      .mockResolvedValueOnce({
+        changes: Array.from({ length: count }, (_, i) => change(i + 1))
+      })
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockResolvedValue({ changes: [change(100)] });
+    const queryClient = createTestQueryClient();
+    queryClient.setDefaultOptions({
+      queries: {
+        networkMode: 'offlineFirst',
+        retry: 1,
+        retryDelay: 0,
+        gcTime: Infinity
+      }
+    });
+    renderSection('massif', { queryClient });
+    await screen.findByText('Entrance 1');
+
+    act(() => {
+      onlineManager.setOnline(false);
+      queryClient.refetchQueries();
+    });
+    expect(await screen.findByTestId('fetch-error-state')).toHaveTextContent(
+      messages.offlineContentUnavailable
+    );
+    expect(screen.getByText('Entrance 1')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+
+    await screen.findByText('Entrance 100');
+    expect(apiGet.mock.calls).toEqual(
+      Array.from({ length: 3 }, () => [
+        `${getRecentChanges}?offset=0&limit=51&massifId=42`
+      ])
+    );
+    expect(screen.queryByTestId('fetch-error-state')).toBeNull();
+  }
+);

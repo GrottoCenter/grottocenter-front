@@ -21,7 +21,9 @@ vi.mock('@/hooks/usePostDeletion', () => ({
   })
 }));
 vi.mock('@/components/common/card/Deleted', () => ({
-  DeletedCard: () => null,
+  DeletedCard: () => (
+    <p data-testid="deleted-organization">Deleted organization</p>
+  ),
   DeleteConfirmationDialog: () => null,
   DELETED_ENTITIES: { organization: 'organization' }
 }));
@@ -52,9 +54,13 @@ vi.mock('@/components/common/Maps/common/MapContainer', () => ({
   default: () => null
 }));
 
-const renderOrganization = (type, isPreview = false) =>
+const renderOrganization = (
+  type,
+  isPreview = false,
+  { isDeleted = false, initialEntries = ['/'] } = {}
+) =>
   renderWithProviders(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={initialEntries}>
       <Organization
         isLoading={false}
         isPreview={isPreview}
@@ -62,6 +68,7 @@ const renderOrganization = (type, isPreview = false) =>
           id: 42,
           name: 'Example organization',
           type,
+          isDeleted,
           cavers: [{ id: 1, nickname: 'Caver' }],
           exploredEntrances: [{ id: 7, name: 'An entrance' }],
           exploredNetworks: [{ id: 8, name: 'A network' }]
@@ -136,6 +143,20 @@ it('keeps recent member contributions in a separate lazy tab', () => {
   expect(screen.getByTestId('authored-documents')).not.toBeVisible();
   expect(screen.queryByTestId('see-all-recent-changes')).toBeNull();
 });
+
+it.each(['/', '/?tab=activities'])(
+  'hides activity on a deleted organization at %s',
+  path => {
+    renderOrganization('SPELEOLOGY', false, {
+      isDeleted: true,
+      initialEntries: [path]
+    });
+    expect(screen.queryByRole('tab', { name: 'Activities' })).toBeNull();
+    expect(screen.queryByTestId('activities')).toBeNull();
+    expect(screen.getByTestId('deleted-organization')).toBeVisible();
+    expect(screen.getByTestId('organization-properties')).toBeVisible();
+  }
+);
 
 it('shows a failed preview without a retry action', () => {
   renderWithProviders(

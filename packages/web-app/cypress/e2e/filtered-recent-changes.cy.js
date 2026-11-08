@@ -93,9 +93,27 @@ describe('Recent-changes tabs', () => {
         cy.location('search').should('eq', '?tab=activities');
         cy.get('[data-testid="recent-change"]').should('have.length', 50);
         cy.get('h1').should('contain.text', scope.data.name ?? 'France');
-        cy.screenshot(`recent-changes-tab-${scope.type}-${width}`);
       });
     });
+  });
+
+  it('hides deleted organization activity even through a direct link', () => {
+    cy.loginAs({ groups: ['User', 'Moderator'] });
+    const scope = scopes.find(item => item.type === 'organization');
+    cy.intercept('GET', `**/api/v1${scope.path}`, {
+      body: { ...scope.data, isDeleted: true }
+    });
+    cy.intercept('GET', '**/api/v1/changes/recent*', {
+      body: { changes }
+    }).as('changes');
+    cy.visit(`${scope.path}?tab=activities`, {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.get('h1').should('contain.text', scope.data.name);
+    cy.get('[data-testid="page-tab-activities"]').should('not.exist');
+    cy.get('#activities').should('not.exist');
+    cy.get('[data-testid="organization-properties"]').should('be.visible');
+    cy.get('@changes.all').should('have.length', 0);
   });
 
   it('keeps the global activity page and its pagination', () => {
