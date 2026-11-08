@@ -37,6 +37,16 @@ code {
   gap: 6px;
 }
 
+.map-popup-photo {
+  display: block;
+  width: 260px;
+  max-width: 100%;
+  height: 110px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
 /* Outranks Leaflet's `.leaflet-popup-content p { margin: 1.3em 0 }`. That one
    used to be ~10px per side under the app's former 62.5% root and is now ~17px,
    and the margins do not collapse (the <p> is a flex item), so losing this tie

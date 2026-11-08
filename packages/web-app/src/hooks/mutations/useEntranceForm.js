@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { refreshEntrance } from '@/api/refreshEntrance';
 import {
   postCreateEntranceUrl,
   putEntranceUrl,
   putEntranceWithNewEntitiesUrl
 } from '../../conf/apiRoutes';
 import { apiPost, apiPut } from '../../api/client';
-import { entranceKeys } from '../../api/queryKeys';
 import { invalidateAll, invalidateTileAt } from '../../utils/mapTileCache';
 
 // Entrance form mutations. Both Create and Update invalidate the entrance
@@ -19,7 +19,7 @@ import { invalidateAll, invalidateTileAt } from '../../utils/mapTileCache';
 // invalidateAll nukes every cached tile the user has explored, so panning
 // after a single create/update kicks off a burst of refetches.
 const invalidateEntranceAndMap = (queryClient, response) => {
-  queryClient.invalidateQueries({ queryKey: entranceKeys.all });
+  refreshEntrance(queryClient, response);
   const latitude = response?.latitude;
   const longitude = response?.longitude;
   if (latitude != null && longitude != null) {

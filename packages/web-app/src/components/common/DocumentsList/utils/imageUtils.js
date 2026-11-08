@@ -95,7 +95,14 @@ export const downloadFile = async (url, fileName) => {
   }
 };
 
-const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
+const IMAGE_EXTENSIONS = new Set([
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.gif',
+  '.webp',
+  '.bmp'
+]);
 
 /**
  * Check if a file is an image based on its extension

@@ -128,6 +128,73 @@ beforeEach(() => {
 });
 
 describe('entrance and network submission validation', () => {
+  it.each([null, 11])(
+    'saves an image-only change from %s without changing the cave',
+    async featuredFile => {
+      renderForm(
+        <EntranceForm
+          entranceValues={{
+            ...entrance,
+            featuredFile,
+            documents: [
+              {
+                id: 3,
+                files: [
+                  { id: 11, fileName: 'first.jpg', completePath: '/first.jpg' },
+                  {
+                    id: 12,
+                    fileName: 'second.jpg',
+                    completePath: '/second.jpg'
+                  }
+                ]
+              }
+            ]
+          }}
+          caveValues={cave}
+        />
+      );
+      expect(screen.queryByRole('radiogroup')).toBeNull();
+      fireEvent.click(screen.getByTestId('featured-image-toggle'));
+      fireEvent.click(screen.getByRole('radio', { name: 'Image 2 of 2' }));
+      expect(screen.getByRole('radiogroup')).toBeVisible();
+      fireEvent.click(screen.getByText('Update'));
+      await waitFor(() =>
+        expect(mocks.updateEntrance).toHaveBeenCalledTimes(1)
+      );
+      expect(mocks.updateEntrance.mock.calls[0][0]).toMatchObject({
+        id: 42,
+        featuredFile: 12
+      });
+      expect(mocks.update).not.toHaveBeenCalled();
+    }
+  );
+
+  it('explicitly clears the selected image with null', async () => {
+    renderForm(
+      <EntranceForm
+        entranceValues={{
+          ...entrance,
+          featuredFile: 11,
+          documents: [
+            {
+              id: 3,
+              files: [
+                { id: 11, fileName: 'first.jpg', completePath: '/first.jpg' }
+              ]
+            }
+          ]
+        }}
+        caveValues={cave}
+      />
+    );
+    fireEvent.click(screen.getByTestId('featured-image-toggle'));
+    expect(screen.getByRole('radio', { name: 'Image 1 of 1' })).toBeChecked();
+    fireEvent.click(screen.getByRole('radio', { name: 'No featured image' }));
+    fireEvent.click(screen.getByText('Update'));
+    await waitFor(() => expect(mocks.updateEntrance).toHaveBeenCalledTimes(1));
+    expect(mocks.updateEntrance.mock.calls[0][0].featuredFile).toBeNull();
+  });
+
   it.each([
     ['Altitude', '10000', '9999'],
     ['Depth', '20001', '20000'],

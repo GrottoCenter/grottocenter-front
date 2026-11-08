@@ -31,6 +31,11 @@ export const makeEntranceData = (data, entityType) => {
         : null
   };
 
+  // Creation has no linked documents; omission also preserves older API data.
+  if (data.entrance.featuredFile !== undefined) {
+    entranceData.featuredFile = data.entrance.featuredFile;
+  }
+
   // Only administrators edit the sensitivity lock: leave the key out entirely
   // when the form doesn't hold a value so the API keeps its own default.
   if (data.entrance.isSensitiveLocked != null) {
@@ -78,6 +83,9 @@ export const hasEntranceChanged = (entranceDataFmt, originalEntranceValues) => {
   return (
     entranceDataFmt.name.text !== originalEntranceValues.name ||
     entranceDataFmt.name.language !== originalEntranceValues.language ||
+    (entranceDataFmt.featuredFile !== undefined &&
+      entranceDataFmt.featuredFile !==
+        (originalEntranceValues.featuredFile ?? null)) ||
     Boolean(entranceDataFmt.isSensitive) !==
       Boolean(originalEntranceValues.isSensitive) ||
     ('isSensitiveLocked' in entranceDataFmt

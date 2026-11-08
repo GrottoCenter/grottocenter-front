@@ -20,6 +20,7 @@ export const EntrancePopup = ({ entrance }) => {
 
   return (
     <>
+      <div data-entrance-popup-image={entrance.id} />
       <Information
         isTitle
         value={entrance.name}

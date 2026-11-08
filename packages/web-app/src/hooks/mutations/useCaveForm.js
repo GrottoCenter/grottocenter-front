@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { refreshEntrance } from '@/api/refreshEntrance';
 import {
   postCreateCaveUrl,
   putCaveUrl,
@@ -77,9 +78,9 @@ export const useUpdateCaveAndEntrance = () => {
         apiPut(putCaveUrl(caveData.id), caveData),
         apiPut(putEntranceUrl(entranceData.id), entranceData)
       ]),
-    onSuccess: () => {
+    onSuccess: ([_cave, entrance]) => {
       queryClient.invalidateQueries({ queryKey: caveKeys.all });
-      queryClient.invalidateQueries({ queryKey: entranceKeys.all });
+      refreshEntrance(queryClient, entrance);
       invalidateAll('entrances');
       invalidateAll('networks');
     }
