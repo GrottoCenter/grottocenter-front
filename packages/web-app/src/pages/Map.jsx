@@ -23,6 +23,7 @@ import {
   fetchOrganizations,
   fetchAllOrganizationsCoordinates,
   fetchEntrances,
+  fetchPoints,
   fetchAllEntrancesCoordinates,
   fetchAllMassifsCoordinates,
   fetchMassifs,
@@ -133,6 +134,7 @@ const Map = () => {
     state => state.map.organizationsCoordinates
   );
   const entrances = useSelector(state => state.map.entrances);
+  const points = useSelector(state => state.map.points);
   const entrancesCoordinates = useSelector(
     state => state.map.entrancesCoordinates
   );
@@ -166,6 +168,9 @@ const Map = () => {
       }
       if (includes('entrances', markers)) {
         dispatch(fetchEntrances(criteria));
+      }
+      if (includes('points', markers)) {
+        dispatch(fetchPoints(criteria));
       }
       // Cleared unconditionally so toggling the layer off also drops a fetch
       // that was still pending for the previous viewport.
@@ -275,6 +280,7 @@ const Map = () => {
         zoom={zoom}
         entrances={entrancesCoordinates}
         entranceMarkers={entrances}
+        pointMarkers={points}
         networks={networksCoordinates}
         networkMarkers={networks}
         organizations={organizationsCoordinates}

@@ -4,6 +4,8 @@ import {
   FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
   FETCH_MAP_ENTRANCES_FAILURE,
   FETCH_MAP_ENTRANCES_SUCCESS,
+  FETCH_MAP_POINTS_SUCCESS,
+  FETCH_MAP_POINTS_FAILURE,
   FETCH_MAP_NETWORKS_COORDINATES_FAILURE,
   FETCH_MAP_NETWORKS_COORDINATES_SUCCESS,
   FETCH_MAP_NETWORKS_FAILURE,
@@ -26,6 +28,7 @@ const initialState = {
   networks: [],
   entrancesCoordinates: [],
   entrances: [],
+  points: [],
   organizations: [],
   organizationsCoordinates: [],
   massifsCoordinates: [],
@@ -76,6 +79,10 @@ const reducer = (state = initialState, action) => {
         entrances: action.data
       };
     case FETCH_MAP_ENTRANCES_FAILURE:
+      return { ...state, error: action.error };
+    case FETCH_MAP_POINTS_SUCCESS:
+      return { ...state, error: initialState.error, points: action.data };
+    case FETCH_MAP_POINTS_FAILURE:
       return { ...state, error: action.error };
     case FETCH_MAP_NETWORKS_SUCCESS:
       return {

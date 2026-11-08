@@ -43,7 +43,7 @@ const IntroduceLengthError = () => {
   );
 };
 
-const renderForm = overrides =>
+const renderForm = (overrides, linkedPointName = null) =>
   renderWithProviders(
     <MemoryRouter>
       <DocumentFormProvider
@@ -56,12 +56,20 @@ const renderForm = overrides =>
           identifierType: { id: 'url', regexp: '^.*$' },
           ...overrides
         }}>
-        <FormContent />
+        <FormContent linkedPointName={linkedPointName} />
         <IntroduceLengthError />
       </DocumentFormProvider>
     </MemoryRouter>,
     { messages }
   );
+
+it('shows the linked point notice without a linked entrance', () => {
+  renderForm({ id: undefined }, 'Underground station');
+  expect(screen.getByRole('alert')).toHaveTextContent(
+    'This document will be linked to point: Underground station'
+  );
+  expect(screen.queryByText(/linked to entrance/)).not.toBeInTheDocument();
+});
 
 describe('Document advanced metadata length errors', () => {
   it.each([true, false])(

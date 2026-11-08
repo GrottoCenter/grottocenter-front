@@ -2,6 +2,13 @@ export const apiVersion = 'v1';
 export const API_URL = import.meta.env.VITE_API_URL;
 const API_BASE_PATH = `${API_URL}/api/${apiVersion}`;
 
+// ===== Points urls
+export const pointsUrl = `${API_BASE_PATH}/points`;
+export const pointUrl = id => `${pointsUrl}/${id}`;
+export const pointPositionsUrl = id => `${pointUrl(id)}/positions`;
+export const pointDocumentUrl = (pointId, documentId) =>
+  `${pointUrl(pointId)}/documents/${documentId}`;
+
 export const dynamicNumbersUrl = {
   documents: `${API_BASE_PATH}/documents/count`,
   entrances: `${API_BASE_PATH}/entrances/count`,
@@ -201,6 +208,8 @@ export const getMapCavesUrl = `${API_BASE_PATH}/geoloc/networks`;
 export const getMapCavesCoordinatesUrl = `${API_BASE_PATH}/geoloc/networksCoordinates`;
 export const getMapEntrancesUrl = `${API_BASE_PATH}/geoloc/entrances`;
 export const getMapEntrancesCoordinatesUrl = `${API_BASE_PATH}/geoloc/entrancesCoordinates`;
+export const getMapPointsUrl = `${API_BASE_PATH}/geoloc/points`;
+export const getMapPointsCoordinatesUrl = `${API_BASE_PATH}/geoloc/pointsCoordinates`;
 export const getMapGrottosUrl = `${API_BASE_PATH}/geoloc/organizations`;
 export const getMapMassifsUrl = `${API_BASE_PATH}/geoloc/massifs`;
 export const getMapMassifsCoordinatesUrl = `${API_BASE_PATH}/geoloc/massifsCoordinates`;

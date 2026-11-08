@@ -3,7 +3,7 @@ import { completeEntityDeletion } from '@/utils/entityDeletionCache';
 
 import { deleteCaveUrl } from '../../conf/apiRoutes';
 import { apiDelete } from '../../api/client';
-import { caveKeys } from '../../api/queryKeys';
+import { caveKeys, pointKeys } from '../../api/queryKeys';
 import { invalidateAll } from '../../utils/mapTileCache';
 
 // Soft- or permanently delete a cave. The `networks` tile cache is invalidated
@@ -19,6 +19,8 @@ export const useDeleteCave = () => {
     onSuccess: async (data, variables) => {
       await completeEntityDeletion(queryClient, caveKeys, data, variables);
       invalidateAll('networks');
+      invalidateAll('points', { discardData: true });
+      await queryClient.invalidateQueries({ queryKey: pointKeys.all });
     }
   });
 };

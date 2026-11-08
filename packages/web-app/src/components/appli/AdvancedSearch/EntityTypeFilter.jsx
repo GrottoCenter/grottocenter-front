@@ -3,13 +3,13 @@ import { Box, Chip } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import { useIntl } from 'react-intl';
 
-const EntityTypeFilter = ({ options, value, onChange }) => {
+const EntityTypeFilter = ({ options, value, onChange, labelId = 'Type' }) => {
   const { formatMessage } = useIntl();
   return (
     <Box
       data-testid="entity-type-filter"
       role="group"
-      aria-label={formatMessage({ id: 'Type' })}
+      aria-label={formatMessage({ id: labelId })}
       sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
       {options.map(option => {
         const isSelected = option.value === value;
@@ -39,6 +39,7 @@ EntityTypeFilter.propTypes = {
     })
   ).isRequired,
   value: PropTypes.string,
+  labelId: PropTypes.string,
   onChange: PropTypes.func.isRequired
 };
 

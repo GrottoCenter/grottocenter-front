@@ -3,6 +3,7 @@ import { defineMessages } from 'react-intl';
 export { default as EntityIcon } from '@/components/common/EntityCreationIcon';
 
 const descriptions = defineMessages({
+  point: { id: 'points.createDescription' },
   entrance: { id: 'Add a cave entrance with its location and characteristics' },
   document: {
     id: 'Add an image, topographic drawing, book, dataset, bibliography reference, etc.'
@@ -20,6 +21,12 @@ export const ENTITIES = [
     iconType: 'entrance',
     titleKey: 'Entrance',
     descriptionKey: descriptions.entrance
+  },
+  {
+    path: 'point',
+    iconType: 'point',
+    titleKey: 'Point',
+    descriptionKey: descriptions.point
   },
   {
     path: 'document',

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { invalidateAll } from '@/utils/mapTileCache';
 import {
   accountUrl,
   banCaverUrl,
@@ -14,7 +15,8 @@ import {
   caveKeys,
   entranceKeys,
   listKeys,
-  personKeys
+  personKeys,
+  pointKeys
 } from '../../api/queryKeys';
 
 // Ban / unban / moveEntrance are body-less side-effects. Passing undefined
@@ -69,7 +71,8 @@ export const useUpdateAccount = () => {
 
 // Attach an entrance to an existing cave (either another network or a solo
 // cave). Both the entrance (parent cave changed) and both caves (member set
-// changed) need a refetch.
+// changed) need a refetch. Points can be transferred or change their displayed
+// entrance/network association even when they stay on the source cave.
 export const useMoveEntranceToCave = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -80,6 +83,8 @@ export const useMoveEntranceToCave = () => {
         queryKey: entranceKeys.detail(entranceId)
       });
       queryClient.invalidateQueries({ queryKey: caveKeys.all });
+      invalidateAll('points', { discardData: true });
+      return queryClient.invalidateQueries({ queryKey: pointKeys.all });
     }
   });
 };
@@ -116,6 +121,8 @@ export const useDetachEntranceToNewCave = () => {
         queryKey: entranceKeys.detail(entrance.id)
       });
       queryClient.invalidateQueries({ queryKey: caveKeys.all });
+      invalidateAll('points', { discardData: true });
+      return queryClient.invalidateQueries({ queryKey: pointKeys.all });
     }
   });
 };

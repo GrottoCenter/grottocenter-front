@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import associateAll from '@/api/associateAll';
 import { associateDocumentToMassifUrl } from '../../conf/apiRoutes';
 import { apiPut, apiDelete } from '../../api/client';
 import { documentKeys, massifKeys } from '../../api/queryKeys';
@@ -16,22 +17,10 @@ const invalidateMassifDocuments = (queryClient, massifId, documentIds) =>
     )
   ]);
 
-const linkDocuments = async (massifId, documents) => {
-  const results = await Promise.allSettled(
-    documents.map(document =>
-      apiPut(associateDocumentToMassifUrl(massifId, document.id))
-    )
+const linkDocuments = (massifId, documents) =>
+  associateAll(documents, document =>
+    associateDocumentToMassifUrl(massifId, document.id)
   );
-  const rejections = results
-    .filter(result => result.status === 'rejected')
-    .map(result => result.reason);
-  if (rejections.length > 0) {
-    const error = rejections[0];
-    error.rejections = rejections;
-    throw error;
-  }
-  return results.map(result => result.value);
-};
 
 /** Associate an existing document with a massif. */
 export const useLinkDocumentToMassif = () => {

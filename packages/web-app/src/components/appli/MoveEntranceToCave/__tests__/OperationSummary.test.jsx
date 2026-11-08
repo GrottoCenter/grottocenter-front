@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
+import englishMessages from '@/../public/lang/en.json';
 
 import OperationSummary from '../OperationSummary';
 
@@ -17,6 +18,7 @@ vi.mock('../../../../hooks', () => ({
 }));
 
 const messages = {
+  ...englishMessages,
   Now: 'Now',
   After: 'After',
   'network.entranceCount':

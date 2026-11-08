@@ -88,6 +88,9 @@ const DocumentsSearchPage = lazy(() => import('./pages/Documents'));
 const MassifsSearchPage = lazy(() => import('./pages/Massifs'));
 const OrganizationsSearchPage = lazy(() => import('./pages/Organizations'));
 const PersonsSearchPage = lazy(() => import('./pages/Persons'));
+const PointsPage = lazy(() => import('./pages/Points'));
+const PointPage = lazy(() => import('./pages/Point'));
+const PointEdit = lazy(() => import('./pages/PointEdit'));
 const VerifyEmail = lazy(() => import('./containers/VerifyEmail'));
 
 const router = createBrowserRouter(
@@ -107,6 +110,8 @@ const router = createBrowserRouter(
       <Route path="/ui/massifs" element={<MassifsSearchPage />} />
       <Route path="/ui/organizations" element={<OrganizationsSearchPage />} />
       <Route path="/ui/persons" element={<PersonsSearchPage />} />
+      <Route path="/ui/points" element={<PointsPage />} />
+      <Route path="/ui/points/:pointId" element={<PointPage />} />
       <Route path="/ui/api/:version" element={<ApiDoc />} />
       <Route path="/ui/api" element={<Api />} />
       <Route path="/ui/:type/:id/snapshots" element={<SnapshotPage />} />
@@ -157,6 +162,7 @@ const router = createBrowserRouter(
         <Route path="massif" element={<AddMassif />} />
         <Route path="organization" element={<AddOrganization />} />
         <Route path="guideline" element={<AddGuideline />} />
+        <Route path="point" element={<PointEdit isNew />} />
       </Route>
       <Route path="/ui/forgotPassword" element={<ForgotPassword />} />
       <Route path="/ui/changePassword" element={<ChangePassword />} />
@@ -167,6 +173,7 @@ const router = createBrowserRouter(
 
       {/* Routes requiring authentication */}
       <Route element={<PrivateRoute />}>
+        <Route path="/ui/points/:pointId/edit" element={<PointEdit />} />
         <Route path="/ui/account" element={<AccountPage />} />
         <Route
           path="/ui/observations/import"

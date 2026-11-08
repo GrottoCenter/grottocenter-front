@@ -25,6 +25,7 @@ import copyToClipboard from '@/utils/clipboard';
 import { matchesEntranceMarker } from '@/utils/entranceMapFilters';
 import useEntranceClusters from '@/hooks/useEntranceClusters';
 import useEntranceFilters from '@/hooks/useEntranceFilters';
+import { useSurfacePointCoordinates } from '@/hooks/queries/usePoints';
 import GeocodingControl from '../common/GeocodingControl';
 import MapTour from './MapTour';
 import DataDisplayControl, { layerTypes } from './DataDisplayControl';
@@ -66,14 +67,16 @@ import { MARKERS_LIMIT, MASSIFS_POLYGON_LIMIT } from './constants';
 const MARKER_LAYERS = [
   layerTypes.ENTRANCES,
   layerTypes.NETWORKS,
-  layerTypes.ORGANIZATIONS
+  layerTypes.ORGANIZATIONS,
+  layerTypes.POINTS
 ];
 
 const DEFAULT_SELECTED_LAYERS = {
   [layerTypes.ENTRANCES]: true,
   [layerTypes.NETWORKS]: false,
   [layerTypes.MASSIFS]: false,
-  [layerTypes.ORGANIZATIONS]: false
+  [layerTypes.ORGANIZATIONS]: false,
+  [layerTypes.POINTS]: false
 };
 
 // Stable empty-array fallback for the projections selector — an inline `?? []`
@@ -85,6 +88,7 @@ const EMPTY_MARKER_LAYERS = [];
 const HydratedMap = ({
   entrances,
   entranceMarkers = [],
+  pointMarkers = [],
   networks,
   networkMarkers = [],
   organizations,
@@ -146,6 +150,10 @@ const HydratedMap = ({
     },
     [setSelectedLayers]
   );
+  const { data: pointCoordinates, isFetching: isFetchingPoints } =
+    useSurfacePointCoordinates({
+      enabled: !!selectedLayers[layerTypes.POINTS]
+    });
   const {
     filters: entranceFilters,
     toggleSize,
@@ -320,7 +328,8 @@ const HydratedMap = ({
       // offline data, not a missing tile.
       [layerTypes.ENTRANCES]: entranceMarkers.length,
       [layerTypes.NETWORKS]: networkMarkers.length,
-      [layerTypes.ORGANIZATIONS]: organizationMarkers.length
+      [layerTypes.ORGANIZATIONS]: organizationMarkers.length,
+      [layerTypes.POINTS]: pointMarkers.length
     }
   });
 
@@ -347,6 +356,12 @@ const HydratedMap = ({
       type: 'organization',
       layer: layerTypes.ORGANIZATIONS,
       data: organizations,
+      off: isMarkersMode
+    },
+    {
+      type: 'point',
+      layer: layerTypes.POINTS,
+      data: pointCoordinates,
       off: isMarkersMode
     }
   ];
@@ -388,25 +403,27 @@ const HydratedMap = ({
           enabled={!!selectedLayers[layer] && !off}
         />
       ))}
-      {selectedLayers[layerTypes.ENTRANCES] &&
+      {((selectedLayers[layerTypes.ENTRANCES] &&
         !isMarkersMode &&
-        entranceClusters.isPending && (
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              zIndex: 500
-            }}>
-            <LinearProgress aria-label={formatMessage({ id: 'Loading ...' })} />
-          </Box>
-        )}
+        entranceClusters.isPending) ||
+        (selectedLayers[layerTypes.POINTS] && isFetchingPoints)) && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 500
+          }}>
+          <LinearProgress aria-label={formatMessage({ id: 'Loading ...' })} />
+        </Box>
+      )}
       <Markers
         visibleMarkers={visibleMarkers}
         organizations={organizationMarkers}
         networks={networkMarkers}
         entrances={filteredEntranceMarkers}
+        points={pointMarkers}
       />
       <MassifPolygons massifs={showMassifPolygons ? massifPolygons : []} />
       <PopupTargetHandler popupTarget={popupTarget} />
@@ -558,6 +575,7 @@ const markerType = PropTypes.shape({
 HydratedMap.propTypes = {
   entrances: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
   entranceMarkers: PropTypes.arrayOf(markerType),
+  pointMarkers: PropTypes.arrayOf(PropTypes.shape({})),
   networks: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
   networkMarkers: PropTypes.arrayOf(markerType),
   organizations: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),

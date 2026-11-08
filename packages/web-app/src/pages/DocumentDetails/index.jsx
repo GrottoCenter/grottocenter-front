@@ -13,6 +13,21 @@ import ShareIcon from '@mui/icons-material/Share';
 import LinkIcon from '@mui/icons-material/Link';
 import { NavigateNext } from '@mui/icons-material';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
+import {
+  useUnlinkDocumentFromPoint,
+  useDocument,
+  useDocumentChildren,
+  useDeleteDocument,
+  useRestoreDocument,
+  useLinkDocumentToEntrances,
+  useUnlinkDocumentToEntrance,
+  useUnlinkDocumentToMassif,
+  useLanguages,
+  useLicenses,
+  findLicenseByName,
+  usePermissions,
+  useSharePage
+} from '@/hooks';
 import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
 import OrganizationIcon from '@/components/common/OrganizationIcon';
 import { LicenseBadge } from '@/components/common/LicenseTag';
@@ -58,20 +73,6 @@ import DocumentChildrenList, {
   ChildrenSectionHeader,
   DocumentChildrenTiles
 } from './DocumentChildrenList';
-import {
-  useDocument,
-  useDocumentChildren,
-  useDeleteDocument,
-  useRestoreDocument,
-  useLinkDocumentToEntrances,
-  useUnlinkDocumentToEntrance,
-  useUnlinkDocumentToMassif,
-  useLanguages,
-  useLicenses,
-  findLicenseByName,
-  usePermissions,
-  useSharePage
-} from '../../hooks';
 import PageContainer from '../../components/common/Layouts/PageContainer';
 import PageHeader from '../../components/common/Layouts/PageHeader';
 import SectionStack from '../../components/common/Layouts/SectionStack';
@@ -185,6 +186,7 @@ const Document = ({
   const linkEntranceMutation = useLinkDocumentToEntrances();
   const unlinkEntranceMutation = useUnlinkDocumentToEntrance();
   const unlinkMassifMutation = useUnlinkDocumentToMassif();
+  const unlinkPointMutation = useUnlinkDocumentFromPoint();
   const [isEntranceSearchVisible, setIsEntranceSearchVisible] = useState(false);
   const { data: languages = [] } = useLanguages();
   const { locale } = useSelector(state => state.intl);
@@ -223,7 +225,7 @@ const Document = ({
     !documentData.isDeleted &&
     !deleteMutation.isPending &&
     !hideActions;
-  // Both entrance/unlink-document.js and massif/unlink-document.js in
+  // Entrance, massif and point unlink-document.js controllers in
   // grottocenter-api require a moderator to unlink a document.
   const canUnlinkLinkedEntities =
     permissions.isModerator && canAssociateEntrances;
@@ -430,7 +432,20 @@ const Document = ({
         secondary: formatMessage({ id: 'Entrance' }),
         url: `/ui/entrances/${entity.id}`,
         canUnlink: true
-      }))
+      })),
+      ...(documentData.point
+        ? [
+            {
+              id: documentData.point.id,
+              type: 'point',
+              iconType: 'point',
+              label: documentData.point.label,
+              secondary: formatMessage({ id: 'Point' }),
+              url: `/ui/points/${documentData.point.id}`,
+              canUnlink: true
+            }
+          ]
+        : [])
     ];
   }, [documentData, formatMessage]);
 
@@ -1030,6 +1045,12 @@ const Document = ({
                                     documentId: documentData.id
                                   });
                                 }
+                                if (entity.type === 'point') {
+                                  return unlinkPointMutation.mutateAsync({
+                                    pointId: entity.id,
+                                    documentId: documentData.id
+                                  });
+                                }
                                 throw new Error(
                                   `Unsupported document unlink type: ${entity.type}`
                                 );
@@ -1038,7 +1059,8 @@ const Document = ({
                         }
                         isUnlinking={
                           unlinkEntranceMutation.isPending ||
-                          unlinkMassifMutation.isPending
+                          unlinkMassifMutation.isPending ||
+                          unlinkPointMutation.isPending
                         }
                       />
                     ) : (

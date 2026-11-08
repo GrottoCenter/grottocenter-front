@@ -18,7 +18,7 @@ const SpacedButton = styled(Button)`
   margin: 0 ${theme.spacing(0.5)};`}
 `;
 
-const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
+const SearchDocumentForm = ({ onSubmit, onSuccess }) => {
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
   const isNarrowViewport = useMediaQuery(theme => theme.breakpoints.down('sm'));
@@ -91,11 +91,6 @@ const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
           sx={{
             my: 3
           }}>
-          {closeForm && (
-            <SpacedButton onClick={closeForm}>
-              {formatMessage({ id: 'Cancel' })}
-            </SpacedButton>
-          )}
           <SpacedButton variant="outlined" onClick={resetForm}>
             {formatMessage({ id: 'Reset' })}
           </SpacedButton>
@@ -132,7 +127,6 @@ const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
 };
 
 SearchDocumentForm.propTypes = {
-  closeForm: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   onSuccess: PropTypes.func
 };

@@ -42,6 +42,11 @@ import AutoCompleteSearch from '../AutoCompleteSearch';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 
 export const DELETED_ENTITIES = {
+  point: {
+    iconType: 'point',
+    str: 'Point',
+    url: '/ui/points/'
+  },
   entrance: {
     iconType: 'entrance',
     str: 'Entrance',
@@ -519,6 +524,13 @@ const DeleteConfirmationDialogContent = ({
             entityValues
           )}
         </Typography>
+        {isPermanent &&
+          (entityType.str === DELETED_ENTITIES.entrance.str ||
+            entityType.str === DELETED_ENTITIES.network.str) && (
+            <Typography variant="body2" color="text.secondary">
+              {formatMessage({ id: 'scientificData.permanentDelete' })}
+            </Typography>
+          )}
         {canSelectRedirect && (
           <Stack
             component="fieldset"

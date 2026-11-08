@@ -13,17 +13,17 @@ export const filterValidPositions = positions =>
     e => typeof e.latitude === 'number' && typeof e.longitude === 'number'
   );
 
-const MultipleMarkers = ({ validPositions }) => {
+const MultipleMarkers = ({ validPositions, markerIcon, tooltipContent }) => {
   const map = useMap();
-  const updateEntranceMarkers = useMarkers({
-    icon: EntranceMarker,
-    tooltipContent: entrance => entrance.name,
+  const updateMarkers = useMarkers({
+    icon: markerIcon,
+    tooltipContent,
     shouldFitMapBound: true
   });
 
   useEffect(() => {
     if (validPositions.length === 0) return undefined;
-    updateEntranceMarkers(validPositions);
+    updateMarkers(validPositions);
 
     const latLngs = validPositions.map(p => [p.latitude, p.longitude]);
     const fitBounds = () =>
@@ -44,17 +44,26 @@ const MultipleMarkers = ({ validPositions }) => {
 
     map.on('resize', onResize);
     return () => map.off('resize', onResize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [validPositions]);
+  }, [map, validPositions, updateMarkers]);
 
   return null;
 };
 
 MultipleMarkers.propTypes = {
-  validPositions: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+  validPositions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  markerIcon: PropTypes.shape({}).isRequired,
+  tooltipContent: PropTypes.func.isRequired
 };
 
-const MapMultipleMarkers = ({ style, zoom, positions }) => {
+const entranceTooltip = entrance => entrance.name;
+
+const MapMultipleMarkers = ({
+  style,
+  zoom,
+  positions,
+  markerIcon = EntranceMarker,
+  tooltipContent = entranceTooltip
+}) => {
   const validPositions = useMemo(
     () => filterValidPositions(positions),
     [positions]
@@ -71,7 +80,11 @@ const MapMultipleMarkers = ({ style, zoom, positions }) => {
       // Field-navigation helpers, only in fullscreen. The compass part of the
       // control self-degrades on non-touch devices.
       isLocationControlInFullscreen>
-      <MultipleMarkers validPositions={validPositions} />
+      <MultipleMarkers
+        validPositions={validPositions}
+        markerIcon={markerIcon}
+        tooltipContent={tooltipContent}
+      />
       <MeasureControl />
       <WaypointControl />
     </CustomMapContainer>
@@ -81,7 +94,9 @@ const MapMultipleMarkers = ({ style, zoom, positions }) => {
 MapMultipleMarkers.propTypes = {
   positions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   style: PropTypes.shape({}),
-  zoom: PropTypes.number
+  zoom: PropTypes.number,
+  markerIcon: PropTypes.shape({}),
+  tooltipContent: PropTypes.func
 };
 
 export default MapMultipleMarkers;

@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 
 import authorType from './author.type';
 import idNameType from './idName.type';
+import pointType from './point.type';
 import { OrganizationSimplePropTypes } from './organization.type';
 
 export const ThumbnailsPropTypes = PropTypes.shape({
@@ -122,6 +123,7 @@ export const DocumentPropTypes = PropTypes.shape({
   ),
   authorizationDocument: DocumentSimplePropTypes,
   cave: idNameType,
+  point: pointType,
   entrances: PropTypes.arrayOf(idNameType),
   massifs: PropTypes.arrayOf(idNameType),
   parent: DocumentSimplePropTypes,

@@ -7,6 +7,7 @@ import useOpenLink from '../../../../hooks/useOpenLink';
 import useMarkers from '../common/Markers/useMarkers';
 import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
 import { entranceIcon } from '../../../../assets/icons';
+import { MAP_PIN_PATH } from '../common/mapPin';
 import {
   MAP_MARKER_OUTLINE_COLOR,
   MAP_MARKER_OUTLINE_WIDTH
@@ -23,8 +24,7 @@ export const ExploredGlobalCss = (
   />
 );
 
-export const EXPLORED_PIN_PATH =
-  'M10 0C5.6 0 2 3.6 2 8c0 6 8 20 8 20s8-14 8-20c0-4.4-3.6-8-8-8z';
+export const EXPLORED_PIN_PATH = MAP_PIN_PATH;
 
 // Module-level: stable reference prevents recreating the icon on every render.
 const exploredBadgeIcon = L.divIcon({
