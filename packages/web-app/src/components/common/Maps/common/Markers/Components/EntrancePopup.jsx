@@ -19,55 +19,57 @@ export const EntrancePopup = ({ entrance }) => {
   const interestLevel = getInterestLevel(entrance.aestheticism);
 
   return (
-    <>
+    <div className="map-popup-entrance" data-testid="entrance-popup">
       <div data-entrance-popup-image={entrance.id} />
-      <Information
-        isTitle
-        value={entrance.name}
-        url={`/ui/entrances/${entrance.id}`}
-      />
-      {entrance.caveName && entrance.caveName !== entrance.name && (
+      <div className="map-popup-details">
         <Information
-          value={`${entrance.caveName}`}
-          icon={<CustomIcon size={25} type="network" />}
-          url={`/ui/caves/${entrance.caveId}`}
+          isTitle
+          value={entrance.name}
+          url={`/ui/entrances/${entrance.id}`}
         />
-      )}
-      {(entrance.city || entrance.region) && (
-        <Information
-          value={[entrance.city, entrance.region].filter(Boolean).join(', ')}
-          icon={<CustomIcon size={25} type="location" />}
-        />
-      )}
-      {entrance.depth > 0 && (
-        <Information
-          value={`${entrance.depth} m`}
-          icon={<CustomIcon size={25} type="depth" />}
-        />
-      )}
-      {entrance.length > 0 && (
-        <Information
-          value={`${entrance.length} m`}
-          icon={<CustomIcon size={25} type="length" />}
-        />
-      )}
-      {dataQualityValue != null && (
-        <Information
-          icon={<DataQualityBadge value={dataQualityValue} size={25} />}
-          value={formatMessage({
-            id: getDataQualityLabelKey(dataQualityValue)
-          })}
-        />
-      )}
-      {interestLevel != null && (
-        <Information
-          icon={<InterestStars value={entrance.aestheticism} size={20} />}
-          value={getInterestLabelKeys(entrance.aestheticism)
-            .map(id => formatMessage({ id }))
-            .join(' – ')}
-        />
-      )}
-    </>
+        {entrance.caveName && entrance.caveName !== entrance.name && (
+          <Information
+            value={`${entrance.caveName}`}
+            icon={<CustomIcon size={25} type="network" />}
+            url={`/ui/caves/${entrance.caveId}`}
+          />
+        )}
+        {(entrance.city || entrance.region) && (
+          <Information
+            value={[entrance.city, entrance.region].filter(Boolean).join(', ')}
+            icon={<CustomIcon size={25} type="location" />}
+          />
+        )}
+        {entrance.depth > 0 && (
+          <Information
+            value={`${entrance.depth} m`}
+            icon={<CustomIcon size={25} type="depth" />}
+          />
+        )}
+        {entrance.length > 0 && (
+          <Information
+            value={`${entrance.length} m`}
+            icon={<CustomIcon size={25} type="length" />}
+          />
+        )}
+        {dataQualityValue != null && (
+          <Information
+            icon={<DataQualityBadge value={dataQualityValue} size={25} />}
+            value={formatMessage({
+              id: getDataQualityLabelKey(dataQualityValue)
+            })}
+          />
+        )}
+        {interestLevel != null && (
+          <Information
+            icon={<InterestStars value={entrance.aestheticism} size={20} />}
+            value={getInterestLabelKeys(entrance.aestheticism)
+              .map(id => formatMessage({ id }))
+              .join(' – ')}
+          />
+        )}
+      </div>
+    </div>
   );
 };
 

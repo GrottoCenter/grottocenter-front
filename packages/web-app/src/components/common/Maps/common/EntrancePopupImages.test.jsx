@@ -16,6 +16,7 @@ const state = vi.hoisted(() => ({ map: null }));
 vi.mock('react-leaflet', async () => {
   const { useEffect } = await import('react');
   return {
+    useMap: () => state.map,
     useMapEvents: handlers => {
       useEffect(() => {
         state.map.on(handlers);
@@ -37,6 +38,10 @@ let element;
 beforeEach(() => {
   vi.clearAllMocks();
   element = document.createElement('div');
+  Object.defineProperties(element, {
+    clientWidth: { configurable: true, value: 390 },
+    clientHeight: { configurable: true, value: 640 }
+  });
   document.body.appendChild(element);
   state.map = L.map(element).setView([45, 6], 13);
 });
@@ -56,7 +61,7 @@ const open = id => {
   const popup = L.popup()
     .setLatLng([45, 6])
     .setContent(
-      `<div data-entrance-popup-image="${id}"></div><a href="/ui/entrances/${id}">Entrance ${id}</a>`
+      `<div class="map-popup-entrance" data-testid="entrance-popup"><div data-entrance-popup-image="${id}"></div><div class="map-popup-details"><a href="/ui/entrances/${id}">Entrance ${id}</a></div></div>`
     );
   act(() => popup.openOn(state.map));
   return popup;
@@ -77,6 +82,107 @@ it('only fetches an opened entrance and shares the detail cache with its page', 
   open(1);
   await screen.findByAltText('Cave');
   expect(apiGet).toHaveBeenCalledTimes(1);
+});
+
+it('adapts portraits to the map width and remeasures the open popup after loading and resizing', async () => {
+  apiGet.mockResolvedValue({ id: 1, name: 'Portrait', featuredFile: file });
+  mount();
+  const popup = open(1);
+  const image = await screen.findByAltText('Portrait');
+  const update = vi.spyOn(popup, 'update');
+  Object.defineProperties(image, {
+    naturalWidth: { value: 320 },
+    naturalHeight: { value: 640 }
+  });
+  fireEvent.load(image);
+  expect(screen.getByTestId('entrance-popup')).toHaveAttribute(
+    'data-photo-layout',
+    'side'
+  );
+  expect(update).toHaveBeenCalled();
+  update.mockClear();
+
+  Object.defineProperty(element, 'clientWidth', { value: 320 });
+  act(() => state.map.invalidateSize({ animate: false }));
+  expect(screen.getByTestId('entrance-popup')).toHaveAttribute(
+    'data-photo-layout',
+    'top'
+  );
+  expect(popup.getElement().style.getPropertyValue('--map-popup-width')).toBe(
+    '272px'
+  );
+  expect(update).toHaveBeenCalled();
+  expect(screen.getByText('Entrance 1')).toBeVisible();
+  expect(image).toBeVisible();
+
+  // Closing restores the lazy content; resize must not reopen or update it.
+  act(() => popup.remove());
+  expect(popup.options.maxHeight).toBeNull();
+  update.mockClear();
+  Object.defineProperty(element, 'clientWidth', { value: 390 });
+  act(() => state.map.invalidateSize({ animate: false }));
+  expect(update).not.toHaveBeenCalled();
+  expect(popup.isOpen()).toBe(false);
+});
+
+it.each([
+  [640, 320],
+  [320, 320]
+])('keeps a %s × %s image above the information', async (width, height) => {
+  apiGet.mockResolvedValue({ id: 1, name: 'Landscape', featuredFile: file });
+  mount();
+  open(1);
+  const image = await screen.findByAltText('Landscape');
+  Object.defineProperties(image, {
+    naturalWidth: { value: width },
+    naturalHeight: { value: height }
+  });
+  fireEvent.load(image);
+  expect(screen.getByTestId('entrance-popup')).toHaveAttribute(
+    'data-photo-layout',
+    'top'
+  );
+});
+
+it('waits for an ongoing pan before measuring a loaded landscape image', async () => {
+  apiGet.mockResolvedValue({ id: 1, name: 'Landscape', featuredFile: file });
+  mount();
+  const popup = open(1);
+  const image = await screen.findByAltText('Landscape');
+  const update = vi.spyOn(popup, 'update');
+  const pane = state.map.getPane('mapPane');
+  pane.classList.add('leaflet-pan-anim');
+  Object.defineProperties(image, {
+    naturalWidth: { value: 640 },
+    naturalHeight: { value: 320 }
+  });
+  fireEvent.load(image);
+  expect(update).not.toHaveBeenCalled();
+  act(() => {
+    pane.classList.remove('leaflet-pan-anim');
+    state.map.fire('moveend');
+  });
+  expect(update).toHaveBeenCalledTimes(1);
+  expect(image).toBeVisible();
+});
+
+it('reserves space for map controls even when the entrance has no photo', async () => {
+  Object.defineProperty(element, 'clientWidth', { value: 320 });
+  state.map.invalidateSize({ animate: false });
+  const controls = element.querySelector('.leaflet-top.leaflet-right');
+  controls.getBoundingClientRect = () => ({ width: 42 });
+  apiGet.mockResolvedValue({ id: 1, name: 'No photo', featuredFile: null });
+  mount();
+  const popup = open(1);
+  await waitFor(() => expect(apiGet).toHaveBeenCalledTimes(1));
+  expect(popup.getElement().style.getPropertyValue('--map-popup-width')).toBe(
+    '230px'
+  );
+  expect(popup.options.autoPanPaddingBottomRight.x).toBe(47);
+  expect(screen.getByText('Entrance 1')).toBeVisible();
+  expect(element.querySelector('img')).toBeNull();
+  act(() => popup.remove());
+  expect(popup.options.autoPanPaddingBottomRight).toBeNull();
 });
 
 it('does not fetch a fresh cached entrance and removes a photo when both URLs fail', async () => {
