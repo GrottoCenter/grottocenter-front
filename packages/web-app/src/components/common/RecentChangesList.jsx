@@ -2,10 +2,13 @@ import { FormattedRelativeTime, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
+import DifferenceIcon from '@mui/icons-material/Difference';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 
-import { getRecentChangeKey } from '@/utils/recentChanges';
+import {
+  getRecentChangeKey,
+  RECENT_CHANGES_MESSAGE_VALUES
+} from '@/utils/recentChanges';
 import AppLink from './AppLink';
 import CustomIcon from './CustomIcon';
 import FetchErrorState from './FetchErrorState';
@@ -186,7 +189,7 @@ const ChangeItem = ({ changeInfo }) => {
   }
 
   return (
-    <TimelineItem>
+    <TimelineItem data-testid="recent-change">
       <IconBubble>
         {iconType ? (
           <CustomIcon type={iconType} size={20} />
@@ -253,35 +256,36 @@ const LoadingState = () => (
 const RecentChangesList = ({
   changes = [],
   isLoading = false,
+  isPaused = false,
   error = null,
-  onRetry = null
+  onRetry = null,
+  emptyMessageId = 'No recent activity'
 }) => {
   const { formatMessage } = useIntl();
 
-  if (isLoading && changes.length === 0) return <LoadingState />;
-
-  if (error && changes.length === 0) {
+  if ((error || isPaused) && changes.length === 0) {
     return (
       <FetchErrorState
         error={error}
-        messageId="Unable to load recent changes"
+        isPaused={isPaused}
+        messageId="Unable to load activities"
         onRetry={onRetry}
       />
     );
   }
 
+  if (isLoading && changes.length === 0) return <LoadingState />;
+
   if (changes.length === 0) {
     return (
       <Box sx={{ py: 4, textAlign: 'center', color: 'text.disabled' }}>
-        <HistoryOutlinedIcon
-          sx={{ fontSize: theme => theme.spacing(6), mb: 0.5 }}
-        />
+        <DifferenceIcon sx={{ fontSize: theme => theme.spacing(6), mb: 0.5 }} />
         <Typography
           variant="body2"
           sx={{
             color: 'text.secondary'
           }}>
-          {formatMessage({ id: 'No recent changes' })}
+          {formatMessage({ id: emptyMessageId }, RECENT_CHANGES_MESSAGE_VALUES)}
         </Typography>
       </Box>
     );
@@ -292,11 +296,12 @@ const RecentChangesList = ({
       {changes.map(change => (
         <ChangeItem changeInfo={change} key={getRecentChangeKey(change)} />
       ))}
-      {error && (
+      {(error || isPaused) && (
         <Box sx={{ mt: 1 }}>
           <FetchErrorState
             error={error}
-            messageId="Unable to load recent changes"
+            isPaused={isPaused}
+            messageId="Unable to load activities"
             onRetry={onRetry}
           />
         </Box>
@@ -322,6 +327,8 @@ ChangeItem.propTypes = { changeInfo: changeInfoShape.isRequired };
 RecentChangesList.propTypes = {
   changes: PropTypes.arrayOf(changeInfoShape),
   isLoading: PropTypes.bool,
+  isPaused: PropTypes.bool,
+  emptyMessageId: PropTypes.string,
   error: PropTypes.oneOfType([
     PropTypes.object,
     PropTypes.string,

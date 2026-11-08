@@ -1434,7 +1434,7 @@ const AccountPage = () => {
     },
     {
       id: 'activities',
-      label: formatMessage({ id: 'Activities' }),
+      label: formatMessage({ id: 'Caving practice' }),
       icon: <TravelExploreOutlinedIcon fontSize="small" />,
       count: nbOrganizations + nbEntrances
     },
@@ -1520,7 +1520,7 @@ const AccountPage = () => {
         {/* Tab Account */}
         <div>{settingsContent}</div>
 
-        {/* Tab Activités */}
+        {/* Tab Caving practice */}
         <div>
           {isPersonFetching ? (
             <SectionStack>

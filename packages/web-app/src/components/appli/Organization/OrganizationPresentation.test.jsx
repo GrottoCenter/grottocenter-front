@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
@@ -12,7 +12,8 @@ vi.mock('@/hooks', () => ({
   useRestoreOrganization: () => ({ mutate: vi.fn() }),
   useJoinOrganization: () => ({ mutateAsync: vi.fn() }),
   useLeaveOrganization: () => ({ mutateAsync: vi.fn() }),
-  useSharePage: () => vi.fn()
+  useSharePage: () => vi.fn(),
+  useRecentChangesFeed: () => ({ data: { changes: [] }, isPending: false })
 }));
 vi.mock('@/hooks/usePostDeletion', () => ({
   usePostDeletion: () => ({
@@ -70,6 +71,12 @@ const renderOrganization = (type, isPreview = false) =>
     { messages }
   );
 
+beforeEach(() => {
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+});
+
+afterEach(() => vi.restoreAllMocks());
+
 it.each(['SPELEOLOGY', 'CAVE_RESCUE', 'RESEARCH', null, undefined, ''])(
   'shows membership and exploration controls for %s',
   type => {
@@ -118,6 +125,16 @@ it('retains the usual controls outside the preview', () => {
   expect(
     screen.getByRole('button', { name: 'Edit properties' })
   ).toBeInTheDocument();
+});
+
+it('keeps recent member contributions in a separate lazy tab', () => {
+  renderOrganization('SPELEOLOGY');
+  expect(screen.queryByTestId('activities')).toBeNull();
+  fireEvent.click(screen.getByRole('tab', { name: 'Activities' }));
+  expect(screen.getByTestId('activities')).toBeVisible();
+  expect(screen.getByTestId('members')).not.toBeVisible();
+  expect(screen.getByTestId('authored-documents')).not.toBeVisible();
+  expect(screen.queryByTestId('see-all-recent-changes')).toBeNull();
 });
 
 it('shows a failed preview without a retry action', () => {

@@ -52,7 +52,21 @@ const PageTabs = ({ tabs, children }) => {
   const childrenArray = React.Children.toArray(children);
   const slugParam = searchParams.get('tab') ?? tabs?.[0]?.id ?? '0';
   const activeTab = Math.max(0, tabs?.findIndex(t => t.id === slugParam) ?? 0);
+  const activeLazyTabId = tabs?.[activeTab]?.lazy ? tabs[activeTab].id : null;
+  const hasTabs = Boolean(tabs?.length);
+  const [visitedTabs, setVisitedTabs] = useState([]);
   const prevActiveTabRef = useRef(activeTab);
+
+  // Lazy panels mount on first activation, then stay mounted so switching tabs
+  // preserves local state and loaded pages. Other panels keep eager mounting.
+  useEffect(() => {
+    if (activeLazyTabId == null) return;
+    setVisitedTabs(previous =>
+      previous.includes(activeLazyTabId)
+        ? previous
+        : [...previous, activeLazyTabId]
+    );
+  }, [activeLazyTabId]);
 
   const appBarPx =
     typeof theme.appBarHeight === 'number'
@@ -60,16 +74,16 @@ const PageTabs = ({ tabs, children }) => {
       : parseInt(theme.appBarHeight, 10);
 
   useEffect(() => {
-    if (isMobile) return undefined;
+    if (isMobile || !hasTabs) return undefined;
     const sentinel = sentinelRef.current;
-    if (!sentinel || !tabs?.length) return undefined;
+    if (!sentinel) return undefined;
     const observer = new IntersectionObserver(
       ([entry]) => setIsStuck(!entry.isIntersecting),
       { rootMargin: `-${appBarPx}px 0px 0px 0px` }
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [tabs, appBarPx, isMobile]);
+  }, [hasTabs, appBarPx, isMobile]);
 
   useEffect(() => {
     if (prevActiveTabRef.current === activeTab) return;
@@ -88,7 +102,7 @@ const PageTabs = ({ tabs, children }) => {
     }
   }, [activeTab, isMobile, appBarPx]);
 
-  if (!tabs || tabs.length === 0) {
+  if (!hasTabs) {
     return children;
   }
 
@@ -143,6 +157,7 @@ const PageTabs = ({ tabs, children }) => {
               <Tab
                 key={tab.id}
                 id={`page-tab-${i}`}
+                data-testid={`page-tab-${tab.id}`}
                 aria-controls={`page-tabpanel-${i}`}
                 label={
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -188,7 +203,10 @@ const PageTabs = ({ tabs, children }) => {
               ? `calc(${bottomNavHeight || BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom) + ${theme.spacing(0.5)})`
               : 0
           }}>
-          {child}
+          {(!tabs[i]?.lazy ||
+            activeTab === i ||
+            visitedTabs.includes(tabs[i].id)) &&
+            child}
         </TabPanel>
       ))}
       {/* eslint-enable react/no-array-index-key */}
@@ -219,6 +237,7 @@ const PageTabs = ({ tabs, children }) => {
               <BottomNavigationAction
                 key={tab.id}
                 id={`page-tab-${i}`}
+                data-testid={`page-tab-${tab.id}`}
                 aria-controls={`page-tabpanel-${i}`}
                 aria-label={tab.label}
                 label={tab.label}
@@ -270,7 +289,8 @@ PageTabs.propTypes = {
       label: PropTypes.string.isRequired,
       icon: PropTypes.node,
       count: PropTypes.number,
-      disabled: PropTypes.bool
+      disabled: PropTypes.bool,
+      lazy: PropTypes.bool
     })
   ),
   children: PropTypes.node.isRequired

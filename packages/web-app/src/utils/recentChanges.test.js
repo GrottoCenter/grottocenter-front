@@ -1,4 +1,13 @@
-import { getRecentChangeKey } from './recentChanges';
+import { getRecentChangeKey, getRecentChangesFilters } from './recentChanges';
+
+it('canonicalizes combined filter identifiers', () => {
+  const filters = { organizationId: 42, regionId: 'fr-ara', ignored: 'value' };
+  expect(getRecentChangesFilters(filters)).toEqual({
+    regionId: 'FR-ARA',
+    organizationId: '42'
+  });
+  expect(getRecentChangesFilters({ countryId: '' })).toEqual({ countryId: '' });
+});
 
 describe('getRecentChangeKey', () => {
   it('keeps field boundaries unambiguous', () => {

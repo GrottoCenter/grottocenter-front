@@ -12,6 +12,9 @@ import ShareIcon from '@mui/icons-material/Share';
 import { useNavigate } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
 import { useUserProperties } from '@/hooks/useUserProperties';
+import PageTabs from '@/components/common/Layouts/PageTabs';
+import RecentChangesSection from '@/components/appli/RecentChanges/Section';
+import { useRecentChangesTabs } from '@/hooks/useRecentChangesTabs';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
@@ -136,6 +139,8 @@ const Country = ({
     </Button>
   );
 
+  const tabs = useRecentChangesTabs();
+
   return (
     <PageContainer>
       <div>
@@ -166,61 +171,66 @@ const Country = ({
           </SectionStack>
         )}
         {country && (
-          <SectionStack>
-            {!isEmpty(position) && (
+          <PageTabs tabs={tabs}>
+            <SectionStack>
+              {!isEmpty(position) && (
+                <ScrollableContent
+                  content={
+                    <Box sx={{ minHeight: 200 }}>
+                      <CustomMapContainer
+                        center={position}
+                        dragging={!isMobile}
+                        forceCentering
+                        scrollWheelZoom={false}
+                        wholePage={false}
+                        shouldChangeControlInFullscreen={false}
+                        zoom={4}>
+                        <Marker icon={CoordinatesMarker} position={position} />
+                      </CustomMapContainer>
+                    </Box>
+                  }
+                />
+              )}
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                size="large"
+                startIcon={<CustomIcon type="entrance" size={24} />}
+                onClick={() =>
+                  navigate(`/ui/countries/${country.id}/entrances`)
+                }>
+                {formatMessage({ id: 'Entrances list' })}
+                {dataCountry?.nb_caves ? ` (${dataCountry.nb_caves})` : ''}
+              </Button>
+              <StatisticsDataDashboard
+                countryId={country.id}
+                description={formatMessage({
+                  id: 'Discover the numbers about this country and its massifs and caves.'
+                })}
+              />
+              {(country.guidelines?.length > 0 || permissions.isAuth) && (
+                <Guidelines
+                  entityType="countries"
+                  entityId={country.id}
+                  entityName={title}
+                  guidelines={country.guidelines}
+                />
+              )}
+              <AssociationSection
+                organizations={country?.organizations}
+                entityType="country"
+                entityId={country?.id}
+                isLoading={isLoading}
+              />
               <ScrollableContent
-                content={
-                  <Box sx={{ minHeight: 200 }}>
-                    <CustomMapContainer
-                      center={position}
-                      dragging={!isMobile}
-                      forceCentering
-                      scrollWheelZoom={false}
-                      wholePage={false}
-                      shouldChangeControlInFullscreen={false}
-                      zoom={4}>
-                      <Marker icon={CoordinatesMarker} position={position} />
-                    </CustomMapContainer>
-                  </Box>
-                }
+                anchorId="regions"
+                title={formatMessage({ id: 'Regions' })}
+                content={<RegionsList countryId={country.id} />}
               />
-            )}
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              size="large"
-              startIcon={<CustomIcon type="entrance" size={24} />}
-              onClick={() => navigate(`/ui/countries/${country.id}/entrances`)}>
-              {formatMessage({ id: 'Entrances list' })}
-              {dataCountry?.nb_caves ? ` (${dataCountry.nb_caves})` : ''}
-            </Button>
-            <StatisticsDataDashboard
-              countryId={country.id}
-              description={formatMessage({
-                id: 'Discover the numbers about this country and its massifs and caves.'
-              })}
-            />
-            {(country.guidelines?.length > 0 || permissions.isAuth) && (
-              <Guidelines
-                entityType="countries"
-                entityId={country.id}
-                entityName={title}
-                guidelines={country.guidelines}
-              />
-            )}
-            <AssociationSection
-              organizations={country?.organizations}
-              entityType="country"
-              entityId={country?.id}
-              isLoading={isLoading}
-            />
-            <ScrollableContent
-              anchorId="regions"
-              title={formatMessage({ id: 'Regions' })}
-              content={<RegionsList countryId={country.id} />}
-            />
-          </SectionStack>
+            </SectionStack>
+            <RecentChangesSection scopeType="country" scopeId={country.id} />
+          </PageTabs>
         )}
         {hasOpenedPdfExport && pdfEntity && (
           <Suspense

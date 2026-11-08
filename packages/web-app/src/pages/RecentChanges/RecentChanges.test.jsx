@@ -5,18 +5,8 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import * as apiClient from '@/api/client';
 import { getRecentChanges } from '@/conf/apiRoutes';
 import { renderWithProviders } from '@/test/renderWithProviders';
+import messages from '@/../public/lang/en.json';
 import RecentChangesPage from './index';
-
-const messages = {
-  'Load more': 'Load more',
-  'No recent changes': 'No recent changes',
-  'Recent changes': 'Recent changes',
-  'Changes from the last 7 days, limited to the latest 500 recorded operations':
-    'Changes from the last 7 days, limited to the latest 500 recorded operations',
-  'the cave': 'the cave',
-  unknown: 'unknown',
-  updated: 'updated'
-};
 
 const makeChange = id => ({
   date: new Date(Date.UTC(2026, 7, 16, 12, id)).toISOString(),
@@ -50,10 +40,10 @@ it('loads additional changes by advancing the server offset', async () => {
     </IntlProvider>
   );
 
-  expect(screen.getByRole('heading', { name: 'Recent changes' })).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'Activities' })).toBeVisible();
   expect(
     screen.getByText(
-      'Changes from the last 7 days, limited to the latest 500 recorded operations'
+      'Contributions from the last 7 days (limited to the latest 500 contributions).'
     )
   ).toBeVisible();
 

@@ -7,10 +7,12 @@ import RecentChangesList from './RecentChangesList';
 const messages = {
   deleted: 'deleted',
   Retry: 'Retry',
-  'No recent changes': 'No recent changes',
+  'No recent activity': 'No recent activity',
   'the cave': 'the cave',
   'the guideline': 'the guideline',
-  'Unable to load recent changes': 'Unable to load recent changes',
+  'Unable to load activities': 'Unable to load activities',
+  offlineActionUnavailable: 'You are offline',
+  offlineContentUnavailable: 'Reconnect to load this content',
   unknown: 'unknown',
   updated: 'updated'
 };
@@ -40,7 +42,7 @@ describe('RecentChangesList', () => {
   it('renders a dedicated empty state', () => {
     renderList({ changes: [] });
 
-    expect(screen.getByText('No recent changes')).toBeInTheDocument();
+    expect(screen.getByText('No recent activity')).toBeInTheDocument();
   });
 
   it('renders a guideline without linking it to the home page', () => {
@@ -76,8 +78,14 @@ describe('RecentChangesList', () => {
       onRetry
     });
 
-    expect(screen.getByText('Unable to load recent changes')).toBeVisible();
+    expect(screen.getByText('Unable to load activities')).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
     expect(onRetry).toHaveBeenCalledOnce();
+  });
+
+  it('shows paused initial loading as offline instead of a perpetual skeleton', () => {
+    renderList({ isLoading: true, isPaused: true });
+    expect(screen.getByText('You are offline')).toBeVisible();
+    expect(screen.queryByText('No recent activity')).toBeNull();
   });
 });

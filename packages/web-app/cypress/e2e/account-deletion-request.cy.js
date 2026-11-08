@@ -23,6 +23,10 @@ describe('Account deletion request', () => {
     });
     cy.location('pathname').should('eq', '/ui/account');
     cy.wait('@getAccount');
+    cy.get('[data-testid="page-tab-activities"]').should(
+      'contain.text',
+      'Caving practice'
+    );
     cy.get('[data-testid="request-account-deletion"]').click();
 
     cy.get('[role="dialog"]')

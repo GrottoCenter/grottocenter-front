@@ -13,8 +13,9 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ShareIcon from '@mui/icons-material/Share';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { useUserProperties } from '@/hooks/useUserProperties';
+import RecentChangesSection from '@/components/appli/RecentChanges/Section';
+import { useRecentChangesTabs } from '@/hooks/useRecentChangesTabs';
 
-import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import {
   useDeleteMassif,
@@ -180,12 +181,7 @@ const Massif = ({
     />
   ) : null;
 
-  const tabs = [
-    {
-      id: 'information',
-      label: formatMessage({ id: 'Information' }),
-      icon: <ExploreOutlinedIcon fontSize="small" />
-    },
+  const tabs = useRecentChangesTabs([
     {
       id: 'documents',
       label: formatMessage({ id: 'Documents' }),
@@ -194,7 +190,7 @@ const Massif = ({
       disabled:
         !!massif && !permissions.isAuth && (massif.documents?.length ?? 0) === 0
     }
-  ];
+  ]);
 
   return (
     <PageContainer>
@@ -382,6 +378,11 @@ const Massif = ({
                   massifId={massifId}
                 />
               </SectionStack>
+            )}
+          </div>
+          <div>
+            {massif && (
+              <RecentChangesSection scopeType="massif" scopeId={massif.id} />
             )}
           </div>
         </PageTabs>
