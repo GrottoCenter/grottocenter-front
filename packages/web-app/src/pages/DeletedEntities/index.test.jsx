@@ -261,6 +261,58 @@ it('loads only the requested server page and recovers after its last row is remo
   ).toBe('0');
 });
 
+it.each(['direct navigation', 'Restore', 'Permanently delete'])(
+  'does not announce zero results during uncached last-page recovery after %s',
+  async action => {
+    const isDirectNavigation = action === 'direct navigation';
+    const totalCount = isDirectNavigation ? 120 : 150;
+    let resolvePage;
+    apiGetWithRange.mockImplementation(url => {
+      const skip = Number(new URL(url).searchParams.get('skip'));
+      if (skip === 100) {
+        return new Promise(resolve => {
+          resolvePage = resolve;
+        });
+      }
+      if (skip === 450 || (skip === 150 && !hasRow)) {
+        return Promise.resolve(pageResponse('organizations', []));
+      }
+      return Promise.resolve(
+        pageResponse(
+          'organizations',
+          [source],
+          totalCount + (!isDirectNavigation && hasRow ? 1 : 0)
+        )
+      );
+    });
+    renderPage(
+      'organizations',
+      ['Administrator'],
+      isDirectNavigation ? '&page=10' : '&page=4'
+    );
+    if (!isDirectNavigation) {
+      const dialog = await openAction(action);
+      fireEvent.click(dialog.getByRole('button', { name: action }));
+    }
+    await waitFor(() => expect(resolvePage).toBeTypeOf('function'));
+    expect(screen.queryByText('0 results')).toBeNull();
+    expect(screen.queryByText(messages['deletedEntities.empty'])).toBeNull();
+    expect(screen.getByRole('progressbar')).toBeVisible();
+    await act(async () =>
+      resolvePage(
+        pageResponse('organizations', [{ ...source, id: 43 }], totalCount)
+      )
+    );
+    expect(await screen.findByTestId('deleted-organization-43')).toBeVisible();
+    expect(screen.getByTestId('deleted-entities-count')).toHaveTextContent(
+      `${totalCount} results`
+    );
+    expect(
+      screen.getByText(isDirectNavigation ? '101–120 / 120' : '101–150 / 150')
+    ).toBeVisible();
+  }
+);
+
 it('shows list errors and retries', async () => {
   apiGetWithRange.mockRejectedValueOnce(new Error('List unavailable'));
   renderPage();
@@ -289,7 +341,9 @@ it.each(['page', 'limit'])(
     if (change === 'page') {
       fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
     } else {
-      fireEvent.mouseDown(screen.getAllByRole('combobox')[1]);
+      fireEvent.mouseDown(
+        screen.getByRole('combobox', { name: 'Results per page:' })
+      );
       fireEvent.click(await screen.findByRole('option', { name: '20' }));
     }
     await waitFor(() => expect(apiGetWithRange).toHaveBeenCalledTimes(2));

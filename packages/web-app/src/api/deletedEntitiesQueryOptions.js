@@ -39,7 +39,8 @@ export const deletedEntitiesQueryOptions = ({
       apiGetWithRange(makeUrl(resource.collectionUrl, criteria), { signal }),
     select: selectors[entityType],
     placeholderData: (previousData, previousQuery) =>
-      previousQuery?.queryKey[0] === resource.keys.all[0]
+      previousQuery?.queryKey[0] === resource.keys.all[0] &&
+      previousData?.data?.[entityType]?.length > 0
         ? previousData
         : undefined,
     retry: false,
