@@ -15,6 +15,7 @@ import {
 import { styled, useTheme } from '@mui/material/styles';
 import { useSearchParams } from 'react-router-dom';
 import { useMeasuredHeight } from '@/hooks/useMeasuredHeight';
+import SectionStack from './SectionStack';
 
 const BOTTOM_NAV_HEIGHT = 56;
 
@@ -103,7 +104,7 @@ const PageTabs = ({ tabs, children, searchParam = 'tab', onChange }) => {
   }, [activeTab, isMobile, appBarPx]);
 
   if (!hasTabs) {
-    return children;
+    return <SectionStack>{children}</SectionStack>;
   }
 
   const handleChange = (_, newValue) => {

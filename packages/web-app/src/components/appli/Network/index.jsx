@@ -65,10 +65,12 @@ export const Network = ({
   error,
   isPaused = false,
   onRetry = null,
-  cave
+  cave,
+  isPreview = false
 }) => {
   const { formatMessage } = useIntl();
-  const { caveId } = useParams();
+  const { caveId: routeCaveId } = useParams();
+  const caveId = routeCaveId ?? cave?.id;
   const { isAuth, isAdmin, isModerator } = usePermissions();
   const deleteMutation = useDeleteCave();
   const restoreMutation = useRestoreCave();
@@ -111,7 +113,7 @@ export const Network = ({
     );
   };
 
-  const canEdit = isAuth && cave && !cave.isDeleted;
+  const canEdit = !isPreview && isAuth && cave && !cave.isDeleted;
 
   const actions = cave ? (
     <ResponsiveActions
@@ -223,10 +225,10 @@ export const Network = ({
           icon={<CustomIcon type="network" />}
           titleAdornment={cave && <NetworkDefinitionHelp />}
           subheader={breadcrumb}
-          actions={actions}
+          actions={isPreview ? null : actions}
         />
 
-        <PageTabs tabs={tabs}>
+        <PageTabs tabs={isPreview ? [] : tabs}>
           {/* Tab 0 — Information */}
           <div>
             {isLoading && (
@@ -260,10 +262,12 @@ export const Network = ({
                     isLoading={isActionLoading}
                     error={restoreMutation.error}
                     onRestorePress={
-                      isAuth && (isAdmin || isModerator) ? onRestorePress : null
+                      !isPreview && isAuth && (isAdmin || isModerator)
+                        ? onRestorePress
+                        : null
                     }
                     onPermanentDeletePress={
-                      isAuth && isAdmin
+                      !isPreview && isAuth && isAdmin
                         ? () => {
                             setIsDeleteConfirmationPermanent(true);
                             setIsDeleteConfirmationOpen(true);
@@ -340,9 +344,9 @@ export const Network = ({
                   descriptions={cave.descriptions}
                   entityType="cave"
                   entityId={cave.id}
-                  isEditAllowed={!cave.isDeleted}
+                  isEditAllowed={!isPreview && !cave.isDeleted}
                 />
-                {isAuth && (
+                {!isPreview && isAuth && (
                   <StandardDialog
                     fullWidth
                     maxWidth="md"
@@ -361,7 +365,7 @@ export const Network = ({
             PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
             so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
             silently shift all subsequent tab panels. */}
-          {isAdmin && (
+          {!isPreview && isAdmin && (
             <SectionStack>
               <Science caveId={caveId} />
             </SectionStack>
@@ -394,7 +398,8 @@ Network.propTypes = {
   error: PropTypes.shape({}),
   isPaused: PropTypes.bool,
   onRetry: PropTypes.func,
-  cave: CavePropTypes
+  cave: CavePropTypes,
+  isPreview: PropTypes.bool
 };
 
 export default Network;

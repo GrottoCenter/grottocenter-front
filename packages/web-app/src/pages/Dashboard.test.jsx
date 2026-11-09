@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
 
+import messages from '@/../public/lang/en.json';
 import {
   useDbExport,
   useDuplicatesCount,
@@ -26,7 +27,7 @@ const queryResult = { data: 0, isPending: false, isError: false };
 const renderDashboard = () =>
   render(
     <MemoryRouter>
-      <IntlProvider locale="en">
+      <IntlProvider locale="en" messages={messages}>
         <Dashboard />
       </IntlProvider>
     </MemoryRouter>
@@ -113,8 +114,12 @@ it.each([
     });
     renderDashboard();
     expect(
-      screen.getByRole('link', { name: /deletedEntities.heading/ })
+      screen.getByRole('link', { name: 'Trash — Administrator / Moderator' })
     ).toHaveAttribute('href', '/ui/deleted-entities');
+    const contentLinks = within(
+      screen.getByText('Content').parentElement
+    ).getAllByRole('link');
+    expect(contentLinks.at(-1)).toHaveAttribute('href', '/ui/deleted-entities');
     if (!isModerator)
       expect(
         screen.queryByRole('link', { name: /Document validation/ })

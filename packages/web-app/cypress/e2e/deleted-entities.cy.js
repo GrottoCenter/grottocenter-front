@@ -77,6 +77,43 @@ const visit = (path, groups) => {
 };
 
 describe('Deleted entities management', () => {
+  it('searches only the loaded page without fetching more records', () => {
+    mockReferences();
+    cy.viewport(390, 844);
+    const organizations = [
+      { id: 42, name: 'Deleted club', isDeleted: true },
+      { id: 43, name: 'Another club', isDeleted: true }
+    ];
+    cy.intercept(
+      {
+        method: 'GET',
+        pathname: '/api/v1/organizations',
+        query: { isDeleted: 'true', limit: '50' }
+      },
+      {
+        statusCode: 206,
+        headers: { 'Content-Range': '0-2/126' },
+        body: { organizations }
+      }
+    ).as('list');
+    visit('/deleted-entities?type=organizations', ['Administrator']);
+    cy.wait('@list');
+    cy.get('input[placeholder="Search on the current page"]')
+      .should('be.visible')
+      .as('pageSearch')
+      .type('ANOTHER');
+    cy.get('[data-testid="deleted-organization-42"]').should('not.exist');
+    cy.get('[data-testid="deleted-organization-43"]').should('be.visible');
+    cy.get('[data-testid="deleted-entities-count"]').should('contain', '126');
+    cy.get('@pageSearch').clear();
+    cy.get('@pageSearch').type('missing');
+    cy.contains('No results').should('be.visible');
+    cy.get('@pageSearch').clear();
+    cy.get('[data-testid="deleted-organization-42"]').should('be.visible');
+    cy.get('[data-testid="deleted-organization-43"]').should('be.visible');
+    cy.get('@list.all').should('have.length', 1);
+  });
+
   [
     ['mobile', 390, 844],
     ['desktop', 1280, 800]
@@ -90,7 +127,7 @@ describe('Deleted entities management', () => {
         type: 'SPELEOLOGY',
         isDeleted: true,
         redirectTo: 43,
-        description: 'Details available in the preview'
+        customMessage: 'Details available in the preview'
       };
       cy.intercept(
         {
@@ -118,12 +155,14 @@ describe('Deleted entities management', () => {
         const preview = $card[0]
           .querySelector('button[aria-label="Preview"]')
           .getBoundingClientRect();
-        const restore = [...$card[0].querySelectorAll('button')]
-          .find(button => button.textContent.includes('Restore'))
-          .getBoundingClientRect();
-        const remove = $card[0]
-          .querySelector('[aria-label="Permanently delete"]')
-          .getBoundingClientRect();
+        const restoreButton = $card[0].querySelector('[aria-label="Restore"]');
+        const removeButton = $card[0].querySelector(
+          '[aria-label="Permanently delete"]'
+        );
+        const restore = restoreButton.getBoundingClientRect();
+        const remove = removeButton.getBoundingClientRect();
+        const style = element =>
+          element.ownerDocument.defaultView.getComputedStyle(element);
         expect(card.right).to.be.at.most(width);
         expect(card.left).to.be.at.least(0);
         expect(card.height).to.be.lessThan(layout === 'mobile' ? 160 : 100);
@@ -134,6 +173,13 @@ describe('Deleted entities management', () => {
         ).to.be.lessThan(2);
         if (layout === 'mobile') {
           expect(preview.bottom).to.be.at.most(restore.top);
+          expect(Math.abs(restore.width - remove.width)).to.be.lessThan(2);
+          const actions = restoreButton.parentElement.getBoundingClientRect();
+          expect(restore.left).to.be.closeTo(actions.left, 1);
+          expect(remove.right).to.be.closeTo(actions.right, 1);
+          expect(style(restoreButton.parentElement).borderTopWidth).to.equal(
+            '0px'
+          );
         } else {
           expect(
             Math.abs(
@@ -144,7 +190,23 @@ describe('Deleted entities management', () => {
             )
           ).to.be.lessThan(2);
         }
+        expect(style(restoreButton).borderTopStyle).to.equal('solid');
+        expect(style(removeButton).borderTopWidth).to.equal('0px');
+        [restoreButton, removeButton].forEach(button => {
+          const label = [...button.children].find(
+            child => child.textContent === button.getAttribute('aria-label')
+          );
+          if (layout === 'mobile') {
+            expect(style(label).display).to.equal('none');
+          } else {
+            expect(style(label).display).not.to.equal('none');
+          }
+        });
       });
+      cy.get('[data-testid="deleted-organization-42"]').should(
+        'contain',
+        '#43'
+      );
       cy.get('[data-testid="deleted-organization-42"]')
         .find('[role="img"][aria-label="Caving group"]')
         .focus();
@@ -156,6 +218,9 @@ describe('Deleted entities management', () => {
       cy.get('[data-testid="deleted-organization-42"]')
         .find('button[aria-label="Preview"]')
         .click();
+      cy.get('[role="dialog"]')
+        .contains('h1', source.name, { timeout: 15000 })
+        .should('be.visible');
       cy.get('[role="dialog"]').should(
         'contain',
         'Details available in the preview'
@@ -198,6 +263,73 @@ describe('Deleted entities management', () => {
   });
 
   resources.forEach(([resource, kind, fields]) => {
+    it(`shows a complete read-only ${resource} preview`, () => {
+      mockReferences();
+      const source = {
+        id: 42,
+        name: `Deleted ${resource}`,
+        ...fields,
+        isDeleted: true
+      };
+      if (resource === 'entrances') {
+        const author = { id: 3, nickname: 'Original author' };
+        source.histories = [{ id: 10, body: 'Historical notes', author }];
+        source.comments = [
+          { id: 11, title: 'Visit feedback', body: 'A visit', author }
+        ];
+      }
+      cy.intercept(
+        {
+          method: 'GET',
+          pathname: `/api/v1/${resource}`,
+          query: { isDeleted: 'true', limit: '50' }
+        },
+        {
+          statusCode: 206,
+          headers: { 'Content-Range': '0-1/1' },
+          body: { [resource]: [source] }
+        }
+      ).as('previewList');
+      cy.intercept('GET', `**/api/v1/${resource}/42`, { body: source });
+      visit(`/deleted-entities?type=${resource}`, ['Administrator']);
+      cy.wait('@previewList');
+      cy.get(`[data-testid="deleted-${kind}-42"]`, { timeout: 15000 })
+        .find('button[aria-label="Preview"]')
+        .click();
+      cy.get('[role="dialog"]').within(() => {
+        cy.contains('h1', fields.title ?? source.name, {
+          timeout: 15000
+        }).should('be.visible');
+        cy.contains('a', 'Details').should('not.exist');
+        cy.contains('button', /^Restore$/).should('not.exist');
+        cy.contains('button', /^Permanently delete$/).should('not.exist');
+        cy.get('[data-testid="action-edit"]').should('not.exist');
+        cy.get('[role="tab"]').should('not.exist');
+        if (resource === 'entrances') {
+          cy.get('#documents').should($documents => {
+            const history =
+              $documents[0].ownerDocument.getElementById('history');
+            const gap =
+              $documents[0].getBoundingClientRect().top -
+              history.getBoundingClientRect().bottom;
+            expect(gap).to.be.at.least(7);
+          });
+          cy.get('#comments').should($comments => {
+            const documents =
+              $comments[0].ownerDocument.getElementById('documents');
+            const gap =
+              $comments[0].getBoundingClientRect().top -
+              documents.getBoundingClientRect().bottom;
+            expect(gap).to.be.at.least(7);
+          });
+        }
+      });
+      cy.location('pathname').should('equal', '/ui/deleted-entities');
+      cy.get('[role="dialog"]').find('button[aria-label="close"]').click();
+      cy.get('[role="dialog"]').should('not.exist');
+      cy.get(`[data-testid="deleted-${kind}-42"]`).should('be.visible');
+    });
+
     ['Administrator', 'Moderator'].forEach(role => {
       it(`lets ${role} inspect ${resource} after reloading and restore from the tool`, () => {
         mockReferences();

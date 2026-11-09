@@ -70,14 +70,14 @@ const ToolCard = ({
   icon,
   title,
   description,
-  roleId,
+  roleIds,
   count,
   isLoading = false,
   isError = false,
   to
 }) => {
   const { formatMessage } = useIntl();
-  const roleLabel = formatMessage({ id: roleId });
+  const roleLabel = roleIds.map(id => formatMessage({ id })).join(' / ');
   const hasCounter = typeof count === 'number';
   const showBadge = hasCounter && (isLoading || isError || count > 0);
 
@@ -145,7 +145,9 @@ ToolCard.propTypes = {
   icon: PropTypes.node.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
-  roleId: PropTypes.oneOf(['Administrator', 'Moderator', 'Leader']).isRequired,
+  roleIds: PropTypes.arrayOf(
+    PropTypes.oneOf(['Administrator', 'Moderator', 'Leader'])
+  ).isRequired,
   count: PropTypes.number,
   isLoading: PropTypes.bool,
   isError: PropTypes.bool,
@@ -292,17 +294,6 @@ const Dashboard = () => {
                 {formatMessage({ id: 'Content' })}
               </SectionTitle>
               <ToolGrid>
-                {permissions.canManageDeletedEntities && (
-                  <ToolCard
-                    icon={<DeleteIcon />}
-                    title={formatMessage({ id: 'deletedEntities.heading' })}
-                    description={formatMessage({
-                      id: 'deletedEntities.description'
-                    })}
-                    roleId={permissions.isAdmin ? 'Administrator' : 'Moderator'}
-                    to="/ui/deleted-entities"
-                  />
-                )}
                 {permissions.isModerator && (
                   <>
                     <ToolCard
@@ -311,7 +302,7 @@ const Dashboard = () => {
                       description={formatMessage({
                         id: 'Document validation description'
                       })}
-                      roleId="Moderator"
+                      roleIds={['Moderator']}
                       count={pendingDocumentsQuery.data ?? 0}
                       isLoading={pendingDocumentsQuery.isPending}
                       isError={pendingDocumentsQuery.isError}
@@ -323,7 +314,7 @@ const Dashboard = () => {
                       description={formatMessage({
                         id: 'Duplicates tool description'
                       })}
-                      roleId="Moderator"
+                      roleIds={['Moderator']}
                       count={duplicatesQuery.data ?? 0}
                       isLoading={duplicatesQuery.isPending}
                       isError={duplicatesQuery.isError}
@@ -335,7 +326,7 @@ const Dashboard = () => {
                       description={formatMessage({
                         id: 'guidelines.dashboard.description'
                       })}
-                      roleId="Moderator"
+                      roleIds={['Moderator']}
                       to="/ui/guidelines"
                     />
                     <ToolCard
@@ -344,7 +335,7 @@ const Dashboard = () => {
                       description={formatMessage({
                         id: 'Organization management description'
                       })}
-                      roleId="Moderator"
+                      roleIds={['Moderator']}
                       to="/ui/organizations/management"
                     />
                     <ToolCard
@@ -353,10 +344,21 @@ const Dashboard = () => {
                       description={formatMessage({
                         id: 'Document management description'
                       })}
-                      roleId="Moderator"
+                      roleIds={['Moderator']}
                       to="/ui/documents/management"
                     />
                   </>
+                )}
+                {permissions.canManageDeletedEntities && (
+                  <ToolCard
+                    icon={<DeleteIcon />}
+                    title={formatMessage({ id: 'deletedEntities.heading' })}
+                    description={formatMessage({
+                      id: 'deletedEntities.description'
+                    })}
+                    roleIds={['Administrator', 'Moderator']}
+                    to="/ui/deleted-entities"
+                  />
                 )}
               </ToolGrid>
             </Section>
@@ -374,7 +376,7 @@ const Dashboard = () => {
                     description={formatMessage({
                       id: 'CSV Import description'
                     })}
-                    roleId="Moderator"
+                    roleIds={['Moderator']}
                     to="/ui/import-csv"
                   />
                 )}
@@ -400,7 +402,7 @@ const Dashboard = () => {
                     description={formatMessage({
                       id: 'Manage users description'
                     })}
-                    roleId="Administrator"
+                    roleIds={['Administrator']}
                     to="/ui/admin/users"
                   />
                 )}
