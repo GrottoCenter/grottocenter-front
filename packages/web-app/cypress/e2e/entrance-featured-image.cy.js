@@ -350,8 +350,22 @@ describe('Entrance featured image', () => {
   [390, 768].forEach(width => {
     it(`reserves the previous loading footprint before the image loads at width ${width}`, () => {
       cy.viewport(width, 900);
+      // Firefox can reuse decoded images even while revalidating their requests.
+      const thumbnailUrl = `https://images.example.org/thumbnails/loading-${width}.webp`;
+      cy.intercept(
+        { method: 'GET', pathname: '/api/v1/entrances/1' },
+        {
+          body: {
+            ...entrance,
+            featuredFile: {
+              ...files[1],
+              thumbnails: { small: thumbnailUrl }
+            }
+          }
+        }
+      );
       let entranceWindow;
-      cy.intercept('https://images.example.org/thumbnails/**', request => {
+      cy.intercept(thumbnailUrl, request => {
         const frame = entranceWindow.document.querySelector(
           '[data-testid="entrance-featured-image"]'
         );
