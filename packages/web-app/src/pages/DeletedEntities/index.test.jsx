@@ -262,7 +262,7 @@ it('loads only the requested server page and recovers after its last row is remo
 });
 
 it.each(['direct navigation', 'Restore', 'Permanently delete'])(
-  'does not announce zero results during uncached last-page recovery after %s',
+  'preserves the total during uncached last-page recovery after %s',
   async action => {
     const isDirectNavigation = action === 'direct navigation';
     const totalCount = isDirectNavigation ? 120 : 150;
@@ -296,6 +296,11 @@ it.each(['direct navigation', 'Restore', 'Permanently delete'])(
     }
     await waitFor(() => expect(resolvePage).toBeTypeOf('function'));
     expect(screen.queryByText('0 results')).toBeNull();
+    expect(screen.queryByText('0–0 / 0')).toBeNull();
+    expect(screen.getByTestId('deleted-entities-count')).toHaveTextContent(
+      `${totalCount} results`
+    );
+    expect(screen.getByText(`101–${totalCount} / ${totalCount}`)).toBeVisible();
     expect(screen.queryByText(messages['deletedEntities.empty'])).toBeNull();
     expect(screen.getByRole('progressbar')).toBeVisible();
     await act(async () =>

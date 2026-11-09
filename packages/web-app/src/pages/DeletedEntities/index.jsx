@@ -64,9 +64,10 @@ const DeletedEntitiesContent = () => {
     enabled: isPastEnd,
     staleTime: 0
   });
-  const totalCount = isPastEnd
-    ? firstPage.data?.totalCount
-    : query.data?.totalCount;
+  const totalCount =
+    isPastEnd || query.data == null
+      ? firstPage.data?.totalCount
+      : query.data.totalCount;
   const changePage = (nextPage, nextLimit = limit) =>
     setSearchParams(
       previous => {
