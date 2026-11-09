@@ -1,15 +1,15 @@
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Stack, Typography } from '@mui/material';
-import DocumentTypeChip from '@/components/common/DocumentTypeChip';
-import { getOrganizationTypeLabelId } from '@/utils/organizationTypes';
 
 const EntitySummary = ({ resource, entity }) => {
   const { formatMessage, formatNumber } = useIntl();
   let summary;
   switch (resource) {
     case 'organizations':
-      summary = formatMessage({ id: getOrganizationTypeLabelId(entity.type) });
+      summary = [entity.city, entity.region, entity.country]
+        .filter(Boolean)
+        .join(' · ');
       break;
     case 'entrances':
       summary = [entity.city, entity.region, entity.country]
@@ -47,19 +47,9 @@ const EntitySummary = ({ resource, entity }) => {
     default:
       summary = null;
   }
-  const language = entity.language ?? entity.mainLanguage;
-  const languageLabel = language?.refName ?? language?.id ?? language;
   return (
     <Stack spacing={0.5}>
-      {resource === 'documents' && (
-        <DocumentTypeChip type={entity.type?.name ?? entity.type} />
-      )}
       {summary && <Typography variant="body2">{summary}</Typography>}
-      {languageLabel && (
-        <Typography variant="body2" color="text.secondary">
-          {languageLabel}
-        </Typography>
-      )}
     </Stack>
   );
 };

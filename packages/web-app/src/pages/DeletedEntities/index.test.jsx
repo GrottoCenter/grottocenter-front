@@ -11,6 +11,8 @@ import { renderWithProviders } from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
 import { DELETED_ENTITY_RESOURCES } from '@/utils/deletedEntities';
 import { organizationKeys } from '@/api/queryKeys';
+import { getOrganizationIconSource } from '@/utils/organizationIcons';
+import { useDeletedEntityCounts } from '@/hooks';
 import DeletedEntities from './index';
 
 let isOnline;
@@ -23,7 +25,8 @@ vi.mock('@/api/client', () => ({
 }));
 vi.mock('@/hooks', async importOriginal => ({
   ...(await importOriginal()),
-  useOnlineStatus: () => isOnline
+  useOnlineStatus: () => isOnline,
+  useDeletedEntityCounts: vi.fn()
 }));
 vi.mock('@/hooks/useNotification', () => ({
   useNotification: () => ({ onSuccess: vi.fn() })
@@ -78,6 +81,7 @@ const openAction = async action => {
 
 beforeEach(() => {
   vi.resetAllMocks();
+  useDeletedEntityCounts.mockReturnValue([]);
   source = { id: 42, name: 'Deleted record', isDeleted: true, entrances: [] };
   hasRow = true;
   isOnline = true;
@@ -208,7 +212,7 @@ it('preselects the existing destination and passes it to the deletion hook', asy
   );
   renderPage();
   const link = await screen.findByRole('link', {
-    name: 'Merge destination: #43'
+    name: 'Destination'
   });
   expect(link).toHaveAttribute('href', '/ui/organizations/43');
   fireEvent.click(screen.getByRole('button', { name: 'Permanently delete' }));
@@ -409,14 +413,122 @@ it('does not show previous-resource rows while another resource loads', async ()
         resolvePage = resolve;
       })
   );
-  fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Type' }));
-  fireEvent.click(await screen.findByRole('option', { name: 'Massifs' }));
+  fireEvent.click(screen.getByRole('tab', { name: 'Massifs' }));
   await waitFor(() => expect(apiGetWithRange).toHaveBeenCalledTimes(2));
   expect(screen.queryByTestId('deleted-organization-42')).toBeNull();
   expect(screen.queryByTestId('deleted-massif-42')).toBeNull();
   expect(screen.queryByRole('button', { name: 'Restore' })).toBeNull();
   await act(async () => resolvePage(pageResponse('massifs')));
   expect(await screen.findByTestId('deleted-massif-42')).toBeVisible();
+});
+
+it('shows all six icon tabs and loads the selected resource', async () => {
+  renderPage();
+  await screen.findByTestId('deleted-organization-42');
+  expect(screen.getAllByRole('tab')).toHaveLength(6);
+  resources.forEach(resource => {
+    const config = DELETED_ENTITY_RESOURCES[resource];
+    const tab = screen.getByRole('tab', {
+      name: messages[config.labelId]
+    });
+    expect(tab.querySelector('img')).toHaveAttribute('src');
+    fireEvent.click(tab);
+    expect(tab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel')).toHaveAccessibleName(
+      messages[config.labelId]
+    );
+  });
+  expect(await screen.findByTestId('deleted-document-42')).toBeVisible();
+  expect(apiGetWithRange).toHaveBeenCalled();
+  expect(apiPost).not.toHaveBeenCalled();
+  expect(apiDelete).not.toHaveBeenCalled();
+});
+
+it('shows each resource total in its tab', () => {
+  useDeletedEntityCounts.mockReturnValue(
+    resources.map((_, index) => ({ data: { totalCount: index + 10 } }))
+  );
+  renderPage();
+  resources.forEach((resource, index) => {
+    expect(
+      within(screen.getByTestId(`page-tab-${resource}`)).getByText(
+        String(index + 10)
+      )
+    ).toBeVisible();
+  });
+});
+
+it('uses organization type icons, muted IDs and a named merge destination', async () => {
+  source = { ...source, type: 'SPELEOLOGY', redirectTo: 43 };
+  apiGet.mockResolvedValue({ id: 43, name: 'Destination club' });
+  renderPage();
+  const row = within(await screen.findByTestId('deleted-organization-42'));
+  expect(row.getByText('#42')).toBeVisible();
+  expect(row.queryByText(/\(#42\)/)).toBeNull();
+  expect(row.queryByText('Deleted')).toBeNull();
+  expect(row.queryByText('fra')).toBeNull();
+  expect(row.queryByText(messages['organizationType.speleology'])).toBeNull();
+  expect(
+    screen.getByTestId('deleted-organization-42').querySelector('img')
+  ).toHaveAttribute('src', getOrganizationIconSource('SPELEOLOGY'));
+  expect(
+    await screen.findByRole('link', { name: 'Destination club' })
+  ).toHaveAttribute('href', '/ui/organizations/43');
+  expect(screen.queryByRole('heading', { name: 'Organizations' })).toBeNull();
+});
+
+it.each([
+  ['Article', 'ArticleIcon'],
+  ['Map', 'MapIcon'],
+  ['Book', 'MenuBookIcon']
+])('uses the %s icon instead of a document type label', async (type, icon) => {
+  source = { ...source, type, title: 'Deleted document' };
+  renderPage('documents');
+  const row = within(await screen.findByTestId('deleted-document-42'));
+  expect(row.getByTestId(icon)).toBeVisible();
+  expect(row.queryByText(type)).toBeNull();
+  expect(row.queryByText(/Français|English/)).toBeNull();
+});
+
+it('opens and closes the preview with additional details', async () => {
+  apiGet.mockResolvedValue({
+    ...source,
+    address: 'Club address',
+    description: 'Club details'
+  });
+  renderPage();
+  fireEvent.click(
+    within(await screen.findByTestId('deleted-organization-42')).getByRole(
+      'button',
+      { name: 'Preview' }
+    )
+  );
+  const dialog = within(screen.getByRole('dialog'));
+  expect(await dialog.findByText('Club address')).toBeVisible();
+  expect(dialog.getByText('Club details')).toBeVisible();
+  fireEvent.click(dialog.getByRole('button', { name: 'close' }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+});
+
+it('loads the selected entity details in the preview window', async () => {
+  apiGet.mockResolvedValue({
+    ...source,
+    description: 'Full archived description'
+  });
+  renderPage();
+  fireEvent.click(await screen.findByRole('button', { name: 'Preview' }));
+  const dialog = within(screen.getByRole('dialog'));
+  expect(await dialog.findByText('Full archived description')).toBeVisible();
+  expect(dialog.getByRole('link', { name: 'Details' })).toHaveAttribute(
+    'href',
+    '/ui/organizations/42'
+  );
+  expect(apiGet).toHaveBeenCalledWith(
+    `${DELETED_ENTITY_RESOURCES.organizations.collectionUrl}/42`,
+    expect.objectContaining({ signal: expect.any(AbortSignal) })
+  );
+  expect(apiPost).not.toHaveBeenCalled();
+  expect(apiDelete).not.toHaveBeenCalled();
 });
 
 it('rejects a response containing active records', async () => {
@@ -456,9 +568,9 @@ it('keeps deleted documents in every validation state', async () => {
   ];
   apiGetWithRange.mockResolvedValue(pageResponse('documents', documents));
   renderPage('documents');
-  await screen.findByRole('link', { name: 'Refused (#43)' });
-  expect(screen.getByRole('link', { name: 'Validated (#41)' })).toBeVisible();
-  expect(screen.getByRole('link', { name: 'Pending (#42)' })).toBeVisible();
+  await screen.findByRole('link', { name: 'Refused' });
+  expect(screen.getByRole('link', { name: 'Validated' })).toBeVisible();
+  expect(screen.getByRole('link', { name: 'Pending' })).toBeVisible();
   expect(
     new URL(apiGetWithRange.mock.calls[0][0]).searchParams.has('isValidated')
   ).toBe(false);
@@ -546,7 +658,7 @@ it('waits for fresh source details before resolving a cached merge destination',
   expect(await screen.findByText('Fresh destination')).toBeVisible();
   expect(apiGet.mock.calls.some(([url]) => url.endsWith('/43'))).toBe(false);
   fireEvent.click(
-    screen.getByRole('button', { name: 'Merge and permanently delete' })
+    await screen.findByRole('button', { name: 'Merge and permanently delete' })
   );
   await waitFor(() => expect(apiDelete).toHaveBeenCalledTimes(1));
   expect(new URL(apiDelete.mock.calls[0][0]).searchParams.get('entityId')).toBe(

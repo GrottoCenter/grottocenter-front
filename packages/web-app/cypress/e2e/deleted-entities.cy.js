@@ -67,6 +67,116 @@ const visit = (path, groups) => {
 };
 
 describe('Deleted entities management', () => {
+  [
+    ['mobile', 390, 844],
+    ['desktop', 1280, 800]
+  ].forEach(([layout, width, height]) => {
+    it(`keeps entity cards and actions compact on ${layout}`, () => {
+      mockReferences();
+      cy.viewport(width, height);
+      const source = {
+        id: 42,
+        name: 'Deleted club',
+        type: 'SPELEOLOGY',
+        isDeleted: true,
+        redirectTo: 43,
+        description: 'Details available in the preview'
+      };
+      cy.intercept(
+        {
+          method: 'GET',
+          pathname: '/api/v1/organizations',
+          query: { isDeleted: 'true' }
+        },
+        {
+          statusCode: 206,
+          headers: { 'Content-Range': '0-1/1' },
+          body: { organizations: [source] }
+        }
+      );
+      cy.intercept('GET', '**/api/v1/organizations/42', { body: source });
+      cy.intercept('GET', '**/api/v1/organizations/43', {
+        body: { id: 43, name: 'Merge destination club' }
+      });
+      visit('/deleted-entities?type=organizations', ['Administrator']);
+      cy.get('[data-testid="deleted-organization-42"]').should(
+        'contain',
+        'Merge destination club'
+      );
+      cy.get('[data-testid="deleted-organization-42"]').should($card => {
+        const card = $card[0].getBoundingClientRect();
+        const preview = $card[0]
+          .querySelector('[aria-label="Preview"]')
+          .getBoundingClientRect();
+        const restore = [...$card[0].querySelectorAll('button')]
+          .find(button => button.textContent.includes('Restore'))
+          .getBoundingClientRect();
+        const remove = $card[0]
+          .querySelector('[aria-label="Permanently delete"]')
+          .getBoundingClientRect();
+        expect(card.right).to.be.at.most(width);
+        expect(card.left).to.be.at.least(0);
+        expect(card.height).to.be.lessThan(layout === 'mobile' ? 160 : 100);
+        expect(
+          Math.abs(
+            restore.top + restore.height / 2 - remove.top - remove.height / 2
+          )
+        ).to.be.lessThan(2);
+        if (layout === 'mobile') {
+          expect(preview.bottom).to.be.at.most(restore.top);
+        } else {
+          expect(
+            Math.abs(
+              preview.top +
+                preview.height / 2 -
+                restore.top -
+                restore.height / 2
+            )
+          ).to.be.lessThan(2);
+        }
+      });
+      cy.get('[data-testid="deleted-organization-42"]')
+        .find('[aria-label="Preview"]')
+        .click();
+      cy.get('[role="dialog"]').should(
+        'contain',
+        'Details available in the preview'
+      );
+    });
+  });
+
+  it('switches resource tabs and resets pagination', () => {
+    mockReferences();
+    ['organizations', 'massifs'].forEach(resource => {
+      cy.intercept(
+        {
+          method: 'GET',
+          pathname: `/api/v1/${resource}`,
+          query: { isDeleted: 'true' }
+        },
+        {
+          statusCode: 206,
+          headers: { 'Content-Range': '0-1/120' },
+          body: {
+            [resource]: [{ id: 42, name: 'Deleted record', isDeleted: true }]
+          }
+        }
+      ).as(resource);
+    });
+    visit('/deleted-entities?type=organizations&page=2', ['Administrator']);
+    cy.wait('@organizations');
+    cy.get('[data-testid="page-tab-massifs"]').click();
+    cy.wait('@massifs').its('request.query.skip').should('equal', '0');
+    cy.get('[data-testid="page-tab-massifs"]').should(
+      'have.attr',
+      'aria-selected',
+      'true'
+    );
+    cy.get('[data-testid="deleted-massif-42"]').should('be.visible');
+    cy.get('[data-testid="deleted-organization-42"]').should('not.exist');
+    cy.location('search').should('include', 'page=1');
+  });
+
   resources.forEach(([resource, kind, fields]) => {
     ['Administrator', 'Moderator'].forEach(role => {
       it(`lets ${role} inspect ${resource} after reloading and restore from the tool`, () => {

@@ -10,12 +10,19 @@ const Location = () => {
   return <output data-testid="location">{search}</output>;
 };
 
-const renderTabs = ({ lazy = true, path = '/?keep=value' } = {}) =>
+const renderTabs = ({
+  lazy = true,
+  path = '/?keep=value',
+  searchParam,
+  onChange
+} = {}) =>
   render(
     <ThemeProvider theme={grottoTheme}>
       <MemoryRouter initialEntries={[path]}>
         <Location />
         <PageTabs
+          searchParam={searchParam}
+          onChange={onChange}
           tabs={[
             { id: 'information', label: 'Information' },
             { id: 'activity', label: 'Activity', lazy }
@@ -58,6 +65,26 @@ it('mounts a lazy panel on first activation and keeps its state afterwards', () 
 it('opens a lazy panel directly from its URL', () => {
   renderTabs({ path: '/?tab=activity' });
   expect(screen.getByLabelText('Activity filter')).toBeVisible();
+});
+
+it('reads and updates a custom search parameter without changing other parameters', () => {
+  renderTabs({
+    path: '/?type=activity&page=3',
+    searchParam: 'type'
+  });
+  expect(screen.getByLabelText('Activity filter')).toBeVisible();
+  fireEvent.click(screen.getByRole('tab', { name: 'Information' }));
+  expect(screen.getByTestId('location')).toHaveTextContent(
+    '?type=information&page=3'
+  );
+});
+
+it('delegates tab changes when the caller owns URL updates', () => {
+  const onChange = vi.fn();
+  renderTabs({ searchParam: 'type', onChange });
+  fireEvent.click(screen.getByRole('tab', { name: 'Activity' }));
+  expect(onChange).toHaveBeenCalledExactlyOnceWith('activity');
+  expect(screen.getByTestId('location')).toHaveTextContent('?keep=value');
 });
 
 it('keeps the scroll observer when only tab metadata changes', () => {
