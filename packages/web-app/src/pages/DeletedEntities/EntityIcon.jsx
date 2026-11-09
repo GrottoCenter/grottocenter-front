@@ -30,7 +30,13 @@ const EntityIcon = ({ resource, entity }) => {
     const label = formatMessage({ id: type || 'unknown' });
     return (
       <Tooltip title={label}>
-        <Icon titleAccess={label} tabIndex={0} sx={{ color: 'primary.main' }} />
+        <Icon
+          role="img"
+          aria-hidden={false}
+          aria-label={label}
+          tabIndex={0}
+          sx={{ color: 'primary.main' }}
+        />
       </Tooltip>
     );
   }
