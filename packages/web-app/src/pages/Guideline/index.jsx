@@ -157,7 +157,8 @@ const GuidelinePage = () => {
     await patchMutation.mutateAsync({ id: data.id, ...scopes });
   };
 
-  const canModerate = permissions.isModerator || permissions.isAdmin;
+  const canModerate =
+    permissions.isAuth && (permissions.isModerator || permissions.isAdmin);
   const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
   const actions = data ? (
     <ResponsiveActions
@@ -201,6 +202,7 @@ const GuidelinePage = () => {
       />
       <DeleteConfirmationDialog
         entityType={DELETED_ENTITIES.guideline}
+        entityId={data?.id}
         entityName={data?.title}
         isOpen={isDeleteDialogOpen}
         isLoading={deleteMutation.isPending}
@@ -229,7 +231,7 @@ const GuidelinePage = () => {
                 isLoading={isActionLoading}
                 onRestorePress={canModerate ? handleRestore : undefined}
                 onPermanentDeletePress={
-                  canModerate
+                  permissions.isAuth && permissions.isAdmin
                     ? () => {
                         setDeletePermanent(true);
                         setDeleteDialogOpen(true);

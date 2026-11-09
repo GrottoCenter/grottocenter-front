@@ -22,6 +22,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import BusinessIcon from '@mui/icons-material/Business';
 import PermMediaIcon from '@mui/icons-material/PermMedia';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
 
 import {
@@ -284,63 +285,79 @@ const Dashboard = () => {
       }
       content={
         <>
-          {permissions.isModerator && (
+          {(permissions.isModerator ||
+            permissions.canManageDeletedEntities) && (
             <Section>
               <SectionTitle variant="overline">
                 {formatMessage({ id: 'Content' })}
               </SectionTitle>
               <ToolGrid>
-                <ToolCard
-                  icon={<DocumentListIcon />}
-                  title={formatMessage({ id: 'Document validation' })}
-                  description={formatMessage({
-                    id: 'Document validation description'
-                  })}
-                  roleId="Moderator"
-                  count={pendingDocumentsQuery.data ?? 0}
-                  isLoading={pendingDocumentsQuery.isPending}
-                  isError={pendingDocumentsQuery.isError}
-                  to="/ui/documents/validation"
-                />
-                <ToolCard
-                  icon={<CallMergeIcon />}
-                  title={formatMessage({ id: 'Duplicates Tool' })}
-                  description={formatMessage({
-                    id: 'Duplicates tool description'
-                  })}
-                  roleId="Moderator"
-                  count={duplicatesQuery.data ?? 0}
-                  isLoading={duplicatesQuery.isPending}
-                  isError={duplicatesQuery.isError}
-                  to="/ui/duplicates"
-                />
-                <ToolCard
-                  icon={<GradingIcon />}
-                  title={formatMessage({ id: 'Guidelines' })}
-                  description={formatMessage({
-                    id: 'guidelines.dashboard.description'
-                  })}
-                  roleId="Moderator"
-                  to="/ui/guidelines"
-                />
-                <ToolCard
-                  icon={<BusinessIcon />}
-                  title={formatMessage({ id: 'Organizations' })}
-                  description={formatMessage({
-                    id: 'Organization management description'
-                  })}
-                  roleId="Moderator"
-                  to="/ui/organizations/management"
-                />
-                <ToolCard
-                  icon={<PermMediaIcon />}
-                  title={formatMessage({ id: 'Documents' })}
-                  description={formatMessage({
-                    id: 'Document management description'
-                  })}
-                  roleId="Moderator"
-                  to="/ui/documents/management"
-                />
+                {permissions.canManageDeletedEntities && (
+                  <ToolCard
+                    icon={<DeleteIcon />}
+                    title={formatMessage({ id: 'deletedEntities.heading' })}
+                    description={formatMessage({
+                      id: 'deletedEntities.description'
+                    })}
+                    roleId={permissions.isAdmin ? 'Administrator' : 'Moderator'}
+                    to="/ui/deleted-entities"
+                  />
+                )}
+                {permissions.isModerator && (
+                  <>
+                    <ToolCard
+                      icon={<DocumentListIcon />}
+                      title={formatMessage({ id: 'Document validation' })}
+                      description={formatMessage({
+                        id: 'Document validation description'
+                      })}
+                      roleId="Moderator"
+                      count={pendingDocumentsQuery.data ?? 0}
+                      isLoading={pendingDocumentsQuery.isPending}
+                      isError={pendingDocumentsQuery.isError}
+                      to="/ui/documents/validation"
+                    />
+                    <ToolCard
+                      icon={<CallMergeIcon />}
+                      title={formatMessage({ id: 'Duplicates Tool' })}
+                      description={formatMessage({
+                        id: 'Duplicates tool description'
+                      })}
+                      roleId="Moderator"
+                      count={duplicatesQuery.data ?? 0}
+                      isLoading={duplicatesQuery.isPending}
+                      isError={duplicatesQuery.isError}
+                      to="/ui/duplicates"
+                    />
+                    <ToolCard
+                      icon={<GradingIcon />}
+                      title={formatMessage({ id: 'Guidelines' })}
+                      description={formatMessage({
+                        id: 'guidelines.dashboard.description'
+                      })}
+                      roleId="Moderator"
+                      to="/ui/guidelines"
+                    />
+                    <ToolCard
+                      icon={<BusinessIcon />}
+                      title={formatMessage({ id: 'Organizations' })}
+                      description={formatMessage({
+                        id: 'Organization management description'
+                      })}
+                      roleId="Moderator"
+                      to="/ui/organizations/management"
+                    />
+                    <ToolCard
+                      icon={<PermMediaIcon />}
+                      title={formatMessage({ id: 'Documents' })}
+                      description={formatMessage({
+                        id: 'Document management description'
+                      })}
+                      roleId="Moderator"
+                      to="/ui/documents/management"
+                    />
+                  </>
+                )}
               </ToolGrid>
             </Section>
           )}

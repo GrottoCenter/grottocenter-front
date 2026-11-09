@@ -36,6 +36,18 @@ export const mfaEnrollUrl = `${API_BASE_PATH}/mfa/enroll`;
 export const mfaVerifyUrl = `${API_BASE_PATH}/mfa/verify`;
 export const mfaResetUrl = `${API_BASE_PATH}/mfa/reset`;
 
+// ===== Core collection urls
+export const deletedEntityCollectionUrls = Object.fromEntries(
+  [
+    'organizations',
+    'entrances',
+    'massifs',
+    'caves',
+    'guidelines',
+    'documents'
+  ].map(resource => [resource, `${API_BASE_PATH}/${resource}`])
+);
+
 // ===== Caves urls
 export const getCaveUrl = `${API_BASE_PATH}/caves/`;
 export const postCreateCaveUrl = `${API_BASE_PATH}/caves`;

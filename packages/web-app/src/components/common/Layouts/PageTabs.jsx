@@ -42,7 +42,7 @@ const TabPanel = styled(Box)`
   }
 `;
 
-const PageTabs = ({ tabs, children }) => {
+const PageTabs = ({ tabs, children, searchParam = 'tab', onChange }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [searchParams, setSearchParams] = useSearchParams();
@@ -50,7 +50,7 @@ const PageTabs = ({ tabs, children }) => {
   const [isStuck, setIsStuck] = useState(false);
   const [bottomNavRef, bottomNavHeight] = useMeasuredHeight();
   const childrenArray = React.Children.toArray(children);
-  const slugParam = searchParams.get('tab') ?? tabs?.[0]?.id ?? '0';
+  const slugParam = searchParams.get(searchParam) ?? tabs?.[0]?.id ?? '0';
   const activeTab = Math.max(0, tabs?.findIndex(t => t.id === slugParam) ?? 0);
   const activeLazyTabId = tabs?.[activeTab]?.lazy ? tabs[activeTab].id : null;
   const hasTabs = Boolean(tabs?.length);
@@ -107,9 +107,13 @@ const PageTabs = ({ tabs, children }) => {
   }
 
   const handleChange = (_, newValue) => {
+    if (onChange) {
+      onChange(tabs[newValue].id);
+      return;
+    }
     setSearchParams(
       prev => {
-        prev.set('tab', tabs[newValue].id);
+        prev.set(searchParam, tabs[newValue].id);
         return prev;
       },
       { replace: true }
@@ -152,7 +156,10 @@ const PageTabs = ({ tabs, children }) => {
             onChange={handleChange}
             variant="scrollable"
             scrollButtons="auto"
-            sx={{ minHeight: 36 }}>
+            sx={{
+              minHeight: 36,
+              '& .MuiTabs-scrollButtons.Mui-disabled': { display: 'none' }
+            }}>
             {tabs.map((tab, i) => (
               <Tab
                 key={tab.id}
@@ -293,6 +300,8 @@ PageTabs.propTypes = {
       lazy: PropTypes.bool
     })
   ),
+  searchParam: PropTypes.string,
+  onChange: PropTypes.func,
   children: PropTypes.node.isRequired
 };
 

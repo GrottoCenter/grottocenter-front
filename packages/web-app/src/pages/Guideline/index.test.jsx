@@ -338,8 +338,8 @@ it('permanently deletes an already soft-deleted guideline', async () => {
   const deleteGuideline = vi.fn().mockResolvedValue(undefined);
   usePermissions.mockReturnValue({
     isAuth: true,
-    isModerator: true,
-    isAdmin: false
+    isModerator: false,
+    isAdmin: true
   });
   useDeleteGuideline.mockReturnValue({
     mutateAsync: deleteGuideline,
@@ -365,6 +365,20 @@ it('permanently deletes an already soft-deleted guideline', async () => {
     isPermanent: true
   });
   expect(await screen.findByText('Guidelines list')).toBeVisible();
+});
+
+it('does not expose permanent deletion to a Moderator-only user', () => {
+  usePermissions.mockReturnValue({
+    isAuth: true,
+    isModerator: true,
+    isAdmin: false
+  });
+  setGuidelineResult({ ...guideline, isDeleted: true });
+  renderPage();
+  expect(screen.getByRole('button', { name: 'Restore' })).toBeVisible();
+  expect(
+    screen.queryByRole('button', { name: 'Permanently delete' })
+  ).toBeNull();
 });
 
 it('stops showing action loading when a soft delete returns stale data', async () => {

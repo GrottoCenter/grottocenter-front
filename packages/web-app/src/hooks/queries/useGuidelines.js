@@ -7,7 +7,7 @@ import { getGuidelinesUrl, getGuidelineUrl } from '../../conf/apiRoutes';
 import { STALE } from '../../conf/queryClient';
 
 const selectGuidelines = ({ data, contentRange }) => {
-  const guidelines = Array.isArray(data) ? data : [];
+  const { guidelines } = data;
   return {
     guidelines,
     totalCount: getTotalCount(guidelines.length, contentRange)

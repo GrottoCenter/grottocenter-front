@@ -1,4 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  completeEntityDeletion,
+  completeEntityRestoration
+} from '@/utils/entityDeletionCache';
 
 import {
   postGuidelineUrl,
@@ -59,12 +63,21 @@ export const useDeleteGuideline = () => {
     networkMode: 'always',
     mutationFn: ({ id, isPermanent }) =>
       apiDelete(deleteGuidelineUrl(id, isPermanent)),
-    onSuccess: () => invalidateGuidelineHosts(queryClient)
+    onSuccess: (data, variables) =>
+      completeEntityDeletion(queryClient, guidelineKeys, data, variables)
   });
 };
 
-export const useRestoreGuideline = () =>
-  useGuidelineMutation(({ id }) => apiPost(restoreGuidelineUrl(id)));
+export const useRestoreGuideline = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    meta: { errorPresentation: 'inline' },
+    networkMode: 'always',
+    mutationFn: ({ id }) => apiPost(restoreGuidelineUrl(id)),
+    onSuccess: (data, variables) =>
+      completeEntityRestoration(queryClient, guidelineKeys, data, variables)
+  });
+};
 
 export const useRollbackGuideline = () =>
   useGuidelineMutation(({ id, snapshotId }) =>

@@ -6,10 +6,16 @@ import {
   act
 } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
+import { MemoryRouter } from 'react-router-dom';
 import frenchMessages from '@/../public/lang/fr.json';
+import englishMessages from '@/../public/lang/en.json';
 import { entranceIcon, networkIcon } from '@/assets/icons';
 
-import { DeleteConfirmationDialog, DELETED_ENTITIES } from './Deleted';
+import {
+  DeletedCard,
+  DeleteConfirmationDialog,
+  DELETED_ENTITIES
+} from './Deleted';
 
 const searchState = vi.hoisted(() => ({ results: [], error: null }));
 const viewportState = vi.hoisted(() => ({ isNarrow: false }));
@@ -89,6 +95,31 @@ const renderDialog = (entityId = 42, onConfirmation = vi.fn()) => (
     />
   </IntlProvider>
 );
+
+it('labels the reviewer metadata as an update, not a deletion', () => {
+  render(
+    <MemoryRouter>
+      <IntlProvider locale="en" messages={englishMessages}>
+        <DeletedCard
+          entityType={DELETED_ENTITIES.massif}
+          entity={{
+            id: 42,
+            reviewer: { id: 7, nickname: 'Last editor' },
+            dateReviewed: '2026-01-02T00:00:00.000Z'
+          }}
+          isLoading={false}
+        />
+      </IntlProvider>
+    </MemoryRouter>
+  );
+  expect(screen.getByText('Updated by')).toBeVisible();
+  expect(screen.getByRole('link', { name: 'Last editor' })).toHaveAttribute(
+    'href',
+    '/ui/persons/7'
+  );
+  expect(screen.getByText('1/2/26')).toBeVisible();
+  expect(screen.queryByText('Deleted by')).toBeNull();
+});
 
 describe('DeleteConfirmationDialog replacement selection', () => {
   beforeEach(() => {
@@ -324,7 +355,7 @@ describe('DeleteConfirmationDialog replacement selection', () => {
       expect(
         screen.getByRole('heading', { name: `Supprimer ${description} ?` })
       ).toBeVisible();
-      expect(screen.getByText('Exemple')).toBeVisible();
+      expect(screen.getByText('Exemple (#42)')).toBeVisible();
       const entityIcon = container.querySelector('img[alt=""]');
       expect(entityIcon).toHaveAttribute('width', '28');
       expect(entityIcon.closest('[aria-hidden="true"]')).not.toBeNull();

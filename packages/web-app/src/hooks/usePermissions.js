@@ -12,7 +12,7 @@ const isTokenExpired = authState => {
   }
 };
 
-export function usePermissions() {
+export const usePermissions = () => {
   const authState = useSelector(state => state.login);
   const isRealAdmin = hasRole(authState, 'Administrator', {
     ignoreImpersonation: true
@@ -29,11 +29,16 @@ export function usePermissions() {
   const isAnonymousMode = impersonatedRole === 'Anonymous';
   const hasLiveSession =
     authState.authTokenDecoded !== null && !isTokenExpired(authState);
+  const isAdmin = hasRole(authState, 'Administrator');
+  const isModerator = hasRole(authState, 'Moderator');
+  const isAuth = hasLiveSession && !isAnonymousMode;
   return {
-    isAdmin: hasRole(authState, 'Administrator'),
-    isAuth: hasLiveSession && !isAnonymousMode,
+    canManageDeletedEntities: isAuth && (isAdmin || isModerator),
+    canPermanentlyDeleteEntities: isAuth && isAdmin,
+    isAdmin,
+    isAuth,
     isLeader: hasRole(authState, 'Leader'),
-    isModerator: hasRole(authState, 'Moderator'),
+    isModerator,
     isTokenExpired: isTokenExpired(authState),
     isUser: hasRole(authState, 'User'),
     // Ignore-impersonation flag so the ImpersonationIndicator and its
@@ -43,4 +48,4 @@ export function usePermissions() {
     isImpersonating: Boolean(impersonatedRole),
     impersonatedRole
   };
-}
+};

@@ -39,56 +39,8 @@ import { Property } from '../Properties';
 
 import { nomelizeSearchEntity, EntityIcon } from '../../../helpers/Entity';
 import AutoCompleteSearch from '../AutoCompleteSearch';
-import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 
-export const DELETED_ENTITIES = {
-  entrance: {
-    iconType: 'entrance',
-    str: 'Entrance',
-    url: '/ui/entrances/',
-    searchType: ADVANCED_SEARCH_TYPES.ENTRANCES
-  },
-  massif: {
-    iconType: 'massif',
-    str: 'Massif',
-    url: '/ui/massifs/',
-    searchType: ADVANCED_SEARCH_TYPES.MASSIFS
-  },
-  organization: {
-    iconType: 'organization',
-    str: 'Organization',
-    url: '/ui/organizations/',
-    searchType: ADVANCED_SEARCH_TYPES.ORGANIZATIONS
-  },
-  document: {
-    iconType: 'bibliography',
-    str: 'Document',
-    url: '/ui/documents/',
-    searchType: ADVANCED_SEARCH_TYPES.DOCUMENTS
-  },
-  guideline: {
-    iconType: 'guidelines',
-    str: 'Guideline',
-    url: '/ui/guidelines/'
-  },
-  network: {
-    iconType: 'network',
-    str: 'Network',
-    url: '/ui/caves/',
-    searchType: ADVANCED_SEARCH_TYPES.CAVES
-  },
-  person: {
-    iconType: 'person',
-    str: 'Person',
-    url: '/ui/persons/',
-    searchType: 'persons'
-  },
-  comment: { str: 'Comment' },
-  description: { str: 'Description' },
-  history: { str: 'History' },
-  location: { str: 'Location' },
-  rigging: { str: 'Rigging' }
-};
+export { DELETED_ENTITIES } from '@/utils/deletedEntityTypes';
 
 const isCurrentEntity = (candidate, entityId) =>
   candidate?.id != null &&
@@ -202,7 +154,7 @@ export const DeletedCard = ({
                 <AuthorAndDate
                   author={entity.reviewer}
                   date={entity.dateReviewed}
-                  verb="Deleted"
+                  verb="Updated"
                 />
               )}
             </Box>
@@ -293,7 +245,9 @@ const DeleteConfirmationDialogContent = ({
   onClose,
   onConfirmation,
   isSearchMandatory = false,
-  successMessageId = 'Deleted'
+  successMessageId = 'Deleted',
+  consequences = null,
+  isConfirmationDisabled = false
 }) => {
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
@@ -321,6 +275,7 @@ const DeleteConfirmationDialogContent = ({
   const isRedirectInterrupted = redirectStatus === 'abandoned';
   const needsRedirectDecision = hasRedirectError || isRedirectInterrupted;
   const isConfirmationBlocked =
+    isConfirmationDisabled ||
     !isOnline ||
     isResolvingRedirect ||
     needsRedirectDecision ||
@@ -503,6 +458,9 @@ const DeleteConfirmationDialogContent = ({
               component="p"
               sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
               {entityName}
+              {entityId != null &&
+                entityName !== `#${entityId}` &&
+                ` (#${entityId})`}
             </Typography>
           </Stack>
         )}
@@ -519,6 +477,7 @@ const DeleteConfirmationDialogContent = ({
             entityValues
           )}
         </Typography>
+        {consequences}
         {canSelectRedirect && (
           <Stack
             component="fieldset"
@@ -729,7 +688,9 @@ DeleteConfirmationDialogContent.propTypes = {
   onClose: PropTypes.func.isRequired,
   onConfirmation: PropTypes.func.isRequired,
   isSearchMandatory: PropTypes.bool,
-  successMessageId: PropTypes.string
+  successMessageId: PropTypes.string,
+  consequences: PropTypes.node,
+  isConfirmationDisabled: PropTypes.bool
 };
 
 DeleteConfirmationDialog.propTypes = DeleteConfirmationDialogContent.propTypes;

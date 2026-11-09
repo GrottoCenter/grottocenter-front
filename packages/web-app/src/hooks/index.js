@@ -18,6 +18,7 @@ export { useAuthNavigate } from './useAuthNavigate';
 export { useFileFormats } from './queries/useFileFormats';
 export { useLicenses, findLicenseByName } from './queries/useLicenses';
 export { useDocumentTypes } from './queries/useDocumentTypes';
+export { useDeletedEntityCounts } from './queries/useDeletedEntityCounts';
 export { useIdentifierTypes } from './queries/useIdentifierTypes';
 export { useSubjects } from './queries/useSubjects';
 export { useLanguages } from './queries/useLanguages';
@@ -157,7 +158,7 @@ export {
   useUpdatePersonGroups
 } from './mutations/usePerson';
 export { useOrganization } from './queries/useOrganization';
-export { useDeletedOrganizations } from './queries/useDeletedOrganizations';
+export { useDeletedEntities } from './queries/useDeletedEntities';
 export { useCountry } from './queries/useCountry';
 export { useRegion } from './queries/useRegion';
 export { useSnapshots } from './queries/useSnapshots';
