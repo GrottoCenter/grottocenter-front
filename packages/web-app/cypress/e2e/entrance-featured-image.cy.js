@@ -328,7 +328,8 @@ describe('Entrance featured image', () => {
           expect(image[0].naturalWidth).to.be.greaterThan(0);
           const photo = image[0].getBoundingClientRect();
           const frame = image[0].closest('button').getBoundingClientRect();
-          expect(photo.width / photo.height).to.be.closeTo(2, 0.01);
+          // Density-corrected intrinsic sizes and layout can round independently.
+          expect(photo.height).to.be.closeTo(photo.width / 2, 1);
           expect(frame.width).to.be.closeTo(photo.width, 1);
           expect(frame.height).to.be.closeTo(photo.height, 1);
           expect(frame.height).to.be.at.most(width < 600 ? 240 : 144);
@@ -468,6 +469,40 @@ describe('Entrance featured image', () => {
     );
     cy.get('[data-testid="featured-image-toggle"]').should('not.exist');
     cy.get('[data-testid="featured-image-options"]').should('not.exist');
+  });
+
+  it('keeps keyboard focus when clearing an unavailable image with no candidates', () => {
+    cy.viewport(1280, 900);
+    cy.loginAs();
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/entrances/1' },
+      { body: { ...entrance, documents: [] } }
+    );
+    visit('/entrances/1/edit');
+    cy.get('[data-testid="featured-image-toggle"]', { timeout: 20000 })
+      .should('be.visible')
+      .and(toggle => {
+        const description = toggle[0]
+          .getAttribute('aria-describedby')
+          .split(' ')
+          .map(id => toggle[0].ownerDocument.getElementById(id).textContent)
+          .join(' ');
+        expect(description).to.include(
+          'The saved featured image is no longer available.'
+        );
+      })
+      .click();
+    cy.get('[data-testid="featured-image-select"] input[value=""]')
+      .should('be.focused')
+      .and('not.be.checked')
+      .check();
+    cy.get('[data-testid="featured-image-options"]').should('be.visible');
+    cy.focused().should('have.value', '');
+    cy.contains('button', 'Close').click();
+    cy.get('[data-testid="featured-image-options"]').should('not.exist');
+    cy.focused()
+      .should('have.attr', 'tabindex', '-1')
+      .and('contain.text', 'Link a document containing an image');
   });
 
   it('only requests the clicked marker detail and reuses it on reopening', () => {

@@ -72,12 +72,15 @@ it('shows every image card and keeps keyboard selection open until explicitly cl
 
 it.each([{ files: [] }, { files: [{ id: 2, fileName: 'other.jpg' }] }])(
   'preserves an unavailable saved selection until explicitly cleared (%j)',
-  ({ files }) => {
+  async ({ files }) => {
     renderWithProviders(<Selector files={files} featuredFile={1} />, {
       messages
     });
     const toggle = screen.getByTestId('featured-image-toggle');
     expect(toggle).toHaveTextContent(messages['featuredImage.unavailable']);
+    expect(toggle).toHaveAccessibleDescription(
+      `${messages['featuredImage.help']} ${messages['featuredImage.unavailable']}`
+    );
     fireEvent.click(toggle);
     expect(
       screen.getByRole('radio', { name: 'No featured image' })
@@ -85,15 +88,24 @@ it.each([{ files: [] }, { files: [{ id: 2, fileName: 'other.jpg' }] }])(
     fireEvent.click(screen.getByRole('button', { name: messages.Close }));
     expect(toggle).toHaveTextContent(messages['featuredImage.unavailable']);
     fireEvent.click(toggle);
-    fireEvent.click(screen.getByRole('radio', { name: 'No featured image' }));
+    const noneRadio = screen.getByRole('radio', { name: 'No featured image' });
+    await userEvent.click(noneRadio);
+    expect(noneRadio).toBeChecked();
+    expect(noneRadio).toHaveFocus();
+    expect(screen.getByTestId('featured-image-options')).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: messages.Close }));
+    expect(screen.queryByTestId('featured-image-options')).toBeNull();
     if (files.length > 0) {
-      expect(
-        screen.getByRole('radio', { name: 'No featured image' })
-      ).toBeChecked();
-      fireEvent.click(screen.getByRole('button', { name: messages.Close }));
       expect(toggle).toHaveTextContent(messages['featuredImage.none']);
+      expect(toggle).toHaveFocus();
+      expect(toggle).toHaveAccessibleDescription(
+        `${messages['featuredImage.help']} ${messages['featuredImage.none']}`
+      );
     } else {
-      expect(screen.getByText(messages['featuredImage.empty'])).toBeVisible();
+      const emptyState = screen.getByText(messages['featuredImage.empty']);
+      expect(emptyState).toBeVisible();
+      expect(emptyState).toHaveFocus();
+      expect(screen.queryByTestId('featured-image-toggle')).toBeNull();
     }
   }
 );

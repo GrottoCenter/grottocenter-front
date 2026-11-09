@@ -53,10 +53,12 @@ const FeaturedImageSelect = ({ control, documents = [] }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(null);
   const toggleRef = useRef(null);
+  const emptyStateRef = useRef(null);
   const groupRef = useRef(null);
   const shouldRestoreFocus = useRef(false);
   const gridId = useId();
   const helpId = useId();
+  const selectionId = useId();
   const candidates = useMemo(
     () => getFeaturedImageCandidates(documents),
     [documents]
@@ -76,7 +78,7 @@ const FeaturedImageSelect = ({ control, documents = [] }) => {
         group?.querySelector('input:checked') ?? group?.querySelector('input');
       input?.focus();
     } else if (shouldRestoreFocus.current) {
-      toggleRef.current?.focus();
+      (toggleRef.current ?? emptyStateRef.current)?.focus();
       shouldRestoreFocus.current = false;
     }
   }, [isExpanded]);
@@ -102,11 +104,15 @@ const FeaturedImageSelect = ({ control, documents = [] }) => {
     );
   };
 
-  if (candidates.length === 0 && !hasSavedImage) {
+  if (candidates.length === 0 && !hasSavedImage && !isExpanded) {
     return (
       <FormSection title="featuredImage.label">
         <Box data-testid="featured-image-select">
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            ref={emptyStateRef}
+            tabIndex={-1}
+            variant="body2"
+            color="text.secondary">
             {formatMessage({ id: 'featuredImage.empty' })}
           </Typography>
         </Box>
@@ -135,6 +141,7 @@ const FeaturedImageSelect = ({ control, documents = [] }) => {
             ref={toggleRef}
             type="button"
             aria-label={actionLabel}
+            aria-describedby={selected ? helpId : `${helpId} ${selectionId}`}
             aria-expanded={isExpanded}
             aria-controls={gridId}
             data-testid="featured-image-toggle"
@@ -176,7 +183,7 @@ const FeaturedImageSelect = ({ control, documents = [] }) => {
             ) : (
               <>
                 <HideImageOutlined fontSize="large" />
-                <Typography variant="body2" sx={{ px: 1 }}>
+                <Typography id={selectionId} variant="body2" sx={{ px: 1 }}>
                   {hasSavedImage
                     ? formatMessage({ id: 'featuredImage.unavailable' })
                     : noneLabel}
