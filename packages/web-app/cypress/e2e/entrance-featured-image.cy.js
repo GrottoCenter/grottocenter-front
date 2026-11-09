@@ -346,6 +346,94 @@ describe('Entrance featured image', () => {
     });
   });
 
+  [390, 768].forEach(width => {
+    it(`reserves the previous loading footprint before the image loads at width ${width}`, () => {
+      cy.viewport(width, 900);
+      let releaseImage;
+      const imageReady = new Cypress.Promise(resolve => {
+        releaseImage = resolve;
+      });
+      cy.intercept('https://images.example.org/thumbnails/**', request =>
+        imageReady.then(() =>
+          request.reply({
+            headers: { 'content-type': 'image/svg+xml' },
+            body: imageBody.replaceAll(
+              'width="320" height="640"',
+              'width="640" height="320"'
+            )
+          })
+        )
+      );
+      visit('/entrances/1');
+      cy.get('[data-testid="entrance-featured-image"]', { timeout: 20000 })
+        .should(frame => {
+          const bounds = frame[0].getBoundingClientRect();
+          expect(frame.find('img')[0].naturalWidth).to.equal(0);
+          expect(bounds.height).to.be.closeTo(width < 600 ? 180 : 144, 1);
+          if (width < 600) {
+            expect(bounds.width).to.be.greaterThan(240);
+          } else {
+            expect(bounds.width).to.be.closeTo(96, 1);
+          }
+        })
+        .then(() => releaseImage());
+      cy.get('[data-testid="entrance-featured-image"] img').should(image => {
+        expect(image[0].naturalWidth).to.be.greaterThan(0);
+        const photo = image[0].getBoundingClientRect();
+        const frame = image[0].closest('button').getBoundingClientRect();
+        expect(photo.height).to.be.closeTo(photo.width / 2, 1);
+        expect(frame.height).to.be.closeTo(photo.height, 1);
+        expect(frame.width).to.be.closeTo(photo.width, 1);
+      });
+    });
+  });
+
+  [16 / 9, 3, 6].forEach(aspectRatio => {
+    it(`keeps the gallery usable without an oversized badge for a ${aspectRatio}:1 photo`, () => {
+      cy.viewport(768, 900);
+      cy.intercept('https://images.example.org/thumbnails/**', {
+        headers: { 'content-type': 'image/svg+xml' },
+        body: imageBody.replaceAll(
+          'width="320" height="640"',
+          `width="${360 * aspectRatio}" height="360"`
+        )
+      });
+      visit('/entrances/1');
+      cy.get('[data-testid="entrance-featured-image"] img', {
+        timeout: 20000
+      })
+        .should('have.css', 'object-fit', 'contain')
+        .and(image => {
+          expect(image[0].naturalWidth).to.be.greaterThan(0);
+          const photo = image[0].getBoundingClientRect();
+          expect(photo.height).to.be.closeTo(photo.width / aspectRatio, 1);
+        });
+      if (aspectRatio <= 4) {
+        cy.get('[data-testid="entrance-featured-image-badge"]')
+          .should('be.visible')
+          .and(badge => {
+            const bounds = badge[0].getBoundingClientRect();
+            const frame = badge[0].closest('button').getBoundingClientRect();
+            expect(bounds.height).to.be.closeTo(18, 1);
+            expect(bounds.top).to.be.at.least(frame.top);
+            expect(bounds.left).to.be.at.least(frame.left);
+            expect(bounds.bottom).to.be.at.most(frame.bottom);
+            expect(bounds.right).to.be.at.most(frame.right);
+          });
+      } else {
+        cy.get('[data-testid="entrance-featured-image-badge"]').should(
+          'not.exist'
+        );
+      }
+      cy.get('[data-testid="entrance-featured-image"]').click();
+      cy.get('[data-testid="lightbox-image"]').should(
+        'have.attr',
+        'src',
+        files[1].completePath
+      );
+    });
+  });
+
   it('shows compact image cards, cancels locally, then saves a replacement and removal', () => {
     cy.viewport(1280, 900);
     cy.loginAs();
