@@ -1229,6 +1229,7 @@
   "featuredImage.none": "ללא תמונה ראשית",
   "featuredImage.openGallery": "פתיחת גלריית הכניסה",
   "featuredImage.preview": "תצוגה מקדימה של {name}",
+  "featuredImage.unavailable": "התמונה הראשית שנשמרה אינה זמינה עוד. יש לבחור תמונה אחרת או לבטל את הבחירה.",
   "Fiji": "פיג'י",
   "File": "קובץ",
   "File available": "קובץ זמין",

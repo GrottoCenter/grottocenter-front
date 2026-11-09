@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { refreshEntrance } from '@/api/refreshEntrance';
 import {
   postCreateCaveUrl,
   putCaveUrl,
@@ -78,9 +77,10 @@ export const useUpdateCaveAndEntrance = () => {
         apiPut(putCaveUrl(caveData.id), caveData),
         apiPut(putEntranceUrl(entranceData.id), entranceData)
       ]),
-    onSuccess: ([_cave, entrance]) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: caveKeys.all });
-      refreshEntrance(queryClient, entrance);
+      // Parallel PUTs can return an entrance containing the old cave values.
+      queryClient.invalidateQueries({ queryKey: entranceKeys.all });
       invalidateAll('entrances');
       invalidateAll('networks');
     }

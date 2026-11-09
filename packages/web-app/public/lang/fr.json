@@ -1229,6 +1229,7 @@
   "featuredImage.none": "Aucune image principale",
   "featuredImage.openGallery": "Ouvrir la galerie de l’entrée",
   "featuredImage.preview": "Aperçu de {name}",
+  "featuredImage.unavailable": "L’image principale enregistrée n’est plus disponible. Choisissez une autre image ou effacez la sélection.",
   "Fiji": "Fidji",
   "File": "Fichier",
   "File available": "Fichier disponible",

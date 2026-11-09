@@ -1229,6 +1229,7 @@
   "featuredImage.none": "Без основно изображение",
   "featuredImage.openGallery": "Отваряне на галерията на входа",
   "featuredImage.preview": "Преглед на {name}",
+  "featuredImage.unavailable": "Запазеното основно изображение вече не е налично. Изберете друго изображение или премахнете избора.",
   "Fiji": "Фиджи",
   "File": "Файл",
   "File available": "Наличен файл",

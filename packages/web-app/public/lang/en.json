@@ -1229,6 +1229,7 @@
   "featuredImage.none": "No featured image",
   "featuredImage.openGallery": "Open the entrance gallery",
   "featuredImage.preview": "Preview {name}",
+  "featuredImage.unavailable": "The saved featured image is no longer available. Choose another image or clear the selection.",
   "Fiji": "Fiji",
   "File": "File",
   "File available": "File available",

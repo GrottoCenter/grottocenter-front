@@ -1,6 +1,10 @@
 import { ENTRANCE_ONLY } from './caveType';
 
-export const makeEntranceData = (data, entityType) => {
+export const makeEntranceData = (
+  data,
+  entityType,
+  originalEntranceValues = null
+) => {
   const entranceData = {
     // When creating a cave with a single entrance, the name of the entrance is the same as the cave one, in data.cave
     name: {
@@ -31,8 +35,13 @@ export const makeEntranceData = (data, entityType) => {
         : null
   };
 
-  // Creation has no linked documents; omission also preserves older API data.
-  if (data.entrance.featuredFile !== undefined) {
+  // Omit unchanged selections so unrelated edits also work on older APIs.
+  if (
+    data.entrance.featuredFile !== undefined &&
+    (!originalEntranceValues ||
+      data.entrance.featuredFile !==
+        (originalEntranceValues.featuredFile ?? null))
+  ) {
     entranceData.featuredFile = data.entrance.featuredFile;
   }
 

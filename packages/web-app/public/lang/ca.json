@@ -1229,6 +1229,7 @@
   "featuredImage.none": "Cap imatge principal",
   "featuredImage.openGallery": "Obre la galeria de l’entrada",
   "featuredImage.preview": "Previsualitza {name}",
+  "featuredImage.unavailable": "La imatge principal desada ja no està disponible. Trieu una altra imatge o esborreu la selecció.",
   "Fiji": "Fiji",
   "File": "Fitxer",
   "File available": "Fitxer disponible",

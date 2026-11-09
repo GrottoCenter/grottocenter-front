@@ -164,7 +164,7 @@ export const EntranceForm = ({
       id: caveValues?.id
     };
     const entranceDataFmt = {
-      ...makeEntranceData(data, entityType),
+      ...makeEntranceData(data, entityType, entranceValues),
       id: entranceValues?.id
     };
     if (entranceDataFmt.longitude != null) {

@@ -169,7 +169,11 @@ describe('entrance and network submission validation', () => {
     }
   );
 
-  it('explicitly clears the selected image with null', async () => {
+  it.each([
+    { files: [] },
+    { files: [{ id: 11, fileName: 'first.jpg', completePath: '/first.jpg' }] },
+    { files: [{ id: 12, fileName: 'other.jpg', completePath: '/other.jpg' }] }
+  ])('explicitly clears a saved image with null (%j)', async ({ files }) => {
     renderForm(
       <EntranceForm
         entranceValues={{
@@ -178,9 +182,7 @@ describe('entrance and network submission validation', () => {
           documents: [
             {
               id: 3,
-              files: [
-                { id: 11, fileName: 'first.jpg', completePath: '/first.jpg' }
-              ]
+              files
             }
           ]
         }}
@@ -188,12 +190,38 @@ describe('entrance and network submission validation', () => {
       />
     );
     fireEvent.click(screen.getByTestId('featured-image-toggle'));
-    expect(screen.getByRole('radio', { name: 'Image 1 of 1' })).toBeChecked();
     fireEvent.click(screen.getByRole('radio', { name: 'No featured image' }));
     fireEvent.click(screen.getByText('Update'));
     await waitFor(() => expect(mocks.updateEntrance).toHaveBeenCalledTimes(1));
     expect(mocks.updateEntrance.mock.calls[0][0].featuredFile).toBeNull();
   });
+
+  it.each([
+    ['Altitude', null],
+    ['Altitude', 11],
+    ['Depth', 11]
+  ])(
+    'omits an unchanged featured image (%s, %s) during unrelated edits',
+    async (label, featuredFile) => {
+      renderForm(
+        <EntranceForm
+          entranceValues={{ ...entrance, featuredFile, documents: [] }}
+          caveValues={cave}
+        />
+      );
+      fireEvent.change(screen.getByLabelText(label), {
+        target: { value: '101' }
+      });
+      fireEvent.click(screen.getByText('Update'));
+      const mutation = label === 'Depth' ? mocks.update : mocks.updateEntrance;
+      await waitFor(() => expect(mutation).toHaveBeenCalledOnce());
+      const payload =
+        label === 'Depth'
+          ? mutation.mock.calls[0][0].entranceData
+          : mutation.mock.calls[0][0];
+      expect(payload).not.toHaveProperty('featuredFile');
+    }
+  );
 
   it.each([
     ['Altitude', '10000', '9999'],

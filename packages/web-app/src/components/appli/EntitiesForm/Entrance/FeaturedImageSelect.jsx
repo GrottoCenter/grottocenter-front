@@ -63,9 +63,10 @@ const FeaturedImageSelect = ({ control, documents = [] }) => {
   );
   const selectedIndex = candidates.findIndex(file => file.id === field.value);
   const selected = candidates[selectedIndex];
+  const hasSavedImage = field.value != null;
   const noneLabel = formatMessage({ id: 'featuredImage.none' });
   const actionLabel = formatMessage({
-    id: selected ? 'Edit' : 'featuredImage.choose'
+    id: hasSavedImage ? 'Edit' : 'featuredImage.choose'
   });
 
   useEffect(() => {
@@ -101,7 +102,7 @@ const FeaturedImageSelect = ({ control, documents = [] }) => {
     );
   };
 
-  if (candidates.length === 0) {
+  if (candidates.length === 0 && !hasSavedImage) {
     return (
       <FormSection title="featuredImage.label">
         <Box data-testid="featured-image-select">
@@ -176,7 +177,9 @@ const FeaturedImageSelect = ({ control, documents = [] }) => {
               <>
                 <HideImageOutlined fontSize="large" />
                 <Typography variant="body2" sx={{ px: 1 }}>
-                  {noneLabel}
+                  {hasSavedImage
+                    ? formatMessage({ id: 'featuredImage.unavailable' })
+                    : noneLabel}
                 </Typography>
               </>
             )}

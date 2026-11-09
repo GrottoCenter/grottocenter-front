@@ -1229,6 +1229,7 @@
   "featuredImage.none": "Tanpa gambar utama",
   "featuredImage.openGallery": "Buka galeri pintu masuk",
   "featuredImage.preview": "Pratinjau {name}",
+  "featuredImage.unavailable": "Gambar utama yang tersimpan tidak lagi tersedia. Pilih gambar lain atau hapus pilihan.",
   "Fiji": "Fiji",
   "File": "File",
   "File available": "File tersedia",

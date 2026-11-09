@@ -16,15 +16,21 @@ vi.mock('@/utils/mapTileCache', () => ({
 afterEach(() => vi.resetAllMocks());
 
 it.each([false, true])(
-  'publishes the updated detail without a redundant GET (combined: %s)',
+  'refreshes combined updates but reuses entrance-only responses (combined: %s)',
   async combined => {
     const queryClient = createTestQueryClient();
-    const original = { id: 1, documents: [], featuredFile: null };
+    const original = {
+      id: 1,
+      documents: [],
+      featuredFile: null,
+      cave: { id: 2, depth: 10 }
+    };
     const updated = {
       ...original,
       featuredFile: { id: 10, fileName: 'cave.jpg', completePath: '/cave.jpg' }
     };
-    apiGet.mockResolvedValue(original);
+    const refreshed = { ...updated, cave: { id: 2, depth: 20 } };
+    apiGet.mockResolvedValueOnce(original).mockResolvedValue(refreshed);
     apiPut.mockImplementation(url =>
       Promise.resolve(url.includes('/entrances/') ? updated : { id: 2 })
     );
@@ -43,7 +49,7 @@ it.each([false, true])(
     await act(async () => {
       if (combined)
         await result.current.updateBoth.mutateAsync({
-          caveData: { id: 2 },
+          caveData: { id: 2, depth: 20 },
           entranceData: { id: 1, featuredFile: 10 }
         });
       else
@@ -52,11 +58,15 @@ it.each([false, true])(
           featuredFile: 10
         });
     });
-    expect(queryClient.getQueryData(entranceKeys.detail('1'))).toEqual(updated);
     await waitFor(() =>
-      expect(result.current.entrance.data.featuredFile?.id).toBe(10)
+      expect(result.current.entrance.data).toEqual(
+        combined ? refreshed : updated
+      )
     );
-    expect(apiGet).toHaveBeenCalledTimes(1);
+    expect(queryClient.getQueryData(entranceKeys.detail('1'))).toEqual(
+      combined ? refreshed : updated
+    );
+    expect(apiGet).toHaveBeenCalledTimes(combined ? 2 : 1);
     unmount();
     queryClient.clear();
   }

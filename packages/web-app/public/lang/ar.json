@@ -1229,6 +1229,7 @@
   "featuredImage.none": "بدون صورة رئيسية",
   "featuredImage.openGallery": "فتح معرض المدخل",
   "featuredImage.preview": "معاينة {name}",
+  "featuredImage.unavailable": "لم تعد الصورة الرئيسية المحفوظة متاحة. اختر صورة أخرى أو ألغِ الاختيار.",
   "Fiji": "فيجي",
   "File": "ملف",
   "File available": "ملف متاح",

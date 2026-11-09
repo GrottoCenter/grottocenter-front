@@ -69,3 +69,31 @@ it('shows every image card and keeps keyboard selection open until explicitly cl
   expect(screen.queryByRole('radiogroup')).toBeNull();
   expect(toggle).toHaveAttribute('aria-expanded', 'false');
 });
+
+it.each([{ files: [] }, { files: [{ id: 2, fileName: 'other.jpg' }] }])(
+  'preserves an unavailable saved selection until explicitly cleared (%j)',
+  ({ files }) => {
+    renderWithProviders(<Selector files={files} featuredFile={1} />, {
+      messages
+    });
+    const toggle = screen.getByTestId('featured-image-toggle');
+    expect(toggle).toHaveTextContent(messages['featuredImage.unavailable']);
+    fireEvent.click(toggle);
+    expect(
+      screen.getByRole('radio', { name: 'No featured image' })
+    ).not.toBeChecked();
+    fireEvent.click(screen.getByRole('button', { name: messages.Close }));
+    expect(toggle).toHaveTextContent(messages['featuredImage.unavailable']);
+    fireEvent.click(toggle);
+    fireEvent.click(screen.getByRole('radio', { name: 'No featured image' }));
+    if (files.length > 0) {
+      expect(
+        screen.getByRole('radio', { name: 'No featured image' })
+      ).toBeChecked();
+      fireEvent.click(screen.getByRole('button', { name: messages.Close }));
+      expect(toggle).toHaveTextContent(messages['featuredImage.none']);
+    } else {
+      expect(screen.getByText(messages['featuredImage.empty'])).toBeVisible();
+    }
+  }
+);

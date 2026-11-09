@@ -1229,6 +1229,7 @@
   "featuredImage.none": "Fără imagine principală",
   "featuredImage.openGallery": "Deschide galeria intrării",
   "featuredImage.preview": "Previzualizare {name}",
+  "featuredImage.unavailable": "Imaginea principală salvată nu mai este disponibilă. Alegeți altă imagine sau ștergeți selecția.",
   "Fiji": "Fiji",
   "File": "Fișier",
   "File available": "Fișier disponibil",

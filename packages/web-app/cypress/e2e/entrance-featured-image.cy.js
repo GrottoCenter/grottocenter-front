@@ -255,6 +255,14 @@ describe('Entrance featured image', () => {
         expect(location).to.have.length(width < 600 ? 0 : 1);
         if (width >= 600) expect(image.outerWidth()).to.be.at.most(128);
       });
+      cy.get('[data-testid="entrance-featured-image"] img')
+        .should('be.visible')
+        .and('have.css', 'object-fit', 'contain')
+        .and(image => {
+          expect(image[0].naturalHeight).to.be.greaterThan(
+            image[0].naturalWidth
+          );
+        });
       cy.get('[data-testid="entrance-location"]').should(location => {
         expect(location[0].scrollWidth).to.be.at.most(location[0].clientWidth);
       });

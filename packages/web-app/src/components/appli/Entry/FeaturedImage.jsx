@@ -33,7 +33,7 @@ const FeaturedImage = ({ file, entranceName, onClick, onUnavailable }) => {
         sizes="(max-width: 599px) 100vw, 128px"
         loading="eager"
         onUnavailable={onUnavailable}
-        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
       />
       <Box
         sx={{

@@ -1229,6 +1229,7 @@
   "featuredImage.none": "Sin imagen principal",
   "featuredImage.openGallery": "Abrir la galería de la entrada",
   "featuredImage.preview": "Vista previa de {name}",
+  "featuredImage.unavailable": "La imagen principal guardada ya no está disponible. Elija otra imagen o borre la selección.",
   "Fiji": "Fiyi",
   "File": "Archivo",
   "File available": "Archivo disponible",

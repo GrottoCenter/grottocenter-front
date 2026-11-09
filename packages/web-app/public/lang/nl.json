@@ -1229,6 +1229,7 @@
   "featuredImage.none": "Geen hoofdafbeelding",
   "featuredImage.openGallery": "Galerij van de ingang openen",
   "featuredImage.preview": "Voorbeeld van {name}",
+  "featuredImage.unavailable": "De opgeslagen hoofdafbeelding is niet meer beschikbaar. Kies een andere afbeelding of wis de selectie.",
   "Fiji": "Fidji",
   "File": "Bestand",
   "File available": "Bestand beschikbaar",
