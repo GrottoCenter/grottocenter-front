@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, ButtonBase } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
@@ -7,6 +8,7 @@ import { FilePropTypes } from '@/types/document.type';
 
 const FeaturedImage = ({ file, entranceName, onClick, onUnavailable }) => {
   const { formatMessage } = useIntl();
+  const [aspectRatio, setAspectRatio] = useState(1);
 
   return (
     <ButtonBase
@@ -16,12 +18,18 @@ const FeaturedImage = ({ file, entranceName, onClick, onUnavailable }) => {
       sx={{
         position: 'relative',
         gridArea: 'photo',
-        width: { xs: '100%', sm: 96, md: 120, lg: 128 },
-        height: { xs: 180, sm: 144 },
+        width: {
+          xs: `min(100%, ${240 * aspectRatio}px)`,
+          sm: `min(96px, ${144 * aspectRatio}px)`,
+          md: `min(120px, ${144 * aspectRatio}px)`,
+          lg: `min(128px, ${144 * aspectRatio}px)`
+        },
+        aspectRatio,
+        justifySelf: 'center',
         flexShrink: 0,
-        borderRadius: 1,
+        borderRadius: 2,
         overflow: 'hidden',
-        bgcolor: 'grey.100',
+        boxShadow: '0 0 0 1px rgba(0,0,0,0.12)',
         '&.Mui-focusVisible': {
           outline: '3px solid',
           outlineColor: 'primary.main'
@@ -32,14 +40,27 @@ const FeaturedImage = ({ file, entranceName, onClick, onUnavailable }) => {
         alt={entranceName}
         sizes="(max-width: 599px) 100vw, 128px"
         loading="eager"
+        onLoad={({ currentTarget }) => {
+          if (currentTarget.naturalWidth && currentTarget.naturalHeight) {
+            setAspectRatio(
+              currentTarget.naturalWidth / currentTarget.naturalHeight
+            );
+          }
+        }}
         onUnavailable={onUnavailable}
-        sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        sx={{
+          display: 'block',
+          width: '100%',
+          height: '100%',
+          borderRadius: 'inherit',
+          objectFit: 'contain'
+        }}
       />
       <Box
         sx={{
           position: 'absolute',
-          bottom: 8,
-          right: 8,
+          bottom: theme => theme.spacing(1),
+          right: theme => theme.spacing(1),
           display: 'flex',
           p: 0.5,
           borderRadius: 1,

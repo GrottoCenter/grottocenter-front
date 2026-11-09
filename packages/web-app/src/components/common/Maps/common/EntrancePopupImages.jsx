@@ -123,7 +123,7 @@ const EntrancePopupContent = ({ file, entranceId, entranceName, popup }) => {
       <FileImage
         file={file}
         alt={entranceName}
-        sizes="160px"
+        sizes="300px"
         loading="eager"
         onLoad={({ currentTarget }) =>
           setImageSize({
@@ -133,11 +133,15 @@ const EntrancePopupContent = ({ file, entranceId, entranceName, popup }) => {
         }
         onUnavailable={() => setIsUnavailable(true)}
         sx={{
-          width: 'auto',
+          width:
+            imageSize?.width && imageSize?.height
+              ? `min(100%, calc(var(--map-popup-photo-height, 160px) * ${imageSize.width / imageSize.height}))`
+              : 'auto',
           height: 'auto',
-          maxWidth: 'min(100%, var(--map-popup-photo-height, 160px))',
+          maxWidth: '100%',
           maxHeight: 'var(--map-popup-photo-height, 160px)',
-          borderRadius: 1,
+          borderRadius: 2,
+          boxShadow: '0 0 0 1px rgba(0,0,0,0.12)',
           objectFit: 'contain',
           display: 'block'
         }}

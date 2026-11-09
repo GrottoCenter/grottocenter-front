@@ -76,7 +76,6 @@ code {
   width: 100%;
   max-width: 100%;
   align-self: start;
-  overflow: hidden;
 }
 
 /* Outranks Leaflet's `.leaflet-popup-content p { margin: 1.3em 0 }`. That one

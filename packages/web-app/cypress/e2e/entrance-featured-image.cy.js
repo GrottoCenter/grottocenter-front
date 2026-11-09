@@ -148,11 +148,29 @@ const expectPopupLayout = layout => {
   cy.get('[data-testid="entrance-popup-photo"] img')
     .should('be.visible')
     .and('have.css', 'object-fit', 'contain')
-    .and('have.css', 'border-top-left-radius', '4px')
+    .and('have.css', 'border-top-left-radius', '8px')
     .and(image => {
       const bounds = image[0].getBoundingClientRect();
       // Leaflet's transforms can add subpixel rounding to the measured size.
-      expect(Math.max(bounds.width, bounds.height)).to.be.at.most(160.5);
+      expect(bounds.height).to.be.at.most(160.5);
+      const popupWidth = image[0]
+        .closest('[data-testid="entrance-popup"]')
+        .getBoundingClientRect().width;
+      expect(bounds.width).to.be.at.most(popupWidth + 0.5);
+      if (image[0].naturalWidth > image[0].naturalHeight) {
+        const maxHeight = parseFloat(
+          image[0]
+            .closest('.leaflet-popup')
+            .style.getPropertyValue('--map-popup-photo-height')
+        );
+        expect(bounds.width).to.be.closeTo(
+          Math.min(
+            popupWidth,
+            (maxHeight * image[0].naturalWidth) / image[0].naturalHeight
+          ),
+          1
+        );
+      }
       expect(bounds.width / bounds.height).to.be.closeTo(
         image[0].naturalWidth / image[0].naturalHeight,
         0.01
@@ -248,7 +266,7 @@ describe('Entrance featured image', () => {
       cy.get('[data-testid="entrance-featured-image"]', { timeout: 20000 })
         .should('be.visible')
         .and(element =>
-          expect(element.height()).to.be.at.most(width < 600 ? 180 : 144)
+          expect(element.height()).to.be.at.most(width < 600 ? 240 : 144)
         );
       cy.get('[data-testid="entrance-featured-image"]').should(image => {
         const location = image.closest('[data-testid="entrance-location"]');
@@ -258,10 +276,19 @@ describe('Entrance featured image', () => {
       cy.get('[data-testid="entrance-featured-image"] img')
         .should('be.visible')
         .and('have.css', 'object-fit', 'contain')
+        .and('have.css', 'border-top-left-radius', '8px')
         .and(image => {
           expect(image[0].naturalHeight).to.be.greaterThan(
             image[0].naturalWidth
           );
+          const photo = image[0].getBoundingClientRect();
+          const frame = image[0].closest('button').getBoundingClientRect();
+          expect(photo.width / photo.height).to.be.closeTo(
+            image[0].naturalWidth / image[0].naturalHeight,
+            0.01
+          );
+          expect(frame.width).to.be.closeTo(photo.width, 1);
+          expect(frame.height).to.be.closeTo(photo.height, 1);
         });
       cy.get('[data-testid="entrance-location"]').should(location => {
         expect(location[0].scrollWidth).to.be.at.most(location[0].clientWidth);
@@ -281,6 +308,40 @@ describe('Entrance featured image', () => {
       );
       cy.get('[aria-label="Close"]').click();
       cy.get('[data-testid="lightbox-image"]').should('not.exist');
+    });
+
+    it(`fits a landscape photo without letterboxing at width ${width}`, () => {
+      cy.viewport(width, 900);
+      cy.intercept('https://images.example.org/thumbnails/**', {
+        headers: { 'content-type': 'image/svg+xml' },
+        body: imageBody.replaceAll(
+          'width="320" height="640"',
+          'width="640" height="320"'
+        )
+      });
+      visit('/entrances/1');
+      cy.get('[data-testid="entrance-featured-image"] img', {
+        timeout: 20000
+      })
+        .should('be.visible')
+        .and(image => {
+          expect(image[0].naturalWidth).to.be.greaterThan(0);
+          const photo = image[0].getBoundingClientRect();
+          const frame = image[0].closest('button').getBoundingClientRect();
+          expect(photo.width / photo.height).to.be.closeTo(2, 0.01);
+          expect(frame.width).to.be.closeTo(photo.width, 1);
+          expect(frame.height).to.be.closeTo(photo.height, 1);
+          expect(frame.height).to.be.at.most(width < 600 ? 240 : 144);
+          if (width < 600) {
+            const container = image[0]
+              .closest('button')
+              .parentElement.getBoundingClientRect();
+            expect(frame.left - container.left).to.be.closeTo(
+              container.right - frame.right,
+              1
+            );
+          }
+        });
     });
   });
 
