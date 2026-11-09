@@ -203,6 +203,11 @@ const EntrancePopupImages = () => {
       }
     }
   });
+  // Temporary trade-off: uncached popups fetch full entrance detail. The shared
+  // five-minute cache avoids repeated fresh reads and preloads the entrance page.
+  // Replace this with the lightweight featured-image API once deployed:
+  // backend: GrottoCenter/grottocenter-api#1992
+  // frontend: GrottoCenter/grottocenter-front#1619
   const { data } = useQuery({
     ...entranceQueryOptions(active?.id),
     meta: { skipErrorNotification: true }
