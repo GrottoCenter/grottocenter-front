@@ -318,6 +318,35 @@ it.each(['direct navigation', 'Restore', 'Permanently delete'])(
   }
 );
 
+it('stops showing the first-page total when an uncached recovery page fails', async () => {
+  let rejectPage;
+  apiGetWithRange.mockImplementation(url => {
+    const skip = Number(new URL(url).searchParams.get('skip'));
+    if (skip === 100) {
+      return new Promise((_, reject) => {
+        rejectPage = reject;
+      });
+    }
+    return Promise.resolve(
+      pageResponse('organizations', skip === 0 ? [source] : [], 120)
+    );
+  });
+  renderPage('organizations', ['Administrator'], '&page=10');
+  await waitFor(() => expect(rejectPage).toBeTypeOf('function'));
+  expect(screen.getByTestId('deleted-entities-count')).toHaveTextContent(
+    '120 results'
+  );
+  expect(screen.getByText('101–120 / 120')).toBeVisible();
+  await act(async () => rejectPage(new Error('List unavailable')));
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'List unavailable'
+  );
+  expect(screen.queryByTestId('deleted-entities-count')).toBeNull();
+  expect(screen.queryByText('101–120 / 120')).toBeNull();
+  expect(screen.getByText('0–0 / 0')).toBeVisible();
+  expect(screen.getByRole('button', { name: 'Retry' })).toBeEnabled();
+});
+
 it('shows list errors and retries', async () => {
   apiGetWithRange.mockRejectedValueOnce(new Error('List unavailable'));
   renderPage();

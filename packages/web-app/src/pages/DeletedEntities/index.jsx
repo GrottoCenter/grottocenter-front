@@ -64,10 +64,12 @@ const DeletedEntitiesContent = () => {
     enabled: isPastEnd,
     staleTime: 0
   });
+  // Keep the known first-page total while a page without placeholder loads,
+  // including the target of last-page recovery, but not after it fails.
   const totalCount =
-    isPastEnd || query.data == null
+    isPastEnd || query.isPending
       ? firstPage.data?.totalCount
-      : query.data.totalCount;
+      : query.data?.totalCount;
   const changePage = (nextPage, nextLimit = limit) =>
     setSearchParams(
       previous => {
