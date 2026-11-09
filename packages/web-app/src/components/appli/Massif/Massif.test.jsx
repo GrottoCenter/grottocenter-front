@@ -77,12 +77,23 @@ it('renders the complete massif preview without page actions or navigation tabs'
   expect(apiGet).not.toHaveBeenCalled();
 });
 
-it('waits for the massif and does not fetch statistics when it is deleted', async () => {
-  const { rerender, queryClient } = renderWithProviders(view(undefined, true), {
-    messages
-  });
+it('fetches statistics while the route massif details are still loading', async () => {
+  renderWithProviders(view(undefined, true), { messages });
+  await waitFor(() =>
+    expect(apiGet).toHaveBeenCalledWith(statisticsUrl, {
+      signal: expect.any(AbortSignal)
+    })
+  );
+  expect(screen.queryByText(messages['More information'])).toBeNull();
+});
+
+it('does not fetch statistics in preview while loading or after receiving a deleted massif', async () => {
+  const { rerender, queryClient } = renderWithProviders(
+    view(undefined, true, true),
+    { messages }
+  );
   expect(apiGet).not.toHaveBeenCalled();
-  rerender(view({ ...massif, isDeleted: true }));
+  rerender(view({ ...massif, isDeleted: true }, false, true));
   expect(screen.getByText('Deleted massif')).toBeVisible();
   await act(() => queryClient.invalidateQueries({ queryKey: statisticsKey }));
   expect(apiGet).not.toHaveBeenCalled();

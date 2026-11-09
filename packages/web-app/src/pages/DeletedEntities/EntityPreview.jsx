@@ -46,7 +46,7 @@ const EntityPreview = ({ resource, entity, onClose }) => {
       case 'organizations':
         return <Organization organization={data} isLoading={false} isPreview />;
       case 'documents':
-        return <DocumentDetails id={entity.id} hideActions />;
+        return <DocumentDetails id={entity.id} isPreview />;
       case 'guidelines':
         return <Guideline id={entity.id} isPreview />;
       default:

@@ -91,7 +91,7 @@ const Massif = ({
 
   const canShowStatistics = !!massif && !massif.isDeleted;
   const { data: dataMassif } = useStatisticsMassif(
-    canShowStatistics ? massifIdInt : null
+    isPreview || massif?.isDeleted ? null : massifIdInt
   );
   useScrollToHashOnLoad(dataMassif);
 
