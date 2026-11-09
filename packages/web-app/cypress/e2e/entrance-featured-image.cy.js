@@ -44,7 +44,7 @@ const entrance = {
 };
 const imageBody =
   '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="640"><rect width="320" height="640" fill="#7c9a6c"/></svg>';
-const visit = path =>
+const visit = (path, onBeforeLoad = () => {}) =>
   cy.visit(path, {
     onBeforeLoad: win => {
       win.localStorage.setItem('selectedLanguage', 'en');
@@ -61,6 +61,7 @@ const visit = path =>
       win.localStorage.removeItem('grottocenter_activeEntranceFilters');
       win.localStorage.removeItem('grottocenter_activeQualityFilters');
       win.localStorage.setItem('grottocenter_minInterest', '0');
+      onBeforeLoad(win);
     }
   });
 
@@ -349,34 +350,32 @@ describe('Entrance featured image', () => {
   [390, 768].forEach(width => {
     it(`reserves the previous loading footprint before the image loads at width ${width}`, () => {
       cy.viewport(width, 900);
-      let releaseImage;
-      const imageReady = new Cypress.Promise(resolve => {
-        releaseImage = resolve;
+      let entranceWindow;
+      cy.intercept('https://images.example.org/thumbnails/**', request => {
+        const frame = entranceWindow.document.querySelector(
+          '[data-testid="entrance-featured-image"]'
+        );
+        expect(frame, 'loading frame').not.to.equal(null);
+        const bounds = frame.getBoundingClientRect();
+        expect(frame.querySelector('img').naturalWidth).to.equal(0);
+        expect(bounds.height).to.be.closeTo(width < 600 ? 180 : 144, 1);
+        if (width < 600) {
+          expect(bounds.width).to.be.greaterThan(240);
+        } else {
+          expect(bounds.width).to.be.closeTo(96, 1);
+        }
+        request.reply({
+          headers: { 'content-type': 'image/svg+xml' },
+          body: imageBody.replaceAll(
+            'width="320" height="640"',
+            'width="640" height="320"'
+          )
+        });
+      }).as('loadingThumbnail');
+      visit('/entrances/1', win => {
+        entranceWindow = win;
       });
-      cy.intercept('https://images.example.org/thumbnails/**', request =>
-        imageReady.then(() =>
-          request.reply({
-            headers: { 'content-type': 'image/svg+xml' },
-            body: imageBody.replaceAll(
-              'width="320" height="640"',
-              'width="640" height="320"'
-            )
-          })
-        )
-      );
-      visit('/entrances/1');
-      cy.get('[data-testid="entrance-featured-image"]', { timeout: 20000 })
-        .should(frame => {
-          const bounds = frame[0].getBoundingClientRect();
-          expect(frame.find('img')[0].naturalWidth).to.equal(0);
-          expect(bounds.height).to.be.closeTo(width < 600 ? 180 : 144, 1);
-          if (width < 600) {
-            expect(bounds.width).to.be.greaterThan(240);
-          } else {
-            expect(bounds.width).to.be.closeTo(96, 1);
-          }
-        })
-        .then(() => releaseImage());
+      cy.wait('@loadingThumbnail');
       cy.get('[data-testid="entrance-featured-image"] img').should(image => {
         expect(image[0].naturalWidth).to.be.greaterThan(0);
         const photo = image[0].getBoundingClientRect();

@@ -46,6 +46,9 @@ it('shows every image card and keeps keyboard selection open until explicitly cl
     messages
   });
   const toggle = screen.getByTestId('featured-image-toggle');
+  expect(toggle).toHaveAccessibleDescription(
+    `${messages['featuredImage.help']} Entrance photos — Image 12 of 12`
+  );
   expect(screen.queryByRole('radiogroup')).toBeNull();
   expect(screen.queryByRole('button', { name: /^Preview / })).toBeNull();
   fireEvent.click(toggle);
@@ -63,6 +66,9 @@ it('shows every image card and keeps keyboard selection open until explicitly cl
   fireEvent.click(screen.getByRole('button', { name: messages.Close }));
   expect(toggle).toBeVisible();
   expect(toggle).toHaveFocus();
+  expect(toggle).toHaveAccessibleDescription(
+    `${messages['featuredImage.help']} Entrance photos — Image 11 of 12`
+  );
   expect(
     screen.getByRole('img', { name: /Entrance photos — Image 11 of 12/ })
   ).toBeVisible();

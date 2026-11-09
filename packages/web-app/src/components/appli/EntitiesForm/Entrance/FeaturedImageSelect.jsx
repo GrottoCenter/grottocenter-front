@@ -141,7 +141,7 @@ const FeaturedImageSelect = ({ control, documents = [] }) => {
             ref={toggleRef}
             type="button"
             aria-label={actionLabel}
-            aria-describedby={selected ? helpId : `${helpId} ${selectionId}`}
+            aria-describedby={`${helpId} ${selectionId}`}
             aria-expanded={isExpanded}
             aria-controls={gridId}
             data-testid="featured-image-toggle"
@@ -173,13 +173,18 @@ const FeaturedImageSelect = ({ control, documents = [] }) => {
               }
             }}>
             {selected ? (
-              <FileImage
-                key={selected.id}
-                file={selected}
-                alt={getImageLabel(selected, selectedIndex)}
-                sizes="(max-width: 599px) 100vw, 256px"
-                sx={imageStyles}
-              />
+              <>
+                <FileImage
+                  key={selected.id}
+                  file={selected}
+                  alt={getImageLabel(selected, selectedIndex)}
+                  sizes="(max-width: 599px) 100vw, 256px"
+                  sx={imageStyles}
+                />
+                <span id={selectionId} hidden>
+                  {getImageLabel(selected, selectedIndex)}
+                </span>
+              </>
             ) : (
               <>
                 <HideImageOutlined fontSize="large" />
