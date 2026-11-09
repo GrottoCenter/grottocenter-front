@@ -44,7 +44,7 @@ const entrance = {
 };
 const imageBody =
   '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="640"><rect width="320" height="640" fill="#7c9a6c"/></svg>';
-const visit = (path, onBeforeLoad = () => {}) =>
+const visit = path =>
   cy.visit(path, {
     onBeforeLoad: win => {
       win.localStorage.setItem('selectedLanguage', 'en');
@@ -61,7 +61,6 @@ const visit = (path, onBeforeLoad = () => {}) =>
       win.localStorage.removeItem('grottocenter_activeEntranceFilters');
       win.localStorage.removeItem('grottocenter_activeQualityFilters');
       win.localStorage.setItem('grottocenter_minInterest', '0');
-      onBeforeLoad(win);
     }
   });
 
@@ -348,70 +347,94 @@ describe('Entrance featured image', () => {
   });
 
   [390, 768].forEach(width => {
-    it(`reserves the previous loading footprint before the image loads at width ${width}`, () => {
-      cy.viewport(width, 900);
-      // Firefox can reuse decoded images even while revalidating their requests.
-      const thumbnailUrl = `https://images.example.org/thumbnails/loading-${width}.webp`;
-      cy.intercept(
-        { method: 'GET', pathname: '/api/v1/entrances/1' },
-        {
-          body: {
-            ...entrance,
-            featuredFile: {
-              ...files[1],
-              thumbnails: { small: thumbnailUrl }
-            }
-          }
-        }
-      );
-      let entranceWindow;
-      cy.intercept(thumbnailUrl, request => {
-        const frame = entranceWindow.document.querySelector(
-          '[data-testid="entrance-featured-image"]'
-        );
-        expect(frame, 'loading frame').not.to.equal(null);
-        const bounds = frame.getBoundingClientRect();
-        expect(frame.querySelector('img').naturalWidth).to.equal(0);
-        const badge = frame
-          .querySelector('[data-testid="entrance-featured-image-badge"]')
-          .getBoundingClientRect();
-        expect(badge.width).to.be.closeTo(28, 1);
-        expect(badge.height).to.be.closeTo(28, 1);
-        expect(badge.top).to.be.at.least(bounds.top);
-        expect(badge.left).to.be.at.least(bounds.left);
-        expect(badge.bottom).to.be.at.most(bounds.bottom);
-        expect(badge.right).to.be.at.most(bounds.right);
-        expect(bounds.height).to.be.closeTo(width < 600 ? 180 : 144, 1);
-        if (width < 600) {
-          expect(bounds.width).to.be.greaterThan(240);
-        } else {
-          expect(bounds.width).to.be.closeTo(96, 1);
-        }
-        request.reply({
-          headers: { 'content-type': 'image/svg+xml' },
-          body: imageBody.replaceAll(
-            'width="320" height="640"',
-            'width="640" height="320"'
-          )
+    it(
+      `reserves the previous loading footprint before the image loads at width ${width}`,
+      { defaultCommandTimeout: 20000 },
+      () => {
+        cy.viewport(width, 900);
+        // Firefox can reuse decoded images even while revalidating their requests.
+        const thumbnailUrl = `https://images.example.org/thumbnails/loading-${width}.webp`;
+        let releaseEntrance;
+        const entranceReady = new Cypress.Promise(resolve => {
+          releaseEntrance = resolve;
         });
-      }).as('loadingThumbnail');
-      visit('/entrances/1', win => {
-        entranceWindow = win;
-      });
-      cy.wait('@loadingThumbnail');
-      cy.get('[data-testid="entrance-featured-image"] img').should(image => {
-        expect(image[0].naturalWidth).to.be.greaterThan(0);
-        const photo = image[0].getBoundingClientRect();
-        const frame = image[0].closest('button').getBoundingClientRect();
-        expect(photo.height).to.be.closeTo(photo.width / 2, 1);
-        expect(frame.height).to.be.closeTo(photo.height, 1);
-        expect(frame.width).to.be.closeTo(photo.width, 1);
-      });
-    });
+        // Render the eager image only after visit finishes, so its held response
+        // cannot block window load and prevent the assertions from running.
+        cy.intercept(
+          { method: 'GET', pathname: '/api/v1/entrances/1' },
+          request =>
+            entranceReady.then(() =>
+              request.reply({
+                body: {
+                  ...entrance,
+                  featuredFile: {
+                    ...files[1],
+                    thumbnails: { small: thumbnailUrl }
+                  }
+                }
+              })
+            )
+        );
+        let releaseImage;
+        const imageReady = new Cypress.Promise(resolve => {
+          releaseImage = resolve;
+        });
+        cy.intercept(thumbnailUrl, request =>
+          imageReady.then(() =>
+            request.reply({
+              headers: { 'content-type': 'image/svg+xml' },
+              body: imageBody.replaceAll(
+                'width="320" height="640"',
+                'width="640" height="320"'
+              )
+            })
+          )
+        ).as('loadingThumbnail');
+        visit('/entrances/1');
+        cy.then(() => releaseEntrance());
+        cy.get('[data-testid="entrance-featured-image"]')
+          .should(frame => {
+            const bounds = frame[0].getBoundingClientRect();
+            expect(frame.find('img')[0].naturalWidth).to.equal(0);
+            const badge = frame
+              .find('[data-testid="entrance-featured-image-badge"]')[0]
+              .getBoundingClientRect();
+            expect(badge.width).to.be.closeTo(28, 1);
+            expect(badge.height).to.be.closeTo(28, 1);
+            expect(badge.top).to.be.at.least(bounds.top);
+            expect(badge.left).to.be.at.least(bounds.left);
+            expect(badge.bottom).to.be.at.most(bounds.bottom);
+            expect(badge.right).to.be.at.most(bounds.right);
+            expect(bounds.height).to.be.closeTo(width < 600 ? 180 : 144, 1);
+            if (width < 600) {
+              expect(bounds.width).to.be.greaterThan(240);
+            } else {
+              expect(bounds.width).to.be.closeTo(96, 1);
+            }
+          })
+          .then(() => releaseImage());
+        cy.wait('@loadingThumbnail');
+        cy.get('[data-testid="entrance-featured-image"] img').should(image => {
+          expect(image[0].naturalWidth).to.be.greaterThan(0);
+          const photo = image[0].getBoundingClientRect();
+          const frame = image[0].closest('button').getBoundingClientRect();
+          expect(photo.height).to.be.closeTo(photo.width / 2, 1);
+          expect(frame.height).to.be.closeTo(photo.height, 1);
+          expect(frame.width).to.be.closeTo(photo.width, 1);
+        });
+      }
+    );
   });
 
-  [16 / 9, 3, 6, 1 / 3, 1 / 6, 1 / 12].forEach(aspectRatio => {
-    it(`keeps the gallery usable without an oversized badge for a ${aspectRatio}:1 photo`, () => {
+  [
+    ['16:9', 16 / 9],
+    ['3:1', 3],
+    ['6:1', 6],
+    ['1:3', 1 / 3],
+    ['1:6', 1 / 6],
+    ['1:12', 1 / 12]
+  ].forEach(([label, aspectRatio]) => {
+    it(`keeps the gallery usable without an oversized badge for a ${label} photo`, () => {
       cy.viewport(768, 900);
       cy.intercept('https://images.example.org/thumbnails/**', {
         headers: { 'content-type': 'image/svg+xml' },
