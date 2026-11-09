@@ -297,7 +297,9 @@ describe('Deleted entities management', () => {
         .find('button[aria-label="Preview"]')
         .click();
       cy.get('[role="dialog"]').within(() => {
-        cy.contains('h1', fields.title ?? source.name, {
+        // Document previews share the compact heading used by moderation.
+        const heading = resource === 'documents' ? 'h3' : 'h1';
+        cy.contains(heading, fields.title ?? source.name, {
           timeout: 15000
         }).should('be.visible');
         cy.contains('a', 'Details').should('not.exist');
