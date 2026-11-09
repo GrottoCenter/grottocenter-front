@@ -12,6 +12,10 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import { useUserProperties } from '@/hooks/useUserProperties';
+import PageTabs from '@/components/common/Layouts/PageTabs';
+import RecentChangesSection from '@/components/appli/RecentChanges/Section';
+import { useRecentChangesTabs } from '@/hooks/useRecentChangesTabs';
+import { getRegionIsoCode } from '@/utils/recentChanges';
 import CustomIcon from '../../common/CustomIcon';
 
 import Guidelines from '../Guidelines';
@@ -135,6 +139,8 @@ const Region = ({
     </Button>
   );
 
+  const tabs = useRecentChangesTabs();
+
   return (
     <PageContainer>
       <div>
@@ -163,60 +169,66 @@ const Region = ({
           </SectionStack>
         )}
         {region && (
-          <SectionStack>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              size="large"
-              startIcon={<CustomIcon type="entrance" size={24} />}
-              onClick={() =>
-                navigate(
-                  `/ui/countries/${countryId}/regions/${regionId}/entrances`
-                )
-              }>
-              {formatMessage({ id: 'Entrances list' })}
-              {dataRegion?.nb_caves ? ` (${dataRegion.nb_caves})` : ''}
-            </Button>
-            {position && (
-              <ScrollableContent
-                content={
-                  <CustomMapContainer
-                    center={position}
-                    dragging={!isMobile}
-                    forceCentering
-                    scrollWheelZoom={false}
-                    wholePage={false}
-                    shouldChangeControlInFullscreen={false}
-                    zoom={6}>
-                    <Marker icon={CoordinatesMarker} position={position} />
-                  </CustomMapContainer>
-                }
+          <PageTabs tabs={tabs}>
+            <SectionStack>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                size="large"
+                startIcon={<CustomIcon type="entrance" size={24} />}
+                onClick={() =>
+                  navigate(
+                    `/ui/countries/${countryId}/regions/${regionId}/entrances`
+                  )
+                }>
+                {formatMessage({ id: 'Entrances list' })}
+                {dataRegion?.nb_caves ? ` (${dataRegion.nb_caves})` : ''}
+              </Button>
+              {position && (
+                <ScrollableContent
+                  content={
+                    <CustomMapContainer
+                      center={position}
+                      dragging={!isMobile}
+                      forceCentering
+                      scrollWheelZoom={false}
+                      wholePage={false}
+                      shouldChangeControlInFullscreen={false}
+                      zoom={6}>
+                      <Marker icon={CoordinatesMarker} position={position} />
+                    </CustomMapContainer>
+                  }
+                />
+              )}
+              <StatisticsDataDashboard
+                regionId={regionId}
+                countryId={countryId}
+                description={formatMessage({
+                  id: 'Discover the numbers about this region and its caves.'
+                })}
               />
-            )}
-            <StatisticsDataDashboard
-              regionId={regionId}
-              countryId={countryId}
-              description={formatMessage({
-                id: 'Discover the numbers about this region and its caves.'
-              })}
-            />
-            {(region.guidelines?.length > 0 || permissions.isAuth) && (
-              <Guidelines
-                entityType="regions"
-                entityId={region.id}
-                entityName={region.name}
-                guidelines={region.guidelines}
+              {(region.guidelines?.length > 0 || permissions.isAuth) && (
+                <Guidelines
+                  entityType="regions"
+                  entityId={region.id}
+                  entityName={region.name}
+                  guidelines={region.guidelines}
+                />
+              )}
+              <AssociationSection
+                organizations={region?.organizations}
+                entityType="region"
+                entityId={regionId}
+                parentEntityId={countryId}
+                isLoading={isLoading}
               />
-            )}
-            <AssociationSection
-              organizations={region?.organizations}
-              entityType="region"
-              entityId={regionId}
-              parentEntityId={countryId}
-              isLoading={isLoading}
+            </SectionStack>
+            <RecentChangesSection
+              scopeType="region"
+              scopeId={getRegionIsoCode(countryId, regionId)}
             />
-          </SectionStack>
+          </PageTabs>
         )}
         {hasOpenedPdfExport && pdfEntity && (
           <Suspense

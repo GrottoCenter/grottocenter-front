@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
@@ -12,7 +12,8 @@ vi.mock('@/hooks', () => ({
   useRestoreOrganization: () => ({ mutate: vi.fn() }),
   useJoinOrganization: () => ({ mutateAsync: vi.fn() }),
   useLeaveOrganization: () => ({ mutateAsync: vi.fn() }),
-  useSharePage: () => vi.fn()
+  useSharePage: () => vi.fn(),
+  useRecentChangesFeed: () => ({ data: { changes: [] }, isPending: false })
 }));
 vi.mock('@/hooks/usePostDeletion', () => ({
   usePostDeletion: () => ({
@@ -20,7 +21,9 @@ vi.mock('@/hooks/usePostDeletion', () => ({
   })
 }));
 vi.mock('@/components/common/card/Deleted', () => ({
-  DeletedCard: () => null,
+  DeletedCard: () => (
+    <p data-testid="deleted-organization">Deleted organization</p>
+  ),
   DeleteConfirmationDialog: () => null,
   DELETED_ENTITIES: { organization: 'organization' }
 }));
@@ -51,9 +54,13 @@ vi.mock('@/components/common/Maps/common/MapContainer', () => ({
   default: () => null
 }));
 
-const renderOrganization = (type, isPreview = false) =>
+const renderOrganization = (
+  type,
+  isPreview = false,
+  { isDeleted = false, initialEntries = ['/'] } = {}
+) =>
   renderWithProviders(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={initialEntries}>
       <Organization
         isLoading={false}
         isPreview={isPreview}
@@ -61,6 +68,7 @@ const renderOrganization = (type, isPreview = false) =>
           id: 42,
           name: 'Example organization',
           type,
+          isDeleted,
           cavers: [{ id: 1, nickname: 'Caver' }],
           exploredEntrances: [{ id: 7, name: 'An entrance' }],
           exploredNetworks: [{ id: 8, name: 'A network' }]
@@ -69,6 +77,12 @@ const renderOrganization = (type, isPreview = false) =>
     </MemoryRouter>,
     { messages }
   );
+
+beforeEach(() => {
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+});
+
+afterEach(() => vi.restoreAllMocks());
 
 it.each(['SPELEOLOGY', 'CAVE_RESCUE', 'RESEARCH', null, undefined, ''])(
   'shows membership and exploration controls for %s',
@@ -119,6 +133,30 @@ it('retains the usual controls outside the preview', () => {
     screen.getByRole('button', { name: 'Edit properties' })
   ).toBeInTheDocument();
 });
+
+it('keeps recent member contributions in a separate lazy tab', () => {
+  renderOrganization('SPELEOLOGY');
+  expect(screen.queryByTestId('activities')).toBeNull();
+  fireEvent.click(screen.getByRole('tab', { name: 'Activities' }));
+  expect(screen.getByTestId('activities')).toBeVisible();
+  expect(screen.getByTestId('members')).not.toBeVisible();
+  expect(screen.getByTestId('authored-documents')).not.toBeVisible();
+  expect(screen.queryByTestId('see-all-recent-changes')).toBeNull();
+});
+
+it.each(['/', '/?tab=activities'])(
+  'hides activity on a deleted organization at %s',
+  path => {
+    renderOrganization('SPELEOLOGY', false, {
+      isDeleted: true,
+      initialEntries: [path]
+    });
+    expect(screen.queryByRole('tab', { name: 'Activities' })).toBeNull();
+    expect(screen.queryByTestId('activities')).toBeNull();
+    expect(screen.getByTestId('deleted-organization')).toBeVisible();
+    expect(screen.getByTestId('organization-properties')).toBeVisible();
+  }
+);
 
 it('shows a failed preview without a retry action', () => {
   renderWithProviders(

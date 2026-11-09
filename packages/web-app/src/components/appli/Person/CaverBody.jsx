@@ -30,7 +30,7 @@ const CaverBody = ({ person, canEdit, onRefresh }) => {
     },
     {
       id: 'activities',
-      label: formatMessage({ id: 'Activities' }),
+      label: formatMessage({ id: 'Caving practice' }),
       icon: <TravelExploreOutlinedIcon fontSize="small" />,
       count: nbOrganizations + nbEntrances,
       disabled: nbOrganizations + nbEntrances === 0
@@ -55,7 +55,7 @@ const CaverBody = ({ person, canEdit, onRefresh }) => {
         </SectionStack>
       </div>
 
-      {/* Tab Activités */}
+      {/* Tab Caving practice */}
       <div>
         <SectionStack>
           <ScrollableContent

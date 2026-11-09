@@ -14,6 +14,9 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShareIcon from '@mui/icons-material/Share';
+import PageTabs from '@/components/common/Layouts/PageTabs';
+import RecentChangesSection from '@/components/appli/RecentChanges/Section';
+import { useRecentChangesTabs } from '@/hooks/useRecentChangesTabs';
 import ContributionMetadata from '@/components/common/Contribution/ContributionMetadata';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { canOrganizationExplore } from '@/utils/organizationTypes';
@@ -275,6 +278,8 @@ const Organization = ({
     </Stack>
   ) : null;
 
+  const tabs = useRecentChangesTabs();
+
   return (
     <PageContainer>
       <PageHeader
@@ -306,231 +311,241 @@ const Organization = ({
         </SectionStack>
       )}
       {organization && (
-        <SectionStack>
-          {organization.isDeleted && (
-            <DeletedCard
-              entityType={DELETED_ENTITIES.organization}
-              entity={organization}
-              isLoading={isActionLoading}
-              error={restoreOrganizationMutation.error}
-              onRestorePress={
-                !isPreview && isAuth && (isAdmin || isModerator)
-                  ? onRestorePress
-                  : null
-              }
-              onPermanentDeletePress={
-                !isPreview && isAuth && isAdmin
-                  ? () => {
-                      setIsDeleteConfirmationPermanent(true);
-                      setIsDeleteConfirmationOpen(true);
-                    }
-                  : null
-              }
-            />
-          )}
-          {!isPreview && (
-            <DeleteConfirmationDialog
-              entityType={DELETED_ENTITIES.organization}
-              entityId={organization.id}
-              entityName={organization.name}
-              entityIconType={getOrganizationIconType(organization.type)}
-              existingRedirectId={
-                organization.isDeleted ? organization.redirectTo : null
-              }
-              isOpen={isDeleteConfirmationOpen}
-              isLoading={isActionLoading}
-              error={deleteOrganizationMutation.error}
-              isPermanent={isDeleteConfirmationPermanent}
-              onClose={() => {
-                setIsDeleteConfirmationOpen(false);
-                deleteOrganizationMutation.reset();
-              }}
-              onConfirmation={entity =>
-                onDeletePress(entity?.id, isDeleteConfirmationPermanent)
-              }
-            />
-          )}
-          <ScrollableContent
-            content={
-              <>
-                <Details organization={organization} />
-                <ContributionMetadata
-                  createdBy={organization.author}
-                  createdAt={organization.dateInscription}
-                  updatedBy={organization.reviewer}
-                  updatedAt={organization.dateReviewed}
-                  language={organization.language}
-                />
-              </>
-            }
-          />
-          {(organization?.countries?.length > 0 ||
-            organization?.regions?.length > 0 ||
-            organization?.massifs?.length > 0) && (
-            <ScrollableContent
-              anchorId="managed-entities"
-              title={formatMessage({ id: 'Managed entities' })}
-              defaultExpanded
-              count={
-                (organization?.countries?.length || 0) +
-                (organization?.regions?.length || 0) +
-                (organization?.massifs?.length || 0)
-              }
-              content={<ManagedEntitiesSection organization={organization} />}
-            />
-          )}
-          {hasExploration && (
-            <ScrollableContent
-              anchorId="members"
-              title={formatMessage({ id: 'Members on Grottocenter' })}
-              defaultExpanded={(organization.cavers ?? []).length > 0}
-              count={(organization.cavers ?? []).length}
-              icon={
-                !isPreview &&
-                isAuth &&
-                !organization.isDeleted && (
-                  <Tooltip
-                    title={formatMessage({
-                      id: isMember ? 'Leave organization' : 'Join organization'
-                    })}>
-                    <Button
-                      variant="outlined"
-                      color={isMember ? 'error' : 'primary'}
-                      onClick={handleJoinLeave}
-                      disabled={isJoining}
-                      startIcon={
-                        isMember ? <PersonRemoveIcon /> : <PersonAddIcon />
+        <PageTabs tabs={isPreview || organization.isDeleted ? [] : tabs}>
+          <SectionStack>
+            {organization.isDeleted && (
+              <DeletedCard
+                entityType={DELETED_ENTITIES.organization}
+                entity={organization}
+                isLoading={isActionLoading}
+                error={restoreOrganizationMutation.error}
+                onRestorePress={
+                  !isPreview && isAuth && (isAdmin || isModerator)
+                    ? onRestorePress
+                    : null
+                }
+                onPermanentDeletePress={
+                  !isPreview && isAuth && isAdmin
+                    ? () => {
+                        setIsDeleteConfirmationPermanent(true);
+                        setIsDeleteConfirmationOpen(true);
                       }
-                      sx={{ minWidth: 0 }}>
-                      <Box
-                        component="span"
-                        sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                        {isMember
-                          ? formatMessage({ id: 'Leave organization' })
-                          : formatMessage({ id: 'Join organization' })}
-                      </Box>
-                    </Button>
-                  </Tooltip>
-                )
-              }
+                    : null
+                }
+              />
+            )}
+            {!isPreview && (
+              <DeleteConfirmationDialog
+                entityType={DELETED_ENTITIES.organization}
+                entityId={organization.id}
+                entityName={organization.name}
+                entityIconType={getOrganizationIconType(organization.type)}
+                existingRedirectId={
+                  organization.isDeleted ? organization.redirectTo : null
+                }
+                isOpen={isDeleteConfirmationOpen}
+                isLoading={isActionLoading}
+                error={deleteOrganizationMutation.error}
+                isPermanent={isDeleteConfirmationPermanent}
+                onClose={() => {
+                  setIsDeleteConfirmationOpen(false);
+                  deleteOrganizationMutation.reset();
+                }}
+                onConfirmation={entity =>
+                  onDeletePress(entity?.id, isDeleteConfirmationPermanent)
+                }
+              />
+            )}
+            <ScrollableContent
               content={
                 <>
-                  <EntitiesList
-                    type="person"
-                    entities={organization.cavers}
-                    onItemRemove={
-                      !isPreview && isAdmin ? requestRemoveMember : null
-                    }
-                    toolTipTitle={formatMessage({
-                      id: 'Remove from organization'
-                    })}
-                    removeIcon={<PersonRemoveIcon />}
-                    emptyMessage={
-                      <Alert
-                        severity="info"
-                        content={formatMessage({
-                          id: 'This organization has no members yet.'
-                        })}
-                      />
-                    }
+                  <Details organization={organization} />
+                  <ContributionMetadata
+                    createdBy={organization.author}
+                    createdAt={organization.dateInscription}
+                    updatedBy={organization.reviewer}
+                    updatedAt={organization.dateReviewed}
+                    language={organization.language}
                   />
-                  {joinLeaveError && (
-                    <Alert severity="error" title={joinLeaveError} />
-                  )}
                 </>
               }
             />
-          )}
-          <ScrollableContent
-            dense
-            anchorId="authored-documents"
-            defaultExpanded={authoredCount > 0}
-            title={formatMessage({ id: 'Authored documents' })}
-            count={authoredCount}
-            subheader={
-              <DocumentReferencesSubheader
-                visibleCount={organization.authoredDocuments?.length ?? 0}
-                totalCount={authoredCount}
+            {(organization?.countries?.length > 0 ||
+              organization?.regions?.length > 0 ||
+              organization?.massifs?.length > 0) && (
+              <ScrollableContent
+                anchorId="managed-entities"
+                title={formatMessage({ id: 'Managed entities' })}
+                defaultExpanded
+                count={
+                  (organization?.countries?.length || 0) +
+                  (organization?.regions?.length || 0) +
+                  (organization?.massifs?.length || 0)
+                }
+                content={<ManagedEntitiesSection organization={organization} />}
               />
-            }
-            content={
-              <DocumentReferences
-                documents={organization.authoredDocuments}
-                totalCount={authoredCount}
-                searchFilter={{
-                  'authorsOrganization.name': organization.name ?? ''
-                }}
-                emptyMessageComponent={
-                  <Alert
-                    severity="info"
-                    content={formatMessage({
-                      id: 'This organization has no authored documents yet.'
-                    })}
-                  />
+            )}
+            {hasExploration && (
+              <ScrollableContent
+                anchorId="members"
+                title={formatMessage({ id: 'Members on Grottocenter' })}
+                defaultExpanded={(organization.cavers ?? []).length > 0}
+                count={(organization.cavers ?? []).length}
+                icon={
+                  !isPreview &&
+                  isAuth &&
+                  !organization.isDeleted && (
+                    <Tooltip
+                      title={formatMessage({
+                        id: isMember
+                          ? 'Leave organization'
+                          : 'Join organization'
+                      })}>
+                      <Button
+                        variant="outlined"
+                        color={isMember ? 'error' : 'primary'}
+                        onClick={handleJoinLeave}
+                        disabled={isJoining}
+                        startIcon={
+                          isMember ? <PersonRemoveIcon /> : <PersonAddIcon />
+                        }
+                        sx={{ minWidth: 0 }}>
+                        <Box
+                          component="span"
+                          sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                          {isMember
+                            ? formatMessage({ id: 'Leave organization' })
+                            : formatMessage({ id: 'Join organization' })}
+                        </Box>
+                      </Button>
+                    </Tooltip>
+                  )
+                }
+                content={
+                  <>
+                    <EntitiesList
+                      type="person"
+                      entities={organization.cavers}
+                      onItemRemove={
+                        !isPreview && isAdmin ? requestRemoveMember : null
+                      }
+                      toolTipTitle={formatMessage({
+                        id: 'Remove from organization'
+                      })}
+                      removeIcon={<PersonRemoveIcon />}
+                      emptyMessage={
+                        <Alert
+                          severity="info"
+                          content={formatMessage({
+                            id: 'This organization has no members yet.'
+                          })}
+                        />
+                      }
+                    />
+                    {joinLeaveError && (
+                      <Alert severity="error" title={joinLeaveError} />
+                    )}
+                  </>
                 }
               />
-            }
-          />
-          <ScrollableContent
-            dense
-            anchorId="published-documents"
-            defaultExpanded={publishedCount > 0}
-            title={formatMessage({ id: 'Published documents' })}
-            count={publishedCount}
-            subheader={
-              <DocumentReferencesSubheader
-                visibleCount={organization.publishedDocuments?.length ?? 0}
-                totalCount={publishedCount}
-              />
-            }
-            content={
-              <DocumentReferences
-                documents={organization.publishedDocuments}
-                totalCount={publishedCount}
-                searchFilter={{ 'editor.name': organization.name ?? '' }}
-                emptyMessageComponent={
-                  <Alert
-                    severity="info"
-                    content={formatMessage({
-                      id: 'This organization has no published documents yet.'
-                    })}
-                  />
-                }
-              />
-            }
-          />
-          {hasExploration && (
+            )}
             <ScrollableContent
-              anchorId="related-caves"
-              title={formatMessage({ id: 'Explored caves' })}
-              defaultExpanded={nbNetworks + nbEntrances > 0}
-              count={nbNetworks + nbEntrances}
-              icon={
-                canManageCaves && (
-                  <SectionCreateButton
-                    isOpen={isCaveSearchVisible}
-                    onToggle={() => setIsCaveSearchVisible(v => !v)}
-                    label={formatMessage({ id: 'Add' })}
-                    tooltip={formatMessage({ id: 'Add a cave' })}
-                    openTooltip={formatMessage({ id: 'Cancel this search' })}
-                  />
-                )
+              dense
+              anchorId="authored-documents"
+              defaultExpanded={authoredCount > 0}
+              title={formatMessage({ id: 'Authored documents' })}
+              count={authoredCount}
+              subheader={
+                <DocumentReferencesSubheader
+                  visibleCount={organization.authoredDocuments?.length ?? 0}
+                  totalCount={authoredCount}
+                />
               }
               content={
-                <RelatedCaves
-                  exploredEntrances={organization.exploredEntrances}
-                  exploredNetworks={organization.exploredNetworks}
-                  entityId={organization.id}
-                  isOrganization
-                  canManageCaves={canManageCaves}
-                  onRefresh={handleRefresh}
-                  isCaveSearchVisible={isCaveSearchVisible}
-                  onToggleCaveSearch={setIsCaveSearchVisible}
+                <DocumentReferences
+                  documents={organization.authoredDocuments}
+                  totalCount={authoredCount}
+                  searchFilter={{
+                    'authorsOrganization.name': organization.name ?? ''
+                  }}
+                  emptyMessageComponent={
+                    <Alert
+                      severity="info"
+                      content={formatMessage({
+                        id: 'This organization has no authored documents yet.'
+                      })}
+                    />
+                  }
                 />
               }
             />
+            <ScrollableContent
+              dense
+              anchorId="published-documents"
+              defaultExpanded={publishedCount > 0}
+              title={formatMessage({ id: 'Published documents' })}
+              count={publishedCount}
+              subheader={
+                <DocumentReferencesSubheader
+                  visibleCount={organization.publishedDocuments?.length ?? 0}
+                  totalCount={publishedCount}
+                />
+              }
+              content={
+                <DocumentReferences
+                  documents={organization.publishedDocuments}
+                  totalCount={publishedCount}
+                  searchFilter={{ 'editor.name': organization.name ?? '' }}
+                  emptyMessageComponent={
+                    <Alert
+                      severity="info"
+                      content={formatMessage({
+                        id: 'This organization has no published documents yet.'
+                      })}
+                    />
+                  }
+                />
+              }
+            />
+            {hasExploration && (
+              <ScrollableContent
+                anchorId="related-caves"
+                title={formatMessage({ id: 'Explored caves' })}
+                defaultExpanded={nbNetworks + nbEntrances > 0}
+                count={nbNetworks + nbEntrances}
+                icon={
+                  canManageCaves && (
+                    <SectionCreateButton
+                      isOpen={isCaveSearchVisible}
+                      onToggle={() => setIsCaveSearchVisible(v => !v)}
+                      label={formatMessage({ id: 'Add' })}
+                      tooltip={formatMessage({ id: 'Add a cave' })}
+                      openTooltip={formatMessage({ id: 'Cancel this search' })}
+                    />
+                  )
+                }
+                content={
+                  <RelatedCaves
+                    exploredEntrances={organization.exploredEntrances}
+                    exploredNetworks={organization.exploredNetworks}
+                    entityId={organization.id}
+                    isOrganization
+                    canManageCaves={canManageCaves}
+                    onRefresh={handleRefresh}
+                    isCaveSearchVisible={isCaveSearchVisible}
+                    onToggleCaveSearch={setIsCaveSearchVisible}
+                  />
+                }
+              />
+            )}
+          </SectionStack>
+          {!isPreview && !organization.isDeleted && (
+            <RecentChangesSection
+              scopeType="organization"
+              scopeId={organization.id}
+            />
           )}
-        </SectionStack>
+        </PageTabs>
       )}
       <StandardDialog
         open={!!pendingRemoveMember}

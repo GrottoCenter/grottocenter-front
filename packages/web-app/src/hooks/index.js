@@ -207,11 +207,13 @@ export { useProcessDocuments } from './mutations/useProcessDocuments';
 export { useImportCsvSession } from './useImportCsvSession';
 export {
   useRandomEntrance,
-  useRecentChanges,
-  useRecentChangesFeed,
   usePartnersCarousel,
   useLatestBlogNews
 } from './queries/useHomepageLists';
+export {
+  useRecentChanges,
+  useRecentChangesFeed
+} from './queries/useRecentChanges';
 export {
   useGroups,
   useBannedCavers,

@@ -53,6 +53,12 @@ describe('Person family identity and record type', () => {
             'This person is a reference used to attribute documents. It is not a caver account.'
           ).should('be.visible');
         }
+        if (type === 'CAVER') {
+          cy.get('[data-testid="page-tab-activities"]').should(
+            'contain.text',
+            'Caving practice'
+          );
+        }
         cy.screenshot(`person-${type.toLowerCase()}-${width}`, {
           capture: 'viewport'
         });

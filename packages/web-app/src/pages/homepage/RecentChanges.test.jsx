@@ -8,9 +8,9 @@ import { renderWithProviders } from '@/test/renderWithProviders';
 import RecentChanges from './RecentChanges';
 
 const messages = {
-  'No recent changes': 'No recent changes',
-  'Recent changes': 'Recent changes',
-  'See all recent changes': 'See all recent changes'
+  'No recent activity': 'No recent activity',
+  'Recent activities': 'Recent activities',
+  'See all activities': 'See all activities'
 };
 
 afterEach(() => {
@@ -31,7 +31,10 @@ it('loads a bounded preview and links to the full recent changes page', async ()
   );
 
   expect(
-    screen.getByRole('link', { name: 'See all recent changes' })
+    screen.getByRole('heading', { name: 'Recent activities' })
+  ).toBeVisible();
+  expect(
+    screen.getByRole('link', { name: 'See all activities' })
   ).toHaveAttribute('href', '/ui/changes/recent');
   await waitFor(() =>
     expect(apiGet).toHaveBeenCalledWith(`${getRecentChanges}?offset=0&limit=11`)
