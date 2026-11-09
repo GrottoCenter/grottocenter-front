@@ -372,6 +372,15 @@ describe('Entrance featured image', () => {
         expect(frame, 'loading frame').not.to.equal(null);
         const bounds = frame.getBoundingClientRect();
         expect(frame.querySelector('img').naturalWidth).to.equal(0);
+        const badge = frame
+          .querySelector('[data-testid="entrance-featured-image-badge"]')
+          .getBoundingClientRect();
+        expect(badge.width).to.be.closeTo(28, 1);
+        expect(badge.height).to.be.closeTo(28, 1);
+        expect(badge.top).to.be.at.least(bounds.top);
+        expect(badge.left).to.be.at.least(bounds.left);
+        expect(badge.bottom).to.be.at.most(bounds.bottom);
+        expect(badge.right).to.be.at.most(bounds.right);
         expect(bounds.height).to.be.closeTo(width < 600 ? 180 : 144, 1);
         if (width < 600) {
           expect(bounds.width).to.be.greaterThan(240);
@@ -401,7 +410,7 @@ describe('Entrance featured image', () => {
     });
   });
 
-  [16 / 9, 3, 6].forEach(aspectRatio => {
+  [16 / 9, 3, 6, 1 / 3, 1 / 6, 1 / 12].forEach(aspectRatio => {
     it(`keeps the gallery usable without an oversized badge for a ${aspectRatio}:1 photo`, () => {
       cy.viewport(768, 900);
       cy.intercept('https://images.example.org/thumbnails/**', {
@@ -419,25 +428,36 @@ describe('Entrance featured image', () => {
         .and(image => {
           expect(image[0].naturalWidth).to.be.greaterThan(0);
           const photo = image[0].getBoundingClientRect();
-          expect(photo.height).to.be.closeTo(photo.width / aspectRatio, 1);
+          const frame = image[0].closest('button').getBoundingClientRect();
+          expect(frame.width).to.be.at.least(24);
+          expect(frame.height).to.be.at.least(24);
+          if (aspectRatio >= 1) {
+            expect(frame.width).to.be.closeTo(96, 1);
+            expect(frame.height).to.be.closeTo(
+              Math.max(24, frame.width / aspectRatio),
+              1
+            );
+          } else {
+            expect(frame.height).to.be.closeTo(144, 1);
+            expect(frame.width).to.be.closeTo(
+              Math.max(24, frame.height * aspectRatio),
+              1
+            );
+          }
+          expect(photo.width).to.be.closeTo(frame.width, 1);
+          expect(photo.height).to.be.closeTo(frame.height, 1);
         });
-      if (aspectRatio <= 4) {
-        cy.get('[data-testid="entrance-featured-image-badge"]')
-          .should('be.visible')
-          .and(badge => {
-            const bounds = badge[0].getBoundingClientRect();
-            const frame = badge[0].closest('button').getBoundingClientRect();
-            expect(bounds.height).to.be.closeTo(18, 1);
-            expect(bounds.top).to.be.at.least(frame.top);
-            expect(bounds.left).to.be.at.least(frame.left);
-            expect(bounds.bottom).to.be.at.most(frame.bottom);
-            expect(bounds.right).to.be.at.most(frame.right);
-          });
-      } else {
-        cy.get('[data-testid="entrance-featured-image-badge"]').should(
-          'not.exist'
-        );
-      }
+      cy.get('[data-testid="entrance-featured-image-badge"]')
+        .should('be.visible')
+        .and(badge => {
+          const bounds = badge[0].getBoundingClientRect();
+          const frame = badge[0].closest('button').getBoundingClientRect();
+          expect(bounds.height).to.be.closeTo(18, 1);
+          expect(bounds.top).to.be.at.least(frame.top);
+          expect(bounds.left).to.be.at.least(frame.left);
+          expect(bounds.bottom).to.be.at.most(frame.bottom);
+          expect(bounds.right).to.be.at.most(frame.right);
+        });
       cy.get('[data-testid="entrance-featured-image"]').click();
       cy.get('[data-testid="lightbox-image"]').should(
         'have.attr',

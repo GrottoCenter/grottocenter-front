@@ -9,9 +9,9 @@ import { FilePropTypes } from '@/types/document.type';
 const FeaturedImage = ({ file, entranceName, onClick, onUnavailable }) => {
   const { formatMessage } = useIntl();
   const [aspectRatio, setAspectRatio] = useState(null);
-  const isWide = aspectRatio > 1.5;
-  // Above 4:1, the narrowest 96px frame cannot comfortably fit the badge.
-  const shouldShowBadge = aspectRatio !== null && aspectRatio <= 4;
+  const shortSide =
+    aspectRatio === null ? null : Math.min(aspectRatio, 1 / aspectRatio);
+  const isCompact = shortSide !== null && shortSide < 1 / 1.5;
 
   return (
     <ButtonBase
@@ -29,7 +29,12 @@ const FeaturedImage = ({ file, entranceName, onClick, onUnavailable }) => {
               lg: `min(128px, ${144 * aspectRatio}px)`
             }
           : { xs: '100%', sm: 96, md: 120, lg: 128 },
-        ...(aspectRatio ? { aspectRatio } : { height: { xs: 180, sm: 144 } }),
+        ...(aspectRatio
+          ? { aspectRatio, maxHeight: { xs: 240, sm: 144 } }
+          : { height: { xs: 180, sm: 144 } }),
+        // Keep extreme ratios reachable without cropping the image.
+        minWidth: 24,
+        minHeight: 24,
         justifySelf: 'center',
         flexShrink: 0,
         borderRadius: 2,
@@ -61,22 +66,20 @@ const FeaturedImage = ({ file, entranceName, onClick, onUnavailable }) => {
           objectFit: 'contain'
         }}
       />
-      {shouldShowBadge && (
-        <Box
-          data-testid="entrance-featured-image-badge"
-          sx={{
-            position: 'absolute',
-            bottom: theme => theme.spacing(isWide ? 0.5 : 1),
-            right: theme => theme.spacing(isWide ? 0.5 : 1),
-            display: 'flex',
-            p: isWide ? 0.25 : 0.5,
-            borderRadius: 1,
-            bgcolor: 'rgba(0,0,0,0.55)',
-            color: 'common.white'
-          }}>
-          <Visibility sx={{ fontSize: isWide ? 14 : 20 }} />
-        </Box>
-      )}
+      <Box
+        data-testid="entrance-featured-image-badge"
+        sx={{
+          position: 'absolute',
+          bottom: theme => theme.spacing(isCompact ? 0.5 : 1),
+          right: theme => theme.spacing(isCompact ? 0.5 : 1),
+          display: 'flex',
+          p: isCompact ? 0.25 : 0.5,
+          borderRadius: 1,
+          bgcolor: 'rgba(0,0,0,0.55)',
+          color: 'common.white'
+        }}>
+        <Visibility sx={{ fontSize: isCompact ? 14 : 20 }} />
+      </Box>
     </ButtonBase>
   );
 };
