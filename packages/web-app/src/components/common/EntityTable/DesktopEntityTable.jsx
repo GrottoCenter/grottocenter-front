@@ -132,6 +132,7 @@ const EntityTableHead = ({
             sortDirection={orderBy === headCell.field ? order : false}>
             {onRequestSort && headCell.sortable ? (
               <TableSortLabel
+                data-testid={`sort-${headCell.field}`}
                 disabled={isSortDisabled}
                 active={orderBy === headCell.field && order}
                 direction={order || undefined}

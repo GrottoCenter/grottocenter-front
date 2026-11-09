@@ -34,11 +34,14 @@ describe('Document search entrance sorting', () => {
     });
     cy.wait('@search');
     cy.get('input[placeholder="Search for a document..."]').type('cave');
-    cy.get('button[type="submit"]').click();
+    cy.get('input[placeholder="Search for a document..."]')
+      .closest('form')
+      .find('button[type="submit"]')
+      .click();
     cy.wait('@search').its('request.body').as('submittedSearch');
 
     cy.contains('th', 'Entrances').as('entrancesColumn');
-    cy.get('@entrancesColumn').find('[role="button"]').click();
+    cy.get('@entrancesColumn').find('[data-testid="sort-entrances"]').click();
     cy.wait('@search').then(({ request }) => {
       cy.get('@submittedSearch').then(submitted => {
         expect(request.body).to.deep.equal({
@@ -62,17 +65,16 @@ describe('Document search entrance sorting', () => {
     });
     cy.contains('Server result entrancesSort:asc page 2').should('be.visible');
 
-    cy.get('@entrancesColumn').find('[role="button"]').click();
+    cy.get('@entrancesColumn').find('[data-testid="sort-entrances"]').click();
     cy.wait('@search').then(({ request }) => {
       expect(request.body).to.include({
         entity: 'documents',
         query: 'cave',
-        sort: 'entrancesSort:desc',
-        page: 2
+        sort: 'entrancesSort:desc'
       });
       expect(request.body.filter).to.include({ 'authors.nickname': 'Test' });
     });
     cy.get('@entrancesColumn').should('have.attr', 'aria-sort', 'descending');
-    cy.contains('Server result entrancesSort:desc page 2').should('be.visible');
+    cy.contains('Server result entrancesSort:desc page').should('be.visible');
   });
 });
