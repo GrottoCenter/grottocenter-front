@@ -10,10 +10,13 @@ is deployed.
   API client and the five-minute `STALE.STANDARD` tier.
 - The lightweight key extends `entranceKeys.detail(id)`, so existing entrance
   invalidation and permanent deletion also cover popup metadata. A partial
-  response never fills the full detail key.
+  response never fills the full detail key. Deletion/restoration prefix writes
+  update only fields already present in each response, preserving partial shapes.
 - Fresh full detail is borrowed without copying it into the lightweight cache or
   renewing its age. Changes to that detail cache are observed so invalidation
   immediately enables a lightweight read, even while a popup is already open.
+  Aging alone emits no cache event, so borrowed data can remain visible past the
+  freshness window until the next render.
 - Saving a featured file invalidates the lightweight cache while retaining a full
   PUT response as fresh detail. Document edits, unlinking, moderation, deletion
   and restoration invalidate both kinds of entrance reads.
@@ -46,6 +49,37 @@ yarn.cmd e2e:run --spec cypress/e2e/entrance-featured-image.cy.js --browser elec
 
 If the shell inherited `ELECTRON_RUN_AS_NODE=1`, remove that environment variable
 for the Cypress process. All modified lintable files pass ESLint.
+
+### Review regression checks
+
+The deletion/restoration tests verify that full mutation responses update cached
+popup metadata without adding documents or descriptions, while still updating
+the full detail cache. Fake-timer tests exercise the real map page's delayed URL
+update: it runs on map routes, skips navigation after leaving the map even while
+the component remains mounted, and is canceled on unmount. The route declaration,
+matcher and generated URL share `MAP_ROUTE`.
+
+29 unique Vitest tests passed across the initial run and the map rerun after
+correcting the test's expected URL to match React Router's comma encoding:
+
+```powershell
+yarn.cmd test --run src/utils/entityDeletionCache.test.js src/pages/Map.test.jsx src/hooks/queries/useEntranceFeaturedImage.test.jsx --maxWorkers=2
+yarn.cmd test --run src/pages/Map.test.jsx --maxWorkers=2
+```
+
+### Deployed API smoke check (2026-11-09)
+
+Anonymous requests to `https://api.grottocenter.org/api/v1/entrances/1/featured-image`
+and `/api/v1/entrances/120177/featured-image` returned HTTP 200. Both responses
+contained exactly `id`, `name`, `isDeleted`, `redirectTo`, and `featuredFile`;
+their ids, names and featured files matched the full detail responses. Both had
+`featuredFile: null`. A request with the production frontend Origin header
+returned `Access-Control-Allow-Origin: *`. Unknown entrance `2147483647` returned
+HTTP 404.
+
+This verifies that the deployed route is available. A live browser popup with a
+selected photo remains unchecked; these samples had no featured file. The
+existing Cypress scenarios cover image rendering using fixtures.
 
 ## Local performance comparison
 

@@ -62,8 +62,10 @@ export const useEntranceFeaturedImage = (
     // Borrow detail without copying it or extending its original freshness.
     placeholderData: detail ? toFeaturedImage(detail.data) : undefined,
     select,
-    // Recheck at refetch time too: invalidating the detail prefix must enable
-    // this read even if fresh detail disabled it when the popup first opened.
+    // Must stay a function: TanStack resolves it when invalidation refetches.
+    // A render-time boolean would keep this query disabled after the borrowed
+    // detail is invalidated. Aging alone emits no cache event, so borrowed data
+    // can remain visible past STALE.STANDARD until the next render.
     enabled: () =>
       enabled && Boolean(entranceId) && !getFreshDetail(getSnapshot()),
     staleTime: STALE.STANDARD,

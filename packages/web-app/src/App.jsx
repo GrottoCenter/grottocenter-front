@@ -10,6 +10,7 @@ import {
 } from 'react-router-dom';
 
 import grottoTheme from './conf/grottoTheme';
+import { MAP_ROUTE } from './conf/config';
 
 // Eagerly loaded: root layout, the landing page (first paint) and the auth
 // guard. Everything else is route-split via React.lazy and rendered inside the
@@ -130,7 +131,7 @@ const router = createBrowserRouter(
       <Route path="/ui/countries/:id" element={<CountryPage />} />
       <Route path="/ui/countries" element={<CountryListPage />} />
       <Route path="/ui/faq" element={<Faq />} />
-      <Route path="/ui/map/:target?" element={<Map />} />
+      <Route path={MAP_ROUTE} element={<Map />} />
       <Route path="/ui/contributions" element={<ContributionsPage />} />
       <Route path="/ui/changes/recent" element={<RecentChangesPage />} />
       <Route path="/ui/notifications" element={<NotificationsPage />} />

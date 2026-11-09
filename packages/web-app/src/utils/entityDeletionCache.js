@@ -1,3 +1,5 @@
+import { pick } from 'ramda';
+
 import {
   advancedSearchKeys,
   caveKeys,
@@ -45,7 +47,13 @@ const updateDeletedState = (
       data?.isDeleted === isDeleted && String(data.id) === String(id)
         ? data
         : {};
-    return { ...current, ...updatedData, isDeleted, redirectTo };
+    // Prefix writes also reach partial entries such as popup featured images.
+    return {
+      ...current,
+      ...pick(Object.keys(current), updatedData),
+      isDeleted,
+      redirectTo
+    };
   });
 };
 
