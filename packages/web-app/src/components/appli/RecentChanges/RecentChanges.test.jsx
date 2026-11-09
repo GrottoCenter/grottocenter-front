@@ -232,3 +232,61 @@ it.each([1, 51])(
     expect(screen.queryByTestId('fetch-error-state')).toBeNull();
   }
 );
+
+it('retries a paused next page without losing Load more, then refreshes loaded pages', async () => {
+  const firstPage = {
+    changes: Array.from({ length: 51 }, (_, i) => change(i + 1))
+  };
+  const apiGet = vi
+    .spyOn(apiClient, 'apiGet')
+    .mockResolvedValueOnce(firstPage)
+    .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    .mockResolvedValueOnce({ changes: [change(51)] })
+    .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    .mockResolvedValueOnce(firstPage)
+    .mockResolvedValue({ changes: [change(51)] });
+  const queryClient = createTestQueryClient();
+  queryClient.setDefaultOptions({
+    queries: {
+      networkMode: 'offlineFirst',
+      retry: 1,
+      retryDelay: 0,
+      gcTime: Infinity
+    }
+  });
+  renderSection('massif', { queryClient });
+  await screen.findByText('Entrance 50');
+
+  act(() => onlineManager.setOnline(false));
+  fireEvent.click(screen.getByRole('button', { name: 'Load more' }));
+  expect(await screen.findByTestId('fetch-error-state')).toHaveTextContent(
+    messages.offlineContentUnavailable
+  );
+  expect(screen.getByText('Entrance 1')).toBeVisible();
+  fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+  await screen.findByText('Entrance 51');
+  expect(apiGet.mock.calls).toEqual(
+    [0, 50, 50].map(offset => [
+      `${getRecentChanges}?offset=${offset}&limit=51&massifId=42`
+    ])
+  );
+  expect(screen.queryByRole('button', { name: 'Load more' })).toBeNull();
+  expect(screen.queryByTestId('fetch-error-state')).toBeNull();
+
+  act(() => {
+    queryClient.refetchQueries();
+  });
+  expect(await screen.findByTestId('fetch-error-state')).toHaveTextContent(
+    messages.offlineContentUnavailable
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+  await waitFor(() =>
+    expect(screen.queryByTestId('fetch-error-state')).toBeNull()
+  );
+  expect(screen.getByText('Entrance 51')).toBeVisible();
+  expect(apiGet.mock.calls).toEqual(
+    [0, 50, 50, 0, 0, 50].map(offset => [
+      `${getRecentChanges}?offset=${offset}&limit=51&massifId=42`
+    ])
+  );
+});

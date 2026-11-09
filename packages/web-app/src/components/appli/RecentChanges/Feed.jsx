@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Box, Button, CircularProgress } from '@mui/material';
 import { useIntl } from 'react-intl';
 
@@ -7,6 +8,7 @@ import { RecentChangesFiltersPropTypes } from '@/types/recentChanges';
 
 const RecentChangesFeed = ({ filters = {} }) => {
   const { formatMessage } = useIntl();
+  const nextPageRequestRef = useRef(null);
   const {
     data,
     error,
@@ -19,8 +21,22 @@ const RecentChangesFeed = ({ filters = {} }) => {
     refetch
   } = useRecentChangesFeed({ filters });
   const changes = data?.changes ?? [];
-  // A failed next page must retry its offset while retaining the loaded rows.
-  const handleRetry = isFetchNextPageError ? fetchNextPage : refetch;
+  const handleLoadMore = async () => {
+    const request = fetchNextPage();
+    nextPageRequestRef.current = request;
+    try {
+      await request;
+    } finally {
+      if (nextPageRequestRef.current === request) {
+        nextPageRequestRef.current = null;
+      }
+    }
+  };
+  // Paused retries have no error yet; retain their direction until they settle.
+  const handleRetry = () =>
+    isFetchNextPageError || (isPaused && nextPageRequestRef.current)
+      ? handleLoadMore()
+      : refetch();
 
   return (
     <Box
@@ -47,7 +63,7 @@ const RecentChangesFeed = ({ filters = {} }) => {
             data-testid="load-more-recent-changes"
             variant="outlined"
             disabled={isFetchingNextPage || isPaused}
-            onClick={fetchNextPage}
+            onClick={handleLoadMore}
             startIcon={
               isFetchingNextPage ? <CircularProgress size={16} /> : undefined
             }>
