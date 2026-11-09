@@ -38,6 +38,10 @@ export const deletedEntitiesQueryOptions = ({
     queryFn: ({ signal }) =>
       apiGetWithRange(makeUrl(resource.collectionUrl, criteria), { signal }),
     select: selectors[entityType],
+    placeholderData: (previousData, previousQuery) =>
+      previousQuery?.queryKey[0] === resource.keys.all[0]
+        ? previousData
+        : undefined,
     retry: false,
     staleTime: STALE.VOLATILE
   };

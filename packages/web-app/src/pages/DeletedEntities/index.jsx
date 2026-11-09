@@ -50,7 +50,11 @@ const DeletedEntitiesContent = () => {
   const [selected, setSelected] = useState(null);
   const query = useDeletedEntities({ entityType, skip: page * limit, limit });
   const entities = query.data?.entities ?? [];
-  const isPastEnd = !!query.data && entities.length === 0 && page > 0;
+  const isPastEnd =
+    !!query.data &&
+    !query.isPlaceholderData &&
+    entities.length === 0 &&
+    page > 0;
   // Empty pages carry no Content-Range, including out-of-range pages. Read
   // page zero to recover the total and jump directly to the last valid page.
   const firstPage = useDeletedEntities({
@@ -153,6 +157,7 @@ const DeletedEntitiesContent = () => {
         )}
         {query.isSuccess &&
           !query.isFetching &&
+          !query.isPlaceholderData &&
           entities.length === 0 &&
           page === 0 && (
             <Alert severity="info">
@@ -205,7 +210,9 @@ const DeletedEntitiesContent = () => {
                 <Button
                   startIcon={<RestoreIcon />}
                   variant="outlined"
-                  disabled={!isOnline || !!activeSelection}
+                  disabled={
+                    !isOnline || !!activeSelection || query.isPlaceholderData
+                  }
                   onClick={() =>
                     setSelected({
                       resource: entityType,
@@ -220,7 +227,9 @@ const DeletedEntitiesContent = () => {
                     startIcon={<DeleteForeverIcon />}
                     color="error"
                     variant="contained"
-                    disabled={!isOnline || !!activeSelection}
+                    disabled={
+                      !isOnline || !!activeSelection || query.isPlaceholderData
+                    }
                     onClick={() =>
                       setSelected({
                         resource: entityType,

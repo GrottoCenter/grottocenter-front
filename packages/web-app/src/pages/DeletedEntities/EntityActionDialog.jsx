@@ -182,30 +182,26 @@ const EntityActionDialog = ({
       open
       fullWidth
       scrollable
-      title={formatMessage({
-        id: isPermanent ? 'Permanently delete' : 'Restore'
-      })}
+      title={formatMessage({ id: 'Restore' })}
       onClose={handleClose}
       actions={
         <Stack direction="row" spacing={1}>
           <Button onClick={handleClose} disabled={isLoading}>
             {formatMessage({ id: 'Cancel' })}
           </Button>
-          {!isPermanent && (
-            <Button
-              variant="contained"
-              disabled={
-                !canAct ||
-                !isOnline ||
-                isLoading ||
-                !isSourceValid ||
-                sourceQuery.isFetching ||
-                !!sourceQuery.error
-              }
-              onClick={() => handleConfirmation().catch(() => {})}>
-              {formatMessage({ id: 'Restore' })}
-            </Button>
-          )}
+          <Button
+            variant="contained"
+            disabled={
+              !canAct ||
+              !isOnline ||
+              isLoading ||
+              !isSourceValid ||
+              sourceQuery.isFetching ||
+              !!sourceQuery.error
+            }
+            onClick={() => handleConfirmation().catch(() => {})}>
+            {formatMessage({ id: 'Restore' })}
+          </Button>
         </Stack>
       }>
       <Typography sx={{ overflowWrap: 'anywhere' }}>
@@ -221,7 +217,7 @@ const EntityActionDialog = ({
           {formatMessage({ id: 'Retry' })}
         </Button>
       )}
-      {resource === 'caves' && !isPermanent && (
+      {resource === 'caves' && (
         <Alert severity="info">
           {formatMessage({ id: 'deletedEntities.caveRestoration' })}
         </Alert>
@@ -246,8 +242,7 @@ const actionDialogPropTypes = {
 EntityActionDialog.propTypes = {
   ...actionDialogPropTypes,
   deletion: mutationPropType.isRequired,
-  restoration: mutationPropType.isRequired,
-  onClose: PropTypes.func.isRequired
+  restoration: mutationPropType.isRequired
 };
 
 // Each adapter owns its hooks. Mount only the selected resource's adapter,

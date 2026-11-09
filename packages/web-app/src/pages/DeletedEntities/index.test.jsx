@@ -1,4 +1,10 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  screen,
+  waitFor,
+  within
+} from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { apiDelete, apiGet, apiGetWithRange, apiPost } from '@/api/client';
 import { renderWithProviders } from '@/test/renderWithProviders';
@@ -263,6 +269,66 @@ it('shows list errors and retries', async () => {
   );
   fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
   await screen.findByTestId('deleted-organization-42');
+});
+
+it.each(['page', 'limit'])(
+  'keeps the rows, count and pagination while a new %s loads',
+  async change => {
+    apiGetWithRange.mockResolvedValue(
+      pageResponse('organizations', [source], 126)
+    );
+    renderPage();
+    await screen.findByTestId('deleted-organization-42');
+    let resolvePage;
+    apiGetWithRange.mockImplementation(
+      () =>
+        new Promise(resolve => {
+          resolvePage = resolve;
+        })
+    );
+    if (change === 'page') {
+      fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    } else {
+      fireEvent.mouseDown(screen.getAllByRole('combobox')[1]);
+      fireEvent.click(await screen.findByRole('option', { name: '20' }));
+    }
+    await waitFor(() => expect(apiGetWithRange).toHaveBeenCalledTimes(2));
+    expect(screen.getByTestId('deleted-organization-42')).toBeVisible();
+    expect(screen.getByTestId('deleted-entities-count')).toHaveTextContent(
+      '126 results'
+    );
+    expect(
+      screen.getByText(change === 'page' ? '51–100 / 126' : '1–20 / 126')
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Restore' })).toBeDisabled();
+    expect(screen.queryByText(messages['deletedEntities.empty'])).toBeNull();
+    await act(async () =>
+      resolvePage(pageResponse('organizations', [{ ...source, id: 43 }], 126))
+    );
+    expect(await screen.findByTestId('deleted-organization-43')).toBeVisible();
+    expect(screen.queryByTestId('deleted-organization-42')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Restore' })).toBeEnabled();
+  }
+);
+
+it('does not show previous-resource rows while another resource loads', async () => {
+  renderPage();
+  await screen.findByTestId('deleted-organization-42');
+  let resolvePage;
+  apiGetWithRange.mockImplementation(
+    () =>
+      new Promise(resolve => {
+        resolvePage = resolve;
+      })
+  );
+  fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Type' }));
+  fireEvent.click(await screen.findByRole('option', { name: 'Massifs' }));
+  await waitFor(() => expect(apiGetWithRange).toHaveBeenCalledTimes(2));
+  expect(screen.queryByTestId('deleted-organization-42')).toBeNull();
+  expect(screen.queryByTestId('deleted-massif-42')).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Restore' })).toBeNull();
+  await act(async () => resolvePage(pageResponse('massifs')));
+  expect(await screen.findByTestId('deleted-massif-42')).toBeVisible();
 });
 
 it('rejects a response containing active records', async () => {
