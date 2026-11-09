@@ -52,16 +52,19 @@ export const documentKeys = {
 
 export const massifKeys = {
   all: ['massif'],
+  list: criteria => [...massifKeys.all, 'list', criteria],
   detail: detailKey('massif')
 };
 
 export const caveKeys = {
   all: ['cave'],
+  list: criteria => [...caveKeys.all, 'list', criteria],
   detail: detailKey('cave')
 };
 
 export const entranceKeys = {
   all: ['entrance'],
+  list: criteria => [...entranceKeys.all, 'list', criteria],
   detail: detailKey('entrance')
 };
 
@@ -77,6 +80,7 @@ export const organizationKeys = {
 };
 
 export const organizationManagementKeys = {
+  all: ['organizationManagement'],
   unclassified: ['organizationManagement', 'unclassified'],
   duplicates: ['organizationManagement', 'duplicates']
 };

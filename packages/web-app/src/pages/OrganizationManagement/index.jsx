@@ -6,7 +6,7 @@ import {
   useQueryClient
 } from '@tanstack/react-query';
 import { useIntl } from 'react-intl';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -20,7 +20,6 @@ import {
 import CallMergeIcon from '@mui/icons-material/CallMerge';
 import BusinessIcon from '@mui/icons-material/Business';
 import SaveIcon from '@mui/icons-material/Save';
-import DeleteIcon from '@mui/icons-material/Delete';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
@@ -49,7 +48,6 @@ import {
 import { useNotification } from '@/hooks/useNotification';
 import DuplicatesSection from './DuplicatesSection';
 import OrganizationActionButtons from './OrganizationActionButtons';
-import DeletedOrganizationsSection from './DeletedOrganizationsSection';
 
 const PAGE_SIZE = 100;
 const CLASSIFICATION_BATCH_SIZE = 50;
@@ -236,11 +234,11 @@ OrganizationRow.propTypes = {
   error: PropTypes.shape({})
 };
 
-const OrganizationManagement = () => {
+const OrganizationManagementContent = () => {
   const { formatMessage } = useIntl();
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get('tab');
-  const isClassifyTab = !['duplicates', 'deleted'].includes(activeTab);
+  const isClassifyTab = activeTab !== 'duplicates';
   const tabs = useMemo(
     () => [
       {
@@ -252,11 +250,6 @@ const OrganizationManagement = () => {
         id: 'duplicates',
         label: formatMessage({ id: 'duplicates.heading' }),
         icon: <CallMergeIcon />
-      },
-      {
-        id: 'deleted',
-        label: formatMessage({ id: 'deletedOrganizations.heading' }),
-        icon: <DeleteIcon />
       }
     ],
     [formatMessage]
@@ -534,12 +527,6 @@ const OrganizationManagement = () => {
             }
           />
         </Card>
-        <Card sx={{ p: { xs: 1.5, sm: 2 } }}>
-          <DeletedOrganizationsSection
-            enabled={canAccess && activeTab === 'deleted'}
-            onPreview={setPreviewId}
-          />
-        </Card>
       </PageTabs>
       {previewId != null && (
         <OrganizationPreview
@@ -549,6 +536,14 @@ const OrganizationManagement = () => {
       )}
     </PageContainer>
   );
+};
+
+const OrganizationManagement = () => {
+  const [searchParams] = useSearchParams();
+  if (searchParams.get('tab') === 'deleted') {
+    return <Navigate to="/ui/deleted-entities?type=organizations" replace />;
+  }
+  return <OrganizationManagementContent />;
 };
 
 export default OrganizationManagement;

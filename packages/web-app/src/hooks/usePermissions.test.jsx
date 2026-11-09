@@ -65,3 +65,38 @@ describe('usePermissions impersonation', () => {
     });
   });
 });
+
+it.each([
+  [['Administrator'], true, true],
+  [['Moderator'], true, false],
+  [['Administrator', 'Moderator'], true, true],
+  [['User'], false, false],
+  [['Leader'], false, false],
+  [[], false, false]
+])(
+  'grants independent deleted-content capabilities to %j',
+  (groups, canManage, canDelete) => {
+    const permissions = renderPermissions({
+      authTokenDecoded: liveToken(groups)
+    });
+    expect(permissions.canManageDeletedEntities).toBe(canManage);
+    expect(permissions.canPermanentlyDeleteEntities).toBe(canDelete);
+  }
+);
+
+it('does not keep deletion capabilities when an administrator impersonates a user', () => {
+  const permissions = renderPermissions({
+    authTokenDecoded: liveToken(['Administrator']),
+    impersonatedRole: 'User'
+  });
+  expect(permissions.canManageDeletedEntities).toBe(false);
+  expect(permissions.canPermanentlyDeleteEntities).toBe(false);
+});
+
+it('does not grant deleted-content capabilities to an expired session', () => {
+  const permissions = renderPermissions({
+    authTokenDecoded: { ...liveToken(['Administrator']), exp: 1 }
+  });
+  expect(permissions.canManageDeletedEntities).toBe(false);
+  expect(permissions.canPermanentlyDeleteEntities).toBe(false);
+});

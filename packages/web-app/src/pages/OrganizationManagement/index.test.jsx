@@ -53,10 +53,22 @@ const renderManagement = (initialEntry = '/ui/organizations/management') =>
           element={<OrganizationManagement />}
         />
         <Route path="/ui/dashboard" element={<p>Dashboard</p>} />
+        <Route path="/ui/deleted-entities" element={<p>Deleted entities</p>} />
       </Routes>
     </MemoryRouter>,
     { messages }
   );
+
+it('redirects the old deleted tab before the organization Moderator gate', async () => {
+  usePermissions.mockReturnValue({
+    isAuth: true,
+    isAdmin: true,
+    isModerator: false
+  });
+  renderManagement('/ui/organizations/management?tab=deleted');
+  expect(await screen.findByText('Deleted entities')).toBeVisible();
+  expect(apiPost).not.toHaveBeenCalled();
+});
 
 const openDuplicatesTab = () =>
   fireEvent.click(screen.getByRole('tab', { name: 'Duplicates' }));

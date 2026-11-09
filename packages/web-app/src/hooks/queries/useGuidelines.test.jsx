@@ -29,10 +29,12 @@ wrapper.propTypes = { children: PropTypes.node };
 
 it('uses server pagination and preserves the Content-Range total', async () => {
   apiGetWithRange.mockResolvedValue({
-    data: [
-      { id: 1, title: 'Public', isDeleted: false },
-      { id: 2, title: 'Deleted', isDeleted: true }
-    ],
+    data: {
+      guidelines: [
+        { id: 1, title: 'Public', isDeleted: false },
+        { id: 2, title: 'Deleted', isDeleted: true }
+      ]
+    },
     contentRange: '20-21/126'
   });
 
@@ -55,7 +57,10 @@ it('uses server pagination and preserves the Content-Range total', async () => {
 });
 
 it('caps the requested page size at the API maximum', async () => {
-  apiGetWithRange.mockResolvedValue({ data: [], contentRange: '0-0/0' });
+  apiGetWithRange.mockResolvedValue({
+    data: { guidelines: [] },
+    contentRange: '0-0/0'
+  });
 
   const { result } = renderHook(() => useGuidelines({ limit: 200 }), {
     wrapper

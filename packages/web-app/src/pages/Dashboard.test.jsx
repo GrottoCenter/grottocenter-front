@@ -97,3 +97,27 @@ it('orders management groups as content, data and users', () => {
       .map(groupTitle => groupTitle.textContent)
   ).toEqual(['Content', 'Data', 'Users']);
 });
+
+it.each([
+  [true, false],
+  [false, true],
+  [true, true]
+])(
+  'shows the deleted-entities tool independently of role hierarchy (admin %s, moderator %s)',
+  (isAdmin, isModerator) => {
+    usePermissions.mockReturnValue({
+      isAuth: true,
+      isAdmin,
+      isModerator,
+      canManageDeletedEntities: true
+    });
+    renderDashboard();
+    expect(
+      screen.getByRole('link', { name: /deletedEntities.heading/ })
+    ).toHaveAttribute('href', '/ui/deleted-entities');
+    if (!isModerator)
+      expect(
+        screen.queryByRole('link', { name: /Document validation/ })
+      ).toBeNull();
+  }
+);

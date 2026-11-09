@@ -6,6 +6,7 @@ import {
   caveKeys,
   massifKeys,
   organizationKeys,
+  organizationManagementKeys,
   personKeys,
   quicksearchKeys,
   regionKeys
@@ -22,6 +23,7 @@ export const subscribeOrganizationMapChanges = listener => {
 export const invalidateOrganizationCaches = (queryClient, excludedKey) => {
   [
     organizationKeys,
+    organizationManagementKeys,
     documentKeys,
     entranceKeys,
     caveKeys,

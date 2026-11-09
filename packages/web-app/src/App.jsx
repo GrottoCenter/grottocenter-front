@@ -23,6 +23,7 @@ import './App.css';
 
 const Api = lazy(() => import('./components/appli/Api'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const DeletedEntities = lazy(() => import('./pages/DeletedEntities'));
 const OrganizationManagement = lazy(
   () => import('./pages/OrganizationManagement')
 );
@@ -100,6 +101,7 @@ const router = createBrowserRouter(
         path="/ui/organizations/management"
         element={<OrganizationManagement />}
       />
+      <Route path="/ui/deleted-entities" element={<DeletedEntities />} />
       <Route path="/ui/admin/users" element={<ManageUsers />} />
       <Route path="/ui/entrances" element={<EntrancesSearchPage />} />
       <Route path="/ui/documents" element={<DocumentsSearchPage />} />

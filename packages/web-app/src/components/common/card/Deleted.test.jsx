@@ -324,7 +324,7 @@ describe('DeleteConfirmationDialog replacement selection', () => {
       expect(
         screen.getByRole('heading', { name: `Supprimer ${description} ?` })
       ).toBeVisible();
-      expect(screen.getByText('Exemple')).toBeVisible();
+      expect(screen.getByText('Exemple (#42)')).toBeVisible();
       const entityIcon = container.querySelector('img[alt=""]');
       expect(entityIcon).toHaveAttribute('width', '28');
       expect(entityIcon.closest('[aria-hidden="true"]')).not.toBeNull();
