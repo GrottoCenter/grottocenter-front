@@ -185,6 +185,9 @@ const Map = () => {
       if (urlDebounceRef.current) clearTimeout(urlDebounceRef.current);
       urlDebounceRef.current = setTimeout(() => {
         urlDebounceRef.current = null;
+        // A lazy detail route can be loading while this map is still mounted.
+        // Never let a delayed viewport update undo navigation away from it.
+        if (!/^\/ui\/map(?:\/|$)/.test(window.location.pathname)) return;
         navigate(
           generatePath('/ui/map/:target', {
             target: encodeMapTarget(center, newZoom)

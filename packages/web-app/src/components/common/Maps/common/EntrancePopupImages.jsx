@@ -1,10 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useMap, useMapEvents } from 'react-leaflet';
 import { point, setOptions } from 'leaflet';
 import PropTypes from 'prop-types';
-import { entranceQueryOptions } from '@/api/entranceQueryOptions';
+import { useEntranceFeaturedImage } from '@/hooks';
 import FileImage from '@/components/common/DocumentsList/FileImage';
 import AppLink from '@/components/common/AppLink';
 import { FilePropTypes } from '@/types/document.type';
@@ -207,15 +206,7 @@ const EntrancePopupImages = () => {
       }
     }
   });
-  // Temporary trade-off: uncached popups fetch full entrance detail. The shared
-  // five-minute cache avoids repeated fresh reads and preloads the entrance page.
-  // Replace this with the lightweight featured-image API once deployed:
-  // backend: GrottoCenter/grottocenter-api#1992
-  // frontend: GrottoCenter/grottocenter-front#1619
-  const { data } = useQuery({
-    ...entranceQueryOptions(active?.id),
-    meta: { skipErrorNotification: true }
-  });
+  const { data } = useEntranceFeaturedImage(active?.id);
 
   if (!active?.popup.isOpen()) return null;
   return createPortal(

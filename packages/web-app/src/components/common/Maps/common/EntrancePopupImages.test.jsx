@@ -10,6 +10,7 @@ import L from 'leaflet';
 import renderWithProviders from '@/test/renderWithProviders';
 import { entranceKeys } from '@/api/queryKeys';
 import { apiGet } from '@/api/client';
+import { getEntranceUrl } from '@/conf/apiRoutes';
 import EntrancePopupImages from './EntrancePopupImages';
 
 const state = vi.hoisted(() => ({ map: null }));
@@ -67,7 +68,7 @@ const open = id => {
   return popup;
 };
 
-it('only fetches an opened entrance and shares the detail cache with its page', async () => {
+it('only fetches an opened entrance image and reuses its separate cache', async () => {
   apiGet.mockResolvedValue({ id: 1, name: 'Cave', featuredFile: file });
   const { queryClient } = mount();
   expect(apiGet).not.toHaveBeenCalled();
@@ -75,8 +76,10 @@ it('only fetches an opened entrance and shares the detail cache with its page', 
   const image = await screen.findByAltText('Cave');
   expect(image).toHaveAttribute('src', '/small.webp');
   expect(image.closest('a')).toHaveAttribute('href', '/ui/entrances/1');
+  expect(apiGet).toHaveBeenCalledWith(`${getEntranceUrl}1/featured-image`);
+  expect(queryClient.getQueryData(entranceKeys.detail('1'))).toBeUndefined();
   expect(
-    queryClient.getQueryData(entranceKeys.detail('1')).featuredFile.id
+    queryClient.getQueryData(entranceKeys.featuredImage('1')).featuredFile.id
   ).toBe(10);
   act(() => popup.remove());
   open(1);
@@ -228,6 +231,25 @@ it('ignores late responses after switching or closing popups', async () => {
   act(() => second.remove());
   expect(element.querySelector('.leaflet-popup')).toBeNull();
   expect(apiGet).toHaveBeenCalledTimes(2);
+});
+
+it('does not restore a closed popup when its request finishes', async () => {
+  let resolveRequest;
+  apiGet.mockImplementationOnce(
+    () =>
+      new Promise(resolve => {
+        resolveRequest = resolve;
+      })
+  );
+  mount();
+  const popup = open(1);
+  act(() => popup.remove());
+  await act(async () =>
+    resolveRequest({ id: 1, name: 'Closed', featuredFile: file })
+  );
+  expect(screen.queryByAltText('Closed')).toBeNull();
+  expect(popup.isOpen()).toBe(false);
+  expect(element.querySelector('.leaflet-popup')).toBeNull();
 });
 
 it.each([null, new Error('offline')])(

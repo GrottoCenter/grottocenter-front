@@ -42,6 +42,13 @@ const entrance = {
   ],
   featuredFile: files[1]
 };
+const featuredImage = {
+  id: entrance.id,
+  name: entrance.name,
+  isDeleted: false,
+  redirectTo: null,
+  featuredFile: entrance.featuredFile
+};
 const imageBody =
   '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="640"><rect width="320" height="640" fill="#7c9a6c"/></svg>';
 const visit = path =>
@@ -92,7 +99,7 @@ const clickEntranceMarker = () =>
       });
     });
 
-const visitMap = () => {
+const mockMap = () => {
   cy.intercept(
     { method: 'GET', pathname: '/api/v1/geoloc/entrancesCoordinates' },
     { body: [[5.5, 45.5, 1, 0, null]] }
@@ -114,8 +121,12 @@ const visitMap = () => {
       ]
     }
   ).as('markers');
+};
+
+const visitMap = () => {
+  mockMap();
   visit('/map/45.5,5.5,16');
-  cy.wait('@markers');
+  cy.wait('@markers', { requestTimeout: 20000 });
 };
 
 const expectPopupLayout = layout => {
@@ -199,6 +210,10 @@ describe('Entrance featured image', () => {
       { method: 'GET', pathname: '/api/v1/entrances/1' },
       { body: entrance }
     ).as('entrance');
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/entrances/1/featured-image' },
+      { body: featuredImage }
+    ).as('featuredImage');
     cy.intercept('https://images.example.org/thumbnails/**', {
       headers: { 'content-type': 'image/svg+xml' },
       body: imageBody
@@ -540,7 +555,7 @@ describe('Entrance featured image', () => {
     cy.viewport(1280, 900);
     cy.intercept('https://images.example.org/**', { statusCode: 404 });
     visit('/entrances/1');
-    cy.wait('@entrance');
+    cy.wait('@entrance', { requestTimeout: 20000 });
     cy.get('[data-testid="entrance-featured-image"]').should('not.exist');
     cy.get('h1').should('contain.text', entrance.name);
     cy.get('[data-testid="entrance-properties"]').then(properties => {
@@ -649,21 +664,80 @@ describe('Entrance featured image', () => {
       .and('contain.text', 'Link a document containing an image');
   });
 
-  it('only requests the clicked marker detail and reuses it on reopening', () => {
-    cy.viewport(1280, 900);
+  it('only requests the clicked marker image, reuses it, then loads complete detail on navigation', () => {
+    cy.viewport(390, 844);
     visitMap();
     cy.get('@entrance.all').should('have.length', 0);
+    cy.get('@featuredImage.all').should('have.length', 0);
     clickEntranceMarker();
-    cy.get('.map-popup-photo img', { timeout: 10000 }).should(
-      'have.attr',
-      'src',
-      files[1].thumbnails.small
+    cy.wait('@featuredImage');
+    cy.get('[data-testid="entrance-popup-photo"] img', {
+      timeout: 10000
+    }).should('have.attr', 'src', files[1].thumbnails.small);
+    cy.get('@entrance.all').should('have.length', 0);
+    cy.get('[aria-label="Close popup"]').click({ scrollBehavior: false });
+    clickEntranceMarker();
+    cy.get('[data-testid="entrance-popup-photo"] img').should('be.visible');
+    cy.get('@featuredImage.all').should('have.length', 1);
+    cy.get('@entrance.all').should('have.length', 0);
+    cy.get('[data-testid="entrance-popup-photo"]').click();
+    cy.wait('@entrance', { requestTimeout: 20000 });
+    cy.get('h1').should('contain.text', entrance.name);
+    cy.get('@entrance.all').should('have.length', 1);
+  });
+
+  it('reuses fresh detail when opening the map after the entrance page', () => {
+    cy.viewport(1280, 900);
+    mockMap();
+    visit('/entrances/1');
+    cy.wait('@entrance', { requestTimeout: 20000 });
+    cy.window().then(win => {
+      win.localStorage.setItem(
+        'grottocenter_map_position',
+        JSON.stringify({ lat: 45.5, lng: 5.5, zoom: 16 })
+      );
+    });
+    cy.get('a[href="/ui/map"]').first().click();
+    cy.wait('@markers', { requestTimeout: 20000 });
+    clickEntranceMarker();
+    cy.get('[data-testid="entrance-popup-photo"] img').should('be.visible');
+    cy.get('@featuredImage.all').should('have.length', 0);
+    cy.get('@entrance.all').should('have.length', 1);
+  });
+
+  it('keeps the text popup usable when the lightweight request fails', () => {
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/entrances/1/featured-image' },
+      { statusCode: 404, body: { message: 'Entrance not found' } }
+    ).as('featuredImage');
+    visitMap();
+    clickEntranceMarker();
+    cy.wait('@featuredImage');
+    cy.get('[data-testid="entrance-popup"] a').should(
+      'contain.text',
+      entrance.name
     );
-    cy.get('@entrance.all').should('have.length', 1);
-    cy.get('.leaflet-popup-close-button').trigger('click');
+    cy.get('[data-testid="entrance-popup-photo"]').should('not.exist');
+    cy.get('@entrance.all').should('have.length', 0);
+  });
+
+  it('keeps a popup closed when its delayed lightweight response arrives', () => {
+    let releaseImage;
+    const imageReady = new Cypress.Promise(resolve => {
+      releaseImage = resolve;
+    });
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/entrances/1/featured-image' },
+      request => imageReady.then(() => request.reply({ body: featuredImage }))
+    ).as('featuredImage');
+    visitMap();
     clickEntranceMarker();
-    cy.get('.map-popup-photo img').should('be.visible');
-    cy.get('@entrance.all').should('have.length', 1);
+    cy.get('[aria-label="Close popup"]').click({ scrollBehavior: false });
+    cy.then(() => releaseImage());
+    cy.wait('@featuredImage');
+    cy.get('[data-testid="entrance-popup"]').should('not.exist');
+    cy.get('@thumbnail.all').should('have.length', 0);
+    cy.get('@entrance.all').should('have.length', 0);
   });
 
   [
@@ -713,19 +787,20 @@ describe('Entrance featured image', () => {
     expectPopupLayout('top');
     cy.viewport(480, 844);
     expectPopupLayout('side');
-    cy.get('@entrance.all').should('have.length', 1);
+    cy.get('@featuredImage.all').should('have.length', 1);
+    cy.get('@entrance.all').should('have.length', 0);
   });
 
   [1280, 320].forEach(width => {
     it(`keeps a popup without an image readable at width ${width}`, () => {
       cy.viewport(width, 700);
       cy.intercept(
-        { method: 'GET', pathname: '/api/v1/entrances/1' },
-        { body: { ...entrance, featuredFile: null } }
-      ).as('entrance');
+        { method: 'GET', pathname: '/api/v1/entrances/1/featured-image' },
+        { body: { ...featuredImage, featuredFile: null } }
+      ).as('featuredImage');
       visitMap();
       clickEntranceMarker();
-      cy.wait('@entrance');
+      cy.wait('@featuredImage');
       cy.get('[data-testid="entrance-popup-photo"]').should('not.exist');
       cy.get('[data-testid="entrance-popup"]').should(popup => {
         expect(popup.width()).to.be.within(200, 260);

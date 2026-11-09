@@ -10,9 +10,13 @@ export const refreshEntrance = (queryClient, entrance) => {
   if (hasDetail)
     queryClient.setQueryData(entranceKeys.detail(entrance.id), entrance);
   // The updated detail is already fresh. Refetching it could race the PUT
-  // response, and every popup/page uses this same normalized detail key.
+  // response. Invalidate its lightweight image as well as other entrance reads.
   queryClient.invalidateQueries({
     queryKey: entranceKeys.all,
-    predicate: query => !hasDetail || query.queryKey[2] !== String(entrance.id)
+    predicate: query =>
+      !hasDetail ||
+      query.queryKey.length !== 3 ||
+      query.queryKey[1] !== 'detail' ||
+      query.queryKey[2] !== String(entrance.id)
   });
 };
