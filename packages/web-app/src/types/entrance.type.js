@@ -6,6 +6,7 @@ import { DescriptionPropTypes } from './description.type';
 
 import { NamePropTypes } from './name.type';
 import { CavePropTypes } from './cave.type';
+import { DocumentChildPropTypes, FilePropTypes } from './document.type';
 
 export const CommentPropTypes = PropTypes.shape({
   id: PropTypes.number,
@@ -25,15 +26,7 @@ export const CommentPropTypes = PropTypes.shape({
   language: PropTypes.string
 });
 
-export const DocumentPropTypes = PropTypes.shape({
-  id: PropTypes.number,
-  isDeleted: PropTypes.bool,
-  title: PropTypes.string,
-  description: PropTypes.string,
-  dateInscription: PropTypes.string,
-  dateReviewed: PropTypes.string,
-  files: PropTypes.arrayOf(PropTypes.string)
-});
+export const DocumentPropTypes = DocumentChildPropTypes;
 
 export const HistoryPropTypes = PropTypes.shape({
   id: PropTypes.number.isRequired,
@@ -95,6 +88,7 @@ export const DataQualityPropTypes = PropTypes.shape({
 
 export const EntrancePropTypes = PropTypes.shape({
   id: PropTypes.number,
+  featuredFile: FilePropTypes,
   isDeleted: PropTypes.bool,
   redirectTo: PropTypes.number,
   name: PropTypes.string,

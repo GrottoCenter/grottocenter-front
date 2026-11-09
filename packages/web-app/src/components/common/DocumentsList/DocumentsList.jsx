@@ -11,7 +11,7 @@ import {
   Skeleton
 } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import { isGalleryFile } from '@/utils/mediaUtils';
+import { getDocumentMedia } from '@/utils/mediaUtils';
 import { GALLERY_MIN_IMAGES } from '@/components/common/DocumentsList/MediaThumbnail';
 import DocumentSortSelect from '../DocumentSortSelect';
 import {
@@ -140,6 +140,7 @@ const DocumentsList = ({
   emptyMessageComponent,
   hasSnapshotButton = false,
   onUnlink,
+  onMediaClick,
   itemsPerPage = 10,
   defaultSortOrder = DOCUMENT_SORT_ORDERS.ADDED_DESC,
   showSort = true,
@@ -183,17 +184,7 @@ const DocumentsList = ({
     sortedDocuments.forEach(doc => {
       const start = media.length;
       offsets.push(start);
-      if (doc.files) {
-        doc.files
-          .filter(file => isGalleryFile(file.fileName))
-          .forEach(file =>
-            media.push({
-              ...file,
-              description: doc.description,
-              documentTitle: doc.title
-            })
-          );
-      }
+      media.push(...getDocumentMedia([doc]));
       // A gallery earns the full row: past the threshold its tiles no longer
       // fit one card. Derived here rather than recounted at render time.
       const modelCount = doc.files?.filter(isModelPreview).length ?? 0;
@@ -202,10 +193,17 @@ const DocumentsList = ({
     return { allMedia: media, mediaOffsets: offsets, isWide: wide };
   }, [sortedDocuments]);
 
-  const handleMediaClick = useCallback(globalIndex => {
-    setLightboxIndex(globalIndex);
-    setLightboxOpen(true);
-  }, []);
+  const handleMediaClick = useCallback(
+    globalIndex => {
+      if (onMediaClick) {
+        onMediaClick(allMedia, globalIndex);
+      } else {
+        setLightboxIndex(globalIndex);
+        setLightboxOpen(true);
+      }
+    },
+    [allMedia, onMediaClick]
+  );
 
   if (isLoading) {
     return (
@@ -304,7 +302,7 @@ const DocumentsList = ({
         // own preview/expansion and must not be limited to the visible card page.
         <DocumentReferences documents={sortedDocuments} />
       )}
-      {allMedia.length > 0 && (
+      {!onMediaClick && allMedia.length > 0 && (
         <MediaLightbox
           open={lightboxOpen}
           onClose={() => setLightboxOpen(false)}
@@ -325,6 +323,7 @@ DocumentsList.propTypes = {
   emptyMessageComponent: PropTypes.node,
   hasSnapshotButton: PropTypes.bool,
   onUnlink: PropTypes.func,
+  onMediaClick: PropTypes.func,
   itemsPerPage: PropTypes.number,
   defaultSortOrder: PropTypes.oneOf(Object.values(DOCUMENT_SORT_ORDERS)),
   showSort: PropTypes.bool,

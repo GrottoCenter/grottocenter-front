@@ -3,6 +3,8 @@ import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import PropTypes from 'prop-types';
 import { apiFetch } from '@/api/client';
+import queryClient from '@/conf/queryClient';
+import { entranceQueryOptions } from '@/api/entranceQueryOptions';
 import {
   EntrancePopup,
   MassifPopup,
@@ -11,7 +13,6 @@ import {
 } from '../common/Markers/Components';
 import useRenderPopup from '../common/Markers/useRenderPopup';
 import {
-  getEntranceUrl,
   getCaveUrl,
   getMassifUrl,
   getOrganizationUrl,
@@ -21,12 +22,10 @@ import {
 const fetchPopupData = async (type, id, signal) => {
   switch (type) {
     case 'entrance': {
-      const data = await apiFetch(`${getEntranceUrl}${id}`, { signal }).then(
-        r => {
-          if (!r.ok) throw new Error(r.status);
-          return r.json();
-        }
-      );
+      const data = await queryClient.fetchQuery({
+        ...entranceQueryOptions(id),
+        meta: { skipErrorNotification: true }
+      });
       return {
         lat: data.latitude,
         lng: data.longitude,

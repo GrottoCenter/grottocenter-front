@@ -128,6 +128,101 @@ beforeEach(() => {
 });
 
 describe('entrance and network submission validation', () => {
+  it.each([null, 11])(
+    'saves an image-only change from %s without changing the cave',
+    async featuredFile => {
+      renderForm(
+        <EntranceForm
+          entranceValues={{
+            ...entrance,
+            featuredFile,
+            documents: [
+              {
+                id: 3,
+                files: [
+                  { id: 11, fileName: 'first.jpg', completePath: '/first.jpg' },
+                  {
+                    id: 12,
+                    fileName: 'second.jpg',
+                    completePath: '/second.jpg'
+                  }
+                ]
+              }
+            ]
+          }}
+          caveValues={cave}
+        />
+      );
+      expect(screen.queryByRole('radiogroup')).toBeNull();
+      fireEvent.click(screen.getByTestId('featured-image-toggle'));
+      fireEvent.click(screen.getByRole('radio', { name: 'Image 2 of 2' }));
+      expect(screen.getByRole('radiogroup')).toBeVisible();
+      fireEvent.click(screen.getByText('Update'));
+      await waitFor(() =>
+        expect(mocks.updateEntrance).toHaveBeenCalledTimes(1)
+      );
+      expect(mocks.updateEntrance.mock.calls[0][0]).toMatchObject({
+        id: 42,
+        featuredFile: 12
+      });
+      expect(mocks.update).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each([
+    { files: [] },
+    { files: [{ id: 11, fileName: 'first.jpg', completePath: '/first.jpg' }] },
+    { files: [{ id: 12, fileName: 'other.jpg', completePath: '/other.jpg' }] }
+  ])('explicitly clears a saved image with null (%j)', async ({ files }) => {
+    renderForm(
+      <EntranceForm
+        entranceValues={{
+          ...entrance,
+          featuredFile: 11,
+          documents: [
+            {
+              id: 3,
+              files
+            }
+          ]
+        }}
+        caveValues={cave}
+      />
+    );
+    fireEvent.click(screen.getByTestId('featured-image-toggle'));
+    fireEvent.click(screen.getByRole('radio', { name: 'No featured image' }));
+    fireEvent.click(screen.getByText('Update'));
+    await waitFor(() => expect(mocks.updateEntrance).toHaveBeenCalledTimes(1));
+    expect(mocks.updateEntrance.mock.calls[0][0].featuredFile).toBeNull();
+  });
+
+  it.each([
+    ['Altitude', null],
+    ['Altitude', 11],
+    ['Depth', 11]
+  ])(
+    'omits an unchanged featured image (%s, %s) during unrelated edits',
+    async (label, featuredFile) => {
+      renderForm(
+        <EntranceForm
+          entranceValues={{ ...entrance, featuredFile, documents: [] }}
+          caveValues={cave}
+        />
+      );
+      fireEvent.change(screen.getByLabelText(label), {
+        target: { value: '101' }
+      });
+      fireEvent.click(screen.getByText('Update'));
+      const mutation = label === 'Depth' ? mocks.update : mocks.updateEntrance;
+      await waitFor(() => expect(mutation).toHaveBeenCalledOnce());
+      const payload =
+        label === 'Depth'
+          ? mutation.mock.calls[0][0].entranceData
+          : mutation.mock.calls[0][0];
+      expect(payload).not.toHaveProperty('featuredFile');
+    }
+  );
+
   it.each([
     ['Altitude', '10000', '9999'],
     ['Depth', '20001', '20000'],

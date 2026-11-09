@@ -19,6 +19,7 @@ import UserLocationMarker from './UserLocationMarker';
 import TileReloader from './TileReloader';
 import useIsFullscreen from './useIsFullscreen';
 import { MapLocationProvider } from './MapLocationContext';
+import EntrancePopupImages from './EntrancePopupImages';
 
 const Wrapper = styled('div', {
   shouldForwardProp: prop => !prop.startsWith('$')
@@ -227,6 +228,7 @@ const CustomMapContainer = ({
           )}
           {forceCentering && <Centerer center={center} zoom={zoom} />}
           <TileReloader />
+          <EntrancePopupImages />
           {/* Bottom-right stack. Leaflet inserts each new bottom control above
               the previous one. */}
           <ScaleControl position="bottomright" />

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
 import { useIntl } from 'react-intl';
+import { Alert } from '@mui/material';
 
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import { normelizeCoordinate } from '../utils/InputCoordinate';
@@ -20,6 +21,7 @@ import EditTypeSelection from './EditTypeSelection';
 import EntranceDetail from './EntranceDetail';
 import CaveDetail from './CaveDetail';
 import EntranceAttributes from './EntranceAttributes';
+import FeaturedImageSelect from './FeaturedImageSelect';
 import NetworkLinkSection from './NetworkLinkSection';
 import NetworkMembershipSection from './NetworkMembershipSection';
 import {
@@ -97,12 +99,20 @@ export const EntranceForm = ({
   // mode already knows it statically from caveValues). Not a form value: used
   // only to render a named link to that network in CaveDetail.
   const [selectedCave, setSelectedCave] = useState(null);
+  const [submissionType, setSubmissionType] = useState(null);
+  const mutations = {
+    createEntrance: createEntranceMutation,
+    createCaveAndEntrance: createCaveAndEntranceMutation,
+    updateEntrance: updateEntranceMutation,
+    updateCaveAndEntrance: updateCaveAndEntranceMutation
+  };
 
   const defaultFormValues = useMemo(
     () => ({
       entrance: { ...defaultEntranceValues, ...(entranceValues ?? {}) },
       cave: caveValues || defaultCaveValues
     }),
+    // Initial values belong to this editing session; refetches must not erase edits.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -149,29 +159,30 @@ export const EntranceForm = ({
   }, [reset]);
 
   const onSubmit = async data => {
-    /* eslint-disable no-param-reassign */
-    if (data?.entrance?.longitude)
-      data.entrance.longitude = normelizeCoordinate(data.entrance.longitude);
-    if (data?.entrance?.latitude)
-      data.entrance.latitude = normelizeCoordinate(data.entrance.latitude);
-    /* eslint-enable no-param-reassign */
-
     const caveData = {
       ...makeCaveData(data),
       id: caveValues?.id
     };
     const entranceDataFmt = {
-      ...makeEntranceData(data, entityType),
+      ...makeEntranceData(data, entityType, entranceValues),
       id: entranceValues?.id
     };
+    if (entranceDataFmt.longitude != null) {
+      entranceDataFmt.longitude = normelizeCoordinate(
+        entranceDataFmt.longitude
+      );
+      entranceDataFmt.latitude = normelizeCoordinate(entranceDataFmt.latitude);
+    }
 
     if (isNewEntrance) {
       if (entityType === ENTRANCE_AND_CAVE) {
+        setSubmissionType('createCaveAndEntrance');
         createCaveAndEntranceMutation.mutate({
           caveData,
           entranceData: entranceDataFmt
         });
       } else {
+        setSubmissionType('createEntrance');
         createEntranceMutation.mutate(entranceDataFmt);
       }
     } else {
@@ -189,17 +200,20 @@ export const EntranceForm = ({
         return;
       }
       if (entityType === ENTRANCE_AND_CAVE && !caveUnchanged) {
+        setSubmissionType('updateCaveAndEntrance');
         updateCaveAndEntranceMutation.mutate({
           caveData,
           entranceData: entranceDataFmt
         });
       } else {
+        setSubmissionType('updateEntrance');
         updateEntranceMutation.mutate(entranceDataFmt);
       }
     }
   };
 
   const activeMutation = (() => {
+    if (submissionType) return mutations[submissionType];
     if (isNewEntrance)
       return entityType === ENTRANCE_AND_CAVE
         ? createCaveAndEntranceMutation
@@ -209,7 +223,7 @@ export const EntranceForm = ({
       : updateEntranceMutation;
   })();
 
-  if (isSubmitSuccessful) {
+  if (isSubmitSuccessful && submissionType && !activeMutation.isError) {
     // For the combined create flow, data is `{cave, entrance}`; for the
     // single-entrance create, it's the entrance itself.
     const createdEntranceId = isNewEntrance
@@ -236,6 +250,11 @@ export const EntranceForm = ({
   return (
     <FormContainer>
       <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+        {activeMutation.isError && (
+          <Alert severity="error" sx={{ mb: 1 }}>
+            {formatMessage({ id: 'A server error occurred' })}
+          </Alert>
+        )}
         <EditTypeSelection
           control={control}
           errors={errors}
@@ -283,6 +302,12 @@ export const EntranceForm = ({
           caveName={isNewEntrance ? selectedCave?.name : caveValues?.name}
         />
         <EntranceAttributes control={control} />
+        {!isNewEntrance && (
+          <FeaturedImageSelect
+            control={control}
+            documents={entranceValues?.documents}
+          />
+        )}
         <FormActionRow
           isNew={isNewEntrance}
           isSubmitting={isSubmitting || activeMutation.isPending}
@@ -298,6 +323,8 @@ export const EntranceForm = ({
 EntranceForm.propTypes = {
   entranceValues: PropTypes.shape({
     id: PropTypes.number,
+    featuredFile: PropTypes.number,
+    documents: FeaturedImageSelect.propTypes.documents,
     name: PropTypes.string,
     description: PropTypes.string,
     descriptionTitle: PropTypes.string,

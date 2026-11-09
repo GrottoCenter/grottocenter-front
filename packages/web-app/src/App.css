@@ -37,6 +37,47 @@ code {
   gap: 6px;
 }
 
+.leaflet-container .leaflet-popup-content:has(.map-popup-entrance) {
+  max-width: min(260px, var(--map-popup-width, 260px));
+}
+
+.leaflet-container .leaflet-popup-content:has(.map-popup-photo) {
+  max-width: var(--map-popup-width, 300px);
+}
+
+.map-popup-entrance {
+  width: 260px;
+  max-width: 100%;
+  white-space: normal;
+}
+
+.map-popup-entrance:has(.map-popup-photo) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  width: var(--map-popup-width, 300px);
+  max-width: 100%;
+}
+
+.map-popup-entrance[data-photo-layout='side']:has(.map-popup-photo) {
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.map-popup-details {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.map-popup-photo {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+  align-self: start;
+}
+
 /* Outranks Leaflet's `.leaflet-popup-content p { margin: 1.3em 0 }`. That one
    used to be ~10px per side under the app's former 62.5% root and is now ~17px,
    and the margins do not collapse (the <p> is a flex item), so losing this tie

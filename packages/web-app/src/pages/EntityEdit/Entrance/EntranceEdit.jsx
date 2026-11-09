@@ -30,6 +30,8 @@ const EntranceEdit = () => {
           depth: entrance.depth,
           length: entrance.length,
           id: entrance.id,
+          documents: entrance.documents,
+          featuredFile: entrance.featuredFile?.id ?? null,
           isSensitive: entrance.isSensitive,
           isSensitiveLocked: entrance.isSensitiveLocked,
           hasBat: entrance.hasBat,

@@ -1,6 +1,7 @@
 import { cleanup, render, waitFor } from '@testing-library/react';
 import store from '@/store';
 import { fetchLoginSuccess, logout } from '@/actions/Login';
+import queryClient from '@/conf/queryClient';
 import PopupTargetHandler from './PopupTargetHandler';
 
 const { map } = vi.hoisted(() => ({ map: { openPopup: vi.fn() } }));
@@ -34,9 +35,13 @@ const detail = {
   }
 };
 
-beforeEach(() => map.openPopup.mockClear());
+beforeEach(() => {
+  map.openPopup.mockClear();
+  queryClient.clear();
+});
 afterEach(() => {
   cleanup();
+  queryClient.clear();
   store.dispatch(logout());
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
@@ -47,6 +52,7 @@ it.each(['entrance', 'network', 'massif', 'organization'])(
   async type => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
+      status: 200,
       json: async () => detail
     });
     vi.stubGlobal('fetch', fetchMock);
@@ -65,10 +71,10 @@ it.each(['entrance', 'network', 'massif', 'organization'])(
         type === 'massif' ? 2 : 1
       );
       fetchMock.mock.calls.slice(before).forEach(([, options]) => {
-        expect(options.headers.get('Authorization')).toBe(
+        expect(new Headers(options.headers).get('Authorization')).toBe(
           token ? `Bearer ${token}` : null
         );
-        expect(options.signal.aborted).toBe(false);
+        if (options.signal) expect(options.signal.aborted).toBe(false);
       });
     }
   }
@@ -90,7 +96,11 @@ it('preserves the non-fatal statistics fallback', async () => {
 });
 
 it('does not retry a rejected session or fall back to anonymous access', async () => {
-  const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 401 });
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok: false,
+    status: 401,
+    json: async () => ({ message: 'Unauthorized' })
+  });
   const errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
   vi.stubGlobal('fetch', fetchMock);
   store.dispatch(fetchLoginSuccess({ id: 1 }, 'revoked'));

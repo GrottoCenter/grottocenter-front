@@ -1,6 +1,10 @@
 import { ENTRANCE_ONLY } from './caveType';
 
-export const makeEntranceData = (data, entityType) => {
+export const makeEntranceData = (
+  data,
+  entityType,
+  originalEntranceValues = null
+) => {
   const entranceData = {
     // When creating a cave with a single entrance, the name of the entrance is the same as the cave one, in data.cave
     name: {
@@ -30,6 +34,16 @@ export const makeEntranceData = (data, entityType) => {
         ? Number(data.entrance.yearDiscovery)
         : null
   };
+
+  // Omit unchanged selections so unrelated edits also work on older APIs.
+  if (
+    data.entrance.featuredFile !== undefined &&
+    (!originalEntranceValues ||
+      data.entrance.featuredFile !==
+        (originalEntranceValues.featuredFile ?? null))
+  ) {
+    entranceData.featuredFile = data.entrance.featuredFile;
+  }
 
   // Only administrators edit the sensitivity lock: leave the key out entirely
   // when the form doesn't hold a value so the API keeps its own default.
@@ -78,6 +92,9 @@ export const hasEntranceChanged = (entranceDataFmt, originalEntranceValues) => {
   return (
     entranceDataFmt.name.text !== originalEntranceValues.name ||
     entranceDataFmt.name.language !== originalEntranceValues.language ||
+    (entranceDataFmt.featuredFile !== undefined &&
+      entranceDataFmt.featuredFile !==
+        (originalEntranceValues.featuredFile ?? null)) ||
     Boolean(entranceDataFmt.isSensitive) !==
       Boolean(originalEntranceValues.isSensitive) ||
     ('isSensitiveLocked' in entranceDataFmt

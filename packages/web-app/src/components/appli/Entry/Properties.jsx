@@ -72,6 +72,7 @@ const qualityColor = score =>
 const Properties = ({
   isLoading = false,
   entrance,
+  featuredImage = null,
   dataQuality,
   canComment
 }) => {
@@ -87,57 +88,68 @@ const Properties = ({
   return (
     <GlobalWrapper>
       <Paper
+        data-testid="entrance-location"
         variant="outlined"
-        sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-        <InfoSection component="h2" title={formatMessage({ id: 'Location' })}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0.5
-            }}>
-            {entrance.latitude && entrance.longitude && (
-              <Property
-                loading={isLoading}
-                label={`${formatMessage({ id: 'Coordinates' })} (${getCRSLabel(preferredCRS)})`}
-                value={
-                  <CoordinateDisplay
-                    latitude={entrance.latitude}
-                    longitude={entrance.longitude}
-                    precision={entrance.precision}
-                    showMapLinks
-                    entityType="entrance"
-                    entityId={entrance.id}
-                  />
-                }
-                icon={<CustomIcon type="coordinates" />}
-              />
-            )}
+        sx={{
+          p: 1,
+          borderRadius: 2,
+          bgcolor: 'grey.50',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 1.5
+        }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <InfoSection component="h2" title={formatMessage({ id: 'Location' })}>
             <Box
               sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
+                display: 'flex',
+                flexDirection: 'column',
                 gap: 0.5
               }}>
-              {cityValue && (
+              {entrance.latitude && entrance.longitude && (
                 <Property
                   loading={isLoading}
-                  label={formatMessage({ id: 'Territory' })}
-                  value={cityValue}
-                  icon={<CustomIcon type="location" />}
-                  secondary
+                  label={`${formatMessage({ id: 'Coordinates' })} (${getCRSLabel(preferredCRS)})`}
+                  value={
+                    <CoordinateDisplay
+                      latitude={entrance.latitude}
+                      longitude={entrance.longitude}
+                      precision={entrance.precision}
+                      showMapLinks
+                      entityType="entrance"
+                      entityId={entrance.id}
+                    />
+                  }
+                  icon={<CustomIcon type="coordinates" />}
                 />
               )}
-              {!!entrance.altitude && (
-                <Property
-                  label={formatMessage({ id: 'Altitude' })}
-                  value={`${entrance.altitude} m`}
-                  icon={<CustomIcon type="altitude" />}
-                />
-              )}
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                  gap: 0.5
+                }}>
+                {cityValue && (
+                  <Property
+                    loading={isLoading}
+                    label={formatMessage({ id: 'Territory' })}
+                    value={cityValue}
+                    icon={<CustomIcon type="location" />}
+                    secondary
+                  />
+                )}
+                {!!entrance.altitude && (
+                  <Property
+                    label={formatMessage({ id: 'Altitude' })}
+                    value={`${entrance.altitude} m`}
+                    icon={<CustomIcon type="altitude" />}
+                  />
+                )}
+              </Box>
             </Box>
-          </Box>
-        </InfoSection>
+          </InfoSection>
+        </Box>
+        {featuredImage}
       </Paper>
       {(entrance.cave?.depth ||
         entrance.cave?.length ||
@@ -409,6 +421,7 @@ const Properties = ({
 Properties.propTypes = {
   isLoading: PropTypes.bool,
   entrance: EntrancePropTypes,
+  featuredImage: PropTypes.node,
   dataQuality: DataQualityPropTypes,
   canComment: PropTypes.bool
 };

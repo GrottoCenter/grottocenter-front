@@ -4,7 +4,14 @@ import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Breadcrumbs, Card, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Breadcrumbs,
+  Card,
+  CircularProgress,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import { NavigateNext, Download } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -18,6 +25,10 @@ import BiotechIcon from '@mui/icons-material/Biotech';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
+import MediaLightbox from '@/components/common/DocumentsList/MediaLightbox';
+import { getDocumentMedia } from '@/utils/mediaUtils';
+import { sortDocuments, DOCUMENT_SORT_ORDERS } from '@/utils/documentSort';
+import FeaturedImage from './FeaturedImage';
 import AppLink from '../../common/AppLink';
 
 import PageContainer from '../../common/Layouts/PageContainer';
@@ -61,12 +72,12 @@ import {
 const PdfExport = lazy(() => import('@/components/appli/PdfExport'));
 
 const HalfSplitContainer = styled('div')`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: ${({ theme }) => theme.spacing(1)};
 
   ${({ theme }) => theme.breakpoints.up('sm')} {
-    flex-direction: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
     gap: ${({ theme }) => theme.spacing(2)};
   }
@@ -80,7 +91,9 @@ export const Entry = ({
   entrance,
   networkDescriptionsCount = 0
 }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, locale } = useIntl();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const openLink = useOpenLink();
   const { entranceId } = useParams();
@@ -107,6 +120,34 @@ export const Entry = ({
     userId
   });
   const mapPositions = useMemo(() => (entrance ? [entrance] : []), [entrance]);
+  const [gallery, setGallery] = useState(null);
+  const [unavailableFeaturedImage, setUnavailableFeaturedImage] =
+    useState(null);
+  const featuredImageKey = entrance?.featuredFile
+    ? `${entrance.id}-${entrance.featuredFile.id}-${entrance.featuredFile.completePath}`
+    : null;
+  const hasFeaturedImage =
+    featuredImageKey !== null && unavailableFeaturedImage !== featuredImageKey;
+  const handleMediaClick = React.useCallback((media, initialIndex) => {
+    setGallery({ media, initialIndex });
+  }, []);
+  const handleFeaturedImageClick = () => {
+    const media = getDocumentMedia(
+      sortDocuments(entrance.documents, DOCUMENT_SORT_ORDERS.TYPE, locale)
+    );
+    const index = media.findIndex(file => file.id === entrance.featuredFile.id);
+    if (index < 0) media.unshift(entrance.featuredFile);
+    handleMediaClick(media, Math.max(0, index));
+  };
+  const featuredImage = hasFeaturedImage ? (
+    <FeaturedImage
+      key={featuredImageKey}
+      file={entrance.featuredFile}
+      entranceName={entrance.name}
+      onClick={handleFeaturedImageClick}
+      onUnavailable={() => setUnavailableFeaturedImage(featuredImageKey)}
+    />
+  ) : null;
 
   const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
@@ -378,9 +419,20 @@ export const Entry = ({
                 <ScrollableContent
                   content={
                     <>
-                      <HalfSplitContainer>
+                      <HalfSplitContainer
+                        sx={{
+                          gridTemplateAreas: {
+                            xs:
+                              hasFeaturedImage && isMobile
+                                ? '"photo" "map" "properties"'
+                                : '"map" "properties"',
+                            sm: '"map properties"'
+                          }
+                        }}>
+                        {isMobile && featuredImage}
                         <Box
                           sx={{
+                            gridArea: 'map',
                             flex: 1,
                             minHeight: 200,
                             display: 'flex',
@@ -405,9 +457,16 @@ export const Entry = ({
                             <SensitiveLocationPlaceholder />
                           )}
                         </Box>
-                        <Box sx={{ flex: 1, overflow: 'auto' }}>
+                        <Box
+                          data-testid="entrance-properties"
+                          sx={{
+                            gridArea: 'properties',
+                            minWidth: 0,
+                            overflow: 'auto'
+                          }}>
                           <Properties
                             entrance={entrance}
+                            featuredImage={isMobile ? null : featuredImage}
                             dataQuality={entrance.dataQuality}
                             canComment={isAuth && !entrance.isDeleted}
                           />
@@ -473,6 +532,7 @@ export const Entry = ({
                   documents={entrance.documents}
                   entranceId={entrance.id}
                   isEditAllowed={!entrance.isDeleted}
+                  onMediaClick={handleMediaClick}
                 />
               </SectionStack>
             )}
@@ -511,6 +571,14 @@ export const Entry = ({
             )}
           </div>
         </PageTabs>
+        {gallery && (
+          <MediaLightbox
+            open
+            media={gallery.media}
+            initialIndex={gallery.initialIndex}
+            onClose={() => setGallery(null)}
+          />
+        )}
         {hasOpenedPdfExport && entrance && (
           <Suspense
             fallback={

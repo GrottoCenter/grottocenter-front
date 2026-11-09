@@ -79,6 +79,7 @@ export const useUpdateCaveAndEntrance = () => {
       ]),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: caveKeys.all });
+      // Parallel PUTs can return an entrance containing the old cave values.
       queryClient.invalidateQueries({ queryKey: entranceKeys.all });
       invalidateAll('entrances');
       invalidateAll('networks');

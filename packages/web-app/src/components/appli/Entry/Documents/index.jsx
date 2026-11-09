@@ -24,7 +24,7 @@ const DividerStyled = styled(Divider)`
 
 const SECTION_ACTION_ICON_SIZE = 24;
 
-const Documents = ({ documents, entranceId, isEditAllowed }) => {
+const Documents = ({ documents, entranceId, isEditAllowed, onMediaClick }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
@@ -95,6 +95,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
 
           <DocumentsList
             documents={documents}
+            onMediaClick={onMediaClick}
             defaultSortOrder={DOCUMENT_SORT_ORDERS.TYPE}
             showBibliographicReferences
             emptyMessageComponent={
@@ -124,7 +125,8 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
 Documents.propTypes = {
   documents: DocumentsList.propTypes.documents,
   entranceId: PropTypes.number.isRequired,
-  isEditAllowed: PropTypes.bool
+  isEditAllowed: PropTypes.bool,
+  onMediaClick: PropTypes.func
 };
 
 export default Documents;
