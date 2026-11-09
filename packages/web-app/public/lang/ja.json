@@ -890,7 +890,6 @@
   "deletedEntities.heading": "削除された項目",
   "deletedEntities.listUnavailable": "削除された項目の一覧を取得できません。",
   "deletedEntities.permanentlyDeleted": "項目を完全に削除しました。",
-  "deletedEntities.redirect": "統合先: #{id}",
   "deletedEntities.restored": "項目を復元しました。",
   "Denmark": "デンマーク",
   "Depository Library": "納本図書館",

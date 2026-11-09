@@ -890,7 +890,6 @@
   "deletedEntities.heading": "Verwijderde entiteiten",
   "deletedEntities.listUnavailable": "De lijst met verwijderde entiteiten is niet beschikbaar.",
   "deletedEntities.permanentlyDeleted": "Entiteit definitief verwijderd.",
-  "deletedEntities.redirect": "Samenvoegdoel: #{id}",
   "deletedEntities.restored": "Entiteit hersteld.",
   "Denmark": "Denemarken",
   "Depository Library": "Depotbibliotheek",

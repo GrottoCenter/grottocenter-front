@@ -46,6 +46,16 @@ const resources = [
 const mockReferences = () => {
   cy.disableServiceWorker();
   cy.mockApiCatchAll();
+  resources.forEach(([resource]) => {
+    cy.intercept(
+      {
+        method: 'GET',
+        pathname: `/api/v1/${resource}`,
+        query: { isDeleted: 'true', skip: '0', limit: '1' }
+      },
+      { body: { [resource]: [] } }
+    ).as(`count-${resource}`);
+  });
   cy.intercept(
     { method: 'GET', pathname: '/api/v1/languages' },
     { body: { languages: [] } }
@@ -86,7 +96,7 @@ describe('Deleted entities management', () => {
         {
           method: 'GET',
           pathname: '/api/v1/organizations',
-          query: { isDeleted: 'true' }
+          query: { isDeleted: 'true', limit: '50' }
         },
         {
           statusCode: 206,
@@ -106,7 +116,7 @@ describe('Deleted entities management', () => {
       cy.get('[data-testid="deleted-organization-42"]').should($card => {
         const card = $card[0].getBoundingClientRect();
         const preview = $card[0]
-          .querySelector('[aria-label="Preview"]')
+          .querySelector('button[aria-label="Preview"]')
           .getBoundingClientRect();
         const restore = [...$card[0].querySelectorAll('button')]
           .find(button => button.textContent.includes('Restore'))
@@ -136,7 +146,15 @@ describe('Deleted entities management', () => {
         }
       });
       cy.get('[data-testid="deleted-organization-42"]')
-        .find('[aria-label="Preview"]')
+        .find('[role="img"][aria-label="Caving group"]')
+        .focus();
+      cy.focused().should('have.attr', 'aria-label', 'Caving group');
+      cy.get('[role="tooltip"]').should('contain.text', 'Caving group');
+      cy.get('[data-testid="deleted-organization-42"]')
+        .find('[role="img"][aria-label="Caving group"]')
+        .blur();
+      cy.get('[data-testid="deleted-organization-42"]')
+        .find('button[aria-label="Preview"]')
         .click();
       cy.get('[role="dialog"]').should(
         'contain',
@@ -152,7 +170,7 @@ describe('Deleted entities management', () => {
         {
           method: 'GET',
           pathname: `/api/v1/${resource}`,
-          query: { isDeleted: 'true' }
+          query: { isDeleted: 'true', limit: '50' }
         },
         {
           statusCode: 206,
@@ -165,6 +183,8 @@ describe('Deleted entities management', () => {
     });
     visit('/deleted-entities?type=organizations&page=2', ['Administrator']);
     cy.wait('@organizations');
+    cy.wait(resources.map(([resource]) => `@count-${resource}`));
+    cy.get('[data-testid="deleted-organization-42"]').should('be.visible');
     cy.get('[data-testid="page-tab-massifs"]').click();
     cy.wait('@massifs').its('request.query.skip').should('equal', '0');
     cy.get('[data-testid="page-tab-massifs"]').should(
@@ -193,9 +213,10 @@ describe('Deleted entities management', () => {
             expect(req.headers.authorization).to.match(/^Bearer /);
             expect(req.query).to.include({
               isDeleted: 'true',
-              skip: '0',
-              limit: '50'
+              skip: '0'
             });
+            expect(req.query.limit).to.be.oneOf(['1', '50']);
+            req.alias = req.query.limit === '1' ? 'count' : 'list';
             expect(req.query).not.to.have.property('isValidated');
             req.reply({
               statusCode: isDeleted ? 206 : 200,
@@ -203,7 +224,7 @@ describe('Deleted entities management', () => {
               body: { [resource]: isDeleted ? [{ ...source, isDeleted }] : [] }
             });
           }
-        ).as('list');
+        );
         cy.intercept(
           { method: 'GET', pathname: `/api/v1/${resource}/42` },
           req => {
@@ -218,9 +239,12 @@ describe('Deleted entities management', () => {
         }).as('restore');
 
         visit(`/deleted-entities?type=${resource}`, [role]);
-        cy.wait('@list');
+        cy.wait('@list').its('request.query.limit').should('equal', '50');
+        cy.wait('@count').its('request.query.limit').should('equal', '1');
         if (role === 'Moderator')
-          cy.contains('button', /^Permanently delete$/).should('not.exist');
+          cy.get(`[data-testid="permanently-delete-${kind}-42"]`).should(
+            'not.exist'
+          );
         cy.get(`[data-testid="open-${kind}-42"]`).click();
         cy.wait('@detail');
         cy.get('h1').should('contain.text', fields.title ?? source.name);
@@ -264,12 +288,18 @@ describe('Deleted entities management', () => {
         isDeleted: true,
         redirectTo: 43
       };
-      cy.intercept({ method: 'GET', pathname: '/api/v1/organizations' }, req =>
-        req.reply({
-          statusCode: hasRow ? 206 : 200,
-          headers: hasRow ? { 'Content-Range': '0-1/1' } : {},
-          body: { organizations: hasRow ? [source] : [] }
-        })
+      cy.intercept(
+        {
+          method: 'GET',
+          pathname: '/api/v1/organizations',
+          query: { isDeleted: 'true', limit: '50' }
+        },
+        req =>
+          req.reply({
+            statusCode: hasRow ? 206 : 200,
+            headers: hasRow ? { 'Content-Range': '0-1/1' } : {},
+            body: { organizations: hasRow ? [source] : [] }
+          })
       ).as('list');
       cy.intercept('GET', '**/api/v1/organizations/42', { body: source });
       cy.intercept('GET', '**/api/v1/organizations/43', {
@@ -291,14 +321,14 @@ describe('Deleted entities management', () => {
           doc.documentElement.clientWidth
         );
       });
-      cy.contains('button', /^Permanently delete$/).click();
+      cy.get('[data-testid="permanently-delete-organization-42"]').click();
       cy.get('[role="dialog"]:visible').within(() => {
         cy.contains('Destination').should('be.visible');
         cy.contains('#42').should('be.visible');
         cy.contains('button', /^Cancel$/).click();
       });
       cy.get('@delete.all').should('have.length', 0);
-      cy.contains('button', /^Permanently delete$/).click();
+      cy.get('[data-testid="permanently-delete-organization-42"]').click();
       cy.get('[role="dialog"]:visible')
         .contains('button', /^Merge and permanently delete$/)
         .should('be.enabled')
@@ -313,17 +343,24 @@ describe('Deleted entities management', () => {
     mockReferences();
     let restored = false;
     const source = { id: 42, title: 'Last deleted guideline', isDeleted: true };
-    cy.intercept({ method: 'GET', pathname: '/api/v1/guidelines' }, req => {
-      const skip = Number(req.query.skip);
-      const rows = skip === 50 && restored ? [] : [source];
-      req.reply({
-        statusCode: rows.length ? 206 : 200,
-        headers: rows.length
-          ? { 'Content-Range': `${skip}-${skip + 1}/${restored ? 50 : 51}` }
-          : {},
-        body: { guidelines: rows }
-      });
-    }).as('list');
+    cy.intercept(
+      {
+        method: 'GET',
+        pathname: '/api/v1/guidelines',
+        query: { isDeleted: 'true', limit: '50' }
+      },
+      req => {
+        const skip = Number(req.query.skip);
+        const rows = skip === 50 && restored ? [] : [source];
+        req.reply({
+          statusCode: rows.length ? 206 : 200,
+          headers: rows.length
+            ? { 'Content-Range': `${skip}-${skip + 1}/${restored ? 50 : 51}` }
+            : {},
+          body: { guidelines: rows }
+        });
+      }
+    ).as('list');
     cy.intercept('GET', '**/api/v1/guidelines/42', { body: source });
     cy.intercept('POST', '**/api/v1/guidelines/42/restore', req => {
       restored = true;

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Tooltip } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import CustomIcon from '@/components/common/CustomIcon';
 import OrganizationIcon from '@/components/common/OrganizationIcon';
 import { getDocumentTypeIcon } from '@/utils/documentTypeHelpers';
@@ -11,11 +11,17 @@ const EntityIcon = ({ resource, entity }) => {
   const { formatMessage } = useIntl();
   const type = entity.type?.name ?? entity.type;
   if (resource === 'organizations') {
+    const label = formatMessage({ id: getOrganizationTypeLabelId(type) });
     return (
-      <Tooltip title={formatMessage({ id: getOrganizationTypeLabelId(type) })}>
-        <span>
+      <Tooltip title={label}>
+        <Box
+          component="span"
+          role="img"
+          aria-label={label}
+          tabIndex={0}
+          sx={{ display: 'inline-flex' }}>
           <OrganizationIcon organizationType={type} size={24} />
-        </span>
+        </Box>
       </Tooltip>
     );
   }
@@ -24,7 +30,7 @@ const EntityIcon = ({ resource, entity }) => {
     const label = formatMessage({ id: type || 'unknown' });
     return (
       <Tooltip title={label}>
-        <Icon aria-label={label} sx={{ color: 'primary.main' }} />
+        <Icon titleAccess={label} tabIndex={0} sx={{ color: 'primary.main' }} />
       </Tooltip>
     );
   }

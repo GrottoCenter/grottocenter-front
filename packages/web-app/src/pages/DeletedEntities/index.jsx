@@ -236,17 +236,20 @@ const DeletedEntitiesContent = () => {
               )}
             </Box>
             <Tooltip title={formatMessage({ id: 'Preview' })}>
-              <IconButton
-                aria-label={formatMessage({ id: 'Preview' })}
-                color="primary"
+              <Box
+                component="span"
                 sx={{
                   gridArea: 'preview',
                   alignSelf: { xs: 'start', md: 'center' }
-                }}
-                disabled={!!activeSelection || query.isPlaceholderData}
-                onClick={() => setPreview({ resource: entityType, entity })}>
-                <VisibilityIcon />
-              </IconButton>
+                }}>
+                <IconButton
+                  aria-label={formatMessage({ id: 'Preview' })}
+                  color="primary"
+                  disabled={!!activeSelection || query.isPlaceholderData}
+                  onClick={() => setPreview({ resource: entityType, entity })}>
+                  <VisibilityIcon />
+                </IconButton>
+              </Box>
             </Tooltip>
             <Stack
               direction="row"
@@ -280,6 +283,7 @@ const DeletedEntitiesContent = () => {
                 <Tooltip title={formatMessage({ id: 'Permanently delete' })}>
                   <span>
                     <IconButton
+                      data-testid={`permanently-delete-${config.kind}-${entity.id}`}
                       aria-label={formatMessage({ id: 'Permanently delete' })}
                       color="error"
                       disabled={

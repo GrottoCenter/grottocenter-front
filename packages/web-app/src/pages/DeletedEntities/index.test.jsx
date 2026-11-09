@@ -469,6 +469,9 @@ it('uses organization type icons, muted IDs and a named merge destination', asyn
   expect(row.queryByText('fra')).toBeNull();
   expect(row.queryByText(messages['organizationType.speleology'])).toBeNull();
   expect(
+    row.getByRole('img', { name: messages['organizationType.speleology'] })
+  ).toHaveAttribute('tabindex', '0');
+  expect(
     screen.getByTestId('deleted-organization-42').querySelector('img')
   ).toHaveAttribute('src', getOrganizationIconSource('SPELEOLOGY'));
   expect(
@@ -481,13 +484,50 @@ it.each([
   ['Article', 'ArticleIcon'],
   ['Map', 'MapIcon'],
   ['Book', 'MenuBookIcon']
-])('uses the %s icon instead of a document type label', async (type, icon) => {
-  source = { ...source, type, title: 'Deleted document' };
-  renderPage('documents');
-  const row = within(await screen.findByTestId('deleted-document-42'));
-  expect(row.getByTestId(icon)).toBeVisible();
-  expect(row.queryByText(type)).toBeNull();
-  expect(row.queryByText(/Français|English/)).toBeNull();
+])(
+  'exposes the %s document type through an accessible icon',
+  async (type, icon) => {
+    source = { ...source, type, title: 'Deleted document' };
+    renderPage('documents');
+    const row = within(await screen.findByTestId('deleted-document-42'));
+    expect(row.getByTestId(icon)).toBeVisible();
+    expect(row.getByRole('img', { name: type })).toHaveAttribute(
+      'tabindex',
+      '0'
+    );
+    expect(row.queryByText(/Français|English/)).toBeNull();
+  }
+);
+
+it('keeps the merge destination link when its details cannot be loaded', async () => {
+  source = { ...source, redirectTo: 43 };
+  apiGet.mockRejectedValue(
+    Object.assign(new Error('Not found'), { status: 404 })
+  );
+  renderPage();
+  expect(await screen.findByRole('link', { name: '#43' })).toHaveAttribute(
+    'href',
+    '/ui/organizations/43'
+  );
+  expect(screen.queryByText(messages['unexpected error'])).toBeNull();
+});
+
+it('reuses the merge destination details when returning to a resource tab', async () => {
+  source = { ...source, redirectTo: 43 };
+  apiGet.mockResolvedValue({ id: 43, name: 'Destination club' });
+  apiGetWithRange.mockImplementation(url => {
+    const resource = new URL(url).pathname.split('/').pop();
+    return Promise.resolve(
+      pageResponse(resource, resource === 'organizations' ? [source] : [])
+    );
+  });
+  renderPage();
+  await screen.findByRole('link', { name: 'Destination club' });
+  fireEvent.click(screen.getByTestId('page-tab-massifs'));
+  await screen.findByText(messages['deletedEntities.empty']);
+  fireEvent.click(screen.getByTestId('page-tab-organizations'));
+  await screen.findByRole('link', { name: 'Destination club' });
+  expect(apiGet).toHaveBeenCalledTimes(1);
 });
 
 it('opens and closes the preview with additional details', async () => {

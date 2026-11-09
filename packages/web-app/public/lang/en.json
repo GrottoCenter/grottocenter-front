@@ -890,7 +890,6 @@
   "deletedEntities.heading": "Deleted entities",
   "deletedEntities.listUnavailable": "The deleted entities list is unavailable.",
   "deletedEntities.permanentlyDeleted": "Entity permanently deleted.",
-  "deletedEntities.redirect": "Merge destination: #{id}",
   "deletedEntities.restored": "Entity restored.",
   "Denmark": "Denmark",
   "Depository Library": "Depository Library",

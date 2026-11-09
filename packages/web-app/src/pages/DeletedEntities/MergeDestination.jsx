@@ -5,6 +5,7 @@ import { Stack, Typography } from '@mui/material';
 import CallMergeIcon from '@mui/icons-material/CallMerge';
 import { apiGet } from '@/api/client';
 import AppLink from '@/components/common/AppLink';
+import { STALE } from '@/conf/queryClient';
 import {
   DELETED_ENTITY_RESOURCES,
   getDeletedEntityName
@@ -13,11 +14,12 @@ import {
 const MergeDestination = ({ resource, id }) => {
   const { formatMessage } = useIntl();
   const config = DELETED_ENTITY_RESOURCES[resource];
-  const { data: destination, error } = useQuery({
+  const { data: destination, isPending } = useQuery({
     queryKey: config.keys.detail(id),
     queryFn: ({ signal }) =>
       apiGet(`${config.collectionUrl}/${id}`, { signal }),
-    retry: false
+    retry: false,
+    staleTime: STALE.STANDARD
   });
   return (
     <Stack
@@ -25,16 +27,14 @@ const MergeDestination = ({ resource, id }) => {
       spacing={0.75}
       sx={{ alignItems: 'center', mt: 0.5 }}>
       <CallMergeIcon fontSize="small" sx={{ color: 'text.secondary' }} />
-      {destination ? (
-        <AppLink to={`${config.entityType.url}${id}`}>
-          {getDeletedEntityName(destination)}
-        </AppLink>
-      ) : (
+      {isPending ? (
         <Typography variant="body2" color="text.secondary">
-          {formatMessage({
-            id: error ? 'unexpected error' : 'Loading ...'
-          })}
+          {formatMessage({ id: 'Loading ...' })}
         </Typography>
+      ) : (
+        <AppLink to={`${config.entityType.url}${id}`}>
+          {destination ? getDeletedEntityName(destination) : `#${id}`}
+        </AppLink>
       )}
     </Stack>
   );
