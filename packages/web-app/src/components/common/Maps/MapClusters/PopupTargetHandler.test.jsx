@@ -93,7 +93,39 @@ it('preserves the non-fatal statistics fallback', async () => {
   );
   render(<PopupTargetHandler popupTarget={{ type: 'massif', id: 1 }} />);
   await waitFor(() => expect(map.openPopup).toHaveBeenCalledTimes(1));
+  expect(
+    map.openPopup.mock.calls[0][0].props.massif.entranceCount
+  ).toBeUndefined();
+  expect(
+    map.openPopup.mock.calls[0][0].props.massif.networkCount
+  ).toBeUndefined();
 });
+
+it.each([
+  [{ nb_entrances: 3, nb_caves: 1, nb_networks: 1 }, 3],
+  [{ nb_entrances: 0, nb_networks: 0 }, 0],
+  [{ nb_entrances: null }, null],
+  [{ nb_caves: 99 }, undefined]
+])(
+  'passes the real entrance count to the massif popup for %j',
+  async (statistics, expected) => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(url =>
+        Promise.resolve({
+          ok: true,
+          json: async () => (url.endsWith('/statistics') ? statistics : detail)
+        })
+      )
+    );
+    render(<PopupTargetHandler popupTarget={{ type: 'massif', id: 1 }} />);
+    await waitFor(() => expect(map.openPopup).toHaveBeenCalledTimes(1));
+    expect(map.openPopup.mock.calls[0][0].props.massif).toMatchObject({
+      entranceCount: expected,
+      networkCount: statistics.nb_networks
+    });
+  }
+);
 
 it('does not retry a rejected session or fall back to anonymous access', async () => {
   const fetchMock = vi.fn().mockResolvedValue({

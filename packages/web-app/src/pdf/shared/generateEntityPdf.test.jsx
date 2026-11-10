@@ -43,7 +43,7 @@ it.each(['country', 'region'])(
         name: 'Territory export'
       },
       statistics: {
-        nb_caves: 1165,
+        nb_entrances: 1165,
         nb_networks: 9,
         diving_caves: 3,
         avg: { avg_depth: 30, avg_length: 273 },
@@ -65,6 +65,7 @@ it.each(['country', 'region'])(
         .map(item => item.str)
         .join(' ');
       expect(text).toContain('1,165');
+      expect(text).toContain('entrances');
       expect(text).toContain('299,165 m');
       expect(text).toContain('30 m');
       expect(text).toContain('273 m');
@@ -143,7 +144,7 @@ it.each([24, 28, 32])(
         ]
       },
       statistics: {
-        nb_caves: 1165,
+        nb_entrances: 1165,
         nb_networks: 9,
         diving_caves: 3,
         avg: { avg_depth: 30, avg_length: 273 },

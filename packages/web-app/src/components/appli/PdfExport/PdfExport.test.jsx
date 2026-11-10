@@ -275,7 +275,7 @@ it.each(['massif', 'country', 'region'])(
       <PdfExport
         entity={entity}
         entityType={entityType}
-        statistics={{ nb_caves: 2 }}
+        statistics={{ nb_entrances: 2 }}
         isAdmin={false}
         open
         onClose={onClose}
@@ -290,7 +290,7 @@ it.each(['massif', 'country', 'region'])(
       <PdfExport
         entity={entity}
         entityType={entityType}
-        statistics={{ nb_caves: 3 }}
+        statistics={{ nb_entrances: 3 }}
         isAdmin={false}
         open
         onClose={onClose}

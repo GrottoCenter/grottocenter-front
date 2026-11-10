@@ -53,8 +53,8 @@ const MassifPolygons = ({ massifs = [] }) => {
           properties: {
             id: m.id,
             name: m.name,
-            entranceCount: m.entranceCount ?? 0,
-            networkCount: m.networkCount ?? 0
+            entranceCount: m.entranceCount,
+            networkCount: m.networkCount
           }
         }))
     };

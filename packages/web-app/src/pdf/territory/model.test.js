@@ -4,7 +4,7 @@ import { PDF_ADAPTERS } from '../adapters';
 
 const intl = createIntl({ locale: 'fr', messages });
 const statistics = {
-  nb_caves: 1165,
+  nb_entrances: 1165,
   nb_networks: 9,
   diving_caves: 3,
   avg: { avg_depth: 30, avg_length: 273 },
@@ -28,12 +28,52 @@ const build = (entityType, overrides = {}) =>
   });
 
 it.each(['massif', 'country', 'region'])(
+  'exports three entrances and one network for a %s without changing length',
+  entityType => {
+    const model = build(entityType, {
+      statistics: {
+        nb_entrances: 3,
+        nb_caves: 1,
+        nb_networks: 1,
+        total_length: { value: 100, nb_data: 1 }
+      }
+    });
+    const { body } = model.blocks.find(block => block.key === 'statistics')
+      .items[0];
+    expect(body).toContain('3 entrées');
+    expect(body).toContain('1 réseau');
+    expect(body).toContain('Développement cumulé: 100 m');
+  }
+);
+
+it.each(['massif', 'country', 'region'])(
+  'distinguishes zero from unavailable entrance counts in a %s PDF',
+  entityType => {
+    const zero = build(entityType, { statistics: { nb_entrances: 0 } });
+    expect(
+      zero.blocks.find(block => block.key === 'statistics').items[0].body
+    ).toContain('0 entrée');
+    for (const unavailable of [{}, { nb_entrances: null }, { nb_caves: 99 }]) {
+      const model = build(entityType, { statistics: unavailable });
+      expect(
+        model.blocks.find(block => block.key === 'statistics')
+      ).toBeUndefined();
+      expect(
+        PDF_ADAPTERS[entityType].availability({ id: 'FR' }, false, {
+          statistics: unavailable
+        }).statistics
+      ).toBe(false);
+    }
+  }
+);
+
+it.each(['massif', 'country', 'region'])(
   'exports all available statistics for a %s with localized numbers',
   entityType => {
     const model = build(entityType);
     const { body } = model.blocks.find(block => block.key === 'statistics')
       .items[0];
-    expect(body).toContain(`${intl.formatNumber(1165)} cavités`);
+    expect(body).toContain(`${intl.formatNumber(1165)} entrées`);
     expect(body).toContain('9 réseaux');
     expect(body).toContain('3 cavités permettent de faire de la plongée');
     expect(body).toContain('Profondeur moyenne: 30 m');
@@ -54,7 +94,7 @@ it.each([
 ])('pluralizes the known-length count of %s caves', (count, label) => {
   const model = build('country', {
     statistics: {
-      nb_caves: 1,
+      nb_entrances: 1,
       total_length: { value: 0, nb_data: count }
     }
   });
@@ -66,7 +106,7 @@ it.each([
 it('keeps zero statistics, pluralizes counts, and omits unknown measurements', () => {
   const model = build('country', {
     statistics: {
-      nb_caves: 1,
+      nb_entrances: 1,
       nb_networks: 0,
       diving_caves: 0,
       nb_massifs: 0,
@@ -74,7 +114,7 @@ it('keeps zero statistics, pluralizes counts, and omits unknown measurements', (
     }
   });
   const { body } = model.blocks[0].items[0];
-  expect(body).toContain('1 cavité (');
+  expect(body).toContain('1 entrée');
   expect(body).toContain('0 réseau (');
   expect(body).toContain('0 massifs');
   expect(body).toContain('Profondeur moyenne: 0 m');

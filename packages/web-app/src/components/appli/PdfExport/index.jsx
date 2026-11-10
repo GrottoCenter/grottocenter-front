@@ -403,7 +403,7 @@ PdfExport.propTypes = {
     'country',
     'region'
   ]).isRequired,
-  statistics: PropTypes.shape({ nb_caves: PropTypes.number }),
+  statistics: PropTypes.shape({ nb_entrances: PropTypes.number }),
   isAdmin: PropTypes.bool.isRequired,
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired

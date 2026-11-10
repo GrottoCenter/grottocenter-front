@@ -201,7 +201,9 @@ const Country = ({
                   navigate(`/ui/countries/${country.id}/entrances`)
                 }>
                 {formatMessage({ id: 'Entrances list' })}
-                {dataCountry?.nb_caves ? ` (${dataCountry.nb_caves})` : ''}
+                {Number.isFinite(dataCountry?.nb_entrances)
+                  ? ` (${dataCountry.nb_entrances})`
+                  : ''}
               </Button>
               <StatisticsDataDashboard
                 countryId={country.id}

@@ -15,8 +15,13 @@ import {
 } from '@/conf/config';
 import GeocodingControl from './GeocodingControl';
 
-const { map, projections } = vi.hoisted(() => ({
+const { map, projections, renderPopup } = vi.hoisted(() => ({
   map: {
+    once: vi.fn(),
+    off: vi.fn(),
+    fire: vi.fn(),
+    fitBounds: vi.fn(),
+    openPopup: vi.fn(),
     getBounds: () => ({
       getWest: () => 6,
       getEast: () => 7,
@@ -24,11 +29,12 @@ const { map, projections } = vi.hoisted(() => ({
       getNorth: () => 46
     })
   },
-  projections: []
+  projections: [],
+  renderPopup: vi.fn()
 }));
 vi.mock('react-leaflet', () => ({ useMap: () => map }));
 vi.mock('@/hooks', () => ({ useProjections: () => projections }));
-vi.mock('./Markers/useRenderPopup', () => ({ default: () => () => null }));
+vi.mock('./Markers/useRenderPopup', () => ({ default: () => renderPopup }));
 vi.mock('./Markers/Components', () => ({
   CoordinatesMarker: {},
   EntrancePopup: () => null,
@@ -59,12 +65,18 @@ const renderSearch = () =>
   render(
     <IntlProvider
       locale="en"
-      messages={{ 'Search on map...': 'Search on map...' }}>
+      messages={{
+        'Search on map...': 'Search on map...',
+        Massif: 'Massif'
+      }}>
       <GeocodingControl />
     </IntlProvider>
   );
 
-beforeEach(() => vi.useFakeTimers());
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.useFakeTimers();
+});
 afterEach(() => {
   cleanup();
   store.dispatch(logout());
@@ -148,3 +160,51 @@ it('aborts searches superseded by input changes and unmounting', async () => {
     expect(signal.aborted).toBe(true);
   });
 });
+
+it.each([
+  [{ nb_entrances: 3, nb_caves: 1, nb_networks: 1 }, 3],
+  [{ nb_entrances: 0, nb_networks: 0 }, 0],
+  [{ nb_entrances: null }, null],
+  [{ nb_caves: 99 }, undefined]
+])(
+  'enriches a massif search result with its real entrance count for %j',
+  async (statistics, expected) => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url, options) => {
+        let data = detail;
+        if (url.startsWith(NOMINATIM_API_URL)) data = [];
+        else if (url.endsWith('/statistics')) data = statistics;
+        else if (options.method === 'POST') {
+          const { entity } = JSON.parse(options.body);
+          data = {
+            results:
+              entity === ADVANCED_SEARCH_TYPES.MASSIFS
+                ? [{ id: 1, name: 'Test massif' }]
+                : []
+          };
+        }
+        return Promise.resolve({ json: async () => data });
+      })
+    );
+    renderSearch();
+    const search = screen.getByRole('combobox');
+    fireEvent.focus(search);
+    fireEvent.change(search, { target: { value: 'Test massif' } });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(AUTOCOMPLETE_DEBOUNCE_DELAY);
+    });
+    fireEvent.click(screen.getByRole('option', { name: /Test massif/ }));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(150);
+    });
+    const [, onMoveEnd] = map.once.mock.calls.find(
+      ([event]) => event === 'moveend'
+    );
+    act(() => onMoveEnd());
+    expect(renderPopup.mock.calls[0][0].props.massif).toMatchObject({
+      entranceCount: expected,
+      networkCount: statistics.nb_networks
+    });
+  }
+);

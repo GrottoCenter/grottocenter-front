@@ -183,7 +183,9 @@ const Region = ({
                   )
                 }>
                 {formatMessage({ id: 'Entrances list' })}
-                {dataRegion?.nb_caves ? ` (${dataRegion.nb_caves})` : ''}
+                {Number.isFinite(dataRegion?.nb_entrances)
+                  ? ` (${dataRegion.nb_entrances})`
+                  : ''}
               </Button>
               {position && (
                 <ScrollableContent

@@ -68,7 +68,7 @@ it.each(['entrance', 'network', 'massif', 'country', 'region'])(
           documents: true
         },
         statistics: {
-          nb_caves: 1,
+          nb_entrances: 1,
           cave_with_max_depth: { id_cave: 8, value: 100 }
         },
         documents: [document],

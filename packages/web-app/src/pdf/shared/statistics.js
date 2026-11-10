@@ -1,7 +1,7 @@
 import { entityUrl, makePdfBlock } from './model';
 
 export const hasPdfStatistics = statistics =>
-  Number.isFinite(statistics?.nb_caves);
+  Number.isFinite(statistics?.nb_entrances);
 
 export const makeStatisticsPdfBlock = (
   entity,
@@ -13,7 +13,7 @@ export const makeStatisticsPdfBlock = (
   const t = id => intl.formatMessage({ id });
   const values = [
     ...[
-      ['nb_caves', 'cave_with_entrances'],
+      ['nb_entrances', 'entrance_count'],
       ['nb_networks', 'network_count'],
       ['diving_caves', 'diveable_caves']
     ].flatMap(([field, id]) =>

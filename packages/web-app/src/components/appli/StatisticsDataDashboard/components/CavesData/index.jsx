@@ -7,14 +7,16 @@ import InlineData from './InlineData';
 const CavesData = ({
   title,
   nbMassifs,
-  nbCaves,
+  nbEntrances,
   nbDivingCaves,
   nbNetworks
 }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+    <Box
+      data-testid="statistics-counts"
+      sx={{ display: 'flex', flexDirection: 'column' }}>
       <Typography
         variant="h4"
         sx={{
@@ -31,13 +33,13 @@ const CavesData = ({
             text={formatMessage({ id: nbMassifs > 1 ? 'massifs' : 'massif' })}
           />
         )}
-        {nbCaves !== undefined && nbCaves !== null && (
+        {Number.isFinite(nbEntrances) && (
           <InlineData
             icon={<CustomIcon type="entrance" size={40} />}
-            numberData={nbCaves}
+            numberData={nbEntrances}
             text={formatMessage(
-              { id: 'cave_with_entrances' },
-              { count: nbCaves }
+              { id: 'entrance_count' },
+              { count: nbEntrances }
             )}
           />
         )}
@@ -66,7 +68,7 @@ const CavesData = ({
 CavesData.propTypes = {
   title: PropTypes.string,
   nbMassifs: PropTypes.number,
-  nbCaves: PropTypes.number,
+  nbEntrances: PropTypes.number,
   nbDivingCaves: PropTypes.number,
   nbNetworks: PropTypes.number
 };

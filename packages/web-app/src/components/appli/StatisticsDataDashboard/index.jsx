@@ -42,11 +42,15 @@ const StatisticsDataDashboard = ({
   }
 
   const { data, isPending: isLoading, isError: hasError } = query;
-  const hasData = data && data.nb_caves > 0 && !hasError;
-  const isEmpty =
-    !isLoading &&
-    !hasData &&
-    (!data || data.nb_caves === undefined || data.nb_caves === 0);
+  const hasData = Number.isFinite(data?.nb_entrances) && !hasError;
+  const isEmpty = !isLoading && !hasData;
+  const hasMeasurements =
+    Number.isFinite(data?.avg?.avg_depth) ||
+    Number.isFinite(data?.avg?.avg_length) ||
+    Number.isFinite(data?.total_length?.value);
+  const hasDepthRecord = Number.isFinite(data?.cave_with_max_depth?.value);
+  const hasLengthRecord = Number.isFinite(data?.cave_with_max_length?.value);
+  const hasRecords = hasDepthRecord || hasLengthRecord;
 
   return (
     <ScrollableContent
@@ -61,21 +65,29 @@ const StatisticsDataDashboard = ({
           {isLoading && <Skeleton height={200} width="100%" />}
           {hasData && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {/* KPI banner: 3 key metrics full width */}
-              <Paper
-                variant="outlined"
-                sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-                <CavesStatistics
-                  avgDepth={data.avg.avg_depth}
-                  avgLength={data.avg.avg_length}
-                  totalLength={data.total_length}
-                />
-              </Paper>
+              {hasMeasurements && (
+                <Paper
+                  variant="outlined"
+                  sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+                  <CavesStatistics
+                    avgDepth={data.avg?.avg_depth}
+                    avgLength={data.avg?.avg_length}
+                    totalLength={
+                      Number.isFinite(data.total_length?.value)
+                        ? data.total_length
+                        : null
+                    }
+                  />
+                </Paper>
+              )}
               {/* 2 columns: counts (left) + specific caves stacked (right) */}
               <Box
                 sx={{
                   display: 'grid',
-                  gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    md: hasRecords ? '1fr 1fr' : '1fr'
+                  },
                   gap: 1
                 }}>
                 <Paper
@@ -84,30 +96,38 @@ const StatisticsDataDashboard = ({
                   <CavesData
                     title={
                       entityType === 'country'
-                        ? formatMessage({ id: 'Massifs, networks and caves' })
-                        : formatMessage({ id: 'Networks and caves' })
+                        ? formatMessage({
+                            id: 'Massifs, networks and entrances'
+                          })
+                        : formatMessage({ id: 'Networks and entrances' })
                     }
                     nbMassifs={data.nb_massifs}
-                    nbCaves={data.nb_caves}
+                    nbEntrances={data.nb_entrances}
                     nbDivingCaves={data.diving_caves}
                     nbNetworks={data.nb_networks}
                   />
                 </Paper>
-                <Paper
-                  variant="outlined"
-                  sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-                  <SpecificsCaves
-                    maxDepthCave={data.cave_with_max_depth}
-                    maxLengthCave={data.cave_with_max_length}
-                    parentEntity={(() => {
-                      if (entityType === 'country')
-                        return formatMessage({ id: 'country' });
-                      if (entityType === 'region')
-                        return formatMessage({ id: 'region' });
-                      return formatMessage({ id: 'massif' });
-                    })()}
-                  />
-                </Paper>
+                {hasRecords && (
+                  <Paper
+                    variant="outlined"
+                    sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+                    <SpecificsCaves
+                      maxDepthCave={
+                        hasDepthRecord ? data.cave_with_max_depth : null
+                      }
+                      maxLengthCave={
+                        hasLengthRecord ? data.cave_with_max_length : null
+                      }
+                      parentEntity={(() => {
+                        if (entityType === 'country')
+                          return formatMessage({ id: 'country' });
+                        if (entityType === 'region')
+                          return formatMessage({ id: 'region' });
+                        return formatMessage({ id: 'massif' });
+                      })()}
+                    />
+                  </Paper>
+                )}
               </Box>
             </Box>
           )}

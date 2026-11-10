@@ -7,22 +7,20 @@ const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 export const MassifPopup = ({ massif }) => {
   const { formatMessage } = useIntl();
-  const entranceLabel =
-    massif.entranceCount > 0
-      ? capitalize(
-          formatMessage({
-            id: massif.entranceCount === 1 ? 'entrance' : 'entrances'
-          })
-        )
-      : null;
-  const networkLabel =
-    massif.networkCount > 0
-      ? capitalize(
-          formatMessage({
-            id: massif.networkCount === 1 ? 'network' : 'networks'
-          })
-        )
-      : null;
+  const entranceLabel = Number.isFinite(massif.entranceCount)
+    ? capitalize(
+        formatMessage({
+          id: massif.entranceCount === 1 ? 'entrance' : 'entrances'
+        })
+      )
+    : null;
+  const networkLabel = Number.isFinite(massif.networkCount)
+    ? capitalize(
+        formatMessage({
+          id: massif.networkCount === 1 ? 'network' : 'networks'
+        })
+      )
+    : null;
   return (
     <>
       <Information
@@ -30,13 +28,13 @@ export const MassifPopup = ({ massif }) => {
         value={massif.name}
         url={`/ui/massifs/${massif.id}`}
       />
-      {massif.entranceCount > 0 && (
+      {Number.isFinite(massif.entranceCount) && (
         <Information
           value={`${massif.entranceCount} ${entranceLabel}`}
           icon={<CustomIcon size={25} type="entrance" />}
         />
       )}
-      {massif.networkCount > 0 && (
+      {Number.isFinite(massif.networkCount) && (
         <Information
           value={`${massif.networkCount} ${networkLabel}`}
           icon={<CustomIcon size={25} type="network" />}

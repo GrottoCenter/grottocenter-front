@@ -60,7 +60,7 @@ const view = (entity, isLoading = false, isPreview = false) => (
 
 beforeEach(() => {
   vi.clearAllMocks();
-  apiGet.mockResolvedValue({ nb_caves: 0 });
+  apiGet.mockResolvedValue({ nb_entrances: 0 });
 });
 
 it('renders the complete massif preview without page actions or navigation tabs', () => {
@@ -114,7 +114,7 @@ it('does not fetch statistics on a deleted massif route after invalidation', asy
 
 it('does not show cached active statistics on a deleted massif', () => {
   const queryClient = createTestQueryClient();
-  queryClient.setQueryData(statisticsKey, { nb_caves: 17 });
+  queryClient.setQueryData(statisticsKey, { nb_entrances: 17 });
   renderWithProviders(view({ ...massif, isDeleted: true }), {
     messages,
     queryClient

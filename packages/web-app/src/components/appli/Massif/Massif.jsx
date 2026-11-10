@@ -323,7 +323,9 @@ const Massif = ({
                   startIcon={<CustomIcon type="entrance" size={24} />}
                   onClick={() => navigate(`/ui/massifs/${massifId}/entrances`)}>
                   {formatMessage({ id: 'Entrances list' })}
-                  {dataMassif?.nb_caves ? ` (${dataMassif.nb_caves})` : ''}
+                  {Number.isFinite(dataMassif?.nb_entrances)
+                    ? ` (${dataMassif.nb_entrances})`
+                    : ''}
                 </Button>
                 <Descriptions
                   descriptions={massif.descriptions ?? []}
