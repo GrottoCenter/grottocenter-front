@@ -83,13 +83,14 @@ const AssociationSection = ({
   entityType,
   entityId,
   parentEntityId,
-  isLoading = false
+  isLoading = false,
+  isEditAllowed = true
 }) => {
   const { formatMessage } = useIntl();
   const { onError } = useNotification();
 
   const { isAuth } = usePermissions();
-  const canManageAssociations = isAuth;
+  const canManageAssociations = isAuth && isEditAllowed;
 
   const { setMutation, removeMutation, makeSetArgs, makeRemoveArgs } =
     useAssociationMutations(entityType, parentEntityId, entityId);
@@ -228,7 +229,8 @@ AssociationSection.propTypes = {
   entityId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     .isRequired,
   parentEntityId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  isLoading: PropTypes.bool
+  isLoading: PropTypes.bool,
+  isEditAllowed: PropTypes.bool
 };
 
 export default AssociationSection;

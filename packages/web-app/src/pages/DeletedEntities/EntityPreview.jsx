@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useQuery } from '@tanstack/react-query';
@@ -10,16 +11,17 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { apiGet } from '@/api/client';
-import AppLink from '@/components/common/AppLink';
-import ContributionMetadata from '@/components/common/Contribution/ContributionMetadata';
 import FormSubmissionError from '@/components/common/FormSubmissionError';
 import StandardDialog from '@/components/common/StandardDialog';
-import {
-  DELETED_ENTITY_RESOURCES,
-  getDeletedEntityName
-} from '@/utils/deletedEntities';
+import { DELETED_ENTITY_RESOURCES } from '@/utils/deletedEntities';
 import EntityIcon from './EntityIcon';
-import EntitySummary from './EntitySummary';
+
+const Entry = lazy(() => import('@/components/appli/Entry'));
+const Network = lazy(() => import('@/components/appli/Network'));
+const Massif = lazy(() => import('@/components/appli/Massif/Massif'));
+const Organization = lazy(() => import('@/components/appli/Organization'));
+const DocumentDetails = lazy(() => import('@/pages/DocumentDetails'));
+const Guideline = lazy(() => import('@/pages/Guideline'));
 
 const EntityPreview = ({ resource, entity, onClose }) => {
   const { formatMessage } = useIntl();
@@ -33,28 +35,42 @@ const EntityPreview = ({ resource, entity, onClose }) => {
     retry: false
   });
   const { data } = query;
-  const descriptions = data?.descriptions ?? [];
+  const renderDetails = () => {
+    switch (resource) {
+      case 'entrances':
+        return <Entry entrance={data} isLoading={false} isPreview />;
+      case 'caves':
+        return <Network cave={data} isLoading={false} isPreview />;
+      case 'massifs':
+        return <Massif massif={data} isLoading={false} isPreview />;
+      case 'organizations':
+        return <Organization organization={data} isLoading={false} isPreview />;
+      case 'documents':
+        return <DocumentDetails id={entity.id} isPreview />;
+      case 'guidelines':
+        return <Guideline id={entity.id} isPreview />;
+      default:
+        return null;
+    }
+  };
   return (
     <StandardDialog
       open
       fullWidth
       fullScreen={isMobile}
+      dense={isMobile}
       scrollable
-      maxWidth="md"
+      maxWidth="lg"
       onClose={onClose}
+      titleComponent="div"
       title={
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <EntityIcon resource={resource} entity={data ?? entity} />
-          <span>{getDeletedEntityName(data ?? entity)}</span>
+          <span>{formatMessage({ id: 'Preview' })}</span>
           <Typography component="span" sx={{ color: 'grey.600' }}>
             #{entity.id}
           </Typography>
         </Stack>
-      }
-      actions={
-        <Button component={AppLink} to={`${config.entityType.url}${entity.id}`}>
-          {formatMessage({ id: 'Details' })}
-        </Button>
       }>
       {query.isPending && <CircularProgress size={24} />}
       <FormSubmissionError error={query.error} />
@@ -64,37 +80,9 @@ const EntityPreview = ({ resource, entity, onClose }) => {
         </Button>
       )}
       {data && (
-        <Stack spacing={1.5}>
-          <EntitySummary resource={resource} entity={data} />
-          {data.description && (
-            <Typography sx={{ whiteSpace: 'pre-wrap' }}>
-              {data.description}
-            </Typography>
-          )}
-          {descriptions.map(description => (
-            <Stack key={description.id} spacing={0.5}>
-              {description.title && (
-                <Typography variant="h5" component="h3">
-                  {description.title}
-                </Typography>
-              )}
-              <Typography sx={{ whiteSpace: 'pre-wrap' }}>
-                {description.body}
-              </Typography>
-            </Stack>
-          ))}
-          {[data.address, data.postalCode, data.mail, data.url]
-            .filter(Boolean)
-            .map(value => (
-              <Typography key={value}>{value}</Typography>
-            ))}
-          <ContributionMetadata
-            createdBy={data.author}
-            createdAt={data.dateInscription}
-            updatedBy={data.reviewer}
-            updatedAt={data.dateReviewed}
-          />
-        </Stack>
+        <Suspense fallback={<CircularProgress size={24} />}>
+          {renderDetails()}
+        </Suspense>
       )}
     </StandardDialog>
   );

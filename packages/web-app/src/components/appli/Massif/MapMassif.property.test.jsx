@@ -10,26 +10,27 @@ const mockUpdateEntranceMarkers = vi.fn();
 
 vi.mock('react-leaflet', () => {
   const React = require('react');
-  // Panes live on the map instance in real Leaflet, but useMap() below returns a
-  // fresh stub on every call — so the registry is kept in the module closure.
   const panes = {};
-  return {
-    useMap: () => ({
-      getZoom: () => 8,
-      getBounds: () => ({
-        _southWest: { wrap: () => ({ lat: -10, lng: -10 }) },
-        _northEast: { wrap: () => ({ lat: 10, lng: 10 }) }
-      }),
-      fitBounds: vi.fn(),
-      getContainer: () => ({ offsetWidth: 100, offsetHeight: 100 }),
-      getPane: name => panes[name],
-      createPane: name => {
-        panes[name] = { style: {} };
-        return panes[name];
-      },
-      on: vi.fn(),
-      off: vi.fn()
+  const map = {
+    getZoom: () => 8,
+    getBounds: () => ({
+      _southWest: { wrap: () => ({ lat: -10, lng: -10 }) },
+      _northEast: { wrap: () => ({ lat: 10, lng: 10 }) }
     }),
+    fitBounds: vi.fn(),
+    invalidateSize: vi.fn(),
+    whenReady: callback => callback(),
+    getContainer: () => ({ offsetWidth: 100, offsetHeight: 100 }),
+    getPane: name => panes[name],
+    createPane: name => {
+      panes[name] = { style: {} };
+      return panes[name];
+    },
+    on: vi.fn(),
+    off: vi.fn()
+  };
+  return {
+    useMap: () => map,
     useMapEvent: vi.fn(),
     useMapEvents: vi.fn(),
     GeoJSON: () => React.createElement('div', { 'data-testid': 'geojson' })

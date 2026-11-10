@@ -89,14 +89,16 @@ export const Entry = ({
   isPaused = false,
   onRetry = null,
   entrance,
-  networkDescriptionsCount = 0
+  networkDescriptionsCount = 0,
+  isPreview = false
 }) => {
   const { formatMessage, locale } = useIntl();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const openLink = useOpenLink();
-  const { entranceId } = useParams();
+  const { entranceId: routeEntranceId } = useParams();
+  const entranceId = routeEntranceId ?? entrance?.id;
   const { isAuth, isAdmin, isModerator } = usePermissions();
   const [isPdfExportOpen, setIsPdfExportOpen] = useState(false);
   const [hasOpenedPdfExport, setHasOpenedPdfExport] = useState(false);
@@ -117,7 +119,7 @@ export const Entry = ({
   const userId = useUserProperties()?.id ?? null;
   const { isExplored, isExploredLoading, handleToggleExplored } = useExplored({
     entranceId: entrance?.id,
-    userId
+    userId: isPreview ? null : userId
   });
   const mapPositions = useMemo(() => (entrance ? [entrance] : []), [entrance]);
   const [gallery, setGallery] = useState(null);
@@ -174,7 +176,7 @@ export const Entry = ({
 
   const canToggleExplored =
     isAuth && entrance?.cave?.id && !entrance?.isDeleted;
-  const canEdit = isAuth && entrance && !entrance.isDeleted;
+  const canEdit = !isPreview && isAuth && entrance && !entrance.isDeleted;
 
   const isNetwork = entrance?.cave?.entrances?.length > 1;
 
@@ -347,10 +349,10 @@ export const Entry = ({
           title={entrance?.name ?? (isLoading ? undefined : '')}
           icon={<CustomIcon type="entrance" />}
           subheader={breadcrumb}
-          actions={actions}
+          actions={isPreview ? null : actions}
         />
 
-        <PageTabs tabs={tabs}>
+        <PageTabs tabs={isPreview ? [] : tabs}>
           {/* Tab Information */}
           <div>
             {isLoading && (
@@ -385,10 +387,12 @@ export const Entry = ({
                     isLoading={isActionLoading}
                     error={restoreMutation.error}
                     onRestorePress={
-                      isAuth && (isAdmin || isModerator) ? onRestorePress : null
+                      !isPreview && isAuth && (isAdmin || isModerator)
+                        ? onRestorePress
+                        : null
                     }
                     onPermanentDeletePress={
-                      isAuth && isAdmin
+                      !isPreview && isAuth && isAdmin
                         ? () => {
                             setIsDeleteConfirmationPermanent(true);
                             setIsDeleteConfirmationOpen(true);
@@ -468,7 +472,9 @@ export const Entry = ({
                             entrance={entrance}
                             featuredImage={isMobile ? null : featuredImage}
                             dataQuality={entrance.dataQuality}
-                            canComment={isAuth && !entrance.isDeleted}
+                            canComment={
+                              !isPreview && isAuth && !entrance.isDeleted
+                            }
                           />
                         </Box>
                       </HalfSplitContainer>
@@ -487,7 +493,7 @@ export const Entry = ({
                   locations={entrance.locations}
                   entranceId={entrance.id}
                   isSensitive={entrance.isSensitive}
-                  isEditAllowed={!entrance.isDeleted}
+                  isEditAllowed={!isPreview && !entrance.isDeleted}
                 />
                 {entrance.guidelines && (
                   <GuidelinesGrouped guidelines={entrance.guidelines} />
@@ -496,7 +502,7 @@ export const Entry = ({
                   descriptions={entrance.descriptions}
                   entityType="entrance"
                   entityId={entrance.id}
-                  isEditAllowed={!entrance.isDeleted}
+                  isEditAllowed={!isPreview && !entrance.isDeleted}
                   networkId={isNetwork ? entrance.cave.id : undefined}
                   networkName={isNetwork ? entrance.cave.name : undefined}
                   networkDescriptionsCount={networkDescriptionsCount}
@@ -504,12 +510,12 @@ export const Entry = ({
                 <Riggings
                   riggings={entrance.riggings}
                   entranceId={entrance.id}
-                  isEditAllowed={!entrance.isDeleted}
+                  isEditAllowed={!isPreview && !entrance.isDeleted}
                 />
                 <Histories
                   histories={entrance.histories ?? []}
                   entranceId={entrance.id}
-                  isEditAllowed={!entrance.isDeleted}
+                  isEditAllowed={!isPreview && !entrance.isDeleted}
                 />
               </SectionStack>
             )}
@@ -531,7 +537,7 @@ export const Entry = ({
                 <Documents
                   documents={entrance.documents}
                   entranceId={entrance.id}
-                  isEditAllowed={!entrance.isDeleted}
+                  isEditAllowed={!isPreview && !entrance.isDeleted}
                   onMediaClick={handleMediaClick}
                 />
               </SectionStack>
@@ -543,7 +549,7 @@ export const Entry = ({
             PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
             so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
             silently shift all subsequent tab panels. */}
-          {isAdmin && entrance?.cave?.id && (
+          {!isPreview && isAdmin && entrance?.cave?.id && (
             <SectionStack>
               <Science caveId={entrance.cave.id} />
             </SectionStack>
@@ -565,7 +571,7 @@ export const Entry = ({
                 <Comments
                   comments={entrance.comments}
                   entranceId={entrance.id}
-                  isEditAllowed={!entrance.isDeleted}
+                  isEditAllowed={!isPreview && !entrance.isDeleted}
                 />
               </SectionStack>
             )}
@@ -607,7 +613,8 @@ Entry.propTypes = {
   isPaused: PropTypes.bool,
   onRetry: PropTypes.func,
   entrance: EntrancePropTypes,
-  networkDescriptionsCount: PropTypes.number
+  networkDescriptionsCount: PropTypes.number,
+  isPreview: PropTypes.bool
 };
 
 export default Entry;

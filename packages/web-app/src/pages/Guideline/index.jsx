@@ -97,8 +97,9 @@ GuidelineScope.propTypes = {
   isUnlinking: PropTypes.bool
 };
 
-const GuidelinePage = () => {
-  const { guidelineId } = useParams();
+const GuidelinePage = ({ id: previewId = null, isPreview = false }) => {
+  const { guidelineId: routeGuidelineId } = useParams();
+  const guidelineId = previewId ?? routeGuidelineId;
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -158,7 +159,9 @@ const GuidelinePage = () => {
   };
 
   const canModerate =
-    permissions.isAuth && (permissions.isModerator || permissions.isAdmin);
+    !isPreview &&
+    permissions.isAuth &&
+    (permissions.isModerator || permissions.isAdmin);
   const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
   const actions = data ? (
     <ResponsiveActions
@@ -198,7 +201,7 @@ const GuidelinePage = () => {
       <PageHeader
         title={data?.title ?? <Skeleton width={240} />}
         icon={<CustomIcon type="guidelines" />}
-        actions={actions}
+        actions={isPreview ? null : actions}
       />
       <DeleteConfirmationDialog
         entityType={DELETED_ENTITIES.guideline}
@@ -231,7 +234,7 @@ const GuidelinePage = () => {
                 isLoading={isActionLoading}
                 onRestorePress={canModerate ? handleRestore : undefined}
                 onPermanentDeletePress={
-                  permissions.isAuth && permissions.isAdmin
+                  !isPreview && permissions.isAuth && permissions.isAdmin
                     ? () => {
                         setDeletePermanent(true);
                         setDeleteDialogOpen(true);
@@ -280,7 +283,7 @@ const GuidelinePage = () => {
                   <GuidelineScope
                     guideline={data}
                     onUnlink={
-                      permissions.isAuth && !isDeleted
+                      !isPreview && permissions.isAuth && !isDeleted
                         ? handleUnlinkScope
                         : undefined
                     }
@@ -294,6 +297,11 @@ const GuidelinePage = () => {
       </SectionStack>
     </PageContainer>
   );
+};
+
+GuidelinePage.propTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  isPreview: PropTypes.bool
 };
 
 export default GuidelinePage;

@@ -60,7 +60,8 @@ export const useStatisticsRegion = (countryId, regionId) =>
 export const useStatisticsMassif = massifId =>
   useQuery({
     queryKey: statsKeys.massif(massifId),
-    queryFn: () => apiGet(getStatisticsMassifUrl(massifId)),
+    queryFn: ({ signal }) =>
+      apiGet(getStatisticsMassifUrl(massifId), { signal }),
     enabled: Boolean(massifId),
     staleTime: STALE.STANDARD
   });

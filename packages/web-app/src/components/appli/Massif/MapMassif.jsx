@@ -39,7 +39,7 @@ const MassifPolygonPane = () => {
   return null;
 };
 
-const MapInternals = ({ geoJson, massifId }) => {
+const MapInternals = ({ massifBounds, massifId }) => {
   const map = useMap();
 
   const updateEntranceMarkers = useMarkers({
@@ -52,15 +52,15 @@ const MapInternals = ({ geoJson, massifId }) => {
   // supercluster index rebuilds when the fetch lands.
   const [entranceCoordinates, setEntranceCoordinates] = useState([]);
   // Toggle between cluster view (low zoom) and real marker view (high zoom).
-  const [showClusters, setShowClusters] = useState(
-    map.getZoom() < MARKERS_LIMIT
-  );
+  const [showClusters, setShowClusters] = useState(false);
+  const [isMapReady, setMapReady] = useState(false);
+  const isMapReadyRef = useRef(false);
 
   // Ref to latest marker updater — keeps fetchMarkers free of its unstable identity.
   const markersRef = useRef(updateEntranceMarkers);
   markersRef.current = updateEntranceMarkers;
 
-  // abortRef only guards the high-zoom viewport marker fetch below (line ~90).
+  // abortRef only guards the high-zoom viewport marker fetch below.
   // The one-shot coordinates fetch further down manages its own AbortController
   // via the useEffect return; both are aborted on unmount independently.
   const abortRef = useRef(null);
@@ -72,13 +72,12 @@ const MapInternals = ({ geoJson, massifId }) => {
     []
   );
 
-  // Computed once; both the heat fetch and fitBounds need it.
-  const massifBounds = useMemo(() => L.geoJSON(geoJson).getBounds(), [geoJson]);
-
   // moveend: at high zoom fetch viewport markers; at low zoom the cluster layer
   // (fed by `entranceCoordinates` state) takes over via the JSX.
   const fetchMarkers = useCallback(() => {
     const zoom = map.getZoom();
+    if (!isMapReadyRef.current || !Number.isFinite(zoom)) return;
+    abortRef.current?.abort();
     if (zoom < MARKERS_LIMIT) {
       markersRef.current(null);
       setShowClusters(true);
@@ -87,7 +86,6 @@ const MapInternals = ({ geoJson, massifId }) => {
 
     setShowClusters(false);
 
-    if (abortRef.current) abortRef.current.abort();
     abortRef.current = new AbortController();
     const { signal } = abortRef.current;
 
@@ -103,7 +101,7 @@ const MapInternals = ({ geoJson, massifId }) => {
     fetch(makeUrl(getMapEntrancesUrl, criteria), { signal })
       .then(r => (r.ok ? r.json() : []))
       .then(data => {
-        if (Array.isArray(data)) markersRef.current(data);
+        if (!signal.aborted && Array.isArray(data)) markersRef.current(data);
       })
       .catch(err => {
         if (err.name !== 'AbortError')
@@ -111,27 +109,28 @@ const MapInternals = ({ geoJson, massifId }) => {
       });
   }, [map, massifId]);
 
-  // fetchMarkersRef lets effects call the latest fetchMarkers without adding it as a dep.
-  const fetchMarkersRef = useRef(null);
-  fetchMarkersRef.current = fetchMarkers;
-
   useMapEvent('moveend', fetchMarkers);
+
+  useEffect(() => {
+    const onReady = () => {
+      isMapReadyRef.current = true;
+      setMapReady(true);
+      fetchMarkers();
+    };
+    map.whenReady(onReady);
+    return () => {
+      isMapReadyRef.current = false;
+      map.off('load', onReady);
+    };
+  }, [map, fetchMarkers]);
 
   // One-shot heat fetch for the entire massif bbox.
   // The ClusterLayer builds a kD-tree from these coordinates and queries
   // only the visible bbox on each moveend — no re-fetch needed on pan/zoom.
-  // After storing the data, re-run the current zoom logic (via fetchMarkersRef) so the
-  // cluster layer is shown immediately if still at low zoom - avoids reading map.getZoom()
-  // asynchronously (race condition).
-  //
-  // Dep note: massifBounds is derived from geoJson via useMemo, and geoJson itself is
-  // memoized on geogPolygon (a string prop) in MapMassif. Leaflet's LatLngBounds has no
-  // referential equality, so this effect re-fires whenever massifBounds is a new object ;
-  // which only happens when geoJson changes reference. As long as geoJson stays stable
-  // (string prop → parsed once), this fires exactly once. If geoJson ever comes from
-  // Redux or a fetch, ensure its reference is stable to avoid double-fetching here.
+  // Coordinates can arrive before a hidden map has its initial view. Readiness
+  // and moveend control the active layer independently of this response.
+  // MapMassif memoizes the validated bounds so this runs once per geometry/id.
   useEffect(() => {
-    if (!massifBounds.isValid()) return undefined;
     const sw = massifBounds.getSouthWest();
     const ne = massifBounds.getNorthEast();
     const controller = new AbortController();
@@ -147,38 +146,40 @@ const MapInternals = ({ geoJson, massifId }) => {
     )
       .then(r => (r.ok ? r.json() : []))
       .then(data => {
-        if (!Array.isArray(data)) return;
+        if (controller.signal.aborted || !Array.isArray(data)) return;
         setEntranceCoordinates(data);
-        fetchMarkersRef.current();
       })
       .catch(() => {});
     return () => controller.abort();
   }, [massifBounds, massifId]);
 
   // Fit the map to the massif bounds once, triggering moveend → fetchMarkers.
-  // If there's no polygon, moveend won't fire, so we call fetchMarkers manually.
   // Guard: if the map is hidden (tab not active), dimensions are 0×0 and fitBounds
   // produces NaN coordinates that crash Leaflet's rendering. Observe the container
   // directly and defer fitBounds until it has real dimensions. The setTimeout lets
   // MapContainer's ResizeObserver (which calls invalidateSize) run first.
   useEffect(() => {
-    if (!massifBounds.isValid()) {
-      fetchMarkersRef.current();
-      return undefined;
-    }
     const container = map.getContainer();
-    if (container.offsetWidth > 0 && container.offsetHeight > 0) {
-      map.fitBounds(massifBounds);
-      return undefined;
-    }
+    const fitBounds = () => {
+      if (container.offsetWidth === 0 || container.offsetHeight === 0)
+        return false;
+      map.invalidateSize({ animate: false, pan: false });
+      map.fitBounds(massifBounds, { animate: false });
+      return true;
+    };
+    if (fitBounds()) return undefined;
+    let pendingFit;
     const observer = new ResizeObserver(() => {
-      if (container.offsetWidth > 0 && container.offsetHeight > 0) {
-        observer.disconnect();
-        setTimeout(() => map.fitBounds(massifBounds), 0);
-      }
+      clearTimeout(pendingFit);
+      pendingFit = setTimeout(() => {
+        if (fitBounds()) observer.disconnect();
+      }, 0);
     });
     observer.observe(container);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      clearTimeout(pendingFit);
+    };
   }, [massifBounds, map]);
 
   return (
@@ -187,47 +188,77 @@ const MapInternals = ({ geoJson, massifId }) => {
       <ClusterLayer
         data={entranceCoordinates}
         type="entrance"
-        enabled={showClusters}
+        enabled={isMapReady && showClusters}
       />
     </>
   );
 };
 
 MapInternals.propTypes = {
-  geoJson: PropTypes.shape({}).isRequired,
+  massifBounds: PropTypes.shape({
+    getSouthWest: PropTypes.func.isRequired,
+    getNorthEast: PropTypes.func.isRequired
+  }).isRequired,
   massifId: PropTypes.number.isRequired
 };
 
+const prepareGeometry = geogPolygon => {
+  try {
+    const geoJson = JSON.parse(geogPolygon);
+    if (
+      !geoJson ||
+      !['Polygon', 'MultiPolygon'].includes(geoJson.type) ||
+      !Array.isArray(geoJson.coordinates)
+    )
+      return null;
+    const points = geoJson.coordinates.flat(geoJson.type === 'Polygon' ? 1 : 2);
+    if (
+      points.length === 0 ||
+      points.some(
+        point =>
+          !Array.isArray(point) ||
+          point.length < 2 ||
+          !point.every(Number.isFinite)
+      )
+    )
+      return null;
+    const massifBounds = L.geoJSON(geoJson).getBounds();
+    if (!massifBounds.isValid()) return null;
+    const sw = massifBounds.getSouthWest();
+    const ne = massifBounds.getNorthEast();
+    if (![sw.lat, sw.lng, ne.lat, ne.lng].every(Number.isFinite)) return null;
+
+    // Split a MultiPolygon into features so every polygon is displayed.
+    const displayGeoJson =
+      geoJson.type === 'Polygon' || geoJson.coordinates.length === 1
+        ? geoJson
+        : {
+            type: 'FeatureCollection',
+            features: geoJson.coordinates.map(coords => ({
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: coords
+              },
+              properties: {}
+            }))
+          };
+    return { displayGeoJson, massifBounds };
+  } catch {
+    // Missing or malformed geometry must not prevent viewing the massif.
+    return null;
+  }
+};
+
 const MapMassif = ({ massifId, geogPolygon }) => {
-  const geoJson = useMemo(() => JSON.parse(geogPolygon), [geogPolygon]);
-
-  // Normalize to a displayable GeoJSON.
-  // Leaflet's GeoJSON layer handles Polygon natively.
-  // For MultiPolygon with multiple polygons, convert to FeatureCollection
-  // so each polygon renders as a separate feature (proper union display).
-  const displayGeoJson = useMemo(() => {
-    if (geoJson.type === 'Polygon' || geoJson.coordinates.length === 1) {
-      return geoJson;
-    }
-
-    return {
-      type: 'FeatureCollection',
-      features: geoJson.coordinates.map(coords => ({
-        type: 'Feature',
-        geometry: {
-          type: 'Polygon',
-          coordinates: coords
-        },
-        properties: {}
-      }))
-    };
-  }, [geoJson]);
+  const geometry = useMemo(() => prepareGeometry(geogPolygon), [geogPolygon]);
+  if (!geometry) return null;
+  const { displayGeoJson, massifBounds } = geometry;
 
   return (
     <CustomMapContainer
       wholePage={false}
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
-      viewport={null}
       scrollWheelZoom={false}>
       {/* MassifPolygonPane must render before GeoJSON so its useEffect (pane
           creation) runs first and the pane exists when the layer is added. */}
@@ -242,7 +273,7 @@ const MapMassif = ({ massifId, geogPolygon }) => {
         pane={MASSIF_POLYGON_PANE}
         renderer={L.svg({ pane: MASSIF_POLYGON_PANE })}
       />
-      <MapInternals geoJson={geoJson} massifId={massifId} />
+      <MapInternals massifBounds={massifBounds} massifId={massifId} />
     </CustomMapContainer>
   );
 };

@@ -235,6 +235,33 @@ it('shows the full instructions, contributors and geographical scope', () => {
   expect(screen.queryByRole('button', { name: /unlink/ })).toBeNull();
 });
 
+it('previews the selected guideline from another route without editing actions', () => {
+  usePermissions.mockReturnValue({ isAuth: true, isAdmin: true });
+  setGuidelineResult({ ...guideline, isDeleted: true });
+  render(
+    <MemoryRouter initialEntries={['/ui/deleted-entities?type=guidelines']}>
+      <IntlProvider locale="en" messages={messages}>
+        <GuidelinePage id={42} isPreview />
+      </IntlProvider>
+    </MemoryRouter>
+  );
+  expect(useGuideline).toHaveBeenCalledWith(42);
+  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+    guideline.title
+  );
+  expect(screen.getByText(/First line/)).toBeVisible();
+  expect(screen.getByRole('link', { name: /Vercors/ })).toHaveAttribute(
+    'href',
+    '/ui/massifs/7'
+  );
+  expect(screen.queryByRole('button', { name: 'Restore' })).toBeNull();
+  expect(
+    screen.queryByRole('button', { name: 'Permanently delete' })
+  ).toBeNull();
+  expect(screen.queryByRole('button', { name: /unlink/ })).toBeNull();
+  expect(screen.queryByRole('link', { name: 'History' })).toBeNull();
+});
+
 it('allows an authenticated user to unlink the last scope', async () => {
   const user = userEvent.setup();
   const patchGuideline = vi.fn().mockResolvedValue(undefined);
