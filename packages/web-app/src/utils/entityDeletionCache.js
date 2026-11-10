@@ -1,4 +1,4 @@
-import { pick } from 'ramda';
+import { equals, pick } from 'ramda';
 
 import {
   advancedSearchKeys,
@@ -42,9 +42,7 @@ const updateDeletedState = (
 ) => {
   const imageKey = entranceKeys.featuredImage(id);
   queryClient.getQueriesData({ queryKey: sourceKey }).forEach(([queryKey]) => {
-    const isPartial =
-      queryKey.length === imageKey.length &&
-      queryKey.every((part, index) => part === imageKey[index]);
+    const isPartial = equals(queryKey, imageKey);
     queryClient.setQueryData(queryKey, current => {
       if (!current || typeof current !== 'object' || Array.isArray(current))
         return current;
