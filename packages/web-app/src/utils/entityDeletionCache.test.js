@@ -37,6 +37,7 @@ describe('entity deletion cache lifecycle', () => {
         name: 'Updated entrance',
         featuredFile: null,
         documents: [{ id: 5 }],
+        deletionReason: 'Updated deletion metadata',
         isDeleted,
         redirectTo: isDeleted ? 2 : null
       };
@@ -65,6 +66,37 @@ describe('entity deletion cache lifecycle', () => {
       });
       expect(client.getQueryState(detailKey).isInvalidated).toBe(true);
       expect(client.getQueryState(imageKey).isInvalidated).toBe(true);
+    }
+  );
+
+  it.each([true, false])(
+    'merges new response fields into full document details and variants (isDeleted: %s)',
+    async isDeleted => {
+      const detailKey = documentKeys.detail(7);
+      const variantKey = documentKeys.detail(7, { requireUpdate: true });
+      const detail = { id: 7, name: 'Document', isDeleted: !isDeleted };
+      const response = {
+        ...detail,
+        deletionReason: 'Updated deletion metadata',
+        isDeleted,
+        redirectTo: null
+      };
+      client.setQueryData(detailKey, detail);
+      client.setQueryData(variantKey, detail);
+
+      if (isDeleted) {
+        await completeEntityDeletion(client, documentKeys, response, {
+          id: 7,
+          isPermanent: false
+        });
+      } else {
+        await completeEntityRestoration(client, documentKeys, response, {
+          id: 7
+        });
+      }
+
+      expect(client.getQueryData(detailKey)).toEqual(response);
+      expect(client.getQueryData(variantKey)).toEqual(response);
     }
   );
 

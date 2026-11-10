@@ -40,20 +40,26 @@ const updateDeletedState = (
   isDeleted,
   redirectTo
 ) => {
-  queryClient.setQueriesData({ queryKey: sourceKey }, current => {
-    if (!current || typeof current !== 'object' || Array.isArray(current))
-      return current;
-    const updatedData =
-      data?.isDeleted === isDeleted && String(data.id) === String(id)
-        ? data
-        : {};
-    // Prefix writes also reach partial entries such as popup featured images.
-    return {
-      ...current,
-      ...pick(Object.keys(current), updatedData),
-      isDeleted,
-      redirectTo
-    };
+  const imageKey = entranceKeys.featuredImage(id);
+  queryClient.getQueriesData({ queryKey: sourceKey }).forEach(([queryKey]) => {
+    const isPartial =
+      queryKey.length === imageKey.length &&
+      queryKey.every((part, index) => part === imageKey[index]);
+    queryClient.setQueryData(queryKey, current => {
+      if (!current || typeof current !== 'object' || Array.isArray(current))
+        return current;
+      const updatedData =
+        data?.isDeleted === isDeleted && String(data.id) === String(id)
+          ? data
+          : {};
+      // Only popup entries filter response fields; full details keep new fields.
+      return {
+        ...current,
+        ...(isPartial ? pick(Object.keys(current), updatedData) : updatedData),
+        isDeleted,
+        redirectTo
+      };
+    });
   });
 };
 
