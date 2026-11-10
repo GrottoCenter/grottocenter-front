@@ -39,7 +39,9 @@ const initColumns = (
       ? applyColumnVisibility(entityConfig.columns, stored)
       : entityConfig.columns;
   }
-  if (entityColumnsModifier) entityColumnsModifier(columns);
+  if (entityColumnsModifier) {
+    columns = entityColumnsModifier(columns) ?? columns;
+  }
   return columns;
 };
 

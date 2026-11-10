@@ -1,7 +1,13 @@
 import { lazy, Suspense, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Box, Button, CircularProgress, useMediaQuery } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  useMediaQuery
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import OfflineDisabled from '@/components/common/OfflineDisabled';
@@ -17,6 +23,30 @@ const SpacedButton = styled(Button)`
   ${({ theme }) => `
   margin: 0 ${theme.spacing(0.5)};`}
 `;
+
+const showPendingDocumentStatus = columns =>
+  columns.map(column =>
+    column.field === 'title'
+      ? {
+          ...column,
+          render: (value, document) => (
+            <Box
+              component="span"
+              sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+              {column.render(value, document)}
+              {document.validationStatus === 'pending' && (
+                <Chip
+                  size="small"
+                  color="warning"
+                  variant="outlined"
+                  label={<FormattedMessage id="Awaiting validation" />}
+                />
+              )}
+            </Box>
+          )
+        }
+      : column
+  );
 
 const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
   const { formatMessage } = useIntl();
@@ -64,9 +94,10 @@ const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
         sx={{
           textAlign: 'center'
         }}>
-        <DocumentSearch />
+        <DocumentSearch includePendingDocuments />
         <br />
         <SearchResults
+          entityColumnsModifier={showPendingDocumentStatus}
           onRowClick={document => {
             setPreviewedDocumentId(document.id);
             return false;

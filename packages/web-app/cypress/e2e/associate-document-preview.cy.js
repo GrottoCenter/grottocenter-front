@@ -154,6 +154,82 @@ describe('Previewing a document before association', () => {
     cy.contains('button', 'Associate 1 document').should('be.enabled');
   });
 
+  it('finds and associates a pending document created by another user', () => {
+    cy.intercept(
+      { method: 'POST', pathname: '/api/v1/advanced-search' },
+      request => {
+        expect(request.body.includePendingDocuments).to.equal(true);
+        request.reply({
+          results: [
+            {
+              id: 7,
+              type: 'Article',
+              title: 'Pending document',
+              validationStatus: 'pending',
+              creator: { id: 99, nickname: 'Another user' },
+              authors: []
+            }
+          ],
+          totalResults: 1
+        });
+      }
+    ).as('pendingSearch');
+    cy.intercept(
+      { method: 'PUT', pathname: '/api/v1/entrances/42/documents/7' },
+      { statusCode: 200, body: {} }
+    ).as('associatePendingDocument');
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/documents/7' },
+      {
+        body: {
+          id: 7,
+          title: 'Pending document',
+          type: 'Article',
+          files: [],
+          authors: [],
+          authorsOrganization: [],
+          massifs: [],
+          entrances: [],
+          isDeleted: false,
+          isValidated: false
+        }
+      }
+    ).as('getPendingDocument');
+
+    cy.loginAs();
+    cy.visit('/entrances/42?tab=documents', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.get('[data-testid="associate-documents-button"]', {
+      timeout: 30000
+    }).click();
+    cy.get('input[placeholder="Search for a document..."]')
+      .closest('form')
+      .find('button[type="submit"]')
+      .click();
+    cy.wait('@pendingSearch');
+    cy.contains('tr', 'Pending document')
+      .should('contain.text', 'Awaiting validation')
+      .click();
+    cy.wait('@getPendingDocument');
+    cy.contains('[role="dialog"]', 'Detailed document view').should(
+      'contain.text',
+      'Pending document'
+    );
+    cy.contains('[role="dialog"]', 'Detailed document view')
+      .find('[aria-label="close"]')
+      .click();
+    cy.contains('button', 'Associate 0 documents').should('be.disabled');
+
+    cy.get('[aria-label="Card view"]').filter(':visible').first().click();
+    cy.contains('button', 'Pending document')
+      .should('contain.text', 'Awaiting validation')
+      .find('input[type="checkbox"]')
+      .click();
+    cy.contains('button', 'Associate 1 document').click();
+    cy.wait('@associatePendingDocument');
+  });
+
   it('closes entrance association when a document is soft-deleted', () => {
     let isDeleted = false;
     cy.intercept({ method: 'GET', pathname: '/api/v1/documents/7' }, request =>

@@ -107,7 +107,11 @@ SubjectEntry.propTypes = {
   })
 };
 
-const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
+const DocumentSearch = ({
+  initialFilter = {},
+  lockedFilter = [],
+  includePendingDocuments = false
+}) => {
   const { formatMessage } = useIntl();
   const mergedInitialState = useMemo(
     () => ({ ...initialFilterState, ...initialFilter }),
@@ -134,6 +138,7 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
       filter: overrideFilter !== undefined ? overrideFilter : filterState,
       matchAllFields:
         overrideMatchAll !== undefined ? overrideMatchAll : matchAllFields,
+      ...(includePendingDocuments && { includePendingDocuments: true }),
       size: getStoredRowsPerPage()
     });
 
@@ -260,6 +265,7 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
           <SearchFormContainer>
             <SearchTextAutocomplete
               ressourceType={searchEntity}
+              includePendingDocuments={includePendingDocuments}
               ressourceField="identifierType"
               ressourceFilter={matchAllFields ? filterState : {}}
               label="Identifier type"
@@ -273,6 +279,7 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
             />
             <SearchTextAutocomplete
               ressourceType={searchEntity}
+              includePendingDocuments={includePendingDocuments}
               ressourceField="importSource"
               ressourceFilter={matchAllFields ? filterState : {}}
               label="Source"
@@ -288,6 +295,7 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
           <SearchFormContainer>
             <SearchTextAutocomplete
               ressourceType={searchEntity}
+              includePendingDocuments={includePendingDocuments}
               ressourceField="datePublication"
               ressourceFilter={matchAllFields ? filterState : {}}
               label="Publication date"
@@ -296,6 +304,7 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
             />
             <SearchTextAutocomplete
               ressourceType={searchEntity}
+              includePendingDocuments={includePendingDocuments}
               ressourceField="iso3166.iso"
               ressourceFilter={matchAllFields ? filterState : {}}
               label="Country / Region"
@@ -304,6 +313,7 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
             />
             <SearchTextAutocomplete
               ressourceType={searchEntity}
+              includePendingDocuments={includePendingDocuments}
               ressourceField="license"
               ressourceFilter={matchAllFields ? filterState : {}}
               label="License"
@@ -325,6 +335,7 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
           {!lockedFilter.includes('authors.nickname') && (
             <SearchTextAutocomplete
               ressourceType={searchEntity}
+              includePendingDocuments={includePendingDocuments}
               ressourceField="authors.nickname"
               ressourceFilter={matchAllFields ? filterState : {}}
               label="Author"
@@ -335,6 +346,7 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
           {!lockedFilter.includes('authorsOrganization.name') && (
             <SearchTextAutocomplete
               ressourceType={searchEntity}
+              includePendingDocuments={includePendingDocuments}
               ressourceField="authorsOrganization.name"
               ressourceFilter={matchAllFields ? filterState : {}}
               label="Organization author"
@@ -345,6 +357,7 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
           {!lockedFilter.includes('editor.name') && (
             <SearchTextAutocomplete
               ressourceType={searchEntity}
+              includePendingDocuments={includePendingDocuments}
               ressourceField="editor.name"
               ressourceFilter={matchAllFields ? filterState : {}}
               label="Editor"
@@ -354,6 +367,7 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
           )}
           <SearchTextAutocomplete
             ressourceType={searchEntity}
+            includePendingDocuments={includePendingDocuments}
             ressourceField="library.name"
             ressourceFilter={matchAllFields ? filterState : {}}
             label="Library"
@@ -366,6 +380,7 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
           <SearchFormContainer sx={{ justifyContent: 'flex-start' }}>
             <SearchTextAutocomplete
               ressourceType={searchEntity}
+              includePendingDocuments={includePendingDocuments}
               ressourceField="issue"
               ressourceFilter={matchAllFields ? filterState : {}}
               label="Issue"
@@ -420,7 +435,8 @@ const DocumentSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
 
 DocumentSearch.propTypes = {
   initialFilter: PropTypes.shape({}),
-  lockedFilter: PropTypes.arrayOf(PropTypes.string)
+  lockedFilter: PropTypes.arrayOf(PropTypes.string),
+  includePendingDocuments: PropTypes.bool
 };
 
 export default DocumentSearch;

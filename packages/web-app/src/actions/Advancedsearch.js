@@ -11,6 +11,7 @@ export const downloadAdvancedSearchResults = async ({
   sort,
   filter,
   matchAllFields = true,
+  includePendingDocuments = false,
   columns,
   columnsName,
   format = 'csv'
@@ -23,7 +24,8 @@ export const downloadAdvancedSearchResults = async ({
     filter,
     matchAllFields,
     columns,
-    columnsName
+    columnsName,
+    ...(includePendingDocuments && { includePendingDocuments: true })
   };
   const requestOptions = {
     method: 'POST',
