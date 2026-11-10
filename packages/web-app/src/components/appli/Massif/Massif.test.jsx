@@ -100,6 +100,18 @@ it('does not fetch statistics in preview while loading or after receiving a dele
   expect(screen.queryByText(messages['More information'])).toBeNull();
 });
 
+it('does not fetch statistics on a deleted massif route after invalidation', async () => {
+  const { queryClient } = renderWithProviders(
+    view({ ...massif, isDeleted: true }),
+    { messages }
+  );
+  expect(screen.getByText('Deleted massif')).toBeVisible();
+  expect(apiGet).not.toHaveBeenCalled();
+  await act(() => queryClient.invalidateQueries({ queryKey: statisticsKey }));
+  expect(apiGet).not.toHaveBeenCalled();
+  expect(screen.queryByText(messages['More information'])).toBeNull();
+});
+
 it('does not show cached active statistics on a deleted massif', () => {
   const queryClient = createTestQueryClient();
   queryClient.setQueryData(statisticsKey, { nb_caves: 17 });
