@@ -15,7 +15,7 @@ import {
 } from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 
-const Documents = ({ documents, massifId }) => {
+const Documents = ({ documents, massifId, isEditAllowed = true }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
@@ -33,6 +33,7 @@ const Documents = ({ documents, massifId }) => {
       anchorId="documents"
       title={formatMessage({ id: 'Documents' })}
       icon={
+        isEditAllowed &&
         permissions.isAuth && (
           <SectionCreateButton
             isOpen={isDocumentSearchVisible}
@@ -73,7 +74,7 @@ const Documents = ({ documents, massifId }) => {
               />
             }
             onUnlink={
-              !permissions.isModerator
+              !isEditAllowed || !permissions.isModerator
                 ? false
                 : document =>
                     unlinkMutation.mutate({
@@ -90,7 +91,8 @@ const Documents = ({ documents, massifId }) => {
 
 Documents.propTypes = {
   documents: DocumentsList.propTypes.documents,
-  massifId: PropTypes.string.isRequired
+  massifId: PropTypes.string.isRequired,
+  isEditAllowed: PropTypes.bool
 };
 
 export default Documents;

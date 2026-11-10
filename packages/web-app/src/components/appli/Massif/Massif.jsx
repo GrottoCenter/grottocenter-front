@@ -17,6 +17,7 @@ import RecentChangesSection from '@/components/appli/RecentChanges/Section';
 import { useRecentChangesTabs } from '@/hooks/useRecentChangesTabs';
 
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
+import GuidelinesGrouped from '@/components/appli/Guidelines/GuidelinesGrouped';
 import {
   useDeleteMassif,
   useRestoreMassif,
@@ -59,9 +60,11 @@ const Massif = ({
   error,
   isPaused = false,
   onRetry = null,
-  massif
+  massif,
+  isPreview = false
 }) => {
-  const { massifId } = useParams();
+  const { massifId: routeMassifId } = useParams();
+  const massifId = routeMassifId ?? massif?.id;
   const massifIdInt = parseInt(massifId, 10);
   const navigate = useNavigate();
   const permissions = usePermissions();
@@ -86,7 +89,10 @@ const Massif = ({
   };
   const handleShare = useSharePage();
 
-  const { data: dataMassif } = useStatisticsMassif(massifIdInt);
+  const canShowStatistics = !!massif && !massif.isDeleted;
+  const { data: dataMassif } = useStatisticsMassif(
+    isPreview || massif?.isDeleted ? null : massifIdInt
+  );
   useScrollToHashOnLoad(dataMassif);
 
   let onEdit = null;
@@ -198,9 +204,9 @@ const Massif = ({
         <PageHeader
           title={massif?.name ?? (isLoading ? undefined : '')}
           icon={<CustomIcon type="massif" />}
-          actions={actions}
+          actions={isPreview ? null : actions}
         />
-        <PageTabs tabs={tabs}>
+        <PageTabs tabs={isPreview ? [] : tabs}>
           {/* Tab Information */}
           <div>
             {isLoading && (
@@ -234,13 +240,14 @@ const Massif = ({
                     isLoading={isActionLoading}
                     error={restoreMutation.error}
                     onRestorePress={
+                      !isPreview &&
                       permissions.isAuth &&
                       (permissions.isAdmin || permissions.isModerator)
                         ? onRestorePress
                         : null
                     }
                     onPermanentDeletePress={
-                      permissions.isAuth && permissions.isAdmin
+                      !isPreview && permissions.isAuth && permissions.isAdmin
                         ? () => {
                             setIsDeleteConfirmationPermanent(true);
                             setIsDeleteConfirmationOpen(true);
@@ -322,28 +329,37 @@ const Massif = ({
                   descriptions={massif.descriptions ?? []}
                   entityType="massif"
                   entityId={massif.id}
-                  isEditAllowed={!massif.isDeleted}
+                  isEditAllowed={!isPreview && !massif.isDeleted}
                   isAddAllowed={!massif.descriptions?.length}
                 />
-                <StatisticsDataDashboard
-                  massifId={massifIdInt}
-                  description={formatMessage({
-                    id: 'Discover the numbers about this massif and its caves.'
-                  })}
-                />
-                {(massif.guidelines?.length > 0 || permissions.isAuth) && (
-                  <Guidelines
-                    entityType="massifs"
-                    entityId={massif.id}
-                    entityName={massif.name}
-                    guidelines={massif.guidelines}
+                {canShowStatistics && (
+                  <StatisticsDataDashboard
+                    massifId={massifIdInt}
+                    description={formatMessage({
+                      id: 'Discover the numbers about this massif and its caves.'
+                    })}
                   />
                 )}
+                {isPreview && massif.guidelines?.length > 0 && (
+                  <GuidelinesGrouped
+                    guidelines={{ massif: massif.guidelines }}
+                  />
+                )}
+                {!isPreview &&
+                  (massif.guidelines?.length > 0 || permissions.isAuth) && (
+                    <Guidelines
+                      entityType="massifs"
+                      entityId={massif.id}
+                      entityName={massif.name}
+                      guidelines={massif.guidelines}
+                    />
+                  )}
                 <AssociationSection
                   organizations={massif?.organizations}
                   entityType="massif"
                   entityId={massif.id}
                   isLoading={isLoading}
+                  isEditAllowed={!isPreview && !massif.isDeleted}
                 />
                 {massif?.networks?.length > 0 && (
                   <ScrollableContent
@@ -375,13 +391,14 @@ const Massif = ({
               <SectionStack>
                 <Documents
                   documents={massif.documents ?? []}
-                  massifId={massifId}
+                  massifId={String(massifId)}
+                  isEditAllowed={!isPreview && !massif.isDeleted}
                 />
               </SectionStack>
             )}
           </div>
           <div>
-            {massif && (
+            {!isPreview && massif && (
               <RecentChangesSection scopeType="massif" scopeId={massif.id} />
             )}
           </div>
@@ -414,7 +431,8 @@ Massif.propTypes = {
   error: PropTypes.shape({}),
   isPaused: PropTypes.bool,
   onRetry: PropTypes.func,
-  massif: MassifTypes
+  massif: MassifTypes,
+  isPreview: PropTypes.bool
 };
 
 export default Massif;

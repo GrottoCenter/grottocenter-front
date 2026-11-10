@@ -15,7 +15,7 @@ import {
 import RestoreIcon from '@mui/icons-material/RestoreFromTrashRounded';
 import DeleteIcon from '@mui/icons-material/DeleteRounded';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForeverRounded';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import {
@@ -178,7 +178,7 @@ export const DeletedCard = ({
               component={AppLink}
               nativeButton={false}
               to={redirectToUrl}
-              startIcon={<ArrowForwardIcon />}>
+              startIcon={<SubdirectoryArrowRightIcon />}>
               {formatMessage(
                 {
                   id: 'deleted-card-go-to-related-btn',

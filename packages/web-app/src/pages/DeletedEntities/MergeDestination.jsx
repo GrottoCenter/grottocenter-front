@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, Typography } from '@mui/material';
-import CallMergeIcon from '@mui/icons-material/CallMerge';
+import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import { apiGet } from '@/api/client';
 import AppLink from '@/components/common/AppLink';
 import { STALE } from '@/conf/queryClient';
@@ -25,8 +25,11 @@ const MergeDestination = ({ resource, id }) => {
     <Stack
       direction="row"
       spacing={0.75}
-      sx={{ alignItems: 'center', mt: 0.5 }}>
-      <CallMergeIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+      sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5, mt: 0.5 }}>
+      <SubdirectoryArrowRightIcon
+        fontSize="small"
+        sx={{ color: 'text.secondary' }}
+      />
       {isPending ? (
         <Typography variant="body2" color="text.secondary">
           {formatMessage({ id: 'Loading ...' })}
@@ -35,6 +38,14 @@ const MergeDestination = ({ resource, id }) => {
         <AppLink to={`${config.entityType.url}${id}`}>
           {destination ? getDeletedEntityName(destination) : `#${id}`}
         </AppLink>
+      )}
+      {(isPending || destination?.title || destination?.name) && (
+        <Typography
+          component="span"
+          variant="body2"
+          sx={{ color: 'grey.600', whiteSpace: 'nowrap' }}>
+          #{id}
+        </Typography>
       )}
     </Stack>
   );

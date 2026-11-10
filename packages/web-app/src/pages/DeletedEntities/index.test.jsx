@@ -31,6 +31,17 @@ vi.mock('@/hooks', async importOriginal => ({
 vi.mock('@/hooks/useNotification', () => ({
   useNotification: () => ({ onSuccess: vi.fn() })
 }));
+// The organization body has its own presentation tests; keep these list tests
+// focused on loading, opening and closing the shared preview dialog.
+vi.mock('@/components/appli/Organization', () => ({
+  default: ({ organization, isPreview }) => (
+    <section data-testid="organization-preview" data-read-only={isPreview}>
+      <h1>{organization.name}</h1>
+      <p>{organization.address}</p>
+      <p>{organization.customMessage}</p>
+    </section>
+  )
+}));
 
 let source;
 let hasRow;
@@ -162,6 +173,44 @@ it.each([[], ['User'], ['Leader']])(
     renderPage('organizations', groups);
     expect(await screen.findByText('Access denied')).toBeVisible();
     expect(apiGetWithRange).not.toHaveBeenCalled();
+  }
+);
+
+it.each(['entrances', 'documents'])(
+  'filters %s on the loaded page without requesting new data',
+  async resource => {
+    const config = DELETED_ENTITY_RESOURCES[resource];
+    const other = { ...source, id: 43, name: 'Retained record' };
+    if (resource === 'documents') {
+      source = { ...source, title: 'Deleted document' };
+      other.name = 'Internal legacy name';
+      other.title = 'Retained document';
+    }
+    apiGetWithRange.mockResolvedValue(
+      pageResponse(resource, [source, other], 126)
+    );
+    renderPage(resource);
+    await screen.findByTestId(`deleted-${config.kind}-42`);
+    const input = screen.getByPlaceholderText(
+      messages['deletedEntities.searchCurrentPage']
+    );
+    fireEvent.change(input, { target: { value: '  RETAINED  ' } });
+    expect(screen.queryByTestId(`deleted-${config.kind}-42`)).toBeNull();
+    expect(screen.getByTestId(`deleted-${config.kind}-43`)).toBeVisible();
+    expect(screen.getByTestId('deleted-entities-count')).toHaveTextContent(
+      '126 results'
+    );
+    expect(screen.getByText('1–50 / 126')).toBeVisible();
+    fireEvent.change(input, { target: { value: '#42' } });
+    expect(screen.getByTestId(`deleted-${config.kind}-42`)).toBeVisible();
+    expect(screen.queryByTestId(`deleted-${config.kind}-43`)).toBeNull();
+    fireEvent.change(input, { target: { value: 'Missing record' } });
+    expect(screen.getByRole('alert')).toHaveTextContent(messages['No results']);
+    expect(screen.queryByText(messages['deletedEntities.empty'])).toBeNull();
+    fireEvent.change(input, { target: { value: '' } });
+    expect(screen.getByTestId(`deleted-${config.kind}-42`)).toBeVisible();
+    expect(screen.getByTestId(`deleted-${config.kind}-43`)).toBeVisible();
+    expect(apiGetWithRange).toHaveBeenCalledTimes(1);
   }
 );
 
@@ -477,6 +526,7 @@ it('uses organization type icons, muted IDs and a named merge destination', asyn
   expect(
     await screen.findByRole('link', { name: 'Destination club' })
   ).toHaveAttribute('href', '/ui/organizations/43');
+  expect(row.getByText('#43')).toBeVisible();
   expect(screen.queryByRole('heading', { name: 'Organizations' })).toBeNull();
 });
 
@@ -486,15 +536,14 @@ it.each([
   ['Book', 'MenuBookIcon']
 ])(
   'exposes the %s document type through an accessible icon',
-  async (type, icon) => {
+  async (type, iconTestId) => {
     source = { ...source, type, title: 'Deleted document' };
     renderPage('documents');
     const row = within(await screen.findByTestId('deleted-document-42'));
-    expect(row.getByTestId(icon)).toBeVisible();
-    expect(row.getByRole('img', { name: type })).toHaveAttribute(
-      'tabindex',
-      '0'
-    );
+    expect(row.getByTestId(iconTestId)).toBeVisible();
+    const icon = row.getByRole('img', { name: type });
+    expect(icon).toHaveAttribute('tabindex', '0');
+    expect(icon.querySelector('title')).toBeNull();
     expect(row.queryByText(/Français|English/)).toBeNull();
   }
 );
@@ -534,7 +583,7 @@ it('opens and closes the preview with additional details', async () => {
   apiGet.mockResolvedValue({
     ...source,
     address: 'Club address',
-    description: 'Club details'
+    customMessage: 'Club details'
   });
   renderPage();
   fireEvent.click(
@@ -553,16 +602,17 @@ it('opens and closes the preview with additional details', async () => {
 it('loads the selected entity details in the preview window', async () => {
   apiGet.mockResolvedValue({
     ...source,
-    description: 'Full archived description'
+    customMessage: 'Full archived description'
   });
   renderPage();
   fireEvent.click(await screen.findByRole('button', { name: 'Preview' }));
   const dialog = within(screen.getByRole('dialog'));
   expect(await dialog.findByText('Full archived description')).toBeVisible();
-  expect(dialog.getByRole('link', { name: 'Details' })).toHaveAttribute(
-    'href',
-    '/ui/organizations/42'
+  expect(dialog.getByTestId('organization-preview')).toHaveAttribute(
+    'data-read-only',
+    'true'
   );
+  expect(dialog.queryByRole('link', { name: 'Details' })).toBeNull();
   expect(apiGet).toHaveBeenCalledWith(
     `${DELETED_ENTITY_RESOURCES.organizations.collectionUrl}/42`,
     expect.objectContaining({ signal: expect.any(AbortSignal) })

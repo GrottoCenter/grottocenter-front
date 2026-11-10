@@ -20,9 +20,11 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import AppLink from '@/components/common/AppLink';
 import CustomIcon from '@/components/common/CustomIcon';
 import FormSubmissionError from '@/components/common/FormSubmissionError';
+import SearchInput from '@/components/common/SearchInput';
 import PageContainer from '@/components/common/Layouts/PageContainer';
 import PageHeader from '@/components/common/Layouts/PageHeader';
 import PageTabs from '@/components/common/Layouts/PageTabs';
+import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
 import {
   useDeletedEntities,
   useDeletedEntityCounts,
@@ -57,6 +59,7 @@ const DeletedEntitiesContent = () => {
   const limit = [20, 50, 100].includes(requestedLimit) ? requestedLimit : 50;
   const [selected, setSelected] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [search, setSearch] = useState('');
   const counts = useDeletedEntityCounts();
   const query = useDeletedEntities({
     entityType,
@@ -64,6 +67,12 @@ const DeletedEntitiesContent = () => {
     limit
   });
   const entities = query.data?.entities ?? [];
+  const searchTerm = search.trim().toLowerCase();
+  const visibleEntities = entities.filter(
+    entity =>
+      getDeletedEntityName(entity).toLowerCase().includes(searchTerm) ||
+      `#${entity.id}`.includes(searchTerm)
+  );
   const isPastEnd =
     !!query.data &&
     !query.isPlaceholderData &&
@@ -127,7 +136,13 @@ const DeletedEntitiesContent = () => {
     icon: <CustomIcon type={resource.entityType.iconType} size={20} alt="" />
   }));
   const content = (
-    <Box>
+    <ScrollableContent collapsible={false}>
+      <SearchInput
+        value={search}
+        onChange={setSearch}
+        placeholder={formatMessage({ id: 'deletedEntities.searchCurrentPage' })}
+        sx={{ mb: 1.5 }}
+      />
       {totalCount != null && (
         <Typography
           aria-live="polite"
@@ -164,8 +179,14 @@ const DeletedEntitiesContent = () => {
             {formatMessage({ id: 'deletedEntities.empty' })}
           </Alert>
         )}
+      {query.isSuccess &&
+        !query.isFetching &&
+        entities.length > 0 &&
+        visibleEntities.length === 0 && (
+          <Alert severity="info">{formatMessage({ id: 'No results' })}</Alert>
+        )}
       <Stack component="ul" spacing={1} sx={{ listStyle: 'none', m: 0, p: 0 }}>
-        {entities.map(entity => (
+        {visibleEntities.map(entity => (
           <Card
             component="li"
             variant="outlined"
@@ -185,6 +206,7 @@ const DeletedEntitiesContent = () => {
               rowGap: 1,
               columnGap: { xs: 1, md: 2 },
               p: 1.5,
+              borderColor: 'primary.main',
               minWidth: 0
             }}>
             <Box
@@ -259,12 +281,16 @@ const DeletedEntitiesContent = () => {
                 alignItems: 'center',
                 justifyContent: 'flex-end',
                 flexShrink: 0,
-                borderTop: { xs: 1, md: 0 },
-                borderColor: 'divider',
-                pt: { xs: 1, md: 0 }
+                '& > .MuiButton-root': { flex: { xs: 1, md: '0 0 auto' } },
+                '& .MuiButton-startIcon': {
+                  ml: { xs: 0, md: -0.25 },
+                  mr: { xs: 0, md: 1 }
+                }
               }}>
               <Button
                 startIcon={<RestoreIcon />}
+                aria-label={formatMessage({ id: 'Restore' })}
+                color="secondary"
                 variant="outlined"
                 size="small"
                 disabled={
@@ -277,31 +303,36 @@ const DeletedEntitiesContent = () => {
                     action: 'restore'
                   })
                 }>
-                {formatMessage({ id: 'Restore' })}
+                <Box
+                  component="span"
+                  sx={{ display: { xs: 'none', md: 'inline' } }}>
+                  {formatMessage({ id: 'Restore' })}
+                </Box>
               </Button>
               {permissions.canPermanentlyDeleteEntities && (
-                <Tooltip title={formatMessage({ id: 'Permanently delete' })}>
-                  <span>
-                    <IconButton
-                      data-testid={`permanently-delete-${config.kind}-${entity.id}`}
-                      aria-label={formatMessage({ id: 'Permanently delete' })}
-                      color="error"
-                      disabled={
-                        !isOnline ||
-                        !!activeSelection ||
-                        query.isPlaceholderData
-                      }
-                      onClick={() =>
-                        setSelected({
-                          resource: entityType,
-                          id: entity.id,
-                          action: 'delete'
-                        })
-                      }>
-                      <DeleteForeverIcon />
-                    </IconButton>
-                  </span>
-                </Tooltip>
+                <Button
+                  data-testid={`permanently-delete-${config.kind}-${entity.id}`}
+                  aria-label={formatMessage({ id: 'Permanently delete' })}
+                  color="error"
+                  variant="contained"
+                  size="small"
+                  startIcon={<DeleteForeverIcon />}
+                  disabled={
+                    !isOnline || !!activeSelection || query.isPlaceholderData
+                  }
+                  onClick={() =>
+                    setSelected({
+                      resource: entityType,
+                      id: entity.id,
+                      action: 'delete'
+                    })
+                  }>
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: 'none', md: 'inline' } }}>
+                    {formatMessage({ id: 'Permanently delete' })}
+                  </Box>
+                </Button>
               )}
             </Stack>
           </Card>
@@ -328,7 +359,7 @@ const DeletedEntitiesContent = () => {
         onRowsPerPageChange={event => changePage(0, Number(event.target.value))}
         sx={{ '& .MuiTablePagination-toolbar': { flexWrap: 'wrap', px: 0 } }}
       />
-    </Box>
+    </ScrollableContent>
   );
   return (
     <PageContainer>
@@ -342,6 +373,7 @@ const DeletedEntitiesContent = () => {
         onChange={nextType => {
           setSelected(null);
           setPreview(null);
+          setSearch('');
           setSearchParams(
             previous => {
               previous.set('type', nextType);
