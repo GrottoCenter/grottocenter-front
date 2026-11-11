@@ -12,7 +12,6 @@ it('passes the map referrer policy to the browser without credentials', async ()
   await fetchPdfResource(
     'https://tile.openstreetmap.org/0/0/0.png',
     undefined,
-    undefined,
     {
       referrerPolicy: 'strict-origin-when-cross-origin'
     }
@@ -126,7 +125,7 @@ it('stops a response exceeding the remaining budget without Content-Length', asy
     fetchPdfResource(
       'https://example.org/file.pdf',
       new AbortController().signal,
-      3
+      { maxBytes: 3 }
     )
   ).rejects.toThrow('pdf.resourceLimit');
   expect(cancel).toHaveBeenCalledOnce();
@@ -147,7 +146,7 @@ it('rejects an oversized advertised body before reading it', async () => {
     fetchPdfResource(
       'https://example.org/file.pdf',
       new AbortController().signal,
-      3
+      { maxBytes: 3 }
     )
   ).rejects.toThrow('pdf.resourceLimit');
   expect(cancel).toHaveBeenCalledOnce();
@@ -161,7 +160,7 @@ it('returns complete bytes at the exact resource limit', async () => {
   const result = await fetchPdfResource(
     'https://example.org/file.pdf',
     new AbortController().signal,
-    3
+    { maxBytes: 3 }
   );
   expect(new Uint8Array(result)).toEqual(new Uint8Array([1, 2, 3]));
 });

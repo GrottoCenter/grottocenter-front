@@ -7,8 +7,7 @@ import { PDF_LIMITS, checkPdfLimit } from './limits';
 export const fetchPdfResource = async (
   url,
   signal,
-  maxBytes = PDF_LIMITS.resourceBytes,
-  { referrerPolicy } = {}
+  { maxBytes = PDF_LIMITS.resourceBytes, referrerPolicy } = {}
 ) => {
   const controller = new AbortController();
   const requestSignal = signal
@@ -134,7 +133,7 @@ export const createPdfMap = async (coordinates, zoom, signal, colors) => {
         .replace('{y}', y);
       jobs.push(
         // OSM requires a Referer even if the page uses a stricter default policy.
-        fetchPdfResource(url, signal, undefined, {
+        fetchPdfResource(url, signal, {
           referrerPolicy: layer.referrerPolicy
         }).then(async bytes => {
           const image = await createImageBitmap(new Blob([bytes]));
