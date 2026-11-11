@@ -237,13 +237,16 @@ describe('document search validation scope', () => {
 
       const labels = screen.getAllByText('Awaiting validation');
       expect(labels).toHaveLength(1);
-      const chip = labels[0].parentElement;
+      const titleSelector = view === 'table' ? 'td' : 'h6';
+      const chip = labels[0].closest('.MuiChip-root');
       expect(chip.tagName).toBe('SPAN');
-      expect(chip.parentElement).toHaveTextContent('Pending document');
+      expect(labels[0].closest(titleSelector)).toHaveTextContent(
+        'Pending document'
+      );
       ['Validated document', 'Legacy document'].forEach(title => {
-        expect(screen.getByText(title).parentElement).not.toHaveTextContent(
-          'Awaiting validation'
-        );
+        expect(
+          screen.getByText(title).closest(titleSelector)
+        ).not.toHaveTextContent('Awaiting validation');
       });
     }
   );
@@ -261,8 +264,6 @@ describe('document search validation scope', () => {
     submitSearch();
 
     const label = await screen.findByText('Awaiting validation');
-    expect(label.parentElement.parentElement).toHaveTextContent(
-      '-Awaiting validation'
-    );
+    expect(label.closest('td')).toHaveTextContent('-Awaiting validation');
   });
 });
