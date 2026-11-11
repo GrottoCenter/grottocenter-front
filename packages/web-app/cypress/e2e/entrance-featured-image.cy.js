@@ -129,6 +129,12 @@ const visitMap = () => {
   cy.wait('@markers', { requestTimeout: 20000 });
 };
 
+const formCoordinate = label =>
+  cy
+    .contains('label', label)
+    .invoke('attr', 'for')
+    .then(id => cy.get('input').filter((_index, input) => input.id === id));
+
 const recordVisiblePopupLayouts = () => {
   const frames = [];
   let stop;
@@ -777,6 +783,114 @@ describe('Entrance featured image', () => {
     cy.get('[data-testid="entrance-popup"]').should('not.exist');
     cy.get('@thumbnail.all').should('have.length', 0);
     cy.get('@entrance.all').should('have.length', 0);
+  });
+
+  it('keeps nearby entrance popups visible and closable in the creation form', () => {
+    cy.viewport(1280, 900);
+    mockMap();
+    cy.loginAs();
+    visit('/entity/add/entrance');
+    cy.get('[data-testid="entrance-precision"]', { timeout: 20000 }).should(
+      'be.visible'
+    );
+    formCoordinate('Latitude').clear().type('45.5').blur();
+    formCoordinate('Longitude').clear().type('5.5').blur();
+    cy.wait('@markers', { requestTimeout: 20000 });
+    cy.get('.leaflet-container').scrollIntoView({
+      offset: { top: -100, left: 0 }
+    });
+    cy.get('.leaflet-map-pane').should('not.have.class', 'leaflet-pan-anim');
+    nextPaint();
+    cy.get('.leaflet-container').then(([container]) => {
+      const bounds = container.getBoundingClientRect();
+      cy.get('.leaflet-overlay-pane canvas').trigger('click', {
+        clientX: bounds.left + bounds.width / 2,
+        clientY: bounds.top + bounds.height / 2,
+        scrollBehavior: false
+      });
+    });
+    cy.get('[data-testid="entrance-popup"]')
+      .should('be.visible')
+      .and('contain.text', entrance.name)
+      .closest('.leaflet-popup')
+      .should('not.have.attr', 'aria-busy');
+    cy.get('[aria-label="Close popup"]').click({ scrollBehavior: false });
+    cy.get('[data-testid="entrance-popup"]').should('not.exist');
+    cy.get('@featuredImage.all').should('have.length', 0);
+  });
+
+  it('keeps entrance search popups visible in the form map without an image manager', () => {
+    cy.viewport(1280, 900);
+    cy.intercept('https://nominatim.openstreetmap.org/**', { body: [] });
+    cy.intercept(
+      { method: 'POST', pathname: '/api/v1/advanced-search' },
+      request =>
+        request.reply({
+          body: {
+            results: request.body.entity === 'entrances' ? [entrance] : []
+          }
+        })
+    );
+    cy.loginAs();
+    visit('/entrances/1/edit');
+    cy.get('.leaflet-container', { timeout: 20000 }).scrollIntoView({
+      offset: { top: -100, left: 0 }
+    });
+    cy.get('.leaflet-container')
+      .find('input[role="combobox"]')
+      .type('Featured');
+    cy.contains('[role="option"]', entrance.name).click();
+    cy.get('[data-testid="entrance-popup"]')
+      .should('be.visible')
+      .and('contain.text', entrance.name)
+      .closest('.leaflet-popup')
+      .should('not.have.attr', 'aria-busy');
+    cy.get('[aria-label="Close popup"]').click({ scrollBehavior: false });
+    cy.get('[data-testid="entrance-popup"]').should('not.exist');
+    cy.get('@featuredImage.all').should('have.length', 0);
+  });
+
+  [1280, 390].forEach(width => {
+    it(`shows text at the deadline and adds a slow photo with one later pan at width ${width}`, () => {
+      cy.viewport(width, width === 390 ? 844 : 900);
+      // The combined request latency exceeds the text deadline. This isolates
+      // late-loading behaviour; it is not a complete Slow 4G throughput profile.
+      cy.intercept(
+        { method: 'GET', pathname: '/api/v1/entrances/1/featured-image' },
+        { delay: 900, body: featuredImage }
+      );
+      cy.intercept('https://images.example.org/thumbnails/**', {
+        delay: 2400,
+        headers: { 'content-type': 'image/svg+xml' },
+        body: imageBody
+      });
+      mockMap();
+      visit('/map/45.4972,5.5,16');
+      cy.wait('@markers', { requestTimeout: 20000 });
+      cy.window().then(win =>
+        cy.spy(win.L.Map.prototype, 'panBy').as('popupPan')
+      );
+      clickEntranceMarker();
+      cy.get('[data-testid="entrance-popup"]')
+        .should('be.visible')
+        .closest('.leaflet-popup')
+        .should('not.have.attr', 'aria-busy');
+      cy.get('[data-testid="entrance-popup-photo"]').should('not.be.visible');
+      cy.get('[data-testid="entrance-popup"] .map-popup-photo').should(
+        'not.exist'
+      );
+      cy.get('.leaflet-map-pane').should('not.have.class', 'leaflet-pan-anim');
+      let textPanCount;
+      cy.get('@popupPan').then(pan => {
+        textPanCount = pan.callCount;
+        expect(textPanCount).to.be.at.most(1);
+      });
+      expectPopupLayout(width === 390 ? 'top' : 'side');
+      cy.get('.leaflet-map-pane').should('not.have.class', 'leaflet-pan-anim');
+      cy.get('@popupPan').should(pan => {
+        expect(pan.callCount).to.equal(textPanCount + 1);
+      });
+    });
   });
 
   [1280, 390].forEach(width => {

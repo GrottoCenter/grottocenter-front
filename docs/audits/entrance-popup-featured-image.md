@@ -112,3 +112,35 @@ measure real API/database latency, compression, mobile networks or production
 performance. The API PR contains separate fixture measurements of SQL work and
 compressed response sizes. The request count on a cache miss and the downloaded
 image are unchanged.
+
+### Popup opening review (2026-11-11)
+
+Popup preparation is opt-in per Leaflet map. `EntrancePopupImages` registers its
+map while mounted; the shared popup factory receives that map explicitly and
+leaves other maps alone. The raw entrance-form map therefore keeps its nearby
+entrance and search popups visible and text-only, without image requests. No
+private Leaflet map reference is needed.
+
+The two-second deadline makes the text available without abandoning a slow
+photo. Metadata and the eager image can finish afterward. The image stays hidden
+and outside the popup's photo layout until decoding completes, then upgrades the
+text presentation once. That upgrade may require one additional pan. If a pan is
+already running, Leaflet measures the new content immediately and postpones only
+the next pan until `moveend`. Closing a popup still discards late callbacks.
+
+Regression scenarios include metadata delayed by 900 ms followed by a thumbnail
+delayed by 2,400 ms, on desktop and mobile. This tests latency beyond the text
+deadline; it is not a complete Slow 4G throughput profile. Tests also cover the
+actual creation-form nearby markers and the edit-form entrance search.
+
+Validation: full `yarn.cmd lint` passed without errors or warnings. All 32 tests
+in the popup, marker, navigation-target and geocoding Vitest suites passed; the
+final popup-only rerun passed its 19 tests. Six affected Cypress scenarios passed
+in focused runs: both form-map paths, late photos at 1280 and 390 px, and the
+existing one-pan/cached-reopening cases at both widths. The complete featured
+image Cypress suite was not rerun in this review iteration.
+
+The deployed endpoint was checked again for entrances 1 and 120177: both still
+return HTTP 200 with `featuredFile: null`. The live selected-photo browser check
+remains pending; fixture-based image tests do not replace it. No production
+content was modified to manufacture that scenario.

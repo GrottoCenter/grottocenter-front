@@ -123,7 +123,7 @@ const PopupTargetHandler = ({ popupTarget }) => {
       .then(result => {
         if (controller.signal.aborted || !result) return;
         map.openPopup(
-          createMapPopup(renderPopup(result.popup)).setLatLng([
+          createMapPopup(renderPopup(result.popup), map).setLatLng([
             result.lat,
             result.lng
           ])

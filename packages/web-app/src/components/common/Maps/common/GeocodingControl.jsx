@@ -203,7 +203,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
       else if (result.resultType === 'massif')
         content = renderPopup(<MassifPopup massif={result} />);
       else content = renderPopup(<OrganizationPopup organization={result} />);
-      map.openPopup(createMapPopup(content).setLatLng([lat, lng]));
+      map.openPopup(createMapPopup(content, map).setLatLng([lat, lng]));
     };
     map.once('moveend', onMoveEnd);
     popupCleanupRef.current = () => map.off('moveend', onMoveEnd);

@@ -7,6 +7,7 @@ import { useEntranceFeaturedImage } from '@/hooks';
 import FileImage from '@/components/common/DocumentsList/FileImage';
 import AppLink from '@/components/common/AppLink';
 import { FilePropTypes } from '@/types/document.type';
+import { registerPopupImageMap } from '@/utils/mapPopup';
 
 const pointPropType = PropTypes.oneOfType([
   PropTypes.arrayOf(PropTypes.number),
@@ -16,8 +17,8 @@ const pointPropType = PropTypes.oneOfType([
   })
 ]);
 
-// A slow metadata/image request must not leave the text inaccessible. Once this
-// deadline expires, keep the text-only layout until the next opening.
+// Reveal text by this deadline, but keep the eager image loading off-layout so
+// a slow connection can still complete one later upgrade to the photo layout.
 const PREPARATION_TIMEOUT = 2000;
 
 const EntrancePopupContent = ({
@@ -28,8 +29,7 @@ const EntrancePopupContent = ({
   popup
 }) => {
   const map = useMap();
-  // Freeze the first completed presentation for this opening. Late metadata or
-  // decoding must not resize a popup that has already fallen back to text.
+  // A text fallback can upgrade once; a completed photo layout stays stable.
   const [presentation, setPresentation] = useState(null);
 
   useEffect(() => {
@@ -37,7 +37,8 @@ const EntrancePopupContent = ({
     const timeout = setTimeout(
       () =>
         setPresentation(
-          previous => previous ?? { file: null, imageSize: null }
+          previous =>
+            previous ?? { file: null, imageSize: null, isFallback: true }
         ),
       PREPARATION_TIMEOUT
     );
@@ -49,8 +50,10 @@ const EntrancePopupContent = ({
       setPresentation({ file: null, imageSize: null });
   }, [file, isPending, presentation]);
 
-  const displayedFile = presentation ? presentation.file : file;
+  const isWaitingForPhoto = !presentation || presentation.isFallback;
+  const displayedFile = isWaitingForPhoto ? file : presentation.file;
   const displayedSize = presentation?.imageSize;
+  const hasPhoto = Boolean(presentation?.file);
 
   // Size against the map itself, including embedded maps and short screens.
   // Only enable autopan after metadata, image decoding and layout have settled.
@@ -65,17 +68,19 @@ const EntrancePopupContent = ({
     const originalPaddingBottomRight = popup.options.autoPanPaddingBottomRight;
     const updatePopup = () => {
       if (!popup.isOpen()) return;
-      // leaflet-rotate skips autopan during an existing map movement. Keep the
-      // popup hidden until that movement ends, then reveal its final layout.
+      // Measure immediately, including a late photo upgrade. leaflet-rotate
+      // skips autopan during an existing pan, so defer only the next movement.
       if (map.getPane('mapPane').classList.contains('leaflet-pan-anim')) {
+        setOptions(popup, { autoPan: false });
+        popup.update();
         map.off('moveend', updatePopup);
         map.once('moveend', updatePopup);
       } else {
         setOptions(popup, { autoPan: true });
         popup.update();
-        delete element.dataset.entrancePopupPreparing;
-        element.removeAttribute('aria-busy');
       }
+      delete element.dataset.entrancePopupPreparing;
+      element.removeAttribute('aria-busy');
     };
     const updateLayout = () => {
       if (!popup.isOpen()) return;
@@ -154,16 +159,16 @@ const EntrancePopupContent = ({
     const finish = () => {
       if (!popup.isOpen() || !image.isConnected) return;
       if (!image.naturalWidth || !image.naturalHeight) return;
-      setPresentation(
-        previous =>
-          previous ?? {
-            file: displayedFile,
-            imageSize: {
-              width: image.naturalWidth,
-              height: image.naturalHeight
-            }
+      setPresentation(previous => {
+        if (previous && !previous.isFallback) return previous;
+        return {
+          file: displayedFile,
+          imageSize: {
+            width: image.naturalWidth,
+            height: image.naturalHeight
           }
-      );
+        };
+      });
     };
     // decode() also covers images already cached by the browser. A decoding
     // failure must not prevent the normal load/error fallback from completing.
@@ -178,7 +183,8 @@ const EntrancePopupContent = ({
   return (
     <AppLink
       to={`/ui/entrances/${entranceId}`}
-      className="map-popup-photo"
+      className={hasPhoto ? 'map-popup-photo' : undefined}
+      hidden={!hasPhoto}
       data-testid="entrance-popup-photo">
       <FileImage
         key={displayedFile.id}
@@ -227,8 +233,10 @@ EntrancePopupContent.propTypes = {
 // A single map listener covers marker, search and navigation-target popups.
 // React portals keep image error handlers alive inside Leaflet's static HTML.
 const EntrancePopupImages = () => {
+  const map = useMap();
   const [active, setActive] = useState(null);
   const originalsRef = useRef(new Map());
+  useEffect(() => registerPopupImageMap(map), [map]);
   useEffect(() => {
     const originals = originalsRef.current;
     return () => {

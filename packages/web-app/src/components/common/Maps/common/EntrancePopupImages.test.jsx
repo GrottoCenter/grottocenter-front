@@ -63,7 +63,8 @@ const mount = () =>
   );
 const open = id => {
   const popup = createMapPopup(
-    `<div class="map-popup-entrance" data-testid="entrance-popup"><div data-entrance-popup-image="${id}"></div><div class="map-popup-details"><a href="/ui/entrances/${id}">Entrance ${id}</a></div></div>`
+    `<div class="map-popup-entrance" data-testid="entrance-popup"><div data-entrance-popup-image="${id}"></div><div class="map-popup-details"><a href="/ui/entrances/${id}">Entrance ${id}</a></div></div>`,
+    state.map
   ).setLatLng([45, 6]);
   act(() => popup.openOn(state.map));
   return popup;
@@ -72,12 +73,32 @@ const open = id => {
 it('does not prepare an unrelated popup whose text mentions the image attribute', () => {
   mount();
   const content = '<p>Organization data-entrance-popup-image=1</p>';
-  const popup = createMapPopup(content).setLatLng([45, 6]);
+  const popup = createMapPopup(content, state.map).setLatLng([45, 6]);
   act(() => popup.openOn(state.map));
   expect(popup.options.autoPan).toBe(true);
   expect(popup.getElement()).not.toHaveAttribute('aria-busy');
   expect(popup.getContent()).toBe(content);
   expect(apiGet).not.toHaveBeenCalled();
+});
+
+it('leaves entrance popups usable on a map without an image manager', () => {
+  const popup = open(1);
+  expect(popup.options.autoPan).toBe(true);
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(popup.getElement()).not.toHaveAttribute(
+    'data-entrance-popup-preparing'
+  );
+  expect(screen.getByText('Entrance 1')).toBeVisible();
+  expect(apiGet).not.toHaveBeenCalled();
+});
+
+it('unregisters the map when its image manager unmounts', () => {
+  const { unmount } = mount();
+  unmount();
+  const popup = open(1);
+  expect(popup.options.autoPan).toBe(true);
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(screen.getByText('Entrance 1')).toBeVisible();
 });
 
 it('keeps autopan disabled until the final image is decoded, then reveals once', async () => {
@@ -116,7 +137,7 @@ it('keeps autopan disabled until the final image is decoded, then reveals once',
   expect(popup.getElement()).toHaveAttribute('aria-busy', 'true');
 });
 
-it('falls back to text after the deadline and ignores late image metadata', async () => {
+it('reveals text at the deadline and upgrades once when late metadata and image arrive', async () => {
   vi.useFakeTimers();
   let resolveMetadata;
   apiGet.mockImplementation(
@@ -137,12 +158,22 @@ it('falls back to text after the deadline and ignores late image metadata', asyn
     resolveMetadata({ id: 1, name: 'Late', featuredFile: file });
     await vi.advanceTimersByTimeAsync(1);
   });
-  expect(screen.queryByAltText('Late')).toBeNull();
+  const image = screen.getByAltText('Late');
+  expect(image).not.toBeVisible();
   expect(screen.getByText('Entrance 1')).toBeVisible();
   expect(update).not.toHaveBeenCalled();
+  Object.defineProperties(image, {
+    naturalWidth: { value: 640 },
+    naturalHeight: { value: 320 }
+  });
+  fireEvent.load(image);
+  expect(image).toBeVisible();
+  expect(update).toHaveBeenCalledTimes(1);
+  fireEvent.load(image);
+  expect(update).toHaveBeenCalledTimes(1);
 });
 
-it('keeps the text fallback when image decoding finishes after the deadline', async () => {
+it('keeps loading off-layout after the deadline and upgrades when decoding finishes', async () => {
   const { queryClient } = mount();
   queryClient.setQueryData(entranceKeys.detail(1), {
     id: 1,
@@ -163,12 +194,13 @@ it('keeps the text fallback when image decoding finishes after the deadline', as
   });
   fireEvent.load(image);
   await act(async () => vi.advanceTimersByTimeAsync(2000));
-  expect(screen.queryByAltText('Cached')).toBeNull();
+  expect(image).not.toBeVisible();
+  expect(image.closest('a')).not.toHaveClass('map-popup-photo');
   expect(popup.getElement()).not.toHaveAttribute('aria-busy');
   const update = vi.spyOn(popup, 'update');
   await act(async () => resolveDecode());
-  expect(update).not.toHaveBeenCalled();
-  expect(screen.queryByAltText('Cached')).toBeNull();
+  expect(update).toHaveBeenCalledTimes(1);
+  expect(image).toBeVisible();
 });
 
 it('closes a preparing popup when its manager unmounts', () => {
@@ -258,7 +290,7 @@ it.each([
   );
 });
 
-it('waits for an ongoing pan before measuring a loaded landscape image', async () => {
+it('measures during an ongoing pan and waits for moveend before enabling autopan', async () => {
   apiGet.mockResolvedValue({ id: 1, name: 'Landscape', featuredFile: file });
   mount();
   const popup = open(1);
@@ -271,12 +303,16 @@ it('waits for an ongoing pan before measuring a loaded landscape image', async (
     naturalHeight: { value: 320 }
   });
   fireEvent.load(image);
-  expect(update).not.toHaveBeenCalled();
+  expect(update).toHaveBeenCalledTimes(1);
+  expect(popup.options.autoPan).toBe(false);
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  update.mockClear();
   act(() => {
     pane.classList.remove('leaflet-pan-anim');
     state.map.fire('moveend');
   });
   expect(update).toHaveBeenCalledTimes(1);
+  expect(popup.options.autoPan).toBe(true);
   expect(image).toBeVisible();
 });
 
@@ -354,7 +390,12 @@ it('ignores late responses after switching or closing popups', async () => {
   mount();
   open(1);
   const second = open(2);
-  await screen.findByAltText('Second');
+  const image = await screen.findByAltText('Second');
+  Object.defineProperties(image, {
+    naturalWidth: { value: 320 },
+    naturalHeight: { value: 640 }
+  });
+  fireEvent.load(image);
   await act(async () =>
     resolveFirst({ id: 1, name: 'First', featuredFile: file })
   );

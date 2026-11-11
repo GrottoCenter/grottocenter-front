@@ -47,7 +47,7 @@ const useMarkers = ({
       // Lazy popup: content is rendered only when the popup is opened
       if (popupContent) {
         markerEl.bindPopup(
-          createMapPopup(() => renderPopup(popupContent(marker)))
+          createMapPopup(() => renderPopup(popupContent(marker)), map)
         );
       }
 
@@ -82,6 +82,7 @@ const useMarkers = ({
       return markerEl;
     },
     [
+      map,
       icon,
       circleMarkerStyle,
       popupContent,
