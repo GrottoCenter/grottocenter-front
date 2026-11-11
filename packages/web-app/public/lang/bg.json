@@ -2005,6 +2005,7 @@
   "Network name": "Пещерна система",
   "Network properties": "име на Пещерна система",
   "network_count": "брой мрежи",
+  "network_count_short": "{count, plural, one {мрежа} other {мрежи}}",
   "network.definition": "В Grottocenter пещерната мрежа е пещера с <strong>поне два входа</strong>, свързани чрез проходи, чиято непрекъснатост е <strong>установена чрез изследване от хора</strong>.",
   "network.definition.exclusions": "Хидроложка връзка, визуален или гласов контакт или предполагаема връзка не са достатъчни, за да се причислят тези входове към една и съща пещерна мрежа.",
   "network.definition.title": "Какво е пещерна мрежа?",

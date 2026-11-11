@@ -2005,6 +2005,7 @@
   "Network name": "ネットワーク",
   "Network properties": "財産",
   "network_count": "ネットワーク数",
+  "network_count_short": "ネットワーク",
   "network.definition": "Grottocenterでは、ネットワークとは、<strong>少なくとも2つの入口</strong>を持ち、それらを結ぶ通路の連続性が<strong>人による探検で確認された</strong>洞窟を指します。",
   "network.definition.exclusions": "水の流れによるつながり、目視や音声による接触、または推測されるつながりだけでは、これらの入口を同じネットワークに関連付けることはできません。",
   "network.definition.title": "洞窟ネットワークとは？",

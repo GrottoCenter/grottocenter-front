@@ -2005,6 +2005,7 @@
   "Network name": "Nome della rete",
   "Network properties": "Proprietà della rete",
   "network_count": "numero di reti",
+  "network_count_short": "{count, plural, one {rete} other {reti}}",
   "network.definition": "In Grottocenter, una rete è una cavità con <strong>almeno due ingressi</strong> collegati da passaggi la cui continuità è stata <strong>accertata mediante l’esplorazione umana</strong>.",
   "network.definition.exclusions": "Un collegamento idrologico, un contatto visivo o sonoro, o un collegamento presunto non sono sufficienti per associare questi ingressi alla stessa rete.",
   "network.definition.title": "Che cos’è una rete?",

@@ -2005,6 +2005,7 @@
   "Network name": "Nom du réseau",
   "Network properties": "Propriétés du réseau",
   "network_count": "{count, plural, one {réseau (cavité avec plus d'une entrée)} other {réseaux (cavité avec plus d'une entrée)}}",
+  "network_count_short": "{count, plural, one {réseau} other {réseaux}}",
   "network.definition": "Dans Grottocenter, un réseau est une cavité comportant <strong>au moins deux entrées</strong> reliées par des passages dont la continuité a été <strong>établie par une exploration humaine</strong>.",
   "network.definition.exclusions": "Une liaison hydrologique, un contact visuel ou sonore, ou une connexion supposée ne suffisent pas à rattacher ces entrées au même réseau.",
   "network.definition.title": "Qu’est-ce qu’un réseau ?",

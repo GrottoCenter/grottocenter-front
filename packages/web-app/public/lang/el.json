@@ -2005,6 +2005,7 @@
   "Network name": "Όνομα δικτύου",
   "Network properties": "Ιδιότητες δικτύου",
   "network_count": "αριθμός δικτύων",
+  "network_count_short": "{count, plural, one {δίκτυο} other {δίκτυα}}",
   "network.definition": "Στο Grottocenter, ένα δίκτυο είναι ένα σπήλαιο με <strong>τουλάχιστον δύο εισόδους</strong> που συνδέονται με περάσματα των οποίων η συνέχεια έχει <strong>επιβεβαιωθεί με ανθρώπινη εξερεύνηση</strong>.",
   "network.definition.exclusions": "Μια υδρολογική σύνδεση, η οπτική ή ηχητική επαφή ή μια υποτιθέμενη σύνδεση δεν αρκούν για να ενταχθούν αυτές οι είσοδοι στο ίδιο δίκτυο.",
   "network.definition.title": "Τι είναι ένα δίκτυο;",

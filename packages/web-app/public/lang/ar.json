@@ -2005,6 +2005,7 @@
   "Network name": "اسم الشبكة",
   "Network properties": "خصائص الشبكة",
   "network_count": "عدد الشبكات",
+  "network_count_short": "{count, plural, zero {شبكات} one {شبكة} two {شبكتان} few {شبكات} many {شبكة} other {شبكة}}",
   "network.definition": "في Grottocenter، الشبكة هي كهف له <strong>مدخلان على الأقل</strong> تربط بينهما ممرات ثبت اتصالها <strong>عن طريق الاستكشاف البشري</strong>.",
   "network.definition.exclusions": "لا يكفي وجود اتصال هيدرولوجي أو تواصل بصري أو صوتي أو اتصال مفترض لإلحاق هذه المداخل بالشبكة نفسها.",
   "network.definition.title": "ما هي الشبكة؟",

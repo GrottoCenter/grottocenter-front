@@ -2005,6 +2005,7 @@
   "Network name": "Systemname",
   "Network properties": "Systemeigenschaften",
   "network_count": "Netzwerkanzahl",
+  "network_count_short": "{count, plural, one {Netzwerk} other {Netzwerke}}",
   "network.definition": "In Grottocenter ist ein Höhlennetz eine Höhle mit <strong>mindestens zwei Eingängen</strong>, die durch Passagen verbunden sind, deren Durchgängigkeit <strong>durch menschliche Erkundung nachgewiesen</strong> wurde.",
   "network.definition.exclusions": "Eine hydrologische Verbindung, Sicht- oder Rufkontakt oder eine vermutete Verbindung reichen nicht aus, um diese Eingänge demselben Höhlennetz zuzuordnen.",
   "network.definition.title": "Was ist ein Höhlennetz?",

@@ -2005,6 +2005,7 @@
   "Network name": "Nome da rede",
   "Network properties": "Propriedades da rede",
   "network_count": "número de redes",
+  "network_count_short": "{count, plural, one {rede} other {redes}}",
   "network.definition": "No Grottocenter, uma rede é uma cavidade com <strong>pelo menos duas entradas</strong> ligadas por passagens cuja continuidade foi <strong>comprovada através da exploração humana</strong>.",
   "network.definition.exclusions": "Uma ligação hidrológica, um contacto visual ou sonoro, ou uma ligação suposta não são suficientes para associar estas entradas à mesma rede.",
   "network.definition.title": "O que é uma rede?",

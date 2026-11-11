@@ -9,16 +9,15 @@ export const MassifPopup = ({ massif }) => {
   const { formatMessage } = useIntl();
   const entranceLabel = Number.isFinite(massif.entranceCount)
     ? capitalize(
-        formatMessage({
-          id: massif.entranceCount === 1 ? 'entrance' : 'entrances'
-        })
+        formatMessage({ id: 'entrance_count' }, { count: massif.entranceCount })
       )
     : null;
   const networkLabel = Number.isFinite(massif.networkCount)
     ? capitalize(
-        formatMessage({
-          id: massif.networkCount === 1 ? 'network' : 'networks'
-        })
+        formatMessage(
+          { id: 'network_count_short' },
+          { count: massif.networkCount }
+        )
       )
     : null;
   return (

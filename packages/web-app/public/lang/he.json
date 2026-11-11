@@ -2005,6 +2005,7 @@
   "Network name": "שם הרשת",
   "Network properties": "מאפייני הרשת",
   "network_count": "מספר רשתות",
+  "network_count_short": "{count, plural, one {רשת} other {רשתות}}",
   "network.definition": "ב־Grottocenter, רשת היא מערה עם <strong>לפחות שני פתחים</strong> המחוברים במעברים שרציפותם <strong>הוכחה באמצעות חקירה אנושית</strong>.",
   "network.definition.exclusions": "קשר הידרולוגי, קשר עין או קשר קולי, או חיבור משוער אינם מספיקים כדי לשייך פתחים אלה לאותה רשת.",
   "network.definition.title": "מהי רשת מערות?",

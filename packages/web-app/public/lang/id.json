@@ -2005,6 +2005,7 @@
   "Network name": "Nama jaringan",
   "Network properties": "Properti jaringan",
   "network_count": "jumlah jaringan",
+  "network_count_short": "jaringan",
   "network.definition": "Di Grottocenter, jaringan gua adalah gua dengan <strong>setidaknya dua pintu masuk</strong> yang terhubung melalui lorong-lorong yang kesinambungannya telah <strong>dibuktikan melalui penjelajahan manusia</strong>.",
   "network.definition.exclusions": "Hubungan hidrologis, kontak visual atau suara, atau hubungan yang diduga tidak cukup untuk mengaitkan pintu-pintu masuk ini ke jaringan gua yang sama.",
   "network.definition.title": "Apa itu jaringan gua?",

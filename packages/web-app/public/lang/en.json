@@ -2005,6 +2005,7 @@
   "Network name": "Network name",
   "Network properties": "Network properties",
   "network_count": "{count, plural, one {network (cave of more than 1 entrance)} other {networks (cave of more than 1 entrance)}}",
+  "network_count_short": "{count, plural, one {network} other {networks}}",
   "network.definition": "In Grottocenter, a network is a cave with <strong>at least two entrances</strong> connected by passages whose continuity has been <strong>established by human exploration</strong>.",
   "network.definition.exclusions": "A hydrological connection, visual or voice contact, or a suspected connection are not sufficient to link these entrances to the same network.",
   "network.definition.title": "What is a network?",
