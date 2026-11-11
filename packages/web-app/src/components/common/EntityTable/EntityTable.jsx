@@ -40,7 +40,7 @@ const initColumns = (
       : entityConfig.columns;
   }
   if (entityColumnsModifier) {
-    columns = entityColumnsModifier(columns) ?? columns;
+    columns = entityColumnsModifier(columns);
   }
   return columns;
 };
@@ -242,6 +242,7 @@ const EntityTable = ({
 
 EntityTable.propTypes = {
   entityType: PropTypes.string,
+  // Pure modifier: must return the columns array without mutating its input.
   entityColumnsModifier: PropTypes.func,
   isLoading: PropTypes.bool,
   isOffline: PropTypes.bool,

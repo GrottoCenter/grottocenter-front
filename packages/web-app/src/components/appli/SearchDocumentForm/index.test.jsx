@@ -1,36 +1,34 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { IntlProvider } from 'react-intl';
+import {
+  cleanup,
+  fireEvent,
+  screen,
+  waitFor,
+  within
+} from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import messages from '@/../public/lang/en.json';
+import { advancedSearchUrl } from '@/conf/apiRoutes';
 import { resetAdvancedSearch } from '@/hooks';
+import { renderWithProviders } from '@/test/renderWithProviders';
+import DocumentSearch from '../AdvancedSearch/DocumentSearch';
+import SearchResults from '../AdvancedSearch/SearchResults';
 import SearchDocumentForm from './index';
 
-vi.mock('@/hooks', () => ({
-  resetAdvancedSearch: vi.fn(),
-  useOnlineStatus: () => true
-}));
+vi.mock('@/hooks', async importOriginal => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    resetAdvancedSearch: vi.fn(actual.resetAdvancedSearch),
+    useOnlineStatus: () => true,
+    useDocumentTypes: () => ({ data: [] }),
+    useSubjects: () => ({ data: [] })
+  };
+});
 
 vi.mock('@/components/common/OfflineDisabled', () => ({
   default: ({ children }) => children
-}));
-
-vi.mock('../AdvancedSearch/DocumentSearch', () => ({
-  default: () => null
-}));
-
-vi.mock('../AdvancedSearch/SearchResults', () => ({
-  default: ({ onSelected, onRowClick }) => (
-    <>
-      <button
-        type="button"
-        onClick={() => onSelected([1], [{ id: 1, title: 'Document' }])}>
-        Select result
-      </button>
-      <button type="button" onClick={() => onRowClick({ id: 1 })}>
-        Preview result
-      </button>
-    </>
-  )
 }));
 
 vi.mock('@/pages/DocumentDetails', () => ({
@@ -41,41 +39,60 @@ vi.mock('@/pages/DocumentDetails', () => ({
   )
 }));
 
-const messages = {
-  Associate: 'Associate',
-  'Associate 1 document': 'Associate 1 document',
-  'Associate {nb} documents': 'Associate {nb} documents',
-  'Detailed document view': 'Detailed document view',
-  Reset: 'Reset',
-  'Select documents with the checkboxes. Preview any document before associating it.':
-    'Select documents',
-  close: 'close'
-};
 const theme = createTheme();
 
-const renderForm = ({ onSubmit, onSuccess }) =>
-  render(
-    <IntlProvider locale="en" messages={messages}>
-      <ThemeProvider theme={theme}>
-        <SearchDocumentForm onSubmit={onSubmit} onSuccess={onSuccess} />
-      </ThemeProvider>
-    </IntlProvider>
+const renderSearch = element =>
+  renderWithProviders(
+    <MemoryRouter>
+      <ThemeProvider theme={theme}>{element}</ThemeProvider>
+    </MemoryRouter>,
+    { messages }
   );
 
-const selectDocument = () => {
-  fireEvent.click(screen.getByRole('button', { name: 'Select result' }));
+const renderForm = ({ onSubmit = vi.fn(), onSuccess } = {}) =>
+  renderSearch(
+    <SearchDocumentForm onSubmit={onSubmit} onSuccess={onSuccess} />
+  );
+
+const submitSearch = () => {
+  fireEvent.click(screen.getByRole('button', { name: 'Search' }));
 };
 
-describe('SearchDocumentForm submission', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+const selectDocument = async () => {
+  submitSearch();
+  const row = (await screen.findByText('Document')).closest('tr');
+  fireEvent.click(within(row).getByRole('checkbox'));
+};
 
+beforeEach(() => {
+  localStorage.clear();
+  resetAdvancedSearch();
+  vi.clearAllMocks();
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          results: [{ id: 1, title: 'Document' }],
+          totalResults: 1
+        })
+      )
+    )
+  );
+});
+
+afterEach(() => {
+  cleanup();
+  resetAdvancedSearch();
+  vi.unstubAllGlobals();
+});
+
+describe('SearchDocumentForm submission', () => {
   it('resets and closes only after a successful association', async () => {
     const onSubmit = vi.fn().mockResolvedValue();
     const onSuccess = vi.fn();
     renderForm({ onSubmit, onSuccess });
-    selectDocument();
+    await selectDocument();
 
     fireEvent.click(
       screen.getByRole('button', { name: 'Associate 1 document' })
@@ -90,7 +107,7 @@ describe('SearchDocumentForm submission', () => {
     const onSubmit = vi.fn().mockRejectedValue(new Error('request failed'));
     const onSuccess = vi.fn();
     renderForm({ onSubmit, onSuccess });
-    selectDocument();
+    await selectDocument();
 
     fireEvent.click(
       screen.getByRole('button', { name: 'Associate 1 document' })
@@ -107,16 +124,16 @@ describe('SearchDocumentForm submission', () => {
   it('previews a document without changing the pending association', async () => {
     const onSubmit = vi.fn().mockResolvedValue();
     renderForm({ onSubmit });
-    selectDocument();
+    await selectDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Preview result' }));
+    fireEvent.click(screen.getByText('Document'));
 
     expect(await screen.findByTestId('document-preview')).toHaveTextContent(
       'Document 1, actions hidden: true'
     );
     expect(onSubmit).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: 'close' }));
+    fireEvent.click(screen.getByRole('button', { name: messages.close }));
     await waitFor(() =>
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     );
@@ -136,19 +153,116 @@ describe('SearchDocumentForm submission', () => {
     const onSubmit = vi.fn();
     renderForm({ onSubmit });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Preview result' }));
+    submitSearch();
+    fireEvent.click(await screen.findByText('Document'));
 
     expect(await screen.findByTestId('document-preview')).toHaveTextContent(
       'Document 1, actions hidden: true'
     );
     expect(onSubmit).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: 'close' }));
+    fireEvent.click(screen.getByRole('button', { name: messages.close }));
     await waitFor(() =>
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     );
     expect(
       screen.getByRole('button', { name: 'Associate 0 documents' })
     ).toBeDisabled();
+  });
+});
+
+describe('document search validation scope', () => {
+  it('posts includePendingDocuments from the association search', async () => {
+    renderForm();
+    submitSearch();
+
+    await screen.findByText('Document');
+    expect(fetch).toHaveBeenCalledWith(
+      advancedSearchUrl,
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.any(String)
+      })
+    );
+    expect(JSON.parse(fetch.mock.calls[0][1].body)).toMatchObject({
+      entity: 'documents',
+      includePendingDocuments: true
+    });
+  });
+
+  it('omits includePendingDocuments from an ordinary document search', async () => {
+    renderSearch(
+      <>
+        <DocumentSearch />
+        <SearchResults />
+      </>
+    );
+    submitSearch();
+
+    await screen.findByText('Document');
+    expect(fetch).toHaveBeenCalledWith(
+      advancedSearchUrl,
+      expect.objectContaining({ method: 'POST' })
+    );
+    expect(JSON.parse(fetch.mock.calls[0][1].body)).not.toHaveProperty(
+      'includePendingDocuments'
+    );
+  });
+
+  it.each(['table', 'cards'])(
+    'labels only pending documents in %s view with inline markup',
+    async view => {
+      fetch.mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            results: [
+              { id: 1, title: 'Pending document', validationStatus: 'pending' },
+              {
+                id: 2,
+                title: 'Validated document',
+                validationStatus: 'validated'
+              },
+              { id: 3, title: 'Legacy document' }
+            ],
+            totalResults: 3
+          })
+        )
+      );
+      renderForm();
+      submitSearch();
+      await screen.findByText('Pending document');
+      if (view === 'cards') {
+        fireEvent.click(screen.getByRole('button', { name: 'Card view' }));
+      }
+
+      const labels = screen.getAllByText('Awaiting validation');
+      expect(labels).toHaveLength(1);
+      const chip = labels[0].parentElement;
+      expect(chip.tagName).toBe('SPAN');
+      expect(chip.parentElement).toHaveTextContent('Pending document');
+      ['Validated document', 'Legacy document'].forEach(title => {
+        expect(screen.getByText(title).parentElement).not.toHaveTextContent(
+          'Awaiting validation'
+        );
+      });
+    }
+  );
+
+  it('preserves the missing-title placeholder beside the pending label', async () => {
+    fetch.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          results: [{ id: 1, validationStatus: 'pending' }],
+          totalResults: 1
+        })
+      )
+    );
+    renderForm();
+    submitSearch();
+
+    const label = await screen.findByText('Awaiting validation');
+    expect(label.parentElement.parentElement).toHaveTextContent(
+      '-Awaiting validation'
+    );
   });
 });

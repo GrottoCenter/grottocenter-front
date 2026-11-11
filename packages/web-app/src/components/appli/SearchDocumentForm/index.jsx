@@ -33,9 +33,10 @@ const showPendingDocumentStatus = columns =>
             <Box
               component="span"
               sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
-              {column.render(value, document)}
+              {column.render(value, document) ?? '-'}
               {document.validationStatus === 'pending' && (
                 <Chip
+                  component="span"
                   size="small"
                   color="warning"
                   variant="outlined"
