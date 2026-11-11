@@ -634,8 +634,9 @@ const documents = {
       visible: false,
       field: 'entrances',
       label: 'Entrances',
-      sortable: false,
-      render: cellsRender.keyArray('name')
+      sortable: true,
+      render: cellsRender.keyArray('name'),
+      sortField: 'entrancesSort'
     },
     {
       visible: false,
