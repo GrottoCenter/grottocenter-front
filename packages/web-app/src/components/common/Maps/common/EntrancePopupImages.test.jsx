@@ -11,6 +11,7 @@ import renderWithProviders from '@/test/renderWithProviders';
 import { entranceKeys } from '@/api/queryKeys';
 import { apiGet } from '@/api/client';
 import { getEntranceUrl } from '@/conf/apiRoutes';
+import { createMapPopup } from '@/utils/mapPopup';
 import EntrancePopupImages from './EntrancePopupImages';
 
 const state = vi.hoisted(() => ({ map: null }));
@@ -50,6 +51,8 @@ afterEach(() => {
   cleanup();
   state.map.remove();
   element.remove();
+  vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 const mount = () =>
@@ -59,14 +62,122 @@ const mount = () =>
     </MemoryRouter>
   );
 const open = id => {
-  const popup = L.popup()
-    .setLatLng([45, 6])
-    .setContent(
-      `<div class="map-popup-entrance" data-testid="entrance-popup"><div data-entrance-popup-image="${id}"></div><div class="map-popup-details"><a href="/ui/entrances/${id}">Entrance ${id}</a></div></div>`
-    );
+  const popup = createMapPopup(
+    `<div class="map-popup-entrance" data-testid="entrance-popup"><div data-entrance-popup-image="${id}"></div><div class="map-popup-details"><a href="/ui/entrances/${id}">Entrance ${id}</a></div></div>`
+  ).setLatLng([45, 6]);
   act(() => popup.openOn(state.map));
   return popup;
 };
+
+it('does not prepare an unrelated popup whose text mentions the image attribute', () => {
+  mount();
+  const content = '<p>Organization data-entrance-popup-image=1</p>';
+  const popup = createMapPopup(content).setLatLng([45, 6]);
+  act(() => popup.openOn(state.map));
+  expect(popup.options.autoPan).toBe(true);
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(popup.getContent()).toBe(content);
+  expect(apiGet).not.toHaveBeenCalled();
+});
+
+it('keeps autopan disabled until the final image is decoded, then reveals once', async () => {
+  apiGet.mockResolvedValue({ id: 1, name: 'Portrait', featuredFile: file });
+  mount();
+  const popup = open(1);
+  const image = await screen.findByAltText('Portrait');
+  const update = vi.spyOn(popup, 'update');
+  let resolveDecode;
+  image.decode = () =>
+    new Promise(resolve => {
+      resolveDecode = resolve;
+    });
+  Object.defineProperties(image, {
+    naturalWidth: { value: 320 },
+    naturalHeight: { value: 640 }
+  });
+  fireEvent.load(image);
+  expect(popup.options.autoPan).toBe(false);
+  expect(popup.getElement()).toHaveAttribute('aria-busy', 'true');
+  expect(update).not.toHaveBeenCalled();
+
+  await act(async () => resolveDecode());
+  expect(update).toHaveBeenCalledTimes(1);
+  expect(popup.options.autoPan).toBe(true);
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(screen.getByTestId('entrance-popup')).toHaveAttribute(
+    'data-photo-layout',
+    'side'
+  );
+
+  // Cached metadata still goes through preparation on the next opening.
+  act(() => popup.remove());
+  act(() => popup.openOn(state.map));
+  expect(popup.options.autoPan).toBe(false);
+  expect(popup.getElement()).toHaveAttribute('aria-busy', 'true');
+});
+
+it('falls back to text after the deadline and ignores late image metadata', async () => {
+  vi.useFakeTimers();
+  let resolveMetadata;
+  apiGet.mockImplementation(
+    () =>
+      new Promise(resolve => {
+        resolveMetadata = resolve;
+      })
+  );
+  mount();
+  const popup = open(1);
+  expect(popup.options.autoPan).toBe(false);
+  await act(async () => vi.advanceTimersByTimeAsync(2000));
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(popup.options.autoPan).toBe(true);
+  const update = vi.spyOn(popup, 'update');
+
+  await act(async () => {
+    resolveMetadata({ id: 1, name: 'Late', featuredFile: file });
+    await vi.advanceTimersByTimeAsync(1);
+  });
+  expect(screen.queryByAltText('Late')).toBeNull();
+  expect(screen.getByText('Entrance 1')).toBeVisible();
+  expect(update).not.toHaveBeenCalled();
+});
+
+it('keeps the text fallback when image decoding finishes after the deadline', async () => {
+  const { queryClient } = mount();
+  queryClient.setQueryData(entranceKeys.detail(1), {
+    id: 1,
+    name: 'Cached',
+    featuredFile: file
+  });
+  vi.useFakeTimers();
+  const popup = open(1);
+  const image = screen.getByAltText('Cached');
+  let resolveDecode;
+  image.decode = () =>
+    new Promise(resolve => {
+      resolveDecode = resolve;
+    });
+  Object.defineProperties(image, {
+    naturalWidth: { value: 640 },
+    naturalHeight: { value: 320 }
+  });
+  fireEvent.load(image);
+  await act(async () => vi.advanceTimersByTimeAsync(2000));
+  expect(screen.queryByAltText('Cached')).toBeNull();
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  const update = vi.spyOn(popup, 'update');
+  await act(async () => resolveDecode());
+  expect(update).not.toHaveBeenCalled();
+  expect(screen.queryByAltText('Cached')).toBeNull();
+});
+
+it('closes a preparing popup when its manager unmounts', () => {
+  apiGet.mockImplementation(() => new Promise(() => {}));
+  const { unmount } = mount();
+  const popup = open(1);
+  unmount();
+  expect(popup.isOpen()).toBe(false);
+});
 
 it('only fetches an opened entrance image and reuses its separate cache', async () => {
   apiGet.mockResolvedValue({ id: 1, name: 'Cave', featuredFile: file });
@@ -177,7 +288,9 @@ it('reserves space for map controls even when the entrance has no photo', async 
   apiGet.mockResolvedValue({ id: 1, name: 'No photo', featuredFile: null });
   mount();
   const popup = open(1);
-  await waitFor(() => expect(apiGet).toHaveBeenCalledTimes(1));
+  await waitFor(() =>
+    expect(popup.getElement()).not.toHaveAttribute('aria-busy')
+  );
   expect(popup.getElement().style.getPropertyValue('--map-popup-width')).toBe(
     '230px'
   );
@@ -203,6 +316,25 @@ it('does not fetch a fresh cached entrance and removes a photo when both URLs fa
   expect(image).not.toHaveAttribute('srcset');
   fireEvent.error(image);
   expect(screen.queryByAltText('Cached')).toBeNull();
+  expect(screen.getByText('Entrance 1')).toBeVisible();
+});
+
+it('remeasures the text layout if a displayed image becomes unavailable', async () => {
+  apiGet.mockResolvedValue({ id: 1, name: 'Portrait', featuredFile: file });
+  mount();
+  const popup = open(1);
+  const image = await screen.findByAltText('Portrait');
+  Object.defineProperties(image, {
+    naturalWidth: { value: 320 },
+    naturalHeight: { value: 640 }
+  });
+  fireEvent.load(image);
+  const update = vi.spyOn(popup, 'update');
+  // A new responsive candidate can fail after an earlier one was displayed.
+  fireEvent.error(image);
+  fireEvent.error(image);
+  expect(screen.queryByTestId('entrance-popup-photo')).toBeNull();
+  expect(update).toHaveBeenCalledTimes(1);
   expect(screen.getByText('Entrance 1')).toBeVisible();
 });
 

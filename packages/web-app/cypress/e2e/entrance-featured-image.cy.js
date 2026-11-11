@@ -129,6 +129,44 @@ const visitMap = () => {
   cy.wait('@markers', { requestTimeout: 20000 });
 };
 
+const recordVisiblePopupLayouts = () => {
+  const frames = [];
+  let stop;
+  cy.window().then(win => {
+    let frameId;
+    const sample = () => {
+      const popup = win.document.querySelector('.leaflet-popup');
+      if (popup && win.getComputedStyle(popup).visibility === 'visible') {
+        const bounds = popup.getBoundingClientRect();
+        frames.push({
+          width: Math.round(bounds.width),
+          height: Math.round(bounds.height),
+          layout: popup.querySelector('.map-popup-entrance')?.dataset
+            .photoLayout,
+          hasLoadedImage: Boolean(
+            popup.querySelector('[data-testid="entrance-popup-photo"] img')
+              ?.naturalWidth
+          )
+        });
+      }
+      frameId = win.requestAnimationFrame(sample);
+    };
+    frameId = win.requestAnimationFrame(sample);
+    stop = () => win.cancelAnimationFrame(frameId);
+  });
+  return { frames, stop: () => stop() };
+};
+
+const nextPaint = () =>
+  cy
+    .window()
+    .then(
+      win =>
+        new Cypress.Promise(resolve =>
+          win.requestAnimationFrame(() => win.requestAnimationFrame(resolve))
+        )
+    );
+
 const expectPopupLayout = layout => {
   cy.get('[data-testid="entrance-popup"]')
     .should('have.attr', 'data-photo-layout', layout)
@@ -732,12 +770,87 @@ describe('Entrance featured image', () => {
     ).as('featuredImage');
     visitMap();
     clickEntranceMarker();
-    cy.get('[aria-label="Close popup"]').click({ scrollBehavior: false });
+    // The preparing popup is hidden; a tap elsewhere still cancels it.
+    cy.get('.leaflet-container').click(10, 300, { scrollBehavior: false });
     cy.then(() => releaseImage());
     cy.wait('@featuredImage');
     cy.get('[data-testid="entrance-popup"]').should('not.exist');
     cy.get('@thumbnail.all').should('have.length', 0);
     cy.get('@entrance.all').should('have.length', 0);
+  });
+
+  [1280, 390].forEach(width => {
+    it(`reveals only the final popup layout with one pan, including a cached reopening at width ${width}`, () => {
+      cy.viewport(width, width === 390 ? 844 : 900);
+      let releaseMetadata;
+      const metadataReady = new Cypress.Promise(resolve => {
+        releaseMetadata = resolve;
+      });
+      cy.intercept(
+        { method: 'GET', pathname: '/api/v1/entrances/1/featured-image' },
+        request =>
+          metadataReady.then(() => request.reply({ body: featuredImage }))
+      );
+      let releaseImage;
+      const imageReady = new Cypress.Promise(resolve => {
+        releaseImage = resolve;
+      });
+      cy.intercept('https://images.example.org/thumbnails/**', request =>
+        imageReady.then(() =>
+          request.reply({
+            headers: { 'content-type': 'image/svg+xml' },
+            body: imageBody
+          })
+        )
+      );
+      mockMap();
+      // Place the entrance near the top, where the completed popup needs a pan.
+      visit('/map/45.4972,5.5,16');
+      cy.wait('@markers', { requestTimeout: 20000 });
+      cy.window().then(win =>
+        cy.spy(win.L.Map.prototype, 'panBy').as('popupPan')
+      );
+      const observation = recordVisiblePopupLayouts();
+      clickEntranceMarker();
+      cy.get('[data-testid="entrance-popup"]')
+        .closest('.leaflet-popup')
+        .should('have.attr', 'aria-busy', 'true')
+        .and('have.css', 'visibility', 'hidden');
+      cy.get('@popupPan').should('not.have.been.called');
+      cy.then(() => releaseMetadata());
+      cy.get('[data-testid="entrance-popup-photo"] img').should('exist');
+      cy.get('@popupPan').should('not.have.been.called');
+      cy.then(() => releaseImage());
+      expectPopupLayout(width === 390 ? 'top' : 'side');
+      cy.get('.leaflet-map-pane').should('not.have.class', 'leaflet-pan-anim');
+      nextPaint();
+      cy.then(() => {
+        observation.stop();
+        expect(observation.frames.length).to.be.greaterThan(0);
+        expect(observation.frames[0].hasLoadedImage).to.equal(true);
+        observation.frames.forEach(frame =>
+          expect(frame).to.deep.equal(observation.frames[0])
+        );
+      });
+      cy.get('@popupPan').should('have.been.calledOnce');
+
+      cy.get('[aria-label="Close popup"]').click({ scrollBehavior: false });
+      cy.get('[data-testid="entrance-popup"]').should('not.exist');
+      cy.get('@popupPan').invoke('resetHistory');
+      const cachedObservation = recordVisiblePopupLayouts();
+      clickEntranceMarker();
+      expectPopupLayout(width === 390 ? 'top' : 'side');
+      cy.get('.leaflet-map-pane').should('not.have.class', 'leaflet-pan-anim');
+      nextPaint();
+      cy.then(() => {
+        cachedObservation.stop();
+        expect(cachedObservation.frames.length).to.be.greaterThan(0);
+        cachedObservation.frames.forEach(frame =>
+          expect(frame).to.deep.equal(observation.frames[0])
+        );
+      });
+      cy.get('@popupPan').its('callCount').should('be.at.most', 1);
+    });
   });
 
   [

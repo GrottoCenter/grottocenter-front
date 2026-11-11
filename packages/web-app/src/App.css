@@ -30,6 +30,41 @@ code {
   max-width: 260px;
 }
 
+/* Leaflet owns this indicator before the React portal mounts. Keep it anchored
+   to the marker while the hidden popup is measured. Leaflet clears inline
+   visibility in update(), so this rule hides intermediate text/photo layouts. */
+.leaflet-container .leaflet-popup[data-entrance-popup-preparing] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.leaflet-popup[data-entrance-popup-preparing]::after {
+  content: '';
+  visibility: visible;
+  position: absolute;
+  left: 50%;
+  bottom: -0.5rem;
+  width: 1rem;
+  height: 1rem;
+  margin-left: -0.5rem;
+  border: 0.125rem solid #5d4037;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: map-popup-loading 0.8s linear infinite;
+}
+
+@keyframes map-popup-loading {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leaflet-popup[data-entrance-popup-preparing]::after {
+    animation: none;
+  }
+}
+
 .map-popup-property {
   display: flex;
   align-items: center;

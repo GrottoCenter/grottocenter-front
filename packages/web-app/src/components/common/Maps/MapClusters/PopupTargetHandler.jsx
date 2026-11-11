@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { apiFetch } from '@/api/client';
 import queryClient from '@/conf/queryClient';
 import { entranceQueryOptions } from '@/api/entranceQueryOptions';
+import { createMapPopup } from '@/utils/mapPopup';
 import {
   EntrancePopup,
   MassifPopup,
@@ -121,7 +122,12 @@ const PopupTargetHandler = ({ popupTarget }) => {
     fetchPopupData(popupTarget.type, popupTarget.id, controller.signal)
       .then(result => {
         if (controller.signal.aborted || !result) return;
-        map.openPopup(renderPopup(result.popup), [result.lat, result.lng]);
+        map.openPopup(
+          createMapPopup(renderPopup(result.popup)).setLatLng([
+            result.lat,
+            result.lng
+          ])
+        );
       })
       .catch(err => {
         if (err.name !== 'AbortError')

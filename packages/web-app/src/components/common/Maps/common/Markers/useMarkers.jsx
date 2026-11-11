@@ -2,6 +2,7 @@ import { useRef, useCallback, useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import { useMediaQuery } from '@mui/material';
+import { createMapPopup } from '@/utils/mapPopup';
 import useRenderPopup from './useRenderPopup';
 
 const useMarkers = ({
@@ -45,7 +46,9 @@ const useMarkers = ({
 
       // Lazy popup: content is rendered only when the popup is opened
       if (popupContent) {
-        markerEl.bindPopup(() => renderPopup(popupContent(marker)));
+        markerEl.bindPopup(
+          createMapPopup(() => renderPopup(popupContent(marker)))
+        );
       }
 
       // Tooltips are a hover affordance, and binding one makes Leaflet listen

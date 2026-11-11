@@ -16,15 +16,47 @@ const pointPropType = PropTypes.oneOfType([
   })
 ]);
 
-const EntrancePopupContent = ({ file, entranceId, entranceName, popup }) => {
+// A slow metadata/image request must not leave the text inaccessible. Once this
+// deadline expires, keep the text-only layout until the next opening.
+const PREPARATION_TIMEOUT = 2000;
+
+const EntrancePopupContent = ({
+  file,
+  isPending,
+  entranceId,
+  entranceName,
+  popup
+}) => {
   const map = useMap();
-  const [isUnavailable, setIsUnavailable] = useState(false);
-  const [imageSize, setImageSize] = useState(null);
+  // Freeze the first completed presentation for this opening. Late metadata or
+  // decoding must not resize a popup that has already fallen back to text.
+  const [presentation, setPresentation] = useState(null);
+
+  useEffect(() => {
+    if (presentation) return undefined;
+    const timeout = setTimeout(
+      () =>
+        setPresentation(
+          previous => previous ?? { file: null, imageSize: null }
+        ),
+      PREPARATION_TIMEOUT
+    );
+    return () => clearTimeout(timeout);
+  }, [presentation]);
+
+  useLayoutEffect(() => {
+    if (!presentation && !isPending && !file)
+      setPresentation({ file: null, imageSize: null });
+  }, [file, isPending, presentation]);
+
+  const displayedFile = presentation ? presentation.file : file;
+  const displayedSize = presentation?.imageSize;
 
   // Size against the map itself, including embedded maps and short screens.
-  // update() keeps Leaflet's existing positioning/autopan after the portal,
-  // image orientation or map dimensions change, without reopening a popup.
+  // Only enable autopan after metadata, image decoding and layout have settled.
+  // A resize can still remeasure the same popup without reopening it.
   useLayoutEffect(() => {
+    if (!presentation) return undefined;
     const element = popup.getElement();
     const mapContainer = map.getContainer();
     const layout = element.querySelector('.map-popup-entrance');
@@ -33,13 +65,16 @@ const EntrancePopupContent = ({ file, entranceId, entranceName, popup }) => {
     const originalPaddingBottomRight = popup.options.autoPanPaddingBottomRight;
     const updatePopup = () => {
       if (!popup.isOpen()) return;
-      // leaflet-rotate skips autopan while a previous pan is running. Measure
-      // the final image after that movement, so it cannot remain offscreen.
+      // leaflet-rotate skips autopan during an existing map movement. Keep the
+      // popup hidden until that movement ends, then reveal its final layout.
       if (map.getPane('mapPane').classList.contains('leaflet-pan-anim')) {
         map.off('moveend', updatePopup);
         map.once('moveend', updatePopup);
       } else {
+        setOptions(popup, { autoPan: true });
         popup.update();
+        delete element.dataset.entrancePopupPreparing;
+        element.removeAttribute('aria-busy');
       }
     };
     const updateLayout = () => {
@@ -80,7 +115,8 @@ const EntrancePopupContent = ({ file, entranceId, entranceName, popup }) => {
       );
       if (layout) {
         layout.dataset.photoLayout =
-          imageSize?.height > imageSize?.width && contentWidth >= 288
+          presentation.imageSize?.height > presentation.imageSize?.width &&
+          contentWidth >= 288
             ? 'side'
             : 'top';
       }
@@ -111,8 +147,33 @@ const EntrancePopupContent = ({ file, entranceId, entranceName, popup }) => {
         autoPanPaddingBottomRight: originalPaddingBottomRight
       });
     };
-  }, [map, popup, imageSize, isUnavailable]);
-  if (!file || isUnavailable) return null;
+  }, [map, popup, presentation]);
+  if (!displayedFile) return null;
+
+  const handleLoad = ({ currentTarget: image }) => {
+    const finish = () => {
+      if (!popup.isOpen() || !image.isConnected) return;
+      if (!image.naturalWidth || !image.naturalHeight) return;
+      setPresentation(
+        previous =>
+          previous ?? {
+            file: displayedFile,
+            imageSize: {
+              width: image.naturalWidth,
+              height: image.naturalHeight
+            }
+          }
+      );
+    };
+    // decode() also covers images already cached by the browser. A decoding
+    // failure must not prevent the normal load/error fallback from completing.
+    if (image.decode)
+      image
+        .decode()
+        .catch(() => {})
+        .then(finish);
+    else finish();
+  };
 
   return (
     <AppLink
@@ -120,21 +181,17 @@ const EntrancePopupContent = ({ file, entranceId, entranceName, popup }) => {
       className="map-popup-photo"
       data-testid="entrance-popup-photo">
       <FileImage
-        file={file}
+        key={displayedFile.id}
+        file={displayedFile}
         alt={entranceName}
         sizes="300px"
         loading="eager"
-        onLoad={({ currentTarget }) =>
-          setImageSize({
-            width: currentTarget.naturalWidth,
-            height: currentTarget.naturalHeight
-          })
-        }
-        onUnavailable={() => setIsUnavailable(true)}
+        onLoad={handleLoad}
+        onUnavailable={() => setPresentation({ file: null, imageSize: null })}
         sx={{
           width:
-            imageSize?.width && imageSize?.height
-              ? `min(100%, calc(var(--map-popup-photo-height, 160px) * ${imageSize.width / imageSize.height}))`
+            displayedSize?.width && displayedSize?.height
+              ? `min(100%, calc(var(--map-popup-photo-height, 160px) * ${displayedSize.width / displayedSize.height}))`
               : 'auto',
           height: 'auto',
           maxWidth: '100%',
@@ -151,6 +208,7 @@ const EntrancePopupContent = ({ file, entranceId, entranceName, popup }) => {
 
 EntrancePopupContent.propTypes = {
   file: FilePropTypes,
+  isPending: PropTypes.bool.isRequired,
   entranceId: PropTypes.number.isRequired,
   entranceName: PropTypes.string.isRequired,
   popup: PropTypes.shape({
@@ -174,7 +232,10 @@ const EntrancePopupImages = () => {
   useEffect(() => {
     const originals = originalsRef.current;
     return () => {
-      originals.forEach((content, popup) => popup.setContent(content));
+      originals.forEach((content, popup) => {
+        popup.close();
+        popup.setContent(content);
+      });
       originals.clear();
     };
   }, []);
@@ -201,18 +262,21 @@ const EntrancePopupImages = () => {
       setActive(previous => (previous?.popup === popup ? null : previous));
       const original = originalsRef.current.get(popup);
       if (original !== undefined) {
+        // popupclose fires while Leaflet still has a map reference. Restoring
+        // the lazy content must not start another pan while the popup closes.
+        setOptions(popup, { autoPan: false });
         popup.setContent(original);
         originalsRef.current.delete(popup);
       }
     }
   });
-  const { data } = useEntranceFeaturedImage(active?.id);
+  const { data, isPending } = useEntranceFeaturedImage(active?.id);
 
   if (!active?.popup.isOpen()) return null;
   return createPortal(
     <EntrancePopupContent
-      key={`${active.id}-${data?.featuredFile?.id ?? 'no-photo'}`}
       file={data?.featuredFile ?? null}
+      isPending={isPending}
       entranceId={active.id}
       entranceName={data?.name ?? ''}
       popup={active.popup}
