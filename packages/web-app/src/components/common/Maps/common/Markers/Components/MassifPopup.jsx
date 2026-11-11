@@ -1,24 +1,21 @@
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import { capitalize } from '@/utils/strings';
 import CustomIcon from '../../../../CustomIcon';
 import { Information } from './utils';
 
-const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
-
 export const MassifPopup = ({ massif }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, locale } = useIntl();
+  const formatCountLabel = (id, count) => {
+    const label = formatMessage({ id }, { count });
+    // Romanian count labels can start with the preposition "de".
+    return locale.split('-')[0] === 'ro' ? label : capitalize(label);
+  };
   const entranceLabel = Number.isFinite(massif.entranceCount)
-    ? capitalize(
-        formatMessage({ id: 'entrance_count' }, { count: massif.entranceCount })
-      )
+    ? formatCountLabel('entrance_count', massif.entranceCount)
     : null;
   const networkLabel = Number.isFinite(massif.networkCount)
-    ? capitalize(
-        formatMessage(
-          { id: 'network_count_short' },
-          { count: massif.networkCount }
-        )
-      )
+    ? formatCountLabel('network_count_short', massif.networkCount)
     : null;
   return (
     <>
