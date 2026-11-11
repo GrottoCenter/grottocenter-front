@@ -99,10 +99,16 @@ it('bounds the accumulated image pixels while deduplicating identical input', as
   view.setUint32(16, PDF_LIMITS.imagePixels);
   view.setUint32(20, 1);
   const prepare = createPdfImagePreparer();
+  await Promise.all(
+    Array.from(
+      {
+        length: Math.floor(PDF_LIMITS.totalImagePixels / PDF_LIMITS.imagePixels)
+      },
+      (_, index) => prepare({ url: `https://example.org/${index + 1}`, bytes })
+    )
+  );
   await prepare({ url: 'https://example.org/1', bytes });
-  await prepare({ url: 'https://example.org/1', bytes });
-  await prepare({ url: 'https://example.org/2', bytes });
   await expect(
-    prepare({ url: 'https://example.org/3', bytes })
+    prepare({ url: 'https://example.org/overflow', bytes })
   ).rejects.toThrow('pdf.resourceLimit');
 });

@@ -3,7 +3,7 @@
 export const PDF_LIMITS = {
   resourceBytes: 64 * 1024 * 1024,
   imagePixels: 24_000_000,
-  totalImagePixels: 48_000_000,
+  totalImagePixels: 250_000_000,
   pages: 200
 };
 
