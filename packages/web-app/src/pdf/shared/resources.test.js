@@ -6,6 +6,35 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+it('passes the map referrer policy to the browser without credentials', async () => {
+  const fetch = vi.fn().mockResolvedValue(new Response(new Uint8Array([1])));
+  vi.stubGlobal('fetch', fetch);
+  await fetchPdfResource(
+    'https://tile.openstreetmap.org/0/0/0.png',
+    undefined,
+    {
+      referrerPolicy: 'strict-origin-when-cross-origin'
+    }
+  );
+  expect(fetch).toHaveBeenCalledWith(
+    'https://tile.openstreetmap.org/0/0/0.png',
+    expect.objectContaining({
+      credentials: 'omit',
+      referrerPolicy: 'strict-origin-when-cross-origin'
+    })
+  );
+});
+
+it('rejects blocked tiles instead of embedding the error image', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue(new Response('blocked', { status: 403 }))
+  );
+  await expect(
+    fetchPdfResource('https://tile.openstreetmap.org/0/0/0.png')
+  ).rejects.toThrow('HTTP 403');
+});
+
 it('keeps a slow response alive while chunks arrive and clears its timer on completion', async () => {
   vi.useFakeTimers();
   let body;
@@ -96,7 +125,7 @@ it('stops a response exceeding the remaining budget without Content-Length', asy
     fetchPdfResource(
       'https://example.org/file.pdf',
       new AbortController().signal,
-      3
+      { maxBytes: 3 }
     )
   ).rejects.toThrow('pdf.resourceLimit');
   expect(cancel).toHaveBeenCalledOnce();
@@ -117,7 +146,7 @@ it('rejects an oversized advertised body before reading it', async () => {
     fetchPdfResource(
       'https://example.org/file.pdf',
       new AbortController().signal,
-      3
+      { maxBytes: 3 }
     )
   ).rejects.toThrow('pdf.resourceLimit');
   expect(cancel).toHaveBeenCalledOnce();
@@ -131,7 +160,7 @@ it('returns complete bytes at the exact resource limit', async () => {
   const result = await fetchPdfResource(
     'https://example.org/file.pdf',
     new AbortController().signal,
-    3
+    { maxBytes: 3 }
   );
   expect(new Uint8Array(result)).toEqual(new Uint8Array([1, 2, 3]));
 });

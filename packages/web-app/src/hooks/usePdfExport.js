@@ -64,11 +64,9 @@ export const usePdfExport = () => {
           setProgress(resource);
           if (!downloads.has(file.url)) {
             const bytes = new Uint8Array(
-              await fetchPdfResource(
-                file.url,
-                signal,
-                PDF_LIMITS.resourceBytes - totalBytes
-              )
+              await fetchPdfResource(file.url, signal, {
+                maxBytes: PDF_LIMITS.resourceBytes - totalBytes
+              })
             );
             totalBytes += bytes.byteLength;
             checkPdfLimit(totalBytes, PDF_LIMITS.resourceBytes);

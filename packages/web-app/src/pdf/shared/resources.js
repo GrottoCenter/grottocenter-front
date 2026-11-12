@@ -7,7 +7,7 @@ import { PDF_LIMITS, checkPdfLimit } from './limits';
 export const fetchPdfResource = async (
   url,
   signal,
-  maxBytes = PDF_LIMITS.resourceBytes
+  { maxBytes = PDF_LIMITS.resourceBytes, referrerPolicy } = {}
 ) => {
   const controller = new AbortController();
   const requestSignal = signal
@@ -30,7 +30,11 @@ export const fetchPdfResource = async (
   try {
     const response = isApi
       ? await apiFetch(url, { signal: requestSignal })
-      : await fetch(url, { signal: requestSignal, credentials: 'omit' });
+      : await fetch(url, {
+          signal: requestSignal,
+          credentials: 'omit',
+          referrerPolicy
+        });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const reader = response.body.getReader();
     const chunks = [];
@@ -128,7 +132,10 @@ export const createPdfMap = async (coordinates, zoom, signal, colors) => {
         .replace('{x}', tileX)
         .replace('{y}', y);
       jobs.push(
-        fetchPdfResource(url, signal).then(async bytes => {
+        // OSM requires a Referer even if the page uses a stricter default policy.
+        fetchPdfResource(url, signal, {
+          referrerPolicy: layer.referrerPolicy
+        }).then(async bytes => {
           const image = await createImageBitmap(new Blob([bytes]));
           try {
             signal.throwIfAborted();

@@ -552,7 +552,7 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
       { method: 'GET', pathname: '/api/v1/entrances/1' },
       { body: { ...entrance, precision: 12 } }
     );
-    cy.intercept('https://tile.openstreetmap.org/**', { statusCode: 503 });
+    cy.intercept('https://tile.openstreetmap.org/**', { statusCode: 403 });
     visitEntrance();
     cy.get('[data-testid="pdf-download"]').click();
     cy.contains('[role="alert"]', 'Unable to generate the PDF', {
@@ -572,11 +572,26 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
       { method: 'GET', pathname: '/api/v1/entrances/1' },
       { body: { ...entrance, name, precision: 12 } }
     );
-    cy.intercept('https://tile.openstreetmap.org/**', {
-      headers: { 'content-type': 'image/png' },
-      fixture: 'entrance-map-tile.png,null'
+    cy.intercept('https://tile.openstreetmap.org/**', request => {
+      if (request.resourceType === 'fetch') {
+        request.alias = 'pdfMapTile';
+        expect(
+          request.headers.referer,
+          'OSM request identifies the website'
+        ).to.equal(`${new URL(Cypress.config('baseUrl')).origin}/`);
+      }
+      request.reply({
+        headers: { 'content-type': 'image/png' },
+        fixture: 'entrance-map-tile.png,null'
+      });
     });
     visitEntrance();
+    cy.document().then(page => {
+      const policy = page.createElement('meta');
+      policy.name = 'referrer';
+      policy.content = 'no-referrer';
+      page.head.appendChild(policy);
+    });
     cy.get('[data-testid="pdf-download"]').click();
     readDownloadedPdf(name).then(output => {
       const images = output.getPages().flatMap(page => {
@@ -596,6 +611,7 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
         )
       ).to.equal(true);
     });
+    cy.get('@pdfMapTile.all').should('have.length.greaterThan', 0);
   });
 
   it('downloads independent sections without a preview when document details fail', () => {
