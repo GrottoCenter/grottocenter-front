@@ -238,6 +238,47 @@ it('rejects malformed or non-projectable massif polygons', () => {
   ).toBeNull();
 });
 
+it.each([0, 1, 1165])(
+  'includes %s entrances beside networks without selecting massif statistics',
+  count => {
+    const model = buildMassifPdfModel({
+      entity: { id: 3, name: 'Massif', networks: [{ id: 8 }] },
+      statistics: { nb_entrances: count },
+      sections: { properties: true },
+      documents: [],
+      attachments: [],
+      intl
+    });
+    expect(model.properties).toEqual([
+      {
+        label: 'Entrances',
+        value: intl.formatNumber(count),
+        icon: 'entrance'
+      },
+      { label: 'Networks', value: '1', icon: 'network' },
+      { label: 'Organizations', value: '0', icon: 'organization' }
+    ]);
+    expect(model.blocks).toEqual([]);
+  }
+);
+
+it.each([undefined, null, {}, { nb_entrances: null }, { nb_caves: 99 }])(
+  'omits unavailable massif entrance counts for statistics %j',
+  statistics => {
+    const model = buildMassifPdfModel({
+      entity: { id: 3, name: 'Massif' },
+      statistics,
+      sections: { properties: true },
+      documents: [],
+      attachments: [],
+      intl
+    });
+    expect(model.properties.map(property => property.icon)).not.toContain(
+      'entrance'
+    );
+  }
+);
+
 it('keeps a sensitive massif public outline and legislation warning without entrance coordinates', () => {
   const model = buildMassifPdfModel({
     entity: { id: 3, name: 'Massif', isSensitive: true, geogPolygon: polygon },

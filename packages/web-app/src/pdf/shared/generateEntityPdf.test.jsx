@@ -86,7 +86,8 @@ it('fits nine linked networks and their dimensions before documents on one page'
   }));
   const massif = buildMassifPdfModel({
     entity: { id: 6487, name: 'Compact massif', networks },
-    sections: { networks: true, documents: true },
+    statistics: { nb_entrances: 1165 },
+    sections: { properties: true, networks: true, documents: true },
     documents: [
       {
         id: 12,
@@ -108,6 +109,13 @@ it('fits nine linked networks and their dimensions before documents on one page'
     const text = (await page.getTextContent()).items
       .map(item => item.str)
       .join(' ');
+    expect(text).toContain('Entrances');
+    expect(text).not.toContain('Entrances list');
+    expect(text.indexOf('Entrances')).toBeLessThan(text.indexOf('Networks'));
+    expect(text.indexOf('Networks')).toBeLessThan(
+      text.indexOf('Organizations')
+    );
+    expect(text).toContain('1,165');
     expect(text).toContain('100 m');
     expect(text).toContain('10,000 m');
     expect(text.indexOf('Document following the networks')).toBeGreaterThan(

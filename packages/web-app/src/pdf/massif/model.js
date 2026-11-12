@@ -69,8 +69,17 @@ export const buildMassifPdfModel = options => {
   const { entity, sections, intl, statistics, origin } = options;
   const t = id => intl.formatMessage({ id });
   const properties = [
+    ...(Number.isFinite(statistics?.nb_entrances)
+      ? [
+          {
+            label: t('Entrances'),
+            value: intl.formatNumber(statistics.nb_entrances),
+            icon: 'entrance'
+          }
+        ]
+      : []),
     {
-      label: t('Networks list'),
+      label: t('Networks'),
       value: String(active(entity.networks).length),
       icon: 'network'
     },
