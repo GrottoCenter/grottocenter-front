@@ -87,7 +87,7 @@ const Document = ({
             {document.isValidated === false && (
               <Chip
                 variant="outlined"
-                color="warning"
+                color="default"
                 size="small"
                 icon={<InfoOutlinedIcon />}
                 label={formatMessage({ id: 'Not validated' })}
