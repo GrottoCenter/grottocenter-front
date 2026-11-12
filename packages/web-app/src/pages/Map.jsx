@@ -10,6 +10,7 @@ import { includes } from 'ramda';
 import {
   useNavigate,
   generatePath,
+  matchPath,
   useParams,
   useSearchParams
 } from 'react-router-dom';
@@ -32,7 +33,12 @@ import useGeolocation from '../hooks/useGeolocation';
 import useGeolocationPermission from '../hooks/useGeolocationPermission';
 import { useRefetchOnReconnect } from '../hooks';
 import 'leaflet/dist/leaflet.css';
-import { defaultZoom, defaultCoord, focusZoom } from '../conf/config';
+import {
+  defaultZoom,
+  defaultCoord,
+  focusZoom,
+  MAP_ROUTE
+} from '../conf/config';
 
 const MapClusters = React.lazy(
   () => import('../components/common/Maps/MapClusters')
@@ -185,8 +191,11 @@ const Map = () => {
       if (urlDebounceRef.current) clearTimeout(urlDebounceRef.current);
       urlDebounceRef.current = setTimeout(() => {
         urlDebounceRef.current = null;
+        // A lazy detail route can be loading while this map is still mounted.
+        // Never let a delayed viewport update undo navigation away from it.
+        if (!matchPath(MAP_ROUTE, window.location.pathname)) return;
         navigate(
-          generatePath('/ui/map/:target', {
+          generatePath(MAP_ROUTE, {
             target: encodeMapTarget(center, newZoom)
           }),
           { replace: true }

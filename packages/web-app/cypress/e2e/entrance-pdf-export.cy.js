@@ -93,6 +93,7 @@ const visitEntrance = (isMobile = false, tab = 'information') => {
       });
     }
   });
+  cy.checkPageLoaded({ timeout: 20000 });
   if (isMobile) cy.get('button[aria-label="actions"]').first().click();
   cy.get('[data-testid="action-pdf"]', { timeout: 20000 }).click();
   cy.get('[role="dialog"]', { timeout: 20000 }).should('be.visible');
@@ -752,6 +753,9 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
     cy.wait('@documentDetails');
     cy.contains('label', 'Original survey').find('input').check();
     cy.contains('button', 'Original size').click();
+    cy.contains('button', 'Original size').trigger('mouseout');
+    cy.contains('button', 'Original size').blur();
+    cy.get('[role="tooltip"]').should('not.exist');
     cy.contains('[role="dialog"] button', 'Cancel').click();
     cy.get('[data-testid="action-pdf"]').click();
     cy.contains('label', 'Original survey').find('input').should('be.checked');

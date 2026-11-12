@@ -1,5 +1,5 @@
 import { QueryClient, QueryObserver } from '@tanstack/react-query';
-import { organizationKeys, documentKeys } from '@/api/queryKeys';
+import { organizationKeys, documentKeys, entranceKeys } from '@/api/queryKeys';
 import {
   completeEntityDeletion,
   completeEntityRestoration
@@ -18,6 +18,87 @@ describe('entity deletion cache lifecycle', () => {
   });
 
   afterEach(() => client.clear());
+
+  it.each([true, false])(
+    'preserves the popup shape when applying an entrance mutation response (isDeleted: %s)',
+    async isDeleted => {
+      const detailKey = entranceKeys.detail(1);
+      const imageKey = entranceKeys.featuredImage(1);
+      const image = {
+        id: 1,
+        name: 'Entrance',
+        featuredFile: { id: 10 },
+        isDeleted: !isDeleted,
+        redirectTo: null
+      };
+      const detail = { ...image, documents: [], descriptions: [] };
+      const response = {
+        ...detail,
+        name: 'Updated entrance',
+        featuredFile: null,
+        documents: [{ id: 5 }],
+        deletionReason: 'Updated deletion metadata',
+        isDeleted,
+        redirectTo: isDeleted ? 2 : null
+      };
+      client.setQueryData(detailKey, detail);
+      client.setQueryData(imageKey, image);
+
+      if (isDeleted) {
+        await completeEntityDeletion(client, entranceKeys, response, {
+          id: 1,
+          entityId: 2,
+          isPermanent: false
+        });
+      } else {
+        await completeEntityRestoration(client, entranceKeys, response, {
+          id: 1
+        });
+      }
+
+      expect(client.getQueryData(detailKey)).toEqual(response);
+      expect(client.getQueryData(imageKey)).toEqual({
+        id: 1,
+        name: response.name,
+        featuredFile: null,
+        isDeleted,
+        redirectTo: response.redirectTo
+      });
+      expect(client.getQueryState(detailKey).isInvalidated).toBe(true);
+      expect(client.getQueryState(imageKey).isInvalidated).toBe(true);
+    }
+  );
+
+  it.each([true, false])(
+    'merges new response fields into full document details and variants (isDeleted: %s)',
+    async isDeleted => {
+      const detailKey = documentKeys.detail(7);
+      const variantKey = documentKeys.detail(7, { requireUpdate: true });
+      const detail = { id: 7, name: 'Document', isDeleted: !isDeleted };
+      const response = {
+        ...detail,
+        deletionReason: 'Updated deletion metadata',
+        isDeleted,
+        redirectTo: null
+      };
+      client.setQueryData(detailKey, detail);
+      client.setQueryData(variantKey, detail);
+
+      if (isDeleted) {
+        await completeEntityDeletion(client, documentKeys, response, {
+          id: 7,
+          isPermanent: false
+        });
+      } else {
+        await completeEntityRestoration(client, documentKeys, response, {
+          id: 7
+        });
+      }
+
+      expect(client.getQueryData(detailKey)).toEqual(response);
+      expect(client.getQueryData(variantKey)).toEqual(response);
+    }
+  );
 
   it('applies confirmed soft deletion and invalidates merge targets and related lists without refetching the source', async () => {
     const fetchSource = vi.fn();

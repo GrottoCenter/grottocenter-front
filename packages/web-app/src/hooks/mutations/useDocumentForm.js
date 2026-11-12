@@ -6,7 +6,7 @@ import {
   putDocumentyWithNewEntitiesUrl
 } from '../../conf/apiRoutes';
 import { apiPostForm, apiPutForm, apiPut } from '../../api/client';
-import { documentKeys } from '../../api/queryKeys';
+import { documentKeys, entranceKeys } from '../../api/queryKeys';
 import { buildFormData } from '../../actions/Document/utils';
 import { filterDocumentPayload } from '../../utils/documentTypeHelpers';
 import {
@@ -135,6 +135,9 @@ export const useUpdateDocument = () => {
         queryKey: documentKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({ queryKey: documentKeys.all });
+      // File edits can change featured-image eligibility; the API returns no
+      // complete list of affected entrances, so refresh detail and popup reads.
+      queryClient.invalidateQueries({ queryKey: entranceKeys.all });
     }
   });
 };
@@ -162,6 +165,7 @@ export const useUpdateDocumentWithNewEntities = () => {
         queryKey: documentKeys.detail(variables.document.id)
       });
       queryClient.invalidateQueries({ queryKey: documentKeys.all });
+      queryClient.invalidateQueries({ queryKey: entranceKeys.all });
     }
   });
 };

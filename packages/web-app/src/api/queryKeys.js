@@ -65,7 +65,9 @@ export const caveKeys = {
 export const entranceKeys = {
   all: ['entrance'],
   list: criteria => [...entranceKeys.all, 'list', criteria],
-  detail: detailKey('entrance')
+  detail: detailKey('entrance'),
+  // Detail invalidation/removal must also cover the popup's partial response.
+  featuredImage: id => [...entranceKeys.detail(id), 'featuredImage']
 };
 
 export const personKeys = {

@@ -10,6 +10,8 @@ import L from 'leaflet';
 import renderWithProviders from '@/test/renderWithProviders';
 import { entranceKeys } from '@/api/queryKeys';
 import { apiGet } from '@/api/client';
+import { getEntranceUrl } from '@/conf/apiRoutes';
+import { createMapPopup } from '@/utils/mapPopup';
 import EntrancePopupImages from './EntrancePopupImages';
 
 const state = vi.hoisted(() => ({ map: null }));
@@ -49,6 +51,8 @@ afterEach(() => {
   cleanup();
   state.map.remove();
   element.remove();
+  vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 const mount = () =>
@@ -58,16 +62,329 @@ const mount = () =>
     </MemoryRouter>
   );
 const open = id => {
-  const popup = L.popup()
-    .setLatLng([45, 6])
-    .setContent(
-      `<div class="map-popup-entrance" data-testid="entrance-popup"><div data-entrance-popup-image="${id}"></div><div class="map-popup-details"><a href="/ui/entrances/${id}">Entrance ${id}</a></div></div>`
-    );
+  const popup = createMapPopup(
+    `<div class="map-popup-entrance" data-testid="entrance-popup"><div data-entrance-popup-image="${id}"></div><div class="map-popup-details"><a href="/ui/entrances/${id}">Entrance ${id}</a></div></div>`,
+    state.map
+  ).setLatLng([45, 6]);
   act(() => popup.openOn(state.map));
   return popup;
 };
 
-it('only fetches an opened entrance and shares the detail cache with its page', async () => {
+it('does not prepare an unrelated popup whose text mentions the image attribute', () => {
+  mount();
+  const content = '<p>Organization data-entrance-popup-image=1</p>';
+  const popup = createMapPopup(content, state.map).setLatLng([45, 6]);
+  act(() => popup.openOn(state.map));
+  expect(popup.options.autoPan).toBe(true);
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(popup.getContent()).toBe(content);
+  expect(apiGet).not.toHaveBeenCalled();
+});
+
+it('leaves entrance popups usable on a map without an image manager', () => {
+  const popup = open(1);
+  expect(popup.options.autoPan).toBe(true);
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(popup.getElement()).not.toHaveAttribute(
+    'data-entrance-popup-preparing'
+  );
+  expect(screen.getByText('Entrance 1')).toBeVisible();
+  expect(apiGet).not.toHaveBeenCalled();
+});
+
+it('unregisters the map when its image manager unmounts', () => {
+  const { unmount } = mount();
+  unmount();
+  const popup = open(1);
+  expect(popup.options.autoPan).toBe(true);
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(screen.getByText('Entrance 1')).toBeVisible();
+});
+
+it('keeps autopan disabled until the final image is decoded, then reveals once', async () => {
+  apiGet.mockResolvedValue({ id: 1, name: 'Portrait', featuredFile: file });
+  mount();
+  const popup = open(1);
+  const image = await screen.findByAltText('Portrait');
+  const update = vi.spyOn(popup, 'update');
+  let resolveDecode;
+  image.decode = () =>
+    new Promise(resolve => {
+      resolveDecode = resolve;
+    });
+  Object.defineProperties(image, {
+    naturalWidth: { value: 320 },
+    naturalHeight: { value: 640 }
+  });
+  fireEvent.load(image);
+  expect(popup.options.autoPan).toBe(false);
+  expect(popup.getElement()).toHaveAttribute('aria-busy', 'true');
+  expect(update).not.toHaveBeenCalled();
+
+  await act(async () => resolveDecode());
+  expect(update).toHaveBeenCalledTimes(1);
+  expect(popup.options.autoPan).toBe(true);
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(screen.getByTestId('entrance-popup')).toHaveAttribute(
+    'data-photo-layout',
+    'side'
+  );
+
+  // Cached metadata still goes through preparation on the next opening.
+  act(() => popup.remove());
+  act(() => popup.openOn(state.map));
+  expect(popup.options.autoPan).toBe(false);
+  expect(popup.getElement()).toHaveAttribute('aria-busy', 'true');
+});
+
+it('reveals text at the deadline and upgrades once when late metadata and image arrive', async () => {
+  vi.useFakeTimers();
+  let resolveMetadata;
+  apiGet.mockImplementation(
+    () =>
+      new Promise(resolve => {
+        resolveMetadata = resolve;
+      })
+  );
+  mount();
+  const popup = open(1);
+  expect(popup.options.autoPan).toBe(false);
+  await act(async () => vi.advanceTimersByTimeAsync(2000));
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(popup.options.autoPan).toBe(true);
+  const update = vi.spyOn(popup, 'update');
+  const panBy = vi.spyOn(state.map, 'panBy').mockReturnValue(state.map);
+  Object.defineProperty(popup.getElement(), 'offsetHeight', { value: 900 });
+
+  await act(async () => {
+    resolveMetadata({ id: 1, name: 'Late', featuredFile: file });
+    await vi.advanceTimersByTimeAsync(1);
+  });
+  const image = screen.getByAltText('Late');
+  expect(image).not.toBeVisible();
+  expect(screen.getByText('Entrance 1')).toBeVisible();
+  expect(update).not.toHaveBeenCalled();
+  Object.defineProperties(image, {
+    naturalWidth: { value: 640 },
+    naturalHeight: { value: 320 }
+  });
+  fireEvent.load(image);
+  expect(image).toBeVisible();
+  expect(update).toHaveBeenCalledTimes(1);
+  expect(panBy).toHaveBeenCalledTimes(1);
+  fireEvent.load(image);
+  expect(update).toHaveBeenCalledTimes(1);
+});
+
+it.each(['dragstart', 'movestart'])(
+  'does not pan for a late photo after %s following the text deadline',
+  async event => {
+    const { queryClient } = mount();
+    queryClient.setQueryData(entranceKeys.detail(1), {
+      id: 1,
+      name: 'Cached',
+      featuredFile: file
+    });
+    vi.useFakeTimers();
+    const popup = open(1);
+    const image = screen.getByAltText('Cached');
+    let resolveDecode;
+    image.decode = () =>
+      new Promise(resolve => {
+        resolveDecode = resolve;
+      });
+    Object.defineProperties(image, {
+      naturalWidth: { value: 640 },
+      naturalHeight: { value: 320 }
+    });
+    fireEvent.load(image);
+    await act(async () => vi.advanceTimersByTimeAsync(2000));
+    expect(screen.getByText('Entrance 1')).toBeVisible();
+    expect(image).not.toBeVisible();
+    const panBy = vi.spyOn(state.map, 'panBy').mockReturnValue(state.map);
+    const update = vi.spyOn(popup, 'update');
+    // Force a popup that would need autopan even in JSDOM's zero-size layout.
+    Object.defineProperty(popup.getElement(), 'offsetHeight', { value: 900 });
+    const pane = state.map.getPane('mapPane');
+    act(() => {
+      state.map.fire(event);
+      pane.classList.add('leaflet-pan-anim');
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(30000);
+      resolveDecode();
+    });
+    expect(image).toBeVisible();
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(popup.options.autoPan).toBe(false);
+    expect(panBy).not.toHaveBeenCalled();
+    act(() => {
+      pane.classList.remove('leaflet-pan-anim');
+      state.map.fire('moveend');
+      state.map.fire('resize');
+    });
+    expect(popup.options.autoPan).toBe(false);
+    expect(panBy).not.toHaveBeenCalled();
+
+    // A new opening gets its normal preparation and autopan back.
+    act(() => popup.remove());
+    act(() => popup.openOn(state.map));
+    const reopenedImage = screen.getByAltText('Cached');
+    Object.defineProperties(reopenedImage, {
+      naturalWidth: { value: 640 },
+      naturalHeight: { value: 320 }
+    });
+    fireEvent.load(reopenedImage);
+    expect(popup.options.autoPan).toBe(true);
+    expect(panBy).toHaveBeenCalledTimes(1);
+  }
+);
+
+it('keeps loading off-layout after the deadline and upgrades when decoding finishes', async () => {
+  const { queryClient } = mount();
+  queryClient.setQueryData(entranceKeys.detail(1), {
+    id: 1,
+    name: 'Cached',
+    featuredFile: file
+  });
+  vi.useFakeTimers();
+  const popup = open(1);
+  const image = screen.getByAltText('Cached');
+  let resolveDecode;
+  image.decode = () =>
+    new Promise(resolve => {
+      resolveDecode = resolve;
+    });
+  Object.defineProperties(image, {
+    naturalWidth: { value: 640 },
+    naturalHeight: { value: 320 }
+  });
+  fireEvent.load(image);
+  await act(async () => vi.advanceTimersByTimeAsync(2000));
+  expect(image).not.toBeVisible();
+  expect(image.closest('a')).not.toHaveClass('map-popup-photo');
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  const update = vi.spyOn(popup, 'update');
+  await act(async () => resolveDecode());
+  expect(update).toHaveBeenCalledTimes(1);
+  expect(image).toBeVisible();
+});
+
+it('cancels deferred fallback autopan after a drag and still displays the photo', async () => {
+  const { queryClient } = mount();
+  queryClient.setQueryData(entranceKeys.detail(1), {
+    id: 1,
+    name: 'Cached',
+    featuredFile: file
+  });
+  vi.useFakeTimers();
+  const popup = open(1);
+  const pane = state.map.getPane('mapPane');
+  const image = screen.getByAltText('Cached');
+  Object.defineProperties(image, {
+    naturalWidth: { value: 640 },
+    naturalHeight: { value: 320 }
+  });
+  Object.defineProperty(popup.getElement(), 'offsetHeight', { value: 900 });
+  const panBy = vi.spyOn(state.map, 'panBy').mockReturnValue(state.map);
+  pane.classList.add('leaflet-pan-anim');
+  await act(async () => vi.advanceTimersByTimeAsync(2000));
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(popup.options.autoPan).toBe(false);
+  act(() => {
+    state.map.fire('dragstart');
+    pane.classList.remove('leaflet-pan-anim');
+    state.map.fire('moveend');
+  });
+  expect(panBy).not.toHaveBeenCalled();
+  fireEvent.load(image);
+  expect(image).toBeVisible();
+  expect(popup.options.autoPan).toBe(false);
+  expect(panBy).not.toHaveBeenCalled();
+});
+
+it('does not mistake deferred fallback autopan for moving the map away', async () => {
+  const { queryClient } = mount();
+  queryClient.setQueryData(entranceKeys.detail(1), {
+    id: 1,
+    name: 'Cached',
+    featuredFile: file
+  });
+  vi.useFakeTimers();
+  const popup = open(1);
+  const pane = state.map.getPane('mapPane');
+  const image = screen.getByAltText('Cached');
+  Object.defineProperties(image, {
+    naturalWidth: { value: 640 },
+    naturalHeight: { value: 320 }
+  });
+  Object.defineProperty(popup.getElement(), 'offsetHeight', { value: 900 });
+  const panBy = vi.spyOn(state.map, 'panBy').mockImplementation(() => {
+    state.map.fire('movestart');
+    return state.map;
+  });
+  pane.classList.add('leaflet-pan-anim');
+  await act(async () => vi.advanceTimersByTimeAsync(2000));
+  act(() => {
+    pane.classList.remove('leaflet-pan-anim');
+    state.map.fire('moveend');
+  });
+  expect(panBy).toHaveBeenCalledTimes(1);
+  fireEvent.load(image);
+  expect(image).toBeVisible();
+  expect(popup.options.autoPan).toBe(true);
+  expect(panBy).toHaveBeenCalledTimes(2);
+});
+
+it.each([false, true])(
+  'distinguishes resize from a later move after the text deadline (move: %s)',
+  async shouldMoveAfterResize => {
+    const { queryClient } = mount();
+    queryClient.setQueryData(entranceKeys.detail(1), {
+      id: 1,
+      name: 'Cached',
+      featuredFile: file
+    });
+    vi.useFakeTimers();
+    const popup = open(1);
+    const image = screen.getByAltText('Cached');
+    Object.defineProperties(image, {
+      naturalWidth: { value: 640 },
+      naturalHeight: { value: 320 }
+    });
+    await act(async () => vi.advanceTimersByTimeAsync(2000));
+    Object.defineProperty(popup.getElement(), 'offsetHeight', { value: 900 });
+    const panBy = vi.spyOn(state.map, 'panBy').mockImplementation(() => {
+      state.map.fire('movestart');
+      return state.map;
+    });
+    const moveStart = vi.fn();
+    state.map.on('movestart', moveStart);
+    Object.defineProperty(element, 'clientWidth', { value: 320 });
+    act(() => state.map.invalidateSize({ animate: true }));
+    expect(moveStart).toHaveBeenCalled();
+    expect(popup.options.autoPan).toBe(true);
+    expect(popup.getElement().style.getPropertyValue('--map-popup-width')).toBe(
+      '272px'
+    );
+    panBy.mockClear();
+    if (shouldMoveAfterResize) act(() => state.map.fire('movestart'));
+    fireEvent.load(image);
+    expect(image).toBeVisible();
+    expect(popup.options.autoPan).toBe(!shouldMoveAfterResize);
+    expect(panBy).toHaveBeenCalledTimes(shouldMoveAfterResize ? 0 : 1);
+  }
+);
+
+it('closes a preparing popup when its manager unmounts', () => {
+  apiGet.mockImplementation(() => new Promise(() => {}));
+  const { unmount } = mount();
+  const popup = open(1);
+  unmount();
+  expect(popup.isOpen()).toBe(false);
+});
+
+it('only fetches an opened entrance image and reuses its separate cache', async () => {
   apiGet.mockResolvedValue({ id: 1, name: 'Cave', featuredFile: file });
   const { queryClient } = mount();
   expect(apiGet).not.toHaveBeenCalled();
@@ -75,8 +392,10 @@ it('only fetches an opened entrance and shares the detail cache with its page', 
   const image = await screen.findByAltText('Cave');
   expect(image).toHaveAttribute('src', '/small.webp');
   expect(image.closest('a')).toHaveAttribute('href', '/ui/entrances/1');
+  expect(apiGet).toHaveBeenCalledWith(`${getEntranceUrl}1/featured-image`);
+  expect(queryClient.getQueryData(entranceKeys.detail('1'))).toBeUndefined();
   expect(
-    queryClient.getQueryData(entranceKeys.detail('1')).featuredFile.id
+    queryClient.getQueryData(entranceKeys.featuredImage('1')).featuredFile.id
   ).toBe(10);
   act(() => popup.remove());
   open(1);
@@ -144,7 +463,7 @@ it.each([
   );
 });
 
-it('waits for an ongoing pan before measuring a loaded landscape image', async () => {
+it('measures during an ongoing pan and waits for moveend before enabling autopan', async () => {
   apiGet.mockResolvedValue({ id: 1, name: 'Landscape', featuredFile: file });
   mount();
   const popup = open(1);
@@ -157,12 +476,16 @@ it('waits for an ongoing pan before measuring a loaded landscape image', async (
     naturalHeight: { value: 320 }
   });
   fireEvent.load(image);
-  expect(update).not.toHaveBeenCalled();
+  expect(update).toHaveBeenCalledTimes(1);
+  expect(popup.options.autoPan).toBe(false);
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  update.mockClear();
   act(() => {
     pane.classList.remove('leaflet-pan-anim');
     state.map.fire('moveend');
   });
   expect(update).toHaveBeenCalledTimes(1);
+  expect(popup.options.autoPan).toBe(true);
   expect(image).toBeVisible();
 });
 
@@ -174,7 +497,9 @@ it('reserves space for map controls even when the entrance has no photo', async 
   apiGet.mockResolvedValue({ id: 1, name: 'No photo', featuredFile: null });
   mount();
   const popup = open(1);
-  await waitFor(() => expect(apiGet).toHaveBeenCalledTimes(1));
+  await waitFor(() =>
+    expect(popup.getElement()).not.toHaveAttribute('aria-busy')
+  );
   expect(popup.getElement().style.getPropertyValue('--map-popup-width')).toBe(
     '230px'
   );
@@ -203,6 +528,25 @@ it('does not fetch a fresh cached entrance and removes a photo when both URLs fa
   expect(screen.getByText('Entrance 1')).toBeVisible();
 });
 
+it('remeasures the text layout if a displayed image becomes unavailable', async () => {
+  apiGet.mockResolvedValue({ id: 1, name: 'Portrait', featuredFile: file });
+  mount();
+  const popup = open(1);
+  const image = await screen.findByAltText('Portrait');
+  Object.defineProperties(image, {
+    naturalWidth: { value: 320 },
+    naturalHeight: { value: 640 }
+  });
+  fireEvent.load(image);
+  const update = vi.spyOn(popup, 'update');
+  // A new responsive candidate can fail after an earlier one was displayed.
+  fireEvent.error(image);
+  fireEvent.error(image);
+  expect(screen.queryByTestId('entrance-popup-photo')).toBeNull();
+  expect(update).toHaveBeenCalledTimes(1);
+  expect(screen.getByText('Entrance 1')).toBeVisible();
+});
+
 it('ignores late responses after switching or closing popups', async () => {
   let resolveFirst;
   apiGet.mockImplementationOnce(
@@ -219,7 +563,12 @@ it('ignores late responses after switching or closing popups', async () => {
   mount();
   open(1);
   const second = open(2);
-  await screen.findByAltText('Second');
+  const image = await screen.findByAltText('Second');
+  Object.defineProperties(image, {
+    naturalWidth: { value: 320 },
+    naturalHeight: { value: 640 }
+  });
+  fireEvent.load(image);
   await act(async () =>
     resolveFirst({ id: 1, name: 'First', featuredFile: file })
   );
@@ -228,6 +577,25 @@ it('ignores late responses after switching or closing popups', async () => {
   act(() => second.remove());
   expect(element.querySelector('.leaflet-popup')).toBeNull();
   expect(apiGet).toHaveBeenCalledTimes(2);
+});
+
+it('does not restore a closed popup when its request finishes', async () => {
+  let resolveRequest;
+  apiGet.mockImplementationOnce(
+    () =>
+      new Promise(resolve => {
+        resolveRequest = resolve;
+      })
+  );
+  mount();
+  const popup = open(1);
+  act(() => popup.remove());
+  await act(async () =>
+    resolveRequest({ id: 1, name: 'Closed', featuredFile: file })
+  );
+  expect(screen.queryByAltText('Closed')).toBeNull();
+  expect(popup.isOpen()).toBe(false);
+  expect(element.querySelector('.leaflet-popup')).toBeNull();
 });
 
 it.each([null, new Error('offline')])(

@@ -69,6 +69,7 @@ export {
 export { useMassif } from './queries/useMassif';
 export { useCave } from './queries/useCave';
 export { useEntrance } from './queries/useEntrance';
+export { useEntranceFeaturedImage } from './queries/useEntranceFeaturedImage';
 // Server-state writes live in ./mutations, same convention.
 export { useDeleteDocument } from './mutations/useDeleteDocument';
 export { useRestoreDocument } from './mutations/useRestoreDocument';

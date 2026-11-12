@@ -16,6 +16,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { apiFetch } from '@/api/client';
+import { createMapPopup } from '@/utils/mapPopup';
 import {
   NOMINATIM_API_URL,
   AUTOCOMPLETE_DEBOUNCE_DELAY,
@@ -202,7 +203,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
       else if (result.resultType === 'massif')
         content = renderPopup(<MassifPopup massif={result} />);
       else content = renderPopup(<OrganizationPopup organization={result} />);
-      map.openPopup(content, [lat, lng]);
+      map.openPopup(createMapPopup(content, map).setLatLng([lat, lng]));
     };
     map.once('moveend', onMoveEnd);
     popupCleanupRef.current = () => map.off('moveend', onMoveEnd);

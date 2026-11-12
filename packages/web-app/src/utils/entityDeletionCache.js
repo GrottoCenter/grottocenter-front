@@ -1,3 +1,5 @@
+import { equals, pick } from 'ramda';
+
 import {
   advancedSearchKeys,
   caveKeys,
@@ -38,14 +40,24 @@ const updateDeletedState = (
   isDeleted,
   redirectTo
 ) => {
-  queryClient.setQueriesData({ queryKey: sourceKey }, current => {
-    if (!current || typeof current !== 'object' || Array.isArray(current))
-      return current;
-    const updatedData =
-      data?.isDeleted === isDeleted && String(data.id) === String(id)
-        ? data
-        : {};
-    return { ...current, ...updatedData, isDeleted, redirectTo };
+  const imageKey = entranceKeys.featuredImage(id);
+  queryClient.getQueriesData({ queryKey: sourceKey }).forEach(([queryKey]) => {
+    const isPartial = equals(queryKey, imageKey);
+    queryClient.setQueryData(queryKey, current => {
+      if (!current || typeof current !== 'object' || Array.isArray(current))
+        return current;
+      const updatedData =
+        data?.isDeleted === isDeleted && String(data.id) === String(id)
+          ? data
+          : {};
+      // Only popup entries filter response fields; full details keep new fields.
+      return {
+        ...current,
+        ...(isPartial ? pick(Object.keys(current), updatedData) : updatedData),
+        isDeleted,
+        redirectTo
+      };
+    });
   });
 };
 

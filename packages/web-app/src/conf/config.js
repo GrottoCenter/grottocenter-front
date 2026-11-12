@@ -100,6 +100,7 @@ export const breadcrumpKeys = {
   users: 'Users'
 };
 
+export const MAP_ROUTE = '/ui/map/:target?';
 export const defaultCoord = { lat: 0, lng: 0 };
 export const defaultZoom = 2;
 export const focusZoom = 13;
