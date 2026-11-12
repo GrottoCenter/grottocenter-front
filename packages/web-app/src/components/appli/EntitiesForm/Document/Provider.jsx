@@ -178,6 +178,10 @@ const normalizeInitialValues = values => {
   const { option, files, authorsOrganization, ...rest } = values;
   return {
     ...rest,
+    parent:
+      typeof rest.parent === 'number' || typeof rest.parent === 'string'
+        ? { id: rest.parent }
+        : (rest.parent ?? null),
     selectOptionAuthorizationDocument:
       option ??
       (values.authorizationDocument?.id ? DOCUMENT_AUTHORIZE_TO_PUBLISH : null),
@@ -204,6 +208,7 @@ const Provider = ({
     document,
     setDocument,
     attributeVersionsRef,
+    isNewDocument: !initialValues,
     initialParent: !initialValues ? creationContext?.parent : null
   });
 

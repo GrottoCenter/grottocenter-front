@@ -186,7 +186,7 @@ it.each([
       type,
       id: null,
       isNewDocument: true,
-      title: '',
+      title: type === 'Issue' ? parent.title : '',
       description: '',
       datePublication: '',
       mainLanguage: 'fra',
@@ -271,6 +271,65 @@ it.each(['clear', 'replace', 'type', 'edit', 'generic'])(
       expect(state().editor).toBeNull();
       expect(state().parent?.id ?? null).toBe(action === 'replace' ? 11 : null);
     }
+  }
+);
+
+it.each(['untouched', 'custom', 'cleared'])(
+  'preserves %s issue-title edits while the collection loads',
+  async action => {
+    const pending = Promise.withResolvers();
+    const originalGet = apiGet.getMockImplementation();
+    apiGet.mockImplementation(url =>
+      url === `${getDocumentDetailsUrl}10` ? pending.promise : originalGet(url)
+    );
+    renderPage('/ui/entity/add/document?type=Issue&parentId=10');
+    const title = screen.getByTestId('document-title').querySelector('input');
+    if (action !== 'untouched') {
+      fireEvent.change(title, { target: { value: 'My issue' } });
+      if (action === 'cleared')
+        fireEvent.change(title, { target: { value: '' } });
+    }
+    await act(async () => pending.resolve({ ...parent, type: 'Collection' }));
+    await waitFor(() => expect(state().parent?.title).toBe(parent.title));
+    const expected = {
+      untouched: parent.title,
+      custom: 'My issue',
+      cleared: ''
+    };
+    expect(title).toHaveValue(expected[action]);
+  }
+);
+
+it.each([false, true])(
+  'updates only the untouched collection prefill when choosing another collection (custom: %s)',
+  async hasCustomTitle => {
+    const originalGet = apiGet.getMockImplementation();
+    apiGet.mockImplementation(async url => {
+      const result = await originalGet(url);
+      return [10, 11].some(id => url === `${getDocumentDetailsUrl}${id}`)
+        ? { ...result, type: 'Collection' }
+        : result;
+    });
+    apiPost.mockResolvedValue({
+      results: [{ ...replacement, type: 'Collection' }]
+    });
+    renderPage('/ui/entity/add/document?type=Issue&parentId=10');
+    const title = screen.getByTestId('document-title').querySelector('input');
+    await waitFor(() => expect(title).toHaveValue(parent.title));
+    if (hasCustomTitle) {
+      fireEvent.change(title, { target: { value: `${parent.title} - 42` } });
+    }
+    const user = userEvent.setup();
+    await clearParent(user);
+    expect(title).toHaveValue(hasCustomTitle ? `${parent.title} - 42` : '');
+    await user.type(parentInput(), 'Replacement');
+    await user.click(
+      await screen.findByRole('option', { name: /Replacement issue/ })
+    );
+    await waitFor(() => expect(state().parent?.title).toBe(replacement.title));
+    expect(title).toHaveValue(
+      hasCustomTitle ? `${parent.title} - 42` : replacement.title
+    );
   }
 );
 

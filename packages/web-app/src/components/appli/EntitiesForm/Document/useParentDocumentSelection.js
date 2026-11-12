@@ -6,7 +6,10 @@ import { getDocumentDetailsUrl } from '@/conf/apiRoutes';
 import { STALE } from '@/conf/queryClient';
 import { useLanguages, useLicenses, findLicenseByName } from '@/hooks';
 import { getLicenseName } from '@/components/common/LicenseTag/helpers';
-import { getParentDocumentType } from '@/utils/documentTypeHelpers';
+import {
+  DocumentTypes,
+  getParentDocumentType
+} from '@/utils/documentTypeHelpers';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './formElements/AddFileForm/FileHelpers';
 
 const fetchDocumentDetail = (queryClient, id) =>
@@ -22,6 +25,7 @@ const useParentDocumentSelection = ({
   document,
   setDocument,
   attributeVersionsRef,
+  isNewDocument,
   initialParent
 }) => {
   const queryClient = useQueryClient();
@@ -51,9 +55,16 @@ const useParentDocumentSelection = ({
     async selection => {
       const version = ++selectionVersionRef.current;
       const attributeVersions = { ...attributeVersionsRef.current };
+      // Only replace an empty title or the untouched collection-name prefill.
+      // A contributor's issue suffix or custom title belongs to them.
+      const shouldPrefillTitle =
+        isNewDocument &&
+        type === DocumentTypes.ISSUE &&
+        (!document.title || document.title === document.parent?.title);
       setDocument(current => ({
         ...current,
         parent: selection,
+        ...(!selection && shouldPrefillTitle ? { title: '' } : {}),
         authorizationDocument:
           current.parent?.id === selection?.id
             ? current.authorizationDocument
@@ -106,6 +117,8 @@ const useParentDocumentSelection = ({
         const attributes = {
           parent: { ...selection, title: details.title, type: details.type }
         };
+        if (shouldPrefillTitle && details.title)
+          attributes.title = details.title;
         // Contextual links may only supply an ID. Resolve the selector's label
         // through the same detail request used for inheritance.
         if (typeof details.mainLanguage === 'string' && details.mainLanguage) {
@@ -148,6 +161,9 @@ const useParentDocumentSelection = ({
     },
     [
       type,
+      isNewDocument,
+      document.title,
+      document.parent?.title,
       setDocument,
       attributeVersionsRef,
       queryClient,

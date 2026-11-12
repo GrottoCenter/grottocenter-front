@@ -93,7 +93,7 @@ describe('DocumentFormProvider parent validation', () => {
   });
 
   describe.each([DocumentTypes.ARTICLE, DocumentTypes.ISSUE])('%s', type => {
-    it.each([{ id: 41 }, 41])(
+    it.each([{ id: 41 }, 41, '41'])(
       'accepts an existing parent without a title when editing: %j',
       async parent => {
         renderValidation({ ...validDocument, type, parent });
@@ -113,16 +113,19 @@ describe('DocumentFormProvider parent validation', () => {
     });
   });
 
-  it('rejects the current document as its own parent', async () => {
-    renderValidation({
-      ...validDocument,
-      parent: { id: '42', title: 'Current document' }
-    });
+  it.each([42, '42', { id: '42', title: 'Current document' }])(
+    'rejects the current document as its own parent: %j',
+    async parent => {
+      renderValidation({
+        ...validDocument,
+        parent
+      });
 
-    await waitFor(() =>
-      expect(screen.getByText('invalid')).toBeInTheDocument()
-    );
-  });
+      await waitFor(() =>
+        expect(screen.getByText('invalid')).toBeInTheDocument()
+      );
+    }
+  );
 
   it('ignores a stale parent on a document type that does not use one', async () => {
     renderValidation({

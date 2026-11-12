@@ -61,7 +61,11 @@ export const defaultDocumentValuesTypes = PropTypes.shape({
   mainLanguage: PropTypes.string,
   option: PropTypes.string,
   files: PropTypes.arrayOf(fileType),
-  parent: documentType,
+  parent: PropTypes.oneOfType([
+    documentType,
+    PropTypes.number,
+    PropTypes.string
+  ]),
   authorizationDocument: documentType,
   iso3166: PropTypes.arrayOf(iso3166Type)
 });

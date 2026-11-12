@@ -130,7 +130,9 @@ describe('Contextual document creation', () => {
       cy.get('[data-testid="app-snackbar"]').should('not.exist');
       cy.get('@createDocument.all').should('have.length', 0);
       cy.get('[data-testid="document-submit"]').should('be.disabled');
-      cy.get('[data-testid="document-title"] input').type(`First ${label}`);
+      cy.get('[data-testid="document-title"] input')
+        .should('have.value', type === 'Issue' ? parent.title : '')
+        .type(type === 'Issue' ? ' - First issue' : `First ${label}`);
       cy.get('textarea').first().type('A new contribution');
       cy.get('[data-testid="document-authors"] input[role="combobox"]').type(
         'Test'
@@ -146,7 +148,10 @@ describe('Contextual document creation', () => {
         .click({ scrollBehavior: false });
       cy.wait('@createDocument')
         .its('request.body')
-        .should('include', `First ${label}`)
+        .should(
+          'include',
+          type === 'Issue' ? `${parent.title} - First issue` : `First ${label}`
+        )
         .and('include', 'name="parent[id]"')
         .and('include', `\r\n\r\n${parent.id}\r\n`)
         .and('include', `\r\n\r\n${type}\r\n`);
