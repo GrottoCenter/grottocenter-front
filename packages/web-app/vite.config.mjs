@@ -8,6 +8,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import pdfJsWasmAssets from './vite/pdfJsWasmAssets.mjs';
 import serviceWorkerBuildGuard from './vite/serviceWorkerBuildGuard.mjs';
 import { mapDetailCacheKey } from './vite/mapDetailCacheKey.mjs';
+import { osmTileCachePlugin } from './vite/osmTileCachePlugin.mjs';
 
 const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -387,32 +388,7 @@ export default defineConfig(({ mode }) => {
                   maxAgeSeconds: 60 * 60 * 24 * 30
                 },
                 cacheableResponse: { statuses: [0, 200] },
-                plugins: [
-                  {
-                    // Offline over an area never visited online: nothing cached,
-                    // nothing reachable. CacheFirst then rejects with
-                    // `no-response`, which surfaces as an uncaught promise per
-                    // tile — dozens per pan, drowning the console. Resolving
-                    // with an SVG (an <img> loads it fine) silences that.
-                    //
-                    // Byte-identical to ERROR_TILE_URL in
-                    // src/components/common/Maps/common/LayersControl.jsx — a
-                    // missing tile must look the same whichever layer it came
-                    // from, and answering here means Leaflet never sees an
-                    // error, so `errorTileUrl` can't cover these two hosts.
-                    // Kept literal on purpose: workbox-build serializes this
-                    // function with toString(), so a closure variable would not
-                    // survive into the generated service worker.
-                    handlerDidError: async () =>
-                      new globalThis.Response(
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">' +
-                          '<rect width="256" height="256" fill="#f5f5f5"/>' +
-                          '<path d="M0 128h256M128 0v256" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4 6"/>' +
-                          '</svg>',
-                        { headers: { 'Content-Type': 'image/svg+xml' } }
-                      )
-                  }
-                ]
+                plugins: [osmTileCachePlugin]
               }
             },
             {
