@@ -890,10 +890,13 @@ describe('Entrance featured image', () => {
       cy.get('@popupPan').invoke('resetHistory');
       cy.then(() => releaseImage());
       // Respect the chosen view even when the enlarged popup is clipped.
-      cy.get('[data-testid="entrance-popup-photo"]')
-        .should('not.have.attr', 'hidden')
-        .find('img')
-        .should(image => expect(image[0].naturalWidth).to.be.greaterThan(0));
+      cy.get('[data-testid="entrance-popup-photo"]').should(
+        'not.have.attr',
+        'hidden'
+      );
+      cy.get('[data-testid="entrance-popup-photo"] img').should(image =>
+        expect(image[0].naturalWidth).to.be.greaterThan(0)
+      );
       nextPaint();
       cy.get('@popupPan').should('not.have.been.called');
       cy.then(() => expect(map.getCenter().equals(center)).to.equal(true));
