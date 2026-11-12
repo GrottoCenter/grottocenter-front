@@ -90,9 +90,8 @@ const Massif = ({
   const handleShare = useSharePage();
 
   const canShowStatistics = !!massif && !massif.isDeleted;
-  const { data: dataMassif } = useStatisticsMassif(
-    isPreview || massif?.isDeleted ? null : massifIdInt
-  );
+  const { data: dataMassif, isPending: isStatisticsPending } =
+    useStatisticsMassif(isPreview || massif?.isDeleted ? null : massifIdInt);
   useScrollToHashOnLoad(dataMassif);
 
   let onEdit = null;
@@ -417,6 +416,7 @@ const Massif = ({
               entity={massif}
               entityType="massif"
               statistics={dataMassif}
+              isStatisticsPending={canShowStatistics && isStatisticsPending}
               isAdmin={permissions.isAdmin}
               open={isPdfExportOpen}
               onClose={() => setIsPdfExportOpen(false)}

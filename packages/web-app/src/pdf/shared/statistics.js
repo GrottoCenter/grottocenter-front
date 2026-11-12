@@ -1,4 +1,4 @@
-import { entityUrl, makePdfBlock } from './model';
+import { contribution, entityUrl } from './model';
 
 export const hasPdfStatistics = statistics =>
   Number.isFinite(statistics?.nb_entrances);
@@ -11,31 +11,40 @@ export const makeStatisticsPdfBlock = (
   origin
 ) => {
   const t = id => intl.formatMessage({ id });
-  const values = [
+  const counts = [
     ...[
-      ['nb_entrances', 'entrance_count'],
-      ['nb_networks', 'network_count'],
-      ['diving_caves', 'diveable_caves']
-    ].flatMap(([field, id]) =>
+      ['nb_entrances', 'entrance_count', 'entrance'],
+      ['nb_networks', 'network_count', 'network'],
+      ['diving_caves', 'diveable_caves', 'diving_cave']
+    ].flatMap(([field, id, icon]) =>
       Number.isFinite(statistics[field])
         ? [
-            `${intl.formatNumber(statistics[field])} ${intl.formatMessage({ id }, { count: statistics[field] })}`
+            {
+              label: intl.formatNumber(statistics[field]),
+              value: intl.formatMessage({ id }, { count: statistics[field] }),
+              icon
+            }
           ]
         : []
     ),
     ...(Number.isFinite(statistics.nb_massifs)
       ? [
-          `${intl.formatNumber(statistics.nb_massifs)} ${t(statistics.nb_massifs === 1 ? 'massif' : 'massifs')}`
+          {
+            label: intl.formatNumber(statistics.nb_massifs),
+            value: t(statistics.nb_massifs === 1 ? 'massif' : 'massifs'),
+            icon: 'massif'
+          }
         ]
       : [])
   ];
-  for (const [label, value] of [
-    ['average depth', statistics.avg?.avg_depth],
-    ['average length', statistics.avg?.avg_length],
-    ['cumulated length', statistics.total_length?.value]
+  const measurements = [];
+  for (const [label, value, icon] of [
+    ['average depth', statistics.avg?.avg_depth, 'depth'],
+    ['average length', statistics.avg?.avg_length, 'length'],
+    ['cumulated length', statistics.total_length?.value, 'length']
   ]) {
     if (!Number.isFinite(value)) continue;
-    let text = `${t(label)}: ${intl.formatNumber(value, { maximumFractionDigits: 1 })} m`;
+    let text = `${intl.formatNumber(value, { maximumFractionDigits: 1 })} m`;
     if (
       label === 'cumulated length' &&
       Number.isFinite(statistics.total_length?.nb_data)
@@ -45,8 +54,9 @@ export const makeStatisticsPdfBlock = (
         { count: statistics.total_length.nb_data }
       )})`;
     }
-    values.push(text);
+    measurements.push({ label: t(label), value: text, icon });
   }
+  const values = [];
   for (const [field, label] of [
     ['cave_with_max_depth', 'is the deepest cave of the'],
     ['cave_with_max_length', 'is the longest cave of the']
@@ -59,18 +69,23 @@ export const makeStatisticsPdfBlock = (
     if (cave.id_cave != null)
       values.push(entityUrl('caves', cave.id_cave, origin));
   }
-  return makePdfBlock(
-    'statistics',
-    'More information',
-    [
+  return {
+    key: 'statistics',
+    type: 'contributions',
+    title: t('More information'),
+    items: [
+      ...[counts, measurements]
+        .filter(details => details.length > 0)
+        .map((details, index) => ({
+          ...contribution({ id: `statistics-${index}` }, intl),
+          details
+        })),
       {
-        id: entity.id,
-        title: t(
+        ...contribution({ id: entity.id, body: values.join('\n') }, intl),
+        metadata: t(
           'Statistics are recomputed periodically and may not reflect the latest changes.'
-        ),
-        body: values.join('\n')
+        )
       }
-    ],
-    intl
-  );
+    ]
+  };
 };

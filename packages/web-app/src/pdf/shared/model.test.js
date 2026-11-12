@@ -94,7 +94,12 @@ it.each(['entrance', 'network', 'massif', 'country', 'region'])(
             .source
         ).toBe(`${expectedOrigin}/ui/organizations/9`);
         expect(
-          model.blocks.find(block => block.key === 'statistics').items[0].body
+          model.blocks.find(block => block.key === 'organizations').items[0]
+            .icon
+        ).toBe('organization');
+        expect(
+          model.blocks.find(block => block.key === 'statistics').items.at(-1)
+            .body
         ).toContain(`${expectedOrigin}/ui/caves/8`);
       }
       if (entityType === 'massif')
@@ -239,7 +244,7 @@ it('rejects malformed or non-projectable massif polygons', () => {
 });
 
 it.each([0, 1, 1165])(
-  'includes %s entrances beside networks without selecting massif statistics',
+  'keeps %s entrances and linked network counts out of massif information',
   count => {
     const model = buildMassifPdfModel({
       entity: { id: 3, name: 'Massif', networks: [{ id: 8 }] },
@@ -249,15 +254,7 @@ it.each([0, 1, 1165])(
       attachments: [],
       intl
     });
-    expect(model.properties).toEqual([
-      {
-        label: 'Entrances',
-        value: intl.formatNumber(count),
-        icon: 'entrance'
-      },
-      { label: 'Networks', value: '1', icon: 'network' },
-      { label: 'Organizations', value: '0', icon: 'organization' }
-    ]);
+    expect(model.properties).toEqual([]);
     expect(model.blocks).toEqual([]);
   }
 );

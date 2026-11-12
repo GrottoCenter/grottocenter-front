@@ -71,7 +71,8 @@ const Region = ({
   } = useSubscriptions();
   const isSubscribed = region ? isSubscribedMethod(region.id) : false;
 
-  const { data: dataRegion } = useStatisticsRegion(countryId, regionId);
+  const { data: dataRegion, isPending: isStatisticsPending } =
+    useStatisticsRegion(countryId, regionId);
   useScrollToHashOnLoad(dataRegion);
 
   const handleChangeSubscribe = () => {
@@ -244,6 +245,7 @@ const Region = ({
               entity={pdfEntity}
               entityType="region"
               statistics={dataRegion}
+              isStatisticsPending={isStatisticsPending}
               isAdmin={permissions.isAdmin}
               open={isPdfExportOpen}
               onClose={() => setIsPdfExportOpen(false)}

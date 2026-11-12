@@ -51,12 +51,6 @@ export const buildTerritoryPdfModel = options => {
       value: `${coordinates.latitude.toFixed(6)}, ${coordinates.longitude.toFixed(6)} (WGS84)`,
       icon: 'coordinates'
     });
-  if (Array.isArray(entity.organizations))
-    properties.push({
-      label: t('Organizations'),
-      value: String(active(entity.organizations).length),
-      icon: 'organization'
-    });
   const blocks = [];
   if (sections.statistics && hasPdfStatistics(statistics))
     blocks.push(
@@ -82,6 +76,7 @@ export const buildTerritoryPdfModel = options => {
         active(entity.organizations).map(item => ({
           id: item.id,
           title: item.name ?? String(item.id),
+          icon: 'organization',
           source: entityUrl('organizations', item.id, origin)
         })),
         intl

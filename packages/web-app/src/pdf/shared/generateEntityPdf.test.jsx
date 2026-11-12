@@ -33,14 +33,15 @@ const fontSources = Object.fromEntries(
 );
 const intl = createIntl({ locale: 'en', messages });
 
-it.each(['country', 'region'])(
+it.each(['massif', 'country', 'region'])(
   'generates a real %s PDF with numeric statistics',
   async entityType => {
     const territory = PDF_ADAPTERS[entityType].build({
       entity: {
         id: entityType === 'country' ? 'FR' : 'ARA',
         countryId: 'FR',
-        name: 'Territory export'
+        name: 'Territory export',
+        networks: [{ id: 1, name: 'Linked network' }]
       },
       statistics: {
         nb_entrances: 1165,
@@ -49,7 +50,7 @@ it.each(['country', 'region'])(
         avg: { avg_depth: 30, avg_length: 273 },
         total_length: { value: 299165 }
       },
-      sections: { statistics: true },
+      sections: { properties: true, statistics: true },
       documents: [],
       attachments: [],
       intl
@@ -66,6 +67,10 @@ it.each(['country', 'region'])(
         .join(' ');
       expect(text).toContain('1,165');
       expect(text).toContain('entrances');
+      expect(text.match(/entrances/g)).toHaveLength(1);
+      expect(text.match(/networks/g)).toHaveLength(1);
+      expect(text).not.toContain('Networks');
+      if (entityType === 'massif') expect(text).not.toContain('Information');
       expect(text).toContain('299,165 m');
       expect(text).toContain('30 m');
       expect(text).toContain('273 m');
@@ -109,13 +114,9 @@ it('fits nine linked networks and their dimensions before documents on one page'
     const text = (await page.getTextContent()).items
       .map(item => item.str)
       .join(' ');
-    expect(text).toContain('Entrances');
-    expect(text).not.toContain('Entrances list');
-    expect(text.indexOf('Entrances')).toBeLessThan(text.indexOf('Networks'));
-    expect(text.indexOf('Networks')).toBeLessThan(
-      text.indexOf('Organizations')
-    );
-    expect(text).toContain('1,165');
+    expect(text).not.toContain('Entrances');
+    expect(text).not.toContain('Information');
+    expect(text).not.toContain('1,165');
     expect(text).toContain('100 m');
     expect(text).toContain('10,000 m');
     expect(text.indexOf('Document following the networks')).toBeGreaterThan(

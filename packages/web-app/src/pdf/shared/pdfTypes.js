@@ -23,6 +23,7 @@ export const PdfContributionType = PropTypes.shape({
   title: PropTypes.string,
   body: PropTypes.string,
   source: PropTypes.string,
+  icon: PropTypes.string,
   metadata: PropTypes.string,
   details: PropTypes.arrayOf(
     PropTypes.shape({

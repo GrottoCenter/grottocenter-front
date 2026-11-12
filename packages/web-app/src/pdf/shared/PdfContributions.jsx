@@ -56,9 +56,12 @@ const EntityLinks = ({ items, model }) => {
   const styles = usePdfStyles();
   return items.map(item => (
     <View key={item.id} style={styles.entityLink} wrap={false}>
-      <Link src={item.source} style={[styles.link, styles.entityLinkTitle]}>
-        {item.title}
-      </Link>
+      <View style={styles.entityLinkHeading}>
+        <PdfGraphic graphic={model.brand?.icons?.[item.icon]} size={16} />
+        <Link src={item.source} style={[styles.link, styles.entityLinkTitle]}>
+          {item.title}
+        </Link>
+      </View>
       {item.details.length > 0 && (
         <View style={styles.entityLinkDetails}>
           {item.details.map(detail => (

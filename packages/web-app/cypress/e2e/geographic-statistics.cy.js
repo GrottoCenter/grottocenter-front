@@ -3,6 +3,14 @@ const territories = [
   ['region', '/countries/FR/regions/38', 'FR-38'],
   ['massif', '/massifs/7', 7]
 ];
+const makeTerritory = id => ({
+  id,
+  name: 'Statistics territory',
+  nativeName: 'Statistics territory',
+  descriptions: [],
+  guidelines: [],
+  organizations: []
+});
 
 describe('geographic entrance counts', () => {
   beforeEach(() => {
@@ -13,16 +21,7 @@ describe('geographic entrance counts', () => {
   const visitTerritory = (path, id, statistics) => {
     cy.intercept(
       { method: 'GET', pathname: `/api/v1${path}` },
-      {
-        body: {
-          id,
-          name: 'Statistics territory',
-          nativeName: 'Statistics territory',
-          descriptions: [],
-          guidelines: [],
-          organizations: []
-        }
-      }
+      { body: makeTerritory(id) }
     );
     cy.intercept(
       { method: 'GET', pathname: `/api/v1${path}/statistics` },
@@ -35,6 +34,41 @@ describe('geographic entrance counts', () => {
   };
 
   territories.forEach(([type, path, id]) => {
+    it(`waits for ${type} statistics before enabling PDF download`, () => {
+      let releaseStatistics;
+      const statisticsReady = new Cypress.Promise(resolve => {
+        releaseStatistics = resolve;
+      });
+      if (type === 'massif') cy.viewport(390, 844);
+      cy.intercept(
+        { method: 'GET', pathname: `/api/v1${path}` },
+        { body: makeTerritory(id) }
+      );
+      cy.intercept(
+        { method: 'GET', pathname: `/api/v1${path}/statistics` },
+        request =>
+          statisticsReady.then(() => {
+            request.reply({ body: { nb_entrances: 3, nb_networks: 1 } });
+          })
+      ).as('statistics');
+      cy.visit(path, {
+        onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+      });
+      if (type === 'massif') cy.get('button[aria-label="actions"]').click();
+      cy.get('[data-testid="action-pdf"]', { timeout: 20000 }).click();
+      cy.get('[data-testid="pdf-download"]', { timeout: 20000 }).should(
+        'be.disabled'
+      );
+      cy.get('[role="dialog"] [role="status"]').should('contain', 'Loading');
+      cy.screenshot(`${type}-pdf-loading`);
+      cy.then(() => releaseStatistics());
+      cy.wait('@statistics');
+      cy.get('[data-testid="pdf-download"]').should('be.enabled');
+      cy.contains('[role="dialog"] label', 'More information')
+        .find('input')
+        .should('be.checked');
+    });
+
     it(`shows three entrances and one network on the ${type} page`, () => {
       visitTerritory(path, id, {
         nb_entrances: 3,

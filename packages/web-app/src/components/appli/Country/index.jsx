@@ -64,7 +64,8 @@ const Country = ({
   } = useSubscriptions();
   const isSubscribed = country ? isSubscribedMethod(country.id) : false;
 
-  const { data: dataCountry } = useStatisticsCountry(country?.id);
+  const { data: dataCountry, isPending: isStatisticsPending } =
+    useStatisticsCountry(country?.id);
 
   const position =
     country?.latitude && country?.longitude
@@ -246,6 +247,7 @@ const Country = ({
               entity={pdfEntity}
               entityType="country"
               statistics={dataCountry}
+              isStatisticsPending={isStatisticsPending}
               isAdmin={permissions.isAdmin}
               open={isPdfExportOpen}
               onClose={() => setIsPdfExportOpen(false)}

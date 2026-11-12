@@ -76,7 +76,12 @@ export const makeStyles = colors =>
     propertyValue: { width: '65%', fontSize: 10 },
     contribution: { marginBottom: 10 },
     entityLink: { marginBottom: 6 },
-    entityLinkTitle: { fontSize: 10, fontWeight: 700 },
+    entityLinkHeading: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5
+    },
+    entityLinkTitle: { fontSize: 10, fontWeight: 700, flex: 1 },
     entityLinkDetails: { flexDirection: 'row', gap: 12, marginTop: 2 },
     entityLinkMetric: {
       flexDirection: 'row',

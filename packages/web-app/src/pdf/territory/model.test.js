@@ -38,11 +38,26 @@ it.each(['massif', 'country', 'region'])(
         total_length: { value: 100, nb_data: 1 }
       }
     });
-    const { body } = model.blocks.find(block => block.key === 'statistics')
-      .items[0];
-    expect(body).toContain('3 entrées');
-    expect(body).toContain('1 réseau');
-    expect(body).toContain('Développement cumulé: 100 m');
+    const { items } = model.blocks.find(block => block.key === 'statistics');
+    expect(items[0].details).toEqual([
+      { label: '3', value: 'entrées', icon: 'entrance' },
+      {
+        label: '1',
+        value: intl.formatMessage({ id: 'network_count' }, { count: 1 }),
+        icon: 'network'
+      }
+    ]);
+    expect(items[1].details[0]).toMatchObject({
+      label: 'Développement cumulé',
+      value: '100 m (1 cavité dont le développement est renseigné)',
+      icon: 'length'
+    });
+    expect(model.properties.map(property => property.icon)).not.toContain(
+      'entrance'
+    );
+    expect(model.properties.map(property => property.icon)).not.toContain(
+      'network'
+    );
   }
 );
 
@@ -51,8 +66,8 @@ it.each(['massif', 'country', 'region'])(
   entityType => {
     const zero = build(entityType, { statistics: { nb_entrances: 0 } });
     expect(
-      zero.blocks.find(block => block.key === 'statistics').items[0].body
-    ).toContain('0 entrée');
+      zero.blocks.find(block => block.key === 'statistics').items[0].details
+    ).toEqual([{ label: '0', value: 'entrée', icon: 'entrance' }]);
     for (const unavailable of [{}, { nb_entrances: null }, { nb_caves: 99 }]) {
       const model = build(entityType, { statistics: unavailable });
       expect(
@@ -71,16 +86,30 @@ it.each(['massif', 'country', 'region'])(
   'exports all available statistics for a %s with localized numbers',
   entityType => {
     const model = build(entityType);
-    const { body } = model.blocks.find(block => block.key === 'statistics')
-      .items[0];
-    expect(body).toContain(`${intl.formatNumber(1165)} entrées`);
-    expect(body).toContain('9 réseaux');
-    expect(body).toContain('3 cavités permettent de faire de la plongée');
-    expect(body).toContain('Profondeur moyenne: 30 m');
-    expect(body).toContain('Développement moyen: 273 m');
-    expect(body).toContain(
-      `Développement cumulé: ${intl.formatNumber(299165)} m (${intl.formatNumber(1092)} cavités dont le développement est renseigné)`
-    );
+    const { items } = model.blocks.find(block => block.key === 'statistics');
+    expect(items[0].details).toEqual([
+      { label: intl.formatNumber(1165), value: 'entrées', icon: 'entrance' },
+      {
+        label: '9',
+        value: intl.formatMessage({ id: 'network_count' }, { count: 9 }),
+        icon: 'network'
+      },
+      {
+        label: '3',
+        value: 'cavités permettent de faire de la plongée',
+        icon: 'diving_cave'
+      }
+    ]);
+    expect(items[1].details).toEqual([
+      { label: 'Profondeur moyenne', value: '30 m', icon: 'depth' },
+      { label: 'Développement moyen', value: '273 m', icon: 'length' },
+      {
+        label: 'Développement cumulé',
+        value: `${intl.formatNumber(299165)} m (${intl.formatNumber(1092)} cavités dont le développement est renseigné)`,
+        icon: 'length'
+      }
+    ]);
+    const { body } = items.at(-1);
     expect(body).not.toContain('Calculé à');
     expect(body).toContain('Bange · 865 m');
     expect(body).toContain(`Bange · ${intl.formatNumber(53955)} m`);
@@ -98,9 +127,7 @@ it.each([
       total_length: { value: 0, nb_data: count }
     }
   });
-  expect(model.blocks[0].items[0].body).toContain(
-    `Développement cumulé: 0 m (${label})`
-  );
+  expect(model.blocks[0].items[1].details[0].value).toBe(`0 m (${label})`);
 });
 
 it('keeps zero statistics, pluralizes counts, and omits unknown measurements', () => {
@@ -113,13 +140,26 @@ it('keeps zero statistics, pluralizes counts, and omits unknown measurements', (
       avg: { avg_depth: 0 }
     }
   });
-  const { body } = model.blocks[0].items[0];
-  expect(body).toContain('1 entrée');
-  expect(body).toContain('0 réseau (');
-  expect(body).toContain('0 massifs');
-  expect(body).toContain('Profondeur moyenne: 0 m');
-  expect(body).not.toContain('Développement moyen');
-  expect(body).not.toMatch(/undefined|NaN|null|{count/);
+  const { items } = model.blocks[0];
+  expect(items[0].details).toContainEqual({
+    label: '1',
+    value: 'entrée',
+    icon: 'entrance'
+  });
+  expect(items[0].details).toContainEqual({
+    label: '0',
+    value: intl.formatMessage({ id: 'network_count' }, { count: 0 }),
+    icon: 'network'
+  });
+  expect(items[0].details).toContainEqual({
+    label: '0',
+    value: 'massifs',
+    icon: 'massif'
+  });
+  expect(items[1].details).toEqual([
+    { label: 'Profondeur moyenne', value: '0 m', icon: 'depth' }
+  ]);
+  expect(JSON.stringify(items)).not.toMatch(/undefined|NaN|null|{count/);
 });
 
 it('uses canonical country and region routes, keeps valid zero coordinates, and omits unavailable sections', () => {
@@ -149,7 +189,44 @@ it('uses canonical country and region routes, keeps valid zero coordinates, and 
   }
 });
 
-it('omits country regions even with stale choices and uses the organization icon', () => {
+it.each(['massif', 'country', 'region'])(
+  'shows %s organizations only as named links with icons',
+  entityType => {
+    const model = build(entityType, {
+      entity: {
+        id: 3,
+        name: 'Territory',
+        organizations: [{ id: 1, name: 'Club' }]
+      },
+      sections: { properties: true, statistics: true, organizations: true }
+    });
+    expect(model.properties.map(property => property.icon)).not.toContain(
+      'organization'
+    );
+    expect(
+      model.blocks
+        .find(block => block.key === 'statistics')
+        .items.flatMap(item => item.details ?? [])
+        .map(detail => detail.icon)
+    ).not.toContain('organization');
+    expect(
+      model.blocks.find(block => block.key === 'organizations').items
+    ).toEqual([
+      expect.objectContaining({ title: 'Club', icon: 'organization' })
+    ]);
+    if (entityType === 'massif') {
+      expect(model.properties).toEqual([]);
+      expect(
+        PDF_ADAPTERS.massif.sections.map(section => section.key)
+      ).not.toContain('properties');
+      expect(
+        PDF_ADAPTERS.massif.availability({}, false, {})
+      ).not.toHaveProperty('properties');
+    }
+  }
+);
+
+it('omits country regions even with stale choices', () => {
   const model = build('country', {
     entity: {
       id: 'FR',
@@ -163,9 +240,9 @@ it('omits country regions even with stale choices and uses the organization icon
   expect(model.properties.map(property => property.label)).not.toContain(
     'Régions'
   );
-  expect(
-    model.properties.find(property => property.label === 'Organisations')
-  ).toMatchObject({ value: '1', icon: 'organization' });
+  expect(model.properties.map(property => property.icon)).not.toContain(
+    'organization'
+  );
   expect(
     PDF_ADAPTERS.country.sections.map(section => section.key)
   ).not.toContain('regions');
