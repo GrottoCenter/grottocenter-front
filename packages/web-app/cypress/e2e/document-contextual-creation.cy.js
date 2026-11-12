@@ -43,14 +43,19 @@ describe('Contextual document creation', () => {
         }
       }
     );
-    cy.intercept(
-      { method: 'GET', pathname: '/api/v1/licenses' },
-      { body: { licenses: [] } }
-    );
-    cy.intercept(
-      { method: 'GET', pathname: '/api/v1/file-formats' },
-      { body: { fileFormats: [] } }
-    );
+    // The catch-all's {} is invalid for reference queries: undefined query
+    // data triggers error snackbars that can cover the mobile submit button.
+    [
+      ['licenses', 'licenses'],
+      ['file-formats', 'fileFormats'],
+      ['documents/identifierTypes', 'identifierTypes'],
+      ['documents/subjects', 'subjects']
+    ].forEach(([path, key]) => {
+      cy.intercept(
+        { method: 'GET', pathname: `/api/v1/${path}` },
+        { body: { [key]: [] } }
+      ).as(key);
+    });
     cy.intercept(
       { method: 'POST', pathname: '/api/v1/search' },
       {
@@ -121,6 +126,8 @@ describe('Contextual document creation', () => {
         'have.value',
         parent.title
       );
+      cy.wait(['@licenses', '@fileFormats', '@identifierTypes', '@subjects']);
+      cy.get('[data-testid="app-snackbar"]').should('not.exist');
       cy.get('@createDocument.all').should('have.length', 0);
       cy.get('[data-testid="document-submit"]').should('be.disabled');
       cy.get('[data-testid="document-title"] input').type(`First ${label}`);
