@@ -33,6 +33,49 @@ const fontSources = Object.fromEntries(
 );
 const intl = createIntl({ locale: 'en', messages });
 
+it.each([0, 2])(
+  'renders every statistics count without duplicate keys when all counts equal %s',
+  async count => {
+    const territory = buildMassifPdfModel({
+      entity: { id: 1, name: 'Equal statistics counts' },
+      statistics: {
+        nb_entrances: count,
+        nb_networks: count,
+        diving_caves: count,
+        nb_massifs: count
+      },
+      sections: { statistics: true },
+      documents: [],
+      attachments: [],
+      intl
+    });
+    const errorSpy = vi.spyOn(console, 'error');
+    let task;
+    try {
+      task = getDocument({
+        data: await generateEntityPdf(territory, [], { fontSources })
+      });
+      const output = await task.promise;
+      const page = await output.getPage(1);
+      const text = (await page.getTextContent()).items
+        .map(item => item.str)
+        .join(' ')
+        .replace(/\s+/g, ' ');
+      for (const id of ['entrance_count', 'network_count', 'diveable_caves']) {
+        expect(text).toContain(
+          `${count} ${intl.formatMessage({ id }, { count })}`
+        );
+      }
+      expect(text).toContain(`${count} ${messages.massifs}`);
+      expect(errorSpy).not.toHaveBeenCalled();
+    } finally {
+      errorSpy.mockRestore();
+      await task?.destroy();
+    }
+  },
+  20000
+);
+
 it.each(['massif', 'country', 'region'])(
   'generates a real %s PDF with numeric statistics',
   async entityType => {

@@ -40,8 +40,9 @@ it.each(['massif', 'country', 'region'])(
     });
     const { items } = model.blocks.find(block => block.key === 'statistics');
     expect(items[0].details).toEqual([
-      { label: '3', value: 'entrées', icon: 'entrance' },
+      { key: 'nb_entrances', label: '3', value: 'entrées', icon: 'entrance' },
       {
+        key: 'nb_networks',
         label: '1',
         value: intl.formatMessage({ id: 'network_count' }, { count: 1 }),
         icon: 'network'
@@ -67,7 +68,9 @@ it.each(['massif', 'country', 'region'])(
     const zero = build(entityType, { statistics: { nb_entrances: 0 } });
     expect(
       zero.blocks.find(block => block.key === 'statistics').items[0].details
-    ).toEqual([{ label: '0', value: 'entrée', icon: 'entrance' }]);
+    ).toEqual([
+      { key: 'nb_entrances', label: '0', value: 'entrée', icon: 'entrance' }
+    ]);
     for (const unavailable of [{}, { nb_entrances: null }, { nb_caves: 99 }]) {
       const model = build(entityType, { statistics: unavailable });
       expect(
@@ -88,22 +91,40 @@ it.each(['massif', 'country', 'region'])(
     const model = build(entityType);
     const { items } = model.blocks.find(block => block.key === 'statistics');
     expect(items[0].details).toEqual([
-      { label: intl.formatNumber(1165), value: 'entrées', icon: 'entrance' },
       {
+        key: 'nb_entrances',
+        label: intl.formatNumber(1165),
+        value: 'entrées',
+        icon: 'entrance'
+      },
+      {
+        key: 'nb_networks',
         label: '9',
         value: intl.formatMessage({ id: 'network_count' }, { count: 9 }),
         icon: 'network'
       },
       {
+        key: 'diving_caves',
         label: '3',
         value: 'cavités permettent de faire de la plongée',
         icon: 'diving_cave'
       }
     ]);
     expect(items[1].details).toEqual([
-      { label: 'Profondeur moyenne', value: '30 m', icon: 'depth' },
-      { label: 'Développement moyen', value: '273 m', icon: 'length' },
       {
+        key: 'average depth',
+        label: 'Profondeur moyenne',
+        value: '30 m',
+        icon: 'depth'
+      },
+      {
+        key: 'average length',
+        label: 'Développement moyen',
+        value: '273 m',
+        icon: 'length'
+      },
+      {
+        key: 'cumulated length',
         label: 'Développement cumulé',
         value: `${intl.formatNumber(299165)} m (${intl.formatNumber(1092)} cavités dont le développement est renseigné)`,
         icon: 'length'
@@ -142,22 +163,30 @@ it('keeps zero statistics, pluralizes counts, and omits unknown measurements', (
   });
   const { items } = model.blocks[0];
   expect(items[0].details).toContainEqual({
+    key: 'nb_entrances',
     label: '1',
     value: 'entrée',
     icon: 'entrance'
   });
   expect(items[0].details).toContainEqual({
+    key: 'nb_networks',
     label: '0',
     value: intl.formatMessage({ id: 'network_count' }, { count: 0 }),
     icon: 'network'
   });
   expect(items[0].details).toContainEqual({
+    key: 'nb_massifs',
     label: '0',
     value: 'massifs',
     icon: 'massif'
   });
   expect(items[1].details).toEqual([
-    { label: 'Profondeur moyenne', value: '0 m', icon: 'depth' }
+    {
+      key: 'average depth',
+      label: 'Profondeur moyenne',
+      value: '0 m',
+      icon: 'depth'
+    }
   ]);
   expect(JSON.stringify(items)).not.toMatch(/undefined|NaN|null|{count/);
 });

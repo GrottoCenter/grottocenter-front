@@ -20,6 +20,7 @@ export const makeStatisticsPdfBlock = (
       Number.isFinite(statistics[field])
         ? [
             {
+              key: field,
               label: intl.formatNumber(statistics[field]),
               value: intl.formatMessage({ id }, { count: statistics[field] }),
               icon
@@ -30,6 +31,7 @@ export const makeStatisticsPdfBlock = (
     ...(Number.isFinite(statistics.nb_massifs)
       ? [
           {
+            key: 'nb_massifs',
             label: intl.formatNumber(statistics.nb_massifs),
             value: t(statistics.nb_massifs === 1 ? 'massif' : 'massifs'),
             icon: 'massif'
@@ -54,7 +56,7 @@ export const makeStatisticsPdfBlock = (
         { count: statistics.total_length.nb_data }
       )})`;
     }
-    measurements.push({ label: t(label), value: text, icon });
+    measurements.push({ key: label, label: t(label), value: text, icon });
   }
   const values = [];
   for (const [field, label] of [

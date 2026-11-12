@@ -103,7 +103,7 @@ export const Blocks = ({ blocks, model }) => {
             {item.body && <LinkedText>{item.body}</LinkedText>}
             {item.details?.map(detail => (
               <View
-                key={detail.label}
+                key={detail.key ?? detail.label}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
