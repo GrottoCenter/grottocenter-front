@@ -115,6 +115,49 @@ beforeEach(() => {
 });
 
 it.each([
+  ['Collection', 'Issue'],
+  ['Issue', 'Article']
+])('offers contextual creation from an empty %s', async (type, childType) => {
+  useDocument.mockReturnValue({
+    data: { ...document, type },
+    isPending: false
+  });
+  renderPage();
+  const action = screen.getByRole('link', { name: 'New' });
+  expect(action).toHaveAttribute(
+    'href',
+    `/ui/entity/add/document?type=${childType}&parentId=123`
+  );
+  expect(action).toHaveTextContent('New');
+  expect(within(action).getByTestId('AddCircleIcon')).toBeInTheDocument();
+  if (type === 'Issue') {
+    expect(screen.getByText('No articles in this issue.')).toBeVisible();
+    const section = action.closest('.MuiCard-root');
+    const collapse = section.querySelector('.MuiCollapse-root');
+    await userEvent.setup().click(action);
+    expect(collapse).toHaveClass('MuiCollapse-entered');
+  }
+});
+
+it.each([
+  ['anonymous', false, false, false, false],
+  ['deleted', true, true, false, false],
+  ['hidden actions', true, false, true, false],
+  ['preview', true, false, false, true]
+])(
+  'hides contextual creation for %s',
+  (_label, isAuth, isDeleted, hideActions, isPreview) => {
+    usePermissions.mockReturnValue({ isAuth, isModerator: true });
+    useDocument.mockReturnValue({
+      data: { ...document, type: 'Issue', isDeleted },
+      isPending: false
+    });
+    renderPage(hideActions, isPreview);
+    expect(screen.queryByRole('link', { name: 'New' })).not.toBeInTheDocument();
+  }
+);
+
+it.each([
   ['administrator only', { isAdmin: true, isModerator: false }],
   ['moderator only', { isAdmin: false, isModerator: true }]
 ])('allows %s to restore a deleted document', async (_role, roles) => {

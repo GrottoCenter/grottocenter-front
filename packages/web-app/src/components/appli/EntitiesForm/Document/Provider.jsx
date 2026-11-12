@@ -3,7 +3,8 @@ import {
   createContext,
   useCallback,
   useEffect,
-  useMemo
+  useMemo,
+  useRef
 } from 'react';
 import PropTypes from 'prop-types';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
@@ -20,6 +21,7 @@ import {
   DOCUMENT_AUTHORIZE_TO_PUBLISH
 } from './formElements/AddFileForm/FileHelpers';
 import { defaultDocumentValuesTypes } from './types';
+import useParentDocumentSelection from './useParentDocumentSelection';
 
 export const defaultDocAttributes = {
   id: null,
@@ -82,7 +84,7 @@ export const getDocumentLengthErrors = document => {
     }));
 };
 
-const checkFormValidation = document => {
+const checkFormValidation = (document, isNewDocument) => {
   let isValid = true;
 
   const payload = filterDocumentPayload(document);
@@ -116,7 +118,9 @@ const checkFormValidation = document => {
   if (
     (document.type === DocumentTypes.ISSUE ||
       document.type === DocumentTypes.ARTICLE) &&
-    !document.parent
+    // Existing and pending details may omit the parent's title. Creation must
+    // still resolve URL-only parents before allowing submission.
+    (isNewDocument ? !document.parent?.title : !document.parent)
   )
     isValid = false;
 
@@ -162,7 +166,8 @@ export const DocumentFormContext = createContext({
   allowEntityCreation: true,
   isFormValid: true,
   lengthErrors: [],
-  updateAttribute: (attributeName, newValue) => {}, // eslint-disable-line no-unused-vars
+  updateAttribute: (_attributeName, _newValue) => {},
+  selectParent: () => {},
   resetContext: () => {},
   linkedEntrance: null,
   setLinkedEntrance: () => {}
@@ -173,6 +178,10 @@ const normalizeInitialValues = values => {
   const { option, files, authorsOrganization, ...rest } = values;
   return {
     ...rest,
+    parent:
+      typeof rest.parent === 'number' || typeof rest.parent === 'string'
+        ? { id: rest.parent }
+        : (rest.parent ?? null),
     selectOptionAuthorizationDocument:
       option ??
       (values.authorizationDocument?.id ? DOCUMENT_AUTHORIZE_TO_PUBLISH : null),
@@ -181,10 +190,26 @@ const normalizeInitialValues = values => {
   };
 };
 
-const Provider = ({ children, initialValues, allowEntityCreation = true }) => {
+const Provider = ({
+  children,
+  initialValues,
+  creationContext,
+  allowEntityCreation = true
+}) => {
   const [document, setDocument] = useState({
     ...defaultDocAttributes,
+    ...(!initialValues && creationContext
+      ? { type: creationContext.type }
+      : {}),
     ...normalizeInitialValues(initialValues)
+  });
+  const attributeVersionsRef = useRef({});
+  const selectParent = useParentDocumentSelection({
+    document,
+    setDocument,
+    attributeVersionsRef,
+    isNewDocument: !initialValues,
+    initialParent: !initialValues ? creationContext?.parent : null
   });
 
   const [isFormValid, setIsFormValid] = useState(false);
@@ -196,6 +221,8 @@ const Provider = ({ children, initialValues, allowEntityCreation = true }) => {
 
   const updateAttribute = useCallback(
     (attributeName, newValue) => {
+      attributeVersionsRef.current[attributeName] =
+        (attributeVersionsRef.current[attributeName] ?? 0) + 1;
       setDocument(prevState => ({
         ...prevState,
         [attributeName]: newValue
@@ -205,11 +232,13 @@ const Provider = ({ children, initialValues, allowEntityCreation = true }) => {
   );
 
   useEffect(() => {
-    setIsFormValid(checkFormValidation(document));
-  }, [document, setIsFormValid]);
+    setIsFormValid(checkFormValidation(document, !initialValues));
+  }, [document, initialValues, setIsFormValid]);
 
   const resetContext = useCallback(
     (overrides = {}) => {
+      attributeVersionsRef.current.parent =
+        (attributeVersionsRef.current.parent ?? 0) + 1;
       setDocument({ ...defaultDocAttributes, ...overrides });
     },
     [setDocument]
@@ -223,6 +252,7 @@ const Provider = ({ children, initialValues, allowEntityCreation = true }) => {
       isFormValid,
       lengthErrors,
       updateAttribute,
+      selectParent,
       resetContext,
       linkedEntrance,
       setLinkedEntrance
@@ -234,6 +264,7 @@ const Provider = ({ children, initialValues, allowEntityCreation = true }) => {
       isFormValid,
       lengthErrors,
       updateAttribute,
+      selectParent,
       resetContext,
       linkedEntrance
     ]
@@ -249,6 +280,11 @@ const Provider = ({ children, initialValues, allowEntityCreation = true }) => {
 Provider.propTypes = {
   children: PropTypes.node.isRequired,
   initialValues: defaultDocumentValuesTypes,
+  creationContext: PropTypes.shape({
+    type: PropTypes.oneOf([DocumentTypes.ARTICLE, DocumentTypes.ISSUE])
+      .isRequired,
+    parent: PropTypes.shape({ id: PropTypes.number.isRequired }).isRequired
+  }),
   allowEntityCreation: PropTypes.bool
 };
 

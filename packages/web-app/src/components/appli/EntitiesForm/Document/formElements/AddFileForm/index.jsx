@@ -130,8 +130,7 @@ const AddFileForm = ({
     if (prevParentIdRef.current === parentId) return;
     prevParentIdRef.current = parentId;
     setCorrectedLicenseParentId(undefined);
-    updateAttribute('authorizationDocument', null);
-  }, [parentId, updateAttribute]);
+  }, [parentId]);
 
   const isParentAuthForced =
     document.parent !== null && document.authorizationDocument !== null;

@@ -14,6 +14,9 @@ import DocumentFormProvider, {
   getDocumentLengthErrors
 } from './Provider';
 
+// Validation is independent of the server-backed parent selection mechanism.
+vi.mock('./useParentDocumentSelection', () => ({ default: () => vi.fn() }));
+
 const ValidationState = () => {
   const { isFormValid } = useContext(DocumentFormContext);
   return <span>{isFormValid ? 'valid' : 'invalid'}</span>;
@@ -89,16 +92,40 @@ describe('DocumentFormProvider parent validation', () => {
     await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
   });
 
-  it('rejects the current document as its own parent', async () => {
-    renderValidation({
-      ...validDocument,
-      parent: { id: '42', title: 'Current document' }
-    });
+  describe.each([DocumentTypes.ARTICLE, DocumentTypes.ISSUE])('%s', type => {
+    it.each([{ id: 41 }, 41, '41'])(
+      'accepts an existing parent without a title when editing: %j',
+      async parent => {
+        renderValidation({ ...validDocument, type, parent });
 
-    await waitFor(() =>
-      expect(screen.getByText('invalid')).toBeInTheDocument()
+        await waitFor(() =>
+          expect(screen.getByText('valid')).toBeInTheDocument()
+        );
+      }
     );
+
+    it('rejects a missing parent when editing', async () => {
+      renderValidation({ ...validDocument, type, parent: null });
+
+      await waitFor(() =>
+        expect(screen.getByText('invalid')).toBeInTheDocument()
+      );
+    });
   });
+
+  it.each([42, '42', { id: '42', title: 'Current document' }])(
+    'rejects the current document as its own parent: %j',
+    async parent => {
+      renderValidation({
+        ...validDocument,
+        parent
+      });
+
+      await waitFor(() =>
+        expect(screen.getByText('invalid')).toBeInTheDocument()
+      );
+    }
+  );
 
   it('ignores a stale parent on a document type that does not use one', async () => {
     renderValidation({

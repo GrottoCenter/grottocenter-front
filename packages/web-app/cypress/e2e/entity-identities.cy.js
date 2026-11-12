@@ -76,6 +76,17 @@ describe('Entity family identities and useful author types', () => {
     cy.intercept('GET', '**/api/v1/documents/types', {
       documentTypes: [{ id: 1, name: 'Event' }]
     });
+    [
+      ['documents/identifierTypes', 'identifierTypes'],
+      ['documents/subjects', 'subjects'],
+      ['file-formats', 'fileFormats'],
+      ['licenses', 'licenses']
+    ].forEach(([path, key]) => {
+      cy.intercept(
+        { method: 'GET', pathname: `/api/v1/${path}` },
+        { body: { [key]: [] } }
+      );
+    });
     cy.intercept('GET', '**/api/v1/documents/42', document).as('document');
     people.forEach(person => {
       cy.intercept('GET', `**/api/v1/cavers/${person.id}`, {
@@ -205,7 +216,7 @@ describe('Entity family identities and useful author types', () => {
       'have.value',
       'new'
     );
-    cy.get('[role="listbox"]').contains('New author').click();
+    cy.contains('[role="option"]', 'New author').click();
     cy.get('[data-testid="document-authors"]')
       .should('contain.text', 'New author')
       .and('not.contain.text', '(Author)');

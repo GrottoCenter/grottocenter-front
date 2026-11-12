@@ -5,6 +5,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useOnlineStatus, useIsDesktopLayout } from '../../hooks';
 import OfflineDisabled from './OfflineDisabled';
+import AppLink from './AppLink';
 import { MOBILE_SECTION_ACTION_BUTTON_SX } from './sectionActionButtonStyles';
 
 /**
@@ -26,13 +27,13 @@ import { MOBILE_SECTION_ACTION_BUTTON_SX } from './sectionActionButtonStyles';
  * in place because a disabled <button> emits no hover — MUI warns about it, and
  * OfflineDisabled's own tooltip is the one that shows.
  *
- * Below `md` the label collapses into the tooltip and the button becomes an
- * IconButton, so a "+ Nouveau" doesn't push the section title to a new line on
- * phones.
+ * Below `md` the outlined button only shows its icon. A `to` destination uses
+ * the same appearance for navigation to a creation page.
  */
 const SectionCreateButton = ({
-  isOpen,
+  isOpen = false,
   onToggle,
+  to,
   label,
   tooltip,
   openTooltip,
@@ -57,44 +58,38 @@ const SectionCreateButton = ({
 
   return (
     <OfflineDisabled disabled={isBlocked}>
-      <Tooltip title={isBlocked ? '' : currentTooltip}>
-        {isDesktop ? (
-          <Button
-            // Red once open: the button no longer creates anything, it abandons
-            // what is on screen. `inherit` made a destructive action look like
-            // plain text.
-            color={currentColor}
-            size={size}
-            variant="outlined"
-            disabled={isBlocked || disabled}
-            onClick={onToggle}
-            data-testid={testId}
-            startIcon={currentIcon}>
-            {currentLabel}
-          </Button>
-        ) : (
-          // Same outlined Button on mobile. Small section actions share one
-          // fixed footprint even when callers provide custom composite icons.
-          <Button
-            color={currentColor}
-            size={size}
-            variant="outlined"
-            disabled={isBlocked || disabled}
-            onClick={onToggle}
-            data-testid={testId}
-            aria-label={currentLabel}
-            sx={size === 'small' ? MOBILE_SECTION_ACTION_BUTTON_SX : undefined}>
-            {currentIcon}
-          </Button>
-        )}
+      <Tooltip title={isBlocked ? '' : currentTooltip} describeChild={!!to}>
+        <Button
+          component={to ? AppLink : undefined}
+          to={to}
+          color={currentColor}
+          size={size}
+          variant="outlined"
+          disabled={isBlocked || disabled}
+          onClick={event => {
+            // Navigation must not expand the enclosing collapsible section.
+            if (to) event.stopPropagation();
+            onToggle?.(event);
+          }}
+          data-testid={testId}
+          startIcon={isDesktop ? currentIcon : undefined}
+          aria-label={isDesktop ? undefined : currentLabel}
+          sx={
+            !isDesktop && size === 'small'
+              ? MOBILE_SECTION_ACTION_BUTTON_SX
+              : undefined
+          }>
+          {isDesktop ? currentLabel : currentIcon}
+        </Button>
       </Tooltip>
     </OfflineDisabled>
   );
 };
 
 SectionCreateButton.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onToggle: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool,
+  onToggle: PropTypes.func,
+  to: PropTypes.string,
   // Already translated: the id differs per section (New / Add / Associate /
   // Join), while the closed state's label is always 'Cancel' and is handled
   // here.

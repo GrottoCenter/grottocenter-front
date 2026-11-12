@@ -141,6 +141,12 @@ it.each([
 ])(
   'searches allowed parents for %s, excludes itself and uses the type icon',
   async (type, parentType, icon) => {
+    const defaultGet = apiGet.getMockImplementation();
+    apiGet.mockImplementation(url =>
+      url === `${getDocumentDetailsUrl}10`
+        ? Promise.resolve({ ...details, type: parentType })
+        : defaultGet(url)
+    );
     apiPost.mockResolvedValue({
       results: [
         { ...firstParent, type: parentType },

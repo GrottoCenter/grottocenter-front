@@ -136,6 +136,36 @@ describe('editing document publication rights', () => {
     apiPutForm.mockResolvedValue({ id: 42 });
   });
 
+  describe.each(['Article', 'Issue'])('%s parent normalization', type => {
+    it.each([{ id: 41 }, 41, '41'])(
+      'submits an untitled existing parent as parent[id]: %j',
+      async parent => {
+        const { onSuccess } = renderSubmission({
+          type,
+          parent
+        });
+        const submit = screen.getByRole('button', { name: 'Update' });
+        await waitFor(() => expect(submit).toBeEnabled());
+        fireEvent.click(submit);
+
+        await waitFor(() => expect(apiPutForm).toHaveBeenCalledTimes(1));
+        const [url, body] = apiPutForm.mock.calls[0];
+        expect(url).toBe(putDocumentUrl(42));
+        expect(body.get('parent[id]')).toBe('41');
+        expect(body.has('parent')).toBe(false);
+        expect(body.get('type')).toBe(type);
+        await waitFor(() => expect(onSuccess).toHaveBeenCalled());
+      }
+    );
+    it.each([42, '42'])('blocks a bare self-parent id: %j', async parent => {
+      renderSubmission({ type, parent });
+      const submit = screen.getByRole('button', { name: 'Update' });
+      expect(submit).toBeDisabled();
+      fireEvent.submit(submit.closest('form'));
+      expect(apiPutForm).not.toHaveBeenCalled();
+    });
+  });
+
   it('submits a new file with the stored license and inferred authorization without reselecting the parent', async () => {
     const { container, onSuccess } = renderSubmission();
     await addFile(container);

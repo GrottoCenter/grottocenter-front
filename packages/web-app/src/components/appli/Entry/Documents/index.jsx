@@ -6,7 +6,8 @@ import LinkIcon from '@mui/icons-material/Link';
 import { styled } from '@mui/material/styles';
 import NewEntityButton from '@/components/common/NewEntityButton';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
-import { DOCUMENT_SORT_ORDERS } from '@/utils/documentSort';
+import DocumentSortSelect from '@/components/common/DocumentSortSelect';
+import { canSortDocuments, DOCUMENT_SORT_ORDERS } from '@/utils/documentSort';
 import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../../SearchDocumentForm';
@@ -28,6 +29,7 @@ const Documents = ({ documents, entranceId, isEditAllowed, onMediaClick }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
+  const [sortOrder, setSortOrder] = useState(DOCUMENT_SORT_ORDERS.TYPE);
   const linkMutation = useLinkDocumentsToEntrance();
   const unlinkMutation = useUnlinkDocumentToEntrance();
   const canAssociateDocuments = permissions.isAuth && isEditAllowed;
@@ -43,9 +45,15 @@ const Documents = ({ documents, entranceId, isEditAllowed, onMediaClick }) => {
       collapsible={false}
       anchorId="documents"
       title={formatMessage({ id: 'Documents' })}
+      headerControls={
+        canSortDocuments(documents) ? (
+          <DocumentSortSelect value={sortOrder} onChange={setSortOrder} />
+        ) : undefined
+      }
       icon={
         canAssociateDocuments ? (
           <Box
+            data-testid="entrance-document-actions"
             sx={{
               display: 'flex',
               gap: 0.5
@@ -96,7 +104,9 @@ const Documents = ({ documents, entranceId, isEditAllowed, onMediaClick }) => {
           <DocumentsList
             documents={documents}
             onMediaClick={onMediaClick}
-            defaultSortOrder={DOCUMENT_SORT_ORDERS.TYPE}
+            sortOrder={sortOrder}
+            onSortOrderChange={setSortOrder}
+            showSort={false}
             showBibliographicReferences
             emptyMessageComponent={
               <Alert

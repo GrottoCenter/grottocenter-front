@@ -55,6 +55,7 @@ import {
 } from './Section';
 import DocumentChildrenList, {
   ChildrenControls,
+  ChildrenAvailabilityLegend,
   ChildrenSectionHeader,
   DocumentChildrenTiles
 } from './DocumentChildrenList';
@@ -434,9 +435,30 @@ const Document = ({
     ];
   }, [documentData, formatMessage]);
 
-  const { isCollection, isEvent } = documentTypeHelpers;
+  const { isCollection, isIssue, isEvent } = documentTypeHelpers;
+  const canCreateChild =
+    permissions.isAuth &&
+    !!documentData &&
+    !documentData.isDeleted &&
+    !hideActions &&
+    !isPreview &&
+    !deleteMutation.isPending;
   const hasLinkedEntities = linkedEntities.length > 0;
   const docType = documentData?.type;
+  const childType = isCollection(docType)
+    ? DocumentTypes.ISSUE
+    : DocumentTypes.ARTICLE;
+  const createChildAction = canCreateChild ? (
+    <SectionCreateButton
+      to={`/ui/entity/add/document?type=${childType}&parentId=${documentData.id}`}
+      label={formatMessage({ id: 'New' })}
+      tooltip={formatMessage({
+        id:
+          childType === DocumentTypes.ISSUE ? 'Add an issue' : 'Add an article'
+      })}
+      testId="create-child-document"
+    />
+  ) : undefined;
   const DocumentTypeIcon =
     DOCUMENT_TYPE_ICONS[docType] ?? DOCUMENT_TYPE_FALLBACK_ICON;
 
@@ -550,13 +572,17 @@ const Document = ({
             </Typography>
           }
           controls={
-            <ChildrenControls
-              documents={childIssues}
-              sortOrder={issuesSortOrder}
-              onSortOrderChange={setIssuesSortOrder}
-            />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <ChildrenControls
+                documents={childIssues}
+                sortOrder={issuesSortOrder}
+                onSortOrderChange={setIssuesSortOrder}
+              />
+              {createChildAction}
+            </Box>
           }
         />
+        <ChildrenAvailabilityLegend documents={childIssues} />
         {childIssues.length > 0 ? (
           <DocumentChildrenTiles
             documents={sortedChildIssues}
@@ -1054,24 +1080,33 @@ const Document = ({
               />
             )}
 
-            {childArticles.length > 0 && (
+            {(childArticles.length > 0 || isIssue(docType)) && (
               <ScrollableContent
                 dense
                 title={formatMessage({ id: 'Articles' })}
                 count={childArticles.length}
-                // In the card's own header row rather than a row added inside the
-                // body: the card header and the content each carry their own
-                // padding, so an extra row there opened a wide empty band under
-                // the title.
-                icon={
+                icon={isIssue(docType) ? createChildAction : undefined}
+                headerControls={
                   <ChildrenControls
                     documents={childArticles}
                     sortOrder={articlesSortOrder}
                     onSortOrderChange={setArticlesSortOrder}
                   />
                 }
+                subheader={
+                  <ChildrenAvailabilityLegend documents={childArticles} />
+                }
+                hideSubheaderWhenCollapsed
                 content={
-                  <DocumentChildrenList documents={sortedChildArticles} />
+                  childArticles.length > 0 ? (
+                    <DocumentChildrenList documents={sortedChildArticles} />
+                  ) : (
+                    <EmptySection
+                      message={formatMessage({
+                        id: 'No articles in this issue.'
+                      })}
+                    />
+                  )
                 }
               />
             )}
@@ -1081,13 +1116,17 @@ const Document = ({
                 dense
                 title={formatMessage({ id: 'Issues' })}
                 count={childIssues.length}
-                icon={
+                headerControls={
                   <ChildrenControls
                     documents={childIssues}
                     sortOrder={issuesSortOrder}
                     onSortOrderChange={setIssuesSortOrder}
                   />
                 }
+                subheader={
+                  <ChildrenAvailabilityLegend documents={childIssues} />
+                }
+                hideSubheaderWhenCollapsed
                 content={<DocumentChildrenList documents={sortedChildIssues} />}
               />
             )}
@@ -1097,13 +1136,17 @@ const Document = ({
                 dense
                 title={formatMessage({ id: 'Child documents' })}
                 count={childOther.length}
-                icon={
+                headerControls={
                   <ChildrenControls
                     documents={childOther}
                     sortOrder={otherSortOrder}
                     onSortOrderChange={setOtherSortOrder}
                   />
                 }
+                subheader={
+                  <ChildrenAvailabilityLegend documents={childOther} />
+                }
+                hideSubheaderWhenCollapsed
                 content={<DocumentChildrenList documents={sortedChildOther} />}
               />
             )}

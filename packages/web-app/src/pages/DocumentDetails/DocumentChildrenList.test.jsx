@@ -6,6 +6,7 @@ import { renderWithProviders } from '@/test/renderWithProviders';
 import { DOCUMENT_SORT_ORDERS } from '@/utils/documentSort';
 import DocumentChildrenList, {
   ChildrenControls,
+  ChildrenAvailabilityLegend,
   DocumentChildrenTiles
 } from './DocumentChildrenList';
 
@@ -42,6 +43,7 @@ const renderChildren = documents =>
   renderWithProviders(
     <MemoryRouter>
       <ChildrenControls documents={documents} />
+      <ChildrenAvailabilityLegend documents={documents} />
       <DocumentChildrenTiles documents={documents} />
       <DocumentChildrenList documents={documents} />
     </MemoryRouter>,
