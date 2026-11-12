@@ -84,7 +84,7 @@ export const getDocumentLengthErrors = document => {
     }));
 };
 
-const checkFormValidation = document => {
+const checkFormValidation = (document, isNewDocument) => {
   let isValid = true;
 
   const payload = filterDocumentPayload(document);
@@ -118,7 +118,9 @@ const checkFormValidation = document => {
   if (
     (document.type === DocumentTypes.ISSUE ||
       document.type === DocumentTypes.ARTICLE) &&
-    !document.parent?.title
+    // Existing and pending details may omit the parent's title. Creation must
+    // still resolve URL-only parents before allowing submission.
+    (isNewDocument ? !document.parent?.title : !document.parent)
   )
     isValid = false;
 
@@ -225,8 +227,8 @@ const Provider = ({
   );
 
   useEffect(() => {
-    setIsFormValid(checkFormValidation(document));
-  }, [document, setIsFormValid]);
+    setIsFormValid(checkFormValidation(document, !initialValues));
+  }, [document, initialValues, setIsFormValid]);
 
   const resetContext = useCallback(
     (overrides = {}) => {

@@ -136,6 +136,26 @@ describe('editing document publication rights', () => {
     apiPutForm.mockResolvedValue({ id: 42 });
   });
 
+  it.each(['Article', 'Issue'])(
+    'submits an edited %s whose existing parent has no title',
+    async type => {
+      const { onSuccess } = renderSubmission({
+        type,
+        parent: { id: 41 }
+      });
+      const submit = screen.getByRole('button', { name: 'Update' });
+      await waitFor(() => expect(submit).toBeEnabled());
+      fireEvent.click(submit);
+
+      await waitFor(() => expect(apiPutForm).toHaveBeenCalledTimes(1));
+      const [url, body] = apiPutForm.mock.calls[0];
+      expect(url).toBe(putDocumentUrl(42));
+      expect(body.get('parent[id]')).toBe('41');
+      expect(body.get('type')).toBe(type);
+      await waitFor(() => expect(onSuccess).toHaveBeenCalled());
+    }
+  );
+
   it('submits a new file with the stored license and inferred authorization without reselecting the parent', async () => {
     const { container, onSuccess } = renderSubmission();
     await addFile(container);

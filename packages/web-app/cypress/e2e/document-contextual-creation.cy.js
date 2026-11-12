@@ -129,10 +129,14 @@ describe('Contextual document creation', () => {
         'Test'
       );
       cy.contains('[role="option"]', 'Test author').click();
-      cy.get('[data-testid="document-submit"]').scrollIntoView();
+      // FixedContent scrolls smoothly. Finish scrolling before the click and
+      // prevent Cypress from starting another scroll in its nested container.
+      cy.get('[data-testid="document-submit"]').then(([button]) => {
+        button.scrollIntoView({ behavior: 'instant', block: 'center' });
+      });
       cy.get('[data-testid="document-submit"]')
         .should('be.visible')
-        .click({ scrollBehavior: 'center' });
+        .click({ scrollBehavior: false });
       cy.wait('@createDocument')
         .its('request.body')
         .should('include', `First ${label}`)

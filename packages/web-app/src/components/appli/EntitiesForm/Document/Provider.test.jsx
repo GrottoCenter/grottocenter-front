@@ -92,6 +92,27 @@ describe('DocumentFormProvider parent validation', () => {
     await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
   });
 
+  describe.each([DocumentTypes.ARTICLE, DocumentTypes.ISSUE])('%s', type => {
+    it.each([{ id: 41 }, 41])(
+      'accepts an existing parent without a title when editing: %j',
+      async parent => {
+        renderValidation({ ...validDocument, type, parent });
+
+        await waitFor(() =>
+          expect(screen.getByText('valid')).toBeInTheDocument()
+        );
+      }
+    );
+
+    it('rejects a missing parent when editing', async () => {
+      renderValidation({ ...validDocument, type, parent: null });
+
+      await waitFor(() =>
+        expect(screen.getByText('invalid')).toBeInTheDocument()
+      );
+    });
+  });
+
   it('rejects the current document as its own parent', async () => {
     renderValidation({
       ...validDocument,
