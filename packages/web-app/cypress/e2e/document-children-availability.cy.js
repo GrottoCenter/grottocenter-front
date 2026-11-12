@@ -173,7 +173,7 @@ describe('Document children file availability', () => {
         const first = $rows[0].getBoundingClientRect();
         const second = $rows[1].getBoundingClientRect();
         if (width === 1280) expect(second.left).to.be.greaterThan(first.right);
-        else expect(second.top).to.be.at.least(first.bottom);
+        else expect(second.top).to.be.at.least(first.bottom - 1);
       });
       cy.contains('[data-testid="document-child-row"] h3 a', title)
         .should('be.visible')

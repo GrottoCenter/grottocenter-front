@@ -88,9 +88,6 @@ CLAUDE.md
 .amazonq
 .kiro
 .claude
-.impeccable/
-/.codex/hooks.json
-/.github/hooks/impeccable.json
 
 # Cypress
 packages/web-app/cypress/downloads/

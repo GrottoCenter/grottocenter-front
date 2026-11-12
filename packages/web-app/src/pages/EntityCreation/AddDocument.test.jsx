@@ -317,3 +317,126 @@ it('ignores a late authorization response after clearing the contextual parent',
   expect(state().parent).toBeNull();
   expect(state().authorizationDocument).toBeNull();
 });
+
+const fillRequiredFields = async user => {
+  fireEvent.change(
+    screen.getByTestId('document-title').querySelector('input'),
+    { target: { value: 'My article' } }
+  );
+  fireEvent.change(document.querySelector('textarea'), {
+    target: { value: 'An article summary' }
+  });
+  apiPost.mockResolvedValueOnce({
+    results: [{ id: 2, nickname: 'Test author', _type: 'persons' }]
+  });
+  await user.type(
+    screen.getByTestId('document-authors').querySelector('input'),
+    'Test'
+  );
+  await user.click(await screen.findByRole('option', { name: /Test author/ }));
+};
+
+it.each([404, 403, 'network'])(
+  'clears an unresolved contextual parent on %s and allows a replacement',
+  async status => {
+    const pending = Promise.withResolvers();
+    const originalGet = apiGet.getMockImplementation();
+    apiGet.mockImplementation(url =>
+      url === `${getDocumentDetailsUrl}10` ? pending.promise : originalGet(url)
+    );
+    const loggedError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      renderPage();
+      const user = userEvent.setup();
+      await waitFor(() => expect(state().parent?.id).toBe(10));
+      await fillRequiredFields(user);
+      // An invisible URL ID must not enable submission while still loading.
+      expect(screen.getByTestId('document-submit')).toBeDisabled();
+      await act(async () => pending.reject(new Error(String(status))));
+      await waitFor(() => expect(state().parent).toBeNull());
+      expect(parentInput()).toHaveValue('');
+      expect(parentInput()).toBeRequired();
+      expect(screen.getByTestId('document-submit')).toBeDisabled();
+      expect(apiPostForm).not.toHaveBeenCalled();
+
+      await user.type(parentInput(), 'Replacement');
+      await user.click(
+        await screen.findByRole('option', { name: /Replacement issue/ })
+      );
+      await waitFor(() =>
+        expect(screen.getByTestId('document-submit')).toBeEnabled()
+      );
+      expect(state().parent).toMatchObject({
+        id: 11,
+        title: replacement.title
+      });
+    } finally {
+      loggedError.mockRestore();
+    }
+  }
+);
+
+it.each([
+  ['Article', 'Collection', false],
+  ['Article', 'Book', false],
+  ['Issue', 'Issue', false],
+  ['Article', 'Issue', true],
+  ['Issue', 'Collection', true]
+])(
+  'rejects a contextual %s parent of type %s (deleted: %s) before inheritance',
+  async (type, parentType, isDeleted) => {
+    const originalGet = apiGet.getMockImplementation();
+    apiGet.mockImplementation(url =>
+      url === `${getDocumentDetailsUrl}10`
+        ? Promise.resolve({ ...parent, type: parentType, isDeleted })
+        : originalGet(url)
+    );
+    renderPage(`/ui/entity/add/document?type=${type}&parentId=10`);
+    await waitFor(() => expect(state().parent).toBeNull());
+    expect(parentInput()).toHaveValue('');
+    expect(parentInput()).toBeRequired();
+    expect(state().editor).toBeNull();
+    expect(state().authorizationDocument).toBeNull();
+    expect(screen.getByTestId('document-submit')).toBeDisabled();
+    expect(apiPostForm).not.toHaveBeenCalled();
+    expect(
+      apiGet.mock.calls.some(([url]) => url === `${getDocumentDetailsUrl}90`)
+    ).toBe(false);
+  }
+);
+
+it('preserves the resolved parent when its authorization cannot be loaded', async () => {
+  const originalGet = apiGet.getMockImplementation();
+  apiGet.mockImplementation(url =>
+    url === `${getDocumentDetailsUrl}90`
+      ? Promise.reject(new Error('Permission unavailable'))
+      : originalGet(url)
+  );
+  const loggedError = vi.spyOn(console, 'error').mockImplementation(() => {});
+  try {
+    renderPage();
+    await waitFor(() => expect(loggedError).toHaveBeenCalled());
+    expect(state().parent).toMatchObject({ id: 10, title: parent.title });
+    expect(parentInput()).toHaveValue(parent.title);
+  } finally {
+    loggedError.mockRestore();
+  }
+});
+
+it('ignores a contextual failure after a replacement was selected', async () => {
+  const pending = Promise.withResolvers();
+  const originalGet = apiGet.getMockImplementation();
+  apiGet.mockImplementation(url =>
+    url === `${getDocumentDetailsUrl}10` ? pending.promise : originalGet(url)
+  );
+  renderPage();
+  const user = userEvent.setup();
+  await user.type(parentInput(), 'Replacement');
+  await user.click(
+    await screen.findByRole('option', { name: /Replacement issue/ })
+  );
+  await waitFor(() => expect(state().parent?.title).toBe(replacement.title));
+  await act(async () => pending.reject(new Error('Old parent unavailable')));
+  expect(state().parent).toMatchObject({ id: 11, title: replacement.title });
+  expect(parentInput()).toHaveValue(replacement.title);
+});

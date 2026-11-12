@@ -6,6 +6,7 @@ import { getDocumentDetailsUrl } from '@/conf/apiRoutes';
 import { STALE } from '@/conf/queryClient';
 import { useLanguages, useLicenses, findLicenseByName } from '@/hooks';
 import { getLicenseName } from '@/components/common/LicenseTag/helpers';
+import { getParentDocumentType } from '@/utils/documentTypeHelpers';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './formElements/AddFileForm/FileHelpers';
 
 const fetchDocumentDetail = (queryClient, id) =>
@@ -83,6 +84,7 @@ const useParentDocumentSelection = ({
         });
       };
 
+      let hasResolvedParent = false;
       try {
         const [details, languageResult, licenseResult] = await Promise.all([
           fetchDocumentDetail(queryClient, selection.id),
@@ -90,6 +92,16 @@ const useParentDocumentSelection = ({
           licenses ? { data: licenses } : fetchLicenses()
         ]);
         if (!isCurrent()) return;
+
+        const expectedParentType = getParentDocumentType(type);
+        if (
+          details.isDeleted ||
+          (expectedParentType && details.type !== expectedParentType)
+        ) {
+          applyAttributes({ parent: null });
+          return;
+        }
+        hasResolvedParent = true;
 
         const attributes = {
           parent: { ...selection, title: details.title, type: details.type }
@@ -126,8 +138,12 @@ const useParentDocumentSelection = ({
           applyAttributes({ authorizationDocument: null });
         }
       } catch (error) {
-        if (isCurrent())
-          console.error('Error fetching parent document details:', error);
+        if (!isCurrent()) return;
+        console.error('Error fetching parent document details:', error);
+        // Preserve a visible selection, including a resolved parent whose
+        // authorization request failed, but never keep an invisible URL ID.
+        if (!hasResolvedParent && !selection.title)
+          applyAttributes({ parent: null });
       }
     },
     [

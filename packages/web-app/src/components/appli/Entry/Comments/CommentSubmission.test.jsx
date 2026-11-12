@@ -77,7 +77,7 @@ const fillComment = () => {
 };
 
 const openComment = async () => {
-  fireEvent.click(screen.getByRole('button', { name: 'Add a new comment' }));
+  fireEvent.click(screen.getByTestId('create-comment'));
   const option = await screen.findByRole('checkbox', {
     name: 'Also add this entrance to my explored entrances'
   });
@@ -95,7 +95,7 @@ beforeEach(() => {
 
 it('validates before publishing and focuses the first invalid field', async () => {
   renderComments();
-  fireEvent.click(screen.getByRole('button', { name: 'Add a new comment' }));
+  fireEvent.click(screen.getByTestId('create-comment'));
   fireEvent.click(screen.getByRole('button', { name: 'Publish my comment' }));
   await waitFor(() =>
     expect(screen.getByRole('textbox', { name: /title/i })).toHaveFocus()
@@ -273,7 +273,7 @@ it('dismisses the exploration warning when the entrance is marked explored elsew
 it('shows the existing exploration and never offers to add it twice', async () => {
   apiGet.mockResolvedValue({ id: 7, exploredEntrances: [{ id: '42' }] });
   renderComments();
-  fireEvent.click(screen.getByRole('button', { name: 'Add a new comment' }));
+  fireEvent.click(screen.getByTestId('create-comment'));
   expect(
     await screen.findByText('Already in my explored entrances')
   ).toBeVisible();
@@ -288,7 +288,7 @@ it('does not offer exploration before the profile has loaded', async () => {
   const response = Promise.withResolvers();
   apiGet.mockReturnValue(response.promise);
   renderComments();
-  fireEvent.click(screen.getByRole('button', { name: 'Add a new comment' }));
+  fireEvent.click(screen.getByTestId('create-comment'));
   expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   expect(
     screen.queryByText('Already in my explored entrances')

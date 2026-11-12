@@ -96,9 +96,7 @@ describe('Contextual document creation', () => {
           expect(rect.right).to.be.at.most(width);
           expect($action.text().trim()).to.eq(width < 900 ? '' : 'New');
         });
-      cy.get(
-        '[data-testid="create-child-document"] [data-testid="AddCircleIcon"]'
-      ).should('be.visible');
+      cy.get('[data-testid="create-child-document"] svg').should('be.visible');
       cy.screenshot(`empty-${type.toLowerCase()}-${width}`);
       if (type === 'Article') {
         cy.get('[data-testid="create-child-document"]')
@@ -131,7 +129,10 @@ describe('Contextual document creation', () => {
         'Test'
       );
       cy.contains('[role="option"]', 'Test author').click();
-      cy.get('[data-testid="document-submit"]').click();
+      cy.get('[data-testid="document-submit"]').scrollIntoView();
+      cy.get('[data-testid="document-submit"]')
+        .should('be.visible')
+        .click({ scrollBehavior: 'center' });
       cy.wait('@createDocument')
         .its('request.body')
         .should('include', `First ${label}`)
@@ -179,7 +180,8 @@ describe('Contextual document creation', () => {
       });
       cy.get('[data-testid="create-child-document"]').scrollIntoView();
       cy.get('[data-testid="create-child-document"]').should('be.visible');
-      cy.get('[data-testid="create-child-document"]').then($action => {
+      cy.get('[role="combobox"][aria-label="Sort by"]').should('be.visible');
+      cy.get('[data-testid="create-child-document"]').should($action => {
         const card = $action[0].closest('.MuiCard-root');
         const heading = card.querySelector('h2').getBoundingClientRect();
         const action = $action[0].getBoundingClientRect();

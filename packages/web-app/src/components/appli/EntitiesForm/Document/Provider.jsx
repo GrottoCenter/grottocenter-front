@@ -118,7 +118,7 @@ const checkFormValidation = document => {
   if (
     (document.type === DocumentTypes.ISSUE ||
       document.type === DocumentTypes.ARTICLE) &&
-    !document.parent
+    !document.parent?.title
   )
     isValid = false;
 

@@ -8,9 +8,9 @@ import { entityOptionForSelector } from '@/helpers/Entity';
 import { useEntitySearch } from '@/hooks';
 import { AUTOCOMPLETE_MIN_CHARACTERS } from '@/conf/config';
 import {
-  documentTypeHelpers,
   filterParentDocumentResults,
-  getDocumentTypeIcon
+  getDocumentTypeIcon,
+  getParentDocumentType
 } from '@/utils/documentTypeHelpers';
 import { DocumentFormContext } from '../Provider';
 
@@ -27,10 +27,8 @@ const ParentDocumentSelect = ({
   const { document, selectParent } = useContext(DocumentFormContext);
   const value = document.parent;
   const filter = useMemo(() => {
-    if (documentTypeHelpers.isArticle(document.type)) return { type: 'Issue' };
-    if (documentTypeHelpers.isIssue(document.type))
-      return { type: 'Collection' };
-    return {};
+    const parentType = getParentDocumentType(document.type);
+    return parentType ? { type: parentType } : {};
   }, [document.type]);
   const { inputValue, setInputValue, results, isLoading, hasError } =
     useEntitySearch(DOCUMENTS, {
