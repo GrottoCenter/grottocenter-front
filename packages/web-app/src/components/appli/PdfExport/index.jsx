@@ -31,6 +31,7 @@ const PdfExport = ({
   entity,
   entityType,
   statistics = null,
+  isStatisticsPending = false,
   isAdmin,
   open,
   onClose
@@ -82,12 +83,13 @@ const PdfExport = ({
     !adapter.sections.some(
       section => sections[section.key] && availability[section.key]
     ) && files.length === 0;
-  const isBlocked = isEmpty || areDocumentsBlocked;
+  const isBlocked = isEmpty || areDocumentsBlocked || isStatisticsPending;
   useEffect(() => {
     cancel();
   }, [
     entity,
     statistics,
+    isStatisticsPending,
     isAdmin,
     intl.locale,
     open,
@@ -108,6 +110,7 @@ const PdfExport = ({
     onClose();
   };
   const handleGenerate = async () => {
+    if (isBlocked) return;
     const model = adapter.build({
       entity,
       statistics,
@@ -188,6 +191,16 @@ const PdfExport = ({
             py: 0.25
           }
         }}>
+        {isStatisticsPending && (
+          <Box
+            role="status"
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CircularProgress size={20} />
+            <Typography variant="body2">
+              {formatMessage({ id: 'Loading ...' })}
+            </Typography>
+          </Box>
+        )}
         <FormControl component="fieldset">
           <FormLabel component="legend">
             {formatMessage({ id: 'pdf.mainContent' })}
@@ -378,7 +391,7 @@ const PdfExport = ({
             : formatMessage({ id: 'An unexpected error occurred' })}
         </Alert>
       )}
-      {isEmpty && !isGenerating && (
+      {isEmpty && !isGenerating && !isStatisticsPending && (
         <Alert severity="info" sx={{ mt: 2 }}>
           {formatMessage({ id: 'pdf.selectContent' })}
         </Alert>
@@ -403,7 +416,8 @@ PdfExport.propTypes = {
     'country',
     'region'
   ]).isRequired,
-  statistics: PropTypes.shape({ nb_caves: PropTypes.number }),
+  statistics: PropTypes.shape({ nb_entrances: PropTypes.number }),
+  isStatisticsPending: PropTypes.bool,
   isAdmin: PropTypes.bool.isRequired,
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired

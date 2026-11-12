@@ -85,8 +85,8 @@ const fetchPopupData = async (type, id, signal) => {
             massif={{
               id: detail.id,
               name: detail.name,
-              entranceCount: stats?.nb_caves ?? 0,
-              networkCount: stats?.nb_networks ?? 0
+              entranceCount: stats?.nb_entrances,
+              networkCount: stats?.nb_networks
             }}
           />
         )

@@ -52,6 +52,7 @@ const renderDialog = (isGenerating = false, options = {}) => {
       entity={options.entity ?? { id: 1, name: 'Test cave' }}
       entityType={options.entityType ?? 'entrance'}
       statistics={options.statistics ?? null}
+      isStatisticsPending={options.isStatisticsPending ?? false}
       isAdmin={false}
       open
       onClose={onClose}
@@ -267,7 +268,15 @@ it.each(['massif', 'country', 'region'])(
   'selects newly available %s statistics by default while retaining explicit choices',
   entityType => {
     const entity = { id: 3, name: 'Massif' };
-    const { rerender } = renderDialog(false, { entity, entityType });
+    const { rerender } = renderDialog(false, {
+      entity,
+      entityType,
+      isStatisticsPending: true
+    });
+    expect(screen.getByTestId('pdf-download')).toBeDisabled();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      messages['Loading ...']
+    );
     expect(
       screen.queryByRole('checkbox', { name: 'More information' })
     ).not.toBeInTheDocument();
@@ -275,7 +284,7 @@ it.each(['massif', 'country', 'region'])(
       <PdfExport
         entity={entity}
         entityType={entityType}
-        statistics={{ nb_caves: 2 }}
+        statistics={{ nb_entrances: 2 }}
         isAdmin={false}
         open
         onClose={onClose}
@@ -285,12 +294,14 @@ it.each(['massif', 'country', 'region'])(
       name: 'More information'
     });
     expect(statistics).toBeChecked();
+    expect(screen.getByTestId('pdf-download')).toBeEnabled();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
     fireEvent.click(statistics);
     rerender(
       <PdfExport
         entity={entity}
         entityType={entityType}
-        statistics={{ nb_caves: 3 }}
+        statistics={{ nb_entrances: 3 }}
         isAdmin={false}
         open
         onClose={onClose}
@@ -299,6 +310,40 @@ it.each(['massif', 'country', 'region'])(
     expect(
       screen.getByRole('checkbox', { name: 'More information' })
     ).not.toBeChecked();
+  }
+);
+
+it.each(['massif', 'country', 'region'])(
+  'allows a %s export after the statistics query fails',
+  entityType => {
+    const entity = {
+      id: 3,
+      name: 'Territory',
+      descriptions: [{ id: 1, body: 'Description' }]
+    };
+    const generate = vi.fn().mockResolvedValue(null);
+    const { rerender } = renderDialog(false, {
+      entity,
+      entityType,
+      generate,
+      isStatisticsPending: true
+    });
+    fireEvent.click(screen.getByTestId('pdf-download'));
+    expect(generate).not.toHaveBeenCalled();
+    rerender(
+      <PdfExport
+        entity={entity}
+        entityType={entityType}
+        isStatisticsPending={false}
+        isAdmin={false}
+        open
+        onClose={onClose}
+      />
+    );
+    expect(screen.getByTestId('pdf-download')).toBeEnabled();
+    expect(
+      screen.queryByRole('checkbox', { name: 'More information' })
+    ).not.toBeInTheDocument();
   }
 );
 

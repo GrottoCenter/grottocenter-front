@@ -90,9 +90,8 @@ const Massif = ({
   const handleShare = useSharePage();
 
   const canShowStatistics = !!massif && !massif.isDeleted;
-  const { data: dataMassif } = useStatisticsMassif(
-    isPreview || massif?.isDeleted ? null : massifIdInt
-  );
+  const { data: dataMassif, isPending: isStatisticsPending } =
+    useStatisticsMassif(isPreview || massif?.isDeleted ? null : massifIdInt);
   useScrollToHashOnLoad(dataMassif);
 
   let onEdit = null;
@@ -323,7 +322,9 @@ const Massif = ({
                   startIcon={<CustomIcon type="entrance" size={24} />}
                   onClick={() => navigate(`/ui/massifs/${massifId}/entrances`)}>
                   {formatMessage({ id: 'Entrances list' })}
-                  {dataMassif?.nb_caves ? ` (${dataMassif.nb_caves})` : ''}
+                  {Number.isFinite(dataMassif?.nb_entrances)
+                    ? ` (${dataMassif.nb_entrances})`
+                    : ''}
                 </Button>
                 <Descriptions
                   descriptions={massif.descriptions ?? []}
@@ -415,6 +416,7 @@ const Massif = ({
               entity={massif}
               entityType="massif"
               statistics={dataMassif}
+              isStatisticsPending={canShowStatistics && isStatisticsPending}
               isAdmin={permissions.isAdmin}
               open={isPdfExportOpen}
               onClose={() => setIsPdfExportOpen(false)}

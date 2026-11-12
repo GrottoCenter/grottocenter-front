@@ -153,7 +153,7 @@ describe('entrance PDF download', PDF_EXPORT_TEST_OPTIONS, () => {
         { method: 'GET', pathname: `/api/v1${path}/statistics` },
         {
           body: {
-            nb_caves: 1165,
+            nb_entrances: 1165,
             nb_networks: 9,
             diving_caves: 3,
             avg: { avg_depth: 30, avg_length: 273 },

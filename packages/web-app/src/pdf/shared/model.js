@@ -22,6 +22,7 @@ export const makePdfLinksBlock = (key, label, items, intl) => ({
     id: item.id,
     title: item.title,
     source: item.source,
+    icon: item.icon,
     details: item.details ?? []
   }))
 });

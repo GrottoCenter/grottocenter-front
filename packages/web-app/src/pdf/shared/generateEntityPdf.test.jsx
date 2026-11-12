@@ -33,23 +33,67 @@ const fontSources = Object.fromEntries(
 );
 const intl = createIntl({ locale: 'en', messages });
 
-it.each(['country', 'region'])(
+it.each([0, 2])(
+  'renders every statistics count without duplicate keys when all counts equal %s',
+  async count => {
+    const territory = buildMassifPdfModel({
+      entity: { id: 1, name: 'Equal statistics counts' },
+      statistics: {
+        nb_entrances: count,
+        nb_networks: count,
+        diving_caves: count,
+        nb_massifs: count
+      },
+      sections: { statistics: true },
+      documents: [],
+      attachments: [],
+      intl
+    });
+    const errorSpy = vi.spyOn(console, 'error');
+    let task;
+    try {
+      task = getDocument({
+        data: await generateEntityPdf(territory, [], { fontSources })
+      });
+      const output = await task.promise;
+      const page = await output.getPage(1);
+      const text = (await page.getTextContent()).items
+        .map(item => item.str)
+        .join(' ')
+        .replace(/\s+/g, ' ');
+      for (const id of ['entrance_count', 'network_count', 'diveable_caves']) {
+        expect(text).toContain(
+          `${count} ${intl.formatMessage({ id }, { count })}`
+        );
+      }
+      expect(text).toContain(`${count} ${messages.massifs}`);
+      expect(errorSpy).not.toHaveBeenCalled();
+    } finally {
+      errorSpy.mockRestore();
+      await task?.destroy();
+    }
+  },
+  20000
+);
+
+it.each(['massif', 'country', 'region'])(
   'generates a real %s PDF with numeric statistics',
   async entityType => {
     const territory = PDF_ADAPTERS[entityType].build({
       entity: {
         id: entityType === 'country' ? 'FR' : 'ARA',
         countryId: 'FR',
-        name: 'Territory export'
+        name: 'Territory export',
+        networks: [{ id: 1, name: 'Linked network' }]
       },
       statistics: {
-        nb_caves: 1165,
+        nb_entrances: 1165,
         nb_networks: 9,
         diving_caves: 3,
         avg: { avg_depth: 30, avg_length: 273 },
         total_length: { value: 299165 }
       },
-      sections: { statistics: true },
+      sections: { properties: true, statistics: true },
       documents: [],
       attachments: [],
       intl
@@ -65,6 +109,11 @@ it.each(['country', 'region'])(
         .map(item => item.str)
         .join(' ');
       expect(text).toContain('1,165');
+      expect(text).toContain('entrances');
+      expect(text.match(/entrances/g)).toHaveLength(1);
+      expect(text.match(/networks/g)).toHaveLength(1);
+      expect(text).not.toContain('Networks');
+      if (entityType === 'massif') expect(text).not.toContain('Information');
       expect(text).toContain('299,165 m');
       expect(text).toContain('30 m');
       expect(text).toContain('273 m');
@@ -85,7 +134,8 @@ it('fits nine linked networks and their dimensions before documents on one page'
   }));
   const massif = buildMassifPdfModel({
     entity: { id: 6487, name: 'Compact massif', networks },
-    sections: { networks: true, documents: true },
+    statistics: { nb_entrances: 1165 },
+    sections: { properties: true, networks: true, documents: true },
     documents: [
       {
         id: 12,
@@ -107,6 +157,9 @@ it('fits nine linked networks and their dimensions before documents on one page'
     const text = (await page.getTextContent()).items
       .map(item => item.str)
       .join(' ');
+    expect(text).not.toContain('Entrances');
+    expect(text).not.toContain('Information');
+    expect(text).not.toContain('1,165');
     expect(text).toContain('100 m');
     expect(text).toContain('10,000 m');
     expect(text.indexOf('Document following the networks')).toBeGreaterThan(
@@ -143,7 +196,7 @@ it.each([24, 28, 32])(
         ]
       },
       statistics: {
-        nb_caves: 1165,
+        nb_entrances: 1165,
         nb_networks: 9,
         diving_caves: 3,
         avg: { avg_depth: 30, avg_length: 273 },

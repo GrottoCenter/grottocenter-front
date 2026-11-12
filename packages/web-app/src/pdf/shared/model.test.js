@@ -68,7 +68,7 @@ it.each(['entrance', 'network', 'massif', 'country', 'region'])(
           documents: true
         },
         statistics: {
-          nb_caves: 1,
+          nb_entrances: 1,
           cave_with_max_depth: { id_cave: 8, value: 100 }
         },
         documents: [document],
@@ -94,7 +94,12 @@ it.each(['entrance', 'network', 'massif', 'country', 'region'])(
             .source
         ).toBe(`${expectedOrigin}/ui/organizations/9`);
         expect(
-          model.blocks.find(block => block.key === 'statistics').items[0].body
+          model.blocks.find(block => block.key === 'organizations').items[0]
+            .icon
+        ).toBe('organization');
+        expect(
+          model.blocks.find(block => block.key === 'statistics').items.at(-1)
+            .body
         ).toContain(`${expectedOrigin}/ui/caves/8`);
       }
       if (entityType === 'massif')
@@ -237,6 +242,39 @@ it('rejects malformed or non-projectable massif polygons', () => {
     })
   ).toBeNull();
 });
+
+it.each([0, 1, 1165])(
+  'keeps %s entrances and linked network counts out of massif information',
+  count => {
+    const model = buildMassifPdfModel({
+      entity: { id: 3, name: 'Massif', networks: [{ id: 8 }] },
+      statistics: { nb_entrances: count },
+      sections: { properties: true },
+      documents: [],
+      attachments: [],
+      intl
+    });
+    expect(model.properties).toEqual([]);
+    expect(model.blocks).toEqual([]);
+  }
+);
+
+it.each([undefined, null, {}, { nb_entrances: null }, { nb_caves: 99 }])(
+  'omits unavailable massif entrance counts for statistics %j',
+  statistics => {
+    const model = buildMassifPdfModel({
+      entity: { id: 3, name: 'Massif' },
+      statistics,
+      sections: { properties: true },
+      documents: [],
+      attachments: [],
+      intl
+    });
+    expect(model.properties.map(property => property.icon)).not.toContain(
+      'entrance'
+    );
+  }
+);
 
 it('keeps a sensitive massif public outline and legislation warning without entrance coordinates', () => {
   const model = buildMassifPdfModel({

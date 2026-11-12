@@ -71,7 +71,8 @@ const Region = ({
   } = useSubscriptions();
   const isSubscribed = region ? isSubscribedMethod(region.id) : false;
 
-  const { data: dataRegion } = useStatisticsRegion(countryId, regionId);
+  const { data: dataRegion, isPending: isStatisticsPending } =
+    useStatisticsRegion(countryId, regionId);
   useScrollToHashOnLoad(dataRegion);
 
   const handleChangeSubscribe = () => {
@@ -183,7 +184,9 @@ const Region = ({
                   )
                 }>
                 {formatMessage({ id: 'Entrances list' })}
-                {dataRegion?.nb_caves ? ` (${dataRegion.nb_caves})` : ''}
+                {Number.isFinite(dataRegion?.nb_entrances)
+                  ? ` (${dataRegion.nb_entrances})`
+                  : ''}
               </Button>
               {position && (
                 <ScrollableContent
@@ -242,6 +245,7 @@ const Region = ({
               entity={pdfEntity}
               entityType="region"
               statistics={dataRegion}
+              isStatisticsPending={isStatisticsPending}
               isAdmin={permissions.isAdmin}
               open={isPdfExportOpen}
               onClose={() => setIsPdfExportOpen(false)}

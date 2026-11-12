@@ -16,10 +16,12 @@ import discoveryDate from '@/assets/icons/discovery-date.svg?raw';
 import category from '@/assets/icons/category.svg?raw';
 import country from '@/assets/icons/country.svg?raw';
 import organization from '@/assets/icons/organization.svg?raw';
+import divingCave from '@/assets/icons/diving-cave.svg?raw';
 
 const sources = {
   country,
   organization,
+  diving_cave: divingCave,
   region: location,
   entrance,
   network,

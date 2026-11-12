@@ -23,9 +23,11 @@ export const PdfContributionType = PropTypes.shape({
   title: PropTypes.string,
   body: PropTypes.string,
   source: PropTypes.string,
+  icon: PropTypes.string,
   metadata: PropTypes.string,
   details: PropTypes.arrayOf(
     PropTypes.shape({
+      key: PropTypes.string,
       label: PropTypes.string.isRequired,
       value: PropTypes.string.isRequired,
       icon: PropTypes.string

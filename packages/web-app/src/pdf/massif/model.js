@@ -9,7 +9,6 @@ import {
 import { hasPdfStatistics, makeStatisticsPdfBlock } from '../shared/statistics';
 
 export const MASSIF_PDF_SECTIONS = [
-  { key: 'properties', label: 'Information' },
   { key: 'map', label: 'Map' },
   { key: 'descriptions', label: 'Descriptions' },
   { key: 'statistics', label: 'More information' },
@@ -55,7 +54,6 @@ export const getMassifPdfPolygons = entity => {
 };
 
 export const getMassifPdfAvailability = (entity, _isAdmin, statistics) => ({
-  properties: true,
   map: Boolean(getMassifPdfPolygons(entity)),
   descriptions: active(entity.descriptions).length > 0,
   statistics: hasPdfStatistics(statistics),
@@ -68,18 +66,6 @@ export const getMassifPdfAvailability = (entity, _isAdmin, statistics) => ({
 export const buildMassifPdfModel = options => {
   const { entity, sections, intl, statistics, origin } = options;
   const t = id => intl.formatMessage({ id });
-  const properties = [
-    {
-      label: t('Networks list'),
-      value: String(active(entity.networks).length),
-      icon: 'network'
-    },
-    {
-      label: t('Organizations'),
-      value: String(active(entity.organizations).length),
-      icon: 'organization'
-    }
-  ];
   const blocks = [];
   if (sections.descriptions)
     blocks.push(
@@ -109,6 +95,7 @@ export const buildMassifPdfModel = options => {
         active(entity.organizations).map(item => ({
           id: item.id,
           title: item.name ?? String(item.id),
+          icon: 'organization',
           source: entityUrl('organizations', item.id, origin)
         })),
         intl
@@ -150,7 +137,7 @@ export const buildMassifPdfModel = options => {
     ...options,
     entityType: 'massif',
     route: 'massifs',
-    properties,
+    properties: [],
     blocks,
     coordinates: polygons ? { points: [], polygons, fit: true } : null,
     warning: entity.isSensitive

@@ -305,7 +305,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
           fetchAdvancedSearch(query, ADVANCED_SEARCH_TYPES.MASSIFS, 3, signal)
             .then(massifs =>
               // Massifs have no coordinates: fetch detail (polygon → bounds) and statistics
-              // (counts) in parallel. Statistics failure is non-fatal: counts fall back to 0.
+              // (counts) in parallel. Statistics failure is non-fatal: unknown counts stay hidden.
               Promise.all(
                 massifs.map(massif =>
                   Promise.all([
@@ -335,8 +335,8 @@ const GeocodingControl = ({ onLocationSelect }) => {
                           [sw.lat, sw.lng],
                           [ne.lat, ne.lng]
                         ],
-                        entranceCount: stats?.nb_caves ?? 0,
-                        networkCount: stats?.nb_networks ?? 0
+                        entranceCount: stats?.nb_entrances,
+                        networkCount: stats?.nb_networks
                       };
                     })
                     .catch(() => null)
