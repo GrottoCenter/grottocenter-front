@@ -252,6 +252,7 @@ export const SearchTextAutocomplete = ({
   ressourceType,
   ressourceField,
   ressourceFilter,
+  includePendingDocuments = false,
   label,
   value,
   onChange
@@ -272,7 +273,8 @@ export const SearchTextAutocomplete = ({
       entity: ressourceType,
       field: ressourceField,
       filter,
-      query
+      query,
+      includePendingDocuments
     });
 
     if (cacheRef.current.has(cacheKey)) {
@@ -287,7 +289,8 @@ export const SearchTextAutocomplete = ({
         entity: ressourceType,
         field: ressourceField,
         filter,
-        query
+        query,
+        ...(includePendingDocuments && { includePendingDocuments: true })
       });
       const hits = r?.hits ?? [];
       if (cacheRef.current.size >= 50) {
@@ -366,6 +369,7 @@ SearchTextAutocomplete.propTypes = {
   ressourceType: PropTypes.string.isRequired,
   ressourceField: PropTypes.string.isRequired,
   ressourceFilter: PropTypes.shape({}).isRequired,
+  includePendingDocuments: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   label: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired

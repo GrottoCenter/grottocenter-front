@@ -106,6 +106,24 @@ describe('downloadAdvancedSearchResults', () => {
     );
   });
 
+  it.each([true, false])(
+    'includes pending documents in exports only when requested: %s',
+    async includePendingDocuments => {
+      setupFetchBlob();
+      await downloadAdvancedSearchResults({
+        query: 'new document',
+        entity: 'documents',
+        includePendingDocuments
+      });
+
+      const [, options] = mockFetch.mock.lastCall;
+      const body = JSON.parse(options.body);
+      expect(body.includePendingDocuments).toBe(
+        includePendingDocuments ? true : undefined
+      );
+    }
+  );
+
   it('uses correct file extension for each format', async () => {
     const formats = [
       { format: 'csv', ext: 'csv' },

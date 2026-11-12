@@ -8,10 +8,10 @@ import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import AuthChecker from '../../components/appli/AuthChecker';
 import Translate from '../../components/common/Translate';
 
-const showContributionDate = columns => {
-  const column = columns.find(e => e.field === 'dateInscription');
-  column.visible = true;
-};
+const showContributionDate = columns =>
+  columns.map(column =>
+    column.field === 'dateInscription' ? { ...column, visible: true } : column
+  );
 
 const ContributionsPage = () => {
   const userId = useUserProperties()?.id;

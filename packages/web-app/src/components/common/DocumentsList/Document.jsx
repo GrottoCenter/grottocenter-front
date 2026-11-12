@@ -12,7 +12,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -83,13 +83,14 @@ const Document = ({
               </AppLink>
             </Typography>
             <DocumentTypeChip type={document.type} />
+            {/* Lists omit the decision date, so false also includes refusals. */}
             {document.isValidated === false && (
               <Chip
                 variant="outlined"
-                color="warning"
+                color="default"
                 size="small"
-                icon={<HourglassEmptyIcon />}
-                label={formatMessage({ id: 'Waiting for validation' })}
+                icon={<InfoOutlinedIcon />}
+                label={formatMessage({ id: 'Not validated' })}
               />
             )}
           </Box>
