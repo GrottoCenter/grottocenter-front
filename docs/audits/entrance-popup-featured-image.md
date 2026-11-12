@@ -144,3 +144,25 @@ The deployed endpoint was checked again for entrances 1 and 120177: both still
 return HTTP 200 with `featuredFile: null`. The live selected-photo browser check
 remains pending; fixture-based image tests do not replace it. No production
 content was modified to manufacture that scenario.
+
+### Late photo movement review (2026-11-12)
+
+After the text deadline, `dragstart` or `movestart` disables further autopan for
+that opening. A late photo still decodes, appears and is measured, but respects
+the chosen map view, even while dragging or after a deferred pan. Movements
+caused by the popup's own update are ignored. Closing and reopening resets this
+policy, and idle late-photo upgrades retain normal autopan.
+
+Validation: full `yarn.cmd lint` passed without errors or warnings; the following
+focused Vitest command passed 39 tests, using the default timeout:
+
+```powershell
+yarn.cmd test --run src/components/common/Maps/common/EntrancePopupImages.test.jsx src/hooks/queries/useEntranceFeaturedImage.test.jsx --maxWorkers=2
+```
+
+The popup tests cover both movement events, decoding 30 seconds past the text
+deadline, deferred autopan cancellation, ignoring popup-generated movement,
+resizing and reopening. Two Cypress regressions cover moved map positions at
+1280 and 390 px. Local browser execution is pending: automatic approval review
+rejected starting the local Vite server with `blocked by policy` and no further
+reason. The live selected-photo smoke check remains pending as described above.

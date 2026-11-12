@@ -31,6 +31,7 @@ const EntrancePopupContent = ({
   const map = useMap();
   // A text fallback can upgrade once; a completed photo layout stays stable.
   const [presentation, setPresentation] = useState(null);
+  const hasMovedSinceFallbackRef = useRef(false);
 
   useEffect(() => {
     if (presentation) return undefined;
@@ -66,19 +67,27 @@ const EntrancePopupContent = ({
     const originalMaxHeight = popup.options.maxHeight;
     const originalPaddingTopLeft = popup.options.autoPanPaddingTopLeft;
     const originalPaddingBottomRight = popup.options.autoPanPaddingBottomRight;
+    let isUpdatingPopup = false;
+    const handleMoveStart = () => {
+      // Ignore movements caused by our own popup measurement/autopan.
+      if (!isUpdatingPopup) hasMovedSinceFallbackRef.current = true;
+    };
     const updatePopup = () => {
       if (!popup.isOpen()) return;
       // Measure immediately, including a late photo upgrade. leaflet-rotate
       // skips autopan during an existing pan, so defer only the next movement.
-      if (map.getPane('mapPane').classList.contains('leaflet-pan-anim')) {
-        setOptions(popup, { autoPan: false });
-        popup.update();
-        map.off('moveend', updatePopup);
-        map.once('moveend', updatePopup);
-      } else {
-        setOptions(popup, { autoPan: true });
-        popup.update();
-      }
+      // Once the map moves after the text fallback, a late photo must respect
+      // that view, including during a drag or a previously deferred autopan.
+      const shouldAutoPan = !hasMovedSinceFallbackRef.current;
+      const isPanning = map
+        .getPane('mapPane')
+        .classList.contains('leaflet-pan-anim');
+      setOptions(popup, { autoPan: shouldAutoPan && !isPanning });
+      isUpdatingPopup = true;
+      popup.update();
+      isUpdatingPopup = false;
+      map.off('moveend', updatePopup);
+      if (shouldAutoPan && isPanning) map.once('moveend', updatePopup);
       delete element.dataset.entrancePopupPreparing;
       element.removeAttribute('aria-busy');
     };
@@ -137,10 +146,12 @@ const EntrancePopupContent = ({
       updatePopup();
     };
     updateLayout();
+    if (presentation.isFallback) map.on('movestart dragstart', handleMoveStart);
     map.on('resize', updateLayout);
     window.addEventListener('resize', updateLayout);
     return () => {
       map.off('resize', updateLayout);
+      map.off('movestart dragstart', handleMoveStart);
       map.off('moveend', updatePopup);
       window.removeEventListener('resize', updateLayout);
       element.style.removeProperty('--map-popup-width');

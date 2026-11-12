@@ -851,6 +851,54 @@ describe('Entrance featured image', () => {
   });
 
   [1280, 390].forEach(width => {
+    it(`keeps the user's map position when a late photo arrives at width ${width}`, () => {
+      cy.viewport(width, width === 390 ? 844 : 900);
+      let releaseImage;
+      const imageReady = new Cypress.Promise(resolve => {
+        releaseImage = resolve;
+      });
+      cy.intercept('https://images.example.org/thumbnails/**', request =>
+        imageReady.then(() =>
+          request.reply({
+            headers: { 'content-type': 'image/svg+xml' },
+            body: imageBody
+          })
+        )
+      );
+      mockMap();
+      visit('/map/45.4972,5.5,16');
+      cy.wait('@markers', { requestTimeout: 20000 });
+      cy.window().then(win => {
+        cy.spy(win.L.Popup.prototype, 'openOn').as('popupOpen');
+        cy.spy(win.L.Map.prototype, 'panBy').as('popupPan');
+      });
+      clickEntranceMarker();
+      cy.get('[data-testid="entrance-popup"]')
+        .should('be.visible')
+        .closest('.leaflet-popup')
+        .should('not.have.attr', 'aria-busy');
+      cy.get('[data-testid="entrance-popup-photo"]').should('not.be.visible');
+      cy.get('.leaflet-map-pane').should('not.have.class', 'leaflet-pan-anim');
+      let map;
+      let center;
+      cy.get('@popupOpen').then(spy => {
+        [map] = spy.lastCall.args;
+        // Move the popup toward the top edge so the photo would need autopan.
+        map.panBy([0, 100], { animate: false });
+        center = map.getCenter();
+      });
+      cy.get('@popupPan').invoke('resetHistory');
+      cy.then(() => releaseImage());
+      // Respect the chosen view even when the enlarged popup is clipped.
+      cy.get('[data-testid="entrance-popup-photo"]')
+        .should('not.have.attr', 'hidden')
+        .find('img')
+        .should(image => expect(image[0].naturalWidth).to.be.greaterThan(0));
+      nextPaint();
+      cy.get('@popupPan').should('not.have.been.called');
+      cy.then(() => expect(map.getCenter().equals(center)).to.equal(true));
+    });
+
     it(`shows text at the deadline and adds a slow photo with one later pan at width ${width}`, () => {
       cy.viewport(width, width === 390 ? 844 : 900);
       // The combined request latency exceeds the text deadline. This isolates

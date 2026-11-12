@@ -153,6 +153,8 @@ it('reveals text at the deadline and upgrades once when late metadata and image 
   expect(popup.getElement()).not.toHaveAttribute('aria-busy');
   expect(popup.options.autoPan).toBe(true);
   const update = vi.spyOn(popup, 'update');
+  const panBy = vi.spyOn(state.map, 'panBy').mockReturnValue(state.map);
+  Object.defineProperty(popup.getElement(), 'offsetHeight', { value: 900 });
 
   await act(async () => {
     resolveMetadata({ id: 1, name: 'Late', featuredFile: file });
@@ -169,9 +171,74 @@ it('reveals text at the deadline and upgrades once when late metadata and image 
   fireEvent.load(image);
   expect(image).toBeVisible();
   expect(update).toHaveBeenCalledTimes(1);
+  expect(panBy).toHaveBeenCalledTimes(1);
   fireEvent.load(image);
   expect(update).toHaveBeenCalledTimes(1);
 });
+
+it.each(['dragstart', 'movestart'])(
+  'does not pan for a late photo after %s following the text deadline',
+  async event => {
+    const { queryClient } = mount();
+    queryClient.setQueryData(entranceKeys.detail(1), {
+      id: 1,
+      name: 'Cached',
+      featuredFile: file
+    });
+    vi.useFakeTimers();
+    const popup = open(1);
+    const image = screen.getByAltText('Cached');
+    let resolveDecode;
+    image.decode = () =>
+      new Promise(resolve => {
+        resolveDecode = resolve;
+      });
+    Object.defineProperties(image, {
+      naturalWidth: { value: 640 },
+      naturalHeight: { value: 320 }
+    });
+    fireEvent.load(image);
+    await act(async () => vi.advanceTimersByTimeAsync(2000));
+    expect(screen.getByText('Entrance 1')).toBeVisible();
+    expect(image).not.toBeVisible();
+    const panBy = vi.spyOn(state.map, 'panBy').mockReturnValue(state.map);
+    const update = vi.spyOn(popup, 'update');
+    // Force a popup that would need autopan even in JSDOM's zero-size layout.
+    Object.defineProperty(popup.getElement(), 'offsetHeight', { value: 900 });
+    const pane = state.map.getPane('mapPane');
+    act(() => {
+      state.map.fire(event);
+      pane.classList.add('leaflet-pan-anim');
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(30000);
+      resolveDecode();
+    });
+    expect(image).toBeVisible();
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(popup.options.autoPan).toBe(false);
+    expect(panBy).not.toHaveBeenCalled();
+    act(() => {
+      pane.classList.remove('leaflet-pan-anim');
+      state.map.fire('moveend');
+      state.map.fire('resize');
+    });
+    expect(popup.options.autoPan).toBe(false);
+    expect(panBy).not.toHaveBeenCalled();
+
+    // A new opening gets its normal preparation and autopan back.
+    act(() => popup.remove());
+    act(() => popup.openOn(state.map));
+    const reopenedImage = screen.getByAltText('Cached');
+    Object.defineProperties(reopenedImage, {
+      naturalWidth: { value: 640 },
+      naturalHeight: { value: 320 }
+    });
+    fireEvent.load(reopenedImage);
+    expect(popup.options.autoPan).toBe(true);
+    expect(panBy).toHaveBeenCalledTimes(1);
+  }
+);
 
 it('keeps loading off-layout after the deadline and upgrades when decoding finishes', async () => {
   const { queryClient } = mount();
@@ -201,6 +268,72 @@ it('keeps loading off-layout after the deadline and upgrades when decoding finis
   await act(async () => resolveDecode());
   expect(update).toHaveBeenCalledTimes(1);
   expect(image).toBeVisible();
+});
+
+it('cancels deferred fallback autopan after a drag and still displays the photo', async () => {
+  const { queryClient } = mount();
+  queryClient.setQueryData(entranceKeys.detail(1), {
+    id: 1,
+    name: 'Cached',
+    featuredFile: file
+  });
+  vi.useFakeTimers();
+  const popup = open(1);
+  const pane = state.map.getPane('mapPane');
+  const image = screen.getByAltText('Cached');
+  Object.defineProperties(image, {
+    naturalWidth: { value: 640 },
+    naturalHeight: { value: 320 }
+  });
+  Object.defineProperty(popup.getElement(), 'offsetHeight', { value: 900 });
+  const panBy = vi.spyOn(state.map, 'panBy').mockReturnValue(state.map);
+  pane.classList.add('leaflet-pan-anim');
+  await act(async () => vi.advanceTimersByTimeAsync(2000));
+  expect(popup.getElement()).not.toHaveAttribute('aria-busy');
+  expect(popup.options.autoPan).toBe(false);
+  act(() => {
+    state.map.fire('dragstart');
+    pane.classList.remove('leaflet-pan-anim');
+    state.map.fire('moveend');
+  });
+  expect(panBy).not.toHaveBeenCalled();
+  fireEvent.load(image);
+  expect(image).toBeVisible();
+  expect(popup.options.autoPan).toBe(false);
+  expect(panBy).not.toHaveBeenCalled();
+});
+
+it('does not mistake deferred fallback autopan for moving the map away', async () => {
+  const { queryClient } = mount();
+  queryClient.setQueryData(entranceKeys.detail(1), {
+    id: 1,
+    name: 'Cached',
+    featuredFile: file
+  });
+  vi.useFakeTimers();
+  const popup = open(1);
+  const pane = state.map.getPane('mapPane');
+  const image = screen.getByAltText('Cached');
+  Object.defineProperties(image, {
+    naturalWidth: { value: 640 },
+    naturalHeight: { value: 320 }
+  });
+  Object.defineProperty(popup.getElement(), 'offsetHeight', { value: 900 });
+  const panBy = vi.spyOn(state.map, 'panBy').mockImplementation(() => {
+    state.map.fire('movestart');
+    return state.map;
+  });
+  pane.classList.add('leaflet-pan-anim');
+  await act(async () => vi.advanceTimersByTimeAsync(2000));
+  act(() => {
+    pane.classList.remove('leaflet-pan-anim');
+    state.map.fire('moveend');
+  });
+  expect(panBy).toHaveBeenCalledTimes(1);
+  fireEvent.load(image);
+  expect(image).toBeVisible();
+  expect(popup.options.autoPan).toBe(true);
+  expect(panBy).toHaveBeenCalledTimes(2);
 });
 
 it('closes a preparing popup when its manager unmounts', () => {
