@@ -21,6 +21,8 @@ export const makeOrganizationData = ({ organization }) => ({
 });
 
 export const makeOrganizationValueData = data => ({
+  avatarUrl: data.avatarUrl ?? null,
+  isDeleted: data.isDeleted ?? false,
   type: data.type ?? '',
   name: data.name,
   customMessage: data.customMessage ?? '',

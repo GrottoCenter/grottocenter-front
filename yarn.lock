@@ -2299,6 +2299,7 @@ __metadata:
     react-device-detect: "npm:^2.2.3"
     react-dom: "npm:^19.3.1"
     react-dropzone: "npm:^20.1.4"
+    react-easy-crop: "npm:^6.2.5"
     react-error-boundary: "npm:^6.1.6"
     react-hook-form: "npm:^7.91.0"
     react-intl: "npm:^12.1.6"
@@ -11413,6 +11414,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"normalize-wheel@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "normalize-wheel@npm:1.0.1"
+  checksum: 10/7a10d4026e64549654c7ec4c08b99e73f857c6f39b9d864e1c5c1fb2c9708e48d6eb388350dbec08407d82828a602ab5366d6cf4d766d70c2aadfadec9d31f78
+  languageName: node
+  linkType: hard
+
 "notistack@npm:^3.0.2":
   version: 3.0.2
   resolution: "notistack@npm:3.0.2"
@@ -12420,6 +12428,22 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10/6d81b46be854e3ca6c7fb051b570077177c4379c20fcd8173de5d033f243508c5b7609f4a8e148b047e99efa89417c79e5c2874863e53e4660fef317c92fdf09
+  languageName: node
+  linkType: hard
+
+"react-easy-crop@npm:^6.2.5":
+  version: 6.2.5
+  resolution: "react-easy-crop@npm:6.2.5"
+  dependencies:
+    normalize-wheel: "npm:^1.0.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ">=16.4.0"
+    react-dom: ">=16.4.0"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10/9e336b0403683d2b7fea3f9f32a04753c442b7ce349084d930ff4dd490a77f43fa402bc73bda89f1b467d6efb4804a8db663686dabb0b50fc93f8c8bc81e2134
   languageName: node
   linkType: hard
 

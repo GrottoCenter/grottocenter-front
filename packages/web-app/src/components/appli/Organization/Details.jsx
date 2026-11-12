@@ -12,6 +12,7 @@ import { isMobile } from 'react-device-detect';
 import { getOrganizationMarker } from '@/components/common/Maps/common/Markers/Components/OrganizationMarker';
 import CustomIcon from '@/components/common/CustomIcon';
 import OrganizationIcon from '@/components/common/OrganizationIcon';
+import ProfileAvatar from '@/components/common/ProfileAvatar';
 import { Property } from '@/components/common/Properties';
 import {
   canOrganizationExplore,
@@ -23,6 +24,8 @@ import OrganizationPopup from '../../common/Maps/common/Markers/Components/Organ
 import InfoSection from '../../common/InfoSection';
 import { GrottoFullPropTypes } from '../../../types/grotto.type';
 import linkifyOptions from '../../../helpers/linkifyOptions';
+
+const ORGANIZATION_LOGO_SIZE = 128;
 
 const InfoRow = styled('div')`
   display: flex;
@@ -86,112 +89,162 @@ const Details = ({ organization }) => {
     (organization.authoredCount ?? 0) + (organization.publishedCount ?? 0);
   const documentsLabel = formatMessage({ id: 'Documents' });
 
+  const hasLogo = Boolean(organization.avatarUrl);
+  const hasInfo = Boolean(
+    hasAddress ||
+    organization.mail ||
+    organization.url ||
+    organization.customMessage
+  );
+  const hasPosition = position.length > 0;
+  let mobileAreas = hasPosition ? '"summary" "map" "info"' : '"summary" "info"';
+  let desktopAreas = hasPosition
+    ? '"map summary" "map info"'
+    : '"summary" "info"';
+  if (hasLogo) {
+    mobileAreas = hasPosition ? '"map" "info"' : '"info"';
+    desktopAreas = mobileAreas;
+    if (hasPosition && hasInfo) desktopAreas = '"map info"';
+    else if (hasPosition) desktopAreas = '"map"';
+  }
+  const organizationSummary = (
+    <SectionPaper
+      variant="outlined"
+      data-testid="organization-summary"
+      sx={{
+        gridArea: hasLogo ? undefined : 'summary',
+        containerType: 'inline-size',
+        display: 'flex',
+        alignItems: hasLogo ? 'stretch' : 'center',
+        flexDirection: hasLogo ? 'column' : 'row',
+        flexWrap: 'wrap',
+        gap: 2
+      }}>
+      <Box
+        data-testid="organization-type"
+        sx={{
+          flex: hasLogo ? '0 1 auto' : { xs: '1 1 100%', sm: '1 1 11rem' },
+          minWidth: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2
+        }}>
+        <Box sx={{ minWidth: 0, flex: 1, overflowWrap: 'anywhere' }}>
+          <Property
+            label={formatMessage({ id: 'organizationType.label' })}
+            icon={<OrganizationIcon organizationType={organization.type} />}
+            value={
+              <span data-testid="organization-type-label">
+                {formatMessage({
+                  id: getOrganizationTypeLabelId(organization.type)
+                })}
+              </span>
+            }
+            flexBasis="auto"
+          />
+        </Box>
+      </Box>
+      <Box
+        data-testid="organization-statistics"
+        sx={{
+          flex: hasLogo ? '0 1 auto' : { xs: '1 1 100%', sm: '4 1 22rem' },
+          minWidth: 0,
+          display: 'grid',
+          gridTemplateColumns: hasExploration
+            ? 'repeat(2, minmax(0, 1fr))'
+            : 'minmax(0, 1fr)',
+          '@container (min-width: 22rem)': {
+            gridTemplateColumns: {
+              sm: hasExploration
+                ? 'repeat(4, minmax(0, 1fr))'
+                : 'minmax(0, 1fr)'
+            }
+          },
+          gap: 1
+        }}>
+        {hasExploration && (
+          <StatItem
+            iconType="caver"
+            alt="cavers"
+            count={nbCavers}
+            label={formatMessage({ id: 'members' })}
+          />
+        )}
+        <StatItem
+          iconType="bibliography"
+          alt={documentsLabel}
+          count={documentsCount}
+          label={documentsLabel}
+        />
+        {hasExploration && (
+          <StatItem
+            iconType="network"
+            alt="networks"
+            count={nbNetworks}
+            label={formatMessage({ id: 'Networks' })}
+          />
+        )}
+        {hasExploration && (
+          <StatItem
+            iconType="entrance"
+            alt="entrances"
+            count={nbEntrances}
+            label={formatMessage({ id: 'Entrances' })}
+          />
+        )}
+      </Box>
+    </SectionPaper>
+  );
+
   return (
     <Box
       data-testid="organization-properties"
       sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+      {hasLogo && (
+        <Box
+          data-testid="organization-presentation"
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'minmax(0, 1fr)',
+              sm: `${ORGANIZATION_LOGO_SIZE}px minmax(0, 1fr)`
+            },
+            gap: { xs: 2, sm: 3 },
+            alignItems: 'start'
+          }}>
+          <Box
+            data-testid="organization-logo"
+            sx={{ justifySelf: { xs: 'center', sm: 'start' } }}>
+            <ProfileAvatar
+              avatarUrl={organization.avatarUrl}
+              name={organization.name}
+              organizationType={organization.type}
+              isOrganization
+              size={ORGANIZATION_LOGO_SIZE}
+            />
+          </Box>
+          {organizationSummary}
+        </Box>
+      )}
       <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: {
             xs: 'minmax(0, 1fr)',
             sm:
-              position.length > 0
+              position.length > 0 && (!hasLogo || hasInfo)
                 ? 'repeat(2, minmax(0, 1fr))'
                 : 'minmax(0, 1fr)'
           },
           gridTemplateAreas: {
-            xs:
-              position.length > 0
-                ? '"summary" "map" "info"'
-                : '"summary" "info"',
-            sm:
-              position.length > 0
-                ? '"map summary" "map info"'
-                : '"summary" "info"'
+            xs: mobileAreas,
+            sm: desktopAreas
           },
-          gridTemplateRows: { sm: 'auto 1fr' },
+          gridTemplateRows: hasLogo ? undefined : { sm: 'auto 1fr' },
           columnGap: { xs: 1, sm: 2 },
           rowGap: 1
         }}>
-        {/* Type first, with statistics alongside when space permits. */}
-        <SectionPaper
-          variant="outlined"
-          data-testid="organization-summary"
-          sx={{
-            gridArea: 'summary',
-            containerType: 'inline-size',
-            display: 'flex',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 2
-          }}>
-          <Box
-            data-testid="organization-type"
-            sx={{ flex: { xs: '1 1 100%', sm: '1 1 11rem' }, minWidth: 0 }}>
-            <Property
-              label={formatMessage({ id: 'organizationType.label' })}
-              icon={<OrganizationIcon organizationType={organization.type} />}
-              value={
-                <span data-testid="organization-type-label">
-                  {formatMessage({
-                    id: getOrganizationTypeLabelId(organization.type)
-                  })}
-                </span>
-              }
-              flexBasis="auto"
-            />
-          </Box>
-          <Box
-            data-testid="organization-statistics"
-            sx={{
-              flex: { xs: '1 1 100%', sm: '4 1 22rem' },
-              minWidth: 0,
-              display: 'grid',
-              gridTemplateColumns: hasExploration
-                ? 'repeat(2, minmax(0, 1fr))'
-                : 'minmax(0, 1fr)',
-              '@container (min-width: 22rem)': {
-                gridTemplateColumns: {
-                  sm: hasExploration
-                    ? 'repeat(4, minmax(0, 1fr))'
-                    : 'minmax(0, 1fr)'
-                }
-              },
-              gap: 1
-            }}>
-            {hasExploration && (
-              <StatItem
-                iconType="caver"
-                alt="cavers"
-                count={nbCavers}
-                label={formatMessage({ id: 'members' })}
-              />
-            )}
-            <StatItem
-              iconType="bibliography"
-              alt={documentsLabel}
-              count={documentsCount}
-              label={documentsLabel}
-            />
-            {hasExploration && (
-              <StatItem
-                iconType="network"
-                alt="networks"
-                count={nbNetworks}
-                label={formatMessage({ id: 'Networks' })}
-              />
-            )}
-            {hasExploration && (
-              <StatItem
-                iconType="entrance"
-                alt="entrances"
-                count={nbEntrances}
-                label={formatMessage({ id: 'Entrances' })}
-              />
-            )}
-          </Box>
-        </SectionPaper>
+        {!hasLogo && organizationSummary}
 
         {/* LEFT: Map only */}
         {position.length > 0 && (
@@ -220,74 +273,78 @@ const Details = ({ organization }) => {
           </Box>
         )}
         {/* Contact and description below the summary on desktop. */}
-        <Box
-          sx={{
-            gridArea: 'info',
-            minWidth: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1
-          }}>
-          {/* Contact Paper */}
-          {(hasAddress || organization.mail || organization.url) && (
-            <SectionPaper variant="outlined" data-testid="organization-contact">
-              <InfoSection
-                component="h2"
-                title={formatMessage({ id: 'Contact' })}>
-                {hasAddress && (
-                  <InfoRow>
-                    <LocationCityIcon
-                      color="primary"
-                      sx={{ fontSize: 24, flexShrink: 0 }}
-                    />
-                    <Typography>{addressText}</Typography>
-                  </InfoRow>
-                )}
-                {organization.mail && (
-                  <InfoRow>
-                    <AlternateEmailIcon
-                      color="primary"
-                      sx={{ fontSize: 24, flexShrink: 0 }}
-                    />
-                    <Typography>
-                      <Linkify options={linkifyOptions}>
-                        {organization.mail}
-                      </Linkify>
-                    </Typography>
-                  </InfoRow>
-                )}
-                {organization.url && (
-                  <InfoRow>
-                    <LanguageIcon
-                      color="primary"
-                      sx={{ fontSize: 24, flexShrink: 0 }}
-                    />
-                    <Typography>
-                      <Linkify options={linkifyOptions}>
-                        {organization.url}
-                      </Linkify>
-                    </Typography>
-                  </InfoRow>
-                )}
-              </InfoSection>
-            </SectionPaper>
-          )}
+        {hasInfo && (
+          <Box
+            sx={{
+              gridArea: 'info',
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1
+            }}>
+            {/* Contact Paper */}
+            {(hasAddress || organization.mail || organization.url) && (
+              <SectionPaper
+                variant="outlined"
+                data-testid="organization-contact">
+                <InfoSection
+                  component="h2"
+                  title={formatMessage({ id: 'Contact' })}>
+                  {hasAddress && (
+                    <InfoRow>
+                      <LocationCityIcon
+                        color="primary"
+                        sx={{ fontSize: 24, flexShrink: 0 }}
+                      />
+                      <Typography>{addressText}</Typography>
+                    </InfoRow>
+                  )}
+                  {organization.mail && (
+                    <InfoRow>
+                      <AlternateEmailIcon
+                        color="primary"
+                        sx={{ fontSize: 24, flexShrink: 0 }}
+                      />
+                      <Typography>
+                        <Linkify options={linkifyOptions}>
+                          {organization.mail}
+                        </Linkify>
+                      </Typography>
+                    </InfoRow>
+                  )}
+                  {organization.url && (
+                    <InfoRow>
+                      <LanguageIcon
+                        color="primary"
+                        sx={{ fontSize: 24, flexShrink: 0 }}
+                      />
+                      <Typography>
+                        <Linkify options={linkifyOptions}>
+                          {organization.url}
+                        </Linkify>
+                      </Typography>
+                    </InfoRow>
+                  )}
+                </InfoSection>
+              </SectionPaper>
+            )}
 
-          {/* Description Paper */}
-          {organization.customMessage && (
-            <SectionPaper variant="outlined">
-              <InfoSection
-                component="h2"
-                title={formatMessage({ id: 'Description' })}>
-                <MultilinesTypography>
-                  <Linkify options={linkifyOptions}>
-                    {organization.customMessage}
-                  </Linkify>
-                </MultilinesTypography>
-              </InfoSection>
-            </SectionPaper>
-          )}
-        </Box>
+            {/* Description Paper */}
+            {organization.customMessage && (
+              <SectionPaper variant="outlined">
+                <InfoSection
+                  component="h2"
+                  title={formatMessage({ id: 'Description' })}>
+                  <MultilinesTypography>
+                    <Linkify options={linkifyOptions}>
+                      {organization.customMessage}
+                    </Linkify>
+                  </MultilinesTypography>
+                </InfoSection>
+              </SectionPaper>
+            )}
+          </Box>
+        )}
       </Box>
     </Box>
   );

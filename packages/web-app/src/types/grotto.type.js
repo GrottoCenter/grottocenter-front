@@ -38,6 +38,7 @@ export const GrottoFullPropTypes = PropTypes.shape({
   mail: PropTypes.string,
   url: PropTypes.string,
   customMessage: PropTypes.string,
+  avatarUrl: PropTypes.string,
   cavers: PropTypes.arrayOf(CaverPropTypes),
   city: PropTypes.string,
   country: PropTypes.string,

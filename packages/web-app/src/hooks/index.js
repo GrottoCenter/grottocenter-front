@@ -11,6 +11,7 @@ export {
   useUpdateNotificationPreferences
 } from './queries/useAccount';
 export { useDebounce } from './useDebounce';
+export { useAvatar } from './mutations/useAvatar';
 export { useBoolean } from './useBoolean';
 export { useAuthNavigate } from './useAuthNavigate';
 // Server-state reads live in ./queries and are re-exported here so consumers

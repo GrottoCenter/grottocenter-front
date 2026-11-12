@@ -16,6 +16,8 @@ vi.mock('@/api/client', () => ({
 }));
 vi.mock('@/hooks', async () => ({
   ...(await import('@/hooks/mutations/useOrganizationForm')),
+  ...(await import('@/hooks/mutations/useAvatar')),
+  usePermissions: () => ({ isAuth: true }),
   useOnlineStatus: () => state.isOnline,
   useLanguages: () => ({
     isSuccess: true,

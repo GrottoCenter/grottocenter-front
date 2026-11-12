@@ -22,6 +22,7 @@ import AppLink from '@/components/common/AppLink';
 import UserAvatar from '@/components/common/UserAvatar';
 import {
   useDuplicatesCount,
+  useAccount,
   usePendingDocumentsCount,
   usePermissions,
   useUserProperties
@@ -51,6 +52,7 @@ const UserMenu = ({
   const [anchorEl, setAnchorEl] = useState(null);
   const userProperties = useUserProperties();
   const permissions = usePermissions();
+  const { data: account } = useAccount();
   // Only moderators consume these counters (see showPendingDot below), so
   // gate the queries on the same permission — anonymous users get no request.
   const { data: pendingDocumentsCount = 0 } = usePendingDocumentsCount({
@@ -116,7 +118,11 @@ const UserMenu = ({
               boxSizing: 'content-box'
             }
           }}>
-          <UserAvatar username={userNickname} />
+          <UserAvatar
+            username={account?.nickname ?? userNickname}
+            src={account?.avatarUrl || undefined}
+            alt={account?.nickname ?? userNickname}
+          />
         </Badge>
       </IconButton>
       <Menu

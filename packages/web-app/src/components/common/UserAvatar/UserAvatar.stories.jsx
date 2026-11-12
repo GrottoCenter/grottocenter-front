@@ -8,5 +8,5 @@ export const SingleWord = { args: { username: 'RomainVanel' } };
 export const Primary = { args: { username: 'Clément Rz', color: 'primary' } };
 export const Empty = { args: { username: undefined } };
 export const Large = {
-  args: { username: 'Frédéric Urien', sx: { width: 56, height: 56 } }
+  args: { username: 'Frédéric Urien', size: 56 }
 };

@@ -48,7 +48,6 @@ const PersonProperties = ({ person, canEdit = false }) => {
         </Box>
       )
     },
-    { label: formatMessage({ id: 'Id' }), value: `${person.id}` },
     person.name && {
       label: formatMessage({ id: 'Caver.Name', defaultMessage: 'Name' }),
       value: person.name
@@ -63,7 +62,12 @@ const PersonProperties = ({ person, canEdit = false }) => {
         value: person.language
       },
     groups && { label: formatMessage({ id: 'Groups' }), value: groups },
-    person.mail && { label: formatMessage({ id: 'Mail' }), value: person.mail }
+    person.mail && { label: formatMessage({ id: 'Mail' }), value: person.mail },
+    {
+      label: formatMessage({ id: 'Id' }),
+      value: `${person.id}`,
+      isSecondary: true
+    }
   ].filter(Boolean);
 
   return (
@@ -78,28 +82,36 @@ const PersonProperties = ({ person, canEdit = false }) => {
           sx={{ alignSelf: 'flex-start' }}
         />
       )}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        {detailRows.map(({ label, value, alignItems = 'center' }) => (
-          <Box key={label} sx={{ display: 'flex', alignItems, gap: 1.5 }}>
-            <Typography
-              variant="body2"
-              sx={{
-                color: 'text.secondary',
-                minWidth: '120px',
-                flexShrink: 0
-              }}>
-              {label}
-            </Typography>
-            <Typography
-              component="div"
-              variant="body1"
-              sx={{
-                fontWeight: 500
-              }}>
-              {value}
-            </Typography>
-          </Box>
-        ))}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+        {detailRows.map(
+          ({ label, value, alignItems = 'center', isSecondary = false }) => (
+            <Box
+              key={label}
+              sx={{ display: 'flex', alignItems, gap: 1.5, minWidth: 0 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  width: { xs: 100, sm: 120 },
+                  overflowWrap: 'anywhere',
+                  flexShrink: 0
+                }}>
+                {label}
+              </Typography>
+              <Typography
+                component="div"
+                variant={isSecondary ? 'body2' : 'body1'}
+                sx={{
+                  fontWeight: isSecondary ? 400 : 500,
+                  color: isSecondary ? 'text.secondary' : 'text.primary',
+                  minWidth: 0,
+                  overflowWrap: 'anywhere'
+                }}>
+                {value}
+              </Typography>
+            </Box>
+          )
+        )}
       </Box>
     </Box>
   );

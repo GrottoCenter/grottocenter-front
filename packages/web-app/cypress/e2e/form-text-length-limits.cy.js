@@ -158,7 +158,7 @@ describe('API text length limits in entity and account forms', () => {
       req.reply({ body: account });
     }).as('accountUpdate');
     visitForm('/account');
-    cy.contains('Personal information')
+    cy.contains('Public profile')
       .parent()
       .parent()
       .contains('button', 'Edit')
@@ -177,7 +177,7 @@ describe('API text length limits in entity and account forms', () => {
       cy.get('input').should('have.attr', 'maxlength', '32');
       cy.contains('Maximum 32 characters (33 entered).').should('be.visible');
     });
-    cy.contains('button', 'Save changes').click();
+    cy.contains('button', 'Save').click();
     cy.get('@accountUpdate.all').should(requests => {
       expect(
         requests.filter(request =>
@@ -196,13 +196,14 @@ describe('API text length limits in entity and account forms', () => {
       'have.value',
       'x'.repeat(32)
     );
-    cy.contains('button', 'Save changes').click();
+    cy.contains('button', 'Save').click();
     cy.wait('@saveAccount')
       .its('request.body')
       .should('deep.equal', {
         nickname: 'TestCaver',
         name: 'x'.repeat(36),
-        surname: 'x'.repeat(32)
+        surname: 'x'.repeat(32),
+        customMessage: ''
       });
   });
 });

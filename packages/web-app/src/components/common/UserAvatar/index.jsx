@@ -10,6 +10,7 @@ const getInitials = username => {
   if (!username) return '?';
 
   const cleaned = username.trim().toUpperCase();
+  if (!cleaned) return '?';
 
   // If username contains space, take first letter of first and last word
   const words = cleaned.split(/\s+/);
@@ -22,22 +23,37 @@ const getInitials = username => {
 };
 
 const StyledAvatar = styled(Avatar, {
-  shouldForwardProp: prop => prop !== '$color'
-})(({ theme, $color }) => ({
-  width: 32,
-  height: 32,
-  cursor: 'pointer',
+  shouldForwardProp: prop => prop !== '$color' && prop !== '$size'
+})(({ theme, $color, $size }) => ({
+  // Preserve the AppBar avatar's existing 15/32 initials-to-diameter ratio.
+  // Both sizes use rem so the ratio also survives browser font-size changes.
+  width: `${$size / 16}rem`,
+  height: `${$size / 16}rem`,
+  cursor: 'inherit',
   backgroundColor: theme.palette[$color].main,
   color: theme.palette.common.white,
-  fontSize: '0.9375rem',
+  fontSize: `${($size / 32) * 0.9375}rem`,
   fontWeight: 500
 }));
 
-const UserAvatar = ({ username, color = 'secondary', sx, ...props }) => {
+const UserAvatar = ({
+  username,
+  color = 'secondary',
+  size = 32,
+  sx,
+  src,
+  alt = ''
+}) => {
   const initials = getInitials(username);
 
   return (
-    <StyledAvatar {...props} $color={color} sx={sx}>
+    <StyledAvatar
+      data-testid="user-avatar"
+      src={src}
+      alt={alt}
+      $color={color}
+      $size={size}
+      sx={sx}>
       {initials}
     </StyledAvatar>
   );
@@ -45,7 +61,10 @@ const UserAvatar = ({ username, color = 'secondary', sx, ...props }) => {
 
 UserAvatar.propTypes = {
   username: PropTypes.string,
+  src: PropTypes.string,
+  alt: PropTypes.string,
   color: PropTypes.oneOf(COLORS),
+  size: PropTypes.number,
   sx: sxPropType
 };
 
