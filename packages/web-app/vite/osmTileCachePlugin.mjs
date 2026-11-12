@@ -1,4 +1,5 @@
-// Workbox serializes these callbacks: use no module bindings inside them.
+// Workbox serializes these callbacks with toString(): module bindings do not
+// reach the generated service worker, so keep the SVG literal inside the callback.
 export const osmTileCachePlugin = {
   cachedResponseWillBeUsed: async ({ request, cachedResponse }) => {
     // Leaflet's <img> requests cache opaque no-cors responses. PDF export
@@ -14,6 +15,9 @@ export const osmTileCachePlugin = {
     // Returning null lets Workbox propagate the original download failure.
     if (request.mode !== 'no-cors') return null;
 
+    // Offline over an area never visited online, CacheFirst rejects with
+    // `no-response`, one uncaught promise per tile. Answering with an SVG (an
+    // <img> loads it fine) silences that, so Leaflet's errorTileUrl never applies.
     // Keep Leaflet's offline placeholder byte-identical to ERROR_TILE_URL in
     // src/components/common/Maps/common/LayersControl.jsx.
     return new globalThis.Response(

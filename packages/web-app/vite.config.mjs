@@ -417,7 +417,7 @@ export default defineConfig(({ mode }) => {
                     },
                     // Same as the OSM rule: swallow the `no-response` rejection
                     // for tiles missing offline, with the same placeholder
-                    // (see comment above).
+                    // (see vite/osmTileCachePlugin.mjs).
                     handlerDidError: async () =>
                       new globalThis.Response(
                         '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">' +
