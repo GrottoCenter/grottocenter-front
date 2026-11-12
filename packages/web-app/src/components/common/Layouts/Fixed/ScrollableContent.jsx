@@ -26,6 +26,9 @@ const Card = styled(MuiCard)`
 const Title = styled('div')`
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing(0.5, 1)};
 `;
 
 // `dense` means "tight" regardless of collapsibility: the top padding is
@@ -69,11 +72,13 @@ const ScrollableContent = ({
   title,
   count,
   icon,
+  headerControls,
   content,
   children,
   anchorId,
   dense = false,
   subheader,
+  hideSubheaderWhenCollapsed = false,
   collapsible = true,
   defaultExpanded = true
 }) => {
@@ -91,14 +96,19 @@ const ScrollableContent = ({
     <Card id={anchorId}>
       {title && (
         <CardHeader
-          subheader={subheader}
+          subheader={
+            isOpen || !hideSubheaderWhenCollapsed ? subheader : undefined
+          }
           onClick={collapsible ? () => setIsExpanded(v => !v) : undefined}
           sx={
             collapsible ? { cursor: 'pointer', userSelect: 'none' } : undefined
           }
           title={
             <Title>
-              <Typography variant="h2" color="secondary">
+              <Typography
+                variant="h2"
+                color="secondary"
+                sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
                 {anchorId ? (
                   <AnchorHeadingWrapper>
                     {title}
@@ -119,9 +129,24 @@ const ScrollableContent = ({
                   </>
                 )}
               </Typography>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  marginInlineStart: 'auto',
+                  minWidth: 0
+                }}>
+                {isOpen && headerControls && (
+                  <div
+                    role="presentation"
+                    onClick={event => event.stopPropagation()}>
+                    {headerControls}
+                  </div>
+                )}
                 {!isNil(icon) && (
                   <div
+                    style={{ minWidth: 0 }}
                     role="presentation"
                     onClick={e => {
                       e.stopPropagation();
@@ -133,6 +158,8 @@ const ScrollableContent = ({
                 {collapsible && (
                   <IconButton
                     size="small"
+                    aria-label={typeof title === 'string' ? title : undefined}
+                    aria-expanded={isOpen}
                     onClick={e => {
                       e.stopPropagation();
                       setIsExpanded(v => !v);
@@ -164,6 +191,7 @@ ScrollableContent.propTypes = {
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   count: PropTypes.number,
   icon: PropTypes.node,
+  headerControls: PropTypes.node,
   content: (props, propName, componentName) => {
     if (!props.content && !props.children) {
       return new Error(
@@ -176,6 +204,7 @@ ScrollableContent.propTypes = {
   anchorId: PropTypes.string,
   dense: PropTypes.bool,
   subheader: PropTypes.node,
+  hideSubheaderWhenCollapsed: PropTypes.bool,
   collapsible: PropTypes.bool,
   defaultExpanded: PropTypes.bool
 };

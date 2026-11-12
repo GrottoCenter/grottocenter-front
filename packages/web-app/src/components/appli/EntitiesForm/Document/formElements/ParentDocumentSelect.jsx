@@ -13,7 +13,6 @@ import {
   getDocumentTypeIcon
 } from '@/utils/documentTypeHelpers';
 import { DocumentFormContext } from '../Provider';
-import useParentDocumentSelection from '../useParentDocumentSelection';
 
 const DOCUMENTS = ['documents'];
 const getDocumentName = document => document.title || '';
@@ -25,9 +24,8 @@ const ParentDocumentSelect = ({
   searchLabelText
 }) => {
   const { formatMessage } = useIntl();
-  const { document } = useContext(DocumentFormContext);
+  const { document, selectParent } = useContext(DocumentFormContext);
   const value = document.parent;
-  const selectDocument = useParentDocumentSelection();
   const filter = useMemo(() => {
     if (documentTypeHelpers.isArticle(document.type)) return { type: 'Issue' };
     if (documentTypeHelpers.isIssue(document.type))
@@ -73,7 +71,7 @@ const ParentDocumentSelect = ({
         filterOptions={available => available}
         onInputChange={(_event, next) => setInputValue(next)}
         onChange={(_event, next) => {
-          selectDocument(next);
+          selectParent(next);
           setInputValue(next?.title ?? '');
         }}
         noOptionsText={

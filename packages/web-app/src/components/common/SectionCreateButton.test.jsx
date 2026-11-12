@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
+import { MemoryRouter } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 import SectionCreateButton from './SectionCreateButton';
 
 const messages = {
@@ -14,18 +16,27 @@ const setOnLine = value => {
   });
 };
 
-const renderButton = (props = {}) =>
+const renderButton = ({
+  isOpen = false,
+  onToggle = vi.fn(),
+  to,
+  onParentClick
+} = {}) =>
   render(
-    <IntlProvider locale="en" messages={messages}>
-      <SectionCreateButton
-        isOpen={false}
-        onToggle={() => {}}
-        label="New"
-        tooltip="Add a new description"
-        openTooltip="Cancel adding a new description"
-        {...props}
-      />
-    </IntlProvider>
+    <MemoryRouter>
+      <IntlProvider locale="en" messages={messages}>
+        <div role="presentation" onClick={onParentClick}>
+          <SectionCreateButton
+            isOpen={isOpen}
+            onToggle={onToggle}
+            to={to}
+            label="New"
+            tooltip="Add a new description"
+            openTooltip="Cancel adding a new description"
+          />
+        </div>
+      </IntlProvider>
+    </MemoryRouter>
   );
 
 describe('SectionCreateButton', () => {
@@ -67,5 +78,37 @@ describe('SectionCreateButton', () => {
     setOnLine(false);
     renderButton({ isOpen: true });
     expect(screen.getByRole('button')).toBeEnabled();
+  });
+
+  it('uses the same New button for links without toggling the enclosing card', async () => {
+    const onParentClick = vi.fn();
+    renderButton({ to: '/ui/entity/add/document', onParentClick });
+    const link = screen.getByRole('link', { name: 'New' });
+    expect(link).toHaveAttribute('href', '/ui/entity/add/document');
+    expect(screen.getByTestId('AddCircleIcon')).toBeInTheDocument();
+    await userEvent.setup().click(link);
+    expect(onParentClick).not.toHaveBeenCalled();
+  });
+
+  it('preserves the enclosing card interaction when opening an inline form', async () => {
+    const onToggle = vi.fn();
+    const onParentClick = vi.fn();
+    renderButton({ onToggle, onParentClick });
+    await userEvent.setup().click(screen.getByRole('button'));
+    expect(onToggle).toHaveBeenCalledOnce();
+    expect(onParentClick).toHaveBeenCalledOnce();
+  });
+
+  it('disables creation links offline', () => {
+    setOnLine(false);
+    renderButton({ to: '/ui/entity/add/document' });
+    expect(screen.getByRole('link', { name: 'New' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+    expect(screen.getByRole('link', { name: 'New' })).toHaveAttribute(
+      'tabindex',
+      '-1'
+    );
   });
 });

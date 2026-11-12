@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 
 import renderWithProviders from '@/test/renderWithProviders';
 import { DOCUMENT_SORT_ORDERS } from '@/utils/documentSort';
@@ -152,5 +153,51 @@ describe('DocumentsList', () => {
     expect(screen.getByRole('combobox', { name: 'Sort by' })).toHaveTextContent(
       'Document type'
     );
+  });
+
+  it('returns to the first page when an external header changes the sort order', async () => {
+    const documents = [
+      {
+        id: 1,
+        title: 'Zebra',
+        type: DocumentTypes.BOOK,
+        dateInscription: '2025'
+      },
+      {
+        id: 2,
+        title: 'Atlas',
+        type: DocumentTypes.BOOK,
+        dateInscription: '2024'
+      }
+    ];
+    const { rerender } = renderWithProviders(
+      <DocumentsList
+        documents={documents}
+        itemsPerPage={1}
+        sortOrder={DOCUMENT_SORT_ORDERS.ADDED_DESC}
+        showSort={false}
+      />,
+      { messages }
+    );
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: 'Go to page 2' }));
+    expect(screen.getByTestId('document-2')).toBeVisible();
+    expect(screen.getByTestId('document-1')).not.toBeVisible();
+    rerender(
+      <DocumentsList
+        documents={documents}
+        itemsPerPage={1}
+        sortOrder={DOCUMENT_SORT_ORDERS.TITLE}
+        showSort={false}
+      />
+    );
+    expect(screen.getByRole('button', { name: 'page 1' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(screen.getByTestId('document-2')).toBeVisible();
+    expect(screen.getByTestId('document-1')).not.toBeVisible();
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 });

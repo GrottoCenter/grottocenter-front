@@ -143,6 +143,8 @@ const DocumentsList = ({
   onMediaClick,
   itemsPerPage = 10,
   defaultSortOrder = DOCUMENT_SORT_ORDERS.ADDED_DESC,
+  sortOrder: controlledSortOrder,
+  onSortOrderChange,
   showSort = true,
   showBibliographicReferences = false
 }) => {
@@ -150,9 +152,18 @@ const DocumentsList = ({
   // has no Redux dependency, and the provider's locale is the same value.
   const { formatMessage, locale } = useIntl();
   const [page, setPage] = useState(1);
-  const [sortOrder, setSortOrder] = useState(defaultSortOrder);
+  const [localSortOrder, setSortOrder] = useState(defaultSortOrder);
+  const sortOrder = controlledSortOrder ?? localSortOrder;
+  const [previousSortOrder, setPreviousSortOrder] = useState(sortOrder);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // External header controls change the same list order. Reset pagination before
+  // rendering the new order, without unmounting the list or its media state.
+  if (previousSortOrder !== sortOrder) {
+    setPreviousSortOrder(sortOrder);
+    setPage(1);
+  }
 
   // Everything below reads this array, never `documents`: the image offsets are
   // positional, so sorting anywhere downstream would make a thumbnail open its
@@ -253,6 +264,7 @@ const DocumentsList = ({
                 value={sortOrder}
                 onChange={order => {
                   setSortOrder(order);
+                  onSortOrderChange?.(order);
                   // The document that was on screen is now somewhere else
                   // entirely; landing back on page 1 is the only honest answer.
                   setPage(1);
@@ -326,6 +338,8 @@ DocumentsList.propTypes = {
   onMediaClick: PropTypes.func,
   itemsPerPage: PropTypes.number,
   defaultSortOrder: PropTypes.oneOf(Object.values(DOCUMENT_SORT_ORDERS)),
+  sortOrder: PropTypes.oneOf(Object.values(DOCUMENT_SORT_ORDERS)),
+  onSortOrderChange: PropTypes.func,
   showSort: PropTypes.bool,
   showBibliographicReferences: PropTypes.bool
 };

@@ -97,37 +97,22 @@ AvailabilityMarker.propTypes = {
 /* Header controls                                                            */
 /* -------------------------------------------------------------------------- */
 
-// ScrollableContent renders this row through its `icon` slot, whose wrapper
-// forces the card open on click. Stopping propagation here keeps a click on
-// the sort select from expanding a collapsed card instead of opening the
-// dropdown.
+// The legend is separate from sorting: it belongs below the title, while the
+// sort control shares the header's action row.
 const ControlsRow = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   flexWrap: 'wrap',
   justifyContent: 'flex-end',
+  marginTop: theme.spacing(0.5),
   columnGap: theme.spacing(1.5),
   rowGap: theme.spacing(0.5)
 }));
 
 /**
- * Legend and sort control as one group, so it can be dropped either into a plain
- * section heading or straight into a card's own header row — where, unlike a row
- * added inside the card body, it costs no vertical space at all.
- *
- * The sort control only appears when a handler is passed AND there is more than
- * one document to order. The legend likewise only lists the states actually
- * present.
- *
- * With neither — including when `documents` is missing entirely — the component
- * returns null rather than an empty row: an element that always renders still
- * counts as a flex child and leaves a gap behind.
+ * The legend only appears when at least one document has a file.
  */
-export const ChildrenControls = ({
-  documents,
-  sortOrder,
-  onSortOrderChange
-}) => {
+export const ChildrenAvailabilityLegend = ({ documents }) => {
   const { formatMessage } = useIntl();
   // Up to four of these are instantiated per page render, and the parent
   // re-renders on every dialog / sort / license state change — so the array scan
@@ -136,8 +121,7 @@ export const ChildrenControls = ({
     () => (documents ?? []).some(hasAttachedFile),
     [documents]
   );
-  const showSort = Boolean(onSortOrderChange) && canSortDocuments(documents);
-  if (!hasFiles && !showSort) return null;
+  if (!hasFiles) return null;
 
   return (
     <ControlsRow onClick={e => e.stopPropagation()}>
@@ -146,6 +130,7 @@ export const ChildrenControls = ({
           data-testid="document-availability-legend"
           size="small"
           variant="outlined"
+          sx={{ mr: 'auto' }}
           label={
             <>
               <InsertDriveFileIcon
@@ -158,12 +143,22 @@ export const ChildrenControls = ({
           }
         />
       )}
-      {showSort && (
-        <DocumentSortSelect value={sortOrder} onChange={onSortOrderChange} />
-      )}
     </ControlsRow>
   );
 };
+
+ChildrenAvailabilityLegend.propTypes = {
+  documents: PropTypes.arrayOf(DocumentChildPropTypes)
+};
+
+export const ChildrenControls = ({
+  documents,
+  sortOrder,
+  onSortOrderChange
+}) =>
+  onSortOrderChange && canSortDocuments(documents) ? (
+    <DocumentSortSelect value={sortOrder} onChange={onSortOrderChange} />
+  ) : null;
 
 ChildrenControls.propTypes = {
   documents: PropTypes.arrayOf(DocumentChildPropTypes),
@@ -395,7 +390,7 @@ DocumentChildrenTiles.propTypes = {
 // it is what tells the eye where one reference ends and the next begins.
 const ChildrenGrid = styled(List)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
   columnGap: theme.spacing(3),
   padding: 0
 }));

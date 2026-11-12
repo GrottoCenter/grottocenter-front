@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { apiGet } from '@/api/client';
 import { documentKeys } from '@/api/queryKeys';
@@ -6,7 +6,6 @@ import { getDocumentDetailsUrl } from '@/conf/apiRoutes';
 import { STALE } from '@/conf/queryClient';
 import { useLanguages, useLicenses, findLicenseByName } from '@/hooks';
 import { getLicenseName } from '@/components/common/LicenseTag/helpers';
-import { DocumentFormContext } from './Provider';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './formElements/AddFileForm/FileHelpers';
 
 const fetchDocumentDetail = (queryClient, id) =>
@@ -18,66 +17,138 @@ const fetchDocumentDetail = (queryClient, id) =>
 
 // Only an explicit parent selection inherits metadata. Merely displaying an
 // existing document's parent must not overwrite its edited fields.
-const useParentDocumentSelection = () => {
-  const { document, updateAttribute } = useContext(DocumentFormContext);
+const useParentDocumentSelection = ({
+  document,
+  setDocument,
+  attributeVersionsRef,
+  initialParent
+}) => {
   const queryClient = useQueryClient();
-  const { data: languages = [] } = useLanguages();
-  const { data: licenses } = useLicenses();
+  const { data: languages, refetch: fetchLanguages } = useLanguages();
+  const { data: licenses, refetch: fetchLicenses } = useLicenses();
   const selectionVersionRef = useRef(0);
+  const previousTypeRef = useRef(document.type);
+  const { type } = document;
+  const isMountedRef = useRef(false);
+  const isInitializedRef = useRef(false);
 
-  useEffect(
-    () => () => {
-      // Ignore a pending response after unmount or a change of allowed parent type.
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (previousTypeRef.current !== document.type) {
       selectionVersionRef.current += 1;
+      previousTypeRef.current = document.type;
+    }
+  }, [document.type]);
+
+  const selectParent = useCallback(
+    async selection => {
+      const version = ++selectionVersionRef.current;
+      const attributeVersions = { ...attributeVersionsRef.current };
+      setDocument(current => ({
+        ...current,
+        parent: selection,
+        authorizationDocument:
+          current.parent?.id === selection?.id
+            ? current.authorizationDocument
+            : null
+      }));
+      if (!selection) return;
+
+      const isCurrent = () =>
+        isMountedRef.current &&
+        version === selectionVersionRef.current &&
+        attributeVersions.parent === attributeVersionsRef.current.parent;
+      // A late inheritance response must not overwrite fields edited meanwhile.
+      const applyAttributes = attributes => {
+        setDocument(current => {
+          if (
+            !isCurrent() ||
+            current.type !== type ||
+            current.parent?.id !== selection.id
+          )
+            return current;
+          const unchanged = Object.fromEntries(
+            Object.entries(attributes).filter(
+              ([field]) =>
+                attributeVersions[field] === attributeVersionsRef.current[field]
+            )
+          );
+          return { ...current, ...unchanged };
+        });
+      };
+
+      try {
+        const [details, languageResult, licenseResult] = await Promise.all([
+          fetchDocumentDetail(queryClient, selection.id),
+          languages ? { data: languages } : fetchLanguages(),
+          licenses ? { data: licenses } : fetchLicenses()
+        ]);
+        if (!isCurrent()) return;
+
+        const attributes = {
+          parent: { ...selection, title: details.title, type: details.type }
+        };
+        // Contextual links may only supply an ID. Resolve the selector's label
+        // through the same detail request used for inheritance.
+        if (typeof details.mainLanguage === 'string' && details.mainLanguage) {
+          attributes.mainLanguage = details.mainLanguage;
+          attributes.mainLanguageName =
+            languageResult.data?.find(
+              language => language.id === details.mainLanguage
+            )?.refName ?? details.mainLanguage;
+        }
+        if (details.license) {
+          attributes.license =
+            findLicenseByName(
+              licenseResult.data,
+              getLicenseName(details.license)
+            ) ?? details.license;
+        }
+        attributes.editor = details.editor ?? null;
+        attributes.library = details.library ?? null;
+        attributes.selectOptionAuthorizationDocument =
+          details.authorizationDocument ? DOCUMENT_AUTHORIZE_TO_PUBLISH : null;
+        applyAttributes(attributes);
+        if (details.authorizationDocument) {
+          const authorization = await fetchDocumentDetail(
+            queryClient,
+            details.authorizationDocument.id
+          );
+          if (!isCurrent()) return;
+          applyAttributes({ authorizationDocument: authorization });
+        } else {
+          applyAttributes({ authorizationDocument: null });
+        }
+      } catch (error) {
+        if (isCurrent())
+          console.error('Error fetching parent document details:', error);
+      }
     },
-    [document.type]
+    [
+      type,
+      setDocument,
+      attributeVersionsRef,
+      queryClient,
+      languages,
+      licenses,
+      fetchLanguages,
+      fetchLicenses
+    ]
   );
 
-  return async selection => {
-    const version = ++selectionVersionRef.current;
-    updateAttribute('parent', selection);
-    if (!selection) return;
+  useEffect(() => {
+    if (!initialParent || isInitializedRef.current) return;
+    isInitializedRef.current = true;
+    selectParent(initialParent);
+  }, [initialParent, selectParent]);
 
-    try {
-      const details = await fetchDocumentDetail(queryClient, selection.id);
-      if (version !== selectionVersionRef.current) return;
-
-      if (typeof details.mainLanguage === 'string' && details.mainLanguage) {
-        updateAttribute('mainLanguage', details.mainLanguage);
-        updateAttribute(
-          'mainLanguageName',
-          languages.find(language => language.id === details.mainLanguage)
-            ?.refName ?? details.mainLanguage
-        );
-      }
-      if (details.license) {
-        updateAttribute(
-          'license',
-          findLicenseByName(licenses, getLicenseName(details.license)) ??
-            details.license
-        );
-      }
-      updateAttribute('editor', details.editor ?? null);
-      updateAttribute('library', details.library ?? null);
-      updateAttribute(
-        'selectOptionAuthorizationDocument',
-        details.authorizationDocument ? DOCUMENT_AUTHORIZE_TO_PUBLISH : null
-      );
-      if (details.authorizationDocument) {
-        const authorization = await fetchDocumentDetail(
-          queryClient,
-          details.authorizationDocument.id
-        );
-        if (version !== selectionVersionRef.current) return;
-        updateAttribute('authorizationDocument', authorization);
-      } else {
-        updateAttribute('authorizationDocument', null);
-      }
-    } catch (error) {
-      if (version === selectionVersionRef.current)
-        console.error('Error fetching parent document details:', error);
-    }
-  };
+  return selectParent;
 };
 
 export default useParentDocumentSelection;

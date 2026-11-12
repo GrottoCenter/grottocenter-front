@@ -216,7 +216,8 @@ TypeCard.propTypes = {
 };
 
 const DocumentTypeSelect = () => {
-  const { document, updateAttribute } = useContext(DocumentFormContext);
+  const { document, updateAttribute, selectParent } =
+    useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -233,7 +234,7 @@ const DocumentTypeSelect = () => {
     if (newDocType === document.type) return;
     updateAttribute('type', newDocType);
     if (!isArticle(newDocType) && !isIssue(newDocType)) {
-      updateAttribute('parent', null);
+      selectParent(null);
     }
   };
 

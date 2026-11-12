@@ -53,7 +53,7 @@ const Spacer = styled('div')`
 const DONT_LEAVE_MESSAGE =
   'If you leave now, some data would be lost. Are you sure you want to leave this page?';
 
-const DocumentSubmission = ({ onCancel, onSuccess }) => {
+export const DocumentSubmission = ({ onCancel, onSuccess }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const permissions = usePermissions();

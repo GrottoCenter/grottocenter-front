@@ -14,6 +14,9 @@ import DocumentFormProvider, {
   getDocumentLengthErrors
 } from './Provider';
 
+// Validation is independent of the server-backed parent selection mechanism.
+vi.mock('./useParentDocumentSelection', () => ({ default: () => vi.fn() }));
+
 const ValidationState = () => {
   const { isFormValid } = useContext(DocumentFormContext);
   return <span>{isFormValid ? 'valid' : 'invalid'}</span>;
