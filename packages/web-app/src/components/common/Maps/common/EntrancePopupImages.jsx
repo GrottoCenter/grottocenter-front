@@ -67,10 +67,13 @@ const EntrancePopupContent = ({
     const originalMaxHeight = popup.options.maxHeight;
     const originalPaddingTopLeft = popup.options.autoPanPaddingTopLeft;
     const originalPaddingBottomRight = popup.options.autoPanPaddingBottomRight;
+    let measuredMapSize = map.getSize();
     let isUpdatingPopup = false;
     const handleMoveStart = () => {
-      // Ignore movements caused by our own popup measurement/autopan.
-      if (!isUpdatingPopup) hasMovedSinceFallbackRef.current = true;
+      // Resizing can emit movestart before resize. Ignore it along with our
+      // own autopan, preserving popup fitting after an orientation change.
+      if (!isUpdatingPopup && map.getSize().equals(measuredMapSize))
+        hasMovedSinceFallbackRef.current = true;
     };
     const updatePopup = () => {
       if (!popup.isOpen()) return;
@@ -93,7 +96,8 @@ const EntrancePopupContent = ({
     };
     const updateLayout = () => {
       if (!popup.isOpen()) return;
-      const { x: width, y: height } = map.getSize();
+      measuredMapSize = map.getSize();
+      const { x: width, y: height } = measuredMapSize;
       const bounds = mapContainer.getBoundingClientRect();
       const clippedTopLeft = point(
         Math.max(0, -bounds.left),

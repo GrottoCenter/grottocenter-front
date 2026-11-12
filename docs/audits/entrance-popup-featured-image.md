@@ -150,11 +150,14 @@ content was modified to manufacture that scenario.
 After the text deadline, `dragstart` or `movestart` disables further autopan for
 that opening. A late photo still decodes, appears and is measured, but respects
 the chosen map view, even while dragging or after a deferred pan. Movements
-caused by the popup's own update are ignored. Closing and reopening resets this
-policy, and idle late-photo upgrades retain normal autopan.
+caused by the popup's own update or a changed map size are ignored. Comparing
+against the last measured size handles `movestart` emitted before `resize`;
+rotation and resizing retain popup fitting, while a later move at the new size
+still disables autopan. Closing and reopening resets this policy, and idle
+late-photo upgrades retain normal autopan.
 
 Validation: full `yarn.cmd lint` passed without errors or warnings; the following
-focused Vitest command passed 39 tests, using the default timeout:
+focused Vitest command passed 41 tests, using the default timeout:
 
 ```powershell
 yarn.cmd test --run src/components/common/Maps/common/EntrancePopupImages.test.jsx src/hooks/queries/useEntranceFeaturedImage.test.jsx --maxWorkers=2

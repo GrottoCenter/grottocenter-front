@@ -336,6 +336,46 @@ it('does not mistake deferred fallback autopan for moving the map away', async (
   expect(panBy).toHaveBeenCalledTimes(2);
 });
 
+it.each([false, true])(
+  'distinguishes resize from a later move after the text deadline (move: %s)',
+  async shouldMoveAfterResize => {
+    const { queryClient } = mount();
+    queryClient.setQueryData(entranceKeys.detail(1), {
+      id: 1,
+      name: 'Cached',
+      featuredFile: file
+    });
+    vi.useFakeTimers();
+    const popup = open(1);
+    const image = screen.getByAltText('Cached');
+    Object.defineProperties(image, {
+      naturalWidth: { value: 640 },
+      naturalHeight: { value: 320 }
+    });
+    await act(async () => vi.advanceTimersByTimeAsync(2000));
+    Object.defineProperty(popup.getElement(), 'offsetHeight', { value: 900 });
+    const panBy = vi.spyOn(state.map, 'panBy').mockImplementation(() => {
+      state.map.fire('movestart');
+      return state.map;
+    });
+    const moveStart = vi.fn();
+    state.map.on('movestart', moveStart);
+    Object.defineProperty(element, 'clientWidth', { value: 320 });
+    act(() => state.map.invalidateSize({ animate: true }));
+    expect(moveStart).toHaveBeenCalled();
+    expect(popup.options.autoPan).toBe(true);
+    expect(popup.getElement().style.getPropertyValue('--map-popup-width')).toBe(
+      '272px'
+    );
+    panBy.mockClear();
+    if (shouldMoveAfterResize) act(() => state.map.fire('movestart'));
+    fireEvent.load(image);
+    expect(image).toBeVisible();
+    expect(popup.options.autoPan).toBe(!shouldMoveAfterResize);
+    expect(panBy).toHaveBeenCalledTimes(shouldMoveAfterResize ? 0 : 1);
+  }
+);
+
 it('closes a preparing popup when its manager unmounts', () => {
   apiGet.mockImplementation(() => new Promise(() => {}));
   const { unmount } = mount();
