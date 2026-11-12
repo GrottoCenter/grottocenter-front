@@ -333,6 +333,31 @@ it.each([false, true])(
   }
 );
 
+it.each(['untouched', 'custom', 'cleared'])(
+  'clears only an untouched issue prefill when switching to Article (%s)',
+  async action => {
+    const originalGet = apiGet.getMockImplementation();
+    apiGet.mockImplementation(url =>
+      url === `${getDocumentDetailsUrl}10`
+        ? Promise.resolve({ ...parent, type: 'Collection' })
+        : originalGet(url)
+    );
+    renderPage('/ui/entity/add/document?type=Issue&parentId=10');
+    const title = screen.getByTestId('document-title').querySelector('input');
+    await waitFor(() => expect(title).toHaveValue(parent.title));
+    if (action !== 'untouched') {
+      fireEvent.change(title, {
+        target: { value: action === 'custom' ? `${parent.title} - 42` : '' }
+      });
+    }
+    await userEvent.setup().click(screen.getByTestId('document-type-3'));
+    expect(state().type).toBe('Article');
+    expect(title).toHaveValue(
+      action === 'custom' ? `${parent.title} - 42` : ''
+    );
+  }
+);
+
 it('resolves reference data before inheriting and never replays initialization on refetch', async () => {
   let resolveLicenses;
   const originalGet = apiGet.getMockImplementation();

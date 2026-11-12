@@ -127,7 +127,6 @@ describe('Contextual document creation', () => {
         parent.title
       );
       cy.wait(['@licenses', '@fileFormats', '@identifierTypes', '@subjects']);
-      cy.get('[data-testid="app-snackbar"]').should('not.exist');
       cy.get('@createDocument.all').should('have.length', 0);
       cy.get('[data-testid="document-submit"]').should('be.disabled');
       cy.get('[data-testid="document-title"] input')
@@ -138,6 +137,8 @@ describe('Contextual document creation', () => {
         'Test'
       );
       cy.contains('[role="option"]', 'Test author').click();
+      // Filling the form lets the query retry window elapse before this guard.
+      cy.get('[data-testid="app-snackbar"]').should('not.exist');
       // FixedContent scrolls smoothly. Finish scrolling before the click and
       // prevent Cypress from starting another scroll in its nested container.
       cy.get('[data-testid="document-submit"]').then(([button]) => {
@@ -155,6 +156,11 @@ describe('Contextual document creation', () => {
         .and('include', 'name="parent[id]"')
         .and('include', `\r\n\r\n${parent.id}\r\n`)
         .and('include', `\r\n\r\n${type}\r\n`);
+      ['licenses', 'fileFormats', 'identifierTypes', 'subjects'].forEach(
+        key => {
+          cy.get(`@${key}.all`).should('have.length', 1);
+        }
+      );
       cy.contains('Your document has been successfully submitted', {
         timeout: 15000
       }).should('be.visible');

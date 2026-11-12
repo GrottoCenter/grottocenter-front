@@ -47,9 +47,16 @@ const useParentDocumentSelection = ({
   useEffect(() => {
     if (previousTypeRef.current !== document.type) {
       selectionVersionRef.current += 1;
+      if (isNewDocument && previousTypeRef.current === DocumentTypes.ISSUE) {
+        setDocument(current =>
+          current.title && current.title === current.parent?.title
+            ? { ...current, title: '' }
+            : current
+        );
+      }
       previousTypeRef.current = document.type;
     }
-  }, [document.type]);
+  }, [document.type, isNewDocument, setDocument]);
 
   const selectParent = useCallback(
     async selection => {
