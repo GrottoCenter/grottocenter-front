@@ -93,12 +93,9 @@ it('preserves the non-fatal statistics fallback', async () => {
   );
   render(<PopupTargetHandler popupTarget={{ type: 'massif', id: 1 }} />);
   await waitFor(() => expect(map.openPopup).toHaveBeenCalledTimes(1));
-  expect(
-    map.openPopup.mock.calls[0][0].props.massif.entranceCount
-  ).toBeUndefined();
-  expect(
-    map.openPopup.mock.calls[0][0].props.massif.networkCount
-  ).toBeUndefined();
+  const { massif } = map.openPopup.mock.calls[0][0].getContent().props;
+  expect(massif.entranceCount).toBeUndefined();
+  expect(massif.networkCount).toBeUndefined();
 });
 
 it.each([
@@ -120,7 +117,8 @@ it.each([
     );
     render(<PopupTargetHandler popupTarget={{ type: 'massif', id: 1 }} />);
     await waitFor(() => expect(map.openPopup).toHaveBeenCalledTimes(1));
-    expect(map.openPopup.mock.calls[0][0].props.massif).toMatchObject({
+    const { massif } = map.openPopup.mock.calls[0][0].getContent().props;
+    expect(massif).toMatchObject({
       entranceCount: expected,
       networkCount: statistics.nb_networks
     });
