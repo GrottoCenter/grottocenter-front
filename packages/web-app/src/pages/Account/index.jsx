@@ -152,6 +152,7 @@ const EditFooter = styled(Box)(({ theme }) => ({
 const SettingSection = ({
   icon,
   title,
+  testId,
   isEditing,
   onEdit,
   viewContent,
@@ -169,6 +170,7 @@ const SettingSection = ({
         </SectionHeaderTitle>
         {!isEditing && (
           <Button
+            data-testid={`${testId}-edit`}
             size="small"
             variant="outlined"
             startIcon={<EditIcon fontSize="small" />}
@@ -186,6 +188,7 @@ const SettingSection = ({
 SettingSection.propTypes = {
   icon: PropTypes.node,
   title: PropTypes.string.isRequired,
+  testId: PropTypes.string.isRequired,
   isEditing: PropTypes.bool.isRequired,
   onEdit: PropTypes.func.isRequired,
   viewContent: PropTypes.node.isRequired,
@@ -216,7 +219,7 @@ const EditActions = ({ isLoading, isDisabled = false, onCancel }) => {
           startIcon={
             isLoading ? <CircularProgress size={16} color="inherit" /> : null
           }>
-          <Translate>Save</Translate>
+          <Translate>Save changes</Translate>
         </Button>
       </OfflineDisabled>
     </EditFooter>
@@ -369,12 +372,12 @@ export const PublicProfileSection = ({ account, onSaved }) => {
             formatMessage({ id: 'profile.emptyMessage' })}
         </Typography>
       </Box>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ display: 'block', mt: 2 }}>
-        {formatMessage({ id: 'Id' })} : {account.id}
-      </Typography>
+      <InfoRow sx={{ mt: 2 }}>
+        <InfoLabel variant="body2">{formatMessage({ id: 'Id' })}</InfoLabel>
+        <Typography variant="body2" color="text.secondary">
+          {account.id}
+        </Typography>
+      </InfoRow>
     </>
   );
 
@@ -455,6 +458,7 @@ export const PublicProfileSection = ({ account, onSaved }) => {
     <SettingSection
       icon={<PersonOutlinedIcon color="action" />}
       title={formatMessage({ id: 'profile.public' })}
+      testId="public-profile"
       isEditing={isEditing}
       onEdit={handleEdit}
       viewContent={viewContent}
@@ -814,6 +818,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
         </SectionHeaderTitle>
         {!isEditingEmail && (
           <Button
+            data-testid="email-security-edit"
             size="small"
             variant="outlined"
             startIcon={<EditIcon fontSize="small" />}
@@ -1174,6 +1179,7 @@ const PreferencesSection = ({ account, onSaved }) => {
     <SettingSection
       icon={<TuneIcon color="action" />}
       title={formatMessage({ id: 'Preferences' })}
+      testId="preferences"
       isEditing={isEditing}
       onEdit={handleEdit}
       viewContent={viewContent}

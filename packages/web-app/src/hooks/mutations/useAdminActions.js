@@ -62,15 +62,13 @@ export const useUpdateAccount = ({ errorPresentation } = {}) => {
   return useMutation({
     meta: { errorPresentation },
     mutationFn: fields => apiPatch(accountUrl, fields),
-    onSuccess: (_data, fields) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: accountKeys.current() });
-      if (Object.hasOwn(fields, 'customMessage')) {
-        const account = queryClient.getQueryData(accountKeys.current());
-        if (account?.id != null)
-          queryClient.invalidateQueries({
-            queryKey: personKeys.detail(account.id)
-          });
-      }
+      const account = queryClient.getQueryData(accountKeys.current());
+      if (account?.id != null)
+        queryClient.invalidateQueries({
+          queryKey: personKeys.detail(account.id)
+        });
     }
   });
 };

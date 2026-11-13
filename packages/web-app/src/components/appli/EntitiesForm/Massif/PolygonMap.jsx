@@ -156,10 +156,10 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
 
       // Edit toolbar
       L.drawLocal.edit.toolbar.actions.save.title = formatMessage({
-        id: 'Save'
+        id: 'Save changes'
       });
       L.drawLocal.edit.toolbar.actions.save.text = formatMessage({
-        id: 'Save'
+        id: 'Save changes'
       });
       L.drawLocal.edit.toolbar.actions.cancel.title = formatMessage({
         id: 'Cancel editing, discards all changes'

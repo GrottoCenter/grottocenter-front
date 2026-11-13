@@ -4,7 +4,7 @@ import { Box, Chip, Typography } from '@mui/material';
 
 import PersonType from './PersonType';
 
-const PersonProperties = ({ person, canEdit = false }) => {
+const PersonProperties = ({ person }) => {
   const { formatMessage } = useIntl();
 
   const groups = (person.groups ?? [])
@@ -28,24 +28,13 @@ const PersonProperties = ({ person, canEdit = false }) => {
       label: formatMessage({ id: 'Nickname' }),
       alignItems: 'baseline',
       value: (
-        <Box>
-          <Typography
-            component="span"
-            variant="h5"
-            color="primary"
-            sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-            {person.nickname}
-          </Typography>
-          {canEdit && (
-            <Typography
-              variant="body2"
-              sx={{ color: 'text.secondary', mt: 0.25 }}>
-              {formatMessage({
-                id: 'The nickname defines how other users see you.'
-              })}
-            </Typography>
-          )}
-        </Box>
+        <Typography
+          component="span"
+          variant="h5"
+          color="primary"
+          sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+          {person.nickname}
+        </Typography>
       )
     },
     person.name && {
@@ -118,7 +107,6 @@ const PersonProperties = ({ person, canEdit = false }) => {
 };
 
 PersonProperties.propTypes = {
-  canEdit: PropTypes.bool,
   person: PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string,

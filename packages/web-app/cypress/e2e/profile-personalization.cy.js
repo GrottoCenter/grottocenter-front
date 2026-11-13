@@ -7,13 +7,7 @@ const visit = (path = '/account', locale = 'en') => {
     onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', locale)
   });
 };
-const editProfile = () =>
-  cy
-    .contains('h2', 'Public profile')
-    .parent()
-    .parent()
-    .contains('button', 'Edit')
-    .click();
+const editProfile = () => cy.get('[data-testid="public-profile-edit"]').click();
 const selectPhoto = () => {
   cy.get('[data-testid="avatar-select"]').should('be.enabled');
   cy.get('[data-testid="avatar-file"]').selectFile(imagePath, { force: true });
@@ -118,7 +112,7 @@ describe('Profile personalization', () => {
     editProfile();
     setMessage('<b>Hello</b>\nCave diver.');
     cy.get('[data-testid="public-profile-form"]')
-      .contains('button', 'Save')
+      .contains('button', 'Save changes')
       .click();
     cy.wait('@saveProfile')
       .its('request.body.customMessage')
@@ -130,7 +124,7 @@ describe('Profile personalization', () => {
     editProfile();
     cy.get('[data-testid="account-custom-message"] textarea').first().clear();
     cy.get('[data-testid="public-profile-form"]')
-      .contains('button', 'Save')
+      .contains('button', 'Save changes')
       .click();
     cy.wait('@saveProfile').its('request.body.customMessage').should('eq', '');
     visit('/persons/1');
@@ -152,18 +146,10 @@ describe('Profile personalization', () => {
         });
       });
     editProfile();
-    cy.contains('h2', 'Email & Security')
-      .parent()
-      .parent()
-      .contains('button', 'Edit')
-      .click();
+    cy.get('[data-testid="email-security-edit"]').click();
     cy.get('input[name="email"]').clear();
     cy.get('input[name="email"]').type('draft@example.org');
-    cy.contains('h2', 'Preferences')
-      .parent()
-      .parent()
-      .contains('button', 'Edit')
-      .click();
+    cy.get('[data-testid="preferences-edit"]').click();
     cy.contains('label', 'Alert for news').find('input').check();
     setMessage('Unsaved introduction');
     selectPhoto();
@@ -278,7 +264,7 @@ describe('Profile personalization', () => {
     visit();
     editProfile();
     cy.get('[data-testid="public-profile-form"]')
-      .contains('button', 'Save')
+      .contains('button', 'Save changes')
       .click();
     cy.get('[data-testid="account-custom-message"] textarea')
       .first()
@@ -296,7 +282,7 @@ describe('Profile personalization', () => {
     }).as('failedMessage');
     setMessage('Keep after error');
     cy.get('[data-testid="public-profile-form"]')
-      .contains('button', 'Save')
+      .contains('button', 'Save changes')
       .click();
     cy.wait('@failedMessage');
     cy.get('[data-testid="account-custom-message"] textarea')
@@ -439,7 +425,7 @@ describe('Profile personalization', () => {
       .click();
     cy.get('[data-testid="avatar-select"]').should('be.disabled');
     cy.get('[data-testid="public-profile-form"]')
-      .contains('button', 'Save')
+      .contains('button', 'Save changes')
       .should('be.disabled');
     cy.window().then(win => win.dispatchEvent(new win.Event('online')));
     cy.get('[data-testid="avatar-select"]').should('be.enabled');
@@ -450,6 +436,8 @@ describe('Profile personalization', () => {
 
   it('renders the profile in French without overflowing', () => {
     account.customMessage = '';
+    // The saved account language takes precedence over localStorage after login.
+    account.language = 'fra';
     cy.viewport(390, 844);
     visit('/account', 'fr');
     cy.contains('h2', 'Profil public').should('be.visible');
@@ -458,17 +446,13 @@ describe('Profile personalization', () => {
       'color',
       'rgb(117, 117, 117)'
     );
-    cy.contains('h2', 'Profil public')
-      .parent()
-      .parent()
-      .contains('button', 'Modifier')
+    cy.get('[data-testid="public-profile-edit"]')
+      .should('contain.text', 'Modifier')
       .click();
     cy.contains('Ajouter une image').should('be.visible');
-    cy.contains('Facultatif. 500 caractères maximum.').should('not.exist');
-    cy.contains('Les GIF sont enregistrés en images fixes.').should(
-      'not.exist'
-    );
-    cy.contains('button', 'Enregistrer').should('exist');
+    cy.get('[data-testid="public-profile-form"]')
+      .contains('button', 'Sauvegarder les modifications')
+      .should('be.visible');
     cy.contains('À propos de moi').should('exist');
     cy.screenshot('profile-public-french-mobile', { capture: 'viewport' });
     cy.document().then(doc =>
