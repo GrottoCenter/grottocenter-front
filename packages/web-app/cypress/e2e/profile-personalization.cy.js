@@ -112,7 +112,7 @@ describe('Profile personalization', () => {
     editProfile();
     setMessage('<b>Hello</b>\nCave diver.');
     cy.get('[data-testid="public-profile-form"]')
-      .contains('button', 'Save changes')
+      .contains('button', 'Save')
       .click();
     cy.wait('@saveProfile')
       .its('request.body.customMessage')
@@ -124,7 +124,7 @@ describe('Profile personalization', () => {
     editProfile();
     cy.get('[data-testid="account-custom-message"] textarea').first().clear();
     cy.get('[data-testid="public-profile-form"]')
-      .contains('button', 'Save changes')
+      .contains('button', 'Save')
       .click();
     cy.wait('@saveProfile').its('request.body.customMessage').should('eq', '');
     visit('/persons/1');
@@ -264,7 +264,7 @@ describe('Profile personalization', () => {
     visit();
     editProfile();
     cy.get('[data-testid="public-profile-form"]')
-      .contains('button', 'Save changes')
+      .contains('button', 'Save')
       .click();
     cy.get('[data-testid="account-custom-message"] textarea')
       .first()
@@ -282,7 +282,7 @@ describe('Profile personalization', () => {
     }).as('failedMessage');
     setMessage('Keep after error');
     cy.get('[data-testid="public-profile-form"]')
-      .contains('button', 'Save changes')
+      .contains('button', 'Save')
       .click();
     cy.wait('@failedMessage');
     cy.get('[data-testid="account-custom-message"] textarea')
@@ -425,7 +425,7 @@ describe('Profile personalization', () => {
       .click();
     cy.get('[data-testid="avatar-select"]').should('be.disabled');
     cy.get('[data-testid="public-profile-form"]')
-      .contains('button', 'Save changes')
+      .contains('button', 'Save')
       .should('be.disabled');
     cy.window().then(win => win.dispatchEvent(new win.Event('online')));
     cy.get('[data-testid="avatar-select"]').should('be.enabled');
@@ -451,7 +451,7 @@ describe('Profile personalization', () => {
       .click();
     cy.contains('Ajouter une image').should('be.visible');
     cy.get('[data-testid="public-profile-form"]')
-      .contains('button', 'Sauvegarder les modifications')
+      .contains('button', 'Enregistrer')
       .should('be.visible');
     cy.contains('À propos de moi').should('exist');
     cy.screenshot('profile-public-french-mobile', { capture: 'viewport' });

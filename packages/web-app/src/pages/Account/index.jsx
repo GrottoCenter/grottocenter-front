@@ -219,7 +219,7 @@ const EditActions = ({ isLoading, isDisabled = false, onCancel }) => {
           startIcon={
             isLoading ? <CircularProgress size={16} color="inherit" /> : null
           }>
-          <Translate>Save changes</Translate>
+          <Translate>Save</Translate>
         </Button>
       </OfflineDisabled>
     </EditFooter>
