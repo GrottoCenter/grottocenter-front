@@ -20,7 +20,9 @@ import {
   Select,
   Skeleton,
   Switch,
-  Typography
+  Typography,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
@@ -37,6 +39,7 @@ import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import TuneIcon from '@mui/icons-material/Tune';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import NoAccountsOutlinedIcon from '@mui/icons-material/NoAccountsOutlined';
 import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { styled } from '@mui/material/styles';
@@ -372,12 +375,12 @@ export const PublicProfileSection = ({ account, onSaved }) => {
             formatMessage({ id: 'profile.emptyMessage' })}
         </Typography>
       </Box>
-      <InfoRow sx={{ mt: 2 }}>
-        <InfoLabel variant="body2">{formatMessage({ id: 'Id' })}</InfoLabel>
-        <Typography variant="body2" color="text.secondary">
-          {account.id}
-        </Typography>
-      </InfoRow>
+      <Typography
+        variant="caption"
+        data-testid="account-profile-id"
+        sx={{ color: 'text.secondary', display: 'block', mt: 2 }}>
+        {formatMessage({ id: 'profile.id' }, { id: account.id })}
+      </Typography>
     </>
   );
 
@@ -1346,6 +1349,8 @@ const OfflineDataSection = () => {
 
 const AccountDeletionSection = () => {
   const { formatMessage, locale } = useIntl();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const contactUrl = contactLinks[locale] ?? contactLinks['*'];
 
@@ -1373,6 +1378,7 @@ const AccountDeletionSection = () => {
           <Button
             variant="outlined"
             color="error"
+            startIcon={<DeleteForeverIcon />}
             onClick={() => setIsDialogOpen(true)}
             data-testid="request-account-deletion">
             {formatMessage({ id: 'Request account deletion' })}
@@ -1383,10 +1389,16 @@ const AccountDeletionSection = () => {
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         fullWidth
+        fullScreen={isMobile}
+        scrollable
+        stackActionsOnMobile
         title={formatMessage({ id: 'Account deletion' })}
         actions={
           <>
-            <Button onClick={() => setIsDialogOpen(false)} variant="outlined">
+            <Button
+              onClick={() => setIsDialogOpen(false)}
+              variant="outlined"
+              data-testid="account-deletion-back">
               {formatMessage({ id: 'Go back' })}
             </Button>
             <Button

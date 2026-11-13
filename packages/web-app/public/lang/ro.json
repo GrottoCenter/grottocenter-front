@@ -2379,6 +2379,7 @@
   "Profile page of the user": "Pagina de profil a utilizatorului",
   "profile.about": "Despre mine",
   "profile.emptyMessage": "Adăugați câteva cuvinte pentru a vă prezenta.",
+  "profile.id": "id: {id}",
   "profile.public": "Profil public",
   "profile.publicHelp": "Aceste informații sunt vizibile pe profilul dumneavoastră public.",
   "Program, source code": "Program, cod sursă",

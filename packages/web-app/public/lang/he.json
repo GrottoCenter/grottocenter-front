@@ -2379,6 +2379,7 @@
   "Profile page of the user": "עמוד הפרופיל של המשתמש",
   "profile.about": "עליי",
   "profile.emptyMessage": "אפשר להוסיף כמה מילים על עצמך.",
+  "profile.id": "Id: {id}",
   "profile.public": "פרופיל ציבורי",
   "profile.publicHelp": "פרטים אלה מוצגים בפרופיל הציבורי שלך.",
   "Program, source code": "תוכנה, קוד מקור",

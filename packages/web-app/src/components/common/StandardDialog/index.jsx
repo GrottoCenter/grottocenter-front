@@ -146,7 +146,7 @@ const StandardDialog = ({
               flexDirection: { xs: 'column-reverse', sm: 'row' },
               alignItems: { xs: 'stretch', sm: 'center' },
               gap: 1,
-              '& > button': { width: { xs: '100%', sm: 'auto' } }
+              '& > button, & > a': { width: { xs: '100%', sm: 'auto' } }
             }),
             ...(hasHeaderActions && {
               py: 2,

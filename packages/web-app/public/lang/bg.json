@@ -2379,6 +2379,7 @@
   "Profile page of the user": "Профилна страница на потребителя",
   "profile.about": "За мен",
   "profile.emptyMessage": "Добавете няколко думи за себе си.",
+  "profile.id": "ИД: {id}",
   "profile.public": "Публичен профил",
   "profile.publicHelp": "Тези данни са видими в публичния ви профил.",
   "Program, source code": "Програма, изходен код",

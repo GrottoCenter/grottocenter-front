@@ -2379,6 +2379,7 @@
   "Profile page of the user": "Profile page of the user",
   "profile.about": "About me",
   "profile.emptyMessage": "Add a few words about yourself.",
+  "profile.id": "Id: {id}",
   "profile.public": "Public profile",
   "profile.publicHelp": "These details are visible on your public profile.",
   "Program, source code": "Program, source code",

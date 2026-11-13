@@ -109,6 +109,7 @@ describe('Profile personalization', () => {
 
   it('saves, displays as plain text, and clears the public message', () => {
     visit();
+    cy.get('[data-testid="account-profile-id"]').should('have.text', 'Id: 1');
     editProfile();
     setMessage('<b>Hello</b>\nCave diver.');
     cy.get('[data-testid="public-profile-form"]')
@@ -441,6 +442,13 @@ describe('Profile personalization', () => {
     cy.viewport(390, 844);
     visit('/account', 'fr');
     cy.contains('h2', 'Profil public').should('be.visible');
+    cy.get('[data-testid="account-profile-id"]').should('have.text', 'Id : 1');
+    cy.get('[data-testid="account-profile-id"]')
+      .should('have.css', 'color')
+      .then(color => {
+        cy.contains('p', /^Prénom$/).should('have.css', 'color', color);
+      });
+    cy.screenshot('profile-id-french-mobile', { capture: 'viewport' });
     cy.contains('Ajoutez quelques mots pour vous présenter.').should(
       'have.css',
       'color',

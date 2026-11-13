@@ -2379,6 +2379,7 @@
   "Profile page of the user": "Pàgina de perfil de l'usuari",
   "profile.about": "Sobre mi",
   "profile.emptyMessage": "Afegeix unes paraules per presentar-te.",
+  "profile.id": "Id: {id}",
   "profile.public": "Perfil públic",
   "profile.publicHelp": "Aquestes dades són visibles al teu perfil públic.",
   "Program, source code": "Programa, codi font",

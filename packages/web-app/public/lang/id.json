@@ -2379,6 +2379,7 @@
   "Profile page of the user": "Halaman profil pengguna",
   "profile.about": "Tentang saya",
   "profile.emptyMessage": "Tambahkan beberapa kata untuk memperkenalkan diri.",
+  "profile.id": "Id: {id}",
   "profile.public": "Profil publik",
   "profile.publicHelp": "Informasi ini terlihat di profil publik Anda.",
   "Program, source code": "Program, kode sumber",
