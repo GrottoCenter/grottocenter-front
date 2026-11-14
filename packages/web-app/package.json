@@ -62,6 +62,7 @@
     "react-device-detect": "^2.2.3",
     "react-dom": "^19.3.1",
     "react-dropzone": "^20.1.4",
+    "react-easy-crop": "^6.2.5",
     "react-error-boundary": "^6.1.6",
     "react-hook-form": "^7.91.0",
     "react-intl": "^12.1.6",

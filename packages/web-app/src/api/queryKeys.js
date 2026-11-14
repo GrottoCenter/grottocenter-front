@@ -225,6 +225,11 @@ export const accountKeys = {
   notificationPreferences: () => ['account', 'notificationPreferences']
 };
 
+export const avatarMutationKeys = {
+  account: () => [...accountKeys.all, 'avatar'],
+  organization: id => [...organizationKeys.detail(id), 'avatar']
+};
+
 // Substance autocomplete backing the observation-import wizard's sensor
 // configuration form. Keyed on the (trimmed) search term so parallel typing
 // in different sensors keeps its own cache.

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import { Box, Divider, Typography } from '@mui/material';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
@@ -15,8 +16,10 @@ import DocumentReferences, {
 import EntitiesList from '@/components/common/entitiesList/EntitiesList';
 import RelatedCaves from '@/components/common/RelatedCaves/RelatedCaves';
 import PersonProperties from '@/components/common/Person/PersonProperties';
+import ProfileAvatar from '@/components/common/ProfileAvatar';
+import InfoSection from '@/components/common/InfoSection';
 
-const CaverBody = ({ person, canEdit, onRefresh }) => {
+const CaverBody = ({ person, onRefresh }) => {
   const { formatMessage } = useIntl();
   const nbOrganizations = (person.organizations ?? []).length;
   const nbEntrances = (person.exploredEntrances ?? []).length;
@@ -50,7 +53,44 @@ const CaverBody = ({ person, canEdit, onRefresh }) => {
       <div>
         <SectionStack>
           <ScrollableContent
-            content={<PersonProperties person={person} canEdit={canEdit} />}
+            content={
+              <Box data-testid="caver-profile">
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: {
+                      xs: 'minmax(0, 1fr)',
+                      sm: 'auto minmax(0, 1fr)'
+                    },
+                    gap: { xs: 2, sm: 3 },
+                    alignItems: 'start'
+                  }}>
+                  <ProfileAvatar
+                    avatarUrl={person.avatarUrl}
+                    name={person.nickname}
+                    size={96}
+                  />
+                  <PersonProperties person={person} />
+                </Box>
+                {person.customMessage && (
+                  <>
+                    <Divider sx={{ my: 3 }} />
+                    <InfoSection
+                      component="h2"
+                      title={formatMessage({ id: 'profile.about' })}>
+                      <Typography
+                        sx={{
+                          whiteSpace: 'pre-wrap',
+                          overflowWrap: 'anywhere',
+                          maxWidth: '75ch'
+                        }}>
+                        {person.customMessage}
+                      </Typography>
+                    </InfoSection>
+                  </>
+                )}
+              </Box>
+            }
           />
         </SectionStack>
       </div>
@@ -129,7 +169,6 @@ const CaverBody = ({ person, canEdit, onRefresh }) => {
 
 CaverBody.propTypes = {
   person: PersonPropTypes.isRequired,
-  canEdit: PropTypes.bool.isRequired,
   onRefresh: PropTypes.func.isRequired
 };
 

@@ -4,7 +4,7 @@ import { Box, Chip, Typography } from '@mui/material';
 
 import PersonType from './PersonType';
 
-const PersonProperties = ({ person, canEdit = false }) => {
+const PersonProperties = ({ person }) => {
   const { formatMessage } = useIntl();
 
   const groups = (person.groups ?? [])
@@ -28,27 +28,15 @@ const PersonProperties = ({ person, canEdit = false }) => {
       label: formatMessage({ id: 'Nickname' }),
       alignItems: 'baseline',
       value: (
-        <Box>
-          <Typography
-            component="span"
-            variant="h5"
-            color="primary"
-            sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-            {person.nickname}
-          </Typography>
-          {canEdit && (
-            <Typography
-              variant="body2"
-              sx={{ color: 'text.secondary', mt: 0.25 }}>
-              {formatMessage({
-                id: 'The nickname defines how other users see you.'
-              })}
-            </Typography>
-          )}
-        </Box>
+        <Typography
+          component="span"
+          variant="h5"
+          color="primary"
+          sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+          {person.nickname}
+        </Typography>
       )
     },
-    { label: formatMessage({ id: 'Id' }), value: `${person.id}` },
     person.name && {
       label: formatMessage({ id: 'Caver.Name', defaultMessage: 'Name' }),
       value: person.name
@@ -63,7 +51,12 @@ const PersonProperties = ({ person, canEdit = false }) => {
         value: person.language
       },
     groups && { label: formatMessage({ id: 'Groups' }), value: groups },
-    person.mail && { label: formatMessage({ id: 'Mail' }), value: person.mail }
+    person.mail && { label: formatMessage({ id: 'Mail' }), value: person.mail },
+    {
+      label: formatMessage({ id: 'Id' }),
+      value: `${person.id}`,
+      isSecondary: true
+    }
   ].filter(Boolean);
 
   return (
@@ -78,35 +71,42 @@ const PersonProperties = ({ person, canEdit = false }) => {
           sx={{ alignSelf: 'flex-start' }}
         />
       )}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        {detailRows.map(({ label, value, alignItems = 'center' }) => (
-          <Box key={label} sx={{ display: 'flex', alignItems, gap: 1.5 }}>
-            <Typography
-              variant="body2"
-              sx={{
-                color: 'text.secondary',
-                minWidth: '120px',
-                flexShrink: 0
-              }}>
-              {label}
-            </Typography>
-            <Typography
-              component="div"
-              variant="body1"
-              sx={{
-                fontWeight: 500
-              }}>
-              {value}
-            </Typography>
-          </Box>
-        ))}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+        {detailRows.map(
+          ({ label, value, alignItems = 'center', isSecondary = false }) => (
+            <Box
+              key={label}
+              sx={{ display: 'flex', alignItems, gap: 1.5, minWidth: 0 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  width: { xs: 100, sm: 120 },
+                  overflowWrap: 'anywhere',
+                  flexShrink: 0
+                }}>
+                {label}
+              </Typography>
+              <Typography
+                component="div"
+                variant={isSecondary ? 'body2' : 'body1'}
+                sx={{
+                  fontWeight: isSecondary ? 400 : 500,
+                  color: isSecondary ? 'text.secondary' : 'text.primary',
+                  minWidth: 0,
+                  overflowWrap: 'anywhere'
+                }}>
+                {value}
+              </Typography>
+            </Box>
+          )
+        )}
       </Box>
     </Box>
   );
 };
 
 PersonProperties.propTypes = {
-  canEdit: PropTypes.bool,
   person: PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string,

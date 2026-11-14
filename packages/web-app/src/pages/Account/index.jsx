@@ -20,7 +20,9 @@ import {
   Select,
   Skeleton,
   Switch,
-  Typography
+  Typography,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
@@ -37,15 +39,19 @@ import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import TuneIcon from '@mui/icons-material/Tune';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import NoAccountsOutlinedIcon from '@mui/icons-material/NoAccountsOutlined';
 import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { styled } from '@mui/material/styles';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import AvatarEditor from '@/components/common/AvatarEditor/AvatarEditor';
+import ProfileAvatar from '@/components/common/ProfileAvatar';
 import { postLogout } from '../../actions/Login';
 import {
   useAccount,
+  useAvatar,
   useNotificationPreferences,
   useUpdateNotificationPreferences,
   usePerson,
@@ -149,6 +155,7 @@ const EditFooter = styled(Box)(({ theme }) => ({
 const SettingSection = ({
   icon,
   title,
+  testId,
   isEditing,
   onEdit,
   viewContent,
@@ -166,6 +173,7 @@ const SettingSection = ({
         </SectionHeaderTitle>
         {!isEditing && (
           <Button
+            data-testid={`${testId}-edit`}
             size="small"
             variant="outlined"
             startIcon={<EditIcon fontSize="small" />}
@@ -183,6 +191,7 @@ const SettingSection = ({
 SettingSection.propTypes = {
   icon: PropTypes.node,
   title: PropTypes.string.isRequired,
+  testId: PropTypes.string.isRequired,
   isEditing: PropTypes.bool.isRequired,
   onEdit: PropTypes.func.isRequired,
   viewContent: PropTypes.node.isRequired,
@@ -213,7 +222,7 @@ const EditActions = ({ isLoading, isDisabled = false, onCancel }) => {
           startIcon={
             isLoading ? <CircularProgress size={16} color="inherit" /> : null
           }>
-          <Translate>Save changes</Translate>
+          <Translate>Save</Translate>
         </Button>
       </OfflineDisabled>
     </EditFooter>
@@ -228,12 +237,16 @@ EditActions.propTypes = {
 
 // ─── Personal info section ────────────────────────────────────────────────────
 
-const PersonalInfoSection = ({ account, onSaved }) => {
+export const PublicProfileSection = ({ account, onSaved }) => {
   const { formatMessage } = useIntl();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
-  const updateAccountMutation = useUpdateAccount();
+  const updateAccountMutation = useUpdateAccount({
+    errorPresentation: 'inline'
+  });
+  const avatarMutation = useAvatar({ personId: account.id });
+  const isOnline = useOnlineStatus();
 
   const {
     control,
@@ -241,18 +254,21 @@ const PersonalInfoSection = ({ account, onSaved }) => {
     reset,
     formState: { errors }
   } = useForm({
-    defaultValues: { nickname: '', name: '', surname: '' }
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
+    defaultValues: { nickname: '', name: '', surname: '', customMessage: '' }
   });
 
   useEffect(() => {
-    if (account) {
+    if (account && !isEditing) {
       reset({
         nickname: account.nickname ?? '',
         name: account.name ?? '',
-        surname: account.surname ?? ''
+        surname: account.surname ?? '',
+        customMessage: account.customMessage ?? ''
       });
     }
-  }, [account, reset]);
+  }, [account, reset, isEditing]);
 
   const handleEdit = () => {
     setSaveError(null);
@@ -263,20 +279,23 @@ const PersonalInfoSection = ({ account, onSaved }) => {
       reset({
         nickname: account.nickname ?? '',
         name: account.name ?? '',
-        surname: account.surname ?? ''
+        surname: account.surname ?? '',
+        customMessage: account.customMessage ?? ''
       });
     setIsEditing(false);
     setSaveError(null);
   };
 
   const onSubmit = async data => {
+    if (!isOnline || isLoading || avatarMutation.isPending) return;
     setIsLoading(true);
     setSaveError(null);
     try {
       await updateAccountMutation.mutateAsync({
         nickname: data.nickname,
         name: data.name,
-        surname: data.surname
+        surname: data.surname,
+        customMessage: data.customMessage
       });
       // useUpdateAccount invalidates accountKeys.current() in its onSuccess,
       // so every useAccount() consumer refetches automatically — no manual
@@ -287,7 +306,9 @@ const PersonalInfoSection = ({ account, onSaved }) => {
       setSaveError(
         error?.status === 409
           ? formatMessage({ id: 'nicknameAlreadyTaken' })
-          : formatMessage({ id: 'genericError' })
+          : formatMessage({
+              id: error?.status === 429 ? 'Too many requests' : 'genericError'
+            })
       );
     } finally {
       setIsLoading(false);
@@ -296,11 +317,17 @@ const PersonalInfoSection = ({ account, onSaved }) => {
 
   const viewContent = (
     <>
-      <InfoRow>
-        <InfoLabel variant="body2">{formatMessage({ id: 'Id' })}</InfoLabel>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="body1">{account?.id ?? '—'}</Typography>
-          {account?.id && (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1, mb: 1 }}>
+        <ProfileAvatar
+          avatarUrl={account.avatarUrl}
+          name={account.nickname}
+          size={72}
+        />
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            {formatMessage({ id: 'profile.publicHelp' })}
+          </Typography>
+          {account.id && (
             <Button
               size="small"
               variant="outlined"
@@ -313,7 +340,7 @@ const PersonalInfoSection = ({ account, onSaved }) => {
             </Button>
           )}
         </Box>
-      </InfoRow>
+      </Box>
       <InfoRow>
         <InfoLabel variant="body2">
           {formatMessage({ id: 'Nickname' })}
@@ -332,56 +359,109 @@ const PersonalInfoSection = ({ account, onSaved }) => {
         </InfoLabel>
         <Typography variant="body1">{account?.surname || '—'}</Typography>
       </InfoRow>
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="h5" component="h3" sx={{ mb: 0.5 }}>
+          {formatMessage({ id: 'profile.about' })}
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            color: account.customMessage ? 'text.primary' : 'grey.600',
+            whiteSpace: 'pre-wrap',
+            overflowWrap: 'anywhere',
+            maxWidth: '75ch'
+          }}>
+          {account.customMessage ||
+            formatMessage({ id: 'profile.emptyMessage' })}
+        </Typography>
+      </Box>
+      <Typography
+        variant="caption"
+        data-testid="account-profile-id"
+        sx={{ color: 'text.secondary', display: 'block', mt: 2 }}>
+        {formatMessage({ id: 'profile.id' }, { id: account.id })}
+      </Typography>
     </>
   );
 
   const editContent = (
-    <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-      <Typography
-        variant="caption"
-        sx={{
-          color: 'text.secondary'
-        }}>
-        <Translate>The nickname defines how other users see you.</Translate>
+    <Box>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        {formatMessage({ id: 'profile.publicHelp' })}
       </Typography>
-      <FormRow>
+      <AvatarEditor
+        avatarUrl={account.avatarUrl}
+        name={account.nickname}
+        isPending={avatarMutation.isPending}
+        isDisabled={isLoading}
+        isOnline={isOnline}
+        onChange={avatarMutation.mutateAsync}
+      />
+      <Divider sx={{ my: 2 }} />
+      <form
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        autoComplete="off"
+        data-testid="public-profile-form">
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary'
+          }}>
+          <Translate>The nickname defines how other users see you.</Translate>
+        </Typography>
+        <FormRow>
+          <InputText
+            formKey="nickname"
+            testId="account-nickname"
+            maxLength={TEXT_LENGTH_LIMITS.NICKNAME}
+            labelName="Nickname"
+            control={control}
+            isRequired
+            isError={!!errors.nickname}
+          />
+        </FormRow>
+        <FormRow>
+          <InputText
+            formKey="name"
+            testId="account-first-name"
+            maxLength={TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME}
+            labelName="First name"
+            control={control}
+            isError={!!errors.name}
+          />
+          <InputText
+            formKey="surname"
+            testId="account-last-name"
+            maxLength={TEXT_LENGTH_LIMITS.PERSON_LAST_NAME}
+            labelName="Last name"
+            control={control}
+            isError={!!errors.surname}
+          />
+        </FormRow>
         <InputText
-          formKey="nickname"
-          testId="account-nickname"
-          maxLength={TEXT_LENGTH_LIMITS.NICKNAME}
-          labelName="Nickname"
+          formKey="customMessage"
+          testId="account-custom-message"
+          labelName="profile.about"
           control={control}
-          isRequired
-          isError={!!errors.nickname}
+          isError={!!errors.customMessage}
+          characterLimit={TEXT_LENGTH_LIMITS.CAVER_MESSAGE}
+          minRows={3}
         />
-      </FormRow>
-      <FormRow>
-        <InputText
-          formKey="name"
-          testId="account-first-name"
-          maxLength={TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME}
-          labelName="First name"
-          control={control}
-          isError={!!errors.name}
+        {saveError && <Alert severity="error" content={saveError} />}
+        <EditActions
+          isLoading={isLoading || avatarMutation.isPending}
+          onCancel={handleCancel}
         />
-        <InputText
-          formKey="surname"
-          testId="account-last-name"
-          maxLength={TEXT_LENGTH_LIMITS.PERSON_LAST_NAME}
-          labelName="Last name"
-          control={control}
-          isError={!!errors.surname}
-        />
-      </FormRow>
-      {saveError && <Alert severity="error" content={saveError} />}
-      <EditActions isLoading={isLoading} onCancel={handleCancel} />
-    </form>
+      </form>
+    </Box>
   );
 
   return (
     <SettingSection
       icon={<PersonOutlinedIcon color="action" />}
-      title={formatMessage({ id: 'Personal information' })}
+      title={formatMessage({ id: 'profile.public' })}
+      testId="public-profile"
       isEditing={isEditing}
       onEdit={handleEdit}
       viewContent={viewContent}
@@ -395,13 +475,15 @@ const accountShape = PropTypes.shape({
   nickname: PropTypes.string,
   name: PropTypes.string,
   surname: PropTypes.string,
+  customMessage: PropTypes.string,
+  avatarUrl: PropTypes.string,
   mail: PropTypes.string,
   mailIsValid: PropTypes.bool,
   language: PropTypes.string,
   sendNotificationByEmail: PropTypes.bool
 });
 
-PersonalInfoSection.propTypes = {
+PublicProfileSection.propTypes = {
   account: accountShape.isRequired,
   onSaved: PropTypes.func.isRequired
 };
@@ -606,8 +688,8 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
   });
 
   useEffect(() => {
-    if (account) resetEmail({ email: account.mail ?? '' });
-  }, [account, resetEmail]);
+    if (account && !isEditingEmail) resetEmail({ email: account.mail ?? '' });
+  }, [account, resetEmail, isEditingEmail]);
 
   const handleEditEmail = () => {
     setEmailError(null);
@@ -739,6 +821,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
         </SectionHeaderTitle>
         {!isEditingEmail && (
           <Button
+            data-testid="email-security-edit"
             size="small"
             variant="outlined"
             startIcon={<EditIcon fontSize="small" />}
@@ -889,7 +972,7 @@ const PreferencesSection = ({ account, onSaved }) => {
   // The RQ hook already runs the fetch on mount — we just mirror its data into
   // the RHF form defaults whenever a fresh copy lands.
   useEffect(() => {
-    if (account) {
+    if (account && !isEditing) {
       reset({
         language: languageIdToLocale(account.language) ?? '',
         ...notifPrefs
@@ -898,7 +981,7 @@ const PreferencesSection = ({ account, onSaved }) => {
     // notifPrefs is rebuilt on every render — depending on notifPrefsData
     // instead avoids resetting the form on every parent re-render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, notifPrefsData, reset]);
+  }, [account, notifPrefsData, reset, isEditing]);
 
   const handleEdit = () => {
     setSaveError(null);
@@ -1099,6 +1182,7 @@ const PreferencesSection = ({ account, onSaved }) => {
     <SettingSection
       icon={<TuneIcon color="action" />}
       title={formatMessage({ id: 'Preferences' })}
+      testId="preferences"
       isEditing={isEditing}
       onEdit={handleEdit}
       viewContent={viewContent}
@@ -1265,6 +1349,8 @@ const OfflineDataSection = () => {
 
 const AccountDeletionSection = () => {
   const { formatMessage, locale } = useIntl();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const contactUrl = contactLinks[locale] ?? contactLinks['*'];
 
@@ -1292,6 +1378,7 @@ const AccountDeletionSection = () => {
           <Button
             variant="outlined"
             color="error"
+            startIcon={<DeleteForeverIcon />}
             onClick={() => setIsDialogOpen(true)}
             data-testid="request-account-deletion">
             {formatMessage({ id: 'Request account deletion' })}
@@ -1302,10 +1389,16 @@ const AccountDeletionSection = () => {
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         fullWidth
+        fullScreen={isMobile}
+        scrollable
+        stackActionsOnMobile
         title={formatMessage({ id: 'Account deletion' })}
         actions={
           <>
-            <Button onClick={() => setIsDialogOpen(false)} variant="outlined">
+            <Button
+              onClick={() => setIsDialogOpen(false)}
+              variant="outlined"
+              data-testid="account-deletion-back">
               {formatMessage({ id: 'Go back' })}
             </Button>
             <Button
@@ -1486,7 +1579,7 @@ const AccountPage = () => {
       )}
       {!isAccountLoading && account && (
         <>
-          <PersonalInfoSection account={account} onSaved={handleSaved} />
+          <PublicProfileSection account={account} onSaved={handleSaved} />
           <EmailSecuritySection
             account={account}
             onSaved={handleSaved}

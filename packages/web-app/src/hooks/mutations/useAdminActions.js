@@ -57,12 +57,18 @@ export const useUnbanCaver = () => {
 // account without a manual invalidation from the caller. mutateAsync still
 // propagates the thrown error, which callers translate (nickname 409
 // conflict, etc.).
-export const useUpdateAccount = () => {
+export const useUpdateAccount = ({ errorPresentation } = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { errorPresentation },
     mutationFn: fields => apiPatch(accountUrl, fields),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: accountKeys.current() });
+      const account = queryClient.getQueryData(accountKeys.current());
+      if (account?.id != null)
+        queryClient.invalidateQueries({
+          queryKey: personKeys.detail(account.id)
+        });
     }
   });
 };

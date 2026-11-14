@@ -251,11 +251,7 @@ const Person = ({
           {isAuthor ? (
             <AuthorBody person={person} />
           ) : (
-            <CaverBody
-              person={person}
-              canEdit={canEdit}
-              onRefresh={handleRefresh}
-            />
+            <CaverBody person={person} onRefresh={handleRefresh} />
           )}
         </>
       )}

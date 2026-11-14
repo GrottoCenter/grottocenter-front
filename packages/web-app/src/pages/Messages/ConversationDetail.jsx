@@ -698,10 +698,9 @@ Message Body: ${body}`;
           <UserAvatar
             username={otherParticipant.nickname}
             color="primary"
+            size={36}
             sx={{
-              display: { xs: 'inline-flex', md: 'none' },
-              width: 36,
-              height: 36
+              display: { xs: 'inline-flex', md: 'none' }
             }}
           />
         )}

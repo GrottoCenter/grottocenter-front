@@ -247,7 +247,7 @@ const MessagesPage = () => {
                   <UserAvatar
                     username={conv.otherParticipant?.nickname}
                     color="primary"
-                    sx={{ width: 40, height: 40 }}
+                    size={40}
                   />
                 </Badge>
               </ListItemAvatar>

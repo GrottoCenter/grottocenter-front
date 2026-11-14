@@ -17,6 +17,9 @@ export const cumulatedLengthUrl = `${API_BASE_PATH}/caves/cumulated-length`;
 
 // ===== Auth urls
 export const accountUrl = `${API_BASE_PATH}/account`;
+export const accountAvatarUrl = `${accountUrl}/avatar`;
+export const organizationAvatarUrl = id =>
+  `${API_BASE_PATH}/organizations/${id}/avatar`;
 export const changePasswordUrl = `${API_BASE_PATH}/account/password`;
 export const changeEmailUrl = `${API_BASE_PATH}/account/email`;
 export const notificationPreferencesUrl = `${API_BASE_PATH}/account/notifications`;
