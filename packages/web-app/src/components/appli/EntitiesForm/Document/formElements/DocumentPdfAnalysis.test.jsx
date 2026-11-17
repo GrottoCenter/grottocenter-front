@@ -1,5 +1,11 @@
 import { useContext } from 'react';
-import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  screen,
+  waitFor,
+  within
+} from '@testing-library/react';
 import { WritableStream } from 'node:stream/web';
 
 import { apiPost } from '@/api/client';
@@ -176,8 +182,8 @@ it('explicitly selects summary and date and synchronizes the mounted date precis
   expect(screen.queryByText('Inherited summary')).not.toBeInTheDocument();
   selectSummary();
   selectDate();
-  expect(screen.getByRole('alert')).toHaveTextContent(
-    messages['documentAi.replace']
+  expect(screen.getByTestId('document-ai-selection')).toHaveTextContent(
+    '2 replacements'
   );
   fireEvent.click(screen.getByTestId('document-ai-apply'));
   expect(screen.getByLabelText('Summary')).toHaveValue('AI summary');
@@ -273,6 +279,104 @@ it('does not offer unrecognized language IDs', async () => {
   expect(
     screen.queryByRole('checkbox', { name: messages['Document main language'] })
   ).not.toBeInTheDocument();
+});
+
+it('strikes through only selected replacements and keeps additions free of redundant statuses', async () => {
+  fetch.mockResolvedValue(
+    answer(['Suggested summary'], null, { title: 'Suggested title' })
+  );
+  renderForm({ title: 'Original title' });
+  startAnalysis();
+  const titleRow = await screen.findByTestId('document-ai-field-title');
+  expect(
+    within(titleRow).getByTestId('document-ai-current-value')
+  ).toHaveTextContent('Original title');
+  expect(
+    within(titleRow).getByTestId('document-ai-proposed-value')
+  ).toHaveTextContent('Suggested title');
+  const summaryRow = screen.getByTestId('document-ai-field-description');
+  expect(
+    within(summaryRow).getByTestId('document-ai-current-text')
+  ).toHaveTextContent('-');
+  expect(screen.getByTestId('document-ai-selection')).toBeEmptyDOMElement();
+  expect(titleRow.querySelector('del')).not.toBeInTheDocument();
+  fireEvent.click(within(titleRow).getByRole('checkbox'));
+  selectSummary();
+  expect(titleRow.querySelector('del')).toHaveTextContent('Original title');
+  expect(summaryRow.querySelector('del')).not.toBeInTheDocument();
+  expect(titleRow).not.toHaveTextContent('Replacement');
+  expect(summaryRow).not.toHaveTextContent('Addition');
+  expect(screen.getByTestId('document-ai-selection')).toHaveTextContent(
+    '2 fields selected'
+  );
+  expect(screen.getByTestId('document-ai-selection')).toHaveTextContent(
+    '1 replacement'
+  );
+  fireEvent.click(within(titleRow).getByRole('checkbox'));
+  expect(titleRow.querySelector('del')).not.toBeInTheDocument();
+  expect(screen.getByTestId('document-ai-selection')).not.toHaveTextContent(
+    'replacement'
+  );
+  fireEvent.click(screen.getByTestId('document-ai-apply'));
+  expect(screen.getByTestId('manual-title')).toHaveValue('Original title');
+  expect(screen.getByLabelText('Summary')).toHaveValue('Suggested summary');
+});
+
+it('labels identical results without offering a redundant overwrite', async () => {
+  fetch.mockResolvedValue(
+    answer(['Existing summary'], '2015', {
+      title: 'Existing title',
+      languages: ['eng']
+    })
+  );
+  renderForm({
+    title: 'Existing title',
+    description: 'Existing summary',
+    datePublication: '2015',
+    mainLanguage: 'eng'
+  });
+  startAnalysis();
+  const titleRow = await screen.findByTestId('document-ai-field-title');
+  expect(
+    within(titleRow).getByTestId('document-ai-current-value')
+  ).toHaveTextContent('Existing title');
+  expect(
+    within(titleRow).getByTestId('document-ai-proposed-value')
+  ).toHaveAttribute(
+    'aria-label',
+    `${messages['documentAi.proposedValue']}: ${messages['documentAi.identical']}`
+  );
+  expect(
+    within(titleRow).getByTestId('document-ai-value-title')
+  ).toHaveTextContent('-');
+  expect(titleRow.querySelector('del')).not.toBeInTheDocument();
+  expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+  expect(screen.getByTestId('document-ai-selection')).toHaveTextContent(
+    messages['documentAi.noChanges']
+  );
+  expect(screen.getByTestId('document-ai-apply')).toBeDisabled();
+});
+
+it('allows choosing a different language even if the first suggestion matches the current value', async () => {
+  fetch.mockResolvedValue(answer([], null, { languages: ['eng', 'cat'] }));
+  renderForm({ mainLanguage: 'eng' });
+  startAnalysis();
+  const languageRow = await screen.findByTestId(
+    'document-ai-field-mainLanguage'
+  );
+  expect(within(languageRow).queryByRole('checkbox')).not.toBeInTheDocument();
+  fireEvent.mouseDown(within(languageRow).getByRole('combobox'));
+  fireEvent.click(screen.getByRole('option', { name: 'Catalan' }));
+  fireEvent.click(within(languageRow).getByRole('checkbox'));
+  expect(screen.getByTestId('document-ai-selection')).toHaveTextContent(
+    '1 replacement'
+  );
+  fireEvent.mouseDown(within(languageRow).getByRole('combobox'));
+  fireEvent.click(screen.getByRole('option', { name: 'English' }));
+  expect(screen.getByTestId('document-ai-apply')).toBeDisabled();
+  expect(screen.getByTestId('document-ai-selection')).toHaveTextContent(
+    messages['documentAi.noChanges']
+  );
 });
 
 it('uses outlined relaunch and a short apply label with icons', async () => {

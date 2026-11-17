@@ -6,12 +6,10 @@ import {
   Alert,
   Box,
   Button,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
   LinearProgress,
   MenuItem,
   Stack,
@@ -24,6 +22,7 @@ import {
 import AutoAwesomeOutlined from '@mui/icons-material/AutoAwesomeOutlined';
 import RefreshOutlined from '@mui/icons-material/RefreshOutlined';
 import CheckOutlined from '@mui/icons-material/CheckOutlined';
+import PictureAsPdfOutlined from '@mui/icons-material/PictureAsPdfOutlined';
 
 import { useAnalyzeDocument } from '@/hooks/mutations/useAnalyzeDocument';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
@@ -35,6 +34,9 @@ import {
 } from '@/utils/documentAnalysis';
 import { DocumentFormContext } from '../Provider';
 import { analysisFileType } from '../types';
+import DocumentAiSuggestion, {
+  DocumentAiComparisonHeader
+} from './DocumentAiSuggestion';
 
 const getErrorMessage = error => {
   if (error.name === 'TimeoutError' || error.status === 504)
@@ -70,6 +72,7 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const titleId = useId();
   const fileId = useId();
+  const descriptionId = useId();
 
   useEffect(() => () => controller.current?.abort(), [file, session]);
 
@@ -105,9 +108,12 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
     selection[field] && !!values[field] && values[field] !== document[field];
   const selectedFields = Object.keys(values).filter(shouldApply);
   const canApply = selectedFields.length > 0;
-  const hasReplacement = selectedFields.some(
+  const replacementCount = selectedFields.filter(
     field =>
       document[field] && (field !== 'mainLanguage' || document[field] !== '000')
+  ).length;
+  const hasChanges = Object.keys(values).some(
+    field => values[field] && values[field] !== document[field]
   );
   const handleSelectionChange = field => event => {
     const { checked } = event.target;
@@ -118,6 +124,63 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
   const actionLabel = formatMessage({
     id: hasSuggestions ? 'documentAi.reviewAction' : 'documentAi.analyze'
   });
+  const fieldLabels = {
+    title: 'Title',
+    mainLanguage: 'Document main language',
+    description: 'Summary of document content',
+    datePublication: 'Publication Date'
+  };
+  const currentValues = {
+    title: document.title ?? '',
+    mainLanguage:
+      document.mainLanguage && document.mainLanguage !== '000'
+        ? languageName(currentLanguage) || document.mainLanguage
+        : '',
+    description: document.description ?? '',
+    datePublication: document.datePublication ?? ''
+  };
+  const displayValues = { ...values, mainLanguage: languageName(language) };
+  const valueControls = {
+    mainLanguage: availableLanguages.length > 1 && (
+      <TextField
+        select
+        fullWidth
+        size="small"
+        label={formatMessage({ id: 'Document main language' })}
+        value={mainLanguage}
+        disabled={disabled}
+        onChange={event => setSelectedLanguageId(event.target.value)}>
+        {availableLanguages.map(item => (
+          <MenuItem key={item.id} value={item.id}>
+            {languageName(item)}
+          </MenuItem>
+        ))}
+      </TextField>
+    ),
+    description: suggestions?.descriptions.length > 1 && (
+      <Box>
+        <TextField
+          select
+          fullWidth
+          size="small"
+          label={formatMessage({ id: 'Summary of document content' })}
+          value={descriptionIndex}
+          disabled={disabled}
+          onChange={event => setDescriptionIndex(Number(event.target.value))}
+          sx={{ mb: 1.5 }}>
+          {suggestions.descriptions.map((value, index) => (
+            <MenuItem key={value} value={index}>
+              {formatMessage(
+                { id: 'documentAi.summaryOption' },
+                { number: index + 1 }
+              )}
+            </MenuItem>
+          ))}
+        </TextField>
+        <Typography variant="body2">{description}</Typography>
+      </Box>
+    )
+  };
 
   const handleAnalyze = () => {
     if (disabled || isPending || isTooLarge) return;
@@ -141,6 +204,73 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
     setSelection(EMPTY_SELECTION);
     setIsOpen(false);
   };
+
+  const closeButton = (
+    <Button
+      key="close"
+      type="button"
+      size="small"
+      variant="outlined"
+      color={isPending ? 'error' : 'primary'}
+      sx={{ flexShrink: 0 }}
+      onClick={handleClose}>
+      {formatMessage({ id: isPending ? 'Cancel' : 'Close' })}
+    </Button>
+  );
+  const restartButton = !isPending && hasSuggestions && (
+    <Tooltip
+      key="restart"
+      title={formatMessage({ id: 'documentAi.newAnalysis' })}>
+      <Box
+        component="span"
+        sx={{ display: 'inline-flex', mr: { sm: 'auto' }, flexShrink: 0 }}>
+        <Button
+          type="button"
+          size="small"
+          variant="outlined"
+          startIcon={<RefreshOutlined />}
+          aria-label={formatMessage({ id: 'documentAi.newAnalysis' })}
+          disabled={disabled}
+          sx={{
+            minWidth: { xs: 44, sm: 'auto' },
+            px: { xs: 1, sm: 1.5 },
+            '& .MuiButton-startIcon': {
+              m: 0,
+              mr: { sm: 1 }
+            }
+          }}
+          onClick={() => {
+            analysis.reset();
+            setSelection(EMPTY_SELECTION);
+          }}>
+          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+            {formatMessage({ id: 'documentAi.newAnalysis' })}
+          </Box>
+        </Button>
+      </Box>
+    </Tooltip>
+  );
+  const primaryButton = !isPending && (
+    <Button
+      key="primary"
+      type="button"
+      size="small"
+      variant="contained"
+      disabled={
+        disabled ||
+        (hasSuggestions ? !canApply : isTooLarge || isLoadingLanguages)
+      }
+      startIcon={hasSuggestions ? <CheckOutlined /> : <AutoAwesomeOutlined />}
+      onClick={hasSuggestions ? handleApply : handleAnalyze}
+      sx={{ flex: { xs: 1, sm: '0 0 auto' } }}
+      data-testid={
+        hasSuggestions ? 'document-ai-apply' : 'document-ai-confirm'
+      }>
+      {formatMessage({
+        id: hasSuggestions ? 'documentAi.apply' : 'documentAi.start'
+      })}
+    </Button>
+  );
 
   return (
     <>
@@ -181,24 +311,45 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
         onClose={handleClose}
         fullScreen={isMobile}
         fullWidth
-        maxWidth="md"
+        maxWidth={hasSuggestions ? 'md' : 'sm'}
         aria-labelledby={titleId}
-        aria-describedby={fileId}>
-        <DialogTitle id={titleId}>
+        aria-describedby={`${fileId} ${descriptionId}`}
+        slotProps={{ paper: { sx: { bgcolor: 'background.paper' } } }}>
+        <DialogTitle
+          id={titleId}
+          variant="h3"
+          component="h2"
+          sx={{ px: { xs: 2, sm: 3 }, py: 2.5 }}>
           {formatMessage({
             id: hasSuggestions ? 'documentAi.choose' : 'documentAi.analyze'
           })}
         </DialogTitle>
-        <DialogContent dividers>
-          <Typography
-            id={fileId}
-            variant="body2"
-            sx={{ fontWeight: 600, overflowWrap: 'anywhere', mb: 2 }}>
-            {file.name ?? file.fileName}
-          </Typography>
+        <DialogContent
+          dividers
+          sx={{ px: { xs: 2, sm: 3 }, py: 2.5, scrollbarGutter: 'stable' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 1,
+              mb: 2.5,
+              minWidth: 0
+            }}>
+            <PictureAsPdfOutlined
+              color="action"
+              fontSize="small"
+              sx={{ mt: 0.25 }}
+            />
+            <Typography
+              id={fileId}
+              variant="body2"
+              sx={{ overflowWrap: 'anywhere', minWidth: 0 }}>
+              {file.name ?? file.fileName}
+            </Typography>
+          </Box>
           {isPending && (
             <Stack spacing={1.5} role="status">
-              <Typography>
+              <Typography id={descriptionId}>
                 {formatMessage({ id: 'documentAi.pending' })}
               </Typography>
               <LinearProgress
@@ -208,16 +359,17 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
           )}
           {!isPending && !hasResult && (
             <Stack spacing={2}>
-              <Typography variant="body2">
+              <Typography id={descriptionId} variant="body1">
                 {formatMessage({ id: 'documentAi.consent' })}
               </Typography>
-              <Box>
+              <Box
+                sx={{ bgcolor: 'background.default', p: 2, borderRadius: 1 }}>
                 <Typography variant="h5" component="h3" sx={{ mb: 1 }}>
                   {formatMessage({ id: 'documentAi.limits' })}
                 </Typography>
                 <Box
                   component="ul"
-                  sx={{ m: 0, pl: 2.5, '& li + li': { mt: 0.75 } }}>
+                  sx={{ m: 0, pl: 2.5, '& li + li': { mt: 1 } }}>
                   <li>
                     <Typography variant="body2">
                       {formatMessage(
@@ -250,6 +402,9 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
                   </li>
                 </Box>
               </Box>
+              <Typography variant="body2" color="text.secondary">
+                {formatMessage({ id: 'documentAi.checkAccuracy' })}
+              </Typography>
               {isTooLarge && (
                 <Alert severity="error">
                   {formatMessage(
@@ -271,237 +426,91 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
             </Typography>
           )}
           {hasResult && !hasSuggestions && !isLoadingLanguages && (
-            <Alert severity="info">
+            <Alert severity="info" id={descriptionId}>
               {formatMessage({ id: 'documentAi.empty' })}
             </Alert>
           )}
           {hasSuggestions && (
-            <Stack
-              spacing={2.5}
-              data-testid="document-ai-suggestions"
-              sx={{ maxWidth: '72ch' }}>
-              <Typography variant="body2" color="text.secondary">
+            <Box data-testid="document-ai-suggestions">
+              <Typography
+                id={descriptionId}
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 1.5, maxWidth: '72ch' }}>
                 {formatMessage({ id: 'documentAi.review' })}
               </Typography>
-              {!!title && (
-                <Box sx={{ pb: 2.5, borderBottom: 1, borderColor: 'divider' }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={shouldApply('title')}
-                        disabled={title === document.title}
-                        onChange={handleSelectionChange('title')}
-                      />
-                    }
-                    label={formatMessage({ id: 'Title' })}
-                  />
-                  <Typography variant="body2" sx={{ overflowWrap: 'anywhere' }}>
-                    {title}
-                  </Typography>
-                  {!!document.title && (
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mt: 1 }}>
-                      {formatMessage({ id: 'documentAi.currentValue' })}:{' '}
-                      {document.title}
-                    </Typography>
-                  )}
-                </Box>
-              )}
-              {!!mainLanguage && (
-                <Box sx={{ pb: 2.5, borderBottom: 1, borderColor: 'divider' }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={shouldApply('mainLanguage')}
-                        disabled={mainLanguage === document.mainLanguage}
-                        onChange={handleSelectionChange('mainLanguage')}
-                      />
-                    }
-                    label={formatMessage({ id: 'Document main language' })}
-                  />
-                  {availableLanguages.length > 1 ? (
-                    <TextField
-                      select
-                      fullWidth
-                      size="small"
-                      label={formatMessage({ id: 'Document main language' })}
-                      value={mainLanguage}
-                      onChange={event =>
-                        setSelectedLanguageId(event.target.value)
-                      }>
-                      {availableLanguages.map(item => (
-                        <MenuItem key={item.id} value={item.id}>
-                          {languageName(item)}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  ) : (
-                    <Typography variant="body2">
-                      {languageName(language)}
-                    </Typography>
-                  )}
-                  {!!document.mainLanguage &&
-                    document.mainLanguage !== '000' && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 1 }}>
-                        {formatMessage({ id: 'documentAi.currentValue' })}:{' '}
-                        {languageName(currentLanguage) || document.mainLanguage}
-                      </Typography>
-                    )}
-                </Box>
-              )}
-              {!!description && (
-                <Box sx={{ pb: 2.5, borderBottom: 1, borderColor: 'divider' }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={shouldApply('description')}
-                        disabled={description === document.description}
-                        onChange={handleSelectionChange('description')}
-                      />
-                    }
-                    label={formatMessage({ id: 'Summary of document content' })}
-                  />
-                  {suggestions.descriptions.length > 1 && (
-                    <TextField
-                      select
-                      fullWidth
-                      size="small"
-                      label={formatMessage({
-                        id: 'Summary of document content'
-                      })}
-                      value={descriptionIndex}
-                      onChange={event =>
-                        setDescriptionIndex(Number(event.target.value))
-                      }
-                      sx={{ mb: 1.5 }}>
-                      {suggestions.descriptions.map((value, index) => (
-                        <MenuItem key={value} value={index}>
-                          {formatMessage(
-                            { id: 'documentAi.summaryOption' },
-                            { number: index + 1 }
-                          )}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
-                  <Typography
-                    variant="body2"
-                    sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-                    {description}
-                  </Typography>
-                  {!!document.description && (
-                    <Box component="details" sx={{ mt: 1.5 }}>
-                      <Typography
-                        component="summary"
-                        variant="body2"
-                        sx={{ cursor: 'pointer', color: 'text.secondary' }}>
-                        {formatMessage({ id: 'documentAi.currentValue' })}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          mt: 1,
-                          whiteSpace: 'pre-wrap',
-                          overflowWrap: 'anywhere'
-                        }}>
-                        {document.description}
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-              )}
-              {!!datePublication && (
-                <Box>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={shouldApply('datePublication')}
-                        disabled={datePublication === document.datePublication}
-                        onChange={handleSelectionChange('datePublication')}
-                      />
-                    }
-                    label={formatMessage({ id: 'Publication Date' })}
-                  />
-                  <Typography variant="body2" data-testid="document-ai-date">
-                    {datePublication}
-                  </Typography>
-                  {!!document.datePublication && (
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mt: 1 }}>
-                      {formatMessage({ id: 'documentAi.currentValue' })}:{' '}
-                      {document.datePublication}
-                    </Typography>
-                  )}
-                </Box>
-              )}
-              {hasReplacement && (
-                <Alert severity="warning">
-                  {formatMessage({ id: 'documentAi.replace' })}
-                </Alert>
-              )}
-            </Stack>
+              <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                <DocumentAiComparisonHeader />
+                {Object.keys(values)
+                  .filter(field => values[field])
+                  .map(field => (
+                    <DocumentAiSuggestion
+                      key={field}
+                      name={field}
+                      label={formatMessage({ id: fieldLabels[field] })}
+                      currentValue={currentValues[field]}
+                      suggestedValue={displayValues[field]}
+                      isSame={values[field] === document[field]}
+                      selected={shouldApply(field)}
+                      disabled={disabled}
+                      onChange={handleSelectionChange(field)}
+                      valueControl={valueControls[field]}
+                    />
+                  ))}
+              </Box>
+            </Box>
           )}
         </DialogContent>
         <DialogActions
+          disableSpacing
           sx={{
-            px: 3,
-            py: 2,
-            gap: 1,
-            flexDirection: { xs: 'column-reverse', sm: 'row' },
-            alignItems: { xs: 'stretch', sm: 'center' },
-            '& > :not(style) ~ :not(style)': { ml: 0 }
+            display: 'block',
+            px: { xs: 2, sm: 3 },
+            py: 1.5,
+            flexShrink: 0
           }}>
-          <Button
-            type="button"
-            variant="outlined"
-            color={isPending ? 'error' : 'primary'}
-            onClick={handleClose}>
-            {formatMessage({
-              id: isPending ? 'Cancel' : 'Close'
-            })}
-          </Button>
-          {!isPending && hasSuggestions && (
-            <Button
-              type="button"
-              variant="outlined"
-              startIcon={<RefreshOutlined />}
-              disabled={disabled}
-              onClick={() => {
-                analysis.reset();
-                setSelection(EMPTY_SELECTION);
-              }}>
-              {formatMessage({ id: 'documentAi.newAnalysis' })}
-            </Button>
+          {hasSuggestions && (
+            <Box sx={{ mb: canApply || !hasChanges ? 1 : 0 }}>
+              <Box
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                data-testid="document-ai-selection"
+                sx={{ display: 'flex', flexWrap: 'wrap', columnGap: 1.5 }}>
+                {(canApply || !hasChanges) && (
+                  <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                    {formatMessage(
+                      {
+                        id: canApply
+                          ? 'documentAi.selectionCount'
+                          : 'documentAi.noChanges'
+                      },
+                      { count: selectedFields.length }
+                    )}
+                  </Typography>
+                )}
+                {replacementCount > 0 && (
+                  <Typography variant="caption" color="text.secondary">
+                    {formatMessage(
+                      { id: 'documentAi.replacementCount' },
+                      { count: replacementCount }
+                    )}
+                  </Typography>
+                )}
+              </Box>
+            </Box>
           )}
-          {!isPending && !hasSuggestions && (
-            <Button
-              type="button"
-              variant="contained"
-              startIcon={<AutoAwesomeOutlined />}
-              disabled={disabled || isTooLarge || isLoadingLanguages}
-              onClick={handleAnalyze}
-              data-testid="document-ai-confirm">
-              {formatMessage({ id: 'documentAi.start' })}
-            </Button>
-          )}
-          {!isPending && hasSuggestions && (
-            <Button
-              type="button"
-              variant="contained"
-              disabled={disabled || !canApply}
-              startIcon={<CheckOutlined />}
-              onClick={handleApply}
-              data-testid="document-ai-apply">
-              {formatMessage({ id: 'documentAi.apply' })}
-            </Button>
-          )}
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              justifyContent: 'flex-end',
+              '& button': { minHeight: { xs: 44, sm: 36 } }
+            }}>
+            {isMobile
+              ? [closeButton, restartButton, primaryButton]
+              : [restartButton, closeButton, primaryButton]}
+          </Box>
         </DialogActions>
       </Dialog>
     </>

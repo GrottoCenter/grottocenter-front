@@ -207,8 +207,21 @@ describe('PDF analysis during document creation and editing', () => {
       cy.wait('@sso');
       cy.wait('@analyze');
       cy.get(
+        '[data-testid="document-ai-field-description"] [data-testid="document-ai-current-value"]'
+      ).scrollIntoView();
+      cy.get(
+        '[data-testid="document-ai-field-description"] [data-testid="document-ai-current-value"]'
+      )
+        .should('be.visible')
+        .and('contain.text', 'Original summary');
+      cy.get(
         '[data-testid="document-ai-suggestions"] input[type="checkbox"]'
-      ).each(checkbox => cy.wrap(checkbox).check());
+      ).each(checkbox => {
+        cy.wrap(checkbox).should('not.be.checked').check();
+      });
+      cy.get('[data-testid="document-ai-selection"]')
+        .should('contain.text', '4 fields selected')
+        .and('contain.text', '4 replacements');
       cy.get('[data-testid="document-ai-apply"]').click();
       cy.get(summary).first().should('have.value', 'Suggested summary');
       cy.get('[data-testid="document-submit"]').should('be.enabled').click();
