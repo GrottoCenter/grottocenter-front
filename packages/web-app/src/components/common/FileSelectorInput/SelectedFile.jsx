@@ -12,7 +12,8 @@ const SelectedFile = ({
   file,
   onRemove,
   disabled = false,
-  renderFileDetails
+  renderFileDetails,
+  renderFileActions
 }) => {
   const { formatMessage } = useIntl();
   const [preview, setPreview] = useState(null);
@@ -28,6 +29,7 @@ const SelectedFile = ({
 
   const localUrl = preview?.file === localFile ? preview?.url : null;
   const url = remoteUrl || localUrl;
+  const extraActions = renderFileActions?.(file);
 
   return (
     <Box
@@ -81,7 +83,14 @@ const SelectedFile = ({
             {file.fileName}
           </Box>
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 0.75
+          }}>
+          {extraActions}
           {url && (
             <Tooltip title={formatMessage({ id: 'fileSelector.open' })}>
               <Button
@@ -134,7 +143,8 @@ SelectedFile.propTypes = {
   }).isRequired,
   onRemove: PropTypes.func,
   disabled: PropTypes.bool,
-  renderFileDetails: PropTypes.func
+  renderFileDetails: PropTypes.func,
+  renderFileActions: PropTypes.func
 };
 
 export default SelectedFile;

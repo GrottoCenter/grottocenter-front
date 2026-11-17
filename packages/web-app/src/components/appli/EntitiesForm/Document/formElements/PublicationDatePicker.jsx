@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -61,6 +61,14 @@ const PublicationDatePicker = ({ required = false, label = null }) => {
   const [granularity, setGranularity] = useState(
     getGranularityFromString(document.datePublication)
   );
+
+  // An applied AI date can change precision while this editor is mounted.
+  // Clearing the field during a manual precision change must retain that choice.
+  useEffect(() => {
+    if (document.datePublication) {
+      setGranularity(getGranularityFromString(document.datePublication));
+    }
+  }, [document.datePublication]);
 
   const handleGranularityChange = (_, newGranularity) => {
     if (!newGranularity) return;

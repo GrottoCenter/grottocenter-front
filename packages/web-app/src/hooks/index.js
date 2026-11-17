@@ -207,6 +207,7 @@ export {
 } from './mutations/useExploredEntrance';
 export { useDbExport } from './queries/useDbExport';
 export { useProcessDocuments } from './mutations/useProcessDocuments';
+export { useAnalyzeDocument } from './mutations/useAnalyzeDocument';
 export { useImportCsvSession } from './useImportCsvSession';
 export {
   useRandomEntrance,
