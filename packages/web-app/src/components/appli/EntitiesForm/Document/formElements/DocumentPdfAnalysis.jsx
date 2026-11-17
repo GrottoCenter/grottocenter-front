@@ -422,7 +422,7 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
           )}
           {hasResult && isLoadingLanguages && (
             <Typography role="status">
-              {formatMessage({ id: 'Loading...' })}
+              {formatMessage({ id: 'Loading ...' })}
             </Typography>
           )}
           {hasResult && !hasSuggestions && !isLoadingLanguages && (

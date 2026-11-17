@@ -23,31 +23,53 @@ describe('PDF analysis during document creation and editing', () => {
     });
     cy.disableServiceWorker();
     cy.mockApiCatchAll();
-    cy.intercept('GET', '**/api/v1/account', {
-      body: { id: 1, nickname: 'TestCaver', language: 'eng' }
-    });
-    cy.intercept('GET', '**/api/v1/documents/types', {
-      body: { documentTypes: [{ id: 22, name: 'Report' }] }
-    });
-    cy.intercept('GET', '**/api/v1/languages', {
-      body: {
-        languages: [
-          { id: 'eng', part1: 'en', refName: 'English' },
-          { id: 'cat', part1: 'ca', refName: 'Catalan' }
-        ]
+    // Match the path independently of reference-query filters (isAvailable,
+    // isPreferedLanguage, etc.), otherwise the catch-all returns an invalid {}.
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/account' },
+      {
+        body: { id: 1, nickname: 'TestCaver', language: 'eng' }
       }
-    });
-    cy.intercept('GET', '**/api/v1/file-formats', {
-      body: { fileFormats: [{ extension: 'pdf', mimeType: 'application/pdf' }] }
-    });
-    cy.intercept('GET', '**/api/v1/licenses', {
-      body: { licenses: [{ id: 1, name: 'CC-BY-SA' }] }
-    });
+    );
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/documents/types' },
+      {
+        body: { documentTypes: [{ id: 22, name: 'Report' }] }
+      }
+    );
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/languages' },
+      {
+        body: {
+          languages: [
+            { id: 'eng', part1: 'en', refName: 'English' },
+            { id: 'cat', part1: 'ca', refName: 'Catalan' }
+          ]
+        }
+      }
+    );
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/file-formats' },
+      {
+        body: {
+          fileFormats: [{ extension: 'pdf', mimeType: 'application/pdf' }]
+        }
+      }
+    );
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/licenses' },
+      {
+        body: { licenses: [{ id: 1, name: 'CC-BY-SA' }] }
+      }
+    );
     [
       ['documents/subjects', 'subjects'],
       ['documents/identifierTypes', 'identifierTypes']
     ].forEach(([path, key]) => {
-      cy.intercept('GET', `**/api/v1/${path}`, { body: { [key]: [] } });
+      cy.intercept(
+        { method: 'GET', pathname: `/api/v1/${path}` },
+        { body: { [key]: [] } }
+      );
     });
     cy.intercept('POST', '**/api/v1/sso/auth-token', request => {
       expect(request.body).to.deep.equal({ product: 'documents' });
