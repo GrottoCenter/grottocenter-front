@@ -1,24 +1,40 @@
 import { useContext } from 'react';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { WritableStream } from 'node:stream/web';
 
 import { apiPost } from '@/api/client';
 import renderWithProviders from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
 import DocumentFormProvider, { DocumentFormContext } from '../Provider';
-import { IS_NEW } from './AddFileForm/FileHelpers';
+import { IS_INTACT, IS_NEW } from './AddFileForm/FileHelpers';
 import PublicationDatePicker from './PublicationDatePicker';
 import DocumentPdfAnalysis from './DocumentPdfAnalysis';
 
 vi.mock('@/api/client', () => ({ apiPost: vi.fn() }));
-const permissions = vi.hoisted(() => ({ isAuth: true, isModerator: true }));
+const permissions = vi.hoisted(() => ({ isAuth: true, isModerator: false }));
 vi.mock('@/hooks/usePermissions', () => ({
   usePermissions: () => permissions
+}));
+vi.mock('@/hooks/queries/useLanguages', () => ({
+  useLanguages: () => ({
+    data: [
+      { id: 'eng', refName: 'English' },
+      { id: 'fra', refName: 'French' },
+      { id: 'cat', refName: 'Catalan' }
+    ],
+    isPending: false
+  })
 }));
 
 const file = new File(['%PDF first'], 'book.pdf', { type: 'application/pdf' });
 const replacement = new File(['%PDF second'], 'book.pdf', {
   type: 'application/pdf'
 });
+const hostedFile = {
+  id: 7,
+  fileName: 'hosted.pdf',
+  completePath: 'https://files.example.org/hosted.pdf'
+};
 const entry = source => ({
   file: source,
   fileName: source.name,
@@ -61,10 +77,20 @@ const Form = () => {
         value={document.description}
         onChange={event => updateAttribute('description', event.target.value)}
       />
+      <input
+        aria-label="Title"
+        data-testid="manual-title"
+        value={document.title}
+        onChange={event => updateAttribute('title', event.target.value)}
+      />
+      <output data-testid="main-language">{document.mainLanguage}</output>
       <PublicationDatePicker />
       <output data-testid="publication-date">{document.datePublication}</output>
+      <output data-testid="attachment-state">
+        {document.files.map(item => item.state).join(',')}
+      </output>
       {document.files.map(item => (
-        <DocumentPdfAnalysis key={item.fileName} file={item.file} />
+        <DocumentPdfAnalysis key={item.fileName} file={item.file ?? item} />
       ))}
     </>
   );
@@ -77,12 +103,12 @@ const renderForm = initialValues =>
     </DocumentFormProvider>,
     { messages }
   );
-const answer = (descriptions, date = '2010') =>
+const answer = (descriptions, date = '2010', metadata = {}) =>
   new Response(
     JSON.stringify({
       message: 'success',
       document_metadata: [
-        { descriptions, publication_date: date },
+        { descriptions, publication_date: date, ...metadata },
         { parent: 'Book', descriptions: ['Inherited summary'] }
       ]
     })
@@ -108,7 +134,9 @@ const selectDate = () =>
 
 beforeEach(() => {
   vi.clearAllMocks();
-  Object.assign(permissions, { isAuth: true, isModerator: true });
+  // JSDOM lacks Web Streams; Response bodies use Node's native implementation.
+  vi.stubGlobal('WritableStream', WritableStream);
+  Object.assign(permissions, { isAuth: true, isModerator: false });
   apiPost.mockResolvedValue({ token: 'documents-token' });
   vi.stubGlobal(
     'fetch',
@@ -185,6 +213,67 @@ it.each(['date', 'summary'])(
     );
   }
 );
+
+it('applies only the selected title and language when these are the only suggestions', async () => {
+  fetch.mockResolvedValue(
+    answer([], null, { title: 'Suggested title', languages: ['cat'] })
+  );
+  renderForm({
+    id: 12,
+    type: 'Book',
+    title: 'Original title',
+    mainLanguage: 'fra',
+    description: 'Original summary',
+    datePublication: '2015'
+  });
+  startAnalysis();
+  await screen.findByText('Suggested title');
+  expect(screen.getByTestId('document-ai-apply')).toBeDisabled();
+  expect(screen.getByTestId('manual-title')).toHaveValue('Original title');
+  fireEvent.click(screen.getByRole('checkbox', { name: messages.Title }));
+  fireEvent.click(
+    screen.getByRole('checkbox', { name: messages['Document main language'] })
+  );
+  fireEvent.click(screen.getByTestId('document-ai-apply'));
+  expect(screen.getByTestId('manual-title')).toHaveValue('Suggested title');
+  expect(screen.getByTestId('main-language')).toHaveTextContent('cat');
+  expect(screen.getByLabelText('Summary')).toHaveValue('Original summary');
+  expect(screen.getByTestId('publication-date')).toHaveTextContent('2015');
+});
+
+it('chooses among recognized suggested languages and leaves the unselected title untouched', async () => {
+  fetch.mockResolvedValue(
+    answer([], null, {
+      title: 'Unused title',
+      languages: ['zzz', 'cat', 'eng']
+    })
+  );
+  renderForm();
+  startAnalysis();
+  await screen.findByText('Unused title');
+  fireEvent.mouseDown(
+    screen.getByRole('combobox', { name: messages['Document main language'] })
+  );
+  fireEvent.click(screen.getByRole('option', { name: 'English' }));
+  fireEvent.click(
+    screen.getByRole('checkbox', { name: messages['Document main language'] })
+  );
+  fireEvent.click(screen.getByTestId('document-ai-apply'));
+  expect(screen.getByTestId('manual-title')).toHaveValue('');
+  expect(screen.getByTestId('main-language')).toHaveTextContent('eng');
+});
+
+it('does not offer unrecognized language IDs', async () => {
+  fetch.mockResolvedValue(answer([], null, { languages: ['zzz'] }));
+  renderForm();
+  startAnalysis();
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    messages['documentAi.empty']
+  );
+  expect(
+    screen.queryByRole('checkbox', { name: messages['Document main language'] })
+  ).not.toBeInTheDocument();
+});
 
 it('uses outlined relaunch and a short apply label with icons', async () => {
   renderForm();
@@ -285,18 +374,44 @@ it('reports a response with neither a summary nor a date', async () => {
   expect(screen.queryByTestId('document-ai-apply')).not.toBeInTheDocument();
 });
 
-it.each([
-  [false, true],
-  [true, false]
-])('hides analysis when auth=%s and moderator=%s', (isAuth, isModerator) => {
-  Object.assign(permissions, { isAuth, isModerator });
+it('hides analysis when logged out', () => {
+  permissions.isAuth = false;
   renderForm();
   fireEvent.click(screen.getByText('Attach PDF'));
   expect(screen.queryByTestId('document-ai')).not.toBeInTheDocument();
 });
 
-it('hides analysis when editing an existing document', () => {
+it('allows a regular user to analyze a newly attached PDF while editing', async () => {
   renderForm({ id: 12, type: 'Book', title: 'Book' });
-  fireEvent.click(screen.getByText('Attach PDF'));
-  expect(screen.queryByTestId('document-ai')).not.toBeInTheDocument();
+  startAnalysis();
+  await screen.findByText('AI summary');
+  selectSummary();
+  fireEvent.click(screen.getByTestId('document-ai-apply'));
+  expect(screen.getByLabelText('Summary')).toHaveValue('AI summary');
+});
+
+it('analyzes an existing attachment and applies selected fields without replacing the file', async () => {
+  fetch.mockImplementation(async url =>
+    url === hostedFile.completePath
+      ? new Response('%PDF stored')
+      : answer(['AI summary'])
+  );
+  renderForm({
+    id: 12,
+    type: 'Book',
+    title: 'Book',
+    description: 'Existing summary',
+    datePublication: '2015',
+    files: [hostedFile]
+  });
+  fireEvent.click(screen.getByTestId('document-ai-analyze'));
+  expect(fetch).not.toHaveBeenCalled();
+  expect(screen.getByRole('dialog')).toHaveTextContent(hostedFile.fileName);
+  fireEvent.click(screen.getByTestId('document-ai-confirm'));
+  await screen.findByText('AI summary');
+  selectDate();
+  fireEvent.click(screen.getByTestId('document-ai-apply'));
+  expect(screen.getByLabelText('Summary')).toHaveValue('Existing summary');
+  expect(screen.getByTestId('publication-date')).toHaveTextContent('2010');
+  expect(screen.getByTestId('attachment-state')).toHaveTextContent(IS_INTACT);
 });

@@ -296,6 +296,17 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
         !isEvent(docType) &&
         !isAuthorizationToPublish(docType) && (
           <Box sx={{ mt: 1 }}>
+            {!isCollection(docType) && (
+              <>
+                {filesIntro}
+                <AddFileForm
+                  {...addFileFormProps}
+                  allowAiAnalysis
+                  disabled={isSubmitting}
+                />
+              </>
+            )}
+
             <FormRow>
               <StringInput
                 data-testid="document-title"
@@ -318,17 +329,6 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
                 label={formatMessage({ id: 'Document main language' })}
               />
             </FormRow>
-
-            {!isCollection(docType) && (
-              <>
-                {filesIntro}
-                <AddFileForm
-                  {...addFileFormProps}
-                  allowAiAnalysis
-                  disabled={isSubmitting}
-                />
-              </>
-            )}
 
             <StringInput
               helperText={formatMessage({

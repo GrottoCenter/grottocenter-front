@@ -40,6 +40,16 @@ export const fileType = PropTypes.shape({
   pdfPageOffset: PropTypes.number
 });
 
+// Analysis also accepts a local upload; hosted sources require a usable URL
+// and filename, unlike the optional metadata fields returned in document lists.
+export const analysisFileType = PropTypes.oneOfType([
+  PropTypes.instanceOf(File),
+  PropTypes.shape({
+    fileName: PropTypes.string.isRequired,
+    completePath: PropTypes.string.isRequired
+  })
+]);
+
 export const defaultDocumentValuesTypes = PropTypes.shape({
   id: PropTypes.number,
   identifier: PropTypes.string,

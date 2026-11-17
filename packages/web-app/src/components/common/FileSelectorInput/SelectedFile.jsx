@@ -90,7 +90,6 @@ const SelectedFile = ({
             justifyContent: 'flex-end',
             gap: 0.75
           }}>
-          {extraActions}
           {url && (
             <Tooltip title={formatMessage({ id: 'fileSelector.open' })}>
               <Button
@@ -110,6 +109,7 @@ const SelectedFile = ({
               </Button>
             </Tooltip>
           )}
+          {extraActions}
           {onRemove && (
             <Tooltip title={formatMessage({ id: 'Remove' })}>
               <Box component="span" sx={{ display: 'flex' }}>

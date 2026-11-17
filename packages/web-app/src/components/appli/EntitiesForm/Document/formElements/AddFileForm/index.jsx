@@ -310,12 +310,16 @@ const AddFileForm = ({
   const renderFileActions = file => {
     if (
       !allowAiAnalysis ||
-      file.state !== IS_NEW ||
-      !(file.file instanceof File) ||
+      (!(file.file instanceof File) && !file.completePath) ||
       !/\.pdf$/i.test(file.fileName)
     )
       return null;
-    return <DocumentPdfAnalysis file={file.file} disabled={disabled} />;
+    return (
+      <DocumentPdfAnalysis
+        file={file.file instanceof File ? file.file : file}
+        disabled={disabled}
+      />
+    );
   };
 
   return (

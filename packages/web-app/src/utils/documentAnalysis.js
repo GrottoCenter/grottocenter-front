@@ -1,4 +1,5 @@
 import { format, isMatch } from 'date-fns';
+import { TEXT_LENGTH_LIMITS } from './textLengthLimits';
 
 export const DOCUMENT_AI_LIMITS = {
   dailyPerUser: 5,
@@ -7,6 +8,8 @@ export const DOCUMENT_AI_LIMITS = {
   sizeMb: 50,
   pages: 300
 };
+
+export const DOCUMENT_AI_MAX_FILE_SIZE = DOCUMENT_AI_LIMITS.sizeMb * 1000000;
 
 const DATE_FORMATS = { 4: 'yyyy', 7: 'yyyy-MM', 10: 'yyyy-MM-dd' };
 
@@ -37,10 +40,21 @@ export const normalizeDocumentAnalysis = result => {
   }
   // Only the uploaded document: subsequent articles may inherit its summary.
   const metadata = result.document_metadata[0];
+  const title = typeof metadata.title === 'string' ? metadata.title.trim() : '';
+  const languages = Array.isArray(metadata.languages) ? metadata.languages : [];
   const descriptions = Array.isArray(metadata.descriptions)
     ? metadata.descriptions
     : [];
   return {
+    title: title && title.length <= TEXT_LENGTH_LIMITS.TITLE ? title : null,
+    languages: [
+      ...new Set(
+        languages
+          .filter(value => typeof value === 'string')
+          .map(value => value.trim().toLowerCase())
+          .filter(value => /^[a-z]{3}$/.test(value))
+      )
+    ],
     descriptions: [
       ...new Set(
         descriptions
