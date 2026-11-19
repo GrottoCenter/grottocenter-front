@@ -128,7 +128,10 @@ export const isModelPreview = file =>
  * @returns {{src: string, srcSet: string|undefined}}
  */
 export const getThumbnailSources = file => {
-  const { completePath, thumbnails } = file;
+  const { thumbnails } = file;
+  // A panorama original may be tens of megabytes. Missing thumbnails must not
+  // start that download in a card, a featured image or a map popup.
+  const completePath = file.isPanorama === true ? undefined : file.completePath;
 
   if (!thumbnails) {
     return { src: completePath, srcSet: undefined };

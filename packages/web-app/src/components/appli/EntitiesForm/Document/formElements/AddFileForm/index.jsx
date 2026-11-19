@@ -25,6 +25,8 @@ import AppLink from '@/components/common/AppLink';
 import InternationalizedLink from '@/components/common/InternationalizedLink';
 import { licenceLinks } from '@/conf/externalLinks';
 import { MAX_SIZE_OF_UPLOADED_FILES } from '@/conf/config';
+import { canSetPanorama } from '@/utils/documentPanorama';
+import { DocumentFileErrorPropTypes } from '@/types/document.type';
 import {
   useUserProperties,
   useFileFormats,
@@ -48,6 +50,7 @@ import FileSelectorInput, {
 import { DocumentFormContext } from '../../Provider';
 import PdfPageOffsetEditor from '../PdfPageOffsetEditor';
 import DocumentPdfAnalysis from '../DocumentPdfAnalysis';
+import PanoramaDisplayEditor from '../PanoramaDisplayEditor';
 
 const DEFAULT_LICENSE = 'CC-BY-SA';
 
@@ -109,7 +112,8 @@ const AddFileForm = ({
   acceptConfig = null,
   showAuthorization = true,
   allowAiAnalysis = false,
-  disabled = false
+  disabled = false,
+  fileError
 }) => {
   const { formatMessage } = useIntl();
   const [errors, setErrors] = useState([]);
@@ -285,6 +289,30 @@ const AddFileForm = ({
   };
 
   const renderFileDetails = (file, url) => {
+    if (canSetPanorama(file.fileName)) {
+      return (
+        <PanoramaDisplayEditor
+          isNew={file.state === IS_NEW}
+          value={
+            file.state === IS_NEW ? file.isPanorama : (file.isPanorama ?? false)
+          }
+          error={fileError?.file === file ? fileError.code : undefined}
+          onChange={isPanorama =>
+            setFiles(
+              files.map(item =>
+                item === file
+                  ? {
+                      ...item,
+                      isPanorama,
+                      state: item.state === IS_NEW ? IS_NEW : IS_MODIFIED
+                    }
+                  : item
+              )
+            )
+          }
+        />
+      );
+    }
     if (!/\.pdf$/i.test(file.fileName)) return null;
     return (
       <PdfPageOffsetEditor
@@ -505,6 +533,7 @@ const AddFileForm = ({
 AddFileForm.propTypes = {
   allowAiAnalysis: PropTypes.bool,
   disabled: PropTypes.bool,
+  fileError: DocumentFileErrorPropTypes,
   acceptConfig: PropTypes.shape({
     extensions: PropTypes.arrayOf(PropTypes.string).isRequired,
     mime: PropTypes.string.isRequired

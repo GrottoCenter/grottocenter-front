@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
+import { MemoryRouter } from 'react-router-dom';
 
 import messages from '@/../public/lang/en.json';
 import { MAX_SIZE_OF_UPLOADED_FILES } from '@/conf/config';
@@ -50,23 +51,134 @@ const formContext = {
   updateAttribute: vi.fn()
 };
 
-const UploadForm = ({ type }) => {
-  const [files, setFiles] = useState([]);
+const UploadForm = ({ type, initialFiles = [], fileError }) => {
+  const [files, setFiles] = useState(initialFiles);
   return (
-    <IntlProvider locale="en" messages={messages}>
-      <DocumentFormContext.Provider value={formContext}>
-        <AddFileForm
-          files={files}
-          setFiles={setFiles}
-          acceptConfig={DOCUMENT_TYPE_ACCEPT[type] ?? null}
-          showAuthorization={false}
-        />
-      </DocumentFormContext.Provider>
-    </IntlProvider>
+    <MemoryRouter>
+      <IntlProvider locale="en" messages={messages}>
+        <DocumentFormContext.Provider value={formContext}>
+          <AddFileForm
+            files={files}
+            setFiles={setFiles}
+            acceptConfig={DOCUMENT_TYPE_ACCEPT[type] ?? null}
+            showAuthorization={false}
+            fileError={fileError}
+          />
+          <output data-testid="file-values">{JSON.stringify(files)}</output>
+        </DocumentFormContext.Provider>
+      </IntlProvider>
+    </MemoryRouter>
   );
 };
 
 describe('document uploads', () => {
+  const readFiles = () =>
+    JSON.parse(screen.getByTestId('file-values').textContent);
+
+  it('keeps automatic detection untouched until an explicit choice and can restore it', async () => {
+    const user = userEvent.setup({ applyAccept: false });
+    const { container } = render(<UploadForm type={DocumentTypes.IMAGE} />);
+    await user.upload(
+      container.querySelector('input[type="file"]'),
+      new File(['photo'], 'sphere.png', { type: 'image/png' })
+    );
+    const toggle = await screen.findByTestId('panorama-display-toggle');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(readFiles()[0]).not.toHaveProperty('isPanorama');
+    await user.click(toggle);
+    const checkbox = screen.getByRole('checkbox');
+    expect(checkbox).toHaveAttribute('aria-checked', 'mixed');
+    expect(readFiles()[0]).not.toHaveProperty('isPanorama');
+    await user.click(checkbox);
+    expect(readFiles()[0]).toMatchObject({ isPanorama: true, state: 'IS_NEW' });
+    await user.click(checkbox);
+    expect(readFiles()[0]).toMatchObject({
+      isPanorama: false,
+      state: 'IS_NEW'
+    });
+    await user.click(toggle);
+    await user.click(toggle);
+    expect(screen.getByRole('checkbox')).not.toBeChecked();
+    await user.click(
+      screen.getByRole('button', { name: messages['panorama.useAutomatic'] })
+    );
+    expect(readFiles()[0]).not.toHaveProperty('isPanorama');
+  });
+
+  it.each([true, false, undefined])(
+    'initializes an existing %s flag and proposes the corrected value',
+    async isPanorama => {
+      const user = userEvent.setup();
+      const file = {
+        id: 1,
+        fileName: 'sphere.jpg',
+        completePath: '/sphere.jpg',
+        state: 'IS_INTACT',
+        isPanorama,
+        pdfPageOffset: 0
+      };
+      render(<UploadForm type={DocumentTypes.IMAGE} initialFiles={[file]} />);
+      await user.click(screen.getByTestId('panorama-display-toggle'));
+      const checkbox = screen.getByRole('checkbox');
+      expect(checkbox.checked).toBe(isPanorama === true);
+      expect(
+        screen.queryByText(messages['panorama.useAutomatic'])
+      ).not.toBeInTheDocument();
+      await user.click(checkbox);
+      expect(readFiles()[0]).toMatchObject({
+        id: 1,
+        isPanorama: isPanorama !== true,
+        state: 'IS_MODIFIED',
+        pdfPageOffset: 0
+      });
+    }
+  );
+
+  it('shows a localized error on the appropriate collapsed file and clears it when corrected', async () => {
+    const user = userEvent.setup();
+    const first = { id: 1, fileName: 'first.jpg', state: 'IS_INTACT' };
+    const second = {
+      id: 2,
+      fileName: 'second.jpg',
+      isPanorama: true,
+      state: 'IS_MODIFIED'
+    };
+    render(
+      <UploadForm
+        type={DocumentTypes.IMAGE}
+        initialFiles={[first, second]}
+        fileError={{ file: second, code: 'E_INCOMPATIBLE_PANORAMA' }}
+      />
+    );
+    expect(screen.getByTestId('selected-file-second.jpg')).toContainElement(
+      screen.getByRole('alert')
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      messages.E_INCOMPATIBLE_PANORAMA
+    );
+    await user.click(screen.getAllByTestId('panorama-display-toggle')[1]);
+    await user.click(screen.getByRole('checkbox'));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(readFiles()[1].isPanorama).toBe(false);
+  });
+
+  it('does not offer the setting for unsupported formats or download an image to decide', () => {
+    const { container } = render(
+      <UploadForm
+        type={DocumentTypes.BOOK}
+        initialFiles={[
+          { id: 1, fileName: 'animation.gif', completePath: '/animation.gif' },
+          { id: 2, fileName: 'movie.mp4', completePath: '/movie.mp4' },
+          { id: 3, fileName: 'scan.pdf', completePath: '/scan.pdf' }
+        ]}
+      />
+    );
+    expect(
+      screen.queryByTestId('panorama-display-toggle')
+    ).not.toBeInTheDocument();
+    expect(container.querySelector('img')).toBeNull();
+    expect(screen.getByTestId('pdf-page-offset')).toBeInTheDocument();
+  });
   afterEach(() => {
     Object.keys(dropzoneOptions).forEach(key => {
       delete dropzoneOptions[key];

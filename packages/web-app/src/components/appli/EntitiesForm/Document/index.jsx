@@ -227,7 +227,11 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
           <form
             onSubmit={onFormSubmit}
             style={isSubmitting ? { opacity: '0.6' } : undefined}>
-            <FromContent onCancel={onCancel} isSubmitting={isSubmitting} />
+            <FromContent
+              onCancel={onCancel}
+              isSubmitting={isSubmitting}
+              fileError={activeMutation.error?.fileError}
+            />
           </form>
 
           <Dialog

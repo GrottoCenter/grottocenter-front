@@ -2,11 +2,8 @@ import { useState, useEffect, useCallback, useId, useRef } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
-  Button,
   ButtonBase,
-  ButtonGroup,
   Chip,
-  CircularProgress,
   Dialog,
   IconButton,
   Tooltip,
@@ -18,12 +15,12 @@ import Download from '@mui/icons-material/Download';
 import FitScreen from '@mui/icons-material/FitScreen';
 import Info from '@mui/icons-material/Info';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
-import ImageOutlined from '@mui/icons-material/ImageOutlined';
 import NavigateBefore from '@mui/icons-material/NavigateBefore';
 import NavigateNext from '@mui/icons-material/NavigateNext';
 import { useIntl } from 'react-intl';
 import VideoPreview from '@/components/common/VideoPreview';
 import PanoramaPreview from '@/components/common/PanoramaPreview';
+import LoadingIndicator from '@/components/common/LoadingIndicator';
 import { useMeasuredHeight } from '@/hooks/useMeasuredHeight';
 import { getVideoPoster, isVideoFile } from '@/utils/mediaUtils';
 import { decodeFileName, downloadFile } from './utils/imageUtils';
@@ -214,7 +211,6 @@ const MediaLightbox = ({
   const [isCaptionVisible, setIsCaptionVisible] = useState(true);
   const [settledImageSrc, setSettledImageSrc] = useState(null);
   const [loadedImage, setLoadedImage] = useState(null);
-  const [panoramaSrc, setPanoramaSrc] = useState(null);
   const [panoramaFooterRef, panoramaFooterHeight] = useMeasuredHeight();
   const captionId = useId();
 
@@ -239,7 +235,6 @@ const MediaLightbox = ({
   useEffect(() => {
     setZoom(MIN_ZOOM);
     setPosition({ x: 0, y: 0 });
-    setPanoramaSrc(null);
     setIsDragging(false);
     setIsTouchPanning(false);
     touchStartDistance.current = null;
@@ -249,7 +244,7 @@ const MediaLightbox = ({
 
   const currentMedia = media[currentIndex];
   const isVideo = isVideoFile(currentMedia?.fileName);
-  const isPanorama = !isVideo && panoramaSrc === currentMedia?.completePath;
+  const isPanorama = !isVideo && currentMedia?.isPanorama === true;
   const isFlatImage = !isVideo && !isPanorama;
   const hasVideos = media.some(file => isVideoFile(file.fileName));
   const isImageLoading =
@@ -448,6 +443,7 @@ const MediaLightbox = ({
       <PanoramaPreview
         key={currentMedia.completePath}
         src={currentMedia.completePath}
+        previewSrc={getVideoPoster(currentMedia)}
         title={captionTitle}
       />
     );
@@ -596,13 +592,12 @@ const MediaLightbox = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              pointerEvents: 'none'
+              pointerEvents: 'none',
+              p: 3,
+              bgcolor: 'rgba(0, 0, 0, 0.6)',
+              color: 'common.white'
             }}>
-            <CircularProgress
-              size={32}
-              sx={{ color: 'common.white' }}
-              aria-label={formatMessage({ id: 'Loading ...' })}
-            />
+            <LoadingIndicator />
           </Box>
         )}
 
@@ -623,44 +618,6 @@ const MediaLightbox = ({
         )}
 
         <TopBar>
-          {!isVideo && (
-            <ButtonGroup
-              variant="contained"
-              aria-label={formatMessage({ id: 'panorama.mode' })}
-              data-testid="panorama-mode-controls"
-              onMouseDown={e => e.stopPropagation()}
-              onTouchStart={e => e.stopPropagation()}
-              onTouchEnd={e => e.stopPropagation()}
-              sx={{
-                bgcolor: 'rgba(0, 0, 0, 0.65)',
-                '& .MuiButton-root': { minHeight: 48, minWidth: 0, px: 1.5 }
-              }}>
-              <Button
-                color={isPanorama ? 'inherit' : 'primary'}
-                aria-label={formatMessage({ id: 'Image' })}
-                aria-pressed={!isPanorama}
-                data-testid="panorama-mode-flat"
-                onClick={() => setPanoramaSrc(null)}>
-                <ImageOutlined sx={{ display: { xs: 'block', sm: 'none' } }} />
-                <Box
-                  component="span"
-                  sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                  {formatMessage({ id: 'Image' })}
-                </Box>
-              </Button>
-              <Button
-                color={isPanorama ? 'primary' : 'inherit'}
-                aria-label={formatMessage({ id: 'panorama.view' })}
-                aria-pressed={isPanorama}
-                data-testid="panorama-mode-spherical"
-                onClick={() => {
-                  handleResetZoom();
-                  setPanoramaSrc(currentMedia.completePath);
-                }}>
-                360°
-              </Button>
-            </ButtonGroup>
-          )}
           <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
             <Tooltip title={captionToggleLabel}>
               <OverlayButton
@@ -740,6 +697,7 @@ MediaLightbox.propTypes = {
     PropTypes.shape({
       fileName: PropTypes.string.isRequired,
       completePath: PropTypes.string.isRequired,
+      isPanorama: PropTypes.bool,
       thumbnails: ThumbnailsPropTypes,
       description: PropTypes.string,
       documentTitle: PropTypes.string

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { getDocumentPanoramaError } from '@/utils/documentPanorama';
 import {
   postDocumentUrl,
   putDocumentUrl,
@@ -20,6 +21,7 @@ import {
 // unchanged. The messages are translation keys, not user-facing text.
 const buildDocErrorMessages = (verb, error) => {
   const status = error?.status;
+  if (getDocumentPanoramaError(error)) return [error.body.code];
   if (status === 400) {
     const detail = error?.body?.message ?? '';
     return [`Bad request: ${detail}`];
@@ -59,6 +61,7 @@ const appendNewFiles = (formData, files) => {
     formData,
     files.map(file => ({
       fileName: file.fileName,
+      isPanorama: file.isPanorama,
       pdfPageOffset: file.pdfPageOffset ?? ''
     })),
     'newFilesMetadata'
@@ -80,6 +83,7 @@ export const useCreateDocument = () => {
         const body = await apiPostForm(postDocumentUrl, formData);
         return body?.document;
       } catch (err) {
+        err.fileError = getDocumentPanoramaError(err, files);
         err.errorMessages = buildDocErrorMessages('create', err);
         throw err;
       }
@@ -126,6 +130,7 @@ export const useUpdateDocument = () => {
       try {
         return await apiPutForm(putDocumentUrl(docAttributes.id), formData);
       } catch (err) {
+        err.fileError = getDocumentPanoramaError(err, files);
         err.errorMessages = buildDocErrorMessages('update', err);
         throw err;
       }

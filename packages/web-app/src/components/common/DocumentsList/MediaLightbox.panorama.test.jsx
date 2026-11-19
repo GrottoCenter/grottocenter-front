@@ -16,7 +16,12 @@ vi.mock('@/components/common/PanoramaPreview/pannellum', () => ({
 }));
 
 const media = [
-  { fileName: 'sphere.jpg', completePath: '/sphere.jpg' },
+  {
+    fileName: 'sphere.jpg',
+    completePath: '/sphere.jpg',
+    isPanorama: true,
+    thumbnails: { small: '/thumb.jpg' }
+  },
   { fileName: 'flat.jpg', completePath: '/flat.jpg' },
   { fileName: 'video.mp4', completePath: '/video.mp4' }
 ];
@@ -57,19 +62,22 @@ afterEach(() => {
 });
 
 const activate = async () => {
-  fireEvent.click(screen.getByTestId('panorama-mode-spherical'));
   await waitFor(() => expect(createPanoramaViewer).toHaveBeenCalled());
   return viewers.at(-1);
 };
 
-it('loads the panorama engine only on request and passes the original image', async () => {
-  render(lightbox());
+it('loads the original automatically only when opened and shows its thumbnail while loading', async () => {
+  const { rerender } = render(lightbox(false));
   expect(createPanoramaViewer).not.toHaveBeenCalled();
-  expect(screen.getByTestId('panorama-mode-flat')).toHaveAttribute(
-    'aria-pressed',
-    'true'
+  expect(screen.queryByTestId('panorama-preview')).not.toBeInTheDocument();
+  rerender(lightbox());
+  expect(screen.getByTestId('panorama-loading-preview')).toHaveAttribute(
+    'src',
+    '/thumb.jpg'
   );
   const viewer = await activate();
+  expect(screen.getByRole('progressbar')).toHaveAccessibleName('Loading ...');
+  expect(screen.getByRole('progressbar')).not.toHaveAttribute('aria-valuenow');
   expect(createPanoramaViewer.mock.calls[0][1]).toMatchObject({
     panorama: '/sphere.jpg',
     type: 'equirectangular',
@@ -78,20 +86,24 @@ it('loads the panorama engine only on request and passes the original image', as
   });
   expect(screen.queryByTestId('lightbox-image')).not.toBeInTheDocument();
   act(() => viewer.events.load());
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+  expect(
+    screen.queryByTestId('panorama-loading-preview')
+  ).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
   expect(viewer.setHfov).toHaveBeenCalledWith(90);
   fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
   expect(viewer.lookAt).toHaveBeenCalledWith(0, 0, 100, false);
 
-  fireEvent.click(screen.getByTestId('panorama-mode-flat'));
+  fireEvent.click(screen.getByRole('button', { name: 'Next media' }));
   expect(viewer.destroy).toHaveBeenCalledOnce();
   expect(screen.getByTestId('lightbox-image')).toHaveAttribute(
     'src',
-    '/sphere.jpg'
+    '/flat.jpg'
   );
 });
 
-it('gives gestures and arrow keys to the panorama and resets mode on navigation', async () => {
+it('gives gestures and arrow keys to the panorama and selects the next viewer from its flag', async () => {
   render(lightbox());
   const viewer = await activate();
   act(() => viewer.events.load());
@@ -108,17 +120,16 @@ it('gives gestures and arrow keys to the panorama and resets mode on navigation'
     'src',
     '/flat.jpg'
   );
-  expect(screen.getByTestId('panorama-mode-flat')).toHaveAttribute(
-    'aria-pressed',
-    'true'
-  );
+  expect(
+    screen.queryByTestId('panorama-mode-controls')
+  ).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Next media' }));
   expect(
     screen.queryByTestId('panorama-mode-controls')
   ).not.toBeInTheDocument();
 });
 
-it('allows retry or flat mode after an error and releases a pending viewer on close', async () => {
+it('allows retry after an error and releases a pending viewer on close', async () => {
   const { rerender } = render(lightbox());
   const viewer = await activate();
   act(() => viewer.events.error());
@@ -134,3 +145,26 @@ it('allows retry or flat mode after an error and releases a pending viewer on cl
   expect(viewers[1].destroy).toHaveBeenCalledTimes(2);
   expect(screen.queryByTestId('panorama-preview')).not.toBeInTheDocument();
 });
+
+it.each([false, undefined])(
+  'uses the regular viewer when isPanorama is %s',
+  isPanorama => {
+    render(
+      <IntlProvider locale="en" messages={messages}>
+        <MediaLightbox
+          open
+          onClose={() => {}}
+          media={[{ ...media[0], isPanorama }]}
+        />
+      </IntlProvider>
+    );
+    expect(screen.getByTestId('lightbox-image')).toHaveAttribute(
+      'src',
+      '/sphere.jpg'
+    );
+    expect(createPanoramaViewer).not.toHaveBeenCalled();
+    expect(
+      screen.queryByTestId('panorama-mode-controls')
+    ).not.toBeInTheDocument();
+  }
+);

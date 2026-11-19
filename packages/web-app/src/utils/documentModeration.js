@@ -48,7 +48,10 @@ const getProposedDocumentFiles = (current, proposed) => {
         // toFile fills missing rename metadata with null or an undefined path.
         // Keep the original download, thumbnails and metadata for this file.
         ...old,
-        fileName: file.fileName,
+        fileName: file.fileName ?? old?.fileName,
+        ...(typeof file.isPanorama === 'boolean'
+          ? { isPanorama: file.isPanorama }
+          : {}),
         pdfPageOffset: Object.hasOwn(file, 'pdfPageOffset')
           ? file.pdfPageOffset
           : old?.pdfPageOffset
@@ -236,6 +239,20 @@ export const getDocumentChanges = (current, proposed) => {
           field === 'newFiles' ? '' : old?.fileName || file.fileName || '',
         newText: field === 'deletedFiles' ? '' : file.fileName || ''
       });
+      if (
+        Object.hasOwn(file, 'isPanorama') &&
+        (field === 'newFiles' ||
+          (field === 'modifiedFiles' &&
+            (old?.isPanorama ?? false) !== file.isPanorama))
+      ) {
+        changes.push({
+          field: `isPanorama-${file.id}`,
+          label: 'panorama.display',
+          fileName: file.fileName ?? old?.fileName,
+          oldText: field === 'newFiles' ? '' : String(old?.isPanorama ?? false),
+          newText: String(file.isPanorama)
+        });
+      }
       if (
         field === 'modifiedFiles' &&
         Object.hasOwn(file, 'pdfPageOffset') &&

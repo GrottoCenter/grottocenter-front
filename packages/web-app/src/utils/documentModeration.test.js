@@ -26,6 +26,66 @@ const current = {
 };
 
 describe('document moderation', () => {
+  it.each([true, false])(
+    'uses the proposed panorama flag %s in preview, edit and diff',
+    isPanorama => {
+      const stored = {
+        files: [
+          {
+            id: 1,
+            fileName: 'sphere.jpg',
+            completePath: '/sphere.jpg',
+            thumbnails: { small: '/thumb.jpg' },
+            isPanorama: !isPanorama
+          }
+        ]
+      };
+      const proposed = { modifiedFiles: [{ id: 1, isPanorama }] };
+      expect(prepareDocumentPreview(stored, proposed).files[0]).toMatchObject({
+        fileName: 'sphere.jpg',
+        completePath: '/sphere.jpg',
+        isPanorama,
+        thumbnails: { small: '/thumb.jpg' }
+      });
+      expect(prepareDocumentEdit(stored, proposed).files[0]).toMatchObject({
+        isPanorama,
+        state: 'IS_MODIFIED'
+      });
+      expect(getDocumentChanges(stored, proposed)).toContainEqual({
+        field: 'isPanorama-1',
+        label: 'panorama.display',
+        fileName: 'sphere.jpg',
+        oldText: String(!isPanorama),
+        newText: String(isPanorama)
+      });
+      expect(stored.files[0].isPanorama).toBe(!isPanorama);
+    }
+  );
+
+  it('preserves stored panorama settings on rename and carries new/deleted flags through moderation', () => {
+    const stored = {
+      files: [
+        { id: 1, fileName: 'sphere.jpg', isPanorama: true },
+        { id: 2, fileName: 'deleted.jpg', isPanorama: true }
+      ]
+    };
+    const proposed = {
+      modifiedFiles: [{ id: 1, fileName: 'renamed.jpg' }],
+      newFiles: [{ id: 3, fileName: 'new.jpg', isPanorama: true }],
+      deletedFiles: [{ id: 2, fileName: 'deleted.jpg' }]
+    };
+    const edit = prepareDocumentEdit(stored, proposed);
+    expect(edit.files.map(file => [file.id, file.isPanorama])).toEqual([
+      [1, true],
+      [3, true],
+      [2, true]
+    ]);
+    expect(
+      getDocumentChanges(stored, proposed).filter(
+        change => change.field === 'isPanorama-1'
+      )
+    ).toHaveLength(0);
+  });
   it('keeps a document new until its first moderation decision', () => {
     expect(getDocumentSubmissionKind(current)).toBe('creation');
     expect(getDocumentSubmissionKind({ ...current, validator: null })).toBe(

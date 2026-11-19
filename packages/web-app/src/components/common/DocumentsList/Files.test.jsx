@@ -27,6 +27,34 @@ const renderFiles = ({ files, onMediaClick, mediaIndexOffset }) =>
   );
 
 describe('Document file thumbnails', () => {
+  it.each([undefined, null, {}, { small: '/missing.webp' }])(
+    'keeps panoramas reachable without loading originals when thumbnails are missing or broken',
+    thumbnails => {
+      const onMediaClick = vi.fn();
+      const { container } = renderFiles({
+        files: [
+          {
+            fileName: 'sphere.jpg',
+            completePath: '/original.jpg',
+            isPanorama: true,
+            thumbnails
+          }
+        ],
+        onMediaClick
+      });
+      const thumbnail = container.querySelector('img');
+      if (thumbnail) fireEvent.error(thumbnail);
+      expect(container.querySelector('img[src="/original.jpg"]')).toBeNull();
+      expect(screen.getByTestId('panorama-thumbnail-badge')).toHaveTextContent(
+        '360°'
+      );
+      expect(
+        screen.getByRole('button', { name: 'sphere.jpg' })
+      ).toHaveAccessibleDescription(messages['panorama.view']);
+      fireEvent.click(screen.getByRole('button', { name: 'sphere.jpg' }));
+      expect(onMediaClick).toHaveBeenCalledExactlyOnceWith(0);
+    }
+  );
   it.each(['avi', 'MPEG'])(
     'keeps %s attachments as file links and out of gallery indexes',
     extension => {

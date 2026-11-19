@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
 import ViewInArIcon from '@mui/icons-material/ViewInAr';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
@@ -11,6 +11,7 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import LoadingIndicator from '@/components/common/LoadingIndicator';
 
 import {
   PreviewControls as Controls,
@@ -72,7 +73,7 @@ const ModelPreviewSession = ({ src, title, poster = null }) => {
   const [status, setStatus] = useState('idle');
   const [isViewerReady, setIsViewerReady] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(null);
   const [hasFullscreenError, setHasFullscreenError] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDarkBackground, setIsDarkBackground] = useState(false);
@@ -89,7 +90,7 @@ const ModelPreviewSession = ({ src, title, poster = null }) => {
 
   const handleStart = async () => {
     setStatus('loading');
-    setProgress(0);
+    setProgress(null);
     try {
       // Register the web component only after the user requests a preview.
       const { ModelViewerElement } = await import('./modelViewer');
@@ -182,17 +183,23 @@ const ModelPreviewSession = ({ src, title, poster = null }) => {
           </Viewer>
         )}
         {!isLoaded && (
-          <Centered data-testid="model-preview-overlay">
+          <Centered
+            data-testid="model-preview-overlay"
+            sx={
+              status === 'loading'
+                ? {
+                    background: theme =>
+                      alpha(
+                        isDarkBackground
+                          ? theme.palette.grey[900]
+                          : theme.palette.common.white,
+                        0.8
+                      )
+                  }
+                : undefined
+            }>
             {status === 'loading' ? (
-              <>
-                <CircularProgress
-                  color="inherit"
-                  aria-label={formatMessage({ id: 'Loading ...' })}
-                />
-                <Typography variant="body2" role="status">
-                  {formatMessage({ id: 'Loading ...' })} {progress}%
-                </Typography>
-              </>
+              <LoadingIndicator progress={progress} />
             ) : (
               <>
                 {status === 'error' && (

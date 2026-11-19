@@ -9,7 +9,6 @@ import MediaLightbox from './MediaLightbox';
 
 const messages = {
   Image: 'Image',
-  'panorama.mode': 'Image display',
   'panorama.view': '360° view',
   Close: 'Close',
   Download: 'Download',

@@ -1,22 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, Button, CircularProgress } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import ZoomIn from '@mui/icons-material/ZoomIn';
 import ZoomOut from '@mui/icons-material/ZoomOut';
 import CenterFocusStrong from '@mui/icons-material/CenterFocusStrong';
+import LoadingIndicator from '@/components/common/LoadingIndicator';
 
 import {
   PreviewControls,
   PreviewControlButton
 } from '@/components/common/MediaPreviewControls';
 
-const PanoramaPreviewSession = ({ src, title }) => {
+const PanoramaPreviewSession = ({ src, title, previewSrc }) => {
   const { formatMessage } = useIntl();
   const containerRef = useRef(null);
   const viewerRef = useRef(null);
   const [status, setStatus] = useState('loading');
   const [attempt, setAttempt] = useState(0);
+  const [failedPreview, setFailedPreview] = useState(null);
 
   useEffect(() => {
     let isDisposed = false;
@@ -73,6 +75,24 @@ const PanoramaPreviewSession = ({ src, title }) => {
         height: '100%',
         '& .pnlm-load-box, & .pnlm-error-msg': { display: 'none !important' }
       }}>
+      {status === 'loading' && previewSrc && previewSrc !== failedPreview && (
+        <Box
+          component="img"
+          data-testid="panorama-loading-preview"
+          src={previewSrc}
+          alt=""
+          onError={() => setFailedPreview(previewSrc)}
+          sx={{
+            position: 'absolute',
+            zIndex: 1,
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            pointerEvents: 'none'
+          }}
+        />
+      )}
       <Box
         ref={containerRef}
         role="region"
@@ -91,14 +111,11 @@ const PanoramaPreviewSession = ({ src, title }) => {
             justifyContent: 'center',
             gap: 2,
             p: 3,
-            bgcolor: 'rgba(0, 0, 0, 0.8)',
+            bgcolor: 'rgba(0, 0, 0, 0.6)',
             color: 'common.white'
           }}>
           {status === 'loading' ? (
-            <CircularProgress
-              color="inherit"
-              aria-label={formatMessage({ id: 'Loading ...' })}
-            />
+            <LoadingIndicator />
           ) : (
             <>
               <Box role="alert">{formatMessage({ id: 'panorama.error' })}</Box>
@@ -121,6 +138,9 @@ const PanoramaPreviewSession = ({ src, title }) => {
           data-testid="panorama-preview-controls"
           sx={{
             zIndex: 2,
+            maxWidth: theme => `calc(100% - ${theme.spacing(2)})`,
+            flexWrap: 'wrap',
+            justifyContent: 'center',
             bottom: theme =>
               `calc(var(--panorama-footer-height, 0px) + ${theme.spacing(2)})`,
             bgcolor: 'rgba(0, 0, 0, 0.4)',
@@ -158,13 +178,19 @@ const PanoramaPreviewSession = ({ src, title }) => {
 
 const panoramaPreviewPropTypes = {
   src: PropTypes.string.isRequired,
+  previewSrc: PropTypes.string,
   title: PropTypes.string.isRequired
 };
 
 PanoramaPreviewSession.propTypes = panoramaPreviewPropTypes;
 
-const PanoramaPreview = ({ src, title }) => (
-  <PanoramaPreviewSession key={src} src={src} title={title} />
+const PanoramaPreview = ({ src, title, previewSrc }) => (
+  <PanoramaPreviewSession
+    key={src}
+    src={src}
+    title={title}
+    previewSrc={previewSrc}
+  />
 );
 
 PanoramaPreview.propTypes = panoramaPreviewPropTypes;

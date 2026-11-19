@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardActionArea, Skeleton, Box } from '@mui/material';
+import { Card, CardActionArea, Skeleton, Box, Typography } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
-import { Description, PlayArrow } from '@mui/icons-material';
+import { Description, PlayArrow, ThreeSixty } from '@mui/icons-material';
 import PlayCircleOutline from '@mui/icons-material/PlayCircleOutlined';
 import { useIntl } from 'react-intl';
 import AppLink from '@/components/common/AppLink';
@@ -124,9 +124,12 @@ const MediaThumbnail = ({
   alt,
   onClick,
   to,
-  isVideo = false
+  isVideo = false,
+  isPanorama = false
 }) => {
   const { formatMessage } = useIntl();
+  const panoramaDescriptionId = useId();
+  const hasPanoramaBadge = isPanorama && !isVideo;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const Fallback = isVideo ? VideoFallback : FallbackIconWrapper;
@@ -146,6 +149,7 @@ const MediaThumbnail = ({
         component={to ? AppLink : 'button'}
         to={to}
         onClick={onClick}
+        aria-describedby={hasPanoramaBadge ? panoramaDescriptionId : undefined}
         aria-label={
           isVideo
             ? formatMessage({ id: 'media.openVideo' }, { name: alt })
@@ -207,6 +211,37 @@ const MediaThumbnail = ({
             />
           </>
         )}
+        {hasPanoramaBadge && (
+          <>
+            <Box component="span" id={panoramaDescriptionId} hidden>
+              {formatMessage({ id: 'panorama.view' })}
+            </Box>
+            <Box
+              component="span"
+              data-testid="panorama-thumbnail-badge"
+              aria-hidden="true"
+              sx={{
+                position: 'absolute',
+                bottom: theme => theme.spacing(1),
+                right: theme => theme.spacing(1),
+                zIndex: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.5,
+                px: 0.75,
+                py: 0.25,
+                borderRadius: 1,
+                bgcolor: 'rgba(0, 0, 0, 0.75)',
+                color: 'common.white',
+                pointerEvents: 'none'
+              }}>
+              <ThreeSixty fontSize="small" />
+              <Typography component="span" variant="caption">
+                360°
+              </Typography>
+            </Box>
+          </>
+        )}
       </CardActionArea>
     </ThumbnailCard>
   );
@@ -221,7 +256,8 @@ MediaThumbnail.propTypes = {
   alt: PropTypes.string.isRequired,
   onClick: PropTypes.func,
   to: PropTypes.string,
-  isVideo: PropTypes.bool
+  isVideo: PropTypes.bool,
+  isPanorama: PropTypes.bool
 };
 
 export default MediaThumbnail;
