@@ -987,7 +987,7 @@
   "documentAi.globalLimit": "All users: {total} analyses per day (provisional limit).",
   "documentAi.identical": "Already identical: current value kept",
   "documentAi.invalidPdf": "This PDF cannot be analyzed. Check its format, protection, size and number of pages.",
-  "documentAi.limits": "Current service limits",
+  "documentAi.limits": "Indicative service limits",
   "documentAi.newAnalysis": "New analysis",
   "documentAi.noChanges": "These values already match the form.",
   "documentAi.notProvided": "Not provided",

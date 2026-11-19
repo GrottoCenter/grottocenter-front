@@ -987,7 +987,7 @@
   "documentAi.globalLimit": "כל המשתמשים: {total} ניתוחים ביום (מגבלה זמנית).",
   "documentAi.identical": "כבר זהה: הערך הנוכחי נשמר",
   "documentAi.invalidPdf": "לא ניתן לנתח קובץ PDF זה. יש לבדוק את הפורמט, ההגנה, הגודל ומספר העמודים שלו.",
-  "documentAi.limits": "מגבלות השירות הנוכחיות",
+  "documentAi.limits": "מגבלות השירות המשוערות",
   "documentAi.newAnalysis": "ניתוח חדש",
   "documentAi.noChanges": "ערכים אלה כבר תואמים לטופס.",
   "documentAi.notProvided": "לא צוין",

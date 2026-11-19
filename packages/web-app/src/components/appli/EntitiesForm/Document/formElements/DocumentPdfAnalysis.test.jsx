@@ -41,6 +41,10 @@ const hostedFile = {
   fileName: 'hosted.pdf',
   completePath: 'https://files.example.org/hosted.pdf'
 };
+const hostedReplacement = {
+  ...hostedFile,
+  completePath: 'https://files.example.org/replacement.pdf'
+};
 const entry = source => ({
   file: source,
   fileName: source.name,
@@ -49,7 +53,7 @@ const entry = source => ({
 const oversized = new File(['%PDF'], 'oversized.pdf', {
   type: 'application/pdf'
 });
-Object.defineProperty(oversized, 'size', { value: 50000001 });
+Object.defineProperty(oversized, 'size', { value: 60 * 1024 * 1024 + 1 });
 
 const Form = () => {
   const { document, updateAttribute } = useContext(DocumentFormContext);
@@ -72,6 +76,21 @@ const Form = () => {
         type="button"
         onClick={() => updateAttribute('files', [entry(oversized)])}>
         Attach oversized PDF
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          updateAttribute(
+            'files',
+            document.files.map(item => ({ ...item, pdfPageOffset: 2 }))
+          )
+        }>
+        Adjust PDF page offset
+      </button>
+      <button
+        type="button"
+        onClick={() => updateAttribute('files', [hostedReplacement])}>
+        Replace hosted PDF
       </button>
       <button
         type="button"
@@ -160,7 +179,7 @@ it('explains AI and all limits before requesting authorization or uploading', ()
   expect(screen.getByRole('dialog')).toHaveTextContent(
     '200 analyses per day (provisional limit)'
   );
-  expect(screen.getByRole('dialog')).toHaveTextContent('50 MB and 300 pages');
+  expect(screen.getByRole('dialog')).toHaveTextContent('62.9 MB and 300 pages');
   expect(apiPost).not.toHaveBeenCalled();
   expect(fetch).not.toHaveBeenCalled();
   expect(screen.getByRole('button', { name: 'Close' })).toHaveClass(
@@ -402,7 +421,7 @@ it('refuses oversized PDFs before requesting a token', () => {
   fireEvent.click(screen.getByText('Attach oversized PDF'));
   fireEvent.click(screen.getByTestId('document-ai-analyze'));
   expect(screen.getByTestId('document-ai-confirm')).toBeDisabled();
-  expect(screen.getByRole('alert')).toHaveTextContent('50 MB');
+  expect(screen.getByRole('alert')).toHaveTextContent('62.9 MB');
   expect(apiPost).not.toHaveBeenCalled();
 });
 
@@ -449,6 +468,41 @@ it('stops waiting and ignores a late response', async () => {
     screen.queryByTestId('document-ai-suggestions')
   ).not.toBeInTheDocument();
 });
+
+it.each(['Escape', 'backdrop'])(
+  'ignores %s while pending but allows dismissal after completion',
+  async action => {
+    let resolve;
+    fetch.mockReturnValue(
+      new Promise(done => {
+        resolve = done;
+      })
+    );
+    renderForm();
+    startAnalysis();
+    await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    const { signal } = fetch.mock.calls[0][1];
+    const dismiss = () => {
+      const dialog = screen.getByRole('dialog');
+      if (action === 'Escape') {
+        fireEvent.keyDown(dialog, { key: 'Escape', code: 'Escape' });
+      } else {
+        fireEvent.mouseDown(dialog.parentElement);
+        fireEvent.click(dialog.parentElement);
+      }
+    };
+    dismiss();
+    expect(signal.aborted).toBe(false);
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    await act(async () => resolve(answer(['AI summary'])));
+    await screen.findByText('AI summary');
+    dismiss();
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    );
+    expect(signal.aborted).toBe(false);
+  }
+);
 
 it.each([
   [401, 'documentAi.authError'],
@@ -519,3 +573,66 @@ it('analyzes an existing attachment and applies selected fields without replacin
   expect(screen.getByTestId('publication-date')).toHaveTextContent('2010');
   expect(screen.getByTestId('attachment-state')).toHaveTextContent(IS_INTACT);
 });
+
+it('preserves hosted suggestions and selection after closing and editing the page offset', async () => {
+  fetch.mockImplementation(async url =>
+    url === hostedFile.completePath
+      ? new Response('%PDF stored')
+      : answer(['AI summary'])
+  );
+  renderForm({ files: [hostedFile] });
+  fireEvent.click(screen.getByTestId('document-ai-analyze'));
+  fireEvent.click(screen.getByTestId('document-ai-confirm'));
+  await screen.findByText('AI summary');
+  selectSummary();
+  fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  );
+  fireEvent.click(screen.getByText('Adjust PDF page offset'));
+  fireEvent.click(screen.getByTestId('document-ai-analyze'));
+  expect(screen.getByText('AI summary')).toBeInTheDocument();
+  expect(
+    screen.getByRole('checkbox', {
+      name: messages['Summary of document content']
+    })
+  ).toBeChecked();
+  expect(apiPost).toHaveBeenCalledOnce();
+  expect(fetch).toHaveBeenCalledTimes(2);
+  fireEvent.click(screen.getByTestId('document-ai-apply'));
+  expect(screen.getByLabelText('Summary')).toHaveValue('AI summary');
+});
+
+it.each(['offset', 'replacement'])(
+  'keeps a hosted analysis only when its URL is unchanged by a %s edit',
+  async action => {
+    let resolve;
+    fetch.mockImplementation(url =>
+      url === hostedFile.completePath
+        ? Promise.resolve(new Response('%PDF stored'))
+        : new Promise(done => {
+            resolve = done;
+          })
+    );
+    renderForm({ files: [hostedFile] });
+    fireEvent.click(screen.getByTestId('document-ai-analyze'));
+    fireEvent.click(screen.getByTestId('document-ai-confirm'));
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    const { signal } = fetch.mock.calls[1][1];
+    fireEvent.click(
+      screen.getByText(
+        action === 'offset' ? 'Adjust PDF page offset' : 'Replace hosted PDF'
+      )
+    );
+    expect(signal.aborted).toBe(action === 'replacement');
+    await act(async () => resolve(answer(['AI summary'])));
+    if (action === 'offset') {
+      await screen.findByText('AI summary');
+      expect(apiPost).toHaveBeenCalledOnce();
+      expect(fetch).toHaveBeenCalledTimes(2);
+    } else {
+      expect(screen.queryByText('AI summary')).not.toBeInTheDocument();
+      expect(screen.getByTestId('document-ai-confirm')).toBeInTheDocument();
+    }
+  }
+);

@@ -987,7 +987,7 @@
   "documentAi.globalLimit": "جميع المستخدمين: {total} تحليل يوميًا (حد مؤقت).",
   "documentAi.identical": "مطابقة بالفعل: تم الإبقاء على القيمة الحالية",
   "documentAi.invalidPdf": "لا يمكن تحليل ملف PDF هذا. تحقق من تنسيقه وحمايته وحجمه وعدد صفحاته.",
-  "documentAi.limits": "الحدود الحالية للخدمة",
+  "documentAi.limits": "حدود الخدمة الاسترشادية",
   "documentAi.newAnalysis": "تحليل جديد",
   "documentAi.noChanges": "هذه القيم مطابقة بالفعل للقيم في النموذج.",
   "documentAi.notProvided": "غير محدد",

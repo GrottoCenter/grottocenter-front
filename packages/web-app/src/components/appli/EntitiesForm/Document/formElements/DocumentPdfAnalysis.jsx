@@ -56,8 +56,11 @@ const EMPTY_SELECTION = {
   datePublication: false
 };
 
+const getFileIdentity = file =>
+  file instanceof File ? file : file?.completePath;
+
 const PdfAnalysisRequest = ({ file, disabled }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatNumber } = useIntl();
   const { document, updateAttribute } = useContext(DocumentFormContext);
   const analysis = useAnalyzeDocument();
   const controller = useRef(null);
@@ -73,11 +76,13 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
   const titleId = useId();
   const fileId = useId();
   const descriptionId = useId();
+  const fileIdentity = getFileIdentity(file);
 
-  useEffect(() => () => controller.current?.abort(), [file, session]);
+  useEffect(() => () => controller.current?.abort(), [fileIdentity, session]);
 
   const isCurrent =
-    analysis.variables?.file === file && !analysis.variables?.signal.aborted;
+    getFileIdentity(analysis.variables?.file) === fileIdentity &&
+    !analysis.variables?.signal.aborted;
   const isPending = isCurrent && analysis.isPending;
   const error = isCurrent && analysis.error;
   const suggestions = isCurrent ? analysis.data : undefined;
@@ -121,6 +126,9 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
   };
   const isTooLarge =
     file instanceof File && file.size > DOCUMENT_AI_MAX_FILE_SIZE;
+  const maxFileSizeMb = formatNumber(DOCUMENT_AI_MAX_FILE_SIZE / 1000000, {
+    maximumFractionDigits: 1
+  });
   const actionLabel = formatMessage({
     id: hasSuggestions ? 'documentAi.reviewAction' : 'documentAi.analyze'
   });
@@ -308,7 +316,9 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
       </Tooltip>
       <Dialog
         open={isOpen}
-        onClose={handleClose}
+        onClose={() => {
+          if (!isPending) handleClose();
+        }}
         fullScreen={isMobile}
         fullWidth
         maxWidth={hasSuggestions ? 'md' : 'sm'}
@@ -394,7 +404,7 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
                       {formatMessage(
                         { id: 'documentAi.fileLimits' },
                         {
-                          size: DOCUMENT_AI_LIMITS.sizeMb,
+                          size: maxFileSizeMb,
                           pages: DOCUMENT_AI_LIMITS.pages
                         }
                       )}
@@ -409,7 +419,7 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
                 <Alert severity="error">
                   {formatMessage(
                     { id: 'documentAi.tooLarge' },
-                    { size: DOCUMENT_AI_LIMITS.sizeMb }
+                    { size: maxFileSizeMb }
                   )}
                 </Alert>
               )}

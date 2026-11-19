@@ -987,7 +987,7 @@
   "documentAi.globalLimit": "Tous les utilisateurs : {total} analyses par jour (limite provisoire).",
   "documentAi.identical": "Déjà identique : valeur conservée",
   "documentAi.invalidPdf": "Ce PDF ne peut pas être analysé. Vérifiez son format, sa protection, sa taille et son nombre de pages.",
-  "documentAi.limits": "Limites actuelles du service",
+  "documentAi.limits": "Limites indicatives du service",
   "documentAi.newAnalysis": "Nouvelle analyse",
   "documentAi.noChanges": "Ces informations sont déjà identiques à celles du formulaire.",
   "documentAi.notProvided": "Non renseigné",

@@ -987,7 +987,7 @@
   "documentAi.globalLimit": "Semua pengguna: {total} analisis per hari (batas sementara).",
   "documentAi.identical": "Sudah sama: nilai saat ini dipertahankan",
   "documentAi.invalidPdf": "PDF ini tidak dapat dianalisis. Periksa format, perlindungan, ukuran, dan jumlah halamannya.",
-  "documentAi.limits": "Batas layanan saat ini",
+  "documentAi.limits": "Perkiraan batas layanan",
   "documentAi.newAnalysis": "Analisis baru",
   "documentAi.noChanges": "Nilai-nilai ini sudah sesuai dengan formulir.",
   "documentAi.notProvided": "Belum diisi",

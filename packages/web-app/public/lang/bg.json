@@ -987,7 +987,7 @@
   "documentAi.globalLimit": "Всички потребители: {total} анализа на ден (временно ограничение).",
   "documentAi.identical": "Вече съвпада: текущата стойност се запазва",
   "documentAi.invalidPdf": "Този PDF файл не може да бъде анализиран. Проверете формата, защитата, размера и броя на страниците му.",
-  "documentAi.limits": "Текущи ограничения на услугата",
+  "documentAi.limits": "Ориентировъчни ограничения на услугата",
   "documentAi.newAnalysis": "Нов анализ",
   "documentAi.noChanges": "Тези стойности вече съвпадат с формуляра.",
   "documentAi.notProvided": "Не е посочено",

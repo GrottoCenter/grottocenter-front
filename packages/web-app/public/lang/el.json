@@ -987,7 +987,7 @@
   "documentAi.globalLimit": "Όλοι οι χρήστες: {total} αναλύσεις την ημέρα (προσωρινό όριο).",
   "documentAi.identical": "Ήδη ίδιο: η τρέχουσα τιμή διατηρείται",
   "documentAi.invalidPdf": "Αυτό το PDF δεν μπορεί να αναλυθεί. Ελέγξτε τη μορφή, την προστασία, το μέγεθος και τον αριθμό σελίδων του.",
-  "documentAi.limits": "Τρέχοντα όρια υπηρεσίας",
+  "documentAi.limits": "Ενδεικτικά όρια της υπηρεσίας",
   "documentAi.newAnalysis": "Νέα ανάλυση",
   "documentAi.noChanges": "Αυτές οι τιμές συμφωνούν ήδη με τη φόρμα.",
   "documentAi.notProvided": "Δεν έχει συμπληρωθεί",

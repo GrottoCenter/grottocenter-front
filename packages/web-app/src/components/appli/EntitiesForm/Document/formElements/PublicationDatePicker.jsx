@@ -63,7 +63,7 @@ const PublicationDatePicker = ({ required = false, label = null }) => {
   );
 
   // An applied AI date can change precision while this editor is mounted.
-  // Clearing the field during a manual precision change must retain that choice.
+  // An empty field retains the selected precision, including after manual clearing.
   useEffect(() => {
     if (document.datePublication) {
       setGranularity(getGranularityFromString(document.datePublication));

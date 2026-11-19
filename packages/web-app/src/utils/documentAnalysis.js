@@ -1,15 +1,18 @@
 import { format, isMatch } from 'date-fns';
 import { TEXT_LENGTH_LIMITS } from './textLengthLimits';
 
+// Mirrors grottocenter-ai/AI_Serveur/config/settings.py defaults, not live
+// configuration. Update together until the service exposes a limits endpoint.
 export const DOCUMENT_AI_LIMITS = {
-  dailyPerUser: 5,
-  concurrentPerUser: 2,
-  dailyTotal: 200,
-  sizeMb: 50,
-  pages: 300
+  dailyPerUser: 5, // USER_DAILY_LIMIT
+  concurrentPerUser: 2, // USER_MAX_CONCURRENT
+  dailyTotal: 200, // GLOBAL_DAILY_LIMIT (provisional)
+  sizeMb: 60, // MAX_FILE_SIZE_MB (the service uses MiB)
+  pages: 300 // MAX_PAGES
 };
 
-export const DOCUMENT_AI_MAX_FILE_SIZE = DOCUMENT_AI_LIMITS.sizeMb * 1000000;
+export const DOCUMENT_AI_MAX_FILE_SIZE =
+  DOCUMENT_AI_LIMITS.sizeMb * 1024 * 1024;
 
 const DATE_FORMATS = { 4: 'yyyy', 7: 'yyyy-MM', 10: 'yyyy-MM-dd' };
 

@@ -165,6 +165,43 @@ it('rejects oversized hosted files from Content-Length before downloading the bo
   expect(fetch).toHaveBeenCalledOnce();
 });
 
+it.each([50000001, 60 * 1024 * 1024])(
+  'accepts a local PDF of %s bytes within the service limit',
+  async size => {
+    const upload = new File(['%PDF test'], 'large.pdf', {
+      type: 'application/pdf'
+    });
+    Object.defineProperty(upload, 'size', { value: size });
+    const { result } = renderAnalysis();
+    await act(async () =>
+      result.current.mutateAsync({
+        file: upload,
+        signal: new AbortController().signal
+      })
+    );
+    expect(apiPost).toHaveBeenCalledOnce();
+    expect(fetch).toHaveBeenCalledOnce();
+  }
+);
+
+it('rejects a local PDF one byte above 60 MiB before requesting SSO', async () => {
+  const upload = new File(['%PDF test'], 'oversized.pdf', {
+    type: 'application/pdf'
+  });
+  Object.defineProperty(upload, 'size', { value: 60 * 1024 * 1024 + 1 });
+  const { result } = renderAnalysis();
+  await act(async () => {
+    await expect(
+      result.current.mutateAsync({
+        file: upload,
+        signal: new AbortController().signal
+      })
+    ).rejects.toMatchObject({ status: 413 });
+  });
+  expect(apiPost).not.toHaveBeenCalled();
+  expect(fetch).not.toHaveBeenCalled();
+});
+
 it('bounds streamed downloads without Content-Length and cancels on overflow', async () => {
   const cancel = vi.fn();
   const stream = new ReadableStream({

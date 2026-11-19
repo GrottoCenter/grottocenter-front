@@ -987,7 +987,7 @@
   "documentAi.globalLimit": "全ユーザー合計：1日{total}回の解析（暫定的な上限）。",
   "documentAi.identical": "すでに同一のため、現在の値を維持します",
   "documentAi.invalidPdf": "このPDFは解析できません。形式、保護設定、サイズ、ページ数を確認してください。",
-  "documentAi.limits": "現在のサービス利用制限",
+  "documentAi.limits": "サービスの制限の目安",
   "documentAi.newAnalysis": "新しい解析",
   "documentAi.noChanges": "これらの値はすでにフォームの内容と一致しています。",
   "documentAi.notProvided": "未入力",

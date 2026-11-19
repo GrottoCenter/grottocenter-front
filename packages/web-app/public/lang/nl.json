@@ -987,7 +987,7 @@
   "documentAi.globalLimit": "Alle gebruikers: {total} analyses per dag (voorlopige limiet).",
   "documentAi.identical": "Al identiek: huidige waarde blijft behouden",
   "documentAi.invalidPdf": "Deze PDF kan niet worden geanalyseerd. Controleer het formaat, de beveiliging, de grootte en het aantal pagina’s.",
-  "documentAi.limits": "Huidige dienstlimieten",
+  "documentAi.limits": "Indicatieve servicelimieten",
   "documentAi.newAnalysis": "Nieuwe analyse",
   "documentAi.noChanges": "Deze waarden komen al overeen met het formulier.",
   "documentAi.notProvided": "Niet ingevuld",

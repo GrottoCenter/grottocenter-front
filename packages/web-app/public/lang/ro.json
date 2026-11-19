@@ -987,7 +987,7 @@
   "documentAi.globalLimit": "Toți utilizatorii: {total} analize pe zi (limită provizorie).",
   "documentAi.identical": "Deja identic: valoarea actuală se păstrează",
   "documentAi.invalidPdf": "Acest PDF nu poate fi analizat. Verifică formatul, protecția, dimensiunea și numărul de pagini.",
-  "documentAi.limits": "Limitele actuale ale serviciului",
+  "documentAi.limits": "Limite orientative ale serviciului",
   "documentAi.newAnalysis": "Analiză nouă",
   "documentAi.noChanges": "Aceste valori corespund deja celor din formular.",
   "documentAi.notProvided": "Necompletat",
