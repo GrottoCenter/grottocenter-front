@@ -159,7 +159,8 @@ describe('JSON POST response headers', () => {
     const failure = await apiPostWithHeaders('/api/v1/sso/auth-token', {
       product: 'documents'
     }).catch(error => error);
-    expect(failure).toBeInstanceOf(SyntaxError);
+    // Native Response.json() errors can originate outside Vitest's VM context.
+    expect(failure).toMatchObject({ name: 'SyntaxError' });
     expect(failure.headers.get('X-Trace-Id')).toBe('sso-parse-failure');
   });
 });
