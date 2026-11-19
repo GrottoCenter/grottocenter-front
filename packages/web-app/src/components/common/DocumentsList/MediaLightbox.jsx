@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback, useId, useRef } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
+  Button,
   ButtonBase,
+  ButtonGroup,
   Chip,
   CircularProgress,
   Dialog,
@@ -16,10 +18,13 @@ import Download from '@mui/icons-material/Download';
 import FitScreen from '@mui/icons-material/FitScreen';
 import Info from '@mui/icons-material/Info';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
+import ImageOutlined from '@mui/icons-material/ImageOutlined';
 import NavigateBefore from '@mui/icons-material/NavigateBefore';
 import NavigateNext from '@mui/icons-material/NavigateNext';
 import { useIntl } from 'react-intl';
 import VideoPreview from '@/components/common/VideoPreview';
+import PanoramaPreview from '@/components/common/PanoramaPreview';
+import { useMeasuredHeight } from '@/hooks/useMeasuredHeight';
 import { getVideoPoster, isVideoFile } from '@/utils/mediaUtils';
 import { decodeFileName, downloadFile } from './utils/imageUtils';
 import { ThumbnailsPropTypes } from '../../../types/document.type';
@@ -85,7 +90,7 @@ const NavButton = styled(OverlayButton)`
 // pill shape kept because the label is text, not an icon.
 const ZoomResetButton = styled(ButtonBase)`
   position: absolute;
-  top: 12px;
+  top: ${({ theme }) => theme.spacing(9)};
   left: 12px;
   z-index: 3;
   background-color: rgba(0, 0, 0, 0.4);
@@ -114,7 +119,10 @@ const TopBar = styled(Box)`
   position: absolute;
   top: 0;
   right: 0;
+  left: 0;
   display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: ${({ theme }) => theme.spacing(1)};
   padding: ${({ theme }) => theme.spacing(1.5)};
   z-index: 3;
@@ -122,13 +130,14 @@ const TopBar = styled(Box)`
 
 const BottomBar = styled(Box, {
   shouldForwardProp: prop => prop[0] !== '$'
-})(({ theme, $isVideo, $isCaptionVisible }) => ({
+})(({ theme, $isVideo, $isPanorama, $isCaptionVisible }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   gap: theme.spacing(0.25),
   zIndex: 2,
   opacity: $isCaptionVisible ? 1 : 0,
+  ...($isPanorama && !$isCaptionVisible && { display: 'none' }),
   transition: theme.transitions.create('opacity', {
     duration: theme.transitions.duration.shorter
   }),
@@ -147,8 +156,9 @@ const BottomBar = styled(Box, {
         background: 'none'
       }
     : {
-        position: 'absolute',
+        position: $isPanorama ? 'relative' : 'absolute',
         bottom: 0,
+        width: '100%',
         left: 0,
         right: 0,
         padding: theme.spacing(3, 2, 1.5),
@@ -204,6 +214,8 @@ const MediaLightbox = ({
   const [isCaptionVisible, setIsCaptionVisible] = useState(true);
   const [settledImageSrc, setSettledImageSrc] = useState(null);
   const [loadedImage, setLoadedImage] = useState(null);
+  const [panoramaSrc, setPanoramaSrc] = useState(null);
+  const [panoramaFooterRef, panoramaFooterHeight] = useMeasuredHeight();
   const captionId = useId();
 
   // Only a zoomed-in image can be panned, so only it gets a grab cursor.
@@ -227,13 +239,21 @@ const MediaLightbox = ({
   useEffect(() => {
     setZoom(MIN_ZOOM);
     setPosition({ x: 0, y: 0 });
+    setPanoramaSrc(null);
+    setIsDragging(false);
+    setIsTouchPanning(false);
+    touchStartDistance.current = null;
+    touchPanStart.current = null;
+    lastTapTime.current = 0;
   }, [currentIndex, open]);
 
   const currentMedia = media[currentIndex];
   const isVideo = isVideoFile(currentMedia?.fileName);
+  const isPanorama = !isVideo && panoramaSrc === currentMedia?.completePath;
+  const isFlatImage = !isVideo && !isPanorama;
   const hasVideos = media.some(file => isVideoFile(file.fileName));
   const isImageLoading =
-    !isVideo && settledImageSrc !== currentMedia?.completePath;
+    isFlatImage && settledImageSrc !== currentMedia?.completePath;
   const imageAspectRatio =
     loadedImage?.src === currentMedia?.completePath
       ? loadedImage?.aspectRatio
@@ -381,6 +401,8 @@ const MediaLightbox = ({
   useEffect(() => {
     const handleKeyDown = e => {
       if (!open) return;
+      // Arrow keys rotate the panorama instead of changing gallery images.
+      if (isPanorama) return;
       // Arrow keys belong to the native video controls while they have focus.
       if (e.target instanceof HTMLVideoElement) return;
       if (e.key === 'ArrowLeft') {
@@ -393,7 +415,7 @@ const MediaLightbox = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, handlePrevious, handleNext]);
+  }, [open, isPanorama, handlePrevious, handleNext]);
 
   if (!currentMedia) return null;
 
@@ -420,6 +442,96 @@ const MediaLightbox = ({
       )
     : null;
 
+  let imageContent;
+  if (isPanorama) {
+    imageContent = open && (
+      <PanoramaPreview
+        key={currentMedia.completePath}
+        src={currentMedia.completePath}
+        title={captionTitle}
+      />
+    );
+  } else if (!isVideo) {
+    imageContent = (
+      <LightboxImage
+        key={currentMedia.completePath}
+        data-testid="lightbox-image"
+        src={currentMedia.completePath}
+        alt={decodedFileName}
+        draggable={false}
+        onLoad={handleImageLoad}
+        onError={() => setSettledImageSrc(currentMedia.completePath)}
+        sx={{
+          backgroundColor: imageAspectRatio ? 'common.white' : 'transparent'
+        }}
+        style={{
+          opacity: isImageLoading ? 0 : 1,
+          // Fit the backing to the bitmap rather than a full-screen object-fit box.
+          width: imageAspectRatio
+            ? `min(100cqw, ${100 * imageAspectRatio}cqh)`
+            : '100%',
+          height: imageAspectRatio
+            ? `min(100cqh, ${100 / imageAspectRatio}cqw)`
+            : '100%',
+          transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
+            position.y / zoom
+          }px)`,
+          transition: isDragging || isTouchPanning ? 'none' : 'transform 0.2s',
+          transformOrigin: 'center',
+          cursor: panCursor
+        }}
+      />
+    );
+  }
+
+  const footer = (
+    <>
+      <BottomBar
+        $isVideo={isVideo}
+        $isPanorama={isPanorama}
+        $isCaptionVisible={isCaptionVisible}
+        data-testid="lightbox-caption"
+        id={captionId}
+        aria-hidden={!isCaptionVisible}>
+        <Typography
+          variant="caption"
+          sx={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
+          {captionTitle}
+        </Typography>
+        {captionDescription && (
+          <Typography
+            variant="body2"
+            sx={{ color: 'white', textAlign: 'center' }}>
+            {captionDescription}
+          </Typography>
+        )}
+        {hasMultipleMedia && (
+          <Typography
+            variant="caption"
+            sx={{ color: 'rgba(255,255,255,0.75)' }}>
+            {mediaCounterLabel}
+          </Typography>
+        )}
+      </BottomBar>
+      {!isCaptionVisible && hasMultipleMedia && (
+        <MediaCounter
+          size="small"
+          label={mediaCounterLabel}
+          sx={
+            isVideo || isPanorama
+              ? {
+                  position: 'static',
+                  transform: 'none',
+                  flexShrink: 0,
+                  mb: 1.5
+                }
+              : undefined
+          }
+        />
+      )}
+    </>
+  );
+
   return (
     <LightboxDialog
       open={open}
@@ -427,7 +539,8 @@ const MediaLightbox = ({
       fullScreen
       aria-label={decodedFileName}>
       <Box
-        ref={isVideo ? undefined : contentRef}
+        ref={isFlatImage ? contentRef : undefined}
+        style={{ '--panorama-footer-height': `${panoramaFooterHeight}px` }}
         aria-busy={isImageLoading}
         sx={{
           position: 'relative',
@@ -441,12 +554,12 @@ const MediaLightbox = ({
           overflow: 'hidden',
           touchAction: isVideo ? 'auto' : 'none'
         }}
-        onMouseDown={isVideo ? undefined : handleMouseDown}
-        onMouseMove={isVideo ? undefined : handleMouseMove}
+        onMouseDown={isFlatImage ? handleMouseDown : undefined}
+        onMouseMove={isFlatImage ? handleMouseMove : undefined}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onTouchStart={isVideo ? undefined : handleTouchStart}
-        onTouchEnd={isVideo ? undefined : handleTouchEnd}>
+        onTouchStart={isFlatImage ? handleTouchStart : undefined}
+        onTouchEnd={isFlatImage ? handleTouchEnd : undefined}>
         {isVideo ? (
           <Box
             data-testid="lightbox-video-stage"
@@ -472,36 +585,7 @@ const MediaLightbox = ({
             )}
           </Box>
         ) : (
-          <LightboxImage
-            key={currentMedia.completePath}
-            data-testid="lightbox-image"
-            src={currentMedia.completePath}
-            alt={decodedFileName}
-            draggable={false}
-            onLoad={handleImageLoad}
-            onError={() => setSettledImageSrc(currentMedia.completePath)}
-            sx={{
-              backgroundColor: imageAspectRatio ? 'common.white' : 'transparent'
-            }}
-            style={{
-              opacity: isImageLoading ? 0 : 1,
-              // The white backing must fit the bitmap, not a full-screen
-              // object-fit box. Container units keep it fitted on resize too.
-              width: imageAspectRatio
-                ? `min(100cqw, ${100 * imageAspectRatio}cqh)`
-                : '100%',
-              height: imageAspectRatio
-                ? `min(100cqh, ${100 / imageAspectRatio}cqw)`
-                : '100%',
-              transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
-                position.y / zoom
-              }px)`,
-              transition:
-                isDragging || isTouchPanning ? 'none' : 'transform 0.2s',
-              transformOrigin: 'center',
-              cursor: panCursor
-            }}
-          />
+          imageContent
         )}
 
         {isImageLoading && (
@@ -522,7 +606,7 @@ const MediaLightbox = ({
           </Box>
         )}
 
-        {!isVideo && zoom !== MIN_ZOOM && (
+        {isFlatImage && zoom !== MIN_ZOOM && (
           <ZoomResetButton
             onClick={handleResetZoom}
             // The image behind reads raw pointer and touch events to pan and to
@@ -539,27 +623,67 @@ const MediaLightbox = ({
         )}
 
         <TopBar>
-          <Tooltip title={captionToggleLabel}>
+          {!isVideo && (
+            <ButtonGroup
+              variant="contained"
+              aria-label={formatMessage({ id: 'panorama.mode' })}
+              data-testid="panorama-mode-controls"
+              onMouseDown={e => e.stopPropagation()}
+              onTouchStart={e => e.stopPropagation()}
+              onTouchEnd={e => e.stopPropagation()}
+              sx={{
+                bgcolor: 'rgba(0, 0, 0, 0.65)',
+                '& .MuiButton-root': { minHeight: 48, minWidth: 0, px: 1.5 }
+              }}>
+              <Button
+                color={isPanorama ? 'inherit' : 'primary'}
+                aria-label={formatMessage({ id: 'Image' })}
+                aria-pressed={!isPanorama}
+                data-testid="panorama-mode-flat"
+                onClick={() => setPanoramaSrc(null)}>
+                <ImageOutlined sx={{ display: { xs: 'block', sm: 'none' } }} />
+                <Box
+                  component="span"
+                  sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                  {formatMessage({ id: 'Image' })}
+                </Box>
+              </Button>
+              <Button
+                color={isPanorama ? 'primary' : 'inherit'}
+                aria-label={formatMessage({ id: 'panorama.view' })}
+                aria-pressed={isPanorama}
+                data-testid="panorama-mode-spherical"
+                onClick={() => {
+                  handleResetZoom();
+                  setPanoramaSrc(currentMedia.completePath);
+                }}>
+                360°
+              </Button>
+            </ButtonGroup>
+          )}
+          <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
+            <Tooltip title={captionToggleLabel}>
+              <OverlayButton
+                onClick={() => setIsCaptionVisible(visible => !visible)}
+                aria-label={captionToggleLabel}
+                aria-expanded={isCaptionVisible}
+                aria-controls={captionId}>
+                {isCaptionVisible ? <Info /> : <InfoOutlined />}
+              </OverlayButton>
+            </Tooltip>
             <OverlayButton
-              onClick={() => setIsCaptionVisible(visible => !visible)}
-              aria-label={captionToggleLabel}
-              aria-expanded={isCaptionVisible}
-              aria-controls={captionId}>
-              {isCaptionVisible ? <Info /> : <InfoOutlined />}
+              onClick={() =>
+                downloadFile(currentMedia.completePath, decodedFileName)
+              }
+              aria-label={formatMessage({ id: 'Download' })}>
+              <Download />
             </OverlayButton>
-          </Tooltip>
-          <OverlayButton
-            onClick={() =>
-              downloadFile(currentMedia.completePath, decodedFileName)
-            }
-            aria-label={formatMessage({ id: 'Download' })}>
-            <Download />
-          </OverlayButton>
-          <OverlayButton
-            onClick={onClose}
-            aria-label={formatMessage({ id: 'Close' })}>
-            <Close />
-          </OverlayButton>
+            <OverlayButton
+              onClick={onClose}
+              aria-label={formatMessage({ id: 'Close' })}>
+              <Close />
+            </OverlayButton>
+          </Box>
         </TopBar>
 
         {hasMultipleMedia && (
@@ -585,47 +709,24 @@ const MediaLightbox = ({
           </>
         )}
 
-        <BottomBar
-          $isVideo={isVideo}
-          $isCaptionVisible={isCaptionVisible}
-          data-testid="lightbox-caption"
-          id={captionId}
-          aria-hidden={!isCaptionVisible}>
-          <Typography
-            variant="caption"
-            sx={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
-            {captionTitle}
-          </Typography>
-          {captionDescription && (
-            <Typography
-              variant="body2"
-              sx={{ color: 'white', textAlign: 'center' }}>
-              {captionDescription}
-            </Typography>
-          )}
-          {hasMultipleMedia && (
-            <Typography
-              variant="caption"
-              sx={{ color: 'rgba(255,255,255,0.75)' }}>
-              {mediaCounterLabel}
-            </Typography>
-          )}
-        </BottomBar>
-        {!isCaptionVisible && hasMultipleMedia && (
-          <MediaCounter
-            size="small"
-            label={mediaCounterLabel}
-            sx={
-              isVideo
-                ? {
-                    position: 'static',
-                    transform: 'none',
-                    flexShrink: 0,
-                    mb: 1.5
-                  }
-                : undefined
-            }
-          />
+        {isPanorama ? (
+          <Box
+            ref={panoramaFooterRef}
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              zIndex: 2,
+              pointerEvents: 'none'
+            }}>
+            {footer}
+          </Box>
+        ) : (
+          footer
         )}
       </Box>
     </LightboxDialog>
