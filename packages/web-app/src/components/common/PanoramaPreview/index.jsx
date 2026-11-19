@@ -12,7 +12,7 @@ import {
   PreviewControlButton
 } from '@/components/common/MediaPreviewControls';
 
-const PanoramaPreviewSession = ({ src, title, previewSrc }) => {
+const PanoramaPreviewSession = ({ src, title, previewSrc, footer }) => {
   const { formatMessage } = useIntl();
   const containerRef = useRef(null);
   const viewerRef = useRef(null);
@@ -97,7 +97,7 @@ const PanoramaPreviewSession = ({ src, title, previewSrc }) => {
         ref={containerRef}
         role="region"
         aria-label={title}
-        sx={{ width: '100%', height: '100%' }}
+        sx={{ width: '100%', height: '100%', touchAction: 'none' }}
       />
       {status !== 'ready' && (
         <Box
@@ -131,47 +131,63 @@ const PanoramaPreviewSession = ({ src, title, previewSrc }) => {
           )}
         </Box>
       )}
-      {status === 'ready' && (
-        <PreviewControls
-          role="group"
-          aria-label={formatMessage({ id: 'panorama.view' })}
-          data-testid="panorama-preview-controls"
-          sx={{
-            zIndex: 2,
-            maxWidth: theme => `calc(100% - ${theme.spacing(2)})`,
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            bottom: theme =>
-              `calc(var(--panorama-footer-height, 0px) + ${theme.spacing(2)})`,
-            bgcolor: 'rgba(0, 0, 0, 0.4)',
-            color: 'common.white',
-            backdropFilter: 'blur(4px)',
-            '& .MuiIconButton-root': { color: 'inherit' }
-          }}>
-          <PreviewControlButton
-            label={formatMessage({ id: 'Zoom in' })}
-            testId="panorama-preview-zoom-in"
-            onClick={() =>
-              viewerRef.current.setHfov(viewerRef.current.getHfov() - 10)
-            }>
-            <ZoomIn />
-          </PreviewControlButton>
-          <PreviewControlButton
-            label={formatMessage({ id: 'Zoom out' })}
-            testId="panorama-preview-zoom-out"
-            onClick={() =>
-              viewerRef.current.setHfov(viewerRef.current.getHfov() + 10)
-            }>
-            <ZoomOut />
-          </PreviewControlButton>
-          <PreviewControlButton
-            label={formatMessage({ id: 'Reset' })}
-            testId="panorama-preview-reset"
-            onClick={() => viewerRef.current.lookAt(0, 0, 100, false)}>
-            <CenterFocusStrong />
-          </PreviewControlButton>
-        </PreviewControls>
-      )}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          pointerEvents: 'none'
+        }}>
+        {status === 'ready' && (
+          <PreviewControls
+            role="group"
+            aria-label={formatMessage({ id: 'panorama.view' })}
+            data-testid="panorama-preview-controls"
+            sx={{
+              zIndex: 2,
+              position: 'static',
+              transform: 'none',
+              flexShrink: 0,
+              pointerEvents: 'auto',
+              mb: 2,
+              maxWidth: theme => `calc(100% - ${theme.spacing(2)})`,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              bgcolor: 'rgba(0, 0, 0, 0.4)',
+              color: 'common.white',
+              backdropFilter: 'blur(4px)',
+              '& .MuiIconButton-root': { color: 'inherit' }
+            }}>
+            <PreviewControlButton
+              label={formatMessage({ id: 'Zoom in' })}
+              testId="panorama-preview-zoom-in"
+              onClick={() =>
+                viewerRef.current.setHfov(viewerRef.current.getHfov() - 10)
+              }>
+              <ZoomIn />
+            </PreviewControlButton>
+            <PreviewControlButton
+              label={formatMessage({ id: 'Zoom out' })}
+              testId="panorama-preview-zoom-out"
+              onClick={() =>
+                viewerRef.current.setHfov(viewerRef.current.getHfov() + 10)
+              }>
+              <ZoomOut />
+            </PreviewControlButton>
+            <PreviewControlButton
+              label={formatMessage({ id: 'Reset' })}
+              testId="panorama-preview-reset"
+              onClick={() => viewerRef.current.lookAt(0, 0, 100, false)}>
+              <CenterFocusStrong />
+            </PreviewControlButton>
+          </PreviewControls>
+        )}
+        {footer}
+      </Box>
     </Box>
   );
 };
@@ -179,17 +195,19 @@ const PanoramaPreviewSession = ({ src, title, previewSrc }) => {
 const panoramaPreviewPropTypes = {
   src: PropTypes.string.isRequired,
   previewSrc: PropTypes.string,
+  footer: PropTypes.node,
   title: PropTypes.string.isRequired
 };
 
 PanoramaPreviewSession.propTypes = panoramaPreviewPropTypes;
 
-const PanoramaPreview = ({ src, title, previewSrc }) => (
+const PanoramaPreview = ({ src, title, previewSrc, footer }) => (
   <PanoramaPreviewSession
     key={src}
     src={src}
     title={title}
     previewSrc={previewSrc}
+    footer={footer}
   />
 );
 

@@ -2303,7 +2303,7 @@
   "panorama.display": "Afișare la 360°",
   "panorama.displayHelp": "Utilizați doar pentru imagini sferice complete în proiecție equirectangulară, în format JPEG, PNG sau WebP.",
   "panorama.displayImage": "Afișează această imagine ca panoramă la 360°",
-  "panorama.error": "Această panoramă nu poate fi afișată. Puteți reveni la modul imagine.",
+  "panorama.error": "Această panoramă nu poate fi afișată. Încercați din nou.",
   "panorama.useAutomatic": "Folosește detectarea automată",
   "panorama.view": "Vedere 360°",
   "Papua New Guinea": "Papua Noua Guinee",

@@ -2303,7 +2303,7 @@
   "panorama.display": "360°-weergave",
   "panorama.displayHelp": "Alleen gebruiken voor volledige bolvormige afbeeldingen in equirectangulaire projectie in JPEG-, PNG- of WebP-formaat.",
   "panorama.displayImage": "Deze afbeelding als 360°-panorama weergeven",
-  "panorama.error": "Dit panorama kan niet worden weergegeven. U kunt teruggaan naar de afbeeldingsmodus.",
+  "panorama.error": "Dit panorama kan niet worden weergegeven. Probeer het opnieuw.",
   "panorama.useAutomatic": "Automatische herkenning gebruiken",
   "panorama.view": "360°-weergave",
   "Papua New Guinea": "Palau",

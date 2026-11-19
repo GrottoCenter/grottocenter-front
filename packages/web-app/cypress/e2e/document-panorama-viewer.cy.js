@@ -1,4 +1,29 @@
 const source = '/panorama-tests/sphere.jpg';
+const panoramaDocument = {
+  id: 7,
+  title: 'Panorama test',
+  type: 'Image',
+  isValidated: true,
+  files: [
+    {
+      fileName: 'sphere.jpg',
+      completePath: source,
+      isPanorama: true,
+      thumbnails: { small: '/panorama-tests/preview.jpg' },
+      description:
+        'A panoramic view of the cave, with a longer caption that wraps over several lines on a narrow screen.'
+    },
+    {
+      fileName: 'flat.jpg',
+      completePath: '/panorama-tests/flat.jpg',
+      thumbnails: { small: '/panorama-tests/preview.jpg' }
+    }
+  ],
+  authors: [],
+  authorsOrganization: [],
+  massifs: [],
+  entrances: []
+};
 
 describe('Document panorama viewer', () => {
   beforeEach(() => {
@@ -14,33 +39,7 @@ describe('Document panorama viewer', () => {
     );
     cy.intercept(
       { method: 'GET', pathname: '/api/v1/documents/7' },
-      {
-        body: {
-          id: 7,
-          title: 'Panorama test',
-          type: 'Image',
-          isValidated: true,
-          files: [
-            {
-              fileName: 'sphere.jpg',
-              completePath: source,
-              isPanorama: true,
-              thumbnails: { small: '/panorama-tests/preview.jpg' },
-              description:
-                'A panoramic view of the cave, with a longer caption that wraps over several lines on a narrow screen.'
-            },
-            {
-              fileName: 'flat.jpg',
-              completePath: '/panorama-tests/flat.jpg',
-              thumbnails: { small: '/panorama-tests/preview.jpg' }
-            }
-          ],
-          authors: [],
-          authorsOrganization: [],
-          massifs: [],
-          entrances: []
-        }
-      }
+      { body: panoramaDocument }
     );
     cy.intercept(source, {
       fixture: 'panorama-preview.jpg,null',
@@ -53,6 +52,75 @@ describe('Document panorama viewer', () => {
     cy.intercept('/panorama-tests/flat.jpg', {
       fixture: 'panorama-preview.jpg,null',
       headers: { 'content-type': 'image/jpeg' }
+    });
+  });
+
+  [1280, 320].forEach(width => {
+    it(`keeps long captions scrollable and controls and gestures usable at ${width}px`, () => {
+      const height = width === 320 ? 480 : 844;
+      cy.viewport(width, height);
+      cy.intercept(
+        { method: 'GET', pathname: '/api/v1/documents/7' },
+        {
+          body: {
+            ...panoramaDocument,
+            files: panoramaDocument.files.map(file => ({
+              ...file,
+              description: `${'A detailed description of the cave and its surroundings. '.repeat(70)}${'x'.repeat(100)}`
+            }))
+          }
+        }
+      );
+      cy.visit('/documents/7');
+      cy.get('img[alt="sphere.jpg"]', { timeout: 30000 }).click();
+      cy.get('[data-testid="panorama-preview"]', { timeout: 30000 })
+        .should('have.attr', 'data-status', 'ready')
+        .find('[role="region"]')
+        .should(([region]) => {
+          expect(
+            region.contains(region.ownerDocument.elementFromPoint(20, 20))
+          ).to.equal(true);
+        });
+      cy.get('[data-testid="panorama-preview-controls"]').should(
+        ([controls]) => {
+          const bounds = controls.getBoundingClientRect();
+          const caption = controls.ownerDocument.querySelector(
+            '[data-testid="lightbox-caption"]'
+          );
+          expect(bounds.top).to.be.greaterThan(72);
+          expect(bounds.bottom).to.be.lessThan(
+            caption.getBoundingClientRect().top
+          );
+        }
+      );
+      cy.get('[data-testid="panorama-preview-zoom-in"]').click();
+      cy.get('[data-testid="panorama-preview-reset"]').click();
+      cy.get('[data-testid="lightbox-caption"]')
+        .should('have.attr', 'tabindex', '0')
+        .and(([caption]) => {
+          expect(caption.getBoundingClientRect().height).to.be.at.most(
+            height * 0.35 + 1
+          );
+          expect(caption.scrollHeight).to.be.greaterThan(caption.clientHeight);
+          expect(caption.scrollWidth).to.be.at.most(caption.clientWidth);
+        })
+        .focus();
+      cy.get('[data-testid="lightbox-caption"]')
+        .should('be.focused')
+        .scrollTo('bottom');
+      cy.get('[data-testid="lightbox-caption"]').should(([caption]) =>
+        expect(caption.scrollTop).to.be.greaterThan(0)
+      );
+      cy.screenshot(`panorama-long-caption-${width}px`, {
+        capture: 'viewport'
+      });
+      cy.get('[aria-label="Hide image caption"]').click();
+      cy.get('[data-testid="lightbox-caption"]')
+        .should('not.be.visible')
+        .and('not.have.attr', 'tabindex');
+      cy.get('[data-testid="panorama-preview-controls"]').should('be.visible');
+      cy.get('[aria-label="Next image"]').click();
+      cy.get('[data-testid="lightbox-image"]').should('be.visible');
     });
   });
 

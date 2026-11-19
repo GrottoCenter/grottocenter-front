@@ -2303,7 +2303,7 @@
   "panorama.display": "Visualizzazione a 360°",
   "panorama.displayHelp": "Usare solo per immagini sferiche complete in proiezione equirettangolare, in formato JPEG, PNG o WebP.",
   "panorama.displayImage": "Mostra questa immagine come panorama a 360°",
-  "panorama.error": "Impossibile visualizzare questo panorama. Puoi tornare alla modalità immagine.",
+  "panorama.error": "Impossibile visualizzare questo panorama. Riprova.",
   "panorama.useAutomatic": "Usa il rilevamento automatico",
   "panorama.view": "Vista a 360°",
   "Papua New Guinea": "Nuova Papua Guinea",

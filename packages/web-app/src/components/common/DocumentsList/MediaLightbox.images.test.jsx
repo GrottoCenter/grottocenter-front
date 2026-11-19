@@ -54,6 +54,8 @@ const loadImage = (image, width, height) => {
   fireEvent.load(image);
 };
 
+afterEach(() => vi.restoreAllMocks());
+
 describe('MediaLightbox original images', () => {
   it('keeps the image mounted until the dialog exit transition finishes', async () => {
     const { rerender } = renderLightbox();
@@ -112,6 +114,78 @@ describe('MediaLightbox original images', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Next image' }));
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
+  });
+
+  it('resets mouse panning and zoom on navigation and an interrupted close', () => {
+    const { rerender } = renderLightbox();
+    const image = screen.getByTestId('lightbox-image');
+    const stage = screen.getByTestId('lightbox-image-stage');
+    fireEvent.wheel(image, { deltaY: -100 });
+    fireEvent.mouseDown(stage, { clientX: 100, clientY: 100 });
+    fireEvent.mouseMove(stage, { clientX: 160, clientY: 130 });
+    expect(image.style.transform).toContain('translate(50px, 25px)');
+
+    fireEvent.keyDown(stage, { key: 'ArrowRight' });
+    fireEvent.keyDown(screen.getByTestId('lightbox-image-stage'), {
+      key: 'ArrowLeft'
+    });
+    const restored = screen.getByTestId('lightbox-image');
+    expect(restored.style.transform).toContain('scale(1) translate(0px, 0px)');
+    fireEvent.mouseMove(screen.getByTestId('lightbox-image-stage'), {
+      clientX: 200,
+      clientY: 200
+    });
+    expect(restored.style.transform).toContain('translate(0px, 0px)');
+
+    fireEvent.wheel(restored, { deltaY: -100 });
+    rerender(viewer(false));
+    rerender(viewer());
+    expect(screen.getByTestId('lightbox-image').style.transform).toContain(
+      'scale(1) translate(0px, 0px)'
+    );
+  });
+
+  it('preserves pinch zoom, touch panning and double-tap reset', () => {
+    renderLightbox();
+    const now = vi.spyOn(Date, 'now').mockReturnValue(1000);
+    const image = screen.getByTestId('lightbox-image');
+    const stage = screen.getByTestId('lightbox-image-stage');
+    fireEvent.touchStart(stage, {
+      touches: [
+        { clientX: 0, clientY: 0 },
+        { clientX: 100, clientY: 0 }
+      ]
+    });
+    fireEvent.touchMove(stage, {
+      touches: [
+        { clientX: 0, clientY: 0 },
+        { clientX: 200, clientY: 0 }
+      ]
+    });
+    fireEvent.touchEnd(stage, { changedTouches: [{}, {}], touches: [] });
+    expect(image.style.transform).toContain('scale(2)');
+
+    fireEvent.touchStart(stage, {
+      touches: [{ clientX: 100, clientY: 100 }]
+    });
+    fireEvent.touchMove(stage, {
+      touches: [{ clientX: 140, clientY: 120 }]
+    });
+    expect(image.style.transform).toContain('translate(20px, 10px)');
+    fireEvent.touchEnd(stage, { changedTouches: [{}], touches: [] });
+
+    // Keep the double tap separate from the preceding drag, with stable timing.
+    now.mockReturnValue(1500);
+    fireEvent.touchStart(stage, {
+      touches: [{ clientX: 140, clientY: 120 }]
+    });
+    fireEvent.touchEnd(stage, { changedTouches: [{}], touches: [] });
+    now.mockReturnValue(1600);
+    fireEvent.touchStart(stage, {
+      touches: [{ clientX: 140, clientY: 120 }]
+    });
+    fireEvent.touchEnd(stage, { changedTouches: [{}], touches: [] });
+    expect(image.style.transform).toContain('scale(1) translate(0px, 0px)');
   });
 });
 

@@ -2303,7 +2303,7 @@
   "panorama.display": "360°-Anzeige",
   "panorama.displayHelp": "Nur für vollständige sphärische Bilder in äquirektangulärer Projektion im Format JPEG, PNG oder WebP verwenden.",
   "panorama.displayImage": "Dieses Bild als 360°-Panorama anzeigen",
-  "panorama.error": "Dieses Panorama kann nicht angezeigt werden. Sie können zur Bildansicht zurückkehren.",
+  "panorama.error": "Dieses Panorama kann nicht angezeigt werden. Bitte versuchen Sie es erneut.",
   "panorama.useAutomatic": "Automatische Erkennung verwenden",
   "panorama.view": "360°-Ansicht",
   "Papua New Guinea": "Papua-Neuguinea",
