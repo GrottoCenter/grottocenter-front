@@ -111,17 +111,56 @@ describe('JSON POST response headers', () => {
     expect(result.headers.get('X-Trace-Id')).toBeNull();
   });
 
-  it('preserves the structured error contract on a rejected POST', async () => {
-    const body = { code: 'UNAUTHORIZED', message: 'Unauthorized' };
+  it.each([
+    [401, '{"code":"UNAUTHORIZED","message":"Unauthorized"}'],
+    [429, '{}'],
+    [502, '<html>Bad gateway</html>'],
+    [503, '']
+  ])(
+    'preserves headers and structured errors on HTTP %i',
+    async (status, body) => {
+      const headers = new Headers({ 'X-Trace-Id': 'sso-failure-id' });
+      vi.stubGlobal(
+        'fetch',
+        vi
+          .fn()
+          .mockImplementation(
+            async () => new Response(body, { status, headers })
+          )
+      );
+      const failure = await apiPostWithHeaders('/api/v1/sso/auth-token', {
+        product: 'documents'
+      }).catch(error => error);
+      expect(failure.status).toBe(status);
+      expect(failure.headers.get('X-Trace-Id')).toBe('sso-failure-id');
+      if (status === 401) {
+        expect(failure).toMatchObject({
+          message: 'Unauthorized',
+          body: { code: 'UNAUTHORIZED', message: 'Unauthorized' }
+        });
+      }
+      const regularFailure = await apiPost('/api/v1/sso/auth-token', {
+        product: 'documents'
+      }).catch(error => error);
+      expect(regularFailure.status).toBe(status);
+      expect(regularFailure).not.toHaveProperty('headers');
+    }
+  );
+
+  it('preserves response headers when a successful POST returns invalid JSON', async () => {
     vi.stubGlobal(
       'fetch',
-      vi
-        .fn()
-        .mockResolvedValue(new Response(JSON.stringify(body), { status: 401 }))
+      vi.fn().mockResolvedValue(
+        new Response('<html>Unexpected response</html>', {
+          headers: { 'X-Trace-Id': 'sso-parse-failure' }
+        })
+      )
     );
-    await expect(
-      apiPostWithHeaders('/api/v1/sso/auth-token', { product: 'documents' })
-    ).rejects.toMatchObject({ status: 401, body, message: 'Unauthorized' });
+    const failure = await apiPostWithHeaders('/api/v1/sso/auth-token', {
+      product: 'documents'
+    }).catch(error => error);
+    expect(failure).toBeInstanceOf(SyntaxError);
+    expect(failure.headers.get('X-Trace-Id')).toBe('sso-parse-failure');
   });
 });
 

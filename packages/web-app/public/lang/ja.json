@@ -994,7 +994,7 @@
   "documentAi.pending": "PDFを解析しています。数分かかる場合があります。",
   "documentAi.proposedValue": "AIの提案",
   "documentAi.quota": "解析回数の上限に達しました。後でもう一度お試しください。",
-  "documentAi.reference": "参照: {id}",
+  "documentAi.reference": "参照番号: {id}",
   "documentAi.replacementCount": "{count, plural, other {#件の置き換え}}",
   "documentAi.review": "フォームで変更する項目を選択し、その後フォームを保存してください。",
   "documentAi.reviewAction": "AIの提案",

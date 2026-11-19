@@ -85,9 +85,14 @@ const send =
     };
     if (body != null) init.body = JSON.stringify(body);
     const response = await fetch(url, init);
-    await checkAndGetStatus(response);
-    const data = await parseJsonOr204(response);
-    return includeHeaders ? { data, headers: response.headers } : data;
+    try {
+      await checkAndGetStatus(response);
+      const data = await parseJsonOr204(response);
+      return includeHeaders ? { data, headers: response.headers } : data;
+    } catch (error) {
+      if (includeHeaders) error.headers = response.headers;
+      throw error;
+    }
   };
 
 /**

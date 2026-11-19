@@ -5,6 +5,7 @@ import { checkAndGetStatus } from '@/actions/utils';
 import { postLogout } from '@/actions/Login';
 import { analyzeDocumentUrl, ssoAuthTokenUrl } from '@/conf/apiRoutes';
 import store from '@/store';
+import { readTraceId } from '@/utils/traceId';
 import {
   DOCUMENT_AI_MAX_FILE_SIZE,
   normalizeDocumentAnalysis
@@ -88,8 +89,10 @@ export const useAnalyzeDocument = () =>
             { signal: controller.signal }
           );
           ({ token } = data);
-          traceId = headers.get('X-Trace-Id')?.trim();
+          traceId = readTraceId(headers);
         } catch (error) {
+          const failureTraceId = readTraceId(error.headers);
+          if (failureTraceId) error.traceId = failureTraceId;
           if (
             error.status === 401 &&
             authorization === store.getState().login.authorizationHeader
@@ -119,8 +122,8 @@ export const useAnalyzeDocument = () =>
           signal: controller.signal
         });
         // Read before parsing: a proxy can return an HTML or empty error body.
-        // Only the analysis response identifies the failure shown to the user.
-        const responseTraceId = response.headers.get('X-Trace-Id')?.trim();
+        // Use the failing request's reference, never the earlier token request's.
+        const responseTraceId = readTraceId(response.headers);
         try {
           await checkAndGetStatus(response);
           const result = await response.json();

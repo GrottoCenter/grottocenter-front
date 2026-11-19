@@ -157,8 +157,8 @@ it('keeps trace ids attached to their attempts when concurrent token responses f
   ]);
 });
 
-it.each([undefined, '', '   '])(
-  'omits an unreadable or empty token trace header (%j)',
+it.each([undefined, '', '   ', 'not an id', '<invalid>', 'a'.repeat(129)])(
+  'omits an unreadable, empty or invalid token trace header (%j)',
   async traceId => {
     apiPostWithHeaders.mockResolvedValue(
       tokenResponse('documents-token', traceId)
@@ -168,6 +168,71 @@ it.each([undefined, '', '   '])(
     expect(fetch.mock.calls[0][1].headers).toEqual({
       Authorization: 'Bearer documents-token'
     });
+  }
+);
+
+it.each(['a', 'A_0-valid-id', 'a'.repeat(128)])(
+  'trims and forwards a valid token trace header (%j)',
+  async traceId => {
+    apiPostWithHeaders.mockResolvedValue(
+      tokenResponse('documents-token', `  ${traceId}  `)
+    );
+    const { result } = renderAnalysis();
+    await act(async () => result.current.mutateAsync(variables()));
+    expect(fetch.mock.calls[0][1].headers['X-Trace-Id']).toBe(traceId);
+  }
+);
+
+it.each(['not an id', '<invalid>', 'a'.repeat(129)])(
+  'discards an invalid trace header on either failed service (%j)',
+  async traceId => {
+    const { result } = renderAnalysis();
+    const ssoFailure = Object.assign(new Error('Unavailable'), {
+      status: 503,
+      headers: new Headers({ 'X-Trace-Id': traceId })
+    });
+    apiPostWithHeaders.mockRejectedValueOnce(ssoFailure);
+    await act(async () => {
+      await expect(result.current.mutateAsync(variables())).rejects.toBe(
+        ssoFailure
+      );
+    });
+    expect(ssoFailure).not.toHaveProperty('traceId');
+    expect(fetch).not.toHaveBeenCalled();
+
+    fetch.mockResolvedValueOnce(
+      new Response('{}', { status: 503, headers: { 'X-Trace-Id': traceId } })
+    );
+    let analysisFailure;
+    await act(async () => {
+      analysisFailure = await result.current
+        .mutateAsync(variables())
+        .catch(error => error);
+    });
+    expect(analysisFailure.status).toBe(503);
+    expect(analysisFailure).not.toHaveProperty('traceId');
+  }
+);
+
+it.each([401, 403, 429, 503])(
+  'preserves the failed SSO request reference on HTTP %i before uploading',
+  async status => {
+    const failure = Object.assign(new Error('SSO failed'), {
+      status,
+      headers: new Headers({ 'X-Trace-Id': '  sso-failure-id  ' })
+    });
+    apiPostWithHeaders.mockRejectedValueOnce(failure);
+    const { result } = renderAnalysis();
+    await act(async () => {
+      await expect(
+        result.current.mutateAsync(variables())
+      ).rejects.toMatchObject({
+        status,
+        traceId: 'sso-failure-id'
+      });
+    });
+    expect(fetch).not.toHaveBeenCalled();
+    expect(store.dispatch).toHaveBeenCalledTimes(status === 401 ? 1 : 0);
   }
 );
 
