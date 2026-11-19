@@ -33,6 +33,9 @@ export const resendVerificationEmailUrl = `${API_BASE_PATH}/resend-verification-
 
 // ===== SSO urls
 export const ssoAuthTokenUrl = `${API_BASE_PATH}/sso/auth-token`;
+export const analyzeDocumentUrl = `${
+  import.meta.env.VITE_AI_URL || 'https://ai.grottocenter.org'
+}/documents/analyze`;
 
 // ===== MFA urls
 export const mfaEnrollUrl = `${API_BASE_PATH}/mfa/enroll`;

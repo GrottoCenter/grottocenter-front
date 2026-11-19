@@ -296,6 +296,17 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
         !isEvent(docType) &&
         !isAuthorizationToPublish(docType) && (
           <Box sx={{ mt: 1 }}>
+            {!isCollection(docType) && (
+              <>
+                {filesIntro}
+                <AddFileForm
+                  {...addFileFormProps}
+                  allowAiAnalysis
+                  disabled={isSubmitting}
+                />
+              </>
+            )}
+
             <FormRow>
               <StringInput
                 data-testid="document-title"
@@ -323,6 +334,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
               helperText={formatMessage({
                 id: 'Make a precise sentence that is pleasant to read and uses keywords.'
               })}
+              data-testid="document-description"
               multiline
               minRows={4}
               onValueChange={value => updateAttribute('description', value)}
@@ -352,10 +364,11 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
             {isArticle(docType) && <PagesEditor />}
 
             {!isCollection(docType) && (
-              <>
-                {filesIntro}
-                <AddFileForm {...addFileFormProps} />
-              </>
+              <Box sx={{ mt: 2, maxWidth: '28rem' }}>
+                <Suspense fallback={<Skeleton height={100} />}>
+                  <PublicationDatePicker />
+                </Suspense>
+              </Box>
             )}
           </Box>
         )}
@@ -388,19 +401,6 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
               </Typography>
             </AccordionSummary>
             <AccordionDetails sx={{ pt: 0.25 }}>
-              {!isCollection(docType) && (
-                <Suspense
-                  fallback={
-                    <>
-                      <Skeleton width={125} />
-                      <Skeleton width={75} />
-                      <Skeleton width={100} />
-                    </>
-                  }>
-                  <PublicationDatePicker />
-                </Suspense>
-              )}
-
               <IdentifierEditor />
 
               <FormRow>

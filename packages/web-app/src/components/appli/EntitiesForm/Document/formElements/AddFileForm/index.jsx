@@ -47,6 +47,7 @@ import FileSelectorInput, {
 } from '../../../../../common/FileSelectorInput';
 import { DocumentFormContext } from '../../Provider';
 import PdfPageOffsetEditor from '../PdfPageOffsetEditor';
+import DocumentPdfAnalysis from '../DocumentPdfAnalysis';
 
 const DEFAULT_LICENSE = 'CC-BY-SA';
 
@@ -106,7 +107,9 @@ const AddFileForm = ({
   setLicense,
   setAuthorizationDocument,
   acceptConfig = null,
-  showAuthorization = true
+  showAuthorization = true,
+  allowAiAnalysis = false,
+  disabled = false
 }) => {
   const { formatMessage } = useIntl();
   const [errors, setErrors] = useState([]);
@@ -304,6 +307,21 @@ const AddFileForm = ({
     );
   };
 
+  const renderFileActions = file => {
+    if (
+      !allowAiAnalysis ||
+      (!(file.file instanceof File) && !file.completePath) ||
+      !/\.pdf$/i.test(file.fileName)
+    )
+      return null;
+    return (
+      <DocumentPdfAnalysis
+        file={file.file instanceof File ? file.file : file}
+        disabled={disabled}
+      />
+    );
+  };
+
   return (
     <>
       <FileSelectorInput
@@ -314,8 +332,9 @@ const AddFileForm = ({
         accept={accept}
         extensions={extensions}
         maxSize={MAX_SIZE_OF_UPLOADED_FILES}
-        disabled={isLoading}
+        disabled={isLoading || disabled}
         renderFileDetails={renderFileDetails}
+        renderFileActions={renderFileActions}
       />
       {showAuthorization && visibleFiles.length > 0 && (
         <Box sx={{ mt: 1 }}>
@@ -484,6 +503,8 @@ const AddFileForm = ({
 };
 
 AddFileForm.propTypes = {
+  allowAiAnalysis: PropTypes.bool,
+  disabled: PropTypes.bool,
   acceptConfig: PropTypes.shape({
     extensions: PropTypes.arrayOf(PropTypes.string).isRequired,
     mime: PropTypes.string.isRequired

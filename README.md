@@ -33,6 +33,13 @@ update that runtime.
 
 By default the app uses the production API as backend. To change it, edit the `VITE_API_URL` variable in `packages/web-app/.env`.
 
+`VITE_AI_URL` optionally overrides the PDF-analysis service base URL (default:
+`https://ai.grottocenter.org`). The main API must support the `documents` SSO
+product, with matching `SSO_SALT_DOCUMENTS` on both services. Both the AI service
+and the hosted-attachment storage must allow cross-origin requests from the
+frontend origins, including PR previews. Hosted PDFs are downloaded without
+credentials; neither the session nor the AI token is sent to storage.
+
 ### Packages
 
 - [**Main web app**](/packages/web-app/README.md)

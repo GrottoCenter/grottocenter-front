@@ -126,7 +126,8 @@ const FileSelectorInput = ({
   multiple = true,
   maxSize,
   maxFiles,
-  renderFileDetails
+  renderFileDetails,
+  renderFileActions
 }) => {
   const { formatMessage } = useIntl();
   const theme = useTheme();
@@ -251,6 +252,7 @@ const FileSelectorInput = ({
           onRemove={onFileRemove}
           disabled={disabled}
           renderFileDetails={renderFileDetails}
+          renderFileActions={renderFileActions}
         />
       ))}
     </Box>
@@ -259,7 +261,7 @@ const FileSelectorInput = ({
   // getInputProps() renders react-dropzone's own <input type="file"/>, which
   // preserves the native picker across browsers (the File System Access API
   // path is bypassed by useDropzone when the ref-less input is present).
-  const inputEl = <input {...getInputProps()} />;
+  const inputEl = <input {...getInputProps({ 'data-testid': 'file-input' })} />;
 
   if (isMobile) {
     // The touch layout is picker-only, so it intentionally omits drop handlers.
@@ -364,7 +366,8 @@ FileSelectorInput.propTypes = {
   multiple: PropTypes.bool,
   maxSize: PropTypes.number,
   maxFiles: PropTypes.number,
-  renderFileDetails: PropTypes.func
+  renderFileDetails: PropTypes.func,
+  renderFileActions: PropTypes.func
 };
 
 export default FileSelectorInput;
