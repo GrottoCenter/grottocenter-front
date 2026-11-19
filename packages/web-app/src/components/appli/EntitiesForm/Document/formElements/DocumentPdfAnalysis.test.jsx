@@ -179,7 +179,7 @@ it('explains AI and all limits before requesting authorization or uploading', ()
   expect(screen.getByRole('dialog')).toHaveTextContent(
     '200 analyses per day (provisional limit)'
   );
-  expect(screen.getByRole('dialog')).toHaveTextContent('62.9 MB and 300 pages');
+  expect(screen.getByRole('dialog')).toHaveTextContent('60 MB and 300 pages');
   expect(apiPost).not.toHaveBeenCalled();
   expect(fetch).not.toHaveBeenCalled();
   expect(screen.getByRole('button', { name: 'Close' })).toHaveClass(
@@ -421,7 +421,7 @@ it('refuses oversized PDFs before requesting a token', () => {
   fireEvent.click(screen.getByText('Attach oversized PDF'));
   fireEvent.click(screen.getByTestId('document-ai-analyze'));
   expect(screen.getByTestId('document-ai-confirm')).toBeDisabled();
-  expect(screen.getByRole('alert')).toHaveTextContent('62.9 MB');
+  expect(screen.getByRole('alert')).toHaveTextContent('60 MB');
   expect(apiPost).not.toHaveBeenCalled();
 });
 

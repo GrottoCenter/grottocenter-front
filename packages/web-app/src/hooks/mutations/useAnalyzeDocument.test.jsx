@@ -184,7 +184,7 @@ it.each([50000001, 60 * 1024 * 1024])(
   }
 );
 
-it('rejects a local PDF one byte above 60 MiB before requesting SSO', async () => {
+it('rejects a local PDF one byte above the service 60 MB limit before requesting SSO', async () => {
   const upload = new File(['%PDF test'], 'oversized.pdf', {
     type: 'application/pdf'
   });

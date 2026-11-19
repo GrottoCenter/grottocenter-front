@@ -7,10 +7,12 @@ export const DOCUMENT_AI_LIMITS = {
   dailyPerUser: 5, // USER_DAILY_LIMIT
   concurrentPerUser: 2, // USER_MAX_CONCURRENT
   dailyTotal: 200, // GLOBAL_DAILY_LIMIT (provisional)
-  sizeMb: 60, // MAX_FILE_SIZE_MB (the service uses MiB)
+  sizeMb: 60, // MAX_FILE_SIZE_MB
   pages: 300 // MAX_PAGES
 };
 
+// The service labels its limit MB but converts it using 1024 * 1024 bytes.
+// Display sizeMb as configured (60 MB); use the exact byte limit for validation.
 export const DOCUMENT_AI_MAX_FILE_SIZE =
   DOCUMENT_AI_LIMITS.sizeMb * 1024 * 1024;
 

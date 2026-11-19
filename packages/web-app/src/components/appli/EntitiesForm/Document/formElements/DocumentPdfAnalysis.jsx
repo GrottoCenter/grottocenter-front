@@ -126,9 +126,7 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
   };
   const isTooLarge =
     file instanceof File && file.size > DOCUMENT_AI_MAX_FILE_SIZE;
-  const maxFileSizeMb = formatNumber(DOCUMENT_AI_MAX_FILE_SIZE / 1000000, {
-    maximumFractionDigits: 1
-  });
+  const maxFileSizeMb = formatNumber(DOCUMENT_AI_LIMITS.sizeMb);
   const actionLabel = formatMessage({
     id: hasSuggestions ? 'documentAi.reviewAction' : 'documentAi.analyze'
   });
