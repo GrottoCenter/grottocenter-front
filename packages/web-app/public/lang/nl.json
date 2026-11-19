@@ -994,6 +994,7 @@
   "documentAi.pending": "De PDF wordt geanalyseerd. Dit kan enkele minuten duren.",
   "documentAi.proposedValue": "AI-voorstel",
   "documentAi.quota": "De analyselimiet is bereikt. Probeer het later opnieuw.",
+  "documentAi.reference": "Referentie: {id}",
   "documentAi.replacementCount": "{count, plural, one {# vervanging} other {# vervangingen}}",
   "documentAi.review": "Selecteer de velden die u in het formulier wilt wijzigen en sla het daarna op.",
   "documentAi.reviewAction": "AI-suggesties",

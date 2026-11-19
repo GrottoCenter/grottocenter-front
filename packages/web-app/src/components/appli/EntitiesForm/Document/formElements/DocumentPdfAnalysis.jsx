@@ -426,6 +426,22 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
           {error && error.name !== 'AbortError' && (
             <Alert severity="error" sx={{ mt: 2 }}>
               {formatMessage({ id: getErrorMessage(error) })}
+              {error.traceId && (
+                <Typography
+                  component="div"
+                  variant="body2"
+                  data-testid="document-ai-reference"
+                  sx={{
+                    mt: 0.5,
+                    overflowWrap: 'anywhere',
+                    userSelect: 'text'
+                  }}>
+                  {formatMessage(
+                    { id: 'documentAi.reference' },
+                    { id: error.traceId }
+                  )}
+                </Typography>
+              )}
             </Alert>
           )}
           {hasResult && isLoadingLanguages && (

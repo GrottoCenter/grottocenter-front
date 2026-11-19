@@ -3,14 +3,14 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import { ReadableStream, WritableStream } from 'node:stream/web';
 
-import { apiPost } from '@/api/client';
+import { apiPostWithHeaders } from '@/api/client';
 import { analyzeDocumentUrl, ssoAuthTokenUrl } from '@/conf/apiRoutes';
 import queryClient from '@/conf/queryClient';
 import store from '@/store';
 import { DOCUMENT_AI_MAX_FILE_SIZE } from '@/utils/documentAnalysis';
 import { useAnalyzeDocument } from './useAnalyzeDocument';
 
-vi.mock('@/api/client', () => ({ apiPost: vi.fn() }));
+vi.mock('@/api/client', () => ({ apiPostWithHeaders: vi.fn() }));
 vi.mock('@/store', () => ({
   default: { getState: vi.fn(), dispatch: vi.fn() }
 }));
@@ -36,6 +36,10 @@ Wrapper.propTypes = { children: PropTypes.node.isRequired };
 const renderAnalysis = () =>
   renderHook(useAnalyzeDocument, { wrapper: Wrapper });
 const variables = () => ({ file, signal: new AbortController().signal });
+const tokenResponse = (token = 'documents-token', traceId = undefined) => ({
+  data: { token },
+  headers: new Headers(traceId == null ? {} : { 'X-Trace-Id': traceId })
+});
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -43,7 +47,7 @@ beforeEach(() => {
   vi.stubGlobal('WritableStream', WritableStream);
   queryClient.clear();
   store.getState.mockReturnValue({ login: { authorizationHeader: session } });
-  apiPost.mockResolvedValue({ token: 'documents-token' });
+  apiPostWithHeaders.mockResolvedValue(tokenResponse());
   vi.stubGlobal(
     'fetch',
     vi.fn().mockImplementation(async () =>
@@ -75,7 +79,7 @@ it('obtains a fresh documents token, uploads multipart and keeps only main-docum
   await act(async () => {
     summaries = await result.current.mutateAsync(variables());
   });
-  expect(apiPost).toHaveBeenCalledWith(
+  expect(apiPostWithHeaders).toHaveBeenCalledWith(
     ssoAuthTokenUrl,
     {
       product: 'documents'
@@ -95,7 +99,150 @@ it('obtains a fresh documents token, uploads multipart and keeps only main-docum
     datePublication: null
   });
   await act(async () => result.current.mutateAsync(variables()));
-  expect(apiPost).toHaveBeenCalledTimes(2);
+  expect(apiPostWithHeaders).toHaveBeenCalledTimes(2);
+});
+
+it('forwards a fresh API trace id for each attempt after an analysis failure', async () => {
+  const firstId = '2f85616b-51be-4003-bc07-7d35ed5b72fa';
+  const secondId = '4b3512e9-3215-4e3f-b8f6-75083e92ab32';
+  apiPostWithHeaders
+    .mockResolvedValueOnce(tokenResponse('first-token', firstId))
+    .mockResolvedValueOnce(tokenResponse('second-token', secondId));
+  fetch.mockResolvedValueOnce(
+    new Response('{}', { status: 503, headers: { 'X-Trace-Id': firstId } })
+  );
+  const { result } = renderAnalysis();
+  await act(async () => {
+    await expect(result.current.mutateAsync(variables())).rejects.toMatchObject(
+      {
+        status: 503,
+        traceId: firstId
+      }
+    );
+  });
+  await act(async () => result.current.mutateAsync(variables()));
+  expect(apiPostWithHeaders).toHaveBeenCalledTimes(2);
+  expect(fetch.mock.calls.map(([, options]) => options.headers)).toEqual([
+    { Authorization: 'Bearer first-token', 'X-Trace-Id': firstId },
+    { Authorization: 'Bearer second-token', 'X-Trace-Id': secondId }
+  ]);
+});
+
+it('keeps trace ids attached to their attempts when concurrent token responses finish out of order', async () => {
+  const firstId = '2f85616b-51be-4003-bc07-7d35ed5b72fa';
+  const secondId = '4b3512e9-3215-4e3f-b8f6-75083e92ab32';
+  let resolveToken;
+  apiPostWithHeaders
+    .mockReturnValueOnce(
+      new Promise(resolve => {
+        resolveToken = resolve;
+      })
+    )
+    .mockResolvedValueOnce(tokenResponse('second-token', secondId));
+  const first = renderAnalysis();
+  const second = renderAnalysis();
+  let firstAttempt;
+  await act(async () => {
+    firstAttempt = first.result.current.mutateAsync(variables());
+  });
+  expect(apiPostWithHeaders).toHaveBeenCalledOnce();
+  await act(async () => second.result.current.mutateAsync(variables()));
+  await act(async () => {
+    resolveToken(tokenResponse('first-token', firstId));
+    await firstAttempt;
+  });
+  expect(fetch.mock.calls.map(([, options]) => options.headers)).toEqual([
+    { Authorization: 'Bearer second-token', 'X-Trace-Id': secondId },
+    { Authorization: 'Bearer first-token', 'X-Trace-Id': firstId }
+  ]);
+});
+
+it.each([undefined, '', '   '])(
+  'omits an unreadable or empty token trace header (%j)',
+  async traceId => {
+    apiPostWithHeaders.mockResolvedValue(
+      tokenResponse('documents-token', traceId)
+    );
+    const { result } = renderAnalysis();
+    await act(async () => result.current.mutateAsync(variables()));
+    expect(fetch.mock.calls[0][1].headers).toEqual({
+      Authorization: 'Bearer documents-token'
+    });
+  }
+);
+
+it.each([undefined, '2f85616b-51be-4003-bc07-7d35ed5b72fa'])(
+  'uses the failed analysis response trace id independently of the token trace (%j)',
+  async traceId => {
+    const responseId = '4b3512e9-3215-4e3f-b8f6-75083e92ab32';
+    apiPostWithHeaders.mockResolvedValue(
+      tokenResponse('documents-token', traceId)
+    );
+    fetch.mockResolvedValue(
+      new Response('{"message":"Service unavailable","code":"UNAVAILABLE"}', {
+        status: 503,
+        headers: { 'X-Trace-Id': responseId }
+      })
+    );
+    const { result } = renderAnalysis();
+    await act(async () => {
+      await expect(
+        result.current.mutateAsync(variables())
+      ).rejects.toMatchObject({
+        status: 503,
+        traceId: responseId,
+        body: { message: 'Service unavailable', code: 'UNAVAILABLE' }
+      });
+    });
+  }
+);
+
+it.each(['<html>Bad gateway</html>', ''])(
+  'preserves the failed analysis trace id with a non-JSON error body (%j)',
+  async body => {
+    const traceId = '2f85616b-51be-4003-bc07-7d35ed5b72fa';
+    fetch.mockResolvedValue(
+      new Response(body, { status: 502, headers: { 'X-Trace-Id': traceId } })
+    );
+    const { result } = renderAnalysis();
+    await act(async () => {
+      await expect(
+        result.current.mutateAsync(variables())
+      ).rejects.toMatchObject({
+        status: 502,
+        traceId
+      });
+    });
+  }
+);
+
+it('does not use the token trace id when the failed analysis exposes none', async () => {
+  apiPostWithHeaders.mockResolvedValue(
+    tokenResponse('documents-token', '2f85616b-51be-4003-bc07-7d35ed5b72fa')
+  );
+  fetch.mockResolvedValue(new Response('{}', { status: 503 }));
+  const { result } = renderAnalysis();
+  let failure;
+  await act(async () => {
+    failure = await result.current
+      .mutateAsync(variables())
+      .catch(error => error);
+  });
+  expect(failure.status).toBe(503);
+  expect(failure).not.toHaveProperty('traceId');
+});
+
+it('does not invent a reference when the analysis fails before receiving a response', async () => {
+  apiPostWithHeaders.mockResolvedValue(
+    tokenResponse('documents-token', '2f85616b-51be-4003-bc07-7d35ed5b72fa')
+  );
+  const failure = new TypeError('Failed to fetch');
+  fetch.mockRejectedValue(failure);
+  const { result } = renderAnalysis();
+  await act(async () => {
+    await expect(result.current.mutateAsync(variables())).rejects.toBe(failure);
+  });
+  expect(failure).not.toHaveProperty('traceId');
 });
 
 it('does not log out or retry when the AI server rejects its temporary token', async () => {
@@ -125,9 +272,9 @@ it('downloads an existing PDF before obtaining its short-lived token and preserv
     events.push('analysis');
     return response([{ descriptions: ['Stored summary'] }]);
   });
-  apiPost.mockImplementation(async () => {
+  apiPostWithHeaders.mockImplementation(async () => {
     events.push('sso');
-    return { token: 'fresh-token' };
+    return tokenResponse('fresh-token');
   });
   const { result } = renderAnalysis();
   await act(async () =>
@@ -161,7 +308,7 @@ it('rejects oversized hosted files from Content-Length before downloading the bo
       })
     ).rejects.toMatchObject({ status: 413 });
   });
-  expect(apiPost).not.toHaveBeenCalled();
+  expect(apiPostWithHeaders).not.toHaveBeenCalled();
   expect(fetch).toHaveBeenCalledOnce();
 });
 
@@ -179,7 +326,7 @@ it.each([50000001, 60 * 1024 * 1024])(
         signal: new AbortController().signal
       })
     );
-    expect(apiPost).toHaveBeenCalledOnce();
+    expect(apiPostWithHeaders).toHaveBeenCalledOnce();
     expect(fetch).toHaveBeenCalledOnce();
   }
 );
@@ -198,7 +345,7 @@ it('rejects a local PDF one byte above the service 60 MB limit before requesting
       })
     ).rejects.toMatchObject({ status: 413 });
   });
-  expect(apiPost).not.toHaveBeenCalled();
+  expect(apiPostWithHeaders).not.toHaveBeenCalled();
   expect(fetch).not.toHaveBeenCalled();
 });
 
@@ -220,7 +367,7 @@ it('bounds streamed downloads without Content-Length and cancels on overflow', a
     ).rejects.toMatchObject({ status: 413 });
   });
   expect(cancel).toHaveBeenCalledOnce();
-  expect(apiPost).not.toHaveBeenCalled();
+  expect(apiPostWithHeaders).not.toHaveBeenCalled();
 });
 
 it('does not request a token or start analysis when the hosted download fails', async () => {
@@ -234,7 +381,7 @@ it('does not request a token or start analysis when the hosted download fails', 
       })
     ).rejects.toMatchObject({ status: 404 });
   });
-  expect(apiPost).not.toHaveBeenCalled();
+  expect(apiPostWithHeaders).not.toHaveBeenCalled();
   expect(fetch).toHaveBeenCalledOnce();
 });
 
@@ -258,12 +405,12 @@ it('cancels a hosted download before SSO or analysis starts', async () => {
     await finished;
   });
   expect(await finished).toMatchObject({ name: 'AbortError' });
-  expect(apiPost).not.toHaveBeenCalled();
+  expect(apiPostWithHeaders).not.toHaveBeenCalled();
   expect(fetch).toHaveBeenCalledOnce();
 });
 
 it('logs out on an SSO session rejection before sending the PDF', async () => {
-  apiPost.mockRejectedValue(
+  apiPostWithHeaders.mockRejectedValue(
     Object.assign(new Error('Unauthorized'), { status: 401 })
   );
   const { result } = renderAnalysis();
@@ -277,7 +424,7 @@ it('logs out on an SSO session rejection before sending the PDF', async () => {
 });
 
 it('does not sign out a newer session after an old SSO request fails', async () => {
-  apiPost.mockImplementation(async () => {
+  apiPostWithHeaders.mockImplementation(async () => {
     store.getState.mockReturnValue({ login: { authorizationHeader: {} } });
     throw Object.assign(new Error('Unauthorized'), { status: 401 });
   });
@@ -293,7 +440,7 @@ it('does not sign out a newer session after an old SSO request fails', async () 
 
 it('does not send the PDF after cancellation during the SSO request', async () => {
   let resolveToken;
-  apiPost.mockReturnValue(
+  apiPostWithHeaders.mockReturnValue(
     new Promise(resolve => {
       resolveToken = resolve;
     })
@@ -308,7 +455,7 @@ it('does not send the PDF after cancellation during the SSO request', async () =
   });
   controller.abort();
   await act(async () => {
-    resolveToken({ token: 'too-late' });
+    resolveToken(tokenResponse('too-late'));
     await finished;
   });
   expect(await finished).toMatchObject({ name: 'AbortError' });

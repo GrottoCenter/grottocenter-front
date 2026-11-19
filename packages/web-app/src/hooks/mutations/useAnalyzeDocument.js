@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { apiPost } from '@/api/client';
+import { apiPostWithHeaders } from '@/api/client';
 import { checkAndGetStatus } from '@/actions/utils';
 import { postLogout } from '@/actions/Login';
 import { analyzeDocumentUrl, ssoAuthTokenUrl } from '@/conf/apiRoutes';
@@ -78,14 +78,17 @@ export const useAnalyzeDocument = () =>
         const upload = await loadAnalysisFile(file, controller.signal);
         controller.signal.throwIfAborted();
         let token;
+        let traceId;
         try {
-          ({ token } = await apiPost(
+          const { data, headers } = await apiPostWithHeaders(
             ssoAuthTokenUrl,
             {
               product: 'documents'
             },
             { signal: controller.signal }
-          ));
+          );
+          ({ token } = data);
+          traceId = headers.get('X-Trace-Id')?.trim();
         } catch (error) {
           if (
             error.status === 401 &&
@@ -108,14 +111,25 @@ export const useAnalyzeDocument = () =>
         // header or set Content-Type: the browser supplies the multipart boundary.
         const response = await fetch(analyzeDocumentUrl, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...(traceId && { 'X-Trace-Id': traceId })
+          },
           body,
           signal: controller.signal
         });
-        await checkAndGetStatus(response);
-        const result = await response.json();
-        controller.signal.throwIfAborted();
-        return normalizeDocumentAnalysis(result);
+        // Read before parsing: a proxy can return an HTML or empty error body.
+        // Only the analysis response identifies the failure shown to the user.
+        const responseTraceId = response.headers.get('X-Trace-Id')?.trim();
+        try {
+          await checkAndGetStatus(response);
+          const result = await response.json();
+          controller.signal.throwIfAborted();
+          return normalizeDocumentAnalysis(result);
+        } catch (error) {
+          if (responseTraceId) error.traceId = responseTraceId;
+          throw error;
+        }
       } finally {
         clearTimeout(timeout);
         signal.removeEventListener('abort', abort);

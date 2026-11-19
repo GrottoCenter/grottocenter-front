@@ -76,7 +76,7 @@ export const apiGetWithRange = async (url, { signal } = {}) => {
 };
 
 const send =
-  method =>
+  (method, { includeHeaders = false } = {}) =>
   async (url, body, { signal } = {}) => {
     const init = {
       method,
@@ -86,7 +86,8 @@ const send =
     if (body != null) init.body = JSON.stringify(body);
     const response = await fetch(url, init);
     await checkAndGetStatus(response);
-    return parseJsonOr204(response);
+    const data = await parseJsonOr204(response);
+    return includeHeaders ? { data, headers: response.headers } : data;
   };
 
 /**
@@ -97,6 +98,9 @@ const send =
  * shape whether the failure came from a query or a mutation.
  */
 export const apiPost = send('POST');
+
+/** POST JSON and return its parsed body and readable response headers. */
+export const apiPostWithHeaders = send('POST', { includeHeaders: true });
 
 /** PUT a JSON body. */
 export const apiPut = send('PUT');

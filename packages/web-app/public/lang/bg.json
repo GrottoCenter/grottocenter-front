@@ -994,6 +994,7 @@
   "documentAi.pending": "PDF файлът се анализира. Това може да отнеме няколко минути.",
   "documentAi.proposedValue": "Предложение от ИИ",
   "documentAi.quota": "Достигнат е лимитът за анализи. Опитайте по-късно.",
+  "documentAi.reference": "Справка: {id}",
   "documentAi.replacementCount": "{count, plural, one {# замяна} other {# замени}}",
   "documentAi.review": "Изберете полетата за промяна във формуляра, след което го запазете.",
   "documentAi.reviewAction": "Предложения на ИИ",

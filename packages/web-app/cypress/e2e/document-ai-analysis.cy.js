@@ -1,4 +1,5 @@
 const summary = '[data-testid="document-description"] textarea';
+const traceId = '2f85616b-51be-4003-bc07-7d35ed5b72fa';
 
 const openForm = () => {
   cy.visit('/entity/add/document', {
@@ -73,13 +74,21 @@ describe('PDF analysis during document creation and editing', () => {
     });
     cy.intercept('POST', '**/api/v1/sso/auth-token', request => {
       expect(request.body).to.deep.equal({ product: 'documents' });
-      request.reply({ body: { token: 'documents-only-token' } });
+      expect(request.headers).not.to.have.property('x-trace-id');
+      request.reply({
+        headers: {
+          'X-Trace-Id': traceId,
+          'Access-Control-Expose-Headers': 'X-Trace-Id'
+        },
+        body: { token: 'documents-only-token' }
+      });
     }).as('sso');
     cy.intercept('OPTIONS', '**/documents/analyze', {
       statusCode: 204,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+        'Access-Control-Allow-Headers':
+          'Authorization, Content-Type, X-Trace-Id',
         'Access-Control-Allow-Methods': 'POST'
       }
     });
@@ -87,11 +96,16 @@ describe('PDF analysis during document creation and editing', () => {
       expect(request.headers.authorization).to.equal(
         'Bearer documents-only-token'
       );
+      expect(request.headers['x-trace-id']).to.equal(traceId);
       expect(request.body).to.include(
         'name="file"; filename="article-pages.pdf"'
       );
       request.reply({
-        headers: { 'Access-Control-Allow-Origin': '*' },
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Expose-Headers': 'X-Trace-Id',
+          'X-Trace-Id': traceId
+        },
         body: {
           message: 'success',
           filename: 'generated.pdf',
@@ -265,9 +279,14 @@ describe('PDF analysis during document creation and editing', () => {
   });
 
   it('keeps the session and the manual summary after an AI token rejection', () => {
+    const failureTraceId = '4b3512e9-3215-4e3f-b8f6-75083e92ab32';
     cy.intercept('POST', '**/documents/analyze', {
       statusCode: 401,
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Expose-Headers': 'X-Trace-Id',
+        'X-Trace-Id': failureTraceId
+      },
       body: { detail: 'Invalid token' }
     }).as('rejected');
     openForm();
@@ -275,6 +294,10 @@ describe('PDF analysis during document creation and editing', () => {
     cy.get('[data-testid="document-ai-confirm"]').click();
     cy.wait('@rejected');
     cy.get('[role="dialog"]').should('contain.text', 'Authorization failed');
+    cy.get('[data-testid="document-ai-reference"]').should(
+      'have.text',
+      `Reference: ${failureTraceId}`
+    );
     cy.get(summary).first().should('have.value', 'Manual summary');
     cy.window().then(win =>
       expect(win.localStorage.getItem('grottocenter_token')).to.be.a('string')

@@ -994,6 +994,7 @@
   "documentAi.pending": "Analizando el PDF. Puede tardar unos minutos.",
   "documentAi.proposedValue": "Sugerencia de la IA",
   "documentAi.quota": "Se ha alcanzado el límite de análisis. Inténtelo más tarde.",
+  "documentAi.reference": "Referencia: {id}",
   "documentAi.replacementCount": "{count, plural, one {# sustitución} other {# sustituciones}}",
   "documentAi.review": "Seleccione los campos que desea modificar en el formulario y guárdelo después.",
   "documentAi.reviewAction": "Sugerencias de la IA",

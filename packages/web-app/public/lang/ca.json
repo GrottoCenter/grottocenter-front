@@ -994,6 +994,7 @@
   "documentAi.pending": "S’està analitzant el PDF. Pot trigar uns minuts.",
   "documentAi.proposedValue": "Suggeriment de la IA",
   "documentAi.quota": "S’ha arribat al límit d’anàlisis. Torneu-ho a provar més tard.",
+  "documentAi.reference": "Referència: {id}",
   "documentAi.replacementCount": "{count, plural, one {# substitució} other {# substitucions}}",
   "documentAi.review": "Seleccioneu els camps que voleu modificar al formulari i deseu-lo després.",
   "documentAi.reviewAction": "Suggeriments de la IA",

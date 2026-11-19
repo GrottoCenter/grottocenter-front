@@ -994,6 +994,7 @@
   "documentAi.pending": "Das PDF wird analysiert. Dies kann einige Minuten dauern.",
   "documentAi.proposedValue": "KI-Vorschlag",
   "documentAi.quota": "Das Analyselimit wurde erreicht. Versuchen Sie es später erneut.",
+  "documentAi.reference": "Referenz: {id}",
   "documentAi.replacementCount": "{count, plural, one {# Ersetzung} other {# Ersetzungen}}",
   "documentAi.review": "Wählen Sie die zu ändernden Felder aus und speichern Sie anschließend das Formular.",
   "documentAi.reviewAction": "KI-Vorschläge",

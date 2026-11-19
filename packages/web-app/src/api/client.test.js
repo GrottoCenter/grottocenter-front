@@ -1,6 +1,11 @@
 import store from '@/store';
 import { fetchLoginSuccess, logout, postLogout } from '@/actions/Login';
-import { apiFetch, apiGetWithRange, apiPost } from './client';
+import {
+  apiFetch,
+  apiGetWithRange,
+  apiPost,
+  apiPostWithHeaders
+} from './client';
 
 vi.mock('@/actions/Login', async importOriginal => {
   const actual = await importOriginal();
@@ -11,7 +16,7 @@ vi.mock('@/actions/Login', async importOriginal => {
   };
 });
 
-it.each(['GET', 'POST', 'raw'])(
+it.each(['GET', 'POST', 'POST with headers', 'raw'])(
   'passes an AbortSignal through to a %s request',
   async method => {
     const controller = new AbortController();
@@ -35,6 +40,12 @@ it.each(['GET', 'POST', 'raw'])(
             { entity: 'organizations' },
             { signal: controller.signal }
           ),
+        'POST with headers': () =>
+          apiPostWithHeaders(
+            '/api/v1/advanced-search',
+            { entity: 'organizations' },
+            { signal: controller.signal }
+          ),
         raw: () =>
           apiFetch('/api/v1/advanced-search', { signal: controller.signal })
       };
@@ -52,6 +63,67 @@ it.each(['GET', 'POST', 'raw'])(
     }
   }
 );
+
+describe('JSON POST response headers', () => {
+  afterEach(() => {
+    store.dispatch(logout());
+    vi.unstubAllGlobals();
+  });
+
+  it('returns the body and readable headers while preserving the regular POST contract', async () => {
+    const data = { token: 'documents-token' };
+    const traceId = '2f85616b-51be-4003-bc07-7d35ed5b72fa';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(
+        async () =>
+          new Response(JSON.stringify(data), {
+            headers: { 'X-Trace-Id': traceId }
+          })
+      )
+    );
+    store.dispatch(fetchLoginSuccess({ id: 1 }, 'session'));
+    const result = await apiPostWithHeaders('/api/v1/sso/auth-token', {
+      product: 'documents'
+    });
+    expect(result.data).toEqual(data);
+    expect(result.headers.get('X-Trace-Id')).toBe(traceId);
+    expect(fetch).toHaveBeenCalledWith('/api/v1/sso/auth-token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer session'
+      },
+      body: JSON.stringify({ product: 'documents' })
+    });
+    await expect(
+      apiPost('/api/v1/sso/auth-token', { product: 'documents' })
+    ).resolves.toEqual(data);
+  });
+
+  it('returns null data and accessible headers for a 204 response', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response(null, { status: 204 }))
+    );
+    const result = await apiPostWithHeaders('/api/v1/resource');
+    expect(result.data).toBeNull();
+    expect(result.headers.get('X-Trace-Id')).toBeNull();
+  });
+
+  it('preserves the structured error contract on a rejected POST', async () => {
+    const body = { code: 'UNAUTHORIZED', message: 'Unauthorized' };
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue(new Response(JSON.stringify(body), { status: 401 }))
+    );
+    await expect(
+      apiPostWithHeaders('/api/v1/sso/auth-token', { product: 'documents' })
+    ).rejects.toMatchObject({ status: 401, body, message: 'Unauthorized' });
+  });
+});
 
 describe('raw authenticated transport', () => {
   afterEach(() => {

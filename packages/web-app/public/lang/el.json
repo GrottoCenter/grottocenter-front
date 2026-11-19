@@ -994,6 +994,7 @@
   "documentAi.pending": "Γίνεται ανάλυση του PDF. Μπορεί να χρειαστούν λίγα λεπτά.",
   "documentAi.proposedValue": "Πρόταση ΤΝ",
   "documentAi.quota": "Συμπληρώθηκε το όριο αναλύσεων. Δοκιμάστε αργότερα.",
+  "documentAi.reference": "Αναφορά: {id}",
   "documentAi.replacementCount": "{count, plural, one {# αντικατάσταση} other {# αντικαταστάσεις}}",
   "documentAi.review": "Επιλέξτε τα πεδία που θέλετε να αλλάξετε στη φόρμα και μετά αποθηκεύστε τη.",
   "documentAi.reviewAction": "Προτάσεις ΤΝ",

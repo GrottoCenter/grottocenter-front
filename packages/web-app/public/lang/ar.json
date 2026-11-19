@@ -994,6 +994,7 @@
   "documentAi.pending": "جارٍ تحليل ملف PDF. قد يستغرق ذلك بضع دقائق.",
   "documentAi.proposedValue": "اقتراح الذكاء الاصطناعي",
   "documentAi.quota": "تم بلوغ الحد الأقصى للتحليلات. حاول لاحقًا.",
+  "documentAi.reference": "المرجع: {id}",
   "documentAi.replacementCount": "{count, plural, one {استبدال واحد} two {استبدالان} few {# استبدالات} many {# استبدالًا} other {# استبدال}}",
   "documentAi.review": "حدد الحقول التي تريد تحديثها في النموذج، ثم احفظ النموذج.",
   "documentAi.reviewAction": "اقتراحات الذكاء الاصطناعي",
