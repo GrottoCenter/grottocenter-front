@@ -8,11 +8,10 @@ import { Download } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ShareIcon from '@mui/icons-material/Share';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { useUserProperties } from '@/hooks/useUserProperties';
+import { useSubscriptionAction } from '@/hooks/useSubscriptionAction';
 import RecentChangesSection from '@/components/appli/RecentChanges/Section';
 import { useRecentChangesTabs } from '@/hooks/useRecentChangesTabs';
 
@@ -130,28 +129,17 @@ const Massif = ({
   const canSubscribe =
     permissions.isLeader && massif && !massif.isDeleted && !error;
 
-  let SubscribeIcon = <CircularProgress size={20} />;
-  if (!isSubscribeLoading) {
-    SubscribeIcon = isSubscribed ? (
-      <NotificationsActiveIcon />
-    ) : (
-      <NotificationsNoneIcon />
-    );
-  }
+  const subscriptionAction = useSubscriptionAction({
+    isSubscribed,
+    isLoading: isSubscribeLoading,
+    canSubscribe,
+    onClick: handleChangeSubscribe
+  });
 
   const actions = massif ? (
     <ResponsiveActions
       items={[
-        {
-          key: 'subscribe',
-          icon: SubscribeIcon,
-          label: formatMessage({
-            id: isSubscribed ? 'Unsubscribe' : 'Subscribe'
-          }),
-          onClick: handleChangeSubscribe,
-          color: isSubscribed ? 'secondary' : 'primary',
-          hidden: !canSubscribe
-        },
+        subscriptionAction,
         {
           key: 'pdf',
           icon: <Download />,
