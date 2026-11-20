@@ -994,6 +994,7 @@
   "documentAi.pending": "קובץ ה־PDF מנותח כעת. הפעולה עשויה להימשך כמה דקות.",
   "documentAi.proposedValue": "הצעת בינה מלאכותית",
   "documentAi.quota": "הגעת למגבלת הניתוחים. יש לנסות שוב מאוחר יותר.",
+  "documentAi.reference": "מספר הפניה: {id}",
   "documentAi.replacementCount": "{count, plural, one {החלפה אחת} two {שתי החלפות} other {# החלפות}}",
   "documentAi.review": "בחרו את השדות שברצונכם לעדכן בטופס ולאחר מכן שמרו אותו.",
   "documentAi.reviewAction": "הצעות הבינה המלאכותית",

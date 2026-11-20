@@ -994,6 +994,7 @@
   "documentAi.pending": "Se analizează PDF-ul. Poate dura câteva minute.",
   "documentAi.proposedValue": "Sugestie IA",
   "documentAi.quota": "Limita de analize a fost atinsă. Încearcă mai târziu.",
+  "documentAi.reference": "Referință: {id}",
   "documentAi.replacementCount": "{count, plural, one {# înlocuire} few {# înlocuiri} other {# de înlocuiri}}",
   "documentAi.review": "Selectați câmpurile de modificat în formular, apoi salvați formularul.",
   "documentAi.reviewAction": "Sugestii IA",

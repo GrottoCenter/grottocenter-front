@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { apiPost } from '@/api/client';
+import { apiPostWithHeaders } from '@/api/client';
 import { checkAndGetStatus } from '@/actions/utils';
 import { postLogout } from '@/actions/Login';
 import { analyzeDocumentUrl, ssoAuthTokenUrl } from '@/conf/apiRoutes';
 import store from '@/store';
+import { readTraceId } from '@/utils/traceId';
 import {
   DOCUMENT_AI_MAX_FILE_SIZE,
   normalizeDocumentAnalysis
@@ -78,15 +79,20 @@ export const useAnalyzeDocument = () =>
         const upload = await loadAnalysisFile(file, controller.signal);
         controller.signal.throwIfAborted();
         let token;
+        let traceId;
         try {
-          ({ token } = await apiPost(
+          const { data, headers } = await apiPostWithHeaders(
             ssoAuthTokenUrl,
             {
               product: 'documents'
             },
             { signal: controller.signal }
-          ));
+          );
+          traceId = readTraceId(headers);
+          token = data?.token;
         } catch (error) {
+          const failureTraceId = readTraceId(error.headers);
+          if (failureTraceId) error.traceId = failureTraceId;
           if (
             error.status === 401 &&
             authorization === store.getState().login.authorizationHeader
@@ -100,7 +106,9 @@ export const useAnalyzeDocument = () =>
           throw new DOMException('Session changed', 'AbortError');
         }
         if (typeof token !== 'string' || !token.trim()) {
-          throw new Error('Invalid SSO response');
+          throw Object.assign(new Error('Invalid SSO response'), {
+            ...(traceId && { traceId })
+          });
         }
         const body = new FormData();
         body.append('file', upload, upload.name);
@@ -108,14 +116,25 @@ export const useAnalyzeDocument = () =>
         // header or set Content-Type: the browser supplies the multipart boundary.
         const response = await fetch(analyzeDocumentUrl, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...(traceId && { 'X-Trace-Id': traceId })
+          },
           body,
           signal: controller.signal
         });
-        await checkAndGetStatus(response);
-        const result = await response.json();
-        controller.signal.throwIfAborted();
-        return normalizeDocumentAnalysis(result);
+        // Read before parsing: a proxy can return an HTML or empty error body.
+        // Use the failing request's reference, never the earlier token request's.
+        const responseTraceId = readTraceId(response.headers);
+        try {
+          await checkAndGetStatus(response);
+          const result = await response.json();
+          controller.signal.throwIfAborted();
+          return normalizeDocumentAnalysis(result);
+        } catch (error) {
+          if (responseTraceId) error.traceId = responseTraceId;
+          throw error;
+        }
       } finally {
         clearTimeout(timeout);
         signal.removeEventListener('abort', abort);

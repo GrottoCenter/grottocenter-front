@@ -8,7 +8,7 @@ import {
 } from '@testing-library/react';
 import { WritableStream } from 'node:stream/web';
 
-import { apiPost } from '@/api/client';
+import { apiPostWithHeaders } from '@/api/client';
 import renderWithProviders from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
 import DocumentFormProvider, { DocumentFormContext } from '../Provider';
@@ -16,7 +16,7 @@ import { IS_INTACT, IS_NEW } from './AddFileForm/FileHelpers';
 import PublicationDatePicker from './PublicationDatePicker';
 import DocumentPdfAnalysis from './DocumentPdfAnalysis';
 
-vi.mock('@/api/client', () => ({ apiPost: vi.fn() }));
+vi.mock('@/api/client', () => ({ apiPostWithHeaders: vi.fn() }));
 const permissions = vi.hoisted(() => ({ isAuth: true, isModerator: false }));
 vi.mock('@/hooks/usePermissions', () => ({
   usePermissions: () => permissions
@@ -162,7 +162,10 @@ beforeEach(() => {
   // JSDOM lacks Web Streams; Response bodies use Node's native implementation.
   vi.stubGlobal('WritableStream', WritableStream);
   Object.assign(permissions, { isAuth: true, isModerator: false });
-  apiPost.mockResolvedValue({ token: 'documents-token' });
+  apiPostWithHeaders.mockResolvedValue({
+    data: { token: 'documents-token' },
+    headers: new Headers()
+  });
   vi.stubGlobal(
     'fetch',
     vi.fn().mockImplementation(async () => answer(['AI summary']))
@@ -180,7 +183,7 @@ it('explains AI and all limits before requesting authorization or uploading', ()
     '200 analyses per day (provisional limit)'
   );
   expect(screen.getByRole('dialog')).toHaveTextContent('60 MB and 300 pages');
-  expect(apiPost).not.toHaveBeenCalled();
+  expect(apiPostWithHeaders).not.toHaveBeenCalled();
   expect(fetch).not.toHaveBeenCalled();
   expect(screen.getByRole('button', { name: 'Close' })).toHaveClass(
     'MuiButton-outlined'
@@ -413,7 +416,7 @@ it('uses outlined relaunch and a short apply label with icons', async () => {
   ).not.toBeNull();
   fireEvent.click(relaunch);
   await screen.findByTestId('document-ai-confirm');
-  expect(apiPost).toHaveBeenCalledOnce();
+  expect(apiPostWithHeaders).toHaveBeenCalledOnce();
 });
 
 it('refuses oversized PDFs before requesting a token', () => {
@@ -422,7 +425,7 @@ it('refuses oversized PDFs before requesting a token', () => {
   fireEvent.click(screen.getByTestId('document-ai-analyze'));
   expect(screen.getByTestId('document-ai-confirm')).toBeDisabled();
   expect(screen.getByRole('alert')).toHaveTextContent('60 MB');
-  expect(apiPost).not.toHaveBeenCalled();
+  expect(apiPostWithHeaders).not.toHaveBeenCalled();
 });
 
 it.each(['removed', 'replaced'])(
@@ -519,6 +522,39 @@ it.each([
   });
   startAnalysis();
   expect(await screen.findByRole('alert')).toHaveTextContent(messages[key]);
+  expect(screen.queryByTestId('document-ai-reference')).not.toBeInTheDocument();
+  expect(screen.getByLabelText('Summary')).toHaveValue('Manual summary');
+});
+
+it('shows the failed analysis reference and clears it during a retry and after success', async () => {
+  const traceId = '2f85616b-51be-4003-bc07-7d35ed5b72fa';
+  fetch.mockResolvedValueOnce(
+    new Response('{}', { status: 503, headers: { 'X-Trace-Id': traceId } })
+  );
+  renderForm();
+  fireEvent.change(screen.getByLabelText('Summary'), {
+    target: { value: 'Manual summary' }
+  });
+  startAnalysis();
+  expect(await screen.findByTestId('document-ai-reference')).toHaveTextContent(
+    `Reference: ${traceId}`
+  );
+  expect(screen.getByRole('alert')).toHaveTextContent(
+    messages['documentAi.unavailable']
+  );
+  let resolve;
+  fetch.mockReturnValueOnce(
+    new Promise(done => {
+      resolve = done;
+    })
+  );
+  fireEvent.click(screen.getByTestId('document-ai-confirm'));
+  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+  expect(screen.queryByTestId('document-ai-reference')).not.toBeInTheDocument();
+  expect(screen.getByLabelText('Summary')).toHaveValue('Manual summary');
+  await act(async () => resolve(answer(['AI summary'])));
+  await screen.findByText('AI summary');
+  expect(screen.queryByTestId('document-ai-reference')).not.toBeInTheDocument();
   expect(screen.getByLabelText('Summary')).toHaveValue('Manual summary');
 });
 
@@ -597,7 +633,7 @@ it('preserves hosted suggestions and selection after closing and editing the pag
       name: messages['Summary of document content']
     })
   ).toBeChecked();
-  expect(apiPost).toHaveBeenCalledOnce();
+  expect(apiPostWithHeaders).toHaveBeenCalledOnce();
   expect(fetch).toHaveBeenCalledTimes(2);
   fireEvent.click(screen.getByTestId('document-ai-apply'));
   expect(screen.getByLabelText('Summary')).toHaveValue('AI summary');
@@ -628,7 +664,7 @@ it.each(['offset', 'replacement'])(
     await act(async () => resolve(answer(['AI summary'])));
     if (action === 'offset') {
       await screen.findByText('AI summary');
-      expect(apiPost).toHaveBeenCalledOnce();
+      expect(apiPostWithHeaders).toHaveBeenCalledOnce();
       expect(fetch).toHaveBeenCalledTimes(2);
     } else {
       expect(screen.queryByText('AI summary')).not.toBeInTheDocument();

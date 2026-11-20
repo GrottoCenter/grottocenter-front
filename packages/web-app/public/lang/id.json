@@ -994,6 +994,7 @@
   "documentAi.pending": "Sedang menganalisis PDF. Proses ini mungkin memerlukan beberapa menit.",
   "documentAi.proposedValue": "Saran AI",
   "documentAi.quota": "Batas analisis tercapai. Coba lagi nanti.",
+  "documentAi.reference": "Referensi: {id}",
   "documentAi.replacementCount": "{count, plural, other {# penggantian}}",
   "documentAi.review": "Pilih bidang yang ingin diubah dalam formulir, lalu simpan formulir.",
   "documentAi.reviewAction": "Saran AI",

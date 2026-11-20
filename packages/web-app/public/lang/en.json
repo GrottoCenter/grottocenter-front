@@ -994,6 +994,7 @@
   "documentAi.pending": "Analyzing the PDF. This may take a few minutes.",
   "documentAi.proposedValue": "AI suggestion",
   "documentAi.quota": "Analysis limit reached. Try again later.",
+  "documentAi.reference": "Reference: {id}",
   "documentAi.replacementCount": "{count, plural, one {# replacement} other {# replacements}}",
   "documentAi.review": "Select the fields to update in the form, then save the form.",
   "documentAi.reviewAction": "AI suggestions",
