@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import BalanceIcon from '@mui/icons-material/Balance';
 import AppLink from '@/components/common/AppLink';
+import IconLabel from '@/components/common/IconLabel';
 import { getLicenseParts } from './helpers';
 
 // The visual identity of a license: its official Creative Commons badge, or the
@@ -21,21 +22,19 @@ const LicenseBadge = ({ license, size = 34, linkToDeed = false }) => {
       sx={{ height: size, width: 'auto', display: 'block' }}
     />
   ) : (
-    <Box
-      component="span"
-      title={name}
-      sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
-      <BalanceIcon sx={{ fontSize: size, display: 'block' }} />
-      <Typography component="span" variant="body2" noWrap>
-        {name}
-      </Typography>
+    <Box component="span" title={name}>
+      <IconLabel
+        icon={<BalanceIcon sx={{ fontSize: size, display: 'block' }} />}>
+        <Typography component="span" variant="body2" noWrap>
+          {name}
+        </Typography>
+      </IconLabel>
     </Box>
   );
 
   if (linkToDeed && url) {
     return (
-      <Link
-        component={AppLink}
+      <AppLink
         href={url}
         title={name}
         sx={{
@@ -45,7 +44,7 @@ const LicenseBadge = ({ license, size = 34, linkToDeed = false }) => {
           color: 'inherit'
         }}>
         {content}
-      </Link>
+      </AppLink>
     );
   }
   return content;

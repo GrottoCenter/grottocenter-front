@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Link as MuiLink, Paper, Typography } from '@mui/material';
+import { Paper, Typography } from '@mui/material';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
 import ContributionSection from '@/components/appli/Contributions/ContributionSection';
 import NetworkInlineLink from '../../common/NetworkInlineLink';
@@ -106,8 +106,7 @@ const Descriptions = ({
                     />
                   ),
                   descriptionsLink: (
-                    <MuiLink
-                      component={AppLink}
+                    <AppLink
                       to={`/ui/caves/${networkId}#description`}
                       openInNewTabDesktop
                       variant="body1"
@@ -116,7 +115,7 @@ const Descriptions = ({
                         { id: 'network.descriptions.count' },
                         { count: networkDescriptionsCount }
                       )}
-                    </MuiLink>
+                    </AppLink>
                   )
                 }}
               />
