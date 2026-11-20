@@ -8,10 +8,14 @@ import AppLink from './AppLink';
 
 // jsdom's user agent is a desktop one, so `isMobile` (react-device-detect) is
 // false here: these run the desktop branches.
-const renderLink = ui =>
+const renderLink = (ui, basename) =>
   render(
     <ThemeProvider theme={grottoTheme}>
-      <MemoryRouter>{ui}</MemoryRouter>
+      <MemoryRouter
+        basename={basename}
+        initialEntries={[basename ? `${basename}/` : '/']}>
+        {ui}
+      </MemoryRouter>
     </ThemeProvider>
   );
 
@@ -69,12 +73,27 @@ describe('AppLink', () => {
     renderLink(
       <AppLink to="/ui/entrances/42" openInNewTabDesktop>
         Entrance
-      </AppLink>
+      </AppLink>,
+      '/pr/1643'
     );
 
     const link = screen.getByRole('link', { name: 'Entrance' });
+    expect(link).toHaveAttribute('href', '/pr/1643/ui/entrances/42');
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('renders internal new-tab links without a router context', () => {
+    render(
+      <AppLink to="/ui/entrances/42" openInNewTabDesktop>
+        Entrance
+      </AppLink>
+    );
+
+    expect(screen.getByRole('link', { name: 'Entrance' })).toHaveAttribute(
+      'href',
+      '/ui/entrances/42'
+    );
   });
 
   it('opens an external URL in a new tab', () => {
