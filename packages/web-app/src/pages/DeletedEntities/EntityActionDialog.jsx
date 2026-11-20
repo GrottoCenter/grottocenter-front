@@ -180,8 +180,6 @@ const EntityActionDialog = ({
   return (
     <StandardDialog
       open
-      fullWidth
-      scrollable
       title={formatMessage({ id: 'Restore' })}
       onClose={handleClose}
       isBusy={isLoading}

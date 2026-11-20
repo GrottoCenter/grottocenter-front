@@ -105,8 +105,7 @@ export const FormActionRow = ({
       key="cancel"
       variant="outlined"
       disabled={isCancelDisabled}
-      onClick={onCancel}
-      sx={{ width: { xs: '100%', sm: 'auto' } }}>
+      onClick={onCancel}>
       {formatMessage({ id: 'Cancel' })}
     </MuiButton>
   );
@@ -123,7 +122,6 @@ export const FormActionRow = ({
         color="primary"
         type="submit"
         data-testid={submitTestId}
-        sx={{ width: { xs: '100%', sm: 'auto' } }}
       />
     </OfflineDisabled>
   );

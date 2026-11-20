@@ -56,10 +56,8 @@ const EntityPreview = ({ resource, entity, onClose }) => {
   return (
     <StandardDialog
       open
-      fullWidth
       fullScreen={isMobile}
       dense={isMobile}
-      scrollable
       maxWidth="lg"
       onClose={onClose}
       titleComponent="div"

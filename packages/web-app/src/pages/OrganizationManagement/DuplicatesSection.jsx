@@ -374,9 +374,9 @@ const DuplicateComparison = ({
             <Button
               color="error"
               variant="contained"
-              startIcon={
-                isBusy ? <CircularProgress size={20} /> : <DeleteRoundedIcon />
-              }
+              startIcon={<DeleteRoundedIcon />}
+              loading={isBusy}
+              loadingPosition="start"
               disabled={isBusy || !isOnline}
               onClick={handleDelete}>
               {formatMessage({ id: 'Delete' })}

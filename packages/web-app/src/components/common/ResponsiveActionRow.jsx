@@ -14,20 +14,17 @@ const flattenActions = (children, parentKey = '') =>
 // not just CSS, so mobile keyboard navigation follows the visible buttons.
 const ResponsiveActionRow = ({
   children,
-  component = 'div',
   stackOnMobile = true,
-  reverseOnMobile = true,
   testId,
   sx = {}
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const actions = flattenActions(children);
-  const shouldReverse = isMobile && stackOnMobile && reverseOnMobile;
+  const shouldReverse = isMobile && stackOnMobile;
 
   return (
     <Box
-      component={component}
       data-testid={testId}
       sx={[
         {
@@ -58,9 +55,7 @@ const ResponsiveActionRow = ({
 
 ResponsiveActionRow.propTypes = {
   children: PropTypes.node,
-  component: PropTypes.elementType,
   stackOnMobile: PropTypes.bool,
-  reverseOnMobile: PropTypes.bool,
   testId: PropTypes.string,
   sx: PropTypes.oneOfType([PropTypes.object, PropTypes.array, PropTypes.func])
 };

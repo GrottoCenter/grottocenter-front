@@ -348,12 +348,10 @@ export const Network = ({
                 />
                 {!isPreview && isAuth && (
                   <StandardDialog
-                    fullWidth
                     fullScreenOnMobile
                     maxWidth="md"
                     open={isEditing}
                     onClose={() => setEditing(false)}
-                    scrollable
                     title={formatMessage({ id: 'Network edition' })}>
                     <NetworkForm networkValues={{ ...cave }} />
                   </StandardDialog>

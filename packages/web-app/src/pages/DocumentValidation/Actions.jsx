@@ -198,8 +198,6 @@ const Actions = ({
       </Box>
       <StandardDialog
         maxWidth="xs"
-        fullWidth
-        scrollable
         open={isConfirmationDialogOpen}
         onClose={() => setIsConfirmationDialogOpen(false)}
         isBusy={isLoading}

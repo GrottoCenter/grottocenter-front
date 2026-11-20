@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { Box, Typography, useMediaQuery } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Box, Typography } from '@mui/material';
 import {
   useCreateOrganization,
   useCreatePerson,
@@ -31,8 +30,6 @@ const RelatedEntityDialog = ({
   onClose
 }) => {
   const { formatMessage } = useIntl();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const titleId = useId();
   const descriptionId = useId();
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
@@ -99,11 +96,9 @@ const RelatedEntityDialog = ({
   return (
     <StandardDialog
       open
-      fullWidth
-      fullScreen={isMobile}
+      fullScreenOnMobile
       disableAutoFocus
       disableRestoreFocus
-      maxWidth="sm"
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
       onClose={handleClose}

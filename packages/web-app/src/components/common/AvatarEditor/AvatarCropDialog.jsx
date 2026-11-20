@@ -5,13 +5,10 @@ import {
   Alert,
   Box,
   Button,
-  CircularProgress,
   FormControlLabel,
   Slider,
   Switch,
-  Typography,
-  useMediaQuery,
-  useTheme
+  Typography
 } from '@mui/material';
 import Cropper from 'react-easy-crop';
 import { createAvatarFile } from '@/utils/avatarImage';
@@ -28,8 +25,6 @@ const AvatarCropDialog = ({
   onClose
 }) => {
   const { formatMessage } = useIntl();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(isOrganization ? 0.9 : 1);
   const [cropAreaRef, cropAreaWidth] = useMeasuredWidth();
@@ -62,10 +57,7 @@ const AvatarCropDialog = ({
   return (
     <StandardDialog
       open
-      fullWidth
-      fullScreen={isMobile}
-      scrollable
-      stackActionsOnMobile
+      fullScreenOnMobile
       title={formatMessage({
         id: isOrganization ? 'avatar.editLogo' : 'avatar.editPhoto'
       })}
@@ -81,7 +73,8 @@ const AvatarCropDialog = ({
             onClick={handleSave}
             disabled={isBusy || !isOnline || (!shouldContain && !cropPixels)}
             data-testid="avatar-save"
-            startIcon={isBusy ? <CircularProgress size={18} /> : null}>
+            loading={isBusy}
+            loadingPosition="start">
             {formatMessage({ id: 'avatar.save' })}
           </Button>
         </>

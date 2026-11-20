@@ -314,7 +314,6 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
         onClose={handleClose}
         isBusy={isPending}
         fullScreen={isMobile}
-        fullWidth
         maxWidth={hasSuggestions ? 'md' : 'sm'}
         aria-labelledby={titleId}
         aria-describedby={`${fileId} ${descriptionId}`}

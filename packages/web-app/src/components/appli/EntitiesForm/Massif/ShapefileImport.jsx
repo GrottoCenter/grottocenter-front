@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -12,12 +12,11 @@ import {
 import { Upload } from '@mui/icons-material';
 import shp from 'shpjs';
 import StandardDialog from '@/components/common/StandardDialog';
-import { useDebounce } from '@/hooks';
+import { useGeometrySimplification } from '@/hooks/useGeometrySimplification';
 import { INFO_VERTICES } from '@/utils/geometrySimplification';
 import { parseGeoJsonToMultiPolygon } from '../../../../helpers/geojsonParser';
 import FileSelectorInput from '../../../common/FileSelectorInput';
 
-const INITIAL_TOLERANCE = 0.0;
 const DANGER_VERTICES = 2000;
 const WARN_VERTICES = 1000;
 
@@ -31,117 +30,26 @@ const ACCEPTED_MIME = {
 const ShapefileImport = ({ onImport }) => {
   const { formatMessage } = useIntl();
   const sessionRef = useRef(0);
-  const requestRef = useRef(0);
-  const workerRef = useRef(null);
-  const workerReadyRef = useRef(false);
   const [open, setOpen] = useState(false);
-  const [tolerance, setTolerance] = useState(INITIAL_TOLERANCE);
   const [rawData, setRawData] = useState(null);
   const [fileName, setFileName] = useState(null);
   const [parseError, setParseError] = useState(null);
 
   const [isParsing, setIsParsing] = useState(false);
-  const [isSimplifying, setIsSimplifying] = useState(false);
-  const [simplifiedData, setSimplifiedData] = useState(null);
-  const [vertexCount, setVertexCount] = useState(0);
-  const debouncedTolerance = useDebounce(tolerance, 100);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [sliderParams, setSliderParams] = useState({
-    maxTolerance: 0.01,
-    step: 0.0001,
-    minAchievableCount: 0
-  });
-
-  useEffect(() => {
-    setSimplifiedData(null);
-    setVertexCount(0);
-    setIsSimplifying(false);
-    if (!rawData) {
-      setSliderParams({
-        maxTolerance: 0.01,
-        step: 0.0001,
-        minAchievableCount: 0
-      });
-      setAnalyzing(false);
-      return undefined;
-    }
-    setAnalyzing(true);
-    let worker;
-    workerReadyRef.current = false;
-    const handleError = () => {
-      if (worker && workerRef.current !== worker) return;
-      worker?.terminate();
-      workerRef.current = null;
-      workerReadyRef.current = false;
-      setParseError(formatMessage({ id: 'Failed to parse file' }));
-      setAnalyzing(false);
-      setIsSimplifying(false);
-      setSimplifiedData(null);
-      setRawData(null);
-    };
-    try {
-      worker = new Worker(
-        new URL(
-          '../../../../workers/geometryImport.worker.js',
-          import.meta.url
-        ),
-        { type: 'module' }
-      );
-    } catch {
-      handleError();
-      return undefined;
-    }
-    workerRef.current = worker;
-    worker.onmessage = ({ data }) => {
-      if (
-        workerRef.current !== worker ||
-        data.requestId !== requestRef.current
-      ) {
-        return;
-      }
-      if (data.error) {
-        handleError();
-        return;
-      }
-      if (data.sliderParams) {
-        setSliderParams(data.sliderParams);
-        workerReadyRef.current = true;
-      }
-      setSimplifiedData(data.simplifiedData);
-      setVertexCount(data.vertexCount);
-      setAnalyzing(false);
-      setIsSimplifying(false);
-    };
-    worker.onerror = handleError;
-    worker.onmessageerror = handleError;
-    worker.postMessage({
-      type: 'load',
-      requestId: ++requestRef.current,
-      geometry: rawData,
-      tolerance: INITIAL_TOLERANCE
-    });
-    return () => {
-      workerRef.current = null;
-      worker.terminate();
-    };
-  }, [rawData, formatMessage]);
-
-  useEffect(() => {
-    if (
-      !workerRef.current ||
-      !workerReadyRef.current ||
-      analyzing ||
-      debouncedTolerance !== tolerance
-    ) {
-      return;
-    }
-    setIsSimplifying(true);
-    workerRef.current.postMessage({
-      type: 'simplify',
-      requestId: ++requestRef.current,
-      tolerance: debouncedTolerance
-    });
-  }, [debouncedTolerance, tolerance, analyzing]);
+  const handleSimplificationError = useCallback(() => {
+    setParseError(formatMessage({ id: 'Failed to parse file' }));
+    setRawData(null);
+  }, [formatMessage]);
+  const {
+    tolerance,
+    updateTolerance,
+    reset: resetSimplification,
+    simplifiedData,
+    vertexCount,
+    isAnalyzing,
+    isSimplifying,
+    sliderParams
+  } = useGeometrySimplification(rawData, handleSimplificationError);
 
   useEffect(
     () => () => {
@@ -219,12 +127,9 @@ const ShapefileImport = ({ onImport }) => {
     if (!file) return;
 
     const session = ++sessionRef.current;
-    requestRef.current += 1;
-    workerReadyRef.current = false;
+    resetSimplification();
     setRawData(null);
-    setSimplifiedData(null);
     setFileName(null);
-    setTolerance(INITIAL_TOLERANCE);
     setParseError(null);
     setIsParsing(true);
 
@@ -282,14 +187,11 @@ const ShapefileImport = ({ onImport }) => {
 
   const handleFileRemove = () => {
     sessionRef.current += 1;
-    requestRef.current += 1;
+    resetSimplification();
     setIsParsing(false);
-    setIsSimplifying(false);
-    setSimplifiedData(null);
     setRawData(null);
     setFileName(null);
     setParseError(null);
-    setTolerance(INITIAL_TOLERANCE);
   };
 
   const handleFileRejections = () => {
@@ -301,7 +203,7 @@ const ShapefileImport = ({ onImport }) => {
   };
 
   const handleImport = () => {
-    if (simplifiedData && !isParsing && !analyzing && !isSimplifying) {
+    if (simplifiedData && !isParsing && !isAnalyzing && !isSimplifying) {
       const data = simplifiedData;
       setOpen(false);
       handleFileRemove();
@@ -331,7 +233,6 @@ const ShapefileImport = ({ onImport }) => {
       <StandardDialog
         open={open}
         onClose={handleClose}
-        maxWidth="sm"
         fullScreenOnMobile
         title={formatMessage({ id: 'Import geometry' })}
         actions={
@@ -342,7 +243,7 @@ const ShapefileImport = ({ onImport }) => {
             <Button
               onClick={handleImport}
               disabled={
-                isParsing || analyzing || isSimplifying || !simplifiedData
+                isParsing || isAnalyzing || isSimplifying || !simplifiedData
               }
               variant="contained">
               {formatMessage({ id: 'Import' })}
@@ -372,10 +273,10 @@ const ShapefileImport = ({ onImport }) => {
             onFilesAdd={handleFilesAdd}
             onFileRemove={handleFileRemove}
             onFileRejections={handleFileRejections}
-            disabled={analyzing || isParsing}
+            disabled={isAnalyzing || isParsing}
           />
 
-          {(isParsing || analyzing || isSimplifying) && (
+          {(isParsing || isAnalyzing || isSimplifying) && (
             <Box
               role="status"
               sx={{
@@ -395,7 +296,7 @@ const ShapefileImport = ({ onImport }) => {
             </Box>
           )}
 
-          {rawData && !analyzing && (
+          {rawData && !isAnalyzing && (
             <>
               <Box>
                 <Typography variant="body2" gutterBottom>
@@ -404,12 +305,7 @@ const ShapefileImport = ({ onImport }) => {
                 </Typography>
                 <Slider
                   value={tolerance}
-                  onChange={(_e, val) => {
-                    if (val === tolerance) return;
-                    requestRef.current += 1;
-                    setIsSimplifying(true);
-                    setTolerance(val);
-                  }}
+                  onChange={(_event, value) => updateTolerance(value)}
                   aria-label={formatMessage({
                     id: 'Simplification Tolerance'
                   })}

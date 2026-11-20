@@ -11,6 +11,7 @@ const ConfirmationDialog = ({
   onClose,
   onConfirm,
   confirmLabel,
+  confirmTestId,
   cancelLabel,
   color = 'primary',
   isBusy = false,
@@ -40,8 +41,10 @@ const ConfirmationDialog = ({
             variant="contained"
             color={color}
             onClick={onConfirm}
+            data-testid={confirmTestId}
             disabled={isBusy || disabled}
-            loading={isBusy}>
+            loading={isBusy}
+            loadingPosition="start">
             {confirmLabel}
           </Button>
         </>
@@ -58,6 +61,7 @@ ConfirmationDialog.propTypes = {
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,
   confirmLabel: PropTypes.node.isRequired,
+  confirmTestId: PropTypes.string,
   cancelLabel: PropTypes.node,
   color: PropTypes.oneOf([
     'primary',

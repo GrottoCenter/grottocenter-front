@@ -479,6 +479,49 @@ const MyComponent = () => {
 };
 ```
 
+### Dialogs and modal actions
+
+**New or reworked modals must reuse the shared components**, not a raw MUI
+`Dialog` with local footer, spacing, or mobile behavior.
+
+| Need | Component |
+| ---- | --------- |
+| Confirmation, including destructive actions | [`ConfirmationDialog`](src/components/common/ConfirmationDialog.jsx) |
+| Form or rich dialog content | [`StandardDialog`](src/components/common/StandardDialog/index.jsx) |
+| Custom responsive action group | [`ResponsiveActionRow`](src/components/common/ResponsiveActionRow.jsx) |
+| Entity-form Cancel/submit actions, including offline handling | [`FormActionRow`](src/components/appli/EntitiesForm/utils/FormContainers.jsx) |
+
+- For long forms, use `StandardDialog fullScreenOnMobile`. Do not recreate a
+  media query solely for fullscreen behavior or add a pass-through `FormDialog`.
+  The shell already defaults to `fullWidth`, `maxWidth="sm"`, `scrollable`,
+  and `stackActionsOnMobile`; omit those props unless overriding a default.
+- Supply secondary actions first and the primary action last. Desktop actions
+  sit bottom-right; below `sm`, the row reverses the **DOM order** and stacks
+  full-width buttons, primary first, with at least 44px touch targets. Do not
+  recreate this with CSS ordering, button widths, or local footer margins.
+- When `actions` already contains `FormActionRow` or `ResponsiveActionRow`,
+  set `stackActionsOnMobile={false}` on the shell to avoid double ordering.
+- Use `ConfirmationDialog`'s `isBusy`, `disabled`, `confirmLabel`, and `color`
+  instead of rebuilding its buttons. `confirmTestId` preserves a stable selector
+  on the primary button. The caller owns mutation handling and when to close;
+  confirmation does **not** automatically close after `onConfirm`.
+- In custom actions, use native MUI `Button loading={isPending}` with
+  `loadingPosition="start"` to retain the label, or `ActionButton loading`.
+  Do not put a handwritten `CircularProgress` in a button; content/status
+  spinners remain appropriate.
+- `StandardDialog isBusy` blocks the cross, Escape, and backdrop dismissal;
+  it does not disable fields or custom actions. Keep their disabling conditions
+  explicit. When Cancel genuinely aborts work, such as PDF generation, preserve
+  that cancellation path rather than blindly locking dismissal.
+- Keep the shell's title association, focus handling, scrollable body, fixed
+  footer, safe-area padding, and keyboard viewport handling. Use existing focus
+  overrides only when the form/portal interaction requires them.
+
+Specialized media viewers such as `DocumentsList/MediaLightbox` and the
+moderation header toolbar are intentional exceptions, not templates for
+ordinary modals. Any new exception must have a concrete interaction reason.
+Use the shared components' Storybook examples and nearby tests as prior art.
+
 ### Navigation (mobile vs desktop)
 
 `AppLink` (`src/components/common/AppLink.jsx`) is the single link component for the whole app. Default choice whenever you render something that looks/behaves like a link — text links, buttons, cards, list items. It renders a real `<a>` / React Router `<Link>`, so keyboard focus, Enter, ctrl/middle-click and right-click "open in new tab" all work for free. Never build a link out of a `<span role="button">` or a plain `onClick`.

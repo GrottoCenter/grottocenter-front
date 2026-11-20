@@ -35,6 +35,7 @@ export const Default = {
           key="save"
           variant="contained"
           loading={isBusy}
+          loadingPosition="start"
           onClick={action('onSave')}>
           Save changes
         </Button>

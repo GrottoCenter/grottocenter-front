@@ -103,10 +103,8 @@ const OrganizationPreview = ({ id, onClose }) => {
       open
       onClose={onClose}
       title={formatMessage({ id: 'Organization' })}
-      fullWidth
       fullScreen={isMobile}
-      maxWidth="xl"
-      scrollable>
+      maxWidth="xl">
       <Organization
         key={id}
         organization={data}

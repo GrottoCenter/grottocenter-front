@@ -200,8 +200,6 @@ const DocumentValidationPage = () => {
       <StandardDialog
         maxWidth="lg"
         fullScreen={isNarrowViewport}
-        fullWidth
-        scrollable
         open={!!editView}
         onClose={closeEditView}
         title={formatMessage({ id: 'Edit document' })}>

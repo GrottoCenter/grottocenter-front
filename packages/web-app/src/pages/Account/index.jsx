@@ -20,9 +20,7 @@ import {
   Select,
   Skeleton,
   Switch,
-  Typography,
-  useMediaQuery,
-  useTheme
+  Typography
 } from '@mui/material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
@@ -585,7 +583,6 @@ const MfaSection = () => {
       <StandardDialog
         open={isDialogOpen}
         onClose={handleClose}
-        fullWidth
         maxWidth="xs"
         title={formatMessage({ id: 'mfaResetTitle' })}
         isBusy={mfaResetMutation.isPending}
@@ -603,11 +600,8 @@ const MfaSection = () => {
               color="error"
               variant="contained"
               disabled={!isValid || mfaResetMutation.isPending}
-              startIcon={
-                mfaResetMutation.isPending ? (
-                  <CircularProgress size={16} color="inherit" />
-                ) : null
-              }>
+              loading={mfaResetMutation.isPending}
+              loadingPosition="start">
               {formatMessage({ id: 'mfaResetButton' })}
             </Button>
           </>
@@ -1314,47 +1308,24 @@ const OfflineDataSection = () => {
           </Button>
         </SectionBody>
       </SectionPaper>
-      <StandardDialog
+      <ConfirmationDialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         isBusy={isClearing}
-        fullWidth
-        maxWidth="xs"
         title={formatMessage({ id: 'Clear offline data' })}
-        actions={
-          <>
-            <Button
-              onClick={() => setIsDialogOpen(false)}
-              variant="outlined"
-              disabled={isClearing}>
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-            <Button
-              onClick={handleConfirm}
-              color="warning"
-              variant="contained"
-              disabled={isClearing}
-              startIcon={
-                isClearing ? (
-                  <CircularProgress size={16} color="inherit" />
-                ) : null
-              }>
-              {formatMessage({ id: 'Clear' })}
-            </Button>
-          </>
-        }>
+        onConfirm={handleConfirm}
+        confirmLabel={formatMessage({ id: 'Clear' })}
+        color="warning">
         <Typography>
           {formatMessage({ id: 'offlineDataConfirmation' })}
         </Typography>
-      </StandardDialog>
+      </ConfirmationDialog>
     </>
   );
 };
 
 const AccountDeletionSection = () => {
   const { formatMessage, locale } = useIntl();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const contactUrl = contactLinks[locale] ?? contactLinks['*'];
 
@@ -1392,10 +1363,7 @@ const AccountDeletionSection = () => {
       <StandardDialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        fullWidth
-        fullScreen={isMobile}
-        scrollable
-        stackActionsOnMobile
+        fullScreenOnMobile
         title={formatMessage({ id: 'Account deletion' })}
         actions={
           <>

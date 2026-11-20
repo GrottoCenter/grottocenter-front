@@ -221,12 +221,10 @@ const StandardDialog = ({
         </DialogContent>
       )}
       {actions && (
-        <ResponsiveActionRow
-          component={StyledDialogActions}
-          stackOnMobile={stackActionsOnMobile && !hasHeaderActions}
+        <StyledDialogActions
+          disableSpacing
           sx={{
             gridArea: 'actions',
-            '& > :not(style) ~ :not(style)': { marginLeft: 0 },
             ...(hasHeaderActions && {
               py: 2,
               pr: 6,
@@ -237,8 +235,11 @@ const StandardDialog = ({
               scrollbarGutter: 'stable'
             })
           }}>
-          {actions}
-        </ResponsiveActionRow>
+          <ResponsiveActionRow
+            stackOnMobile={stackActionsOnMobile && !hasHeaderActions}>
+            {actions}
+          </ResponsiveActionRow>
+        </StyledDialogActions>
       )}
     </Dialog>
   );
@@ -247,10 +248,7 @@ const StandardDialog = ({
 export default StandardDialog;
 
 StandardDialog.propTypes = {
-  actions: PropTypes.oneOfType([
-    PropTypes.node,
-    PropTypes.arrayOf(PropTypes.node)
-  ]),
+  actions: PropTypes.node,
   actionsPosition: PropTypes.oneOf(['top', 'bottom']),
   centerContentMobile: PropTypes.bool,
   children: PropTypes.node,
@@ -266,7 +264,7 @@ StandardDialog.propTypes = {
   onClose: PropTypes.func,
   isBusy: PropTypes.bool,
   scrollable: PropTypes.bool,
-  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  title: PropTypes.node,
   titleComponent: PropTypes.oneOf(['h1', 'h2', 'div']),
   titleVariant: PropTypes.oneOf(['h1', 'h2', 'h3']),
   'aria-labelledby': PropTypes.string,
