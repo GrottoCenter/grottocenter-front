@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { Marker, Popup } from 'react-leaflet';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
@@ -13,6 +13,7 @@ import { getOrganizationMarker } from '@/components/common/Maps/common/Markers/C
 import CustomIcon from '@/components/common/CustomIcon';
 import OrganizationIcon from '@/components/common/OrganizationIcon';
 import ProfileAvatar from '@/components/common/ProfileAvatar';
+import InfoPanel from '@/components/common/InfoPanel';
 import { Property } from '@/components/common/Properties';
 import {
   canOrganizationExplore,
@@ -21,7 +22,6 @@ import {
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import MultilinesTypography from '../../common/MultilinesTypography';
 import OrganizationPopup from '../../common/Maps/common/Markers/Components/OrganizationPopup';
-import InfoSection from '../../common/InfoSection';
 import { GrottoFullPropTypes } from '../../../types/grotto.type';
 import linkifyOptions from '../../../helpers/linkifyOptions';
 
@@ -31,12 +31,6 @@ const InfoRow = styled('div')`
   display: flex;
   align-items: flex-start;
   gap: ${({ theme }) => theme.spacing(0.5)};
-`;
-
-const SectionPaper = styled(Paper)`
-  padding: ${({ theme }) => theme.spacing(1)};
-  border-radius: ${({ theme }) => theme.spacing(0.5)};
-  background-color: ${({ theme }) => theme.palette.grey[50]};
 `;
 
 const StatItem = ({ iconType, alt, count, label }) => (
@@ -108,9 +102,8 @@ const Details = ({ organization }) => {
     else if (hasPosition) desktopAreas = '"map"';
   }
   const organizationSummary = (
-    <SectionPaper
-      variant="outlined"
-      data-testid="organization-summary"
+    <InfoPanel
+      testId="organization-summary"
       sx={{
         gridArea: hasLogo ? undefined : 'summary',
         containerType: 'inline-size',
@@ -193,7 +186,7 @@ const Details = ({ organization }) => {
           />
         )}
       </Box>
-    </SectionPaper>
+    </InfoPanel>
   );
 
   return (
@@ -282,66 +275,56 @@ const Details = ({ organization }) => {
               flexDirection: 'column',
               gap: 1
             }}>
-            {/* Contact Paper */}
             {(hasAddress || organization.mail || organization.url) && (
-              <SectionPaper
-                variant="outlined"
-                data-testid="organization-contact">
-                <InfoSection
-                  component="h2"
-                  title={formatMessage({ id: 'Contact' })}>
-                  {hasAddress && (
-                    <InfoRow>
-                      <LocationCityIcon
-                        color="primary"
-                        sx={{ fontSize: 24, flexShrink: 0 }}
-                      />
-                      <Typography>{addressText}</Typography>
-                    </InfoRow>
-                  )}
-                  {organization.mail && (
-                    <InfoRow>
-                      <AlternateEmailIcon
-                        color="primary"
-                        sx={{ fontSize: 24, flexShrink: 0 }}
-                      />
-                      <Typography>
-                        <Linkify options={linkifyOptions}>
-                          {organization.mail}
-                        </Linkify>
-                      </Typography>
-                    </InfoRow>
-                  )}
-                  {organization.url && (
-                    <InfoRow>
-                      <LanguageIcon
-                        color="primary"
-                        sx={{ fontSize: 24, flexShrink: 0 }}
-                      />
-                      <Typography>
-                        <Linkify options={linkifyOptions}>
-                          {organization.url}
-                        </Linkify>
-                      </Typography>
-                    </InfoRow>
-                  )}
-                </InfoSection>
-              </SectionPaper>
+              <InfoPanel
+                testId="organization-contact"
+                title={formatMessage({ id: 'Contact' })}>
+                {hasAddress && (
+                  <InfoRow>
+                    <LocationCityIcon
+                      color="primary"
+                      sx={{ fontSize: 24, flexShrink: 0 }}
+                    />
+                    <Typography>{addressText}</Typography>
+                  </InfoRow>
+                )}
+                {organization.mail && (
+                  <InfoRow>
+                    <AlternateEmailIcon
+                      color="primary"
+                      sx={{ fontSize: 24, flexShrink: 0 }}
+                    />
+                    <Typography>
+                      <Linkify options={linkifyOptions}>
+                        {organization.mail}
+                      </Linkify>
+                    </Typography>
+                  </InfoRow>
+                )}
+                {organization.url && (
+                  <InfoRow>
+                    <LanguageIcon
+                      color="primary"
+                      sx={{ fontSize: 24, flexShrink: 0 }}
+                    />
+                    <Typography>
+                      <Linkify options={linkifyOptions}>
+                        {organization.url}
+                      </Linkify>
+                    </Typography>
+                  </InfoRow>
+                )}
+              </InfoPanel>
             )}
 
-            {/* Description Paper */}
             {organization.customMessage && (
-              <SectionPaper variant="outlined">
-                <InfoSection
-                  component="h2"
-                  title={formatMessage({ id: 'Description' })}>
-                  <MultilinesTypography>
-                    <Linkify options={linkifyOptions}>
-                      {organization.customMessage}
-                    </Linkify>
-                  </MultilinesTypography>
-                </InfoSection>
-              </SectionPaper>
+              <InfoPanel title={formatMessage({ id: 'Description' })}>
+                <MultilinesTypography>
+                  <Linkify options={linkifyOptions}>
+                    {organization.customMessage}
+                  </Linkify>
+                </MultilinesTypography>
+              </InfoPanel>
             )}
           </Box>
         )}
