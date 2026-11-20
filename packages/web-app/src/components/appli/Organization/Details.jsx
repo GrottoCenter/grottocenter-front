@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { Marker, Popup } from 'react-leaflet';
 import { Box, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -14,6 +13,7 @@ import CustomIcon from '@/components/common/CustomIcon';
 import OrganizationIcon from '@/components/common/OrganizationIcon';
 import ProfileAvatar from '@/components/common/ProfileAvatar';
 import InfoPanel from '@/components/common/InfoPanel';
+import IconLabel from '@/components/common/IconLabel';
 import { Property } from '@/components/common/Properties';
 import {
   canOrganizationExplore,
@@ -26,12 +26,6 @@ import { GrottoFullPropTypes } from '../../../types/grotto.type';
 import linkifyOptions from '../../../helpers/linkifyOptions';
 
 const ORGANIZATION_LOGO_SIZE = 128;
-
-const InfoRow = styled('div')`
-  display: flex;
-  align-items: flex-start;
-  gap: ${({ theme }) => theme.spacing(0.5)};
-`;
 
 const StatItem = ({ iconType, alt, count, label }) => (
   <Property
@@ -280,39 +274,48 @@ const Details = ({ organization }) => {
                 testId="organization-contact"
                 title={formatMessage({ id: 'Contact' })}>
                 {hasAddress && (
-                  <InfoRow>
-                    <LocationCityIcon
-                      color="primary"
-                      sx={{ fontSize: 24, flexShrink: 0 }}
-                    />
-                    <Typography>{addressText}</Typography>
-                  </InfoRow>
+                  <IconLabel
+                    alignToFirstLine
+                    icon={
+                      <LocationCityIcon
+                        color="primary"
+                        sx={{ fontSize: 24, flexShrink: 0 }}
+                      />
+                    }>
+                    <Typography component="span">{addressText}</Typography>
+                  </IconLabel>
                 )}
                 {organization.mail && (
-                  <InfoRow>
-                    <AlternateEmailIcon
-                      color="primary"
-                      sx={{ fontSize: 24, flexShrink: 0 }}
-                    />
-                    <Typography>
+                  <IconLabel
+                    alignToFirstLine
+                    icon={
+                      <AlternateEmailIcon
+                        color="primary"
+                        sx={{ fontSize: 24, flexShrink: 0 }}
+                      />
+                    }>
+                    <Typography component="span">
                       <Linkify options={linkifyOptions}>
                         {organization.mail}
                       </Linkify>
                     </Typography>
-                  </InfoRow>
+                  </IconLabel>
                 )}
                 {organization.url && (
-                  <InfoRow>
-                    <LanguageIcon
-                      color="primary"
-                      sx={{ fontSize: 24, flexShrink: 0 }}
-                    />
-                    <Typography>
+                  <IconLabel
+                    alignToFirstLine
+                    icon={
+                      <LanguageIcon
+                        color="primary"
+                        sx={{ fontSize: 24, flexShrink: 0 }}
+                      />
+                    }>
+                    <Typography component="span">
                       <Linkify options={linkifyOptions}>
                         {organization.url}
                       </Linkify>
                     </Typography>
-                  </InfoRow>
+                  </IconLabel>
                 )}
               </InfoPanel>
             )}

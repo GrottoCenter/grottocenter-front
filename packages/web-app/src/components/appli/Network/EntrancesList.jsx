@@ -8,15 +8,13 @@ import {
   ListItemButton,
   ListItemText,
   ListItemIcon,
-  Paper,
   Tooltip
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Skeleton from '@mui/material/Skeleton';
-import { Link as RouterLink } from 'react-router-dom';
-
-import InfoSection from '../../common/InfoSection';
+import AppLink from '@/components/common/AppLink';
+import InfoPanel from '@/components/common/InfoPanel';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
 import Alert from '../../common/Alert';
@@ -86,8 +84,10 @@ const EntrancesList = ({
                   )
                 }>
                 <ListItemButton
-                  component={RouterLink}
+                  component={AppLink}
                   nativeButton={false}
+                  color="inherit"
+                  underline="none"
                   to={`/ui/entrances/${entrance.id}`}
                   selected={selectedEntrancesId.includes(entrance.id)}>
                   <ListItemIcon>
@@ -112,15 +112,9 @@ const EntrancesList = ({
   if (inline) {
     return (
       <Box sx={{ height: '100%', overflow: 'auto' }}>
-        <Paper
-          variant="outlined"
-          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-          <InfoSection
-            component="h2"
-            title={formatMessage({ id: 'Entrances' })}>
-            {listContent}
-          </InfoSection>
-        </Paper>
+        <InfoPanel title={formatMessage({ id: 'Entrances' })}>
+          {listContent}
+        </InfoPanel>
       </Box>
     );
   }

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Box, Link, Paper, Typography, useTheme } from '@mui/material';
+import { Box, Paper, Typography, useTheme } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -41,13 +41,13 @@ const RecapTile = ({ icon, color, count, label, reportUrl, downloadLabel }) => (
       {label}
     </Typography>
     {reportUrl && (
-      <Link
+      <AppLink
         href={reportUrl}
         target="_blank"
         rel="noopener noreferrer"
         variant="caption">
         {downloadLabel}
-      </Link>
+      </AppLink>
     )}
   </Paper>
 );
@@ -170,16 +170,12 @@ const ImportResultRecap = ({ progress, status, reportUrls = null }) => {
             defaultMessage="A copy of this summary has been sent to your notifications, and by email if you enabled it in your {settingsLink}. Report download links expire after 7 days."
             values={{
               settingsLink: (
-                <Link
-                  component={AppLink}
-                  to="/ui/account"
-                  openInNewTabDesktop
-                  variant="caption">
+                <AppLink to="/ui/account" openInNewTabDesktop variant="caption">
                   {formatMessage({
                     id: 'csvImport.notificationSettingsLink',
                     defaultMessage: 'notification settings'
                   })}
-                </Link>
+                </AppLink>
               )
             }}
           />
