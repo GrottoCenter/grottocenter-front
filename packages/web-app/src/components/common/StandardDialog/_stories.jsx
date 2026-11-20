@@ -1,4 +1,5 @@
 import { action } from 'storybook/actions';
+import { expect, waitFor, within } from 'storybook/test';
 import { Button, TextField, Typography } from '@mui/material';
 import StandardDialog from './index';
 
@@ -14,6 +15,7 @@ export const Default = {
     actionsPosition = 'bottom',
     isBusy = false,
     fullScreenOnMobile = false,
+    centerContentMobile = false,
     isLongContent = false
   }) => (
     <StandardDialog
@@ -22,6 +24,7 @@ export const Default = {
       title="Edit the entrance"
       isBusy={isBusy}
       fullScreenOnMobile={fullScreenOnMobile}
+      centerContentMobile={centerContentMobile}
       actionsPosition={actionsPosition}
       actions={[
         <Button
@@ -64,4 +67,37 @@ export const LongForm = {
 export const Saving = {
   ...Default,
   args: { isBusy: true }
+};
+
+export const CenteredContent = {
+  ...Default,
+  args: { centerContentMobile: true, fullScreenOnMobile: true },
+  play: async ({ canvasElement }) => {
+    const dialog = await within(canvasElement.ownerDocument.body).findByRole(
+      'dialog'
+    );
+    const content = dialog.querySelector('.MuiDialogContent-root');
+    await waitFor(() => {
+      const bounds = content.getBoundingClientRect();
+      const first = content.firstElementChild.getBoundingClientRect();
+      const last = content.lastElementChild.getBoundingClientRect();
+      expect(first.top).toBeGreaterThanOrEqual(bounds.top);
+      if (
+        content.ownerDocument.defaultView.matchMedia('(max-width: 599.95px)')
+          .matches &&
+        content.scrollHeight <= content.clientHeight
+      ) {
+        expect(
+          Math.abs(
+            (first.top + last.bottom) / 2 - (bounds.top + bounds.bottom) / 2
+          )
+        ).toBeLessThanOrEqual(1);
+      }
+    });
+  }
+};
+
+export const CenteredLongContent = {
+  ...CenteredContent,
+  args: { ...CenteredContent.args, isLongContent: true }
 };

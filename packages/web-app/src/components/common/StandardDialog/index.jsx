@@ -36,7 +36,13 @@ const DialogContent = styled(MuiDialogContent, {
       padding: ${({ theme, $dense }) => theme.spacing(1, $dense ? 0.5 : 2)};
       ${({ $centerMobile }) =>
         $centerMobile
-          ? 'display: flex; flex-direction: column; justify-content: center;'
+          ? {
+              display: 'flex',
+              flexDirection: 'column',
+              // Auto margins collapse on overflow, keeping the start reachable.
+              '& > :first-child': { marginTop: 'auto' },
+              '& > :last-child': { marginBottom: 'auto' }
+            }
           : ''}
     }
   }
