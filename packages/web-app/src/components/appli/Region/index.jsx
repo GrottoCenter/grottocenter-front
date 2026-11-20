@@ -4,14 +4,13 @@ import { useIntl } from 'react-intl';
 import { Marker } from 'react-leaflet';
 import { Button, Card, CircularProgress } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { Download } from '@mui/icons-material';
 import ShareIcon from '@mui/icons-material/Share';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import { useUserProperties } from '@/hooks/useUserProperties';
+import { useSubscriptionAction } from '@/hooks/useSubscriptionAction';
 import PageTabs from '@/components/common/Layouts/PageTabs';
 import RecentChangesSection from '@/components/appli/RecentChanges/Section';
 import { useRecentChangesTabs } from '@/hooks/useRecentChangesTabs';
@@ -88,28 +87,17 @@ const Region = ({
       ? [region.latitude, region.longitude]
       : null;
 
-  let SubscribeIcon = <CircularProgress size={20} />;
-  if (!isSubscribeLoading) {
-    SubscribeIcon = isSubscribed ? (
-      <NotificationsActiveIcon />
-    ) : (
-      <NotificationsNoneIcon />
-    );
-  }
+  const subscriptionAction = useSubscriptionAction({
+    isSubscribed,
+    isLoading: isSubscribeLoading,
+    canSubscribe,
+    onClick: handleChangeSubscribe
+  });
 
   const actions = region ? (
     <ResponsiveActions
       items={[
-        {
-          key: 'subscribe',
-          icon: SubscribeIcon,
-          label: formatMessage({
-            id: isSubscribed ? 'Unsubscribe' : 'Subscribe'
-          }),
-          onClick: handleChangeSubscribe,
-          color: isSubscribed ? 'secondary' : 'primary',
-          hidden: !canSubscribe
-        },
+        subscriptionAction,
         {
           key: 'pdf',
           icon: <Download />,
