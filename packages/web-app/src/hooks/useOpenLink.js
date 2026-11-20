@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHref, useNavigate } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
 
 /**
@@ -17,12 +17,17 @@ import { isMobile } from 'react-device-detect';
  */
 const useOpenLink = () => {
   const navigate = useNavigate();
+  const routerBaseHref = useHref('/');
   return useCallback(
     url => {
       if (isMobile) navigate(url);
-      else window.open(url, '_blank');
+      else {
+        const basePath = routerBaseHref.replace(/\/$/, '');
+        const href = url.startsWith('/') ? `${basePath}${url}` : url;
+        window.open(href, '_blank');
+      }
     },
-    [navigate]
+    [navigate, routerBaseHref]
   );
 };
 

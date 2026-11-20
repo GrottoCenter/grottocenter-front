@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link as RouterLink } from 'react-router-dom';
+import {
+  Link as RouterLink,
+  useHref,
+  useInRouterContext
+} from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
 import MuiLink from '@mui/material/Link';
 
@@ -8,6 +12,54 @@ import MuiLink from '@mui/material/Link';
 // `blob:`, `tel:`, …) or is protocol-relative (`//host/path`). Everything else —
 // `/ui/entrances/42`, `#anchor`, `foo` — is a route this app owns.
 const isExternalUrl = url => /^[a-z][a-z0-9+.-]*:|^\/\//i.test(url);
+
+const RoutedInternalNewTabLink = React.forwardRef(
+  ({ url, children, ...rest }, ref) => (
+    <MuiLink
+      ref={ref}
+      href={useHref(url)}
+      {...rest}
+      target="_blank"
+      rel="noopener noreferrer">
+      {children}
+    </MuiLink>
+  )
+);
+
+RoutedInternalNewTabLink.propTypes = {
+  url: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired
+};
+
+const InternalNewTabLink = React.forwardRef(
+  ({ url, children, ...rest }, ref) => {
+    const isInRouterContext = useInRouterContext();
+
+    if (isInRouterContext) {
+      return (
+        <RoutedInternalNewTabLink ref={ref} url={url} {...rest}>
+          {children}
+        </RoutedInternalNewTabLink>
+      );
+    }
+
+    return (
+      <MuiLink
+        ref={ref}
+        href={url}
+        {...rest}
+        target="_blank"
+        rel="noopener noreferrer">
+        {children}
+      </MuiLink>
+    );
+  }
+);
+
+InternalNewTabLink.propTypes = {
+  url: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired
+};
 
 /**
  * Single link component for the whole app.
@@ -39,7 +91,14 @@ const isExternalUrl = url => /^[a-z][a-z0-9+.-]*:|^\/\//i.test(url);
 // accident.
 const AppLink = React.forwardRef(
   (
-    { to = null, href = null, openInNewTabDesktop = false, children, ...rest },
+    {
+      to = null,
+      href = null,
+      openInNewTabDesktop = false,
+      children,
+      nativeButton: _nativeButton,
+      ...rest
+    },
     ref
   ) => {
     // React 19 no longer checks propTypes at runtime, so the "exactly one
@@ -55,7 +114,6 @@ const AppLink = React.forwardRef(
         );
       }
     }
-
     const url = href ?? to;
 
     // No destination: render inert children rather than a <RouterLink to={null}>,
@@ -68,10 +126,8 @@ const AppLink = React.forwardRef(
       );
     }
 
-    // Leaves the app, either because the URL points elsewhere or because the
-    // caller asked for a new tab on desktop: a plain anchor, never a router
-    // navigation.
-    if (isExternalUrl(url) || (openInNewTabDesktop && !isMobile)) {
+    // External links are plain anchors, never router navigations.
+    if (isExternalUrl(url)) {
       return (
         <MuiLink
           ref={ref}
@@ -81,6 +137,14 @@ const AppLink = React.forwardRef(
           rel="noopener noreferrer">
           {children}
         </MuiLink>
+      );
+    }
+
+    if (openInNewTabDesktop && !isMobile) {
+      return (
+        <InternalNewTabLink ref={ref} url={url} {...rest}>
+          {children}
+        </InternalNewTabLink>
       );
     }
 
@@ -103,6 +167,8 @@ AppLink.propTypes = {
   href: PropTypes.string,
   // For internal links only: open a new tab on desktop instead of same-tab nav.
   openInNewTabDesktop: PropTypes.bool,
+  // Consumed by MUI button components that render this link.
+  nativeButton: PropTypes.bool,
   children: PropTypes.node.isRequired
 };
 
