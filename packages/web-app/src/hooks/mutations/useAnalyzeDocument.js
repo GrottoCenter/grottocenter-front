@@ -88,8 +88,8 @@ export const useAnalyzeDocument = () =>
             },
             { signal: controller.signal }
           );
-          ({ token } = data);
           traceId = readTraceId(headers);
+          token = data?.token;
         } catch (error) {
           const failureTraceId = readTraceId(error.headers);
           if (failureTraceId) error.traceId = failureTraceId;

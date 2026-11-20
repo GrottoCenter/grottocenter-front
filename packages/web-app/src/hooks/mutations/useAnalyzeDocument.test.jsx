@@ -236,12 +236,20 @@ it.each([401, 403, 429, 503])(
   }
 );
 
-it.each([undefined, null, '', '   ', 123])(
-  'preserves the SSO reference when its token is unusable (%j) without uploading',
-  async token => {
+it.each([
+  undefined,
+  null,
+  {},
+  { token: null },
+  { token: '' },
+  { token: '   ' },
+  { token: 123 }
+])(
+  'preserves the SSO reference when its body has no usable token (%j) without uploading',
+  async data => {
     apiPostWithHeaders.mockResolvedValue({
       ...tokenResponse(),
-      data: { token },
+      data,
       headers: new Headers({ 'X-Trace-Id': '  invalid-sso-response-id  ' })
     });
     const { result } = renderAnalysis();
