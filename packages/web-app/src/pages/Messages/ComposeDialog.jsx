@@ -161,7 +161,8 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
   return (
     <StandardDialog
       open={open}
-      onClose={isSending ? undefined : handleClose}
+      onClose={handleClose}
+      isBusy={isSending}
       title={formatMessage({
         id: 'New Message',
         defaultMessage: 'New Message'

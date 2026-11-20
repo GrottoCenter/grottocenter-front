@@ -21,8 +21,8 @@ import ContributionMetadata from '@/components/common/Contribution/ContributionM
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { canOrganizationExplore } from '@/utils/organizationTypes';
 import { getOrganizationIconType } from '@/utils/organizationIcons';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import AppLink from '../../common/AppLink';
-import StandardDialog from '../../common/StandardDialog';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import SectionStack from '../../common/Layouts/SectionStack';
@@ -547,29 +547,13 @@ const Organization = ({
           )}
         </PageTabs>
       )}
-      <StandardDialog
+      <ConfirmationDialog
         open={!!pendingRemoveMember}
         onClose={() => setPendingRemoveMember(null)}
-        fullWidth
-        maxWidth="xs"
         title={formatMessage({ id: 'Remove member' })}
-        actions={
-          <>
-            <Button
-              onClick={() => setPendingRemoveMember(null)}
-              variant="outlined">
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-            <Button
-              onClick={handleConfirmRemoveMember}
-              variant="contained"
-              color="error"
-              startIcon={<PersonRemoveIcon />}
-              autoFocus>
-              {formatMessage({ id: 'Remove' })}
-            </Button>
-          </>
-        }>
+        onConfirm={handleConfirmRemoveMember}
+        confirmLabel={formatMessage({ id: 'Remove' })}
+        color="error">
         {formatMessage(
           {
             id: 'Are you sure you want to remove {name} from this organization?'
@@ -586,7 +570,7 @@ const Organization = ({
             )
           }
         )}
-      </StandardDialog>
+      </ConfirmationDialog>
     </PageContainer>
   );
 };

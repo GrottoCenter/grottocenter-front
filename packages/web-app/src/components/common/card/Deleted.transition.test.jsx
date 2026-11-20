@@ -61,7 +61,7 @@ it('prevents closing the real MUI dialog by cross, Escape or backdrop while pend
       />
     </IntlProvider>
   );
-  expect(screen.queryByRole('button', { name: 'close' })).toBeNull();
+  expect(screen.getByRole('button', { name: 'close' })).toBeDisabled();
   expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
   fireEvent.keyDown(screen.getByRole('dialog'), {
     key: 'Escape',

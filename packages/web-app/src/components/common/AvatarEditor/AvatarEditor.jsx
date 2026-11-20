@@ -211,13 +211,15 @@ const AvatarEditor = ({
         fullWidth
         maxWidth="xs"
         title={formatMessage({ id: 'avatar.remove' })}
-        onClose={isPending ? null : () => setIsRemoving(false)}
+        onClose={() => setIsRemoving(false)}
+        isBusy={isPending}
         stackActionsOnMobile
         actions={
           <>
             <Button
               variant="outlined"
               onClick={() => setIsRemoving(false)}
+              autoFocus
               disabled={isPending}>
               {formatMessage({ id: 'Cancel' })}
             </Button>

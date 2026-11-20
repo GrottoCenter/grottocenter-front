@@ -48,6 +48,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import AvatarEditor from '@/components/common/AvatarEditor/AvatarEditor';
 import ProfileAvatar from '@/components/common/ProfileAvatar';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import { postLogout } from '../../actions/Login';
 import {
   useAccount,
@@ -587,11 +588,13 @@ const MfaSection = () => {
         fullWidth
         maxWidth="xs"
         title={formatMessage({ id: 'mfaResetTitle' })}
+        isBusy={mfaResetMutation.isPending}
+        fullScreenOnMobile
         actions={
           <>
             <Button
               onClick={handleClose}
-              variant="text"
+              variant="outlined"
               disabled={mfaResetMutation.isPending}>
               {formatMessage({ id: 'Cancel' })}
             </Button>
@@ -1313,7 +1316,8 @@ const OfflineDataSection = () => {
       </SectionPaper>
       <StandardDialog
         open={isDialogOpen}
-        onClose={() => !isClearing && setIsDialogOpen(false)}
+        onClose={() => setIsDialogOpen(false)}
+        isBusy={isClearing}
         fullWidth
         maxWidth="xs"
         title={formatMessage({ id: 'Clear offline data' })}
@@ -1321,7 +1325,7 @@ const OfflineDataSection = () => {
           <>
             <Button
               onClick={() => setIsDialogOpen(false)}
-              variant="text"
+              variant="outlined"
               disabled={isClearing}>
               {formatMessage({ id: 'Cancel' })}
             </Button>
@@ -1760,27 +1764,13 @@ const AccountPage = () => {
           )}
         </div>
       </PageTabs>
-      <StandardDialog
+      <ConfirmationDialog
         open={!!pendingLeaveOrg}
         onClose={() => setPendingLeaveOrg(null)}
-        fullWidth
-        maxWidth="xs"
         title={formatMessage({ id: 'Leave organization' })}
-        actions={
-          <>
-            <Button onClick={() => setPendingLeaveOrg(null)} variant="outlined">
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-            <Button
-              onClick={handleConfirmLeaveOrg}
-              variant="contained"
-              color="error"
-              startIcon={<PersonRemoveIcon />}
-              autoFocus>
-              {formatMessage({ id: 'Leave' })}
-            </Button>
-          </>
-        }>
+        onConfirm={handleConfirmLeaveOrg}
+        confirmLabel={formatMessage({ id: 'Leave' })}
+        color="error">
         {formatMessage(
           { id: 'Are you sure you want to leave {name}?' },
           {
@@ -1795,7 +1785,7 @@ const AccountPage = () => {
             )
           }
         )}
-      </StandardDialog>
+      </ConfirmationDialog>
     </PageContainer>
   );
 };

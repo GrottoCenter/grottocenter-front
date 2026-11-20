@@ -75,6 +75,7 @@ const DocumentPreview = ({
         </Typography>
       }
       actionsPosition={hasHeaderActions ? 'top' : 'bottom'}
+      stackActionsOnMobile={false}
       actions={
         permissions.isModerator ? (
           <Box data-testid="document-moderation-actions" sx={{ width: '100%' }}>

@@ -4,10 +4,9 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
-import { Button, CircularProgress } from '@mui/material';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import LicenseBox from '../utils/LicenseBox';
-import StandardDialog from '../../../common/StandardDialog';
 import Alert from '../../../common/Alert';
 import { MassifTypes } from '../../../../types/massif.type';
 import FormProgressInfo from '../utils/FormProgressInfo';
@@ -393,29 +392,16 @@ export const MassifForm = ({ massifValues, onCancel }) => {
           onCancel={onCancel}
         />
       </form>
-      <StandardDialog
+      <ConfirmationDialog
         open={isConfirmOpen}
         onClose={handleConfirmCancel}
         title={confirmTitle}
-        actions={
-          <>
-            <Button onClick={handleConfirmCancel} variant="outlined">
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-            <Button
-              onClick={handleConfirmSubmit}
-              color="warning"
-              variant="contained">
-              {isSubmitting ? (
-                <CircularProgress size={24} />
-              ) : (
-                formatMessage({ id: 'Confirm' })
-              )}
-            </Button>
-          </>
-        }>
+        onConfirm={handleConfirmSubmit}
+        confirmLabel={formatMessage({ id: 'Confirm' })}
+        color="warning"
+        isBusy={isSubmitting}>
         <Alert severity="warning" disableMargins content={confirmBody} />
-      </StandardDialog>
+      </ConfirmationDialog>
       <LicenseBox />
     </FormContainer>
   );

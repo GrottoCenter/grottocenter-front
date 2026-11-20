@@ -385,43 +385,32 @@ const DeleteConfirmationDialogContent = ({
       fullScreen={isNarrowViewport}
       scrollable
       open={isOpen}
-      onClose={isLoading ? null : handleClose}
-      title={
-        <Typography variant="h3" component="span">
-          {formatMessage(
-            {
-              id: isPermanent
-                ? 'delete-permanent-confirmation-dialog'
-                : 'delete-confirmation-dialog',
-              defaultMessage: isPermanent
-                ? 'Permanently delete this {entityFmt}?'
-                : 'Delete this {entityFmt}?'
-            },
-            entityValues
-          )}
-        </Typography>
-      }
+      onClose={handleClose}
+      isBusy={isLoading}
+      title={formatMessage(
+        {
+          id: isPermanent
+            ? 'delete-permanent-confirmation-dialog'
+            : 'delete-confirmation-dialog',
+          defaultMessage: isPermanent
+            ? 'Permanently delete this {entityFmt}?'
+            : 'Delete this {entityFmt}?'
+        },
+        entityValues
+      )}
       actions={
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column-reverse', sm: 'row' },
-            justifyContent: 'flex-end',
-            gap: 1,
-            width: '100%'
-          }}>
+        <>
           <Button
             variant="outlined"
             onClick={handleClose}
             disabled={isLoading}
-            sx={{ width: { xs: '100%', sm: 'auto' } }}>
+            autoFocus>
             {formatMessage({ id: 'Cancel' })}
           </Button>
           <OfflineDisabled>
             <ActionButton
               variant="contained"
               color="error"
-              sx={{ width: { xs: '100%', sm: 'auto' } }}
               icon={isPermanent ? <DeleteForeverIcon /> : <DeleteIcon />}
               label={actionButtonTitle}
               loading={isLoading}
@@ -430,7 +419,7 @@ const DeleteConfirmationDialogContent = ({
               onClick={handleConfirmation}
             />
           </OfflineDisabled>
-        </Box>
+        </>
       }>
       <Stack spacing={2}>
         <FormSubmissionError error={error} />

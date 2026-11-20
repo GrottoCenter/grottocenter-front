@@ -3,15 +3,7 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import {
-  Box,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogActions,
-  Typography,
-  useMediaQuery
-} from '@mui/material';
+import { Box, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import {
   useCreateOrganization,
@@ -20,6 +12,7 @@ import {
   useNotification
 } from '@/hooks';
 import FormSubmissionError from '@/components/common/FormSubmissionError';
+import StandardDialog from '@/components/common/StandardDialog';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import OrganizationBasicFields from './Organization/OrganizationBasicFields';
 import { defaultOrganizationValues } from './Organization/formValues';
@@ -104,7 +97,7 @@ const RelatedEntityDialog = ({
   };
 
   return (
-    <Dialog
+    <StandardDialog
       open
       fullWidth
       fullScreen={isMobile}
@@ -114,6 +107,27 @@ const RelatedEntityDialog = ({
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
       onClose={handleClose}
+      isBusy={isPending}
+      dividers
+      stackActionsOnMobile={false}
+      title={formatMessage({
+        id: isOrganization
+          ? 'entityCreation.organization'
+          : 'entityCreation.author'
+      })}
+      actions={
+        <FormActionRow
+          isNew
+          isSubmitting={isPending}
+          isCancelDisabled={isPending}
+          onCancel={handleClose}
+          submitLabel={formatMessage({
+            id: 'entityCreation.createAndSelect'
+          })}
+          submitTestId="create-related-entity"
+          sx={{ m: 0 }}
+        />
+      }
       slotProps={{
         paper: {
           component: 'form',
@@ -137,92 +151,66 @@ const RelatedEntityDialog = ({
           }
         }
       }}>
-      <DialogTitle id={titleId}>
+      <Typography
+        id={descriptionId}
+        variant="body2"
+        color="text.secondary"
+        sx={{ mb: 2 }}>
         {formatMessage({
           id: isOrganization
-            ? 'entityCreation.organization'
-            : 'entityCreation.author'
+            ? 'entityCreation.organizationHelp'
+            : 'entityCreation.authorHelp'
         })}
-      </DialogTitle>
-      <DialogContent dividers>
-        <Typography
-          id={descriptionId}
-          variant="body2"
-          color="text.secondary"
-          sx={{ mb: 2 }}>
-          {formatMessage({
-            id: isOrganization
-              ? 'entityCreation.organizationHelp'
-              : 'entityCreation.authorHelp'
-          })}
-        </Typography>
-        <Box
-          component="fieldset"
-          disabled={isPending}
-          inert={isPending}
-          sx={{ border: 0, p: 0, m: 0, minWidth: 0 }}>
-          <Box ref={errorRef}>
-            <FormSubmissionError error={mutation.error} />
-          </Box>
-          {isOrganization ? (
-            <OrganizationBasicFields control={control} errors={errors} />
-          ) : (
-            <Box sx={{ display: 'grid', gap: 2 }}>
-              {defaultName && (
-                <Typography variant="body2">
-                  {formatMessage(
-                    { id: 'entityCreation.searchedName' },
-                    { name: defaultName }
-                  )}
-                </Typography>
-              )}
-              <FormRow>
-                <InputText
-                  control={control}
-                  formKey="name"
-                  labelName="entityCreation.firstName"
-                  isRequired
-                  isError={!!errors.name}
-                  maxLength={TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME}
-                  validatorFn={value =>
-                    !!value.trim() || formatMessage({ id: 'Required' })
-                  }
-                />
-                <InputText
-                  control={control}
-                  formKey="surname"
-                  labelName="Surname"
-                  isRequired
-                  isError={!!errors.surname}
-                  maxLength={TEXT_LENGTH_LIMITS.PERSON_LAST_NAME}
-                  validatorFn={value =>
-                    !!value.trim() || formatMessage({ id: 'Required' })
-                  }
-                />
-              </FormRow>
-            </Box>
-          )}
+      </Typography>
+      <Box
+        component="fieldset"
+        disabled={isPending}
+        inert={isPending}
+        sx={{ border: 0, p: 0, m: 0, minWidth: 0 }}>
+        <Box ref={errorRef}>
+          <FormSubmissionError error={mutation.error} />
         </Box>
-        <LicenseBox />
-      </DialogContent>
-      <DialogActions
-        sx={{
-          display: 'block',
-          px: 3,
-          '& [data-testid="form-action-row"]': { my: 1 }
-        }}>
-        <FormActionRow
-          isNew
-          isSubmitting={isPending}
-          isCancelDisabled={isPending}
-          onCancel={handleClose}
-          submitLabel={formatMessage({
-            id: 'entityCreation.createAndSelect'
-          })}
-          submitTestId="create-related-entity"
-        />
-      </DialogActions>
-    </Dialog>
+        {isOrganization ? (
+          <OrganizationBasicFields control={control} errors={errors} />
+        ) : (
+          <Box sx={{ display: 'grid', gap: 2 }}>
+            {defaultName && (
+              <Typography variant="body2">
+                {formatMessage(
+                  { id: 'entityCreation.searchedName' },
+                  { name: defaultName }
+                )}
+              </Typography>
+            )}
+            <FormRow>
+              <InputText
+                control={control}
+                formKey="name"
+                labelName="entityCreation.firstName"
+                isRequired
+                isError={!!errors.name}
+                maxLength={TEXT_LENGTH_LIMITS.PERSON_FIRST_NAME}
+                validatorFn={value =>
+                  !!value.trim() || formatMessage({ id: 'Required' })
+                }
+              />
+              <InputText
+                control={control}
+                formKey="surname"
+                labelName="Surname"
+                isRequired
+                isError={!!errors.surname}
+                maxLength={TEXT_LENGTH_LIMITS.PERSON_LAST_NAME}
+                validatorFn={value =>
+                  !!value.trim() || formatMessage({ id: 'Required' })
+                }
+              />
+            </FormRow>
+          </Box>
+        )}
+      </Box>
+      <LicenseBox />
+    </StandardDialog>
   );
 };
 

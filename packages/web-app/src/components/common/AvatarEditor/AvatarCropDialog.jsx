@@ -69,7 +69,8 @@ const AvatarCropDialog = ({
       title={formatMessage({
         id: isOrganization ? 'avatar.editLogo' : 'avatar.editPhoto'
       })}
-      onClose={isBusy ? null : onClose}
+      onClose={onClose}
+      isBusy={isBusy}
       actions={
         <>
           <Button variant="outlined" onClick={onClose} disabled={isBusy}>
