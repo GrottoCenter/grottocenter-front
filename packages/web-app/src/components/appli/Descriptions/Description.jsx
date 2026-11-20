@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box, ListItem, ListItemText } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import ContributionItem from '@/components/appli/Contributions/ContributionItem';
 import { DescriptionPropTypes } from '../../../types/description.type';
 import CreateDescriptionForm from '../EntitiesForm/Description/index';
 import {
@@ -14,12 +13,6 @@ import ActionButtons from '../Entry/ActionButtons';
 import SectionTitle from '../Entry/SectionTitle';
 import Contribution from '../../common/Contribution/Contribution';
 
-const ListItemStyled = styled(ListItem)`
-  display: flow-root;
-  border-top: 1px solid ${({ theme }) => theme.palette.divider};
-  padding-top: ${({ theme }) => theme.spacing(0.5)};
-  padding-bottom: ${({ theme }) => theme.spacing(0.5)};
-`;
 const Description = ({
   description,
   isEditAllowed,
@@ -56,8 +49,8 @@ const Description = ({
   const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
   return (
-    <ListItemStyled disableGutters>
-      <Box sx={{ float: 'right', ml: 0.5 }}>
+    <ContributionItem
+      actions={
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}
@@ -94,44 +87,34 @@ const Description = ({
               }
             : {})}
         />
-      </Box>
-      {isUpdateFormVisible && permissions.isAuth ? (
-        <Box
-          sx={{
-            width: '100%'
-          }}>
+      }
+      form={
+        isUpdateFormVisible && permissions.isAuth ? (
           <CreateDescriptionForm
             closeForm={() => setIsUpdateFormVisible(false)}
             isNewDescription={false}
             onSubmit={onSubmitForm}
             values={description}
           />
-        </Box>
-      ) : (
-        <ListItemText
-          style={{ margin: 0 }}
-          disableTypography
-          primary={
-            <SectionTitle
-              title={description.title}
-              anchorId={`description-${description.id}`}
-              isDeleted={description.isDeleted}
-            />
-          }
-          secondary={
-            <Contribution
-              body={description.body}
-              author={description.author}
-              reviewer={description.reviewer}
-              dateInscription={description.dateInscription}
-              dateReviewed={description.dateReviewed}
-              language={description.language}
-              isDeleted={description.isDeleted}
-            />
-          }
+        ) : null
+      }
+      title={
+        <SectionTitle
+          title={description.title}
+          anchorId={`description-${description.id}`}
+          isDeleted={description.isDeleted}
         />
-      )}
-    </ListItemStyled>
+      }>
+      <Contribution
+        body={description.body}
+        author={description.author}
+        reviewer={description.reviewer}
+        dateInscription={description.dateInscription}
+        dateReviewed={description.dateReviewed}
+        language={description.language}
+        isDeleted={description.isDeleted}
+      />
+    </ContributionItem>
   );
 };
 

@@ -1,17 +1,11 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Divider,
-  Link as MuiLink,
-  List,
-  Paper,
-  Typography
-} from '@mui/material';
+import { Link as MuiLink, Paper, Typography } from '@mui/material';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
+import ContributionSection from '@/components/appli/Contributions/ContributionSection';
 import NetworkInlineLink from '../../common/NetworkInlineLink';
 
-import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { DescriptionPropTypes } from '../../../types/description.type';
 import Description from './Description';
 import CreateDescriptionForm from '../EntitiesForm/Description';
@@ -21,7 +15,6 @@ import {
   usePermissions
 } from '../../../hooks';
 import { useMoveRelevanceWithUndo } from '../../../hooks/useMoveRelevanceWithUndo';
-import { sortByRelevance } from '../../../helpers/sortByRelevance';
 import Alert from '../../common/Alert';
 import AppLink from '../../common/AppLink';
 
@@ -55,12 +48,25 @@ const Descriptions = ({
   };
 
   return (
-    <ScrollableContent
-      dense
+    <ContributionSection
       anchorId="description"
       defaultExpanded={descriptions.length > 0 || hasNetworkDescriptions}
       title={formatMessage({ id: 'Description' })}
-      icon={
+      items={descriptions}
+      renderItem={(description, { isFirst, isLast }) => (
+        <Description
+          description={description}
+          isEditAllowed={isEditAllowed}
+          isMoving={movingId === description.id}
+          onMoveUp={() => handleMove(description.id, -1)}
+          onMoveDown={() => handleMove(description.id, 1)}
+          isFirst={isFirst}
+          isLast={isLast}
+          parentId={entityId}
+          parentType={entityType}
+        />
+      )}
+      createAction={
         permissions.isAuth &&
         isEditAllowed &&
         isAddAllowed && (
@@ -75,87 +81,59 @@ const Descriptions = ({
           />
         )
       }
-      content={
-        <>
-          {hasNetworkDescriptions && (
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 1,
-                mb: 1,
-                borderRadius: 2,
-                borderLeftWidth: 3,
-                borderLeftColor: 'secondary.main',
-                bgcolor: 'grey.50'
-              }}>
-              <Typography variant="body1" sx={{ overflowWrap: 'anywhere' }}>
-                <FormattedMessage
-                  id="network.descriptions.callout"
-                  values={{
-                    networkLink: (
-                      <NetworkInlineLink
-                        caveId={networkId}
-                        label={networkName}
-                        size={18}
-                        variant="body1"
-                      />
-                    ),
-                    descriptionsLink: (
-                      <MuiLink
-                        component={AppLink}
-                        to={`/ui/caves/${networkId}#description`}
-                        openInNewTabDesktop
-                        variant="body1"
-                        sx={{ display: 'inline', verticalAlign: 'baseline' }}>
-                        {formatMessage(
-                          { id: 'network.descriptions.count' },
-                          { count: networkDescriptionsCount }
-                        )}
-                      </MuiLink>
-                    )
-                  }}
-                />
-              </Typography>
-            </Paper>
-          )}
-
-          {isFormVisible && (
-            <>
-              <CreateDescriptionForm isNewDescription onSubmit={onSubmitForm} />
-              <Divider />
-            </>
-          )}
-
-          {descriptions.length > 0 ? (
-            <List dense disablePadding>
-              {(() => {
-                const sorted = sortByRelevance(descriptions);
-                const activeIds = sorted
-                  .filter(d => !d.isDeleted)
-                  .map(d => d.id);
-                return sorted.map(description => (
-                  <Description
-                    description={description}
-                    isEditAllowed={isEditAllowed}
-                    isMoving={movingId === description.id}
-                    key={description.id}
-                    onMoveUp={() => handleMove(description.id, -1)}
-                    onMoveDown={() => handleMove(description.id, 1)}
-                    isFirst={description.id === activeIds[0]}
-                    isLast={description.id === activeIds[activeIds.length - 1]}
-                    parentId={entityId}
-                    parentType={entityType}
-                  />
-                ));
-              })()}
-            </List>
-          ) : (
-            <Alert
-              severity="info"
-              content={formatMessage({ id: `descriptions.none.${entityType}` })}
-            />
-          )}
-        </>
+      beforeContent={
+        hasNetworkDescriptions ? (
+          <Paper
+            variant="outlined"
+            sx={{
+              p: 1,
+              mb: 1,
+              borderRadius: 2,
+              borderLeftWidth: 3,
+              borderLeftColor: 'secondary.main',
+              bgcolor: 'grey.50'
+            }}>
+            <Typography variant="body1" sx={{ overflowWrap: 'anywhere' }}>
+              <FormattedMessage
+                id="network.descriptions.callout"
+                values={{
+                  networkLink: (
+                    <NetworkInlineLink
+                      caveId={networkId}
+                      label={networkName}
+                      size={18}
+                      variant="body1"
+                    />
+                  ),
+                  descriptionsLink: (
+                    <MuiLink
+                      component={AppLink}
+                      to={`/ui/caves/${networkId}#description`}
+                      openInNewTabDesktop
+                      variant="body1"
+                      sx={{ display: 'inline', verticalAlign: 'baseline' }}>
+                      {formatMessage(
+                        { id: 'network.descriptions.count' },
+                        { count: networkDescriptionsCount }
+                      )}
+                    </MuiLink>
+                  )
+                }}
+              />
+            </Typography>
+          </Paper>
+        ) : null
+      }
+      form={
+        isFormVisible ? (
+          <CreateDescriptionForm isNewDescription onSubmit={onSubmitForm} />
+        ) : null
+      }
+      emptyState={
+        <Alert
+          severity="info"
+          content={formatMessage({ id: `descriptions.none.${entityType}` })}
+        />
       }
     />
   );

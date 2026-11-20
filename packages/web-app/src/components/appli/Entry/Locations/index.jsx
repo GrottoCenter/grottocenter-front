@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Divider, List } from '@mui/material';
 
+import ContributionSection from '@/components/appli/Contributions/ContributionSection';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
-import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { LocationPropTypes } from '../../../../types/entrance.type';
 import Location from './Location';
 import CreateLocationForm from '../../EntitiesForm/Location';
@@ -14,7 +13,6 @@ import {
   usePermissions
 } from '../../../../hooks';
 import { useMoveRelevanceWithUndo } from '../../../../hooks/useMoveRelevanceWithUndo';
-import { sortByRelevance } from '../../../../helpers/sortByRelevance';
 import Alert from '../../../common/Alert';
 
 const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
@@ -36,12 +34,23 @@ const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
   };
 
   return (
-    <ScrollableContent
-      dense
+    <ContributionSection
       anchorId="location"
-      defaultExpanded={locations.length > 0}
       title={formatMessage({ id: 'Access' })}
-      icon={
+      items={locations}
+      renderItem={(location, { isFirst, isLast }) => (
+        <Location
+          location={location}
+          entranceId={entranceId}
+          isEditAllowed={isEditAllowed}
+          isMoving={movingId === location.id}
+          onMoveUp={() => handleMove(location.id, -1)}
+          onMoveDown={() => handleMove(location.id, 1)}
+          isFirst={isFirst}
+          isLast={isLast}
+        />
+      )}
+      createAction={
         // Hidden for non-admins on sensitive entrances: they cannot add locations
         permissions.isAuth &&
         isEditAllowed &&
@@ -55,49 +64,20 @@ const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
           />
         )
       }
-      content={
-        <>
-          {isFormVisible && (
-            <>
-              <CreateLocationForm isNewLocation onSubmit={onSubmitForm} />
-              <Divider />
-            </>
-          )}
-
-          {locations.length > 0 ? (
-            <List dense disablePadding>
-              {(() => {
-                const sorted = sortByRelevance(locations);
-                const activeIds = sorted
-                  .filter(l => !l.isDeleted)
-                  .map(l => l.id);
-                return sorted.map(location => (
-                  <React.Fragment key={location.id}>
-                    <Location
-                      location={location}
-                      entranceId={entranceId}
-                      isEditAllowed={isEditAllowed}
-                      isMoving={movingId === location.id}
-                      onMoveUp={() => handleMove(location.id, -1)}
-                      onMoveDown={() => handleMove(location.id, 1)}
-                      isFirst={location.id === activeIds[0]}
-                      isLast={location.id === activeIds[activeIds.length - 1]}
-                    />
-                  </React.Fragment>
-                ));
-              })()}
-            </List>
-          ) : (
-            <Alert
-              severity={isSensitive ? 'warning' : 'info'}
-              content={formatMessage({
-                id: isSensitive
-                  ? 'This entrance has a restricted access, you can not see its locations.'
-                  : 'There is currently no location for this entrance.'
-              })}
-            />
-          )}
-        </>
+      form={
+        isFormVisible ? (
+          <CreateLocationForm isNewLocation onSubmit={onSubmitForm} />
+        ) : null
+      }
+      emptyState={
+        <Alert
+          severity={isSensitive ? 'warning' : 'info'}
+          content={formatMessage({
+            id: isSensitive
+              ? 'This entrance has a restricted access, you can not see its locations.'
+              : 'There is currently no location for this entrance.'
+          })}
+        />
       }
     />
   );
