@@ -106,7 +106,9 @@ export const useAnalyzeDocument = () =>
           throw new DOMException('Session changed', 'AbortError');
         }
         if (typeof token !== 'string' || !token.trim()) {
-          throw new Error('Invalid SSO response');
+          throw Object.assign(new Error('Invalid SSO response'), {
+            ...(traceId && { traceId })
+          });
         }
         const body = new FormData();
         body.append('file', upload, upload.name);

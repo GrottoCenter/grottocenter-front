@@ -236,6 +236,49 @@ it.each([401, 403, 429, 503])(
   }
 );
 
+it.each([undefined, null, '', '   ', 123])(
+  'preserves the SSO reference when its token is unusable (%j) without uploading',
+  async token => {
+    apiPostWithHeaders.mockResolvedValue({
+      ...tokenResponse(),
+      data: { token },
+      headers: new Headers({ 'X-Trace-Id': '  invalid-sso-response-id  ' })
+    });
+    const { result } = renderAnalysis();
+    await act(async () => {
+      await expect(
+        result.current.mutateAsync(variables())
+      ).rejects.toMatchObject({
+        message: 'Invalid SSO response',
+        traceId: 'invalid-sso-response-id'
+      });
+    });
+    expect(fetch).not.toHaveBeenCalled();
+    expect(store.dispatch).not.toHaveBeenCalled();
+    expect(apiPostWithHeaders).toHaveBeenCalledOnce();
+  }
+);
+
+it.each([undefined, 'not an id', 'a'.repeat(129)])(
+  'omits an absent or invalid reference when the SSO token is missing (%j)',
+  async traceId => {
+    apiPostWithHeaders.mockResolvedValue({
+      ...tokenResponse('documents-token', traceId),
+      data: {}
+    });
+    const { result } = renderAnalysis();
+    let failure;
+    await act(async () => {
+      failure = await result.current
+        .mutateAsync(variables())
+        .catch(error => error);
+    });
+    expect(failure.message).toBe('Invalid SSO response');
+    expect(failure).not.toHaveProperty('traceId');
+    expect(fetch).not.toHaveBeenCalled();
+  }
+);
+
 it.each([undefined, '2f85616b-51be-4003-bc07-7d35ed5b72fa'])(
   'uses the failed analysis response trace id independently of the token trace (%j)',
   async traceId => {

@@ -303,6 +303,30 @@ describe('PDF analysis during document creation and editing', () => {
     );
   });
 
+  it('shows the reference for a successful SSO response without a token and does not upload', () => {
+    cy.intercept('POST', '**/api/v1/sso/auth-token', {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Expose-Headers': 'X-Trace-Id',
+        'X-Trace-Id': traceId
+      },
+      body: {}
+    }).as('invalidSso');
+    openForm();
+    cy.get('[data-testid="document-ai-analyze"]').click();
+    cy.get('[data-testid="document-ai-confirm"]').click();
+    cy.wait('@invalidSso');
+    cy.get('[data-testid="document-ai-reference"]').should(
+      'have.text',
+      `Reference: ${traceId}`
+    );
+    cy.get('@analyze.all').should('have.length', 0);
+    cy.get(summary).first().should('have.value', 'Manual summary');
+    cy.window().then(win =>
+      expect(win.localStorage.getItem('grottocenter_token')).to.be.a('string')
+    );
+  });
+
   it('keeps the session and the manual summary after an AI token rejection', () => {
     const failureTraceId = '4b3512e9-3215-4e3f-b8f6-75083e92ab32';
     cy.intercept('POST', '**/documents/analyze', {
