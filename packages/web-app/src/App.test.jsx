@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 import App from './App';
 
 vi.hoisted(() => {
-  window.history.replaceState({}, '', '/ui/guidelines');
+  window.history.replaceState({}, '', '/pr/1643/ui/guidelines');
 });
 
 vi.mock('./pages/ApplicationShell', () => ({
