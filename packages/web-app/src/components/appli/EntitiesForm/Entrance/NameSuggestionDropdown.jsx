@@ -5,13 +5,8 @@ import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
-  Button,
   CircularProgress,
   ClickAwayListener,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Link,
   List,
   ListItemButton,
@@ -21,6 +16,7 @@ import {
   Typography
 } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import { useNameDuplicateSuggestions } from '../../../../hooks';
 import useOpenLink from '../../../../hooks/useOpenLink';
 
@@ -164,64 +160,53 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
           </Popper>
         </Box>
       </ClickAwayListener>
-      <Dialog
+      <ConfirmationDialog
         open={!!candidate}
         onClose={dismissConfirmation}
-        maxWidth="xs"
-        fullWidth>
-        <DialogTitle>
-          {formatMessage({ id: 'Is this the same cave?' })}
-        </DialogTitle>
-        <DialogContent>
-          <Typography
-            variant="body2"
-            sx={{
-              color: 'text.secondary',
-              mb: 0.5
-            }}>
-            {formatMessage({
-              id: 'An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.'
-            })}
-          </Typography>
-          {candidate && (
-            <>
-              <Typography variant="subtitle1" component="span">
-                {candidate.name}
-              </Typography>
-              {candidateLocation && (
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: 'text.secondary'
-                  }}>
-                  {candidateLocation}
-                </Typography>
-              )}
-              <Link
-                component="button"
-                type="button"
-                onClick={() => openLink(entranceDetailPath(candidate.id))}
+        title={formatMessage({ id: 'Is this the same cave?' })}
+        onConfirm={confirmSameCave}
+        cancelLabel={formatMessage({ id: "It's a different cave" })}
+        confirmLabel={formatMessage({ id: "It's the same cave" })}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+            mb: 0.5
+          }}>
+          {formatMessage({
+            id: 'An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.'
+          })}
+        </Typography>
+        {candidate && (
+          <>
+            <Typography variant="subtitle1" component="span">
+              {candidate.name}
+            </Typography>
+            {candidateLocation && (
+              <Typography
+                variant="body2"
                 sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  mt: 0.5
+                  color: 'text.secondary'
                 }}>
-                {formatMessage({ id: 'View full details' })}
-                <OpenInNewIcon fontSize="inherit" />
-              </Link>
-            </>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={dismissConfirmation} color="inherit">
-            {formatMessage({ id: "It's a different cave" })}
-          </Button>
-          <Button onClick={confirmSameCave} variant="contained">
-            {formatMessage({ id: "It's the same cave" })}
-          </Button>
-        </DialogActions>
-      </Dialog>
+                {candidateLocation}
+              </Typography>
+            )}
+            <Link
+              component="button"
+              type="button"
+              onClick={() => openLink(entranceDetailPath(candidate.id))}
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                mt: 0.5
+              }}>
+              {formatMessage({ id: 'View full details' })}
+              <OpenInNewIcon fontSize="inherit" />
+            </Link>
+          </>
+        )}
+      </ConfirmationDialog>
     </>
   );
 };

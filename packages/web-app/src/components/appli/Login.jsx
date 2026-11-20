@@ -414,16 +414,7 @@ const Login = () => {
       onClose={() => dispatch(hideLoginDialog())}
       fullScreen={isMobile}
       centerContentMobile={isMobile}
-      title={
-        <Typography
-          variant="h5"
-          component="span"
-          sx={{
-            fontWeight: 600
-          }}>
-          <Translate>Log in</Translate>
-        </Typography>
-      }>
+      title={<Translate>Log in</Translate>}>
       <form onSubmit={onLogin} noValidate>
         {DialogContent}
       </form>

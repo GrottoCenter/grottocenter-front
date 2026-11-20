@@ -148,8 +148,6 @@ const SearchDocumentForm = ({ closeForm, onSubmit, onSuccess }) => {
         maxWidth="lg"
         fullScreen={isNarrowViewport}
         dense={isNarrowViewport}
-        fullWidth
-        scrollable
         open={previewedDocumentId !== null}
         onClose={() => setPreviewedDocumentId(null)}
         title={formatMessage({ id: 'Detailed document view' })}>

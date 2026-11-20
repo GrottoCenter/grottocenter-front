@@ -24,7 +24,7 @@ import AppLink from '../AppLink';
 import Files from './Files';
 import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
 import Translate from '../Translate';
-import StandardDialog from '../StandardDialog';
+import ConfirmationDialog from '../ConfirmationDialog';
 import OfflineDisabled from '../OfflineDisabled';
 import { useOnlineStatus } from '../../../hooks';
 import linkifyOptions from '../../../helpers/linkifyOptions';
@@ -203,35 +203,21 @@ const Document = ({
         )}
       </Paper>
       {onUnlink && (
-        <StandardDialog
+        <ConfirmationDialog
           open={isUnlinkDialogOpen}
           onClose={() => setUnlinkDialogOpen(false)}
           title={formatMessage({ id: 'Unlink this document?' })}
-          actions={[
-            <Button
-              key="no"
-              onClick={() => setUnlinkDialogOpen(false)}
-              variant="outlined"
-              disableElevation>
-              <Translate>No</Translate>
-            </Button>,
-            <Button
-              key="yes"
-              disableElevation
-              onClick={() => {
-                setUnlinkDialogOpen(false);
-                onUnlink(document);
-              }}
-              variant="contained"
-              color="error"
-              autoFocus>
-              <Translate>Yes</Translate>
-            </Button>
-          ]}>
+          onConfirm={() => {
+            setUnlinkDialogOpen(false);
+            onUnlink(document);
+          }}
+          cancelLabel={<Translate>No</Translate>}
+          confirmLabel={<Translate>Yes</Translate>}
+          color="error">
           <Translate>
             Are you sure you want to unlink this document of this entity?
           </Translate>
-        </StandardDialog>
+        </ConfirmationDialog>
       )}
     </ListItem>
   );

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Skeleton, Box, Button, Typography } from '@mui/material';
+import { Skeleton, Box, Typography } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { OrganizationSimplePropTypes } from '@/types/organization.type';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import {
   usePermissions,
   useNotification,
@@ -21,7 +22,6 @@ import EntitiesList from '../../common/entitiesList/EntitiesList';
 import Alert from '../../common/Alert';
 import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import SectionCreateButton from '../../common/SectionCreateButton';
-import StandardDialog from '../../common/StandardDialog';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 
 // Both set/remove hooks are read for a given entity type; the effective pair
@@ -102,7 +102,7 @@ const AssociationSection = ({
   const handleSet = orgData => setMutation.mutateAsync(makeSetArgs(orgData));
 
   const handleRemove = () => {
-    if (!orgToRemove) return;
+    if (!orgToRemove || isPending) return;
     removeMutation.mutate(makeRemoveArgs(orgToRemove.id), {
       onSuccess: () => setOrgToRemove(null),
       onError: err =>
@@ -185,28 +185,14 @@ const AssociationSection = ({
               }
             />
 
-            <StandardDialog
+            <ConfirmationDialog
               open={!!orgToRemove}
               onClose={() => setOrgToRemove(null)}
               title={formatMessage({ id: 'Remove association' })}
-              actions={
-                <>
-                  <Button
-                    variant="outlined"
-                    onClick={() => setOrgToRemove(null)}
-                    disabled={isPending}>
-                    {formatMessage({ id: 'Cancel' })}
-                  </Button>
-                  <Button
-                    color="error"
-                    variant="contained"
-                    startIcon={<LinkOffIcon />}
-                    onClick={handleRemove}
-                    disabled={isPending}>
-                    {formatMessage({ id: 'Remove' })}
-                  </Button>
-                </>
-              }>
+              onConfirm={handleRemove}
+              isBusy={isPending}
+              confirmLabel={formatMessage({ id: 'Remove' })}
+              color="error">
               <Typography>
                 {formatMessage(
                   {
@@ -215,7 +201,7 @@ const AssociationSection = ({
                   { name: orgToRemove?.name || '' }
                 )}
               </Typography>
-            </StandardDialog>
+            </ConfirmationDialog>
           </Box>
         )
       }

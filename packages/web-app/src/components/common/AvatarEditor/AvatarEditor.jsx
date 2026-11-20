@@ -17,7 +17,7 @@ import {
   prepareAvatar
 } from '@/utils/avatarImage';
 import ProfileAvatar from '../ProfileAvatar';
-import StandardDialog from '../StandardDialog';
+import ConfirmationDialog from '../ConfirmationDialog';
 
 const AvatarCropDialog = lazy(() => import('./AvatarCropDialog'));
 
@@ -206,41 +206,25 @@ const AvatarEditor = ({
           />
         </Suspense>
       )}
-      <StandardDialog
+      <ConfirmationDialog
         open={isRemoving}
-        fullWidth
-        maxWidth="xs"
         title={formatMessage({ id: 'avatar.remove' })}
-        onClose={isPending ? null : () => setIsRemoving(false)}
-        stackActionsOnMobile
-        actions={
-          <>
-            <Button
-              variant="outlined"
-              onClick={() => setIsRemoving(false)}
-              disabled={isPending}>
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              disabled={isBlocked}
-              onClick={() => {
-                saveChange(null).catch(() => {});
-              }}
-              data-testid="avatar-confirm-remove"
-              startIcon={isPending ? <CircularProgress size={18} /> : null}>
-              {formatMessage({ id: 'avatar.remove' })}
-            </Button>
-          </>
-        }>
+        onClose={() => setIsRemoving(false)}
+        isBusy={isPending}
+        disabled={isBlocked}
+        color="error"
+        confirmTestId="avatar-confirm-remove"
+        onConfirm={() => {
+          saveChange(null).catch(() => {});
+        }}
+        confirmLabel={formatMessage({ id: 'avatar.remove' })}>
         <Typography>{formatMessage({ id: 'avatar.removeHelp' })}</Typography>
         {errorId && (
           <Alert severity="error" sx={{ mt: 1 }}>
             {formatMessage({ id: errorId })}
           </Alert>
         )}
-      </StandardDialog>
+      </ConfirmationDialog>
     </Box>
   );
 };
