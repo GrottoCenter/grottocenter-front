@@ -36,10 +36,14 @@ const ShapefileImport = ({ onImport }) => {
   const [parseError, setParseError] = useState(null);
 
   const [isParsing, setIsParsing] = useState(false);
-  const handleSimplificationError = useCallback(() => {
-    setParseError(formatMessage({ id: 'Failed to parse file' }));
-    setRawData(null);
-  }, [formatMessage]);
+  const handleSimplificationError = useCallback(
+    message => {
+      const prefix = formatMessage({ id: 'Failed to parse file' });
+      setParseError(message ? `${prefix}: ${message}` : prefix);
+      setRawData(null);
+    },
+    [formatMessage]
+  );
   const {
     tolerance,
     updateTolerance,

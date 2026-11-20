@@ -96,6 +96,7 @@ const respond = (
     worker.onmessage({
       data: {
         requestId: request.requestId,
+        tolerance: request.tolerance,
         simplifiedData: data,
         vertexCount: 4,
         ...(request.type === 'load' && {
@@ -112,7 +113,10 @@ const respond = (
 
 const finishLoading = worker => {
   respond(worker);
-  respond(worker);
+  expect(worker.postMessage).toHaveBeenCalledOnce();
+  expect(
+    screen.getByRole('button', { name: 'Import', exact: true })
+  ).toBeEnabled();
 };
 
 it('ignores a file read that finishes after the dialog was closed and reopened', async () => {
@@ -190,11 +194,18 @@ it('imports only the current tolerance result, including a return to a previous 
     screen.getByRole('button', { name: 'Import', exact: true })
   ).toBeEnabled();
   fireEvent.change(slider, { target: { value: '0.003' } });
+  await waitFor(() =>
+    expect(worker.postMessage.mock.lastCall[0].tolerance).toBe(0.003)
+  );
+  const obsoleteRequest = worker.postMessage.mock.lastCall[0];
   fireEvent.change(slider, { target: { value: '0.002' } });
   await waitFor(() =>
-    expect(worker.postMessage.mock.calls.length).toBeGreaterThan(3)
+    expect(
+      screen.getByRole('button', { name: 'Import', exact: true })
+    ).toBeEnabled()
   );
-  respond(worker);
+  expect(worker.postMessage).toHaveBeenCalledTimes(3);
+  respond(worker, obsoleteRequest, { ...geometry, coordinates: [] });
   await userEvent.click(
     screen.getByRole('button', { name: 'Import', exact: true })
   );
@@ -203,16 +214,32 @@ it('imports only the current tolerance result, including a return to a previous 
   );
 });
 
-it('exposes a worker failure and leaves cancellation available', async () => {
-  await openImporter();
-  await choose('geometry.geojson');
-  await waitFor(() => expect(workers).toHaveLength(1));
-  act(() => workers[0].onerror(new Error('Worker failed')));
-  expect(screen.getByRole('alert')).toHaveTextContent('Failed to parse file');
-  expect(screen.queryByRole('slider')).toBeNull();
-  expect(
-    screen.getByRole('button', { name: 'Import', exact: true })
-  ).toBeDisabled();
-  expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
-  expect(workers[0].terminate).toHaveBeenCalled();
+[false, true].forEach(isWorkerResponse => {
+  it(`exposes details from a worker ${isWorkerResponse ? 'response' : 'event'} and leaves cancellation available`, async () => {
+    await openImporter();
+    await choose('geometry.geojson');
+    await waitFor(() => expect(workers).toHaveLength(1));
+    const worker = workers[0];
+    act(() => {
+      if (isWorkerResponse) {
+        worker.onmessage({
+          data: {
+            requestId: worker.postMessage.mock.lastCall[0].requestId,
+            error: 'Worker failed'
+          }
+        });
+      } else {
+        worker.onerror(new Error('Worker failed'));
+      }
+    });
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Failed to parse file: Worker failed'
+    );
+    expect(screen.queryByRole('slider')).toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'Import', exact: true })
+    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+    expect(workers[0].terminate).toHaveBeenCalled();
+  });
 });

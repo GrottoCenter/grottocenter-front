@@ -19,6 +19,7 @@ globalThis.onmessage = ({ data }) => {
     const simplifiedData = simplifyPolygon(geometry, data.tolerance);
     globalThis.postMessage({
       requestId: data.requestId,
+      tolerance: data.tolerance,
       sliderParams,
       simplifiedData,
       vertexCount: countMultiPolygonVertices(simplifiedData.coordinates)

@@ -12,6 +12,7 @@ export const useGeometrySimplification = (geometry, onError) => {
   const requestRef = useRef(0);
   const workerRef = useRef(null);
   const workerReadyRef = useRef(false);
+  const lastToleranceRef = useRef(null);
   const [tolerance, setTolerance] = useState(INITIAL_TOLERANCE);
   const [simplifiedData, setSimplifiedData] = useState(null);
   const [vertexCount, setVertexCount] = useState(0);
@@ -32,12 +33,14 @@ export const useGeometrySimplification = (geometry, onError) => {
     setIsAnalyzing(true);
     let worker;
     workerReadyRef.current = false;
-    const handleError = () => {
+    lastToleranceRef.current = null;
+    const handleError = message => {
       if (worker && workerRef.current !== worker) return;
       worker?.terminate();
       workerRef.current = null;
       workerReadyRef.current = false;
-      onError();
+      lastToleranceRef.current = null;
+      onError(message);
       setIsAnalyzing(false);
       setIsSimplifying(false);
       setSimplifiedData(null);
@@ -47,8 +50,8 @@ export const useGeometrySimplification = (geometry, onError) => {
         new URL('../workers/geometryImport.worker.js', import.meta.url),
         { type: 'module' }
       );
-    } catch {
-      handleError();
+    } catch (error) {
+      handleError(error.message);
       return undefined;
     }
     workerRef.current = worker;
@@ -60,20 +63,21 @@ export const useGeometrySimplification = (geometry, onError) => {
         return;
       }
       if (data.error) {
-        handleError();
+        handleError(data.error);
         return;
       }
       if (data.sliderParams) {
         setSliderParams(data.sliderParams);
         workerReadyRef.current = true;
       }
+      lastToleranceRef.current = data.tolerance;
       setSimplifiedData(data.simplifiedData);
       setVertexCount(data.vertexCount);
       setIsAnalyzing(false);
       setIsSimplifying(false);
     };
-    worker.onerror = handleError;
-    worker.onmessageerror = handleError;
+    worker.onerror = event => handleError(event.message);
+    worker.onmessageerror = () => handleError();
     worker.postMessage({
       type: 'load',
       requestId: ++requestRef.current,
@@ -95,6 +99,10 @@ export const useGeometrySimplification = (geometry, onError) => {
     ) {
       return;
     }
+    if (debouncedTolerance === lastToleranceRef.current) {
+      setIsSimplifying(false);
+      return;
+    }
     setIsSimplifying(true);
     workerRef.current.postMessage({
       type: 'simplify',
@@ -106,6 +114,7 @@ export const useGeometrySimplification = (geometry, onError) => {
   const reset = () => {
     requestRef.current += 1;
     workerReadyRef.current = false;
+    lastToleranceRef.current = null;
     setSimplifiedData(null);
     setIsSimplifying(false);
     setTolerance(INITIAL_TOLERANCE);

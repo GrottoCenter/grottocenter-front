@@ -19,7 +19,7 @@ const ResponsiveActionRow = ({
   sx = {}
 }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'), { noSsr: true });
   const actions = flattenActions(children);
   const shouldReverse = isMobile && stackOnMobile;
 

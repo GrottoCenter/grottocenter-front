@@ -94,7 +94,9 @@ const StandardDialog = ({
 }) => {
   const { formatMessage } = useIntl();
   const muiTheme = useTheme();
-  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'), {
+    noSsr: true
+  });
   const isFullScreen = fullScreen ?? (fullScreenOnMobile && isMobile);
   const dialogRef = useRef(null);
   const hasHeaderActions = actionsPosition === 'top';
@@ -107,6 +109,11 @@ const StandardDialog = ({
     const node = dialogRef.current;
     node?.style.setProperty('--dialog-viewport-height', `${viewport.height}px`);
     node?.style.setProperty('--dialog-viewport-top', `${viewport.offsetTop}px`);
+    node?.style.setProperty('--dialog-viewport-width', `${viewport.width}px`);
+    node?.style.setProperty(
+      '--dialog-viewport-left',
+      `${viewport.offsetLeft}px`
+    );
   }, []);
   const handleDialogRef = useCallback(
     node => {
@@ -146,8 +153,11 @@ const StandardDialog = ({
           ...slotProps.container,
           sx: [
             {
+              position: 'relative',
+              top: 'var(--dialog-viewport-top, 0px)',
+              left: 'var(--dialog-viewport-left, 0px)',
               height: 'var(--dialog-viewport-height, 100%)',
-              transform: 'translateY(var(--dialog-viewport-top, 0px))'
+              width: 'var(--dialog-viewport-width, 100%)'
             },
             ...(Array.isArray(slotProps.container?.sx)
               ? slotProps.container.sx

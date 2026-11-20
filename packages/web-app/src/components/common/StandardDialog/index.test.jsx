@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import {
   act,
   fireEvent,
@@ -174,10 +174,47 @@ it('reorders sibling fragments without duplicate keys or wrapper elements', () =
   expect(error).not.toHaveBeenCalled();
 });
 
+it('uses fullscreen and primary-first actions on the first mobile commit', () => {
+  mockMobile(true);
+  const firstCommit = vi.fn();
+  const FirstCommitProbe = () => {
+    useLayoutEffect(() => {
+      firstCommit(
+        screen
+          .getByRole('dialog')
+          .classList.contains('MuiDialog-paperFullScreen'),
+        within(document.querySelector('.MuiDialogActions-root'))
+          .getAllByRole('button')
+          .map(button => button.textContent)
+      );
+    }, []);
+    return null;
+  };
+  render(
+    withIntl(
+      <StandardDialog
+        open
+        fullScreenOnMobile
+        title="Edit"
+        actions={
+          <>
+            <Button>Cancel</Button>
+            <Button>Save</Button>
+          </>
+        }>
+        <FirstCommitProbe />
+      </StandardDialog>
+    )
+  );
+  expect(firstCommit).toHaveBeenCalledExactlyOnceWith(true, ['Save', 'Cancel']);
+});
+
 it('resizes with the keyboard viewport and removes its event listeners', () => {
   const viewport = new EventTarget();
   viewport.height = 700;
   viewport.offsetTop = 0;
+  viewport.width = 390;
+  viewport.offsetLeft = 0;
   const remove = vi.spyOn(viewport, 'removeEventListener');
   vi.stubGlobal('visualViewport', viewport);
   const { rerender, unmount } = render(
@@ -188,14 +225,21 @@ it('resizes with the keyboard viewport and removes its event listeners', () => {
     )
   );
   const root = document.querySelector('.MuiDialog-root');
+  const container = document.querySelector('.MuiDialog-container');
+  expect(container).toHaveStyle({ position: 'relative' });
+  expect(getComputedStyle(container).transform).toBe('none');
   expect(root.style.getPropertyValue('--dialog-viewport-height')).toBe('700px');
   act(() => {
     viewport.height = 320;
     viewport.offsetTop = 80;
+    viewport.width = 250;
+    viewport.offsetLeft = 40;
     viewport.dispatchEvent(new Event('resize'));
   });
   expect(root.style.getPropertyValue('--dialog-viewport-height')).toBe('320px');
   expect(root.style.getPropertyValue('--dialog-viewport-top')).toBe('80px');
+  expect(root.style.getPropertyValue('--dialog-viewport-width')).toBe('250px');
+  expect(root.style.getPropertyValue('--dialog-viewport-left')).toBe('40px');
   rerender(withIntl(<StandardDialog open={false} title="Edit" />));
   expect(remove.mock.calls.map(([type]) => type)).toEqual(['resize', 'scroll']);
   unmount();
