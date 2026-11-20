@@ -55,6 +55,52 @@ describe('Document panorama viewer', () => {
     });
   });
 
+  it('reserves arrows for the focused viewer and navigates from the caption and toolbar', () => {
+    cy.visit('/documents/7', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.get('img[alt="sphere.jpg"]', { timeout: 30000 }).click();
+    cy.get('[data-testid="panorama-preview"]', { timeout: 30000 })
+      .should('have.attr', 'data-status', 'ready')
+      .find('[role="region"]')
+      .focus();
+    cy.get('[data-testid="panorama-preview"] [role="region"]').trigger(
+      'keydown',
+      { key: 'ArrowRight', keyCode: 39 }
+    );
+    cy.get('[data-testid="panorama-preview"] [role="region"]').trigger(
+      'keyup',
+      { key: 'ArrowRight', keyCode: 39 }
+    );
+    cy.get('[data-testid="panorama-preview"]').should('be.visible');
+    cy.get('[data-testid="lightbox-caption"]').focus();
+    cy.get('[data-testid="lightbox-caption"]').trigger('keydown', {
+      key: 'ArrowRight',
+      keyCode: 39
+    });
+    cy.get('[data-testid="lightbox-image"]').should(
+      'have.attr',
+      'src',
+      '/panorama-tests/flat.jpg'
+    );
+    cy.get('[aria-label="Previous image"]').click();
+    cy.get('[data-testid="panorama-preview"]', { timeout: 30000 }).should(
+      'have.attr',
+      'data-status',
+      'ready'
+    );
+    cy.get('[aria-label="Close"]').focus();
+    cy.get('[aria-label="Close"]').trigger('keydown', {
+      key: 'ArrowLeft',
+      keyCode: 37
+    });
+    cy.get('[data-testid="lightbox-image"]').should(
+      'have.attr',
+      'src',
+      '/panorama-tests/flat.jpg'
+    );
+  });
+
   [1280, 320].forEach(width => {
     it(`keeps long captions scrollable and controls and gestures usable at ${width}px`, () => {
       const height = width === 320 ? 480 : 844;

@@ -190,8 +190,12 @@ const MediaLightbox = ({
   useEffect(() => {
     const handleKeyDown = e => {
       if (!open) return;
-      // Arrow keys rotate the panorama instead of changing gallery images.
-      if (isPanorama) return;
+      // Arrow keys rotate the panorama only while focus is inside its viewer.
+      if (
+        isPanorama &&
+        e.target.closest?.('[data-testid="panorama-preview"] [role="region"]')
+      )
+        return;
       // Arrow keys belong to the native video controls while they have focus.
       if (e.target instanceof HTMLVideoElement) return;
       if (e.key === 'ArrowLeft') {

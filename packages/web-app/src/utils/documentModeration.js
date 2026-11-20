@@ -240,7 +240,7 @@ export const getDocumentChanges = (current, proposed) => {
         newText: field === 'deletedFiles' ? '' : file.fileName || ''
       });
       if (
-        Object.hasOwn(file, 'isPanorama') &&
+        typeof file.isPanorama === 'boolean' &&
         (field === 'newFiles' ||
           (field === 'modifiedFiles' &&
             (old?.isPanorama ?? false) !== file.isPanorama))

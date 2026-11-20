@@ -61,11 +61,18 @@ const appendNewFiles = (formData, files) => {
     formData,
     files.map(file => ({
       fileName: file.fileName,
-      isPanorama: file.isPanorama,
       pdfPageOffset: file.pdfPageOffset ?? ''
     })),
     'newFilesMetadata'
   );
+  files.forEach((file, index) => {
+    if (typeof file.isPanorama === 'boolean') {
+      formData.append(
+        `newFilesMetadata[${index}][isPanorama]`,
+        String(file.isPanorama)
+      );
+    }
+  });
   // Files share one key so the parser groups them together server-side.
   files.forEach(file => formData.append('files', file.file, file.fileName));
 };
@@ -114,9 +121,19 @@ export const useUpdateDocument = () => {
           case IS_MODIFIED:
             buildFormData(
               formData,
-              { ...baseFile, pdfPageOffset: baseFile.pdfPageOffset ?? '' },
+              {
+                ...baseFile,
+                isPanorama: undefined,
+                pdfPageOffset: baseFile.pdfPageOffset ?? ''
+              },
               `modifiedFiles[${indexModified}]`
             );
+            if (typeof file.isPanorama === 'boolean') {
+              formData.append(
+                `modifiedFiles[${indexModified}][isPanorama]`,
+                String(file.isPanorama)
+              );
+            }
             indexModified += 1;
             break;
           case IS_DELETED:

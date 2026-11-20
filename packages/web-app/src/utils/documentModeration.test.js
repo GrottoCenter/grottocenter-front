@@ -26,6 +26,42 @@ const current = {
 };
 
 describe('document moderation', () => {
+  it.each([null, undefined])(
+    'omits an undecided panorama flag %s from new and modified file diffs',
+    isPanorama => {
+      const stored = {
+        files: [{ id: 1, fileName: 'flat.jpg', isPanorama: false }]
+      };
+      const proposed = {
+        modifiedFiles: [{ id: 1, fileName: 'renamed.jpg', isPanorama }],
+        newFiles: [{ id: 2, fileName: 'automatic.jpg', isPanorama }]
+      };
+      expect(
+        getDocumentChanges(stored, proposed).filter(
+          change => change.label === 'panorama.display'
+        )
+      ).toEqual([]);
+    }
+  );
+
+  it.each([true, false])(
+    'shows an explicit panorama flag %s for a new file',
+    isPanorama => {
+      expect(
+        getDocumentChanges(
+          { files: [] },
+          { newFiles: [{ id: 1, fileName: 'new.jpg', isPanorama }] }
+        )
+      ).toContainEqual({
+        field: 'isPanorama-1',
+        label: 'panorama.display',
+        fileName: 'new.jpg',
+        oldText: '',
+        newText: String(isPanorama)
+      });
+    }
+  );
+
   it.each([true, false])(
     'uses the proposed panorama flag %s in preview, edit and diff',
     isPanorama => {

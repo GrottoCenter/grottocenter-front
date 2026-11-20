@@ -7,6 +7,7 @@ import { DocumentTypes } from '@/utils/documentTypeHelpers';
 import { createTestQueryClient } from '@/test/renderWithProviders';
 import {
   IS_INTACT,
+  IS_DELETED,
   IS_MODIFIED,
   IS_NEW
 } from '@/components/appli/EntitiesForm/Document/formElements/AddFileForm/FileHelpers';
@@ -99,6 +100,44 @@ describe('document PDF pagination uploads', () => {
     expect(formData.has('modifiedFiles[2][isPanorama]')).toBe(false);
     expect(formData.has('modifiedFiles[3][id]')).toBe(false);
     expect(formData.get('newFilesMetadata[0][isPanorama]')).toBe('false');
+  });
+
+  it('omits unrelated false booleans from nested document and existing-file metadata', async () => {
+    const { result } = renderMutation(useUpdateDocument);
+    await act(async () =>
+      result.current.mutateAsync({
+        id: 42,
+        type: DocumentTypes.BOOK,
+        authors: [{ id: 1, isDeleted: false }],
+        subjects: [{ id: 2, isValidated: false }],
+        license: { id: 3, isDeleted: false },
+        files: [
+          {
+            id: 4,
+            fileName: 'modified.jpg',
+            state: IS_MODIFIED,
+            isPanorama: false,
+            isDeleted: false,
+            isValidated: false
+          },
+          {
+            id: 5,
+            fileName: 'deleted.jpg',
+            state: IS_DELETED,
+            isDeleted: false,
+            isValidated: false
+          }
+        ]
+      })
+    );
+    const formData = apiPutForm.mock.calls[0][1];
+    expect(formData.get('authors[0][id]')).toBe('1');
+    expect(formData.get('subjects[0][id]')).toBe('2');
+    expect(formData.get('license[id]')).toBe('3');
+    expect(formData.get('deletedFiles[0][id]')).toBe('5');
+    expect(
+      [...formData.entries()].filter(([, value]) => value === 'false')
+    ).toEqual([['modifiedFiles[0][isPanorama]', 'false']]);
   });
 
   it.each([

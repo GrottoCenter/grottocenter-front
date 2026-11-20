@@ -54,11 +54,12 @@ describe('buildFormData', () => {
     expect(entries(formData)).toEqual([]);
   });
 
-  it('omits null and undefined values but keeps empty strings', () => {
+  it('omits null, undefined and false values but keeps empty strings', () => {
     const formData = new FormData();
     buildFormData(formData, {
       pages: null,
       issue: undefined,
+      isValidated: false,
       identifier: ''
     });
 

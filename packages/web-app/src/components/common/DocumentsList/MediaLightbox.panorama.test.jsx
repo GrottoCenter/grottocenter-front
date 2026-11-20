@@ -146,6 +146,26 @@ it('allows retry after an error and releases a pending viewer on close', async (
   expect(screen.queryByTestId('panorama-preview')).not.toBeInTheDocument();
 });
 
+it.each(['ArrowRight', 'ArrowLeft'])(
+  'keeps gallery navigation with %s outside the panorama viewer',
+  async key => {
+    render(lightbox());
+    const viewer = await activate();
+    act(() => viewer.events.load());
+    fireEvent.keyDown(screen.getByTestId('lightbox-caption'), { key });
+    expect(viewer.destroy).toHaveBeenCalledOnce();
+    expect(screen.queryByTestId('panorama-preview')).not.toBeInTheDocument();
+    if (key === 'ArrowRight') {
+      expect(screen.getByTestId('lightbox-image')).toHaveAttribute(
+        'src',
+        '/flat.jpg'
+      );
+    } else {
+      expect(screen.getByTestId('video-preview')).toBeInTheDocument();
+    }
+  }
+);
+
 it.each([false, undefined])(
   'uses the regular viewer when isPanorama is %s',
   isPanorama => {
