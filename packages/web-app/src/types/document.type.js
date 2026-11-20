@@ -15,7 +15,13 @@ export const FilePropTypes = PropTypes.shape({
   fileName: PropTypes.string,
   completePath: PropTypes.string,
   pdfPageOffset: PropTypes.number,
+  isPanorama: PropTypes.bool,
   thumbnails: ThumbnailsPropTypes
+});
+
+export const DocumentFileErrorPropTypes = PropTypes.shape({
+  code: PropTypes.string.isRequired,
+  file: FilePropTypes
 });
 
 export const DocumentSimplePropTypes = PropTypes.shape({

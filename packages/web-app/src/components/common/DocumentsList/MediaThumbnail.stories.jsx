@@ -1,3 +1,4 @@
+import panoramaSource from '@/../cypress/fixtures/panorama-preview.jpg?url';
 import MediaThumbnail from './MediaThumbnail';
 
 const meta = {
@@ -17,4 +18,12 @@ export const VideoWithPoster = {
     alt: 'cave.mp4',
     src: 'https://placehold.co/640x480'
   }
+};
+
+export const Panorama = {
+  args: { isPanorama: true, alt: 'sphere.jpg', src: panoramaSource }
+};
+
+export const PanoramaWithoutThumbnail = {
+  args: { isPanorama: true, alt: 'sphere.jpg' }
 };

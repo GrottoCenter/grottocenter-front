@@ -1,9 +1,17 @@
 import { useState } from 'react';
 import { Button } from '@mui/material';
 import videoSource from '@/../cypress/fixtures/media-preview.webm';
+import panoramaSource from '@/../cypress/fixtures/panorama-preview.jpg?url';
 import MediaLightbox from './MediaLightbox';
 
 const media = [
+  {
+    fileName: 'sphere.jpg',
+    completePath: panoramaSource,
+    thumbnails: { small: panoramaSource },
+    isPanorama: true,
+    documentTitle: '360-degree cave view'
+  },
   {
     fileName: 'survey.png',
     completePath: 'https://placehold.co/640x480/png',

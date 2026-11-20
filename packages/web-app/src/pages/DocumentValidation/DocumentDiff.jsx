@@ -11,6 +11,13 @@ import { DocumentPropTypes } from '@/types/document.type';
 const DocumentDiff = ({ current, proposed }) => {
   const { formatMessage } = useIntl();
   const changes = getDocumentChanges(current, proposed);
+  const formatChange = (field, text) => {
+    if (!text) return text;
+    if (field.startsWith('isPanorama-'))
+      return formatMessage({ id: text === 'true' ? 'Yes' : 'No' });
+    if (field === 'type') return formatMessage({ id: text });
+    return text;
+  };
   return (
     <Card
       component="section"
@@ -38,7 +45,7 @@ const DocumentDiff = ({ current, proposed }) => {
           whiteSpace: 'pre-wrap',
           overflowWrap: 'anywhere'
         }}>
-        {changes.map(({ field, label, oldText, newText }) => (
+        {changes.map(({ field, label, fileName, oldText, newText }) => (
           <Box
             key={field}
             data-testid={`document-diff-${field}`}
@@ -49,20 +56,12 @@ const DocumentDiff = ({ current, proposed }) => {
             }}>
             <Property
               flexBasis="100%"
-              label={formatMessage({ id: label })}
+              label={`${formatMessage({ id: label })}${fileName ? ` — ${fileName}` : ''}`}
               value={
                 <HighLightsChar
                   showChangeMarkers
-                  oldText={
-                    field === 'type' && oldText
-                      ? formatMessage({ id: oldText })
-                      : oldText
-                  }
-                  newText={
-                    field === 'type' && newText
-                      ? formatMessage({ id: newText })
-                      : newText
-                  }
+                  oldText={formatChange(field, oldText)}
+                  newText={formatChange(field, newText)}
                 />
               }
             />

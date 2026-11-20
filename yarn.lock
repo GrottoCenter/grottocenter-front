@@ -2286,6 +2286,7 @@ __metadata:
     linkify-react: "npm:^4.4.0"
     linkifyjs: "npm:^4.4.0"
     notistack: "npm:^3.0.2"
+    pannellum: "npm:2.5.7"
     papaparse: "npm:^5.7.0"
     pdf-lib: "npm:^1.17.1"
     pdfjs-dist: "npm:^6.4.299"
@@ -11807,6 +11808,13 @@ __metadata:
   version: 1.0.11
   resolution: "pako@npm:1.0.11"
   checksum: 10/1ad07210e894472685564c4d39a08717e84c2a68a70d3c1d9e657d32394ef1670e22972a433cbfe48976cb98b154ba06855dcd3fcfba77f60f1777634bec48c0
+  languageName: node
+  linkType: hard
+
+"pannellum@npm:2.5.7":
+  version: 2.5.7
+  resolution: "pannellum@npm:2.5.7"
+  checksum: 10/3e0da52597364d59e5399da68c032f4417d9c0ebcecdd5d4475690e721766466894e1e0d3b864998c0a0f2fb6896cfc57e710ef5f8647968b454158ec583aa1e
   languageName: node
   linkType: hard
 

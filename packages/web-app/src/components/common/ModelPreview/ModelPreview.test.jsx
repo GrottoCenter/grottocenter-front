@@ -97,6 +97,41 @@ describe('ModelPreview sessions', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('reports measured progress and waits for load even after reaching 100%', async () => {
+    renderPreview();
+    const viewer = await startPreview();
+    const initialIndicator = screen.getByRole('progressbar');
+    expect(initialIndicator).not.toHaveAttribute('aria-valuenow');
+    expect(initialIndicator.querySelector('svg')).not.toBeNull();
+
+    fireEvent(
+      viewer,
+      new CustomEvent('progress', { detail: { totalProgress: 0.42 } })
+    );
+    expect(screen.getByRole('progressbar')).toBe(initialIndicator);
+    expect(screen.getByRole('progressbar')).toHaveAccessibleName('Loading ...');
+    expect(screen.getByRole('progressbar')).toHaveAttribute(
+      'aria-valuenow',
+      '42'
+    );
+    expect(screen.getByText('42%')).toBeInTheDocument();
+
+    fireEvent(
+      viewer,
+      new CustomEvent('progress', { detail: { totalProgress: 1 } })
+    );
+    expect(screen.getByRole('progressbar')).toHaveAttribute(
+      'aria-valuenow',
+      '100'
+    );
+    expect(screen.getByTestId('model-preview')).toHaveAttribute(
+      'data-status',
+      'loading'
+    );
+    fireEvent.load(viewer);
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+  });
+
   it('retries a failed URL without accepting events from the old viewer', async () => {
     renderPreview();
     const firstViewer = await startPreview();

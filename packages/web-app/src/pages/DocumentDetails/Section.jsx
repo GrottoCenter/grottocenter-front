@@ -294,6 +294,7 @@ export const FilesSection = ({ files, externalPdfUrl }) => {
                 srcSet={srcSet}
                 maxHeight={DOCUMENT_IMAGE_MAX_HEIGHT}
                 alt={decodeFileName(file.fileName)}
+                isPanorama={file.isPanorama === true}
                 onClick={() => setLightboxIndex(idx)}
               />
             );
@@ -408,6 +409,7 @@ FilesSection.propTypes = {
       fileName: PropTypes.string,
       completePath: PropTypes.string,
       description: PropTypes.string,
+      isPanorama: PropTypes.bool,
       thumbnails: ThumbnailsPropTypes
     })
   ),

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { getDocumentPanoramaError } from '@/utils/documentPanorama';
 import {
   postDocumentUrl,
   putDocumentUrl,
@@ -20,6 +21,7 @@ import {
 // unchanged. The messages are translation keys, not user-facing text.
 const buildDocErrorMessages = (verb, error) => {
   const status = error?.status;
+  if (getDocumentPanoramaError(error)) return [error.body.code];
   if (status === 400) {
     const detail = error?.body?.message ?? '';
     return [`Bad request: ${detail}`];
@@ -63,6 +65,14 @@ const appendNewFiles = (formData, files) => {
     })),
     'newFilesMetadata'
   );
+  files.forEach((file, index) => {
+    if (typeof file.isPanorama === 'boolean') {
+      formData.append(
+        `newFilesMetadata[${index}][isPanorama]`,
+        String(file.isPanorama)
+      );
+    }
+  });
   // Files share one key so the parser groups them together server-side.
   files.forEach(file => formData.append('files', file.file, file.fileName));
 };
@@ -80,6 +90,7 @@ export const useCreateDocument = () => {
         const body = await apiPostForm(postDocumentUrl, formData);
         return body?.document;
       } catch (err) {
+        err.fileError = getDocumentPanoramaError(err, files);
         err.errorMessages = buildDocErrorMessages('create', err);
         throw err;
       }
@@ -110,9 +121,19 @@ export const useUpdateDocument = () => {
           case IS_MODIFIED:
             buildFormData(
               formData,
-              { ...baseFile, pdfPageOffset: baseFile.pdfPageOffset ?? '' },
+              {
+                ...baseFile,
+                isPanorama: undefined,
+                pdfPageOffset: baseFile.pdfPageOffset ?? ''
+              },
               `modifiedFiles[${indexModified}]`
             );
+            if (typeof file.isPanorama === 'boolean') {
+              formData.append(
+                `modifiedFiles[${indexModified}][isPanorama]`,
+                String(file.isPanorama)
+              );
+            }
             indexModified += 1;
             break;
           case IS_DELETED:
@@ -126,6 +147,7 @@ export const useUpdateDocument = () => {
       try {
         return await apiPutForm(putDocumentUrl(docAttributes.id), formData);
       } catch (err) {
+        err.fileError = getDocumentPanoramaError(err, files);
         err.errorMessages = buildDocErrorMessages('update', err);
         throw err;
       }

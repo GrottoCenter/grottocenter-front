@@ -1,14 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  IconButton,
-  Tooltip,
-  Typography
-} from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
 import ViewInArIcon from '@mui/icons-material/ViewInAr';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
@@ -18,6 +11,12 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import LoadingIndicator from '@/components/common/LoadingIndicator';
+
+import {
+  PreviewControls as Controls,
+  PreviewControlButton as ControlButton
+} from '@/components/common/MediaPreviewControls';
 
 const Frame = styled('div')(({ theme }) => ({
   '--model-background': theme.palette.grey[100],
@@ -67,41 +66,6 @@ const Centered = styled('div')(({ theme }) => ({
     'linear-gradient(135deg, var(--model-overlay-start), var(--model-overlay-end))'
 }));
 
-const Controls = styled('div')(({ theme }) => ({
-  position: 'absolute',
-  bottom: theme.spacing(2),
-  left: '50%',
-  transform: 'translateX(-50%)',
-  display: 'flex',
-  alignItems: 'center',
-  gap: theme.spacing(0.5),
-  padding: theme.spacing(0.5),
-  borderRadius: theme.spacing(4),
-  background: theme.palette.background.paper,
-  color: theme.palette.text.primary,
-  boxShadow: theme.shadows[4],
-  '& .MuiIconButton-root': { width: 44, height: 44 }
-}));
-
-const ControlButton = ({ label, onClick, testId, children }) => (
-  <Tooltip
-    title={label}
-    placement="top"
-    enterTouchDelay={500}
-    slotProps={{ popper: { disablePortal: true } }}>
-    <IconButton aria-label={label} onClick={onClick} data-testid={testId}>
-      {children}
-    </IconButton>
-  </Tooltip>
-);
-
-ControlButton.propTypes = {
-  label: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
-  testId: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired
-};
-
 const ModelPreviewSession = ({ src, title, poster = null }) => {
   const { formatMessage } = useIntl();
   const frameRef = useRef(null);
@@ -109,7 +73,7 @@ const ModelPreviewSession = ({ src, title, poster = null }) => {
   const [status, setStatus] = useState('idle');
   const [isViewerReady, setIsViewerReady] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(null);
   const [hasFullscreenError, setHasFullscreenError] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDarkBackground, setIsDarkBackground] = useState(false);
@@ -126,7 +90,7 @@ const ModelPreviewSession = ({ src, title, poster = null }) => {
 
   const handleStart = async () => {
     setStatus('loading');
-    setProgress(0);
+    setProgress(null);
     try {
       // Register the web component only after the user requests a preview.
       const { ModelViewerElement } = await import('./modelViewer');
@@ -219,17 +183,23 @@ const ModelPreviewSession = ({ src, title, poster = null }) => {
           </Viewer>
         )}
         {!isLoaded && (
-          <Centered data-testid="model-preview-overlay">
+          <Centered
+            data-testid="model-preview-overlay"
+            sx={
+              status === 'loading'
+                ? {
+                    background: theme =>
+                      alpha(
+                        isDarkBackground
+                          ? theme.palette.grey[900]
+                          : theme.palette.common.white,
+                        0.8
+                      )
+                  }
+                : undefined
+            }>
             {status === 'loading' ? (
-              <>
-                <CircularProgress
-                  color="inherit"
-                  aria-label={formatMessage({ id: 'Loading ...' })}
-                />
-                <Typography variant="body2" role="status">
-                  {formatMessage({ id: 'Loading ...' })} {progress}%
-                </Typography>
-              </>
+              <LoadingIndicator progress={progress} />
             ) : (
               <>
                 {status === 'error' && (

@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import OrganizationSelect from '@/components/appli/OrganizationSelect';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { getDefaultOrganizationType } from '@/utils/organizationTypes';
+import { DocumentFileErrorPropTypes } from '@/types/document.type';
 
 import { useLanguages } from '../../../../hooks';
 
@@ -54,7 +55,7 @@ const PublicationDatePicker = React.lazy(
   () => import('./formElements/PublicationDatePicker')
 );
 
-const FormContent = ({ onCancel, isSubmitting = false }) => {
+const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
   const [isAdditionalInfoExpanded, setIsAdditionalInfoExpanded] =
     useState(false);
   const {
@@ -105,6 +106,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
   );
 
   const addFileFormProps = {
+    fileError,
     acceptConfig,
     files: document.files,
     setFiles: newFiles => updateAttribute('files', newFiles),
@@ -524,6 +526,7 @@ const FormContent = ({ onCancel, isSubmitting = false }) => {
 export default FormContent;
 
 FormContent.propTypes = {
+  fileError: DocumentFileErrorPropTypes,
   onCancel: PropTypes.func,
   isSubmitting: PropTypes.bool
 };

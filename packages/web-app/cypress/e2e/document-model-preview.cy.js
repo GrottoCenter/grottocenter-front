@@ -90,6 +90,58 @@ describe('Document 3D preview', () => {
   });
 
   [1280, 390].forEach(width => {
+    it(
+      `shows measured loading feedback at ${width}px until the model is ready`,
+      { defaultCommandTimeout: 15000 },
+      () => {
+        let releaseModel;
+        cy.viewport(width, 900);
+        cy.intercept(
+          modelRequest,
+          request =>
+            new Promise(resolve => {
+              releaseModel = () => {
+                request.reply(modelResponse);
+                resolve();
+              };
+            })
+        );
+        visitDocument();
+        cy.get('[data-testid="model-preview-start"]').click();
+        cy.wrap(null, { timeout: 30000 }).should(() =>
+          expect(releaseModel).to.be.a('function')
+        );
+        cy.get('[data-testid="loading-indicator"] [role="progressbar"]')
+          .should('be.visible')
+          .find('svg')
+          .should('be.visible');
+        cy.get(viewerSelector).then(([viewer]) => {
+          viewer.dispatchEvent(
+            new CustomEvent('progress', { detail: { totalProgress: 0.42 } })
+          );
+        });
+        cy.get('[data-testid="loading-indicator"]').scrollIntoView();
+        cy.get('[data-testid="loading-indicator"] [role="progressbar"]')
+          .should('be.visible')
+          .and('have.attr', 'aria-valuenow', '42');
+        cy.get('[data-testid="loading-indicator"]')
+          .should('contain', '42%')
+          .and(([indicator]) => {
+            const bounds = indicator.getBoundingClientRect();
+            expect(bounds.left).to.be.at.least(0);
+            expect(bounds.right).to.be.at.most(width);
+          });
+        cy.screenshot(`model-loading-${width}px`, { capture: 'viewport' });
+        cy.then(() => releaseModel());
+        cy.get('[data-testid="model-preview"]', { timeout: 30000 }).should(
+          'have.attr',
+          'data-status',
+          'ready'
+        );
+        cy.get('[data-testid="loading-indicator"]').should('not.exist');
+      }
+    );
+
     it(`shows model thumbnails on an entrance at ${width}px without loading 3D`, () => {
       cy.viewport(width, 900);
       cy.intercept('**/modelViewer*.js*').as('modelRuntime');

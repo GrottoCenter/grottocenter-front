@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  IconButton,
-  Typography
-} from '@mui/material';
+import { Box, Button, IconButton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
   ChevronLeft,
@@ -22,6 +16,7 @@ import {
 import PDF_WORKER_URL from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url';
 import { useMeasuredWidth } from '@/hooks';
 import { hasNativePdfViewer } from '@/utils/pdfViewerSupport';
+import LoadingIndicator from '@/components/common/LoadingIndicator';
 import AppLink from '../AppLink';
 
 const FRAME_HEIGHTS = { xs: 320, sm: 480, md: 600 };
@@ -306,7 +301,7 @@ const PdfJsViewer = ({ src }) => {
         </Scroller>
         {!pdf && (
           <Centered>
-            <CircularProgress size={32} />
+            <LoadingIndicator />
           </Centered>
         )}
       </Frame>

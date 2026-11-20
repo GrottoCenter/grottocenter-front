@@ -37,7 +37,8 @@ export const fileType = PropTypes.shape({
   isValidated: PropTypes.bool,
   fileName: PropTypes.string,
   completePath: PropTypes.string,
-  pdfPageOffset: PropTypes.number
+  pdfPageOffset: PropTypes.number,
+  isPanorama: PropTypes.bool
 });
 
 // Analysis also accepts a local upload; hosted sources require a usable URL

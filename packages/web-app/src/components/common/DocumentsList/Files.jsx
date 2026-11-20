@@ -64,6 +64,7 @@ const Files = ({
                 srcSet={srcSet}
                 alt={decodeFileName(file.fileName)}
                 isVideo={isVideo}
+                isPanorama={file.isPanorama === true}
                 objectFit={isModel ? 'contain' : 'cover'}
                 to={isModel ? documentUrl : undefined}
                 onClick={
@@ -111,6 +112,7 @@ Files.propTypes = {
     PropTypes.shape({
       fileName: PropTypes.string.isRequired,
       completePath: PropTypes.string.isRequired,
+      isPanorama: PropTypes.bool,
       thumbnails: ThumbnailsPropTypes
     })
   ),

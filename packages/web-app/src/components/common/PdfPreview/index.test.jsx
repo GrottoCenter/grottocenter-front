@@ -42,6 +42,7 @@ vi.mock('@/utils/pdfViewerSupport', () => ({
 }));
 
 const messages = {
+  'Loading ...': 'Loading ...',
   'Page {current} of {total}': 'Page {current} of {total}',
   'Previous page': 'Previous page',
   'Next page': 'Next page',
@@ -80,6 +81,7 @@ describe('PdfPreview', () => {
     expect(mockGlobalWorkerOptions.workerSrc).toBe(
       '/assets/pdf.worker.min.mjs'
     );
+    expect(screen.getByRole('progressbar')).toHaveAccessibleName('Loading ...');
 
     unmount();
     expect(mockDestroy).toHaveBeenCalledOnce();
