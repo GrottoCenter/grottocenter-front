@@ -18,6 +18,7 @@ import { MAP_ROUTE } from './conf/config';
 import ApplicationShell from './pages/ApplicationShell';
 import HomePage from './pages/homepage';
 import PrivateRoute from './components/appli/PrivateRoute';
+import getRouterBasename from './utils/getRouterBasename';
 
 import 'leaflet/dist/leaflet.css';
 import './App.css';
@@ -199,6 +200,7 @@ const router = createBrowserRouter(
     </Route>
   ),
   {
+    basename: getRouterBasename(window.location.pathname),
     // Opt into React Router v7 behaviour ahead of the v8 migration.
     // These flags eliminate the deprecation warnings that would otherwise fire
     // when upgrading, and let us test v7 semantics incrementally.

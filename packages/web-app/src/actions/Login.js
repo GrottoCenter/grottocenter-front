@@ -1,5 +1,6 @@
 import { loginUrl, forgotPasswordUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
+import getRouterBasename from '../utils/getRouterBasename';
 
 // ==========
 export const FETCH_LOGIN = 'FETCH_LOGIN';
@@ -85,7 +86,7 @@ export const clearImpersonation = () => ({
 export function postLogout() {
   return dispatch => {
     dispatch(logout());
-    window.location.href = '/';
+    window.location.href = `${getRouterBasename(window.location.pathname)}/`;
   };
 }
 
