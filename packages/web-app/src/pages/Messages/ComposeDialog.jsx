@@ -161,14 +161,13 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
   return (
     <StandardDialog
       open={open}
-      onClose={isSending ? undefined : handleClose}
+      onClose={handleClose}
+      isBusy={isSending}
       title={formatMessage({
         id: 'New Message',
         defaultMessage: 'New Message'
       })}
-      fullScreen={isMobile}
-      fullWidth
-      maxWidth="sm"
+      fullScreenOnMobile
       actions={
         <>
           <Button onClick={handleClose} disabled={isSending} variant="outlined">
@@ -183,13 +182,9 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
               variant="contained"
               color="primary"
               disabled={!isOnline || !isFormValid || isSending}
-              startIcon={
-                isSending ? (
-                  <CircularProgress size={20} color="inherit" />
-                ) : (
-                  <SendIcon />
-                )
-              }>
+              startIcon={<SendIcon />}
+              loading={isSending}
+              loadingPosition="start">
               {formatMessage({ id: 'Send', defaultMessage: 'Send' })}
             </Button>
           </OfflineDisabled>

@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { useIntl } from 'react-intl';
 
 import { useOnlineStatus } from '@/hooks';
 import CustomIcon from '@/components/common/CustomIcon';
 import OfflineDisabled from '@/components/common/OfflineDisabled';
-import StandardDialog from '@/components/common/StandardDialog';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import { EntityCard, EntityCardsGrid } from './EntitiesListItem';
 
 const LinkedEntityCards = ({
@@ -34,7 +34,7 @@ const LinkedEntityCards = ({
   }, [entities, entityToUnlink]);
 
   const handleUnlink = async () => {
-    if (!entityToUnlink || !onUnlink) return;
+    if (!entityToUnlink || !onUnlink || isBusy || !isOnline) return;
     setSubmitting(true);
     try {
       await onUnlink(entityToUnlink);
@@ -119,33 +119,22 @@ const LinkedEntityCards = ({
       </EntityCardsGrid>
 
       {onUnlink && (
-        <StandardDialog
+        <ConfirmationDialog
           open={Boolean(entityToUnlink)}
           onClose={() => setEntityToUnlink(null)}
           title={formatMessage({ id: 'Unlink' })}
-          actions={[
-            <Button
-              key="cancel"
-              variant="outlined"
-              disabled={isBusy}
-              onClick={() => setEntityToUnlink(null)}>
-              {formatMessage({ id: 'No' })}
-            </Button>,
-            <Button
-              key="confirm"
-              variant="contained"
-              color="error"
-              disabled={isBusy}
-              onClick={handleUnlink}>
-              {formatMessage({ id: 'Unlink' })}
-            </Button>
-          ]}>
+          onConfirm={handleUnlink}
+          isBusy={isBusy}
+          disabled={!isOnline}
+          cancelLabel={formatMessage({ id: 'No' })}
+          confirmLabel={formatMessage({ id: 'Unlink' })}
+          color="error">
           {entityToUnlink &&
             formatMessage(
               { id: 'Are you sure you want to unlink {name}?' },
               { name: entityToUnlink.label }
             )}
-        </StandardDialog>
+        </ConfirmationDialog>
       )}
     </>
   );

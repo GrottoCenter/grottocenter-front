@@ -37,9 +37,7 @@ const NetworkDefinitionHelp = () => {
             <CustomIcon type="network" size={24} alt="" />
             {title}
           </Box>
-        }
-        fullWidth
-        scrollable>
+        }>
         <NetworkDefinition />
       </StandardDialog>
     </>

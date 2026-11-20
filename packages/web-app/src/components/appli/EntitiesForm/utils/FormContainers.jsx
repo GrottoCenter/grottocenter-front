@@ -1,15 +1,15 @@
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import {
   Box,
   Button as MuiButton,
   Divider,
   FormLabel,
-  Typography,
-  useMediaQuery
+  Typography
 } from '@mui/material';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import OfflineDisabled from '@/components/common/OfflineDisabled';
+import ResponsiveActionRow from '@/components/common/ResponsiveActionRow';
 import { useOnlineStatus } from '@/hooks';
 import ActionButton from '../../../common/ActionButton';
 import Translate from '../../../common/Translate';
@@ -91,12 +91,11 @@ export const FormActionRow = ({
   isCancelDisabled = false,
   onCancel,
   submitLabel,
-  submitTestId
+  submitTestId,
+  sx
 }) => {
   const { formatMessage } = useIntl();
   const isOnline = useOnlineStatus();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Cancel stays enabled offline: it only discards local form state.
   // Only the submit is wrapped, so losing the connection mid-typing
@@ -106,8 +105,7 @@ export const FormActionRow = ({
       key="cancel"
       variant="outlined"
       disabled={isCancelDisabled}
-      onClick={onCancel}
-      sx={{ width: { xs: '100%', sm: 'auto' } }}>
+      onClick={onCancel}>
       {formatMessage({ id: 'Cancel' })}
     </MuiButton>
   );
@@ -124,25 +122,17 @@ export const FormActionRow = ({
         color="primary"
         type="submit"
         data-testid={submitTestId}
-        sx={{ width: { xs: '100%', sm: 'auto' } }}
       />
     </OfflineDisabled>
   );
 
   return (
-    <Box
-      data-testid="form-action-row"
-      sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' },
-        justifyContent: 'flex-end',
-        gap: 1,
-        mt: 3,
-        mb: 2
-      }}>
-      {/* DOM order follows the visual order, including keyboard navigation. */}
-      {isMobile ? [submitButton, cancelButton] : [cancelButton, submitButton]}
-    </Box>
+    <ResponsiveActionRow
+      testId="form-action-row"
+      sx={[{ mt: 3, mb: 2 }, ...(Array.isArray(sx) ? sx : [sx])]}>
+      {cancelButton}
+      {submitButton}
+    </ResponsiveActionRow>
   );
 };
 FormActionRow.propTypes = {
@@ -152,5 +142,6 @@ FormActionRow.propTypes = {
   isCancelDisabled: PropTypes.bool,
   onCancel: PropTypes.func,
   submitLabel: PropTypes.string,
-  submitTestId: PropTypes.string
+  submitTestId: PropTypes.string,
+  sx: PropTypes.oneOfType([PropTypes.object, PropTypes.array, PropTypes.func])
 };

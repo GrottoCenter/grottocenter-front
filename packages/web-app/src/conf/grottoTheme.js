@@ -299,9 +299,9 @@ export const overridings = {
     },
     MuiDialog: {
       styleOverrides: {
-        paper: {
-          backgroundColor: grey['200']
-        }
+        paper: ({ theme }) => ({
+          backgroundColor: theme.palette.background.paper
+        })
       }
     },
     MuiDialogActions: {

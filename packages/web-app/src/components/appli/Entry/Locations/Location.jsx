@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Box, ListItem, ListItemText } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
+import ContributionItem from '@/components/appli/Contributions/ContributionItem';
 import ActionButtons from '../ActionButtons';
 import SectionTitle from '../SectionTitle';
 import { LocationPropTypes } from '../../../../types/entrance.type';
@@ -14,12 +13,6 @@ import {
 } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
 
-const ListItemStyled = styled(ListItem)`
-  display: flow-root;
-  border-top: 1px solid ${({ theme }) => theme.palette.divider};
-  padding-top: ${({ theme }) => theme.spacing(0.5)};
-  padding-bottom: ${({ theme }) => theme.spacing(0.5)};
-`;
 const Location = ({
   location,
   entranceId,
@@ -55,8 +48,8 @@ const Location = ({
   const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
   return (
-    <ListItemStyled disableGutters>
-      <Box sx={{ float: 'right', ml: 0.5 }}>
+    <ContributionItem
+      actions={
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}
@@ -93,44 +86,34 @@ const Location = ({
               }
             : {})}
         />
-      </Box>
-      {isUpdateFormVisible && permissions.isAuth ? (
-        <Box
-          sx={{
-            width: '100%'
-          }}>
+      }
+      form={
+        isUpdateFormVisible && permissions.isAuth ? (
           <CreateLocationForm
             closeForm={() => setIsUpdateFormVisible(false)}
             isNewLocation={false}
             onSubmit={onSubmitForm}
             values={location}
           />
-        </Box>
-      ) : (
-        <ListItemText
-          style={{ margin: 0 }}
-          disableTypography
-          primary={
-            <SectionTitle
-              title={location.title}
-              anchorId={`location-${location.id}`}
-              isDeleted={location.isDeleted}
-            />
-          }
-          secondary={
-            <Contribution
-              author={location.author}
-              reviewer={location.reviewer}
-              body={location.body}
-              dateInscription={location.dateInscription}
-              dateReviewed={location.dateReviewed}
-              language={location.language}
-              isDeleted={location.isDeleted}
-            />
-          }
+        ) : null
+      }
+      title={
+        <SectionTitle
+          title={location.title}
+          anchorId={`location-${location.id}`}
+          isDeleted={location.isDeleted}
         />
-      )}
-    </ListItemStyled>
+      }>
+      <Contribution
+        author={location.author}
+        reviewer={location.reviewer}
+        body={location.body}
+        dateInscription={location.dateInscription}
+        dateReviewed={location.dateReviewed}
+        language={location.language}
+        isDeleted={location.isDeleted}
+      />
+    </ContributionItem>
   );
 };
 

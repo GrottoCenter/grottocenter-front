@@ -21,9 +21,6 @@ const searchState = vi.hoisted(() => ({ results: [], error: null }));
 const viewportState = vi.hoisted(() => ({ isNarrow: false }));
 const networkState = vi.hoisted(() => ({ isOnline: true }));
 
-vi.mock('@mui/material/useMediaQuery', () => ({
-  default: () => viewportState.isNarrow
-}));
 const redirectState = vi.hoisted(() => ({
   data: null,
   isPending: false,
@@ -50,11 +47,21 @@ vi.mock('@/hooks/useNotification', () => ({
 }));
 
 vi.mock('../StandardDialog', () => ({
-  default: ({ open, title, children, actions, fullScreen, scrollable }) =>
+  default: ({
+    open,
+    title,
+    children,
+    actions,
+    fullScreen,
+    fullScreenOnMobile = false,
+    scrollable = true
+  }) =>
     open ? (
       <div
         data-testid="deletion-dialog"
-        data-fullscreen={fullScreen}
+        data-fullscreen={
+          fullScreen ?? (fullScreenOnMobile && viewportState.isNarrow)
+        }
         data-scrollable={scrollable}>
         <h2>{title}</h2>
         {children}

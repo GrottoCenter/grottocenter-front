@@ -180,13 +180,17 @@ const EntityActionDialog = ({
   return (
     <StandardDialog
       open
-      fullWidth
-      scrollable
       title={formatMessage({ id: 'Restore' })}
       onClose={handleClose}
+      isBusy={isLoading}
+      maxWidth="xs"
       actions={
-        <Stack direction="row" spacing={1}>
-          <Button onClick={handleClose} disabled={isLoading}>
+        <>
+          <Button
+            variant="outlined"
+            onClick={handleClose}
+            disabled={isLoading}
+            autoFocus>
             {formatMessage({ id: 'Cancel' })}
           </Button>
           <Button
@@ -202,7 +206,7 @@ const EntityActionDialog = ({
             onClick={() => handleConfirmation().catch(() => {})}>
             {formatMessage({ id: 'Restore' })}
           </Button>
-        </Stack>
+        </>
       }>
       <Typography sx={{ overflowWrap: 'anywhere' }}>
         {formatMessage({ id: config.entityType.str })} — {name}

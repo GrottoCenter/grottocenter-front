@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Tooltip } from '@mui/material';
+import { Box, Button, Tooltip } from '@mui/material';
 import PropTypes from 'prop-types';
 import { MOBILE_SECTION_ACTION_BUTTON_SX } from '../sectionActionButtonStyles';
 
@@ -22,7 +22,9 @@ const ActionButton = ({
   const button = (
     <Button
       color={color}
-      disabled={disabled || loading}
+      disabled={disabled}
+      loading={loading}
+      loadingPosition="start"
       onClick={onClick}
       startIcon={icon}
       aria-label={shouldHideLabelOnMobile ? label : undefined}
@@ -32,14 +34,6 @@ const ActionButton = ({
           ? [mobileIconButtonSx, buttonProps.sx]
           : buttonProps.sx
       }>
-      {loading && (
-        <CircularProgress
-          style={{ marginRight: '8px' }}
-          size={20}
-          thickness={6}
-          color={color}
-        />
-      )}
       <Box
         component="span"
         sx={

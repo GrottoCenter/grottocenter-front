@@ -6,10 +6,6 @@ import {
   Alert,
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   LinearProgress,
   MenuItem,
   Stack,
@@ -23,6 +19,8 @@ import AutoAwesomeOutlined from '@mui/icons-material/AutoAwesomeOutlined';
 import RefreshOutlined from '@mui/icons-material/RefreshOutlined';
 import CheckOutlined from '@mui/icons-material/CheckOutlined';
 import PictureAsPdfOutlined from '@mui/icons-material/PictureAsPdfOutlined';
+import StandardDialog from '@/components/common/StandardDialog';
+import ResponsiveActionRow from '@/components/common/ResponsiveActionRow';
 
 import { useAnalyzeDocument } from '@/hooks/mutations/useAnalyzeDocument';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
@@ -217,7 +215,7 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
       type="button"
       size="small"
       variant="outlined"
-      color={isPending ? 'error' : 'primary'}
+      color="primary"
       sx={{ flexShrink: 0 }}
       onClick={handleClose}>
       {formatMessage({ id: isPending ? 'Cancel' : 'Close' })}
@@ -242,14 +240,14 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
             px: { xs: 1, sm: 1.5 },
             '& .MuiButton-startIcon': {
               m: 0,
-              mr: { sm: 1 }
+              mr: 1
             }
           }}
           onClick={() => {
             analysis.reset();
             setSelection(EMPTY_SELECTION);
           }}>
-          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+          <Box component="span">
             {formatMessage({ id: 'documentAi.newAnalysis' })}
           </Box>
         </Button>
@@ -268,7 +266,6 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
       }
       startIcon={hasSuggestions ? <CheckOutlined /> : <AutoAwesomeOutlined />}
       onClick={hasSuggestions ? handleApply : handleAnalyze}
-      sx={{ flex: { xs: 1, sm: '0 0 auto' } }}
       data-testid={
         hasSuggestions ? 'document-ai-apply' : 'document-ai-confirm'
       }>
@@ -312,231 +309,208 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
           </Button>
         </Box>
       </Tooltip>
-      <Dialog
+      <StandardDialog
         open={isOpen}
-        onClose={() => {
-          if (!isPending) handleClose();
-        }}
+        onClose={handleClose}
+        isBusy={isPending}
         fullScreen={isMobile}
-        fullWidth
         maxWidth={hasSuggestions ? 'md' : 'sm'}
         aria-labelledby={titleId}
         aria-describedby={`${fileId} ${descriptionId}`}
-        slotProps={{ paper: { sx: { bgcolor: 'background.paper' } } }}>
-        <DialogTitle
-          id={titleId}
-          variant="h3"
-          component="h2"
-          sx={{ px: { xs: 2, sm: 3 }, py: 2.5 }}>
-          {formatMessage({
-            id: hasSuggestions ? 'documentAi.choose' : 'documentAi.analyze'
-          })}
-        </DialogTitle>
-        <DialogContent
-          dividers
-          sx={{ px: { xs: 2, sm: 3 }, py: 2.5, scrollbarGutter: 'stable' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 1,
-              mb: 2.5,
-              minWidth: 0
-            }}>
-            <PictureAsPdfOutlined
-              color="action"
-              fontSize="small"
-              sx={{ mt: 0.25 }}
-            />
-            <Typography
-              id={fileId}
-              variant="body2"
-              sx={{ overflowWrap: 'anywhere', minWidth: 0 }}>
-              {file.name ?? file.fileName}
-            </Typography>
-          </Box>
-          {isPending && (
-            <Stack spacing={1.5} role="status">
-              <Typography id={descriptionId}>
-                {formatMessage({ id: 'documentAi.pending' })}
-              </Typography>
-              <LinearProgress
-                aria-label={formatMessage({ id: 'documentAi.pending' })}
-              />
-            </Stack>
-          )}
-          {!isPending && !hasResult && (
-            <Stack spacing={2}>
-              <Typography id={descriptionId} variant="body1">
-                {formatMessage({ id: 'documentAi.consent' })}
-              </Typography>
-              <Box
-                sx={{ bgcolor: 'background.default', p: 2, borderRadius: 1 }}>
-                <Typography variant="h5" component="h3" sx={{ mb: 1 }}>
-                  {formatMessage({ id: 'documentAi.limits' })}
-                </Typography>
+        dividers
+        stackActionsOnMobile={false}
+        title={formatMessage({
+          id: hasSuggestions ? 'documentAi.choose' : 'documentAi.analyze'
+        })}
+        actions={
+          <Box sx={{ width: '100%' }}>
+            {hasSuggestions && (
+              <Box sx={{ mb: canApply || !hasChanges ? 1 : 0 }}>
                 <Box
-                  component="ul"
-                  sx={{ m: 0, pl: 2.5, '& li + li': { mt: 1 } }}>
-                  <li>
-                    <Typography variant="body2">
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                  data-testid="document-ai-selection"
+                  sx={{ display: 'flex', flexWrap: 'wrap', columnGap: 1.5 }}>
+                  {(canApply || !hasChanges) && (
+                    <Typography variant="caption" sx={{ fontWeight: 600 }}>
                       {formatMessage(
-                        { id: 'documentAi.userLimits' },
                         {
-                          daily: DOCUMENT_AI_LIMITS.dailyPerUser,
-                          parallel: DOCUMENT_AI_LIMITS.concurrentPerUser
-                        }
+                          id: canApply
+                            ? 'documentAi.selectionCount'
+                            : 'documentAi.noChanges'
+                        },
+                        { count: selectedFields.length }
                       )}
                     </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="body2">
+                  )}
+                  {replacementCount > 0 && (
+                    <Typography variant="caption" color="text.secondary">
                       {formatMessage(
-                        { id: 'documentAi.globalLimit' },
-                        { total: DOCUMENT_AI_LIMITS.dailyTotal }
+                        { id: 'documentAi.replacementCount' },
+                        { count: replacementCount }
                       )}
                     </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="body2">
-                      {formatMessage(
-                        { id: 'documentAi.fileLimits' },
-                        {
-                          size: maxFileSizeMb,
-                          pages: DOCUMENT_AI_LIMITS.pages
-                        }
-                      )}
-                    </Typography>
-                  </li>
+                  )}
                 </Box>
               </Box>
-              <Typography variant="body2" color="text.secondary">
-                {formatMessage({ id: 'documentAi.checkAccuracy' })}
-              </Typography>
-              {isTooLarge && (
-                <Alert severity="error">
-                  {formatMessage(
-                    { id: 'documentAi.tooLarge' },
-                    { size: maxFileSizeMb }
-                  )}
-                </Alert>
-              )}
-            </Stack>
-          )}
-          {error && error.name !== 'AbortError' && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              {formatMessage({ id: getErrorMessage(error) })}
-              {error.traceId && (
-                <Typography
-                  component="div"
-                  variant="body2"
-                  data-testid="document-ai-reference"
-                  sx={{
-                    mt: 0.5,
-                    overflowWrap: 'anywhere',
-                    userSelect: 'text'
-                  }}>
-                  {formatMessage(
-                    { id: 'documentAi.reference' },
-                    { id: error.traceId }
-                  )}
-                </Typography>
-              )}
-            </Alert>
-          )}
-          {hasResult && isLoadingLanguages && (
-            <Typography role="status">
-              {formatMessage({ id: 'Loading ...' })}
-            </Typography>
-          )}
-          {hasResult && !hasSuggestions && !isLoadingLanguages && (
-            <Alert severity="info" id={descriptionId}>
-              {formatMessage({ id: 'documentAi.empty' })}
-            </Alert>
-          )}
-          {hasSuggestions && (
-            <Box data-testid="document-ai-suggestions">
-              <Typography
-                id={descriptionId}
-                variant="body2"
-                color="text.secondary"
-                sx={{ mb: 1.5, maxWidth: '72ch' }}>
-                {formatMessage({ id: 'documentAi.review' })}
-              </Typography>
-              <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
-                <DocumentAiComparisonHeader />
-                {Object.keys(values)
-                  .filter(field => values[field])
-                  .map(field => (
-                    <DocumentAiSuggestion
-                      key={field}
-                      name={field}
-                      label={formatMessage({ id: fieldLabels[field] })}
-                      currentValue={currentValues[field]}
-                      suggestedValue={displayValues[field]}
-                      isSame={values[field] === document[field]}
-                      selected={shouldApply(field)}
-                      disabled={disabled}
-                      onChange={handleSelectionChange(field)}
-                      valueControl={valueControls[field]}
-                    />
-                  ))}
-              </Box>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions
-          disableSpacing
-          sx={{
-            display: 'block',
-            px: { xs: 2, sm: 3 },
-            py: 1.5,
-            flexShrink: 0
-          }}>
-          {hasSuggestions && (
-            <Box sx={{ mb: canApply || !hasChanges ? 1 : 0 }}>
-              <Box
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-                data-testid="document-ai-selection"
-                sx={{ display: 'flex', flexWrap: 'wrap', columnGap: 1.5 }}>
-                {(canApply || !hasChanges) && (
-                  <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                    {formatMessage(
-                      {
-                        id: canApply
-                          ? 'documentAi.selectionCount'
-                          : 'documentAi.noChanges'
-                      },
-                      { count: selectedFields.length }
-                    )}
-                  </Typography>
-                )}
-                {replacementCount > 0 && (
-                  <Typography variant="caption" color="text.secondary">
-                    {formatMessage(
-                      { id: 'documentAi.replacementCount' },
-                      { count: replacementCount }
-                    )}
-                  </Typography>
-                )}
-              </Box>
-            </Box>
-          )}
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 1,
-              justifyContent: 'flex-end',
-              '& button': { minHeight: { xs: 44, sm: 36 } }
-            }}>
-            {isMobile
-              ? [closeButton, restartButton, primaryButton]
-              : [restartButton, closeButton, primaryButton]}
+            )}
+            <ResponsiveActionRow>
+              {restartButton}
+              {closeButton}
+              {primaryButton}
+            </ResponsiveActionRow>
           </Box>
-        </DialogActions>
-      </Dialog>
+        }>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 1,
+            mb: 2.5,
+            minWidth: 0
+          }}>
+          <PictureAsPdfOutlined
+            color="action"
+            fontSize="small"
+            sx={{ mt: 0.25 }}
+          />
+          <Typography
+            id={fileId}
+            variant="body2"
+            sx={{ overflowWrap: 'anywhere', minWidth: 0 }}>
+            {file.name ?? file.fileName}
+          </Typography>
+        </Box>
+        {isPending && (
+          <Stack spacing={1.5} role="status">
+            <Typography id={descriptionId}>
+              {formatMessage({ id: 'documentAi.pending' })}
+            </Typography>
+            <LinearProgress
+              aria-label={formatMessage({ id: 'documentAi.pending' })}
+            />
+          </Stack>
+        )}
+        {!isPending && !hasResult && (
+          <Stack spacing={2}>
+            <Typography id={descriptionId} variant="body1">
+              {formatMessage({ id: 'documentAi.consent' })}
+            </Typography>
+            <Box sx={{ bgcolor: 'background.default', p: 2, borderRadius: 1 }}>
+              <Typography variant="h5" component="h3" sx={{ mb: 1 }}>
+                {formatMessage({ id: 'documentAi.limits' })}
+              </Typography>
+              <Box
+                component="ul"
+                sx={{ m: 0, pl: 2.5, '& li + li': { mt: 1 } }}>
+                <li>
+                  <Typography variant="body2">
+                    {formatMessage(
+                      { id: 'documentAi.userLimits' },
+                      {
+                        daily: DOCUMENT_AI_LIMITS.dailyPerUser,
+                        parallel: DOCUMENT_AI_LIMITS.concurrentPerUser
+                      }
+                    )}
+                  </Typography>
+                </li>
+                <li>
+                  <Typography variant="body2">
+                    {formatMessage(
+                      { id: 'documentAi.globalLimit' },
+                      { total: DOCUMENT_AI_LIMITS.dailyTotal }
+                    )}
+                  </Typography>
+                </li>
+                <li>
+                  <Typography variant="body2">
+                    {formatMessage(
+                      { id: 'documentAi.fileLimits' },
+                      {
+                        size: maxFileSizeMb,
+                        pages: DOCUMENT_AI_LIMITS.pages
+                      }
+                    )}
+                  </Typography>
+                </li>
+              </Box>
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              {formatMessage({ id: 'documentAi.checkAccuracy' })}
+            </Typography>
+            {isTooLarge && (
+              <Alert severity="error">
+                {formatMessage(
+                  { id: 'documentAi.tooLarge' },
+                  { size: maxFileSizeMb }
+                )}
+              </Alert>
+            )}
+          </Stack>
+        )}
+        {error && error.name !== 'AbortError' && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {formatMessage({ id: getErrorMessage(error) })}
+            {error.traceId && (
+              <Typography
+                component="div"
+                variant="body2"
+                data-testid="document-ai-reference"
+                sx={{
+                  mt: 0.5,
+                  overflowWrap: 'anywhere',
+                  userSelect: 'text'
+                }}>
+                {formatMessage(
+                  { id: 'documentAi.reference' },
+                  { id: error.traceId }
+                )}
+              </Typography>
+            )}
+          </Alert>
+        )}
+        {hasResult && isLoadingLanguages && (
+          <Typography role="status">
+            {formatMessage({ id: 'Loading ...' })}
+          </Typography>
+        )}
+        {hasResult && !hasSuggestions && !isLoadingLanguages && (
+          <Alert severity="info" id={descriptionId}>
+            {formatMessage({ id: 'documentAi.empty' })}
+          </Alert>
+        )}
+        {hasSuggestions && (
+          <Box data-testid="document-ai-suggestions">
+            <Typography
+              id={descriptionId}
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 1.5, maxWidth: '72ch' }}>
+              {formatMessage({ id: 'documentAi.review' })}
+            </Typography>
+            <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
+              <DocumentAiComparisonHeader />
+              {Object.keys(values)
+                .filter(field => values[field])
+                .map(field => (
+                  <DocumentAiSuggestion
+                    key={field}
+                    name={field}
+                    label={formatMessage({ id: fieldLabels[field] })}
+                    currentValue={currentValues[field]}
+                    suggestedValue={displayValues[field]}
+                    isSame={values[field] === document[field]}
+                    selected={shouldApply(field)}
+                    disabled={disabled}
+                    onChange={handleSelectionChange(field)}
+                    valueControl={valueControls[field]}
+                  />
+                ))}
+            </Box>
+          </Box>
+        )}
+      </StandardDialog>
     </>
   );
 };
