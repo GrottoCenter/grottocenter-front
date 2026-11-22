@@ -41,11 +41,7 @@ const RecapTile = ({ icon, color, count, label, reportUrl, downloadLabel }) => (
       {label}
     </Typography>
     {reportUrl && (
-      <AppLink
-        href={reportUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        variant="caption">
+      <AppLink href={reportUrl} variant="caption">
         {downloadLabel}
       </AppLink>
     )}

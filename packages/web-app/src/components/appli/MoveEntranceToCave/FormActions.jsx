@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Box, Button, CircularProgress, Tooltip } from '@mui/material';
+import { Box, Button, Tooltip } from '@mui/material';
 import { useIntl } from 'react-intl';
 import ResponsiveActionRow from '@/components/common/ResponsiveActionRow';
 
@@ -20,11 +20,10 @@ const FormActions = ({
     <Button
       variant="contained"
       color="primary"
-      disabled={disabled || loading}
-      onClick={onConfirm}
-      startIcon={
-        loading ? <CircularProgress size={18} color="inherit" /> : null
-      }>
+      disabled={disabled}
+      loading={loading}
+      loadingPosition="start"
+      onClick={onConfirm}>
       {confirmLabel}
     </Button>
   );

@@ -69,7 +69,7 @@ const PersonEdit = () => {
                 error={error}
                 isPaused={isPaused}
                 onRetry={refetch}
-                messageId="The person you are looking for doesn't exist."
+                messageId="Error, the person you are looking for is not available."
               />
             ) : (
               <Alert

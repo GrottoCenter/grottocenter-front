@@ -49,7 +49,7 @@ it('uses the shared fetch error and retries the person request', () => {
   state.query.error = new Error('Request failed');
   renderPage();
   expect(screen.getByTestId('fetch-error-state')).toHaveTextContent(
-    messages["The person you are looking for doesn't exist."]
+    messages['Error, the person you are looking for is not available.']
   );
   fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
   expect(state.query.refetch).toHaveBeenCalledTimes(1);
