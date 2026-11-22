@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { Link as MuiLink } from '@mui/material';
 import { networkIcon } from '../../assets/icons';
 import AppLink from './AppLink';
 
@@ -7,8 +6,7 @@ import AppLink from './AppLink';
 // FormattedMessage's `values` as a named placeholder, e.g.:
 //   <FormattedMessage id="... {networkLink} ..." values={{ networkLink: <NetworkInlineLink .../> }} />
 const NetworkInlineLink = ({ caveId, label, size = 16, variant = 'body2' }) => (
-  <MuiLink
-    component={AppLink}
+  <AppLink
     to={`/ui/caves/${caveId}`}
     openInNewTabDesktop
     variant={variant}
@@ -22,7 +20,7 @@ const NetworkInlineLink = ({ caveId, label, size = 16, variant = 'body2' }) => (
       style={{ verticalAlign: 'middle', marginRight: '2px' }}
     />
     {label}
-  </MuiLink>
+  </AppLink>
 );
 
 NetworkInlineLink.propTypes = {

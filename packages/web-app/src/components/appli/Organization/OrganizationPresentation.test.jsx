@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
 import Organization from './index';
+import Details from './Details';
 
 vi.mock('@/hooks', () => ({
   usePermissions: () => ({ isAuth: true, isAdmin: true, isModerator: true }),
@@ -83,6 +84,43 @@ beforeEach(() => {
 });
 
 afterEach(() => vi.restoreAllMocks());
+
+it('retains the untitled summary, contact links and description inside shared panels', () => {
+  renderWithProviders(
+    <MemoryRouter>
+      <Details
+        organization={{
+          id: 42,
+          name: 'Example organization',
+          type: 'SPELEOLOGY',
+          address: 'Example address',
+          mail: 'contact@example.org',
+          url: 'https://example.org',
+          customMessage: 'Organization description'
+        }}
+      />
+    </MemoryRouter>,
+    { messages }
+  );
+  const summary = screen.getByTestId('organization-summary');
+  expect(within(summary).queryByRole('heading')).toBeNull();
+  expect(summary).toHaveTextContent('Documents');
+  const contact = screen.getByTestId('organization-contact');
+  expect(
+    within(contact).getByRole('heading', { name: 'Contact', level: 2 })
+  ).toBeVisible();
+  expect(contact).toHaveTextContent('Example address');
+  expect(
+    within(contact).getByRole('link', { name: 'contact@example.org' })
+  ).toHaveAttribute('href', 'mailto:contact@example.org');
+  expect(
+    within(contact).getByRole('link', { name: 'https://example.org' })
+  ).toHaveAttribute('href', 'https://example.org');
+  expect(
+    screen.getByRole('heading', { name: 'Description', level: 2 })
+  ).toBeVisible();
+  expect(screen.getByText('Organization description')).toBeVisible();
+});
 
 it.each(['SPELEOLOGY', 'CAVE_RESCUE', 'RESEARCH', null, undefined, ''])(
   'shows membership and exploration controls for %s',

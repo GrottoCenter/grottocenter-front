@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { Skeleton } from '@mui/material';
+import FetchErrorState from '@/components/common/FetchErrorState';
 
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import PersonForm from '../../components/appli/EntitiesForm/Person';
@@ -16,9 +17,14 @@ const PersonEdit = () => {
 
   const userId = useUserProperties()?.id ?? null;
   const isOurAccount = userId?.toString() === personId.toString();
-  const { data: person, isFetching } = usePerson(
-    isOurAccount ? undefined : personId
-  );
+  const {
+    data: person,
+    isFetching,
+    error,
+    fetchStatus,
+    refetch
+  } = usePerson(isOurAccount ? undefined : personId);
+  const isPaused = fetchStatus === 'paused';
   let isAllowed = isOurAccount || isAdmin;
   if (isModerator && person?.type === 'AUTHOR') isAllowed = true;
 
@@ -55,14 +61,24 @@ const PersonEdit = () => {
               })}
             />
           )}
-          {isAllowed && !person && !isFetching && (
-            <Alert
-              severity="error"
-              content={formatMessage({
-                id: "The person you are looking for doesn't exist."
-              })}
-            />
-          )}
+          {isAllowed &&
+            !person &&
+            !isFetching &&
+            (error || isPaused ? (
+              <FetchErrorState
+                error={error}
+                isPaused={isPaused}
+                onRetry={refetch}
+                messageId="Error, the person you are looking for is not available."
+              />
+            ) : (
+              <Alert
+                severity="error"
+                content={formatMessage({
+                  id: "The person you are looking for doesn't exist."
+                })}
+              />
+            ))}
           {person && isAllowed && (
             <PersonForm
               personValues={person}

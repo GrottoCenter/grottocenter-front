@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Box, ListItem, ListItemText } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
+import ContributionItem from '@/components/appli/Contributions/ContributionItem';
 import { HistoryPropTypes } from '../../../../types/entrance.type';
 import CreateHistoryForm from '../../EntitiesForm/History';
 import ActionButtons from '../ActionButtons';
@@ -12,15 +11,6 @@ import {
   usePermissions
 } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
-
-const ListItemStyled = styled(ListItem)`
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  border-top: 1px solid ${({ theme }) => theme.palette.divider};
-  padding-top: ${({ theme }) => theme.spacing(0.5)};
-  padding-bottom: ${({ theme }) => theme.spacing(0.5)};
-`;
 
 const History = ({
   history,
@@ -56,34 +46,19 @@ const History = ({
   const isActionLoading = deleteMutation.isPending || restoreMutation.isPending;
 
   return (
-    <ListItemStyled disableGutters>
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        {isUpdateFormVisible && permissions.isAuth ? (
+    <ContributionItem
+      inlineActions
+      form={
+        isUpdateFormVisible && permissions.isAuth ? (
           <CreateHistoryForm
             closeForm={() => setIsUpdateFormVisible(false)}
             isNewHistory={false}
             onSubmit={onSubmitForm}
             values={history}
           />
-        ) : (
-          <ListItemText
-            style={{ margin: 0 }}
-            disableTypography
-            secondary={
-              <Contribution
-                body={history.body}
-                author={history.author}
-                reviewer={history.reviewer}
-                dateInscription={history.dateInscription}
-                dateReviewed={history.dateReviewed}
-                language={history.language}
-                isDeletedWithHeader={history.isDeleted}
-              />
-            }
-          />
-        )}
-      </Box>
-      <Box sx={{ flexShrink: 0, ml: 0.5 }}>
+        ) : null
+      }
+      actions={
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}
@@ -119,8 +94,17 @@ const History = ({
               }
             : {})}
         />
-      </Box>
-    </ListItemStyled>
+      }>
+      <Contribution
+        body={history.body}
+        author={history.author}
+        reviewer={history.reviewer}
+        dateInscription={history.dateInscription}
+        dateReviewed={history.dateReviewed}
+        language={history.language}
+        isDeletedWithHeader={history.isDeleted}
+      />
+    </ContributionItem>
   );
 };
 

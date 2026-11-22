@@ -7,10 +7,10 @@ import {
   Collapse,
   IconButton,
   LinearProgress,
-  Paper,
   Typography
 } from '@mui/material';
 import { WarningAmber, ExpandMore, ExpandLess } from '@mui/icons-material';
+import InfoPanel from '@/components/common/InfoPanel';
 import CoordinateDisplay from '../../common/CoordinateDisplay';
 import { useCoordinatePreference, getCRSLabel } from '../../../hooks';
 import DataQualityBadge from '../../common/DataQualityBadge';
@@ -87,13 +87,9 @@ const Properties = ({
 
   return (
     <GlobalWrapper>
-      <Paper
-        data-testid="entrance-location"
-        variant="outlined"
+      <InfoPanel
+        testId="entrance-location"
         sx={{
-          p: 1,
-          borderRadius: 2,
-          bgcolor: 'grey.50',
           display: 'flex',
           alignItems: 'flex-start',
           gap: 1.5
@@ -150,7 +146,7 @@ const Properties = ({
           </InfoSection>
         </Box>
         {featuredImage}
-      </Paper>
+      </InfoPanel>
       {(entrance.cave?.depth ||
         entrance.cave?.length ||
         entrance.cave?.temperature ||
@@ -158,60 +154,51 @@ const Properties = ({
         massifsWithType.length > 0 ||
         entrance.cave?.isDiving ||
         entrance.isTouristic) && (
-        <Paper
-          variant="outlined"
-          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-          <InfoSection
-            component="h2"
-            title={formatMessage({ id: 'Characteristics' })}>
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 0.5
-              }}>
-              <DepthProperty
-                depth={entrance.cave?.depth}
-                isLoading={isLoading}
+        <InfoPanel title={formatMessage({ id: 'Characteristics' })}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 0.5
+            }}>
+            <DepthProperty depth={entrance.cave?.depth} isLoading={isLoading} />
+            <LengthProperty
+              length={entrance.cave?.length}
+              isLoading={isLoading}
+            />
+            <TemperatureProperty
+              temperature={entrance.cave?.temperature}
+              isLoading={isLoading}
+            />
+            {!!entrance.discoveryYear && (
+              <Property
+                label={formatMessage({ id: 'Year of discovery' })}
+                value={entrance.discoveryYear}
+                icon={<CustomIcon type="discovery_date" />}
               />
-              <LengthProperty
-                length={entrance.cave?.length}
-                isLoading={isLoading}
+            )}
+            {massifsWithType.map(m => (
+              <Property
+                key={m.id}
+                label={formatMessage({ id: 'Underground type' })}
+                value={
+                  massifsWithType.length > 1
+                    ? `${m.undergroundType} (${m.name})`
+                    : m.undergroundType
+                }
+                icon={<CustomIcon type="category" />}
               />
-              <TemperatureProperty
-                temperature={entrance.cave?.temperature}
-                isLoading={isLoading}
-              />
-              {!!entrance.discoveryYear && (
-                <Property
-                  label={formatMessage({ id: 'Year of discovery' })}
-                  value={entrance.discoveryYear}
-                  icon={<CustomIcon type="discovery_date" />}
-                />
-              )}
-              {massifsWithType.map(m => (
-                <Property
-                  key={m.id}
-                  label={formatMessage({ id: 'Underground type' })}
-                  value={
-                    massifsWithType.length > 1
-                      ? `${m.undergroundType} (${m.name})`
-                      : m.undergroundType
-                  }
-                  icon={<CustomIcon type="category" />}
-                />
-              ))}
-              <DivingProperty
-                isDiving={entrance.cave?.isDiving}
-                isLoading={isLoading}
-              />
-              <IsTouristicProperty
-                isTouristic={entrance.isTouristic}
-                isLoading={isLoading}
-              />
-            </Box>
-          </InfoSection>
-        </Paper>
+            ))}
+            <DivingProperty
+              isDiving={entrance.cave?.isDiving}
+              isLoading={isLoading}
+            />
+            <IsTouristicProperty
+              isTouristic={entrance.isTouristic}
+              isLoading={isLoading}
+            />
+          </Box>
+        </InfoPanel>
       )}
       {!entrance.isDeleted && (
         <InterestSummary
@@ -228,191 +215,171 @@ const Properties = ({
         entrance.dangerRockfall ||
         entrance.hasRules ||
         entrance.needStayOnTrail) && (
-        <Paper
-          variant="outlined"
+        <InfoPanel
+          title={formatMessage({ id: 'Hazards & restrictions' })}
+          titleColor="secondary.main"
+          icon={<WarningAmber sx={{ color: 'secondary.main', fontSize: 20 }} />}
           sx={{
-            p: 1,
-            borderRadius: 2,
             bgcolor: 'secondary.veryLight',
             borderColor: 'secondary.light'
           }}>
-          <InfoSection
-            component="h2"
-            title={formatMessage({ id: 'Hazards & restrictions' })}
-            titleColor="secondary.main"
-            icon={
-              <WarningAmber sx={{ color: 'secondary.main', fontSize: 20 }} />
-            }>
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 0.5
-              }}>
-              <HasBatProperty hasBat={entrance.hasBat} isLoading={isLoading} />
-              <DangerFloodingProperty
-                dangerFlooding={entrance.dangerFlooding}
-                isLoading={isLoading}
-              />
-              <DangerCO2Property
-                dangerCo2={entrance.dangerCo2}
-                isLoading={isLoading}
-              />
-              <NeedCleanGearProperty
-                needCleanGear={entrance.needCleanGear}
-                isLoading={isLoading}
-              />
-              <DangerPollutionProperty
-                dangerPollution={entrance.dangerPollution}
-                isLoading={isLoading}
-              />
-              <DangerRockfallProperty
-                dangerRockfall={entrance.dangerRockfall}
-                isLoading={isLoading}
-              />
-              <HasRulesProperty
-                hasRules={entrance.hasRules}
-                isLoading={isLoading}
-              />
-              <NeedStayOnTrailProperty
-                needStayOnTrail={entrance.needStayOnTrail}
-                isLoading={isLoading}
-              />
-            </Box>
-          </InfoSection>
-        </Paper>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 0.5
+            }}>
+            <HasBatProperty hasBat={entrance.hasBat} isLoading={isLoading} />
+            <DangerFloodingProperty
+              dangerFlooding={entrance.dangerFlooding}
+              isLoading={isLoading}
+            />
+            <DangerCO2Property
+              dangerCo2={entrance.dangerCo2}
+              isLoading={isLoading}
+            />
+            <NeedCleanGearProperty
+              needCleanGear={entrance.needCleanGear}
+              isLoading={isLoading}
+            />
+            <DangerPollutionProperty
+              dangerPollution={entrance.dangerPollution}
+              isLoading={isLoading}
+            />
+            <DangerRockfallProperty
+              dangerRockfall={entrance.dangerRockfall}
+              isLoading={isLoading}
+            />
+            <HasRulesProperty
+              hasRules={entrance.hasRules}
+              isLoading={isLoading}
+            />
+            <NeedStayOnTrailProperty
+              needStayOnTrail={entrance.needStayOnTrail}
+              isLoading={isLoading}
+            />
+          </Box>
+        </InfoPanel>
       )}
       {entrance.cave?.exploringOrganizations?.length > 0 && (
-        <Paper
-          variant="outlined"
-          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-          <InfoSection
-            component="h2"
-            title={formatMessage({ id: 'Exploring organizations' })}>
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: {
-                  xs: '1fr',
-                  sm: 'repeat(2, 1fr)',
-                  md: 'repeat(3, 1fr)',
-                  lg: 'repeat(4, 1fr)'
-                }
-              }}>
-              {entrance.cave.exploringOrganizations.map(org => (
-                <OrganizationProperty key={org.id} organization={org} />
-              ))}
-            </Box>
-          </InfoSection>
-        </Paper>
+        <InfoPanel title={formatMessage({ id: 'Exploring organizations' })}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(3, 1fr)',
+                lg: 'repeat(4, 1fr)'
+              }
+            }}>
+            {entrance.cave.exploringOrganizations.map(org => (
+              <OrganizationProperty key={org.id} organization={org} />
+            ))}
+          </Box>
+        </InfoPanel>
       )}
       {dataQuality?.total != null && (
-        <Paper
-          variant="outlined"
-          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-          <InfoSection
-            component="h2"
-            title={formatMessage({ id: 'Data quality' })}>
+        <InfoPanel title={formatMessage({ id: 'Data quality' })}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: 'column'
+                alignItems: 'center',
+                gap: 1,
+                flexWrap: 'wrap'
               }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  flexWrap: 'wrap'
-                }}>
-                <DataQualityBadge value={dataQuality.total} size={32} />
-                <Typography variant="body2">
-                  {formatMessage({
-                    id: getDataQualityLabelKey(dataQuality.total)
-                  })}
-                </Typography>
-                <DataQualityHelpButton />
-                {dataQuality.categories && (
-                  <Box
-                    onClick={() => setCategoriesOpen(o => !o)}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      cursor: 'pointer',
-                      color: 'text.secondary',
-                      ml: 'auto',
-                      userSelect: 'none'
-                    }}>
-                    <Typography variant="caption">
-                      {formatMessage({ id: 'Details by category' })}
-                    </Typography>
-                    <IconButton size="small" sx={{ p: 0.25 }}>
-                      {categoriesOpen ? (
-                        <ExpandLess fontSize="small" />
-                      ) : (
-                        <ExpandMore fontSize="small" />
-                      )}
-                    </IconButton>
-                  </Box>
-                )}
-              </Box>
+              <DataQualityBadge value={dataQuality.total} size={32} />
+              <Typography variant="body2">
+                {formatMessage({
+                  id: getDataQualityLabelKey(dataQuality.total)
+                })}
+              </Typography>
+              <DataQualityHelpButton />
               {dataQuality.categories && (
-                <Collapse in={categoriesOpen}>
-                  <Box
-                    sx={{
-                      display: 'grid',
-                      gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
-                      columnGap: 2,
-                      rowGap: '4px',
-                      pt: '4px'
-                    }}>
-                    {CATEGORY_KEYS.map(({ key, label }) => {
-                      const score = dataQuality.categories[key];
-                      if (score == null) return null;
-                      const color = qualityColor(score);
-                      return (
-                        <Box
-                          key={key}
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 0.5
-                          }}>
-                          <Typography
-                            variant="caption"
-                            noWrap
-                            sx={{
-                              minWidth: 80,
-                              flexShrink: 0,
-                              color: 'text.secondary'
-                            }}>
-                            {formatMessage({ id: label })}
-                          </Typography>
-                          <LinearProgress
-                            variant="determinate"
-                            value={score}
-                            color={color}
-                            sx={{ flex: 1, height: 6, borderRadius: 3 }}
-                          />
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              minWidth: 24,
-                              textAlign: 'right',
-                              color: 'text.secondary'
-                            }}>
-                            {score}%
-                          </Typography>
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                </Collapse>
+                <Box
+                  onClick={() => setCategoriesOpen(o => !o)}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    cursor: 'pointer',
+                    color: 'text.secondary',
+                    ml: 'auto',
+                    userSelect: 'none'
+                  }}>
+                  <Typography variant="caption">
+                    {formatMessage({ id: 'Details by category' })}
+                  </Typography>
+                  <IconButton size="small" sx={{ p: 0.25 }}>
+                    {categoriesOpen ? (
+                      <ExpandLess fontSize="small" />
+                    ) : (
+                      <ExpandMore fontSize="small" />
+                    )}
+                  </IconButton>
+                </Box>
               )}
             </Box>
-          </InfoSection>
-        </Paper>
+            {dataQuality.categories && (
+              <Collapse in={categoriesOpen}>
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+                    columnGap: 2,
+                    rowGap: '4px',
+                    pt: '4px'
+                  }}>
+                  {CATEGORY_KEYS.map(({ key, label }) => {
+                    const score = dataQuality.categories[key];
+                    if (score == null) return null;
+                    const color = qualityColor(score);
+                    return (
+                      <Box
+                        key={key}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5
+                        }}>
+                        <Typography
+                          variant="caption"
+                          noWrap
+                          sx={{
+                            minWidth: 80,
+                            flexShrink: 0,
+                            color: 'text.secondary'
+                          }}>
+                          {formatMessage({ id: label })}
+                        </Typography>
+                        <LinearProgress
+                          variant="determinate"
+                          value={score}
+                          color={color}
+                          sx={{ flex: 1, height: 6, borderRadius: 3 }}
+                        />
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            minWidth: 24,
+                            textAlign: 'right',
+                            color: 'text.secondary'
+                          }}>
+                          {score}%
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </Collapse>
+            )}
+          </Box>
+        </InfoPanel>
       )}
     </GlobalWrapper>
   );

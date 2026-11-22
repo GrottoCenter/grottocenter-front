@@ -9,6 +9,7 @@ const DEFAULT_SLIDER_PARAMS = {
 };
 
 export const useGeometrySimplification = (geometry, onError) => {
+  const onErrorRef = useRef(onError);
   const requestRef = useRef(0);
   const workerRef = useRef(null);
   const workerReadyRef = useRef(false);
@@ -19,9 +20,17 @@ export const useGeometrySimplification = (geometry, onError) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSimplifying, setIsSimplifying] = useState(false);
   const [sliderParams, setSliderParams] = useState(DEFAULT_SLIDER_PARAMS);
+  const [resetVersion, setResetVersion] = useState(0);
   const debouncedTolerance = useDebounce(tolerance, 100);
 
   useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  useEffect(() => {
+    workerReadyRef.current = false;
+    lastToleranceRef.current = null;
+    setTolerance(INITIAL_TOLERANCE);
     setSimplifiedData(null);
     setVertexCount(0);
     setIsSimplifying(false);
@@ -32,15 +41,13 @@ export const useGeometrySimplification = (geometry, onError) => {
     }
     setIsAnalyzing(true);
     let worker;
-    workerReadyRef.current = false;
-    lastToleranceRef.current = null;
     const handleError = message => {
       if (worker && workerRef.current !== worker) return;
       worker?.terminate();
       workerRef.current = null;
       workerReadyRef.current = false;
       lastToleranceRef.current = null;
-      onError(message);
+      onErrorRef.current?.(message);
       setIsAnalyzing(false);
       setIsSimplifying(false);
       setSimplifiedData(null);
@@ -88,7 +95,7 @@ export const useGeometrySimplification = (geometry, onError) => {
       workerRef.current = null;
       worker.terminate();
     };
-  }, [geometry, onError]);
+  }, [geometry]);
 
   useEffect(() => {
     if (
@@ -109,21 +116,24 @@ export const useGeometrySimplification = (geometry, onError) => {
       requestId: ++requestRef.current,
       tolerance: debouncedTolerance
     });
-  }, [debouncedTolerance, tolerance, isAnalyzing]);
+  }, [debouncedTolerance, tolerance, isAnalyzing, resetVersion]);
 
   const reset = () => {
-    requestRef.current += 1;
-    workerReadyRef.current = false;
+    // Keep an initial load valid: it already computes the reset tolerance.
+    if (workerReadyRef.current) requestRef.current += 1;
     lastToleranceRef.current = null;
     setSimplifiedData(null);
-    setIsSimplifying(false);
+    setIsSimplifying(workerReadyRef.current);
     setTolerance(INITIAL_TOLERANCE);
+    setResetVersion(version => version + 1);
   };
 
   const updateTolerance = value => {
     if (value === tolerance) return;
-    requestRef.current += 1;
-    setIsSimplifying(true);
+    if (workerReadyRef.current) requestRef.current += 1;
+    setIsSimplifying(
+      workerReadyRef.current && value !== lastToleranceRef.current
+    );
     setTolerance(value);
   };
 

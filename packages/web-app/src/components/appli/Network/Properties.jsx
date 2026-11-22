@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import { Box, Paper } from '@mui/material';
+import { Box } from '@mui/material';
 
-import InfoSection from '../../common/InfoSection';
+import InfoPanel from '@/components/common/InfoPanel';
 import {
   DepthProperty,
   LengthProperty,
@@ -28,52 +28,40 @@ const Properties = ({ isLoading, cave }) => {
   return (
     <GlobalWrapper>
       {hasCharacteristics && (
-        <Paper
-          variant="outlined"
-          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-          <InfoSection
-            component="h2"
-            title={formatMessage({ id: 'Characteristics' })}>
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 0.5
-              }}>
-              <DepthProperty depth={cave?.depth} isLoading={isLoading} />
-              <LengthProperty length={cave?.length} isLoading={isLoading} />
-              <TemperatureProperty
-                temperature={cave?.temperature}
-                isLoading={isLoading}
-              />
-              <DivingProperty isDiving={cave?.isDiving} isLoading={isLoading} />
-            </Box>
-          </InfoSection>
-        </Paper>
+        <InfoPanel title={formatMessage({ id: 'Characteristics' })}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 0.5
+            }}>
+            <DepthProperty depth={cave?.depth} isLoading={isLoading} />
+            <LengthProperty length={cave?.length} isLoading={isLoading} />
+            <TemperatureProperty
+              temperature={cave?.temperature}
+              isLoading={isLoading}
+            />
+            <DivingProperty isDiving={cave?.isDiving} isLoading={isLoading} />
+          </Box>
+        </InfoPanel>
       )}
       {cave?.exploringOrganizations?.length > 0 && (
-        <Paper
-          variant="outlined"
-          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-          <InfoSection
-            component="h2"
-            title={formatMessage({ id: 'Exploring organizations' })}>
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: {
-                  xs: '1fr',
-                  sm: 'repeat(2, 1fr)',
-                  md: 'repeat(3, 1fr)',
-                  lg: 'repeat(4, 1fr)'
-                }
-              }}>
-              {cave.exploringOrganizations.map(org => (
-                <OrganizationProperty key={org.id} organization={org} />
-              ))}
-            </Box>
-          </InfoSection>
-        </Paper>
+        <InfoPanel title={formatMessage({ id: 'Exploring organizations' })}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(3, 1fr)',
+                lg: 'repeat(4, 1fr)'
+              }
+            }}>
+            {cave.exploringOrganizations.map(org => (
+              <OrganizationProperty key={org.id} organization={org} />
+            ))}
+          </Box>
+        </InfoPanel>
       )}
     </GlobalWrapper>
   );
