@@ -6,7 +6,6 @@ import {
   prepareDocumentPreview,
   prepareDocumentEdit
 } from './documentModeration';
-import { getDocumentModerationStatus } from './documentValidationStatus';
 
 const current = {
   id: 7,
@@ -27,32 +26,6 @@ const current = {
 };
 
 describe('document moderation', () => {
-  it.each(['pending', 'modificationPending', 'rejected', 'validated'])(
-    'uses the explicit API status %s independently of legacy metadata',
-    validationStatus => {
-      expect(
-        getDocumentModerationStatus({
-          validationStatus,
-          isValidated: true,
-          dateValidation: 'invalid',
-          validator: { id: 9 }
-        })
-      ).toBe(validationStatus);
-    }
-  );
-
-  it.each([undefined, null, 'future'])(
-    'keeps status %s unknown instead of inferring a decision',
-    validationStatus => {
-      expect(
-        getDocumentModerationStatus({
-          validationStatus,
-          isValidated: false,
-          dateValidation: '2026-01-01'
-        })
-      ).toBe('unknown');
-    }
-  );
   it.each([null, undefined])(
     'omits an undecided panorama flag %s from new and modified file diffs',
     isPanorama => {

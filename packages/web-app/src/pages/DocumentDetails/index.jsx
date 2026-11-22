@@ -746,7 +746,7 @@ const Document = ({
                       {shouldShowModerationNotice && (
                         <Alert
                           data-testid="document-moderation-notice"
-                          severity={moderationBadge.color}
+                          severity={moderationBadge.severity}
                           title={
                             isRejected
                               ? formatMessage({

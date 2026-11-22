@@ -6,12 +6,21 @@ export const DOCUMENT_VALIDATION_STATUSES = [
 ];
 
 const BADGES = {
-  pending: { label: 'Awaiting validation', color: 'warning' },
+  pending: {
+    label: 'Awaiting validation',
+    color: 'warning',
+    severity: 'warning'
+  },
   modificationPending: {
     label: 'Awaiting re-validation',
-    color: 'info'
+    color: 'info',
+    severity: 'info'
   },
-  rejected: { label: 'documentValidation.rejected', color: 'error' }
+  rejected: {
+    label: 'documentValidation.rejected',
+    color: 'error',
+    severity: 'error'
+  }
 };
 
 // Partial responses and older indexes can omit the read-only API status.

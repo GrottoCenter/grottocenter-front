@@ -52,6 +52,7 @@ describe('Document moderation notice', () => {
       visitDocument({});
       cy.get('[data-testid="document-moderation-notice"]')
         .should('be.visible')
+        .and('have.class', 'MuiAlert-colorWarning')
         .and(
           'contain.text',
           'This document is awaiting validation by a moderator.'
@@ -70,6 +71,7 @@ describe('Document moderation notice', () => {
       });
       cy.get('[data-testid="document-moderation-notice"]')
         .should('be.visible')
+        .and('have.class', 'MuiAlert-colorError')
         .and('contain.text', 'This document has been rejected.')
         .and('contain.text', 'Reason: <b>Wrong entrance</b>')
         .and('contain.text', 'Decision on October 18, 2026')
@@ -91,10 +93,12 @@ describe('Document moderation notice', () => {
       validationStatus: 'modificationPending',
       validator: { id: 9, nickname: 'Moderator' }
     });
-    cy.get('[data-testid="document-moderation-notice"]').should(
-      'contain.text',
-      'A moderator needs to validate the last modification before being able to edit the document again.'
-    );
+    cy.get('[data-testid="document-moderation-notice"]')
+      .should(
+        'contain.text',
+        'A moderator needs to validate the last modification before being able to edit the document again.'
+      )
+      .and('have.class', 'MuiAlert-colorInfo');
   });
 
   it('does not show an old refusal on the accepted version', () => {
