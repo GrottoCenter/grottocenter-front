@@ -61,8 +61,6 @@ const DocumentPreview = ({
       maxWidth="lg"
       fullScreen={isNarrowViewport}
       dense={isNarrowViewport}
-      fullWidth
-      scrollable
       open
       onClose={onClose}
       titleComponent="h1"
@@ -75,6 +73,7 @@ const DocumentPreview = ({
         </Typography>
       }
       actionsPosition={hasHeaderActions ? 'top' : 'bottom'}
+      stackActionsOnMobile={false}
       actions={
         permissions.isModerator ? (
           <Box data-testid="document-moderation-actions" sx={{ width: '100%' }}>

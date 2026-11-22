@@ -15,10 +15,8 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
-  Typography,
-  useMediaQuery
+  Typography
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import DownloadIcon from '@mui/icons-material/Download';
 import StandardDialog from '@/components/common/StandardDialog';
 import DocumentTypeChip from '@/components/common/DocumentTypeChip';
@@ -39,8 +37,6 @@ const PdfExport = ({
   const intl = useIntl();
   const { formatMessage } = intl;
   const appendicesHelpId = useId();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { enqueueSnackbar } = useSnackbar();
   const adapter = PDF_ADAPTERS[entityType];
   const hasDocumentsSection = adapter.sections.some(
@@ -144,13 +140,9 @@ const PdfExport = ({
     <StandardDialog
       open={open}
       onClose={handleClose}
-      fullScreen={isMobile}
-      fullWidth
-      maxWidth="sm"
-      scrollable
+      fullScreenOnMobile
       dividers
       showCloseButton={false}
-      stackActionsOnMobile
       title={[formatMessage({ id: 'pdf.download' }), entity.name]
         .filter(Boolean)
         .join(' · ')}
@@ -161,13 +153,9 @@ const PdfExport = ({
           </Button>
           <Button
             variant="contained"
-            startIcon={
-              isGenerating ? (
-                <CircularProgress size={18} color="inherit" />
-              ) : (
-                <DownloadIcon />
-              )
-            }
+            startIcon={<DownloadIcon />}
+            loading={isGenerating}
+            loadingPosition="start"
             disabled={isBlocked || isGenerating}
             onClick={handleGenerate}
             data-testid="pdf-download">

@@ -1,17 +1,11 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Tooltip
-} from '@mui/material';
+import { Button, DialogContentText, Tooltip } from '@mui/material';
 import RestorePageIcon from '@mui/icons-material/RestorePage';
 import { pathOr } from 'ramda';
 import { useIntl } from 'react-intl';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
+import StandardDialog from '@/components/common/StandardDialog';
 import {
   useUpdateDescription,
   useUpdateHistory,
@@ -171,57 +165,45 @@ const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
             {formatMessage({ id: 'Restore' })}
           </Button>
         </Tooltip>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle id="alert-dialog-title">
-            <Translate>Restore this revision?</Translate>
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              <Translate>
-                If you click YES, the content of this revision will be saved as
-                the new current revision.
-              </Translate>
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>
-              <Translate>No</Translate>
-            </Button>
-            <Button
-              onClick={() => restoreSnapshot(snapshotType, snapshot)}
-              color="secondary"
-              autoFocus>
-              <Translate>Yes</Translate>
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog open={openSuccess}>
-          <DialogTitle id="alert-dialog-title">
-            <Translate>Restore completed</Translate>
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {hasOpener ? (
-                <Translate>
-                  This window will be closed shortly and your origin page
-                  refreshed...
-                </Translate>
-              ) : (
-                <Translate>
-                  The revision has been restored. You can close this tab and
-                  reload the page to see the changes.
-                </Translate>
-              )}
-            </DialogContentText>
-          </DialogContent>
-          {!hasOpener && (
-            <DialogActions>
-              <Button onClick={() => setOpenSuccess(false)}>
+        <ConfirmationDialog
+          open={open}
+          onClose={handleClose}
+          title={<Translate>Restore this revision?</Translate>}
+          onConfirm={() => restoreSnapshot(snapshotType, snapshot)}
+          cancelLabel={<Translate>No</Translate>}
+          confirmLabel={<Translate>Yes</Translate>}>
+          <DialogContentText>
+            <Translate>
+              If you click YES, the content of this revision will be saved as
+              the new current revision.
+            </Translate>
+          </DialogContentText>
+        </ConfirmationDialog>
+        <StandardDialog
+          open={openSuccess}
+          onClose={hasOpener ? undefined : () => setOpenSuccess(false)}
+          title={<Translate>Restore completed</Translate>}
+          actions={
+            !hasOpener && (
+              <Button variant="contained" onClick={() => setOpenSuccess(false)}>
                 <Translate>Close</Translate>
               </Button>
-            </DialogActions>
-          )}
-        </Dialog>
+            )
+          }>
+          <DialogContentText>
+            {hasOpener ? (
+              <Translate>
+                This window will be closed shortly and your origin page
+                refreshed...
+              </Translate>
+            ) : (
+              <Translate>
+                The revision has been restored. You can close this tab and
+                reload the page to see the changes.
+              </Translate>
+            )}
+          </DialogContentText>
+        </StandardDialog>
       </>
     )
   );

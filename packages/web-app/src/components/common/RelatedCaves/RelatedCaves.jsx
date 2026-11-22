@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 
 import EntitiesList from '../entitiesList/EntitiesList';
 import Alert from '../Alert';
-import StandardDialog from '../StandardDialog';
+import ConfirmationDialog from '../ConfirmationDialog';
 import { NetworkPropTypes } from '../../../types/grotto.type';
 import { EntranceSimplePropTypes } from '../../../types/entrance.type';
 import SearchCaveForm from '../../appli/Form/SearchCaveForm';
@@ -240,27 +240,13 @@ const RelatedCaves = ({
       )}
       {!isOrganization && userId && <ExploredEntrancesMap userId={userId} />}
       {listContent}
-      <StandardDialog
+      <ConfirmationDialog
         open={!!pendingRemove}
         onClose={handleCancelRemove}
-        fullWidth
-        maxWidth="xs"
         title={toolTipTitle}
-        actions={
-          <>
-            <Button onClick={handleCancelRemove} variant="outlined">
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-            <Button
-              onClick={handleConfirmRemove}
-              variant="contained"
-              color="error"
-              startIcon={<LinkOffIcon />}
-              autoFocus>
-              {formatMessage({ id: 'Remove' })}
-            </Button>
-          </>
-        }>
+        onConfirm={handleConfirmRemove}
+        confirmLabel={formatMessage({ id: 'Remove' })}
+        color="error">
         {formatMessage(
           { id: 'Are you sure you want to unlink {name}?' },
           {
@@ -275,7 +261,7 @@ const RelatedCaves = ({
             )
           }
         )}
-      </StandardDialog>
+      </ConfirmationDialog>
     </>
   );
 };

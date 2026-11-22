@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import DeclineIcon from '@mui/icons-material/NotInterested';
 import EditIcon from '@mui/icons-material/Edit';
@@ -198,12 +198,20 @@ const Actions = ({
       </Box>
       <StandardDialog
         maxWidth="xs"
-        fullWidth
-        scrollable
         open={isConfirmationDialogOpen}
         onClose={() => setIsConfirmationDialogOpen(false)}
+        isBusy={isLoading}
+        fullScreenOnMobile
         title={actionType && formatMessage({ id: actionType.confirmationText })}
         actions={[
+          <Button
+            key="cancel"
+            variant="outlined"
+            disabled={isLoading}
+            autoFocus
+            onClick={() => setIsConfirmationDialogOpen(false)}>
+            {formatMessage({ id: 'Cancel' })}
+          </Button>,
           <ActionButton
             key={0}
             label={`${formatMessage({
@@ -213,6 +221,7 @@ const Actions = ({
             onClick={() => {
               if (
                 !isOnline ||
+                isLoading ||
                 comment.length > TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT
               )
                 return;
@@ -256,6 +265,7 @@ const Actions = ({
           characterLimit={TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT}
           valueName={formatMessage({ id: 'Comment' })}
           required={actionType === ActionTypes.decline}
+          disabled={isLoading}
         />
       </StandardDialog>
     </>

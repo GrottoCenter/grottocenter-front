@@ -17,7 +17,7 @@ import AppLink from '@/components/common/AppLink';
 import Contribution from '@/components/common/Contribution/Contribution';
 import CustomIcon from '@/components/common/CustomIcon';
 import OfflineDisabled from '@/components/common/OfflineDisabled';
-import StandardDialog from '@/components/common/StandardDialog';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import { useOnlineStatus } from '@/hooks';
 import GuidelinePropTypes from '@/types/guideline.type';
 
@@ -40,6 +40,7 @@ const Guideline = ({
   const isUnlinkDisabled = !isOnline || isUnlinking;
 
   const handleUnlink = async () => {
+    if (isUnlinkDisabled) return;
     setUnlinking(true);
     try {
       await onUnlink(guideline);
@@ -144,31 +145,21 @@ const Guideline = ({
         </Box>
       </Paper>
       {onUnlink && (
-        <StandardDialog
+        <ConfirmationDialog
           open={isUnlinkDialogOpen}
           onClose={() => setUnlinkDialogOpen(false)}
           title={formatMessage({ id: 'unlink' })}
-          actions={[
-            <Button
-              key="cancel"
-              variant="outlined"
-              onClick={() => setUnlinkDialogOpen(false)}>
-              {formatMessage({ id: 'No' })}
-            </Button>,
-            <Button
-              key="confirm"
-              variant="contained"
-              color="error"
-              disabled={isUnlinking}
-              onClick={handleUnlink}>
-              {formatMessage({ id: 'Unlink' })}
-            </Button>
-          ]}>
+          onConfirm={handleUnlink}
+          isBusy={isUnlinking}
+          disabled={!isOnline}
+          cancelLabel={formatMessage({ id: 'No' })}
+          confirmLabel={formatMessage({ id: 'Unlink' })}
+          color="error">
           {formatMessage(
             { id: 'Are you sure you want to unlink {name}?' },
             { name: guideline.title }
           )}
-        </StandardDialog>
+        </ConfirmationDialog>
       )}
     </ListItem>
   );

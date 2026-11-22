@@ -1,23 +1,26 @@
+import { useCallback, useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import {
   Dialog,
   DialogActions,
   DialogContent as MuiDialogContent,
-  DialogTitle
+  DialogTitle,
+  useMediaQuery
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
+import ResponsiveActionRow from '../ResponsiveActionRow';
 
 const CustomDialogTitle = styled(DialogTitle)`
   flex-shrink: 0;
   overflow-wrap: anywhere;
   padding-right: ${({ theme }) => theme.spacing(6)};
-  margin-top: 0.625rem;
-  @media (max-width: 600px) {
-    margin-top: 0.3125rem;
-    padding: ${({ theme }) => theme.spacing(2, 6, 1, 2)};
+  margin-top: ${({ theme }) => theme.spacing(1.25)};
+  ${({ theme }) => theme.breakpoints.down('sm')} {
+    margin-top: ${({ theme }) => theme.spacing(0.625)};
+    padding: ${({ theme }) => theme.spacing(2, 7, 1, 2)};
   }
 `;
 
@@ -26,12 +29,20 @@ const DialogContent = styled(MuiDialogContent, {
 })`
   && {
     min-height: 0;
+    min-width: 0;
+    overscroll-behavior: contain;
     overflow: ${({ $scrollable }) => ($scrollable ? 'auto' : 'visible')};
-    @media (max-width: 600px) {
-      padding: ${({ $dense }) => ($dense ? '8px 4px' : '8px 16px')};
+    ${({ theme }) => theme.breakpoints.down('sm')} {
+      padding: ${({ theme, $dense }) => theme.spacing(1, $dense ? 0.5 : 2)};
       ${({ $centerMobile }) =>
         $centerMobile
-          ? 'display: flex; flex-direction: column; justify-content: center;'
+          ? {
+              display: 'flex',
+              flexDirection: 'column',
+              // Auto margins collapse on overflow, keeping the start reachable.
+              '& > :first-child': { marginTop: 'auto' },
+              '& > :last-child': { marginBottom: 'auto' }
+            }
           : ''}
     }
   }
@@ -39,70 +50,159 @@ const DialogContent = styled(MuiDialogContent, {
 
 const StyledDialogActions = styled(DialogActions)`
   flex-shrink: 0;
-  flex-wrap: wrap;
-  @media (max-width: 600px) {
-    padding: 8px 16px;
+  ${({ theme }) => theme.breakpoints.down('sm')} {
+    padding: ${({ theme }) => theme.spacing(1, 2)};
+    padding-bottom: ${({ theme }) =>
+      `max(${theme.spacing(1)}, env(safe-area-inset-bottom))`};
   }
 `;
 
 const CloseButton = styled(IconButton)`
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: ${({ theme }) => theme.spacing(0.5)};
+  right: ${({ theme }) => theme.spacing(0.5)};
+  min-width: 44px;
+  min-height: 44px;
   z-index: 1;
 `;
 
 const StandardDialog = ({
-  fullScreen = false,
-  fullWidth = false,
-  scrollable = false,
+  fullScreen,
+  fullScreenOnMobile = false,
+  fullWidth = true,
+  scrollable = true,
   centerContentMobile = false,
   dense = false,
   dividers = false,
   showCloseButton = true,
-  stackActionsOnMobile = false,
+  stackActionsOnMobile = true,
   maxWidth = 'sm',
   open = false,
-  onClose = () => {},
+  onClose,
+  isBusy = false,
   title,
   titleComponent = 'h2',
+  titleVariant = 'h3',
   children,
   actions,
-  actionsPosition = 'bottom'
+  actionsPosition = 'bottom',
+  'aria-labelledby': labelledBy,
+  'aria-describedby': describedBy,
+  disableAutoFocus = false,
+  disableRestoreFocus = false,
+  slotProps = {}
 }) => {
   const { formatMessage } = useIntl();
+  const muiTheme = useTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'), {
+    noSsr: true
+  });
+  const isFullScreen = fullScreen ?? (fullScreenOnMobile && isMobile);
+  const dialogRef = useRef(null);
   const hasHeaderActions = actionsPosition === 'top';
+  const handleClose = (event, reason) => {
+    if (!isBusy) onClose?.(event, reason);
+  };
+  const updateViewport = useCallback(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const node = dialogRef.current;
+    node?.style.setProperty('--dialog-viewport-height', `${viewport.height}px`);
+    node?.style.setProperty('--dialog-viewport-top', `${viewport.offsetTop}px`);
+    node?.style.setProperty('--dialog-viewport-width', `${viewport.width}px`);
+    node?.style.setProperty(
+      '--dialog-viewport-left',
+      `${viewport.offsetLeft}px`
+    );
+  }, []);
+  const handleDialogRef = useCallback(
+    node => {
+      dialogRef.current = node;
+      updateViewport();
+    },
+    [updateViewport]
+  );
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!open || !viewport) return undefined;
+    updateViewport();
+    viewport.addEventListener('resize', updateViewport);
+    viewport.addEventListener('scroll', updateViewport);
+    return () => {
+      viewport.removeEventListener('resize', updateViewport);
+      viewport.removeEventListener('scroll', updateViewport);
+    };
+  }, [open, updateViewport]);
+
   return (
     <Dialog
-      fullScreen={fullScreen}
+      ref={handleDialogRef}
+      fullScreen={isFullScreen}
       fullWidth={fullWidth}
       maxWidth={maxWidth}
       open={open}
-      onClose={onClose}
+      onClose={onClose ? handleClose : undefined}
+      aria-labelledby={labelledBy}
+      aria-describedby={describedBy}
+      disableAutoFocus={disableAutoFocus}
+      disableRestoreFocus={disableRestoreFocus}
       slotProps={{
+        ...slotProps,
+        container: {
+          ...slotProps.container,
+          sx: [
+            {
+              position: 'relative',
+              top: 'var(--dialog-viewport-top, 0px)',
+              left: 'var(--dialog-viewport-left, 0px)',
+              height: 'var(--dialog-viewport-height, 100%)',
+              width: 'var(--dialog-viewport-width, 100%)'
+            },
+            ...(Array.isArray(slotProps.container?.sx)
+              ? slotProps.container.sx
+              : [slotProps.container?.sx])
+          ]
+        },
         paper: {
-          style: { overflow: 'visible' },
-          sx:
-            actions && hasHeaderActions
-              ? {
+          ...slotProps.paper,
+          'aria-busy': isBusy || undefined,
+          sx: [
+            {
+              overflow: scrollable ? 'hidden' : 'auto',
+              maxHeight: isFullScreen
+                ? 'var(--dialog-viewport-height, 100dvh)'
+                : theme =>
+                    `calc(var(--dialog-viewport-height, 100dvh) - ${theme.spacing(8)})`,
+              ...(isFullScreen && {
+                height: 'var(--dialog-viewport-height, 100dvh)'
+              }),
+              ...(actions &&
+                hasHeaderActions && {
                   display: 'grid',
                   gridTemplateColumns: 'minmax(0, 1fr) fit-content(60%)',
                   gridTemplateRows: 'auto minmax(0, 1fr)',
                   gridTemplateAreas: '"title actions" "content content"'
-                }
-              : undefined
+                })
+            },
+            ...(Array.isArray(slotProps.paper?.sx)
+              ? slotProps.paper.sx
+              : [slotProps.paper?.sx])
+          ]
         }
       }}>
       {onClose && showCloseButton && (
         <CloseButton
           aria-label={formatMessage({ id: 'close' })}
-          onClick={onClose}
+          onClick={event => handleClose(event, 'closeButtonClick')}
+          disabled={isBusy}
           color="primary">
           <CloseIcon />
         </CloseButton>
       )}
       <CustomDialogTitle
         component={titleComponent}
+        variant={titleVariant}
         sx={{
           gridArea: 'title',
           minWidth: 0,
@@ -138,16 +238,9 @@ const StandardDialog = ({
       )}
       {actions && (
         <StyledDialogActions
-          disableSpacing={stackActionsOnMobile}
+          disableSpacing
           sx={{
             gridArea: 'actions',
-            minWidth: 0,
-            ...(stackActionsOnMobile && {
-              flexDirection: { xs: 'column-reverse', sm: 'row' },
-              alignItems: { xs: 'stretch', sm: 'center' },
-              gap: 1,
-              '& > button, & > a': { width: { xs: '100%', sm: 'auto' } }
-            }),
             ...(hasHeaderActions && {
               py: 2,
               pr: 6,
@@ -158,7 +251,10 @@ const StandardDialog = ({
               scrollbarGutter: 'stable'
             })
           }}>
-          {actions}
+          <ResponsiveActionRow
+            stackOnMobile={stackActionsOnMobile && !hasHeaderActions}>
+            {actions}
+          </ResponsiveActionRow>
         </StyledDialogActions>
       )}
     </Dialog>
@@ -168,10 +264,7 @@ const StandardDialog = ({
 export default StandardDialog;
 
 StandardDialog.propTypes = {
-  actions: PropTypes.oneOfType([
-    PropTypes.node,
-    PropTypes.arrayOf(PropTypes.node)
-  ]),
+  actions: PropTypes.node,
   actionsPosition: PropTypes.oneOf(['top', 'bottom']),
   centerContentMobile: PropTypes.bool,
   children: PropTypes.node,
@@ -180,11 +273,40 @@ StandardDialog.propTypes = {
   showCloseButton: PropTypes.bool,
   stackActionsOnMobile: PropTypes.bool,
   fullScreen: PropTypes.bool,
+  fullScreenOnMobile: PropTypes.bool,
   fullWidth: PropTypes.bool,
   maxWidth: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl']),
   open: PropTypes.bool,
   onClose: PropTypes.func,
+  isBusy: PropTypes.bool,
   scrollable: PropTypes.bool,
-  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-  titleComponent: PropTypes.oneOf(['h1', 'h2'])
+  title: PropTypes.node,
+  titleComponent: PropTypes.oneOf(['h1', 'h2', 'div']),
+  titleVariant: PropTypes.oneOf(['h1', 'h2', 'h3']),
+  'aria-labelledby': PropTypes.string,
+  'aria-describedby': PropTypes.string,
+  disableAutoFocus: PropTypes.bool,
+  disableRestoreFocus: PropTypes.bool,
+  slotProps: PropTypes.shape({
+    paper: PropTypes.shape({
+      component: PropTypes.elementType,
+      onSubmit: PropTypes.func,
+      sx: PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.array,
+        PropTypes.func
+      ])
+    }),
+    transition: PropTypes.shape({
+      onEntered: PropTypes.func,
+      onExited: PropTypes.func
+    }),
+    container: PropTypes.shape({
+      sx: PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.array,
+        PropTypes.func
+      ])
+    })
+  })
 };

@@ -5,19 +5,13 @@ import {
   unstable_usePrompt as usePrompt,
   useSearchParams
 } from 'react-router-dom';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Fade
-} from '@mui/material';
+import { Button, Fade } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import {
   useEntrance,
   useLinkDocumentToEntrance,
@@ -234,31 +228,19 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
             />
           </form>
 
-          <Dialog
-            aria-describedby="missing-file-warning"
+          <ConfirmationDialog
             open={isMissingFileDialogOpen}
-            onClose={() => setMissingFileDialogOpen(false)}>
-            <DialogTitle>
-              {formatMessage({ id: 'Submit without a file?' })}
-            </DialogTitle>
-            <DialogContent>
-              <Alert id="missing-file-warning" severity="warning">
-                {formatMessage({
-                  id: 'No file attached — please check that it is not an oversight.'
-                })}
-              </Alert>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={onConfirmMissingFile} variant="outlined">
-                {formatMessage({ id: 'Submit anyway' })}
-              </Button>
-              <Button
-                onClick={() => setMissingFileDialogOpen(false)}
-                variant="contained">
-                {formatMessage({ id: 'Cancel' })}
-              </Button>
-            </DialogActions>
-          </Dialog>
+            onClose={() => setMissingFileDialogOpen(false)}
+            title={formatMessage({ id: 'Submit without a file?' })}
+            onConfirm={onConfirmMissingFile}
+            confirmLabel={formatMessage({ id: 'Submit anyway' })}
+            color="warning">
+            <Alert severity="warning">
+              {formatMessage({
+                id: 'No file attached — please check that it is not an oversight.'
+              })}
+            </Alert>
+          </ConfirmationDialog>
 
           {errorMessages.length > 0 && (
             <CenteredBlock>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import {
   Button,
   Box,
@@ -17,7 +17,6 @@ import DeleteIcon from '@mui/icons-material/DeleteRounded';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForeverRounded';
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import {
   DELETED_ENTITY_REDIRECT_KINDS,
   getDeletedEntityRedirectUrl
@@ -253,8 +252,6 @@ const DeleteConfirmationDialogContent = ({
   const isOnline = useOnlineStatus();
   const { onSuccess } = useNotification();
   const isConfirming = useRef(false);
-  const theme = useTheme();
-  const isNarrowViewport = useMediaQuery(theme.breakpoints.down('sm'));
   const canSelectRedirect = Boolean(entityType.searchType);
   const [inputValue, setInputValue] = useState('');
   const [selectedEntity, setSelectedEntity] = useState(null);
@@ -382,46 +379,34 @@ const DeleteConfirmationDialogContent = ({
 
   return (
     <StandardDialog
-      fullScreen={isNarrowViewport}
-      scrollable
+      fullScreenOnMobile
       open={isOpen}
-      onClose={isLoading ? null : handleClose}
-      title={
-        <Typography variant="h3" component="span">
-          {formatMessage(
-            {
-              id: isPermanent
-                ? 'delete-permanent-confirmation-dialog'
-                : 'delete-confirmation-dialog',
-              defaultMessage: isPermanent
-                ? 'Permanently delete this {entityFmt}?'
-                : 'Delete this {entityFmt}?'
-            },
-            entityValues
-          )}
-        </Typography>
-      }
+      onClose={handleClose}
+      isBusy={isLoading}
+      title={formatMessage(
+        {
+          id: isPermanent
+            ? 'delete-permanent-confirmation-dialog'
+            : 'delete-confirmation-dialog',
+          defaultMessage: isPermanent
+            ? 'Permanently delete this {entityFmt}?'
+            : 'Delete this {entityFmt}?'
+        },
+        entityValues
+      )}
       actions={
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column-reverse', sm: 'row' },
-            justifyContent: 'flex-end',
-            gap: 1,
-            width: '100%'
-          }}>
+        <>
           <Button
             variant="outlined"
             onClick={handleClose}
             disabled={isLoading}
-            sx={{ width: { xs: '100%', sm: 'auto' } }}>
+            autoFocus>
             {formatMessage({ id: 'Cancel' })}
           </Button>
           <OfflineDisabled>
             <ActionButton
               variant="contained"
               color="error"
-              sx={{ width: { xs: '100%', sm: 'auto' } }}
               icon={isPermanent ? <DeleteForeverIcon /> : <DeleteIcon />}
               label={actionButtonTitle}
               loading={isLoading}
@@ -430,7 +415,7 @@ const DeleteConfirmationDialogContent = ({
               onClick={handleConfirmation}
             />
           </OfflineDisabled>
-        </Box>
+        </>
       }>
       <Stack spacing={2}>
         <FormSubmissionError error={error} />

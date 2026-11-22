@@ -20,9 +20,7 @@ import {
   Select,
   Skeleton,
   Switch,
-  Typography,
-  useMediaQuery,
-  useTheme
+  Typography
 } from '@mui/material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
@@ -48,6 +46,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import AvatarEditor from '@/components/common/AvatarEditor/AvatarEditor';
 import ProfileAvatar from '@/components/common/ProfileAvatar';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import { postLogout } from '../../actions/Login';
 import {
   useAccount,
@@ -584,14 +583,15 @@ const MfaSection = () => {
       <StandardDialog
         open={isDialogOpen}
         onClose={handleClose}
-        fullWidth
         maxWidth="xs"
         title={formatMessage({ id: 'mfaResetTitle' })}
+        isBusy={mfaResetMutation.isPending}
+        fullScreenOnMobile
         actions={
           <>
             <Button
               onClick={handleClose}
-              variant="text"
+              variant="outlined"
               disabled={mfaResetMutation.isPending}>
               {formatMessage({ id: 'Cancel' })}
             </Button>
@@ -600,11 +600,8 @@ const MfaSection = () => {
               color="error"
               variant="contained"
               disabled={!isValid || mfaResetMutation.isPending}
-              startIcon={
-                mfaResetMutation.isPending ? (
-                  <CircularProgress size={16} color="inherit" />
-                ) : null
-              }>
+              loading={mfaResetMutation.isPending}
+              loadingPosition="start">
               {formatMessage({ id: 'mfaResetButton' })}
             </Button>
           </>
@@ -1311,46 +1308,24 @@ const OfflineDataSection = () => {
           </Button>
         </SectionBody>
       </SectionPaper>
-      <StandardDialog
+      <ConfirmationDialog
         open={isDialogOpen}
-        onClose={() => !isClearing && setIsDialogOpen(false)}
-        fullWidth
-        maxWidth="xs"
+        onClose={() => setIsDialogOpen(false)}
+        isBusy={isClearing}
         title={formatMessage({ id: 'Clear offline data' })}
-        actions={
-          <>
-            <Button
-              onClick={() => setIsDialogOpen(false)}
-              variant="text"
-              disabled={isClearing}>
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-            <Button
-              onClick={handleConfirm}
-              color="warning"
-              variant="contained"
-              disabled={isClearing}
-              startIcon={
-                isClearing ? (
-                  <CircularProgress size={16} color="inherit" />
-                ) : null
-              }>
-              {formatMessage({ id: 'Clear' })}
-            </Button>
-          </>
-        }>
+        onConfirm={handleConfirm}
+        confirmLabel={formatMessage({ id: 'Clear' })}
+        color="warning">
         <Typography>
           {formatMessage({ id: 'offlineDataConfirmation' })}
         </Typography>
-      </StandardDialog>
+      </ConfirmationDialog>
     </>
   );
 };
 
 const AccountDeletionSection = () => {
   const { formatMessage, locale } = useIntl();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const contactUrl = contactLinks[locale] ?? contactLinks['*'];
 
@@ -1388,10 +1363,7 @@ const AccountDeletionSection = () => {
       <StandardDialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        fullWidth
-        fullScreen={isMobile}
-        scrollable
-        stackActionsOnMobile
+        fullScreenOnMobile
         title={formatMessage({ id: 'Account deletion' })}
         actions={
           <>
@@ -1760,27 +1732,13 @@ const AccountPage = () => {
           )}
         </div>
       </PageTabs>
-      <StandardDialog
+      <ConfirmationDialog
         open={!!pendingLeaveOrg}
         onClose={() => setPendingLeaveOrg(null)}
-        fullWidth
-        maxWidth="xs"
         title={formatMessage({ id: 'Leave organization' })}
-        actions={
-          <>
-            <Button onClick={() => setPendingLeaveOrg(null)} variant="outlined">
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-            <Button
-              onClick={handleConfirmLeaveOrg}
-              variant="contained"
-              color="error"
-              startIcon={<PersonRemoveIcon />}
-              autoFocus>
-              {formatMessage({ id: 'Leave' })}
-            </Button>
-          </>
-        }>
+        onConfirm={handleConfirmLeaveOrg}
+        confirmLabel={formatMessage({ id: 'Leave' })}
+        color="error">
         {formatMessage(
           { id: 'Are you sure you want to leave {name}?' },
           {
@@ -1795,7 +1753,7 @@ const AccountPage = () => {
             )
           }
         )}
-      </StandardDialog>
+      </ConfirmationDialog>
     </PageContainer>
   );
 };
