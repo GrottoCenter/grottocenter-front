@@ -2,7 +2,6 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
   Box,
-  Chip,
   ListItem,
   Paper,
   ButtonGroup,
@@ -12,13 +11,14 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useState, useLayoutEffect, useRef } from 'react';
 import Linkify from 'linkify-react';
 import { isGalleryFile } from '@/utils/mediaUtils';
+import { DocumentValidationStatusPropType } from '@/types/document.type';
+import DocumentValidationBadge from '@/components/common/DocumentValidationBadge';
 import DocumentTypeChip from '../DocumentTypeChip';
 import AppLink from '../AppLink';
 import Files from './Files';
@@ -83,16 +83,9 @@ const Document = ({
               </AppLink>
             </Typography>
             <DocumentTypeChip type={document.type} />
-            {/* Lists omit the decision date, so false also includes refusals. */}
-            {document.isValidated === false && (
-              <Chip
-                variant="outlined"
-                color="default"
-                size="small"
-                icon={<InfoOutlinedIcon />}
-                label={formatMessage({ id: 'Not validated' })}
-              />
-            )}
+            <DocumentValidationBadge
+              validationStatus={document.validationStatus}
+            />
           </Box>
           {(hasSnapshotButton || onUnlink) && (
             <Box sx={{ flexShrink: 0 }}>
@@ -232,7 +225,7 @@ Document.propTypes = {
     id: PropTypes.number,
     title: PropTypes.string,
     type: PropTypes.string,
-    isValidated: PropTypes.bool,
+    validationStatus: DocumentValidationStatusPropType,
     description: PropTypes.string,
     files: Files.propTypes.files
   })

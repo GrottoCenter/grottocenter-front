@@ -12,6 +12,7 @@ import {
 } from '@/utils/organizationTypes';
 import PersonType from '@/components/common/Person/PersonType';
 import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
+import DocumentValidationBadge from '@/components/common/DocumentValidationBadge';
 import IconLabel from '@/components/common/IconLabel';
 import { isPersonType } from '@/utils/personTypes';
 import AppLink from '../AppLink';
@@ -555,7 +556,10 @@ const documents = {
       field: 'title',
       label: 'Title',
       sortable: true,
-      render: cellsRender.ellipsis
+      render: cellsRender.ellipsis,
+      renderAdornment: document => (
+        <DocumentValidationBadge validationStatus={document.validationStatus} />
+      )
     },
     {
       visible: true,

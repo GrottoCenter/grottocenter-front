@@ -1,8 +1,14 @@
 import PropTypes from 'prop-types';
 
+import { DOCUMENT_VALIDATION_STATUSES } from '@/utils/documentValidationStatus';
+
 import authorType from './author.type';
 import idNameType from './idName.type';
 import { OrganizationSimplePropTypes } from './organization.type';
+
+export const DocumentValidationStatusPropType = PropTypes.oneOf(
+  DOCUMENT_VALIDATION_STATUSES
+);
 
 export const ThumbnailsPropTypes = PropTypes.shape({
   small: PropTypes.string,
@@ -25,6 +31,7 @@ export const DocumentFileErrorPropTypes = PropTypes.shape({
 });
 
 export const DocumentSimplePropTypes = PropTypes.shape({
+  validationStatus: DocumentValidationStatusPropType,
   id: PropTypes.number.isRequired,
   type: PropTypes.string,
   title: PropTypes.string,
@@ -36,12 +43,14 @@ export const DocumentSimplePropTypes = PropTypes.shape({
 });
 
 const CitationParentPropTypes = PropTypes.shape({
+  validationStatus: DocumentValidationStatusPropType,
   id: PropTypes.number.isRequired,
   type: PropTypes.string,
   title: PropTypes.string,
   issue: PropTypes.string,
   datePublication: PropTypes.string,
   parent: PropTypes.shape({
+    validationStatus: DocumentValidationStatusPropType,
     id: PropTypes.number.isRequired,
     type: PropTypes.string,
     title: PropTypes.string,
@@ -57,6 +66,7 @@ const CitationParentPropTypes = PropTypes.shape({
 // Richer than the simple shape: it carries the dates the lists are ordered on
 // and the availability information used by their indicators.
 export const DocumentChildPropTypes = PropTypes.shape({
+  validationStatus: DocumentValidationStatusPropType,
   id: PropTypes.number.isRequired,
   type: PropTypes.string,
   title: PropTypes.string,
@@ -86,6 +96,7 @@ export const DocumentChildPropTypes = PropTypes.shape({
 });
 
 export const DocumentPropTypes = PropTypes.shape({
+  validationStatus: DocumentValidationStatusPropType,
   id: PropTypes.number,
   importSource: PropTypes.string,
   importId: PropTypes.number,

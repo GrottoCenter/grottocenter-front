@@ -169,6 +169,11 @@ const MobileEntityCard = React.memo(
                 )}
               </Box>
               <Divider />
+              {titleCol.renderAdornment && (
+                <Box sx={{ py: 0.5, '&:empty': { display: 'none' } }}>
+                  {titleCol.renderAdornment(doc)}
+                </Box>
+              )}
               {bodyColumns.length > 0 && (
                 <Box
                   sx={{

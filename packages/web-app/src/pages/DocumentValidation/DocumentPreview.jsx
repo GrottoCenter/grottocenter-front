@@ -16,14 +16,15 @@ import {
   getDocumentSubmissionKind,
   prepareDocumentPreview
 } from '@/utils/documentModeration';
+import { getDocumentModerationStatus } from '@/utils/documentValidationStatus';
 import DocumentDetails from '../DocumentDetails';
 import DocumentDiff from './DocumentDiff';
 import Actions from './Actions';
 import ProcessResults, { processBatchesPropType } from './ProcessResults';
 
 const SUBMISSION_TITLES = {
-  creation: 'documentModeration.reviewCreation',
-  modification: 'documentModeration.reviewModification',
+  pending: 'documentModeration.reviewCreation',
+  modificationPending: 'documentModeration.reviewModification',
   unknown: 'documentModeration.reviewDocument'
 };
 
@@ -49,6 +50,9 @@ const DocumentPreview = ({
   const isPaused = currentQuery.isPaused || proposedQuery.isPaused;
   const isLoading = currentQuery.isPending || proposedQuery.isPending;
   const kind = getDocumentSubmissionKind(current);
+  const titleId =
+    SUBMISSION_TITLES[getDocumentModerationStatus(current)] ??
+    SUBMISSION_TITLES.unknown;
   const isReady = !!current && !!proposed && !error && !isPaused && !isLoading;
   const hasPendingFiles = !!proposed?.newFiles?.length;
   const onRetry = () => {
@@ -69,7 +73,7 @@ const DocumentPreview = ({
           component="span"
           variant="h1"
           data-testid="document-moderation-title">
-          {formatMessage({ id: SUBMISSION_TITLES[kind] })}
+          {formatMessage({ id: titleId })}
         </Typography>
       }
       actionsPosition={hasHeaderActions ? 'top' : 'bottom'}

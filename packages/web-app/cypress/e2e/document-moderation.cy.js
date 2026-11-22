@@ -6,6 +6,7 @@ const current = {
   dateInscription: '2026-01-01T00:00:00Z',
   datePublication: '2026-01-01',
   isValidated: false,
+  validationStatus: 'modificationPending',
   validator: { id: 9, nickname: 'Moderator' },
   authors: [{ id: 1, nickname: 'Alice' }],
   authorsOrganization: [],
@@ -827,7 +828,11 @@ describe('Document moderation preview', () => {
   [false, true].forEach(isNewDocument => {
     it(`returns to the refreshed proposal after editing a ${isNewDocument ? 'new' : 'previously moderated'} document`, () => {
       if (isNewDocument) {
-        const newDocument = { ...current, validator: null };
+        const newDocument = {
+          ...current,
+          validator: null,
+          validationStatus: 'pending'
+        };
         let corrected = newDocument;
         cy.intercept(
           { method: 'GET', pathname: '/api/v1/documents/7' },
