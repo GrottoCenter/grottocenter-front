@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { postLogout, LOGOUT } from './Login';
 
 describe('postLogout', () => {
@@ -5,13 +7,15 @@ describe('postLogout', () => {
   let assignedHref;
 
   const stubLocation = pathname => {
-    // jsdom's window.location.href is non-configurable, so we stub the whole
-    // global and capture the href value that postLogout() assigns.
+    // Node lets us stub window without redefining jsdom's non-configurable
+    // location property, including when CI runs with the vmThreads pool.
     assignedHref = undefined;
-    vi.stubGlobal('location', {
-      pathname,
-      set href(val) {
-        assignedHref = val;
+    vi.stubGlobal('window', {
+      location: {
+        pathname,
+        set href(val) {
+          assignedHref = val;
+        }
       }
     });
   };
