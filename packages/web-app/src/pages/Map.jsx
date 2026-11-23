@@ -21,12 +21,10 @@ import PageLoader from '../components/common/PageLoader';
 
 import {
   fetchNetworks,
-  fetchAllNetworksCoordinates,
+  fetchAllMapCoordinates,
   fetchOrganizations,
   fetchAllOrganizationsCoordinates,
   fetchEntrances,
-  fetchAllEntrancesCoordinates,
-  fetchAllMassifsCoordinates,
   fetchMassifs,
   refetchMapViewport
 } from '../actions/Map';
@@ -223,12 +221,10 @@ const Map = () => {
     []
   );
 
-  const loadMapData = useCallback(() => {
-    dispatch(fetchAllEntrancesCoordinates());
-    dispatch(fetchAllNetworksCoordinates());
-    dispatch(fetchAllMassifsCoordinates());
-    dispatch(fetchAllOrganizationsCoordinates());
-  }, [dispatch]);
+  const loadMapData = useCallback(
+    (onlyMissing = false) => dispatch(fetchAllMapCoordinates({ onlyMissing })),
+    [dispatch]
+  );
 
   useEffect(
     () =>
@@ -251,20 +247,23 @@ const Map = () => {
   // is a plain function call. mapTileCache owns its own dispatch reference (see
   // Map.js), so calling it directly is the correct shape — do not wrap it in
   // dispatch().
-  const reloadMap = useCallback(() => {
-    loadMapData();
-    refetchMapViewport();
-    if (massifsCriteriaRef.current) {
-      clearTimeout(massifsDebounceRef.current);
-      massifsDebounceRef.current = null;
-      dispatch(fetchMassifs(massifsCriteriaRef.current));
-    }
-  }, [dispatch, loadMapData]);
+  const reloadMap = useCallback(
+    (onlyMissing = false) => {
+      loadMapData(onlyMissing);
+      refetchMapViewport();
+      if (massifsCriteriaRef.current) {
+        clearTimeout(massifsDebounceRef.current);
+        massifsDebounceRef.current = null;
+        dispatch(fetchMassifs(massifsCriteriaRef.current));
+      }
+    },
+    [dispatch, loadMapData]
+  );
   useRefetchOnReconnect(reloadMap);
   useEffect(
     () =>
       subscribeMapRateLimit(() => {
-        if (getMapRateLimit()?.retryAt <= Date.now()) reloadMap();
+        if (getMapRateLimit()?.retryAt <= Date.now()) reloadMap(true);
       }),
     [reloadMap]
   );

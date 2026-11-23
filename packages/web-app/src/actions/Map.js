@@ -292,6 +292,27 @@ export const fetchAllMassifsCoordinates = () => dispatch => {
     });
 };
 
+// Rate-limit recovery preserves successful loads (including empty responses)
+// and lets requests already in flight finish. Mount/reconnect still refresh all.
+export const fetchAllMapCoordinates =
+  ({ onlyMissing = false } = {}) =>
+  (dispatch, getState) => {
+    const { loadedCoordinates, loadings } = getState().map;
+    const datasets = [
+      [LOADINGS.ENTRANCES_COORDINATES, fetchAllEntrancesCoordinates],
+      [LOADINGS.NETWORKS_COORDINATES, fetchAllNetworksCoordinates],
+      [LOADINGS.MASSIFS_COORDINATES, fetchAllMassifsCoordinates],
+      [LOADINGS.ORGANIZATIONS_COORDINATES, fetchAllOrganizationsCoordinates]
+    ];
+    return Promise.all(
+      datasets
+        .filter(
+          ([key]) => !onlyMissing || (!loadedCoordinates[key] && !loadings[key])
+        )
+        .map(([, fetchCoordinates]) => dispatch(fetchCoordinates()))
+    );
+  };
+
 // Unlike the tile-cached thunks above, massif polygons aren't tile-cached
 // (registerEntity/fetchForBounds isn't used here), so nothing bounds the request
 // rate: unthrottled, this fires on every moveend at polygon zoom. The 500 ms
