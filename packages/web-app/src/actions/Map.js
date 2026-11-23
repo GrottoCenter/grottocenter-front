@@ -1,4 +1,5 @@
-import { mapFetch } from '@/api/mapClient';
+import { isMapRateLimited, mapFetch } from '@/api/mapClient';
+import store from '@/store';
 import { isClientError } from '@/utils/httpErrors';
 import {
   getMapCavesUrl,
@@ -65,6 +66,10 @@ export * from './mapTypes';
 // rate-limited map load could emit up to 16 requests against the same IP
 // bucket (grottocenter-api#1848); the 4xx short-circuit caps it at 4.
 const fetchWithRetry = (url, maxRetries = 3) => {
+  const wasAuthenticated = Boolean(
+    store.getState().login.authorizationHeader?.Authorization
+  );
+  let hasRetriedAfterLogin = false;
   const attempts =
     typeof navigator !== 'undefined' && navigator.onLine === false
       ? 0
@@ -82,6 +87,19 @@ const fetchWithRetry = (url, maxRetries = 3) => {
         return response.text();
       })
       .catch(error => {
+        // Login recovery leaves in-flight bulk loads alone. If a visitor 429
+        // arrives afterwards, mapFetch ignores its old pause; retry once with
+        // the new session so that dataset is not left missing indefinitely.
+        if (
+          error.status === 429 &&
+          !wasAuthenticated &&
+          !hasRetriedAfterLogin &&
+          store.getState().login.authorizationHeader?.Authorization &&
+          !isMapRateLimited()
+        ) {
+          hasRetriedAfterLogin = true;
+          return attempt(retriesLeft, delay);
+        }
         if (retriesLeft === 0 || isClientError(error)) throw error;
         return new Promise(resolve => {
           setTimeout(resolve, delay);
