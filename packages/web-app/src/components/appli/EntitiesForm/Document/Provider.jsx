@@ -22,6 +22,7 @@ import {
 } from './formElements/AddFileForm/FileHelpers';
 import { defaultDocumentValuesTypes } from './types';
 import useParentDocumentSelection from './useParentDocumentSelection';
+import usePhotoDatePrefill from './usePhotoDatePrefill';
 
 export const defaultDocAttributes = {
   id: null,
@@ -204,6 +205,13 @@ const Provider = ({
     ...normalizeInitialValues(initialValues)
   });
   const attributeVersionsRef = useRef({});
+  const allowPhotoDatePrefillRef = useRef(true);
+  usePhotoDatePrefill({
+    document,
+    setDocument,
+    attributeVersionsRef,
+    allowPrefillRef: allowPhotoDatePrefillRef
+  });
   const selectParent = useParentDocumentSelection({
     document,
     setDocument,
@@ -221,6 +229,10 @@ const Provider = ({
 
   const updateAttribute = useCallback(
     (attributeName, newValue) => {
+      // An explicit date edit (including clearing it) wins over photo metadata
+      // for the rest of this document, even if extraction has not finished yet.
+      if (attributeName === 'datePublication')
+        allowPhotoDatePrefillRef.current = false;
       attributeVersionsRef.current[attributeName] =
         (attributeVersionsRef.current[attributeName] ?? 0) + 1;
       setDocument(prevState => ({
@@ -237,6 +249,9 @@ const Provider = ({
 
   const resetContext = useCallback(
     (overrides = {}) => {
+      allowPhotoDatePrefillRef.current = true;
+      attributeVersionsRef.current.datePublication =
+        (attributeVersionsRef.current.datePublication ?? 0) + 1;
       attributeVersionsRef.current.parent =
         (attributeVersionsRef.current.parent ?? 0) + 1;
       setDocument({ ...defaultDocAttributes, ...overrides });

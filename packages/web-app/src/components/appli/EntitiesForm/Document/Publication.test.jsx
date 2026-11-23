@@ -200,6 +200,21 @@ describe('editing document publication rights', () => {
     await waitFor(() => expect(onSuccess).toHaveBeenCalled());
   });
 
+  it('preserves the existing photo date when saving other metadata', async () => {
+    renderSubmission({
+      type: 'Image',
+      parent: null,
+      datePublication: '2005-04-12',
+      files: [{ id: 9, fileName: 'photo.jpg', completePath: '/photo.jpg' }]
+    });
+    const submit = screen.getByRole('button', { name: 'Update' });
+    await waitFor(() => expect(submit).toBeEnabled());
+    fireEvent.click(submit);
+    await waitFor(() => expect(apiPutForm).toHaveBeenCalledOnce());
+    const [, body] = apiPutForm.mock.calls[0];
+    expect(body.get('datePublication')).toBe('2005-04-12');
+  });
+
   it('blocks submission while the existing license is being resolved', async () => {
     let resolveLicenses;
     const licenses = new Promise(resolve => {
