@@ -32,8 +32,45 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-it('resumes on login, ignores late visitor responses and pauses again on an authenticated 429', async () => {
-  stopMonitoring = observeMapRateLimit();
+it.each([200, 429])(
+  'retries a late visitor 429 with the same options and handles authenticated HTTP %i',
+  async status => {
+    stopMonitoring = observeMapRateLimit();
+    let finish;
+    fetchMock.mockImplementationOnce(
+      () =>
+        new Promise(resolve => {
+          finish = resolve;
+        })
+    );
+    const response = new Response('[]', { status });
+    fetchMock.mockResolvedValueOnce(response);
+    const url = '/api/v1/geoloc/networks';
+    const options = {
+      signal: new AbortController().signal,
+      headers: { 'X-Request-Id': 'map-test' }
+    };
+    const pending = mapFetch(url, options);
+    recordMapRateLimit({ retryAt: NOW + 600000 });
+    store.dispatch(fetchLoginSuccess({ id: 1 }, 'session'));
+    expect(isMapRateLimited()).toBe(false);
+    finish(new Response(null, { status: 429 }));
+    expect(await pending).toBe(response);
+    expect(response.bodyUsed).toBe(false);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[0][1].headers.has('Authorization')).toBe(false);
+    const [retryUrl, retryOptions] = fetchMock.mock.lastCall;
+    expect(retryUrl).toBe(url);
+    expect(retryOptions.signal).toBe(options.signal);
+    expect(retryOptions.headers.get('X-Request-Id')).toBe('map-test');
+    expect(retryOptions.headers.get('Authorization')).toBe('Bearer session');
+    expect(isMapRateLimited()).toBe(status === 429);
+    store.dispatch(logout());
+    expect(isMapRateLimited()).toBe(status === 429);
+  }
+);
+
+it('does not retry a late visitor 429 during a new authenticated pause', async () => {
   let finish;
   fetchMock.mockImplementationOnce(
     () =>
@@ -42,16 +79,13 @@ it('resumes on login, ignores late visitor responses and pauses again on an auth
       })
   );
   const pending = mapFetch('/api/v1/geoloc/networks');
-  recordMapRateLimit({ retryAt: NOW + 600000 });
   store.dispatch(fetchLoginSuccess({ id: 1 }, 'session'));
-  expect(isMapRateLimited()).toBe(false);
-  finish(new Response(null, { status: 429 }));
-  await pending;
-  expect(isMapRateLimited()).toBe(false);
   fetchMock.mockResolvedValueOnce(new Response(null, { status: 429 }));
   await mapFetch('/api/v1/geoloc/entrances');
   expect(isMapRateLimited()).toBe(true);
-  store.dispatch(logout());
+  finish(new Response(null, { status: 429 }));
+  await expect(pending).rejects.toMatchObject({ status: 429 });
+  expect(fetchMock).toHaveBeenCalledTimes(2);
   expect(isMapRateLimited()).toBe(true);
 });
 

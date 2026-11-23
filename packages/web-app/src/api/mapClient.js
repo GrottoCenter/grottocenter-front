@@ -119,13 +119,14 @@ export const mapFetch = async (url, options) => {
   );
   const response = await apiFetch(url, options);
   if (response.status === 429) {
-    // A visitor request already in flight must not reinstate the old pause
-    // after login has opened access to the authenticated quota.
+    // Retry a late visitor 429 with the new session for every map caller.
+    // The next call captures authenticated state, so a fresh 429 records a
+    // pause normally; an already-active pause blocks the retry up front.
     if (
       !wasAuthenticated &&
       store.getState().login.authorizationHeader?.Authorization
     )
-      return response;
+      return mapFetch(url, options);
     // Other requests may already be in flight: their responses can extend the
     // pause, but a shorter delay or a success must never cancel an active one.
     recordMapRateLimit(

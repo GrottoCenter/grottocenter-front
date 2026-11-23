@@ -1,4 +1,11 @@
-import { _resetForTests as resetMapRateLimit } from '@/api/mapClient';
+import store from '@/store';
+import { fetchLoginSuccess, logout } from '@/actions/Login';
+import {
+  _resetForTests as resetMapRateLimit,
+  isMapRateLimited,
+  observeMapRateLimit,
+  recordMapRateLimit
+} from '@/api/mapClient';
 import {
   fetchAllNetworksCoordinates,
   fetchAllEntrancesCoordinates,
@@ -13,6 +20,8 @@ import {
   FETCH_MAP_NETWORKS_COORDINATES_FAILURE,
   FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS,
   FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE,
+  FETCH_MAP_MASSIFS_SUCCESS,
+  FETCH_MAP_MASSIFS_FAILURE,
   LOADINGS
 } from './Map';
 
@@ -53,6 +62,56 @@ it('shares a massif 429 pause with bulk coordinates and viewport tiles', async (
     vi.unstubAllGlobals();
   }
 });
+
+it.each([200, 429])(
+  'recovers pending massif polygons after login and handles an authenticated HTTP %i',
+  async status => {
+    store.dispatch(logout());
+    const stopMonitoring = observeMapRateLimit();
+    let finishVisitorRequest;
+    const pending = new Promise(resolve => {
+      finishVisitorRequest = resolve;
+    });
+    const data = [{ id: 42 }];
+    const fetchMock = vi
+      .fn()
+      .mockReturnValueOnce(pending)
+      .mockResolvedValueOnce(new Response(JSON.stringify(data), { status }));
+    vi.stubGlobal('fetch', fetchMock);
+    const dispatch = vi.fn();
+    try {
+      const request = fetchMassifs({ zoom: 13 })(dispatch);
+      recordMapRateLimit({ retryAt: Date.now() + 600000 });
+      store.dispatch(fetchLoginSuccess({ id: 1 }, 'session'));
+      finishVisitorRequest(new Response(null, { status: 429 }));
+      await request;
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock.mock.lastCall[1].headers.get('Authorization')).toBe(
+        'Bearer session'
+      );
+      expect(isMapRateLimited()).toBe(status === 429);
+      if (status === 200) {
+        expect(dispatch).toHaveBeenCalledWith({
+          type: FETCH_MAP_MASSIFS_SUCCESS,
+          data
+        });
+      } else {
+        expect(dispatch).toHaveBeenCalledWith({
+          type: FETCH_MAP_MASSIFS_FAILURE,
+          error: { type: '429', message: 'Fetching massifs' }
+        });
+      }
+      expect(dispatch).toHaveBeenLastCalledWith({
+        type: FETCH_MAP_END_LOADING,
+        key: LOADINGS.MASSIFS
+      });
+    } finally {
+      stopMonitoring();
+      store.dispatch(logout());
+      vi.unstubAllGlobals();
+    }
+  }
+);
 
 describe('organization coordinate refresh', () => {
   afterEach(() => vi.unstubAllGlobals());

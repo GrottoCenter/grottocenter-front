@@ -1,5 +1,14 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { _resetForTests as resetMapRateLimit } from '@/api/mapClient';
+import store from '@/store';
+import { fetchLoginSuccess, logout } from '@/actions/Login';
+import {
+  _resetForTests as resetMapRateLimit,
+  getMapRateLimit,
+  isMapRateLimited,
+  observeMapRateLimit,
+  recordMapRateLimit,
+  subscribeMapRateLimit
+} from '@/api/mapClient';
 import {
   registerEntity,
   fetchForBounds,
@@ -282,6 +291,58 @@ describe('mapTileCache', () => {
   });
 
   describe('shared 429 cooldown', () => {
+    it.each([200, 429])(
+      'recovers a tile pending at login and handles an authenticated HTTP %i',
+      async status => {
+        store.dispatch(logout());
+        const stopMonitoring = observeMapRateLimit();
+        const stopRecovery = subscribeMapRateLimit(() => {
+          if (getMapRateLimit()?.retryAt <= Date.now())
+            refetchVisibleTiles(ENTITY);
+        });
+        try {
+          registerEntity(ENTITY, CONFIG);
+          let finishVisitorRequest;
+          fetchMock.mockImplementationOnce(
+            () =>
+              new Promise(resolve => {
+                finishVisitorRequest = resolve;
+              })
+          );
+          fetchMock.mockResolvedValueOnce(
+            new Response(JSON.stringify([{ id: 42 }]), { status })
+          );
+          fetchForBounds(ENTITY, singleTileBounds(250, 250), 13, dispatch);
+          recordMapRateLimit({ retryAt: Date.now() + 600000 });
+          store.dispatch(fetchLoginSuccess({ id: 1 }, 'session'));
+          // Login's viewport recovery deduplicates the pending visitor request.
+          expect(fetchMock).toHaveBeenCalledTimes(1);
+          finishVisitorRequest(new Response(null, { status: 429 }));
+          await flushPromises();
+          expect(fetchMock).toHaveBeenCalledTimes(2);
+          expect(fetchMock.mock.lastCall[1].headers.get('Authorization')).toBe(
+            'Bearer session'
+          );
+          expect(isMapRateLimited()).toBe(status === 429);
+          if (status === 200) {
+            expect(dispatch).toHaveBeenLastCalledWith({
+              type: CONFIG.successType,
+              data: [{ id: 42 }]
+            });
+          } else {
+            expect(dispatch).toHaveBeenLastCalledWith({
+              type: CONFIG.failureType,
+              error: { type: '429', message: 'Fetching entrances' }
+            });
+          }
+        } finally {
+          stopRecovery();
+          stopMonitoring();
+          store.dispatch(logout());
+        }
+      }
+    );
+
     it('blocks new tiles across layers, reconnects and invalidations, then fetches the latest viewport', async () => {
       registerEntity(ENTITY, CONFIG);
       registerEntity('networks', { ...CONFIG, url: '/api/networks' });
