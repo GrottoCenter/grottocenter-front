@@ -73,7 +73,7 @@ const PublicationDatePicker = ({ required = false, label = null }) => {
   const handleGranularityChange = (_, newGranularity) => {
     if (!newGranularity) return;
     setGranularity(newGranularity);
-    updateAttribute('datePublication', '');
+    if (document.datePublication) updateAttribute('datePublication', '');
   };
 
   const handleDateChange = newDate => {

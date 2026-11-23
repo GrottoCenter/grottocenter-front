@@ -48,6 +48,7 @@ describe('Photo capture date during document creation', () => {
         .find('[aria-expanded]')
         .should('have.attr', 'aria-expanded', 'false');
       cy.get('[data-testid="document-title"] input').type('Entrance photo');
+      cy.get(dateField).find('button[value="full"]').click();
       cy.get('[data-testid="file-input"]').selectFile(
         'cypress/fixtures/photo-dates/capture.jpg',
         { force: true }

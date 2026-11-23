@@ -4,27 +4,19 @@ import { readPhotoDate } from '@/utils/photoDate';
 import { documentTypeHelpers } from '@/utils/documentTypeHelpers';
 import { IS_NEW } from './formElements/AddFileForm/FileHelpers';
 
-const { isUnknown, isCollection, isEvent, isAuthorizationToPublish } =
-  documentTypeHelpers;
+const { isImage } = documentTypeHelpers;
 
 const usePhotoDatePrefill = ({
   document,
   setDocument,
   attributeVersionsRef,
-  enabled
+  allowPrefillRef
 }) => {
   const datesRef = useRef(new WeakMap());
   const { files, type, datePublication } = document;
 
   useEffect(() => {
-    if (
-      !enabled ||
-      datePublication ||
-      isUnknown(type) ||
-      isCollection(type) ||
-      isEvent(type) ||
-      isAuthorizationToPublish(type)
-    )
+    if (!allowPrefillRef.current || datePublication || !isImage(type))
       return undefined;
 
     let isCurrent = true;
@@ -55,6 +47,7 @@ const usePhotoDatePrefill = ({
       setDocument(current => {
         if (
           !isCurrent ||
+          !allowPrefillRef.current ||
           current.datePublication ||
           current.type !== type ||
           attributeVersionsRef.current.datePublication !== dateVersion ||
@@ -76,7 +69,7 @@ const usePhotoDatePrefill = ({
     files,
     type,
     datePublication,
-    enabled,
+    allowPrefillRef,
     setDocument,
     attributeVersionsRef
   ]);

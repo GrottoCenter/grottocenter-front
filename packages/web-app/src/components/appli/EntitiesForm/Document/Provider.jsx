@@ -210,7 +210,7 @@ const Provider = ({
     document,
     setDocument,
     attributeVersionsRef,
-    enabled: allowPhotoDatePrefillRef.current
+    allowPrefillRef: allowPhotoDatePrefillRef
   });
   const selectParent = useParentDocumentSelection({
     document,

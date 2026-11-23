@@ -1,9 +1,18 @@
 import { useContext } from 'react';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react';
+import { IntlProvider } from 'react-intl';
 
+import messages from '@/../public/lang/en.json';
 import { readPhotoDate } from '@/utils/photoDate';
 import { DocumentTypes } from '@/utils/documentTypeHelpers';
 import DocumentFormProvider, { DocumentFormContext } from './Provider';
+import PublicationDatePicker from './formElements/PublicationDatePicker';
 import { IS_INTACT, IS_NEW } from './formElements/AddFileForm/FileHelpers';
 
 vi.mock('@/utils/photoDate', () => ({ readPhotoDate: vi.fn() }));
@@ -42,6 +51,20 @@ beforeEach(() => {
 
 it('prefills an empty date when a new photo is attached', async () => {
   renderForm();
+  setFiles([photo('capture.jpg')]);
+  await expectDate('2012-02-29');
+});
+
+it('prefills after selecting full-date precision on an empty field', async () => {
+  render(
+    <IntlProvider locale="en" messages={messages}>
+      <DocumentFormProvider initialValues={{ type: DocumentTypes.IMAGE }}>
+        <FormState />
+        <PublicationDatePicker />
+      </DocumentFormProvider>
+    </IntlProvider>
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Full Date' }));
   setFiles([photo('capture.jpg')]);
   await expectDate('2012-02-29');
 });
@@ -206,12 +229,9 @@ it('leaves the field empty when metadata has no usable date', async () => {
   await expectDate('');
 });
 
-it.each([
-  DocumentTypes.UNKNOWN,
-  DocumentTypes.COLLECTION,
-  DocumentTypes.EVENT,
-  DocumentTypes.AUTHORIZATION_TO_PUBLISH
-])('does not infer a publication date for %s', type => {
+it.each(
+  Object.values(DocumentTypes).filter(type => type !== DocumentTypes.IMAGE)
+)('does not infer a publication date for %s', type => {
   renderForm({ type });
   setFiles([photo('capture.jpg')]);
   expect(readPhotoDate).not.toHaveBeenCalled();
