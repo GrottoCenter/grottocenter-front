@@ -93,7 +93,13 @@ it.each([
   });
 });
 
-it.each(['/ui/entrances/1', '/ui/map-settings', '/ui/map/44,5,10/extra'])(
+it.each([
+  '/ui/entrances/1',
+  '/ui/map-settings',
+  '/ui/map/44,5,10/extra',
+  '/pr/1643/ui/entrances/1',
+  '/pr/1643/ui/map/44,5,10/extra'
+])(
   'does not undo navigation to %s while the map is still mounted',
   async pathname => {
     await moveMap();
