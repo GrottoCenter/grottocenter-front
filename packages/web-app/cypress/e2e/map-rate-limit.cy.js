@@ -1,4 +1,13 @@
 const warningText = 'Limite de consultation de la carte atteinte.';
+const mapCalls = spy =>
+  spy.getCalls().filter(call => String(call.args[0]).includes('/geoloc/'));
+const panMap = () => {
+  cy.get('[data-testid="map-container"]').children().first().focus();
+  cy.get('[data-testid="map-container"]')
+    .children()
+    .first()
+    .trigger('keydown', { keyCode: 39, which: 39, shiftKey: true });
+};
 
 describe('Map rate-limit warning', () => {
   beforeEach(() => {
@@ -25,21 +34,12 @@ describe('Map rate-limit warning', () => {
       }).should('contain.text', 'plus tard.');
       cy.get('[data-testid="app-snackbar"]').should('have.length', 1);
       let beforePan;
-      const mapCalls = spy =>
-        spy
-          .getCalls()
-          .filter(call => String(call.args[0]).includes('/geoloc/'));
       cy.get('@networkFetch').then(spy => {
         // Count at fetch invocation: responses already in flight can still
         // arrive after the first 429 and must not be mistaken for new calls.
         beforePan = mapCalls(spy).length;
       });
-      cy.get('.leaflet-container').focus();
-      cy.get('.leaflet-container').trigger('keydown', {
-        keyCode: 39,
-        which: 39,
-        shiftKey: true
-      });
+      panMap();
       cy.window().should(win => {
         const saved = JSON.parse(
           win.localStorage.getItem('grottocenter_map_position')
@@ -49,12 +49,6 @@ describe('Map rate-limit warning', () => {
       });
       cy.get('@networkFetch').should(spy =>
         expect(mapCalls(spy)).to.have.length(beforePan)
-      );
-      cy.screenshot(
-        `map-rate-limit-${isAuthenticated ? 'user-desktop' : 'visitor-mobile'}`,
-        {
-          capture: 'viewport'
-        }
       );
       if (isAuthenticated) {
         cy.get('[data-testid="map-rate-limit-login"]').should('not.exist');
@@ -66,13 +60,19 @@ describe('Map rate-limit warning', () => {
     });
   });
 
-  it('dismisses the warning when the server-provided cooldown expires', () => {
+  it('resumes bulk loads and dismisses the warning when the cooldown expires', () => {
+    let hasResumed = false;
+    cy.intercept({ method: 'GET', pathname: '/api/v1/geoloc/**' }, req => {
+      if (new URL(req.url).pathname.endsWith('/entrancesCoordinates'))
+        hasResumed = true;
+      req.reply({ body: [] });
+    });
     cy.intercept(
-      { method: 'GET', pathname: '/api/v1/geoloc/**' },
-      { body: [] }
-    );
-    cy.intercept(
-      { method: 'GET', pathname: '/api/v1/geoloc/entrancesCoordinates' },
+      {
+        method: 'GET',
+        pathname: '/api/v1/geoloc/entrancesCoordinates',
+        times: 1
+      },
       {
         statusCode: 429,
         body: 'Too many requests',
@@ -92,6 +92,38 @@ describe('Map rate-limit warning', () => {
     cy.contains('[data-testid="app-snackbar"]', warningText, {
       timeout: 12000
     }).should('not.exist');
+    cy.wrap(null).should(() => expect(hasResumed).to.eq(true));
+  });
+
+  it('resumes map requests with the authenticated quota immediately after login', () => {
+    let token;
+    cy.loginAs();
+    cy.then(() => {
+      token = localStorage.getItem('grottocenter_token');
+      localStorage.removeItem('grottocenter_token');
+    });
+    cy.intercept({ method: 'POST', pathname: '/api/v1/login' }, req => {
+      req.reply({ body: { token } });
+    });
+    cy.intercept({ method: 'GET', pathname: '/api/v1/geoloc/**' }, req => {
+      if (req.headers.authorization) {
+        expect(req.headers.authorization).to.eq(`Bearer ${token}`);
+        if (new URL(req.url).pathname.endsWith('/entrancesCoordinates'))
+          req.alias = 'authenticatedCoordinates';
+        req.reply({ body: [] });
+      } else req.reply({ statusCode: 429, body: 'Too many requests' });
+    });
+    cy.visit('/map/45.5,6.5,13', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'fr')
+    });
+    cy.get('[data-testid="map-rate-limit-login"]').click();
+    cy.get('#login-email').type('test@example.com');
+    cy.get('#login-password').type('password{enter}');
+    cy.wait('@authenticatedCoordinates');
+    cy.contains('[data-testid="app-snackbar"]', warningText).should(
+      'not.exist'
+    );
+    cy.location('pathname').should('include', '/map/');
   });
 });
 
@@ -100,7 +132,7 @@ const describeWithServiceWorker = Cypress.expose('serviceWorker')
   : describe.skip;
 
 describeWithServiceWorker('Map background rate limit', () => {
-  it('preserves a cached response while announcing a background 429 and stopping worker fetches', () => {
+  it('preserves a cached response, pauses page requests and detects a new 429 after reload', () => {
     cy.then(async () => {
       const registrations = await navigator.serviceWorker.getRegistrations();
       await Promise.all(registrations.map(item => item.unregister()));
@@ -113,8 +145,11 @@ describeWithServiceWorker('Map background rate limit', () => {
       { method: 'GET', pathname: '/api/v1/geoloc/**' },
       { body: [] }
     ).as('coordinates');
-    cy.visit('/map/45.5,6.5,10', {
-      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'fr')
+    cy.visit('/map/45.5,6.5,13', {
+      onBeforeLoad: win => {
+        win.localStorage.setItem('selectedLanguage', 'fr');
+        cy.spy(win, 'fetch').as('networkFetch');
+      }
     });
     cy.wait('@coordinates').then(({ request }) => {
       apiOrigin = new URL(request.url).origin;
@@ -159,12 +194,26 @@ describeWithServiceWorker('Map background rate limit', () => {
       'be.visible'
     );
     cy.get('[data-testid="app-snackbar"]').should('have.length', 1);
-    cy.window().then(async win => {
-      const response = await win.fetch(
-        `${apiOrigin}/api/v1/geoloc/entrancesCoordinates?rateLimitTest=1`
-      );
-      expect(await response.json()).to.deep.eq([]);
+    let beforePan;
+    cy.get('@networkFetch').then(spy => {
+      beforePan = mapCalls(spy).length;
     });
+    panMap();
+    cy.window().should(win => {
+      const saved = JSON.parse(
+        win.localStorage.getItem('grottocenter_map_position')
+      );
+      expect(saved.lng).not.to.eq(6.5);
+    });
+    cy.get('@networkFetch').should(spy =>
+      expect(mapCalls(spy)).to.have.length(beforePan)
+    );
     cy.then(() => expect(requests).to.eq(1));
+    // Each document owns its pause. A reload detects its own background 429.
+    cy.reload();
+    cy.contains('[data-testid="app-snackbar"]', warningText).should(
+      'be.visible'
+    );
+    cy.wrap(null).should(() => expect(requests).to.be.at.least(2));
   });
 });

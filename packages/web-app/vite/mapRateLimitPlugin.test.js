@@ -1,71 +1,46 @@
 import { runInNewContext } from 'node:vm';
 import { mapRateLimitPlugin } from './mapRateLimitPlugin.mjs';
 
-let worker;
-let plugin;
-let postMessage;
-const NOW = Date.UTC(2026, 10, 23, 12);
-
-beforeEach(() => {
-  vi.spyOn(Date, 'now').mockReturnValue(NOW);
-  postMessage = vi.fn();
-  worker = { clients: { matchAll: async () => [{ postMessage }] } };
-  // Exercise serialized callbacks with no access to module bindings.
-  plugin = Object.fromEntries(
-    Object.entries(mapRateLimitPlugin).map(([key, callback]) => [
-      key,
-      runInNewContext(`(${callback.toString()})`, { globalThis: worker, Date })
-    ])
-  );
-});
-
-afterEach(() => vi.restoreAllMocks());
-
-it.each([
-  ['120', 120000, true],
-  [new Date(NOW + 90000).toUTCString(), 90000, true],
-  ['0', 1000, true],
-  ['600', 600000, true],
-  [null, 600000, false],
-  ['invalid', 600000, false],
-  ['-1', 600000, false]
-])(
-  'announces Retry-After %s and blocks new worker requests',
-  async (value, delay, hasServerDeadline) => {
+it.each([null, '120', 'Wed, 25 Nov 2026 12:00:00 GMT'])(
+  'reports a background 429 with raw Retry-After %s only to its requesting page',
+  async retryAfter => {
+    const postMessage = vi.fn();
+    const get = vi.fn().mockResolvedValue({ postMessage });
+    // Workbox serializes callbacks without access to module bindings.
+    const fetchDidSucceed = runInNewContext(
+      `(${mapRateLimitPlugin.fetchDidSucceed.toString()})`,
+      { globalThis: { clients: { get } } }
+    );
     const response = new Response(null, {
       status: 429,
-      headers: value === null ? {} : { 'Retry-After': value }
+      headers: retryAfter === null ? {} : { 'Retry-After': retryAfter }
     });
-    expect(await plugin.fetchDidSucceed({ response })).toBe(response);
-    expect(postMessage).toHaveBeenCalledWith({
-      type: 'grottocenter-map-rate-limit',
-      retryAt: NOW + delay,
-      hasServerDeadline
-    });
-    const otherRoute = { ...plugin };
-    await expect(
-      otherRoute.requestWillFetch({ request: new Request('https://api.test/') })
-    ).rejects.toThrow('Map rate limit');
-
-    worker.grottocenterMapRateLimit.retryAt = Date.now() - 1;
     const request = new Request('https://api.test/');
-    expect(await otherRoute.requestWillFetch({ request })).toBe(request);
+    expect(
+      await fetchDidSucceed({ response, request, event: { clientId: 'page' } })
+    ).toBe(response);
+    expect(get).toHaveBeenCalledExactlyOnceWith('page');
+    expect(postMessage).toHaveBeenCalledExactlyOnceWith({
+      type: 'grottocenter-map-rate-limit',
+      retryAfter,
+      isAuthenticated: false
+    });
   }
 );
 
-it('shares fallback parsing and never shortens an in-flight cooldown', async () => {
-  await plugin.fetchDidSucceed({
-    response: new Response(null, { status: 429 })
-  });
-  const previous = worker.grottocenterMapRateLimit;
-  expect(previous.hasServerDeadline).toBe(false);
-  await plugin.fetchDidSucceed({
-    response: new Response(null, {
-      status: 429,
-      headers: { 'Retry-After': '5' }
-    })
-  });
-  expect(worker.grottocenterMapRateLimit).toBe(previous);
-  await plugin.fetchDidSucceed({ response: new Response('[]') });
-  expect(worker.grottocenterMapRateLimit).toBe(previous);
+it('preserves the 429 if its requesting page has already closed', async () => {
+  const get = vi.fn().mockResolvedValue(undefined);
+  vi.stubGlobal('clients', { get });
+  try {
+    const response = new Response(null, { status: 429 });
+    expect(
+      await mapRateLimitPlugin.fetchDidSucceed({
+        response,
+        request: new Request('https://api.test/'),
+        event: { clientId: 'closed-page' }
+      })
+    ).toBe(response);
+  } finally {
+    vi.unstubAllGlobals();
+  }
 });

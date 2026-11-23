@@ -1,3 +1,4 @@
+import store from '@/store';
 import { apiFetch } from './client';
 
 const getMapRateLimitDeadline = value => {
@@ -14,18 +15,42 @@ const getMapRateLimitDeadline = value => {
 };
 
 // The API's general quota is shared by IP across all geoloc endpoints. Keep
-// this deadline across map mounts and session changes. CORS currently hides
-// Retry-After in production, so fall back to the full 10-minute quota window.
+// this deadline across map mounts and logout. A new session can try the higher
+// authenticated quota. CORS currently hides Retry-After in production, so
+// fall back to the full 10-minute quota window.
 let rateLimit = null;
 let episode = 0;
 let announcedEpisode = 0;
+let expiryTimer = null;
 const listeners = new Set();
+
+const scheduleExpiry = () => {
+  clearTimeout(expiryTimer);
+  const remaining = rateLimit.retryAt - Date.now();
+  if (remaining > 0) {
+    // Long server deadlines must not overflow the browser's timer range.
+    expiryTimer = setTimeout(scheduleExpiry, Math.min(remaining, 2147483647));
+    return;
+  }
+  expiryTimer = null;
+  // Retain the episode so the notifier can close its existing snackbar.
+  rateLimit = { ...rateLimit };
+  listeners.forEach(listener => listener());
+};
 
 export const getMapRateLimit = () => rateLimit;
 
 export const subscribeMapRateLimit = listener => {
   listeners.add(listener);
   return () => listeners.delete(listener);
+};
+
+const resumeMapAfterLogin = () => {
+  if (!rateLimit || rateLimit.retryAt <= Date.now()) return;
+  clearTimeout(expiryTimer);
+  expiryTimer = null;
+  rateLimit = { ...rateLimit, retryAt: Date.now() };
+  listeners.forEach(listener => listener());
 };
 
 export const recordMapRateLimit = deadline => {
@@ -35,7 +60,39 @@ export const recordMapRateLimit = deadline => {
   if (isActive && rateLimit.retryAt >= deadline.retryAt) return;
   if (!isActive) episode += 1;
   rateLimit = { ...deadline, episode };
+  scheduleExpiry();
   listeners.forEach(listener => listener());
+};
+
+// Installed by the application shell. Session and worker events belong to the
+// transport lifecycle; displaying or dismissing a toast must not control them.
+export const observeMapRateLimit = () => {
+  const getAuthorization = () =>
+    store.getState().login.authorizationHeader?.Authorization;
+  let authorization = getAuthorization();
+  const unsubscribe = store.subscribe(() => {
+    const next = getAuthorization();
+    const hasStartedSession = next && !authorization;
+    // Update before notifying: recovery can dispatch map actions immediately.
+    authorization = next;
+    if (hasStartedSession) resumeMapAfterLogin();
+  });
+  const worker = navigator.serviceWorker;
+  const handleMessage = event => {
+    if (
+      event.source !== worker.controller ||
+      event.data?.type !== 'grottocenter-map-rate-limit' ||
+      // Ignore visitor requests that completed after the session started.
+      (authorization && !event.data.isAuthenticated)
+    )
+      return;
+    recordMapRateLimit(getMapRateLimitDeadline(event.data.retryAfter));
+  };
+  worker?.addEventListener('message', handleMessage);
+  return () => {
+    unsubscribe();
+    worker?.removeEventListener('message', handleMessage);
+  };
 };
 
 // Claim before enqueueing: dismissal, StrictMode and remounts must not repeat
@@ -57,8 +114,18 @@ export const mapFetch = async (url, options) => {
     error.status = 429;
     throw error;
   }
+  const wasAuthenticated = Boolean(
+    store.getState().login.authorizationHeader?.Authorization
+  );
   const response = await apiFetch(url, options);
   if (response.status === 429) {
+    // A visitor request already in flight must not reinstate the old pause
+    // after login has opened access to the authenticated quota.
+    if (
+      !wasAuthenticated &&
+      store.getState().login.authorizationHeader?.Authorization
+    )
+      return response;
     // Other requests may already be in flight: their responses can extend the
     // pause, but a shorter delay or a success must never cancel an active one.
     recordMapRateLimit(
@@ -70,6 +137,8 @@ export const mapFetch = async (url, options) => {
 
 // Test-only reset of the shared deadline.
 export const _resetForTests = () => {
+  clearTimeout(expiryTimer);
+  expiryTimer = null;
   rateLimit = null;
   episode = 0;
   announcedEpisode = 0;

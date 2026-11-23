@@ -150,7 +150,8 @@ describe('fetchAllNetworksCoordinates retry policy', () => {
       await fetchAllNetworksCoordinates()(dispatch);
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
-      expect(vi.getTimerCount()).toBe(0);
+      // A 429 arms only the shared recovery timer, never a request retry.
+      expect(vi.getTimerCount()).toBe(status === 429 ? 1 : 0);
       expectFailure(String(status));
     }
   );

@@ -1,6 +1,8 @@
 import { act, render, screen } from '@testing-library/react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { recordMapRateLimit, _resetForTests } from '@/api/mapClient';
+import { refetchMapViewport } from '@/actions/Map';
 
 import MapPage from './Map';
 
@@ -14,11 +16,9 @@ vi.mock('react-redux', () => ({
   useDispatch: vi.fn(),
   useSelector: vi.fn()
 }));
-vi.mock('@/actions/Map', () => ({
-  fetchAllEntrancesCoordinates: vi.fn(),
-  fetchAllNetworksCoordinates: vi.fn(),
-  fetchAllMassifsCoordinates: vi.fn(),
-  fetchAllOrganizationsCoordinates: vi.fn()
+vi.mock('@/actions/Map', async importOriginal => ({
+  ...(await importOriginal()),
+  refetchMapViewport: vi.fn()
 }));
 vi.mock('@/utils/organizationCache', () => ({
   subscribeOrganizationMapChanges: () => () => {}
@@ -37,7 +37,7 @@ vi.mock('@/components/common/Maps/MapClusters', () => ({
       onClick={() =>
         onUpdate({
           markers: [],
-          showMassifPolygons: false,
+          showMassifPolygons: true,
           zoom: 13,
           center: { lat: 45, lng: 6 },
           bounds: {
@@ -54,7 +54,10 @@ vi.mock('@/components/common/Maps/MapClusters', () => ({
 let navigate;
 
 beforeEach(() => {
+  _resetForTests();
   vi.useFakeTimers();
+  vi.clearAllMocks();
+  vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
   navigate = vi.fn();
   useNavigate.mockReturnValue(navigate);
   useDispatch.mockReturnValue(vi.fn());
@@ -63,7 +66,10 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  _resetForTests();
   vi.useRealTimers();
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
   localStorage.clear();
   window.history.replaceState(null, '', '/');
 });
@@ -118,4 +124,60 @@ it('cancels a pending URL update when the map unmounts', async () => {
   view.unmount();
   act(() => vi.advanceTimersByTime(1000));
   expect(navigate).not.toHaveBeenCalled();
+});
+
+it('loads all four bulk datasets and retries the viewport after mounting during a pause', async () => {
+  const fetchMock = vi
+    .fn()
+    .mockImplementation(() => Promise.resolve(new Response('[]')));
+  vi.stubGlobal('fetch', fetchMock);
+  const dispatch = vi.fn(action =>
+    typeof action === 'function' ? action(dispatch) : action
+  );
+  useDispatch.mockReturnValue(dispatch);
+  recordMapRateLimit({ retryAt: Date.now() + 5000, hasServerDeadline: true });
+  await act(async () => render(<MapPage />));
+  expect(fetchMock).not.toHaveBeenCalled();
+  expect(refetchMapViewport).not.toHaveBeenCalled();
+  await act(() => vi.advanceTimersByTimeAsync(4999));
+  expect(fetchMock).not.toHaveBeenCalled();
+  await act(() => vi.advanceTimersByTimeAsync(1));
+  expect(fetchMock).toHaveBeenCalledTimes(4);
+  expect(refetchMapViewport).toHaveBeenCalledTimes(1);
+  const successfulLoads = dispatch.mock.calls
+    .map(([action]) => action.type)
+    .filter(type => type?.endsWith('_COORDINATES_SUCCESS'));
+  expect(successfulLoads).toHaveLength(4);
+  await act(() => vi.advanceTimersByTimeAsync(60000));
+  expect(fetchMock).toHaveBeenCalledTimes(4);
+});
+
+it('does not reload an unmounted map when the pause expires', async () => {
+  recordMapRateLimit({ retryAt: Date.now() + 5000, hasServerDeadline: true });
+  const view = render(<MapPage />);
+  view.unmount();
+  await act(() => vi.advanceTimersByTimeAsync(5000));
+  expect(refetchMapViewport).not.toHaveBeenCalled();
+});
+
+it('resumes visible massif polygons along with the bulk datasets', async () => {
+  const fetchMock = vi
+    .fn()
+    .mockImplementation(() => Promise.resolve(new Response('[]')));
+  vi.stubGlobal('fetch', fetchMock);
+  const dispatch = vi.fn(action =>
+    typeof action === 'function' ? action(dispatch) : action
+  );
+  useDispatch.mockReturnValue(dispatch);
+  recordMapRateLimit({ retryAt: Date.now() + 5000, hasServerDeadline: true });
+  await moveMap();
+  await act(() => vi.advanceTimersByTimeAsync(4999));
+  expect(fetchMock).not.toHaveBeenCalled();
+  await act(() => vi.advanceTimersByTimeAsync(1));
+  expect(fetchMock).toHaveBeenCalledTimes(5);
+  expect(
+    fetchMock.mock.calls.some(([url]) =>
+      new URL(url).pathname.endsWith('/massifs')
+    )
+  ).toBe(true);
 });

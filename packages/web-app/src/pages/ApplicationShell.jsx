@@ -9,6 +9,7 @@ import { styled, useTheme } from '@mui/material/styles';
 import { Box, CircularProgress, useMediaQuery } from '@mui/material';
 
 import MapRateLimitNotifier from '@/components/common/Maps/MapRateLimitNotifier';
+import { observeMapRateLimit } from '@/api/mapClient';
 import store from '../store';
 import queryClient from '../conf/queryClient';
 import {
@@ -180,6 +181,7 @@ const ApplicationLayout = () => {
 const ApplicationShell = () => {
   const theme = useTheme();
   const isCompact = useMediaQuery(theme.breakpoints.down('sm'));
+  useEffect(observeMapRateLimit, []);
 
   return (
     <div>

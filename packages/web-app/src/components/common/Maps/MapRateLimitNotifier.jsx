@@ -1,9 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { Button } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
-import { claimMapRateLimitWarning, recordMapRateLimit } from '@/api/mapClient';
+import {
+  claimMapRateLimitWarning,
+  getMapRateLimit,
+  subscribeMapRateLimit
+} from '@/api/mapClient';
 import { displayLoginDialog } from '@/actions/Login';
 import { useMapRateLimit } from '@/hooks/useMapRateLimit';
 import { useNotification } from '@/hooks/useNotification';
@@ -59,26 +63,9 @@ const mapRateLimitActions = snackbarKey => (
 );
 
 const MapRateLimitNotifier = () => {
-  const { limit, isActive } = useMapRateLimit();
+  const limit = useSyncExternalStore(subscribeMapRateLimit, getMapRateLimit);
+  const isActive = limit?.retryAt > Date.now();
   const { onWarning, onClose } = useNotification();
-
-  useEffect(() => {
-    const worker = navigator.serviceWorker;
-    if (!worker) return undefined;
-    const handleMessage = event => {
-      if (
-        event.source !== worker.controller ||
-        event.data?.type !== 'grottocenter-map-rate-limit'
-      )
-        return;
-      recordMapRateLimit({
-        retryAt: event.data.retryAt,
-        hasServerDeadline: event.data.hasServerDeadline === true
-      });
-    };
-    worker.addEventListener('message', handleMessage);
-    return () => worker.removeEventListener('message', handleMessage);
-  }, []);
 
   useEffect(() => {
     const key = limit ? `${SNACKBAR_KEY}-${limit.episode}` : null;
