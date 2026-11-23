@@ -6,9 +6,9 @@ describe('getRouterBasename', () => {
     expect(getRouterBasename('/pr/1643/ui/entrances')).toBe('/pr/1643');
   });
 
-  it('uses the root basename for regular app URLs', () => {
-    expect(getRouterBasename('/')).toBe('/');
-    expect(getRouterBasename('/ui/entrances')).toBe('/');
-    expect(getRouterBasename('/pr/not-a-number')).toBe('/');
+  it('uses an empty string as the basename for regular app URLs', () => {
+    expect(getRouterBasename('/')).toBe('');
+    expect(getRouterBasename('/ui/entrances')).toBe('');
+    expect(getRouterBasename('/pr/not-a-number')).toBe('');
   });
 });

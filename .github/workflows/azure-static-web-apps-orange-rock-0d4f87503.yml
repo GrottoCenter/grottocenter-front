@@ -30,7 +30,6 @@ jobs:
     name: Build and Deploy Job
     permissions:
       contents: read
-      issues: write
       pull-requests: write
     steps:
       - uses: actions/checkout@v5
@@ -89,8 +88,9 @@ jobs:
           skip_app_build: true
           ###### End of Repository/Build Configurations ######
       - name: Comment with the stage site URL
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        continue-on-error: true
+        uses: actions/github-script@v8
         with:
           script: |
             await github.rest.issues.createComment({
