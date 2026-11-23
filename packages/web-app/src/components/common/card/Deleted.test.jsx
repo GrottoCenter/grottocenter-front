@@ -99,7 +99,7 @@ const renderDialog = (entityId = 42, onConfirmation = vi.fn()) => (
 it('labels the reviewer metadata as an update, not a deletion', () => {
   render(
     <MemoryRouter>
-      <IntlProvider locale="en" messages={englishMessages}>
+      <IntlProvider locale="en" messages={englishMessages} timeZone="UTC">
         <DeletedCard
           entityType={DELETED_ENTITIES.massif}
           entity={{
