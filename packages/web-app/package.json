@@ -41,6 +41,7 @@
     "d3-polygon": "^3.0.1",
     "date-fns": "^4.4.0",
     "diff": "^9.0.0",
+    "exifr": "^7.1.3",
     "jay-peg": "1.1.1",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",

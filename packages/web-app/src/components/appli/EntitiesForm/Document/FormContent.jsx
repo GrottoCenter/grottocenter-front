@@ -142,6 +142,14 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
     />
   );
 
+  const publicationDateField = (
+    <Box sx={{ mt: 2, maxWidth: '28rem' }}>
+      <Suspense fallback={<Skeleton height={100} />}>
+        <PublicationDatePicker />
+      </Suspense>
+    </Box>
+  );
+
   return (
     <FormContainer>
       {linkedEntrance && (
@@ -195,6 +203,7 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
           />
           {filesIntro}
           <AddFileForm {...addFileFormProps} />
+          {publicationDateField}
         </Box>
       )}
       {!isUnknown(docType) && isEvent(docType) && (
@@ -365,13 +374,7 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
 
             {isArticle(docType) && <PagesEditor />}
 
-            {!isCollection(docType) && (
-              <Box sx={{ mt: 2, maxWidth: '28rem' }}>
-                <Suspense fallback={<Skeleton height={100} />}>
-                  <PublicationDatePicker />
-                </Suspense>
-              </Box>
-            )}
+            {!isCollection(docType) && publicationDateField}
           </Box>
         )}
       {!isUnknown(docType) && <AuthorsSection />}
