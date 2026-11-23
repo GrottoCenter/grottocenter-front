@@ -168,9 +168,16 @@ describe('Previewing a document before association', () => {
               validationStatus: 'pending',
               creator: { id: 99, nickname: 'Another user' },
               authors: []
+            },
+            {
+              id: 8,
+              type: 'Article',
+              title: 'Document awaiting re-validation',
+              validationStatus: 'modificationPending',
+              authors: []
             }
           ],
-          totalResults: 1
+          totalResults: 2
         });
       }
     ).as('pendingSearch');
@@ -208,6 +215,14 @@ describe('Previewing a document before association', () => {
       .find('button[type="submit"]')
       .click();
     cy.wait('@pendingSearch');
+    cy.contains('tr', 'Document awaiting re-validation')
+      .find('[data-testid="document-validation-badge"]')
+      .should('have.length', 1)
+      .and('have.class', 'MuiChip-colorInfo');
+    cy.contains('tr', 'Pending document')
+      .find('[data-testid="document-validation-badge"]')
+      .should('have.length', 1)
+      .and('have.class', 'MuiChip-colorWarning');
     cy.contains('tr', 'Pending document')
       .should('contain.text', 'Awaiting validation')
       .click();
@@ -226,6 +241,10 @@ describe('Previewing a document before association', () => {
       .should('contain.text', 'Awaiting validation')
       .find('input[type="checkbox"]')
       .click();
+    cy.contains('button', 'Document awaiting re-validation')
+      .find('[data-testid="document-validation-badge"]')
+      .should('have.length', 1)
+      .and('contain.text', 'Awaiting re-validation');
     cy.contains('button', 'Associate 1 document').click();
     cy.wait('@associatePendingDocument');
   });

@@ -1,6 +1,8 @@
-import { Box, Chip } from '@mui/material';
+import { Box } from '@mui/material';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import DocumentValidationBadge from '@/components/common/DocumentValidationBadge';
+import { DocumentValidationStatusPropType } from '@/types/document.type';
 import { Property } from '../../../../common/Properties';
 import { HighLightsLine } from '../../../../common/Highlights';
 import intactDescription from '../../../../../types/intactDescription.type';
@@ -21,7 +23,7 @@ const DocumentSnapshots = ({ document, previous }) => {
     parent,
     description,
     intactDescriptions,
-    isValidated,
+    validationStatus,
     validatorComment
   } = document;
 
@@ -55,17 +57,9 @@ const DocumentSnapshots = ({ document, previous }) => {
         width: '100%',
         rowGap: 0.5
       }}>
-      {isValidated != null && (
-        <Box sx={{ gridColumn: '1 / -1' }}>
-          <Chip
-            label={formatMessage({
-              id: isValidated ? 'Validated' : 'Not validated'
-            })}
-            color={isValidated ? 'success' : 'default'}
-            size="small"
-          />
-        </Box>
-      )}
+      <Box sx={{ gridColumn: '1 / -1', '&:empty': { display: 'none' } }}>
+        <DocumentValidationBadge validationStatus={validationStatus} />
+      </Box>
       {show(creatorLabel, null) && (
         <Property
           label={formatMessage({ id: 'Created by' })}
@@ -235,7 +229,7 @@ DocumentSnapshots.propTypes = {
     datePublication: PropTypes.string,
     dateInscription: PropTypes.string,
     dateValidation: PropTypes.string,
-    isValidated: PropTypes.bool,
+    validationStatus: DocumentValidationStatusPropType,
     validatorComment: PropTypes.string,
     creator: PropTypes.shape({
       id: PropTypes.number,

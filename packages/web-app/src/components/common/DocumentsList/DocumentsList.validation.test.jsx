@@ -15,28 +15,33 @@ const renderDocument = validation =>
     { messages }
   );
 
-describe('DocumentsList validation label', () => {
-  it('labels non-validated documents neutrally', () => {
-    renderDocument({ isValidated: false });
-
-    expect(screen.getByText('Not validated')).toBeVisible();
-    expect(
-      screen.queryByText('Waiting for validation')
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText('Awaiting validation')).not.toBeInTheDocument();
-  });
-
-  it.each([
-    ['validated', { isValidated: true }],
-    ['without validation information', {}]
-  ])('omits the validation label for documents %s', (_status, validation) => {
-    renderDocument(validation);
-
-    expect(screen.getByRole('link', { name: 'Cave survey' })).toBeVisible();
+it.each([
+  ['pending', 'Awaiting validation'],
+  ['modificationPending', 'Awaiting re-validation'],
+  ['rejected', 'Rejected']
+])(
+  'uses the API status %s even when legacy fields disagree',
+  (validationStatus, label) => {
+    renderDocument({ validationStatus, isValidated: true });
+    expect(screen.getByTestId('document-validation-badge')).toHaveTextContent(
+      label
+    );
     expect(screen.queryByText('Not validated')).not.toBeInTheDocument();
+  }
+);
+
+it.each(['validated', undefined, 'future'])(
+  'omits the badge for %s without falling back to legacy moderation fields',
+  validationStatus => {
+    renderDocument({
+      validationStatus,
+      isValidated: false,
+      validator: { id: 9 },
+      dateValidation: '2026-01-01'
+    });
+    expect(screen.getByRole('link', { name: 'Cave survey' })).toBeVisible();
     expect(
-      screen.queryByText('Waiting for validation')
+      screen.queryByTestId('document-validation-badge')
     ).not.toBeInTheDocument();
-    expect(screen.queryByText('Awaiting validation')).not.toBeInTheDocument();
-  });
-});
+  }
+);

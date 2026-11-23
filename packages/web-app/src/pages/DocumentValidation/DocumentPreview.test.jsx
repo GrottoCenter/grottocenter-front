@@ -30,6 +30,7 @@ const current = {
   title: 'Old title',
   dateInscription: '2026-01-01',
   isValidated: false,
+  validationStatus: 'modificationPending',
   validator: { id: 9, nickname: 'Moderator' },
   files: []
 };
@@ -64,6 +65,34 @@ beforeEach(() => {
 });
 
 describe('DocumentPreview', () => {
+  it('labels a corrected never-accepted submission as a first validation while preserving its diff', () => {
+    useDocument.mockImplementation((_id, options) => ({
+      data: options?.requireUpdate
+        ? proposed
+        : { ...current, validationStatus: 'pending' },
+      isPending: false,
+      refetch: vi.fn()
+    }));
+    renderPreview();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Review a new document'
+    );
+    expect(screen.getByTestId('document-diff')).toBeInTheDocument();
+  });
+
+  it('keeps the review title neutral when the API status is missing', () => {
+    useDocument.mockImplementation((_id, options) => ({
+      data: options?.requireUpdate
+        ? proposed
+        : { ...current, validationStatus: undefined },
+      isPending: false,
+      refetch: vi.fn()
+    }));
+    renderPreview();
+    expect(screen.getByTestId('document-moderation-title')).toHaveTextContent(
+      messages['documentModeration.reviewDocument']
+    );
+  });
   it('shows the proposed document and diff and validates only the displayed id', () => {
     renderPreview();
     expect(screen.getByTestId('proposed-document')).toHaveTextContent(
@@ -116,7 +145,7 @@ describe('DocumentPreview', () => {
 
   it('shows a creation without a diff when requireUpdate falls back to the base detail', () => {
     useDocument.mockReturnValue({
-      data: { ...current, validator: null },
+      data: { ...current, validator: null, validationStatus: 'pending' },
       isPending: false,
       refetch: vi.fn()
     });
@@ -129,7 +158,9 @@ describe('DocumentPreview', () => {
 
   it('shows the corrected creation without comparing it to its initial submission', () => {
     useDocument.mockImplementation((_id, options) => ({
-      data: options?.requireUpdate ? proposed : { ...current, validator: null },
+      data: options?.requireUpdate
+        ? proposed
+        : { ...current, validator: null, validationStatus: 'pending' },
       isPending: false,
       refetch: vi.fn()
     }));

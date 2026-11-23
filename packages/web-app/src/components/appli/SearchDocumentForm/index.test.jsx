@@ -210,7 +210,7 @@ describe('document search validation scope', () => {
   });
 
   it.each(['table', 'cards'])(
-    'labels only pending documents in %s view with inline markup',
+    'labels pending documents and modifications in %s view with inline markup',
     async view => {
       fetch.mockResolvedValue(
         new Response(
@@ -222,9 +222,14 @@ describe('document search validation scope', () => {
                 title: 'Validated document',
                 validationStatus: 'validated'
               },
-              { id: 3, title: 'Legacy document' }
+              { id: 3, title: 'Legacy document' },
+              {
+                id: 4,
+                title: 'Modified document',
+                validationStatus: 'modificationPending'
+              }
             ],
-            totalResults: 3
+            totalResults: 4
           })
         )
       );
@@ -237,9 +242,11 @@ describe('document search validation scope', () => {
 
       const labels = screen.getAllByText('Awaiting validation');
       expect(labels).toHaveLength(1);
-      const titleSelector = view === 'table' ? 'td' : 'h6';
+      expect(screen.getAllByText('Awaiting re-validation')).toHaveLength(1);
+      const titleSelector = view === 'table' ? 'td' : 'button';
       const chip = labels[0].closest('.MuiChip-root');
       expect(chip.tagName).toBe('SPAN');
+      expect(chip.closest('h6')).toBeNull();
       expect(labels[0].closest(titleSelector)).toHaveTextContent(
         'Pending document'
       );
@@ -248,6 +255,69 @@ describe('document search validation scope', () => {
           screen.getByText(title).closest(titleSelector)
         ).not.toHaveTextContent('Awaiting validation');
       });
+    }
+  );
+
+  it.each(['table', 'cards'])(
+    'renders ordinary document search statuses in %s view without isValidated',
+    async view => {
+      fetch.mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            results: [
+              {
+                id: 7,
+                title: 'Accepted content with proposed changes',
+                validationStatus: 'modificationPending'
+              },
+              {
+                id: 8,
+                title: 'Accepted content',
+                validationStatus: 'validated'
+              },
+              { id: 9, title: 'Old index content' }
+            ],
+            totalResults: 3
+          })
+        )
+      );
+      renderSearch(
+        <>
+          <DocumentSearch />
+          <SearchResults />
+        </>
+      );
+      submitSearch();
+      await screen.findByText('Accepted content');
+      if (view === 'cards') {
+        fireEvent.click(screen.getByRole('button', { name: 'Card view' }));
+      }
+      const titleSelector = view === 'table' ? 'td' : 'a';
+      const badge = screen.getByTestId('document-validation-badge');
+      expect(badge).toHaveTextContent('Awaiting re-validation');
+      expect(badge).toHaveClass('MuiChip-colorInfo');
+      expect(badge.closest('h6')).toBeNull();
+      expect(badge.closest(titleSelector)).toHaveTextContent(
+        'Accepted content with proposed changes'
+      );
+      ['Accepted content', 'Old index content'].forEach(title => {
+        expect(
+          screen.getByText(title).closest(titleSelector)
+        ).not.toContainElement(badge);
+      });
+      expect(
+        screen.queryByRole('columnheader', { name: 'Status' })
+      ).not.toBeInTheDocument();
+      expect(JSON.parse(fetch.mock.calls[0][1].body)).not.toHaveProperty(
+        'includePendingDocuments'
+      );
+      if (view === 'cards') {
+        expect(
+          screen.getByRole('link', {
+            name: /Accepted content with proposed changes/
+          })
+        ).toHaveAttribute('href', '/ui/documents/7');
+      }
     }
   );
 

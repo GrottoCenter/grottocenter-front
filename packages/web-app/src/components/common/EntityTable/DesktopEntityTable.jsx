@@ -526,7 +526,22 @@ const DesktopEntityTable = ({
             )}
             {visibleColumns.map(column => (
               <TableCell key={column.field}>
-                {renderCell(doc, column.field, column.render)}
+                {column.renderAdornment ? (
+                  <Box
+                    component="span"
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: 0.5,
+                      maxWidth: '100%'
+                    }}>
+                    <span>{renderCell(doc, column.field, column.render)}</span>
+                    {column.renderAdornment(doc)}
+                  </Box>
+                ) : (
+                  renderCell(doc, column.field, column.render)
+                )}
               </TableCell>
             ))}
           </TableRow>

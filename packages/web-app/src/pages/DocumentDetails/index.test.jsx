@@ -492,22 +492,23 @@ it.each([
 );
 
 it.each([
-  [null, 'This document is awaiting validation by a moderator.'],
+  ['pending', 'This document is awaiting validation by a moderator.'],
   [
-    { id: 9, nickname: 'Moderator' },
+    'modificationPending',
     messages[
       'A moderator needs to validate the last modification before being able to edit the document again.'
     ]
   ]
 ])(
   'shows the pending notice for the submission kind (%j)',
-  (validator, text) => {
+  (validationStatus, text) => {
     useDocument.mockReturnValue({
       data: {
         ...document,
         isValidated: false,
         dateValidation: null,
-        validator
+        validationStatus,
+        validator: { id: 9, nickname: 'Moderator' }
       },
       isPending: false,
       refetch: vi.fn()
@@ -520,11 +521,44 @@ it.each([
   }
 );
 
+it.each(['pending', 'modificationPending', 'rejected'])(
+  'shows the header badge %s even when actions are hidden',
+  validationStatus => {
+    useDocument.mockReturnValue({
+      data: { ...document, validationStatus },
+      isPending: false,
+      refetch: vi.fn()
+    });
+    renderPage(true);
+    expect(screen.getByTestId('document-validation-badge')).toBeVisible();
+    expect(
+      screen.queryByTestId('document-moderation-notice')
+    ).not.toBeInTheDocument();
+  }
+);
+
+it.each([undefined, 'invalid'])(
+  'shows an explicit refusal without formatting an unavailable date (%s)',
+  dateValidation => {
+    useDocument.mockReturnValue({
+      data: { ...document, validationStatus: 'rejected', dateValidation },
+      isPending: false,
+      refetch: vi.fn()
+    });
+    renderPage();
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'This document has been rejected.'
+    );
+    expect(screen.getByRole('alert')).not.toHaveTextContent('Decision on');
+  }
+);
+
 it('shows the refusal, plain-text reason and localized decision date', () => {
   useDocument.mockReturnValue({
     data: {
       ...document,
       isValidated: false,
+      validationStatus: 'rejected',
       dateValidation: '2026-10-18T12:00:00Z',
       validatorComment: '<b>Wrong entrance</b>\nPlease check the location.'
     },
@@ -546,6 +580,7 @@ it('shows a refusal without an empty reason when no comment is available', () =>
     data: {
       ...document,
       isValidated: false,
+      validationStatus: 'rejected',
       dateValidation: '2026-10-18T12:00:00Z',
       validatorComment: '   '
     },
@@ -564,6 +599,7 @@ it.each([
     'accepted version after a refused modification',
     {
       isValidated: true,
+      validationStatus: 'validated',
       dateValidation: '2026-10-18T12:00:00Z',
       validatorComment: 'No'
     }
@@ -594,7 +630,12 @@ it.each([null, '2026-10-18T12:00:00Z'])(
   'hides the moderation notice when actions are hidden (decision: %s)',
   dateValidation => {
     useDocument.mockReturnValue({
-      data: { ...document, isValidated: false, dateValidation },
+      data: {
+        ...document,
+        isValidated: false,
+        validationStatus: dateValidation ? 'rejected' : 'pending',
+        dateValidation
+      },
       isPending: false,
       refetch: vi.fn()
     });
@@ -608,7 +649,12 @@ it.each([null, '2026-10-18T12:00:00Z'])(
   dateValidation => {
     usePermissions.mockReturnValue({ isAuth: false, isModerator: false });
     useDocument.mockReturnValue({
-      data: { ...document, isValidated: false, dateValidation },
+      data: {
+        ...document,
+        isValidated: false,
+        validationStatus: dateValidation ? 'rejected' : 'pending',
+        dateValidation
+      },
       isPending: false,
       refetch: vi.fn()
     });

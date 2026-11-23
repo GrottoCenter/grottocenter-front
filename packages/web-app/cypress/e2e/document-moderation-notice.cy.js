@@ -4,6 +4,7 @@ const document = {
   type: 'Event',
   dateInscription: '2026-01-01T00:00:00Z',
   isValidated: false,
+  validationStatus: 'pending',
   dateValidation: null,
   validator: null,
   authors: [],
@@ -51,6 +52,7 @@ describe('Document moderation notice', () => {
       visitDocument({});
       cy.get('[data-testid="document-moderation-notice"]')
         .should('be.visible')
+        .and('have.class', 'MuiAlert-colorWarning')
         .and(
           'contain.text',
           'This document is awaiting validation by a moderator.'
@@ -62,12 +64,14 @@ describe('Document moderation notice', () => {
     it(`shows a refusal and its plain-text reason at ${width}px`, () => {
       cy.viewport(width, 900);
       visitDocument({
+        validationStatus: 'rejected',
         dateValidation: '2026-10-18T12:00:00Z',
         validator: { id: 9, nickname: 'Moderator' },
         validatorComment: `<b>Wrong entrance</b>\n${'Long reason '.repeat(35)}`
       });
       cy.get('[data-testid="document-moderation-notice"]')
         .should('be.visible')
+        .and('have.class', 'MuiAlert-colorError')
         .and('contain.text', 'This document has been rejected.')
         .and('contain.text', 'Reason: <b>Wrong entrance</b>')
         .and('contain.text', 'Decision on October 18, 2026')
@@ -85,25 +89,61 @@ describe('Document moderation notice', () => {
   });
 
   it('preserves the notice for a pending modification', () => {
-    visitDocument({ validator: { id: 9, nickname: 'Moderator' } });
-    cy.get('[data-testid="document-moderation-notice"]').should(
-      'contain.text',
-      'A moderator needs to validate the last modification before being able to edit the document again.'
-    );
+    visitDocument({
+      validationStatus: 'modificationPending',
+      validator: { id: 9, nickname: 'Moderator' }
+    });
+    cy.get('[data-testid="document-moderation-notice"]')
+      .should(
+        'contain.text',
+        'A moderator needs to validate the last modification before being able to edit the document again.'
+      )
+      .and('have.class', 'MuiAlert-colorInfo');
   });
 
   it('does not show an old refusal on the accepted version', () => {
     visitDocument({
       isValidated: true,
+      validationStatus: 'validated',
       dateValidation: '2026-10-18T12:00:00Z',
       validatorComment: 'Proposed modification refused'
     });
+    cy.get('[data-testid="document-moderation-notice"]').should('not.exist');
+    cy.get('[data-testid="document-validation-badge"]').should('not.exist');
+  });
+
+  it('shows first validation for a corrected submission despite previous refusal metadata', () => {
+    visitDocument({
+      validationStatus: 'pending',
+      validator: { id: 9, nickname: 'Moderator' },
+      dateValidation: '2026-10-18T12:00:00Z',
+      validatorComment: 'Old refusal'
+    });
+    cy.get('[data-testid="document-validation-badge"]')
+      .should('contain.text', 'Awaiting validation')
+      .and('have.class', 'MuiChip-colorWarning');
+    cy.get('[data-testid="document-moderation-notice"]')
+      .should(
+        'contain.text',
+        'This document is awaiting validation by a moderator.'
+      )
+      .and('not.contain.text', 'last modification')
+      .and('not.contain.text', 'Old refusal');
+  });
+
+  it('does not infer a state from legacy fields when the status is absent', () => {
+    visitDocument({
+      validationStatus: undefined,
+      dateValidation: '2026-10-18T12:00:00Z'
+    });
+    cy.get('[data-testid="document-validation-badge"]').should('not.exist');
     cy.get('[data-testid="document-moderation-notice"]').should('not.exist');
   });
 
   it('renders the refusal and decision date in French', () => {
     visitDocument(
       {
+        validationStatus: 'rejected',
         dateValidation: '2026-10-18T12:00:00Z',
         validatorComment: 'Mauvaise entrée'
       },

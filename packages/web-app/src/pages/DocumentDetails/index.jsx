@@ -14,6 +14,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import { NavigateNext } from '@mui/icons-material';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
+import DocumentValidationBadge from '@/components/common/DocumentValidationBadge';
 import OrganizationIcon from '@/components/common/OrganizationIcon';
 import { LicenseBadge } from '@/components/common/LicenseTag';
 import {
@@ -27,8 +28,8 @@ import { findDocumentPdfUrl, withPdfPage } from '@/utils/pdfUrl';
 import { getFileExtension } from '@/components/common/DocumentsList/utils/imageUtils';
 import {
   getDocumentModerationStatus,
-  getDocumentSubmissionKind
-} from '@/utils/documentModeration';
+  getDocumentValidationBadge
+} from '@/utils/documentValidationStatus';
 import LinkedEntityCards from '@/components/common/entitiesList/LinkedEntityCards';
 import SearchEntranceForm from '@/components/appli/SearchEntranceForm';
 import SectionCreateButton from '@/components/common/SectionCreateButton';
@@ -469,14 +470,18 @@ const Document = ({
     : null;
 
   const moderationStatus = getDocumentModerationStatus(documentData);
+  const moderationBadge = getDocumentValidationBadge(moderationStatus);
   const isRejected = moderationStatus === 'rejected';
+  const hasDecisionDate =
+    typeof documentData?.dateValidation === 'string' &&
+    !Number.isNaN(Date.parse(documentData.dateValidation));
   const shouldShowModerationNotice =
     !hideActions &&
     !isLoading &&
     documentData &&
     !documentData.isDeleted &&
     permissions.isAuth &&
-    (moderationStatus === 'pending' || isRejected);
+    !!moderationBadge;
 
   const ParentTypeIcon =
     (documentData?.parent?.type &&
@@ -615,7 +620,13 @@ const Document = ({
     <DocumentContainer>
       {isPreview ? (
         <Box sx={{ mb: 1.5 }}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              flexWrap: 'wrap',
+              gap: 0.5
+            }}>
             <CustomIcon type="bibliography" size={24} />
             <Typography
               variant="h3"
@@ -623,12 +634,20 @@ const Document = ({
               sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
               {documentData?.title ?? (isLoading ? <Skeleton /> : '')}
             </Typography>
+            <DocumentValidationBadge
+              validationStatus={documentData?.validationStatus}
+            />
           </Box>
           {breadcrumb ?? coverage}
         </Box>
       ) : (
         <PageHeader
           title={documentData?.title ?? (isLoading ? undefined : '')}
+          titleAdornment={
+            <DocumentValidationBadge
+              validationStatus={documentData?.validationStatus}
+            />
+          }
           icon={<CustomIcon type="bibliography" />}
           subheader={breadcrumb ?? coverage}
           actions={actions}
@@ -727,7 +746,7 @@ const Document = ({
                       {shouldShowModerationNotice && (
                         <Alert
                           data-testid="document-moderation-notice"
-                          severity={isRejected ? 'error' : 'warning'}
+                          severity={moderationBadge.severity}
                           title={
                             isRejected
                               ? formatMessage({
@@ -748,22 +767,23 @@ const Document = ({
                                     )}
                                   </Typography>
                                 )}
-                                <Typography>
-                                  {formatMessage(
-                                    { id: 'documentModeration.decisionDate' },
-                                    {
-                                      date: new Date(
-                                        documentData.dateValidation
-                                      )
-                                    }
-                                  )}
-                                </Typography>
+                                {hasDecisionDate && (
+                                  <Typography>
+                                    {formatMessage(
+                                      { id: 'documentModeration.decisionDate' },
+                                      {
+                                        date: new Date(
+                                          documentData.dateValidation
+                                        )
+                                      }
+                                    )}
+                                  </Typography>
+                                )}
                               </Box>
                             ) : (
                               formatMessage({
                                 id:
-                                  getDocumentSubmissionKind(documentData) ===
-                                  'modification'
+                                  moderationStatus === 'modificationPending'
                                     ? 'A moderator needs to validate the last modification before being able to edit the document again.'
                                     : 'documentModeration.pendingCreation'
                               })
