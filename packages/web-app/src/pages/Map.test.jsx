@@ -76,19 +76,22 @@ const moveMap = async () => {
   act(() => screen.getByRole('button', { name: 'Move map' }).click());
 };
 
-it.each(['/ui/map', '/ui/map/44,5,10', '/ui/map/'])(
-  'updates the shareable URL after settling on %s',
-  async pathname => {
-    window.history.replaceState(null, '', pathname);
-    await moveMap();
-    act(() => vi.advanceTimersByTime(999));
-    expect(navigate).not.toHaveBeenCalled();
-    act(() => vi.advanceTimersByTime(1));
-    expect(navigate).toHaveBeenCalledExactlyOnceWith('/ui/map/45%2C6%2C13', {
-      replace: true
-    });
-  }
-);
+it.each([
+  '/ui/map',
+  '/ui/map/44,5,10',
+  '/ui/map/',
+  '/pr/1643/ui/map',
+  '/pr/1643/ui/map/44,5,10'
+])('updates the shareable URL after settling on %s', async pathname => {
+  window.history.replaceState(null, '', pathname);
+  await moveMap();
+  act(() => vi.advanceTimersByTime(999));
+  expect(navigate).not.toHaveBeenCalled();
+  act(() => vi.advanceTimersByTime(1));
+  expect(navigate).toHaveBeenCalledExactlyOnceWith('/ui/map/45%2C6%2C13', {
+    replace: true
+  });
+});
 
 it.each(['/ui/entrances/1', '/ui/map-settings', '/ui/map/44,5,10/extra'])(
   'does not undo navigation to %s while the map is still mounted',

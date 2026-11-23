@@ -39,6 +39,7 @@ import {
   focusZoom,
   MAP_ROUTE
 } from '../conf/config';
+import getRouterBasename from '../utils/getRouterBasename';
 
 const MapClusters = React.lazy(
   () => import('../components/common/Maps/MapClusters')
@@ -193,7 +194,10 @@ const Map = () => {
         urlDebounceRef.current = null;
         // A lazy detail route can be loading while this map is still mounted.
         // Never let a delayed viewport update undo navigation away from it.
-        if (!matchPath(MAP_ROUTE, window.location.pathname)) return;
+        const basename = getRouterBasename(window.location.pathname);
+        const relativePathname =
+          window.location.pathname.slice(basename.length) || '/';
+        if (!matchPath(MAP_ROUTE, relativePathname)) return;
         navigate(
           generatePath(MAP_ROUTE, {
             target: encodeMapTarget(center, newZoom)
