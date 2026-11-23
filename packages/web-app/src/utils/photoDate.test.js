@@ -1,10 +1,12 @@
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { URL as NodeURL } from 'node:url';
 
 import { readPhotoDate } from './photoDate';
 
 const fixtureBytes = name =>
-  readFileSync(resolve('cypress/fixtures/photo-dates', name));
+  readFileSync(
+    new NodeURL(`../../cypress/fixtures/photo-dates/${name}`, import.meta.url)
+  );
 
 it.each(['capture.jpg', 'capture.png', 'capture.tiff'])(
   'reads the original capture day from %s without shifting it to UTC',
