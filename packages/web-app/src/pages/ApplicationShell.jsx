@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { styled, useTheme } from '@mui/material/styles';
 import { Box, CircularProgress, useMediaQuery } from '@mui/material';
 
+import MapRateLimitNotifier from '@/components/common/Maps/MapRateLimitNotifier';
 import store from '../store';
 import queryClient from '../conf/queryClient';
 import {
@@ -192,15 +193,15 @@ const ApplicationShell = () => {
           the locale — see NetworkStatusNotifier.
 
           maxSnack MUST stay greater than the number of `persist` snackbars that
-          can coexist (network-offline, sw-update, session-expiry): once every
+          can coexist (network-offline, sw-update, session-expiry, map-rate-limit): once every
           slot holds a persistent one, notistack stops queueing and dismisses the
           oldest instead, silently killing e.g. the update prompt. Adding a
-          fourth persistent notification means raising maxSnack with it.
+          persistent notification means raising maxSnack with it.
 
           NO `preventDuplicate` here: without a `key` notistack dedupes on the
           MESSAGE, which silently swallows legitimate repeats — reorder two rows
           in a row and the second "Order updated" never appears, taking its Undo
-          link with it (useMoveRelevanceWithUndo). The three persistent
+          link with it (useMoveRelevanceWithUndo). The persistent
           notifiers each pass `preventDuplicate` themselves, keyed, which is
           where the flag actually belongs.
 
@@ -214,7 +215,7 @@ const ApplicationShell = () => {
         <QueryClientProvider client={queryClient}>
           <HydratedIntlProvider onError={customOnIntlError}>
             <SnackbarProvider
-              maxSnack={4}
+              maxSnack={5}
               dense={isCompact}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
               Components={SNACKBAR_COMPONENTS}>
@@ -223,6 +224,7 @@ const ApplicationShell = () => {
                   app, offering the update is exactly what fixes it. */}
               <UpdatePrompt />
               <NetworkStatusNotifier />
+              <MapRateLimitNotifier />
               <SessionExpiryNotifier />
               <ErrorBoundary>
                 <ApplicationLayout />

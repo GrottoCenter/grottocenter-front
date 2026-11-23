@@ -5,7 +5,7 @@
 // receive the caller's role and return the same public projection for everyone.
 // If that contract changes, partition both this cache and SW api-map-tiles.
 
-import { apiFetch } from '@/api/client';
+import { mapFetch, isMapRateLimited } from '@/api/mapClient';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 import { makeUrl } from '../actions/utils';
 import {
@@ -139,9 +139,13 @@ const fetchTile = (entity, tile, apiZoom) => {
     if (rec && rec.inFlight === promise) delete rec.inFlight;
   };
 
-  promise = apiFetch(url)
+  promise = mapFetch(url)
     .then(response => {
-      if (response.status >= 400) throw new Error(response.status);
+      if (response.status >= 400) {
+        const error = new Error(String(response.status));
+        error.status = response.status;
+        throw error;
+      }
       return response.text();
     })
     .then(text => JSON.parse(text))
@@ -167,7 +171,8 @@ const fetchTile = (entity, tile, apiZoom) => {
       s.tiles.set(key, {
         ...(prev?.data !== undefined ? { data: prev.data } : {}),
         fetchedAt: now(),
-        failed: true
+        failed: true,
+        rateLimited: error.status === 429
       });
       s.tilesVersion += 1;
       evictIfNeeded(s.tiles);
@@ -209,6 +214,10 @@ export const fetchForBounds = (entity, bounds, apiZoom, dispatch) => {
   // circuits: subsequent moveends within already-cached tiles are free.
   scheduleEmit(entity);
 
+  // Still record the latest viewport and serve cached data above. A 429 on
+  // any geoloc endpoint pauses even unseen tiles, reconnects and invalidations.
+  if (isMapRateLimited()) return;
+
   const tiles = tilesForBounds(bounds, CACHE_ZOOM);
   const t = now();
   // No inFlight check here: fetchTile itself dedupes concurrent requests for
@@ -226,7 +235,9 @@ export const fetchForBounds = (entity, bounds, apiZoom, dispatch) => {
     // Failed tiles use a shorter cooldown so an outage recovers quickly,
     // successful tiles use the normal freshness TTL.
     const ttl = rec.failed ? FAILURE_COOLDOWN_MS : FRESH_MS;
-    if (t - rec.fetchedAt >= ttl) {
+    // A 429 is gated by the shared deadline above, including short Retry-After
+    // values. Do not add the generic 30-second failure cooldown on top of it.
+    if (rec.rateLimited || t - rec.fetchedAt >= ttl) {
       fetchTile(entity, tile, apiZoom).catch(() => {});
     }
   }

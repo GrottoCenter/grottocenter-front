@@ -9,6 +9,7 @@ import pdfJsWasmAssets from './vite/pdfJsWasmAssets.mjs';
 import serviceWorkerBuildGuard from './vite/serviceWorkerBuildGuard.mjs';
 import { mapDetailCacheKey } from './vite/mapDetailCacheKey.mjs';
 import { osmTileCachePlugin } from './vite/osmTileCachePlugin.mjs';
+import { mapRateLimitPlugin } from './vite/mapRateLimitPlugin.mjs';
 
 const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -495,6 +496,7 @@ export default defineConfig(({ mode }) => {
                     handler: 'StaleWhileRevalidate',
                     options: {
                       cacheName: 'api-map-coords-daily',
+                      plugins: [mapRateLimitPlugin],
                       expiration: {
                         maxEntries: 40,
                         maxAgeSeconds: 60 * 60 * 24 * 2,
@@ -516,6 +518,7 @@ export default defineConfig(({ mode }) => {
                     handler: 'NetworkFirst',
                     options: {
                       cacheName: 'api-map-orgs-bulk',
+                      plugins: [mapRateLimitPlugin],
                       networkTimeoutSeconds: 3,
                       expiration: {
                         maxEntries: 2,
@@ -559,6 +562,7 @@ export default defineConfig(({ mode }) => {
                       cacheableResponse: { statuses: [0, 200] },
                       matchOptions: { ignoreVary: true },
                       plugins: [
+                        mapRateLimitPlugin,
                         {
                           // `zoom` is sent by mapTileCache but read by no
                           // /geoloc controller (they only use sw_lat/sw_lng/

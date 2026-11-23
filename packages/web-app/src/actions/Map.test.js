@@ -1,7 +1,11 @@
+import { _resetForTests as resetMapRateLimit } from '@/api/mapClient';
 import {
   fetchAllNetworksCoordinates,
   fetchAllEntrancesCoordinates,
   fetchAllOrganizationsCoordinates,
+  fetchAllMassifsCoordinates,
+  fetchMassifs,
+  fetchEntrances,
   FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
   FETCH_MAP_START_LOADING,
   FETCH_MAP_END_LOADING,
@@ -11,6 +15,44 @@ import {
   FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE,
   LOADINGS
 } from './Map';
+
+beforeEach(() => resetMapRateLimit());
+afterEach(() => resetMapRateLimit());
+
+it('shares a massif 429 pause with bulk coordinates and viewport tiles', async () => {
+  const fetchMock = vi.fn().mockResolvedValue({ status: 429 });
+  vi.stubGlobal('fetch', fetchMock);
+  const dispatch = vi.fn();
+  const criteria = {
+    sw_lat: 45.5,
+    sw_lng: 6.5,
+    ne_lat: 45.50001,
+    ne_lng: 6.50001,
+    zoom: 13
+  };
+  try {
+    await fetchMassifs(criteria)(dispatch);
+    await Promise.all([
+      fetchAllEntrancesCoordinates()(dispatch),
+      fetchAllNetworksCoordinates()(dispatch),
+      fetchAllOrganizationsCoordinates()(dispatch),
+      fetchAllMassifsCoordinates()(dispatch),
+      fetchMassifs(criteria)(dispatch),
+      fetchEntrances(criteria)(dispatch)
+    ]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: FETCH_MAP_NETWORKS_COORDINATES_FAILURE,
+      error: { type: '429', message: 'Fetching all networks coordinates' }
+    });
+    expect(dispatch).toHaveBeenCalledWith({
+      type: FETCH_MAP_END_LOADING,
+      key: LOADINGS.NETWORKS_COORDINATES
+    });
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});
 
 describe('organization coordinate refresh', () => {
   afterEach(() => vi.unstubAllGlobals());
