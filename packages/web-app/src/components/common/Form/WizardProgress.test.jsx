@@ -52,6 +52,7 @@ it('renders only the active label and progress in the compact layout', () => {
     name: 'Step 2 of 3'
   });
   expect(Number(progressbar.getAttribute('aria-valuenow'))).toBeCloseTo(
-    (2 / 3) * 100
+    (2 / 3) * 100,
+    0
   );
 });
