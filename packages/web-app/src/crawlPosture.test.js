@@ -22,9 +22,15 @@ import { describe, expect, it } from 'vitest';
 
 const WEB_APP_ROOT = resolve(fileURLToPath(import.meta.url), '../..');
 
-// The only paths robots.txt may allow: the hubs served by the edge Worker
-// (GrottoCenter/grottocenter-api#1935). Exact match: deeper SPA-only paths such
-// as /ui/countries/FR/entrances must stay out.
+// The only `Allow` lines robots.txt may contain: the hubs served by the edge
+// Worker (GrottoCenter/grottocenter-api#1935). The test compares the text of
+// each line exactly, but crawlers apply `Allow` as a path PREFIX, so each line
+// also reaches everything beneath it (`/ui/caves/` covers every cave detail
+// page; `/ui/countries` covers `/ui/countries/FR/entrances`). That reach is
+// intended: the edge Worker serves a generated page to verified crawlers at
+// those addresses, and anything it does not serve falls back to the SPA shell,
+// which stays `noindex`. Entrances, persons and the rest of `/ui/` stay
+// disallowed.
 const ALLOWED_PATHS = [
   '/ui/caves/',
   '/ui/massifs/',
@@ -39,68 +45,90 @@ const DELIBERATE = `The SPA crawl block is deliberate, see ${ISSUE_URL}.`;
 const readWebAppFile = relativePath =>
   readFileSync(resolve(WEB_APP_ROOT, relativePath), 'utf8');
 
-const getRobotsMetaContent = html => {
-  const tags = html.match(/<meta\b[^>]*>/gi) || [];
-  const robots = tags.find(tag => /\bname\s*=\s*["']robots["']/i.test(tag));
-  const content = robots && robots.match(/\bcontent\s*=\s*["']([^"']*)["']/i);
-  return content ? content[1] : null;
-};
+// Every meta addressed to robots or to a named crawler (`robots`, `googlebot`,
+// `bingbot`, ...), as { name, content }.
+const getCrawlerMetas = html =>
+  (html.match(/<meta\b[^>]*>/gi) || [])
+    .map(tag => ({
+      name: (tag.match(/\bname\s*=\s*["']([^"']*)["']/i) || [])[1],
+      content: (tag.match(/\bcontent\s*=\s*["']([^"']*)["']/i) || [])[1] || ''
+    }))
+    .filter(({ name }) => name && /^robots$|bot/i.test(name));
 
+const metaHasNoindex = ({ content }) =>
+  content
+    .toLowerCase()
+    .split(',')
+    .map(directive => directive.trim())
+    .includes('noindex');
+
+// A crawler obeys only the most specific meta addressed to it, so the generic
+// `robots` meta must exist and every crawler-specific one must say noindex too.
 const hasNoindex = html => {
-  const content = getRobotsMetaContent(html);
+  const metas = getCrawlerMetas(html);
   return (
-    content !== null &&
-    content
-      .toLowerCase()
-      .split(',')
-      .map(directive => directive.trim())
-      .includes('noindex')
+    metas.some(({ name }) => name.toLowerCase() === 'robots') &&
+    metas.every(metaHasNoindex)
   );
 };
 
-// Returns the rules of the group addressed to `User-agent: *`. Consecutive
-// User-agent lines share one group, as in the robots.txt spec.
-const getWildcardRules = robotsTxt => {
-  const rules = [];
-  let agents = [];
+// Returns every group as { agents, rules }. Consecutive User-agent lines share
+// one group, as in the robots.txt spec. A crawler obeys only the most specific
+// group naming it and ignores `*` then, so every group is checked, not just `*`.
+const getGroups = robotsTxt => {
+  const groups = [];
+  let current = null;
   let lastWasAgent = false;
   robotsTxt.split(/\r?\n/).forEach(rawLine => {
     const line = rawLine.replace(/#.*$/, '').trim();
-    if (!line) return;
     const separator = line.indexOf(':');
     if (separator === -1) return;
     const field = line.slice(0, separator).trim().toLowerCase();
     const value = line.slice(separator + 1).trim();
     if (field === 'user-agent') {
-      agents = lastWasAgent ? [...agents, value] : [value];
+      if (!lastWasAgent) {
+        current = { agents: [], rules: [] };
+        groups.push(current);
+      }
+      current.agents.push(value);
       lastWasAgent = true;
     } else {
       lastWasAgent = false;
-      if ((field === 'allow' || field === 'disallow') && agents.includes('*')) {
-        rules.push({ field, value });
+      if (current && (field === 'allow' || field === 'disallow')) {
+        current.rules.push({ field, value });
       }
     }
   });
-  return rules;
+  return groups;
 };
 
-const hasRootDisallow = robotsTxt =>
-  getWildcardRules(robotsTxt).some(
-    ({ field, value }) => field === 'disallow' && value === '/'
+const hasWildcardGroup = robotsTxt =>
+  getGroups(robotsTxt).some(({ agents }) => agents.includes('*'));
+
+// Groups that do not disallow the whole site.
+const getGroupsWithoutRootDisallow = robotsTxt =>
+  getGroups(robotsTxt).filter(
+    ({ rules }) =>
+      !rules.some(({ field, value }) => field === 'disallow' && value === '/')
   );
 
 const getUnexpectedAllows = robotsTxt =>
-  getWildcardRules(robotsTxt)
+  getGroups(robotsTxt)
+    .flatMap(({ rules }) => rules)
     .filter(({ field }) => field === 'allow')
     .map(({ value }) => value)
     .filter(value => !ALLOWED_PATHS.includes(value));
+
+const hasRootDisallow = robotsTxt =>
+  hasWildcardGroup(robotsTxt) &&
+  getGroupsWithoutRootDisallow(robotsTxt).length === 0;
 
 describe('crawl posture: the SPA stays blocked', () => {
   it(`keeps noindex in the robots meta of index.html. ${DELIBERATE}`, () => {
     expect(hasNoindex(readWebAppFile('index.html'))).toBe(true);
   });
 
-  it(`keeps "Disallow: /" in the User-agent: * group. ${DELIBERATE}`, () => {
+  it(`keeps "Disallow: /" in every group, including User-agent: *. ${DELIBERATE}`, () => {
     expect(hasRootDisallow(readWebAppFile('public/robots.txt'))).toBe(true);
   });
 
@@ -145,6 +173,55 @@ describe('crawl posture: the guard detects loosening', () => {
     expect(
       hasRootDisallow('User-agent: Googlebot\nDisallow: /\n\nUser-agent: *\n')
     ).toBe(false);
+  });
+
+  it('rejects a named group that allows everything, even if * disallows', () => {
+    const robots =
+      'User-agent: Googlebot\nAllow: /\n\nUser-agent: *\nDisallow: /\n';
+    expect(hasRootDisallow(robots)).toBe(false);
+    expect(getUnexpectedAllows(robots)).toEqual(['/']);
+  });
+
+  it('rejects a named group with an empty Disallow, even if * disallows', () => {
+    expect(
+      hasRootDisallow(
+        'User-agent: Googlebot\nDisallow:\n\nUser-agent: *\nDisallow: /\n'
+      )
+    ).toBe(false);
+  });
+
+  it('rejects a robots.txt with no User-agent: * group', () => {
+    expect(hasRootDisallow('User-agent: Googlebot\nDisallow: /\n')).toBe(false);
+  });
+
+  it('flags hub allows placed in a named group the same way', () => {
+    expect(
+      getUnexpectedAllows(
+        'User-agent: Bingbot\nDisallow: /\nAllow: /ui/entrances/\n'
+      )
+    ).toEqual(['/ui/entrances/']);
+  });
+
+  it('rejects a crawler-specific meta that allows indexing', () => {
+    expect(
+      hasNoindex(
+        `${meta('noindex, nofollow')}<meta name="googlebot" content="index" />`
+      )
+    ).toBe(false);
+  });
+
+  it('accepts crawler-specific metas that also say noindex', () => {
+    expect(
+      hasNoindex(
+        `${meta('noindex, nofollow')}<meta name="googlebot" content="noindex" />`
+      )
+    ).toBe(true);
+  });
+
+  it('ignores unrelated metas such as viewport', () => {
+    expect(
+      hasNoindex(`${meta('noindex')}<meta name="viewport" content="width=1" />`)
+    ).toBe(true);
   });
 
   it('accepts a Disallow: / shared by grouped user agents', () => {

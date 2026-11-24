@@ -343,7 +343,16 @@ export default defineConfig(({ mode }) => {
           // from the first visit (matches the previous CRA SW's clientsClaim()).
           clientsClaim: true,
           navigateFallback: '/index.html',
-          navigateFallbackDenylist: [/^\/api/, /^\/\.well-known/],
+          // Keep in step with navigationFallback.exclude in
+          // public/staticwebapp.config.json: the edge Worker serves these, and
+          // the service worker must not answer them with the app shell.
+          navigateFallbackDenylist: [
+            /^\/api/,
+            /^\/\.well-known/,
+            /^\/robots\.txt$/,
+            /^\/sitemap\.xml$/,
+            /^\/sitemaps\//
+          ],
           cleanupOutdatedCaches: true,
           runtimeCaching: [
             {
