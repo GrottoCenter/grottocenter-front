@@ -21,7 +21,14 @@ describe('Map rate-limit warning', () => {
       if (isAuthenticated) cy.loginAs();
       cy.intercept(
         { method: 'GET', pathname: '/api/v1/geoloc/**' },
-        { statusCode: 429, body: 'Too many requests' }
+        {
+          statusCode: 429,
+          body: 'Too many requests',
+          headers: {
+            'Retry-After': '120',
+            'Access-Control-Expose-Headers': 'Retry-After'
+          }
+        }
       );
       cy.visit('/map/45.5,6.5,13', {
         onBeforeLoad: win => {
@@ -31,7 +38,7 @@ describe('Map rate-limit warning', () => {
       });
       cy.contains('[data-testid="app-snackbar"]', warningText, {
         timeout: 20000
-      }).should('contain.text', 'plus tard.');
+      }).should('contain.text', 'dans 2 minutes.');
       cy.get('[data-testid="app-snackbar"]').should('have.length', 1);
       let beforePan;
       cy.get('@networkFetch').then(spy => {

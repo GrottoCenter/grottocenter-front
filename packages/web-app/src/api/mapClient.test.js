@@ -173,10 +173,10 @@ it('announces expiry once at the extended deadline and supports unsubscribe', ()
   const listener = vi.fn();
   const unsubscribe = subscribeMapRateLimit(listener);
   try {
-    recordMapRateLimit({ retryAt: NOW + 5000, hasServerDeadline: true });
+    recordMapRateLimit({ retryAt: NOW + 5000 });
     vi.advanceTimersByTime(1000);
-    recordMapRateLimit({ retryAt: NOW + 10000, hasServerDeadline: true });
-    recordMapRateLimit({ retryAt: NOW + 6000, hasServerDeadline: true });
+    recordMapRateLimit({ retryAt: NOW + 10000 });
+    recordMapRateLimit({ retryAt: NOW + 6000 });
     expect(listener).toHaveBeenCalledTimes(2);
     expect(vi.getTimerCount()).toBe(1);
     vi.advanceTimersByTime(4000);
@@ -189,6 +189,34 @@ it('announces expiry once at the extended deadline and supports unsubscribe', ()
     recordMapRateLimit({ retryAt: Date.now() + 1000 });
     vi.advanceTimersByTime(1000);
     expect(listener).toHaveBeenCalledTimes(3);
+  } finally {
+    unsubscribe();
+    _resetForTests();
+    vi.useRealTimers();
+  }
+});
+
+it('publishes remaining-minute changes and expiry with a single shared timer', () => {
+  clock.mockRestore();
+  vi.useFakeTimers();
+  vi.setSystemTime(NOW);
+  const listener = vi.fn();
+  const unsubscribe = subscribeMapRateLimit(listener);
+  try {
+    recordMapRateLimit({ retryAt: NOW + 125000 });
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(vi.getTimerCount()).toBe(1);
+    vi.advanceTimersByTime(4999);
+    expect(listener).toHaveBeenCalledTimes(1);
+    vi.advanceTimersByTime(1);
+    expect(listener).toHaveBeenCalledTimes(2);
+    vi.advanceTimersByTime(60000);
+    expect(listener).toHaveBeenCalledTimes(3);
+    expect(vi.getTimerCount()).toBe(1);
+    vi.advanceTimersByTime(60000);
+    expect(listener).toHaveBeenCalledTimes(4);
+    expect(isMapRateLimited()).toBe(false);
+    expect(vi.getTimerCount()).toBe(0);
   } finally {
     unsubscribe();
     _resetForTests();

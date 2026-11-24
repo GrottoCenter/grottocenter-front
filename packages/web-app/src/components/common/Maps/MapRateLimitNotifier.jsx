@@ -9,7 +9,6 @@ import {
   subscribeMapRateLimit
 } from '@/api/mapClient';
 import { displayLoginDialog } from '@/actions/Login';
-import { useMapRateLimit } from '@/hooks/useMapRateLimit';
 import { useNotification } from '@/hooks/useNotification';
 import { usePermissions } from '@/hooks/usePermissions';
 import { createCloseAction } from '../snackbarActions';
@@ -18,20 +17,19 @@ const SNACKBAR_KEY = 'map-rate-limit';
 
 const MapRateLimitMessage = () => {
   const { isAuth } = usePermissions();
-  const { limit, minutes } = useMapRateLimit();
-  if (!isAuth && limit?.hasServerDeadline)
-    return (
-      <FormattedMessage
-        id="mapRateLimit.anonymousRetryAfter"
-        values={{ minutes }}
-      />
-    );
-  if (!isAuth) return <FormattedMessage id="mapRateLimit.anonymous" />;
-  if (limit?.hasServerDeadline)
-    return (
-      <FormattedMessage id="mapRateLimit.retryAfter" values={{ minutes }} />
-    );
-  return <FormattedMessage id="mapRateLimit.authenticated" />;
+  const limit = useSyncExternalStore(subscribeMapRateLimit, getMapRateLimit);
+  const minutes = Math.max(
+    1,
+    Math.ceil(((limit?.retryAt ?? 0) - Date.now()) / 60000)
+  );
+  return (
+    <FormattedMessage
+      id={
+        isAuth ? 'mapRateLimit.retryAfter' : 'mapRateLimit.anonymousRetryAfter'
+      }
+      values={{ minutes }}
+    />
+  );
 };
 
 const MapRateLimitActions = ({ snackbarKey }) => {

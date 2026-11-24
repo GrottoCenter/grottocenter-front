@@ -26,7 +26,7 @@ const tree = () => (
   </StrictMode>
 );
 
-const limitMap = async (retryAfter = null) => {
+const limitMap = async (retryAfter = '120') => {
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue(
@@ -60,7 +60,9 @@ afterEach(() => {
 it('offers login, closes the visitor warning on login and keeps a subsequent authenticated pause through logout', async () => {
   const view = renderWithProviders(tree(), { messages: en, store });
   await limitMap();
-  expect(screen.getAllByText(en['mapRateLimit.anonymous'])).toHaveLength(1);
+  expect(screen.getAllByText(/Sign in or try again in 2 minutes/)).toHaveLength(
+    1
+  );
   fireEvent.click(screen.getByTestId('map-rate-limit-login'));
   expect(store.getState().login.isLoginDialogDisplayed).toBe(true);
   act(() => store.dispatch(fetchLoginSuccess({ id: 1 }, 'session')));
@@ -68,27 +70,22 @@ it('offers login, closes the visitor warning on login and keeps a subsequent aut
   await act(() => vi.advanceTimersByTimeAsync(1000));
   // Notistack starts its collapse after React commits the slide's exit.
   await act(() => vi.advanceTimersByTimeAsync(1000));
-  expect(
-    screen.queryByText(en['mapRateLimit.anonymous'])
-  ).not.toBeInTheDocument();
+  expect(screen.queryByText(/Sign in or try again in/)).not.toBeInTheDocument();
   expect(screen.getByTestId('app-snackbar')).not.toBeVisible();
 
   await limitMap();
-  expect(screen.getByRole('alert')).toHaveTextContent(
-    en['mapRateLimit.authenticated']
-  );
+  expect(screen.getByRole('alert')).toHaveTextContent('Try again in 2 minutes');
   expect(screen.queryByTestId('map-rate-limit-login')).not.toBeInTheDocument();
   const deadline = getMapRateLimit().retryAt;
   act(() => store.dispatch(logout()));
   expect(getMapRateLimit().retryAt).toBe(deadline);
   fireEvent.click(screen.getByRole('button', { name: 'Close' }));
   await act(() => vi.advanceTimersByTimeAsync(1000));
+  act(() => vi.advanceTimersByTime(60000));
   view.unmount();
   renderWithProviders(tree(), { messages: en, store });
   await act(async () => {});
-  expect(
-    screen.queryByText(en['mapRateLimit.anonymous'])
-  ).not.toBeInTheDocument();
+  expect(screen.queryByText(/Sign in or try again in/)).not.toBeInTheDocument();
 });
 
 it('counts down a server deadline and closes at expiry', async () => {
@@ -108,11 +105,10 @@ it('counts down a server deadline and closes at expiry', async () => {
   );
 });
 
-it('renders the French copy without inventing a retry time for the fallback', async () => {
+it('shows the applied fallback delay in French when Retry-After is missing', async () => {
   renderWithProviders(tree(), { messages: fr, locale: 'fr', store });
-  await limitMap();
-  expect(screen.getByText(fr['mapRateLimit.anonymous'])).toBeVisible();
-  expect(screen.queryByText(/10 minutes/)).not.toBeInTheDocument();
+  await limitMap(null);
+  expect(screen.getByText(/réessayez dans 10 minutes/)).toBeVisible();
 });
 
 it('announces a new cooldown while the previous toast is exiting', async () => {

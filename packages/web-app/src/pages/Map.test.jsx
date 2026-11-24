@@ -149,7 +149,7 @@ it('loads all four bulk datasets and retries the viewport after mounting during 
   vi.stubGlobal('fetch', fetchMock);
   const dispatch = vi.fn(mapStore.dispatch);
   useDispatch.mockReturnValue(dispatch);
-  recordMapRateLimit({ retryAt: Date.now() + 5000, hasServerDeadline: true });
+  recordMapRateLimit({ retryAt: Date.now() + 5000 });
   await act(async () => render(<MapPage />));
   expect(fetchMock).not.toHaveBeenCalled();
   expect(refetchMapViewport).not.toHaveBeenCalled();
@@ -166,7 +166,7 @@ it('loads all four bulk datasets and retries the viewport after mounting during 
 });
 
 it('does not reload an unmounted map when the pause expires', async () => {
-  recordMapRateLimit({ retryAt: Date.now() + 5000, hasServerDeadline: true });
+  recordMapRateLimit({ retryAt: Date.now() + 5000 });
   const view = render(<MapPage />);
   view.unmount();
   await act(() => vi.advanceTimersByTimeAsync(5000));
@@ -178,7 +178,7 @@ it('resumes visible massif polygons along with the bulk datasets', async () => {
     .fn()
     .mockImplementation(() => Promise.resolve(new Response('[]')));
   vi.stubGlobal('fetch', fetchMock);
-  recordMapRateLimit({ retryAt: Date.now() + 5000, hasServerDeadline: true });
+  recordMapRateLimit({ retryAt: Date.now() + 5000 });
   await moveMap();
   await act(() => vi.advanceTimersByTimeAsync(4999));
   expect(fetchMock).not.toHaveBeenCalled();
