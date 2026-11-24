@@ -40,6 +40,11 @@
       src/crawlPosture.test.js (GrottoCenter/grottocenter-front#1500).
     -->
     <meta property="og:type" content="website" />
+    <!--
+      The apex (https://grottocenter.org) is the canonical origin. www
+      redirects to it and must not be used in metadata. Guarded by
+      src/metadataOrigin.test.js.
+    -->
     <meta property="og:url" content="https://grottocenter.org" />
     <meta property="og:site_name" content="Grottocenter" />
     <meta property="og:title" content="Grottocenter" />
