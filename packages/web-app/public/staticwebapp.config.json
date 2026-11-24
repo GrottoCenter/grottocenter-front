@@ -1,7 +1,15 @@
 {
   "navigationFallback": {
     "rewrite": "index.html",
-    "exclude": ["/images/*", "/assets/*", "/.well-known/*", "/sw.js"]
+    "exclude": [
+      "/images/*",
+      "/assets/*",
+      "/.well-known/*",
+      "/sw.js",
+      "/robots.txt",
+      "/sitemap.xml",
+      "/sitemaps/*"
+    ]
   },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff"
