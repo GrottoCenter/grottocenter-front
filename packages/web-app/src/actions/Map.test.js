@@ -1,7 +1,18 @@
+import store from '@/store';
+import { fetchLoginSuccess, logout } from '@/actions/Login';
+import {
+  _resetForTests as resetMapRateLimit,
+  isMapRateLimited,
+  observeMapRateLimit,
+  recordMapRateLimit
+} from '@/api/mapClient';
 import {
   fetchAllNetworksCoordinates,
   fetchAllEntrancesCoordinates,
   fetchAllOrganizationsCoordinates,
+  fetchAllMassifsCoordinates,
+  fetchMassifs,
+  fetchEntrances,
   FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
   FETCH_MAP_START_LOADING,
   FETCH_MAP_END_LOADING,
@@ -9,8 +20,98 @@ import {
   FETCH_MAP_NETWORKS_COORDINATES_FAILURE,
   FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS,
   FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE,
+  FETCH_MAP_MASSIFS_SUCCESS,
+  FETCH_MAP_MASSIFS_FAILURE,
   LOADINGS
 } from './Map';
+
+beforeEach(() => resetMapRateLimit());
+afterEach(() => resetMapRateLimit());
+
+it('shares a massif 429 pause with bulk coordinates and viewport tiles', async () => {
+  const fetchMock = vi.fn().mockResolvedValue({ status: 429 });
+  vi.stubGlobal('fetch', fetchMock);
+  const dispatch = vi.fn();
+  const criteria = {
+    sw_lat: 45.5,
+    sw_lng: 6.5,
+    ne_lat: 45.50001,
+    ne_lng: 6.50001,
+    zoom: 13
+  };
+  try {
+    await fetchMassifs(criteria)(dispatch);
+    await Promise.all([
+      fetchAllEntrancesCoordinates()(dispatch),
+      fetchAllNetworksCoordinates()(dispatch),
+      fetchAllOrganizationsCoordinates()(dispatch),
+      fetchAllMassifsCoordinates()(dispatch),
+      fetchMassifs(criteria)(dispatch),
+      fetchEntrances(criteria)(dispatch)
+    ]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: FETCH_MAP_NETWORKS_COORDINATES_FAILURE,
+      error: { type: '429', message: 'Fetching all networks coordinates' }
+    });
+    expect(dispatch).toHaveBeenCalledWith({
+      type: FETCH_MAP_END_LOADING,
+      key: LOADINGS.NETWORKS_COORDINATES
+    });
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});
+
+it.each([200, 429])(
+  'recovers pending massif polygons after login and handles an authenticated HTTP %i',
+  async status => {
+    store.dispatch(logout());
+    const stopMonitoring = observeMapRateLimit();
+    let finishVisitorRequest;
+    const pending = new Promise(resolve => {
+      finishVisitorRequest = resolve;
+    });
+    const data = [{ id: 42 }];
+    const fetchMock = vi
+      .fn()
+      .mockReturnValueOnce(pending)
+      .mockResolvedValueOnce(new Response(JSON.stringify(data), { status }));
+    vi.stubGlobal('fetch', fetchMock);
+    const dispatch = vi.fn();
+    try {
+      const request = fetchMassifs({ zoom: 13 })(dispatch);
+      recordMapRateLimit({ retryAt: Date.now() + 600000 });
+      store.dispatch(fetchLoginSuccess({ id: 1 }, 'session'));
+      finishVisitorRequest(new Response(null, { status: 429 }));
+      await request;
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock.mock.lastCall[1].headers.get('Authorization')).toBe(
+        'Bearer session'
+      );
+      expect(isMapRateLimited()).toBe(status === 429);
+      if (status === 200) {
+        expect(dispatch).toHaveBeenCalledWith({
+          type: FETCH_MAP_MASSIFS_SUCCESS,
+          data
+        });
+      } else {
+        expect(dispatch).toHaveBeenCalledWith({
+          type: FETCH_MAP_MASSIFS_FAILURE,
+          error: { type: '429', message: 'Fetching massifs' }
+        });
+      }
+      expect(dispatch).toHaveBeenLastCalledWith({
+        type: FETCH_MAP_END_LOADING,
+        key: LOADINGS.MASSIFS
+      });
+    } finally {
+      stopMonitoring();
+      store.dispatch(logout());
+      vi.unstubAllGlobals();
+    }
+  }
+);
 
 describe('organization coordinate refresh', () => {
   afterEach(() => vi.unstubAllGlobals());
@@ -108,7 +209,8 @@ describe('fetchAllNetworksCoordinates retry policy', () => {
       await fetchAllNetworksCoordinates()(dispatch);
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
-      expect(vi.getTimerCount()).toBe(0);
+      // A 429 arms only the shared recovery timer, never a request retry.
+      expect(vi.getTimerCount()).toBe(status === 429 ? 1 : 0);
       expectFailure(String(status));
     }
   );

@@ -199,7 +199,7 @@ const CustomMapContainer = ({
   );
 
   return (
-    <Wrapper $wholePage={wholePage} sx={sx}>
+    <Wrapper $wholePage={wholePage} sx={sx} data-testid="map-container">
       <MapContainer
         style={{ flex: '1 1 auto', minHeight: 0, width: '100%', ...style }}
         wholePage={wholePage}

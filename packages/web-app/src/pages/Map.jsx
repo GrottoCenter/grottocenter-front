@@ -15,17 +15,16 @@ import {
   useSearchParams
 } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { getMapRateLimit, subscribeMapRateLimit } from '@/api/mapClient';
 import { subscribeOrganizationMapChanges } from '@/utils/organizationCache';
 import PageLoader from '../components/common/PageLoader';
 
 import {
   fetchNetworks,
-  fetchAllNetworksCoordinates,
+  fetchAllMapCoordinates,
   fetchOrganizations,
   fetchAllOrganizationsCoordinates,
   fetchEntrances,
-  fetchAllEntrancesCoordinates,
-  fetchAllMassifsCoordinates,
   fetchMassifs,
   refetchMapViewport
 } from '../actions/Map';
@@ -155,6 +154,7 @@ const Map = () => {
   // `redux-debounced` middleware applied before it was removed — this is the
   // only site that dispatches fetchMassifs, so debouncing here is equivalent.
   const massifsDebounceRef = useRef(null);
+  const massifsCriteriaRef = useRef(null);
 
   const handleUpdate = useCallback(
     ({ markers, showMassifPolygons, zoom: newZoom, center, bounds }) => {
@@ -177,6 +177,7 @@ const Map = () => {
       // Cleared unconditionally so toggling the layer off also drops a fetch
       // that was still pending for the previous viewport.
       if (massifsDebounceRef.current) clearTimeout(massifsDebounceRef.current);
+      massifsCriteriaRef.current = showMassifPolygons ? criteria : null;
       if (showMassifPolygons) {
         massifsDebounceRef.current = setTimeout(() => {
           massifsDebounceRef.current = null;
@@ -220,12 +221,10 @@ const Map = () => {
     []
   );
 
-  const loadMapData = useCallback(() => {
-    dispatch(fetchAllEntrancesCoordinates());
-    dispatch(fetchAllNetworksCoordinates());
-    dispatch(fetchAllMassifsCoordinates());
-    dispatch(fetchAllOrganizationsCoordinates());
-  }, [dispatch]);
+  const loadMapData = useCallback(
+    (onlyMissing = false) => dispatch(fetchAllMapCoordinates({ onlyMissing })),
+    [dispatch]
+  );
 
   useEffect(
     () =>
@@ -237,8 +236,7 @@ const Map = () => {
 
   useEffect(() => {
     loadMapData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadMapData]);
 
   // Both halves of the map need waking up on reconnection, and neither does it
   // on its own: the cluster datasets are only fetched on mount, and the marker
@@ -249,11 +247,26 @@ const Map = () => {
   // is a plain function call. mapTileCache owns its own dispatch reference (see
   // Map.js), so calling it directly is the correct shape — do not wrap it in
   // dispatch().
-  const reloadMap = useCallback(() => {
-    loadMapData();
-    refetchMapViewport();
-  }, [loadMapData]);
+  const reloadMap = useCallback(
+    (onlyMissing = false) => {
+      loadMapData(onlyMissing);
+      refetchMapViewport();
+      if (massifsCriteriaRef.current) {
+        clearTimeout(massifsDebounceRef.current);
+        massifsDebounceRef.current = null;
+        dispatch(fetchMassifs(massifsCriteriaRef.current));
+      }
+    },
+    [dispatch, loadMapData]
+  );
   useRefetchOnReconnect(reloadMap);
+  useEffect(
+    () =>
+      subscribeMapRateLimit(() => {
+        if (getMapRateLimit()?.retryAt <= Date.now()) reloadMap(true);
+      }),
+    [reloadMap]
+  );
 
   // When there is no URL target and no saved position, fall back to geolocation once available.
   const initialTargetRef = useRef(params.target);

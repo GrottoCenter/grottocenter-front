@@ -1,4 +1,4 @@
-import { apiFetch } from '@/api/client';
+import { mapFetch } from '@/api/mapClient';
 import { isClientError } from '@/utils/httpErrors';
 import {
   getMapCavesUrl,
@@ -70,7 +70,7 @@ const fetchWithRetry = (url, maxRetries = 3) => {
       ? 0
       : maxRetries;
   const attempt = (retriesLeft, delay) =>
-    apiFetch(url)
+    mapFetch(url)
       .then(response => {
         if (response.status >= 400) {
           // Carry the HTTP status on the error so the retry filter can read a
@@ -128,8 +128,8 @@ export const fetchAllNetworksCoordinates = () => dispatch => {
 
 // Bounds-based thunks now go through the tile cache (utils/mapTileCache.js).
 // The cache handles per-tile dedup, TTL/SWR freshness, and coalesced dispatches,
-// so `redux-debounced` is no longer needed here — the request rate is bounded
-// by the tile grid.
+// so `redux-debounced` is no longer needed here. mapClient's shared cooldown
+// pauses requests across all geoloc endpoints after a 429.
 registerEntity('networks', {
   url: getMapCavesUrl,
   successType: FETCH_MAP_NETWORKS_SUCCESS,
@@ -292,6 +292,27 @@ export const fetchAllMassifsCoordinates = () => dispatch => {
     });
 };
 
+// Rate-limit recovery preserves successful loads (including empty responses)
+// and lets requests already in flight finish. Mount/reconnect still refresh all.
+export const fetchAllMapCoordinates =
+  ({ onlyMissing = false } = {}) =>
+  (dispatch, getState) => {
+    const { loadedCoordinates, loadings } = getState().map;
+    const datasets = [
+      [LOADINGS.ENTRANCES_COORDINATES, fetchAllEntrancesCoordinates],
+      [LOADINGS.NETWORKS_COORDINATES, fetchAllNetworksCoordinates],
+      [LOADINGS.MASSIFS_COORDINATES, fetchAllMassifsCoordinates],
+      [LOADINGS.ORGANIZATIONS_COORDINATES, fetchAllOrganizationsCoordinates]
+    ];
+    return Promise.all(
+      datasets
+        .filter(
+          ([key]) => !onlyMissing || (!loadedCoordinates[key] && !loadings[key])
+        )
+        .map(([, fetchCoordinates]) => dispatch(fetchCoordinates()))
+    );
+  };
+
 // Unlike the tile-cached thunks above, massif polygons aren't tile-cached
 // (registerEntity/fetchForBounds isn't used here), so nothing bounds the request
 // rate: unthrottled, this fires on every moveend at polygon zoom. The 500 ms
@@ -307,7 +328,7 @@ export const fetchAllMassifsCoordinates = () => dispatch => {
 export const fetchMassifs = criteria => dispatch => {
   dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.MASSIFS });
   const completedUrl = makeUrl(getMapMassifsUrl, criteria);
-  return apiFetch(completedUrl)
+  return mapFetch(completedUrl)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);

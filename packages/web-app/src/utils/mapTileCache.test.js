@@ -1,4 +1,14 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import store from '@/store';
+import { fetchLoginSuccess, logout } from '@/actions/Login';
+import {
+  _resetForTests as resetMapRateLimit,
+  getMapRateLimit,
+  isMapRateLimited,
+  observeMapRateLimit,
+  recordMapRateLimit,
+  subscribeMapRateLimit
+} from '@/api/mapClient';
 import {
   registerEntity,
   fetchForBounds,
@@ -45,12 +55,14 @@ describe('mapTileCache', () => {
 
   beforeEach(() => {
     _resetForTests();
+    resetMapRateLimit();
     fetchMock = vi.fn();
     global.fetch = fetchMock;
     dispatch = vi.fn();
   });
 
   afterEach(() => {
+    resetMapRateLimit();
     vi.restoreAllMocks();
     delete global.fetch;
   });
@@ -275,6 +287,142 @@ describe('mapTileCache', () => {
       );
       const lastData = successCalls[successCalls.length - 1][0].data;
       expect(lastData).toEqual([{ id: 7, name: 'kept' }]);
+    });
+  });
+
+  describe('shared 429 cooldown', () => {
+    it.each([200, 429])(
+      'recovers a tile pending at login and handles an authenticated HTTP %i',
+      async status => {
+        store.dispatch(logout());
+        const stopMonitoring = observeMapRateLimit();
+        const stopRecovery = subscribeMapRateLimit(() => {
+          if (getMapRateLimit()?.retryAt <= Date.now())
+            refetchVisibleTiles(ENTITY);
+        });
+        try {
+          registerEntity(ENTITY, CONFIG);
+          let finishVisitorRequest;
+          fetchMock.mockImplementationOnce(
+            () =>
+              new Promise(resolve => {
+                finishVisitorRequest = resolve;
+              })
+          );
+          fetchMock.mockResolvedValueOnce(
+            new Response(JSON.stringify([{ id: 42 }]), { status })
+          );
+          fetchForBounds(ENTITY, singleTileBounds(250, 250), 13, dispatch);
+          recordMapRateLimit({ retryAt: Date.now() + 600000 });
+          store.dispatch(fetchLoginSuccess({ id: 1 }, 'session'));
+          // Login's viewport recovery deduplicates the pending visitor request.
+          expect(fetchMock).toHaveBeenCalledTimes(1);
+          finishVisitorRequest(new Response(null, { status: 429 }));
+          await flushPromises();
+          expect(fetchMock).toHaveBeenCalledTimes(2);
+          expect(fetchMock.mock.lastCall[1].headers.get('Authorization')).toBe(
+            'Bearer session'
+          );
+          expect(isMapRateLimited()).toBe(status === 429);
+          if (status === 200) {
+            expect(dispatch).toHaveBeenLastCalledWith({
+              type: CONFIG.successType,
+              data: [{ id: 42 }]
+            });
+          } else {
+            expect(dispatch).toHaveBeenLastCalledWith({
+              type: CONFIG.failureType,
+              error: { type: '429', message: 'Fetching entrances' }
+            });
+          }
+        } finally {
+          stopRecovery();
+          stopMonitoring();
+          store.dispatch(logout());
+        }
+      }
+    );
+
+    it('blocks new tiles across layers, reconnects and invalidations, then fetches the latest viewport', async () => {
+      registerEntity(ENTITY, CONFIG);
+      registerEntity('networks', { ...CONFIG, url: '/api/networks' });
+      const start = Date.now();
+      const clock = vi.spyOn(Date, 'now').mockReturnValue(start);
+      fetchMock.mockResolvedValueOnce(
+        new Response(null, { status: 429, headers: { 'Retry-After': '120' } })
+      );
+      fetchForBounds(ENTITY, singleTileBounds(250, 250), 13, dispatch);
+      await flushPromises();
+
+      clock.mockReturnValue(start + 31000);
+      const latest = singleTileBounds(251, 250);
+      fetchForBounds(ENTITY, latest, 13, dispatch);
+      fetchForBounds('networks', latest, 13, dispatch);
+      refetchVisibleTiles(ENTITY);
+      invalidateAll(ENTITY);
+      invalidateAll('networks', { discardData: true });
+      await flushPromises();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      fetchMock.mockReturnValue(fetchOk([{ id: 42 }]));
+      clock.mockReturnValue(start + 120000);
+      refetchVisibleTiles(ENTITY);
+      await flushPromises();
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      const url = new URL(fetchMock.mock.calls.at(-1)[0], 'http://localhost');
+      expect(Number(url.searchParams.get('sw_lng'))).toBe(
+        tileToBounds(251, 250, CACHE_ZOOM).sw_lng
+      );
+      expect(dispatch).toHaveBeenLastCalledWith({
+        type: CONFIG.successType,
+        data: [{ id: 42 }]
+      });
+    });
+
+    it('retries the rate-limited tile after a short Retry-After without adding 30 seconds', async () => {
+      registerEntity(ENTITY, CONFIG);
+      const start = Date.now();
+      const clock = vi.spyOn(Date, 'now').mockReturnValue(start);
+      const bounds = singleTileBounds(250, 250);
+      fetchMock.mockResolvedValueOnce(
+        new Response(null, { status: 429, headers: { 'Retry-After': '5' } })
+      );
+      fetchForBounds(ENTITY, bounds, 13, dispatch);
+      await flushPromises();
+
+      clock.mockReturnValue(start + 4999);
+      fetchForBounds(ENTITY, bounds, 13, dispatch);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      clock.mockReturnValue(start + 5000);
+      fetchMock.mockReturnValueOnce(fetchOk([{ id: 42 }]));
+      fetchForBounds(ENTITY, bounds, 13, dispatch);
+      await flushPromises();
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(dispatch).toHaveBeenLastCalledWith({
+        type: CONFIG.successType,
+        data: [{ id: 42 }]
+      });
+    });
+
+    it('keeps cached markers available during the shared pause', async () => {
+      registerEntity(ENTITY, CONFIG);
+      fetchMock.mockReturnValueOnce(fetchOk([{ id: 7 }]));
+      const bounds = singleTileBounds(250, 250);
+      fetchForBounds(ENTITY, bounds, 13, dispatch);
+      await flushPromises();
+
+      fetchMock.mockReturnValueOnce(fetchFail(429));
+      invalidateAll(ENTITY);
+      await flushPromises();
+      fetchForBounds(ENTITY, singleTileBounds(251, 250), 13, dispatch);
+      await flushPromises();
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      const successes = dispatch.mock.calls
+        .map(([action]) => action)
+        .filter(action => action.type === CONFIG.successType);
+      expect(successes.at(-1).data).toEqual([{ id: 7 }]);
     });
   });
 

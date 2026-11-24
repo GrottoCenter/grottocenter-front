@@ -30,6 +30,9 @@ const initialState = {
   organizationsCoordinates: [],
   massifsCoordinates: [],
   massifs: [],
+  // A successful empty response is loaded too. Keep this across map remounts
+  // and failed refreshes, which preserve the previous coordinates.
+  loadedCoordinates: {},
   error: undefined,
   loadings: {
     [LOADINGS.NETWORKS]: false,
@@ -61,6 +64,10 @@ const reducer = (state = initialState, action) => {
     case FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS:
       return {
         ...state,
+        loadedCoordinates: {
+          ...state.loadedCoordinates,
+          [LOADINGS.ENTRANCES_COORDINATES]: true
+        },
         error: initialState.error,
         entrancesCoordinates: action.data
       };
@@ -88,6 +95,10 @@ const reducer = (state = initialState, action) => {
     case FETCH_MAP_NETWORKS_COORDINATES_SUCCESS:
       return {
         ...state,
+        loadedCoordinates: {
+          ...state.loadedCoordinates,
+          [LOADINGS.NETWORKS_COORDINATES]: true
+        },
         error: initialState.error,
         networksCoordinates: action.data
       };
@@ -104,6 +115,10 @@ const reducer = (state = initialState, action) => {
     case FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS:
       return {
         ...state,
+        loadedCoordinates: {
+          ...state.loadedCoordinates,
+          [LOADINGS.ORGANIZATIONS_COORDINATES]: true
+        },
         error: initialState.error,
         organizationsCoordinates: action.data
       };
@@ -120,6 +135,10 @@ const reducer = (state = initialState, action) => {
     case FETCH_MAP_MASSIFS_COORDINATES_SUCCESS:
       return {
         ...state,
+        loadedCoordinates: {
+          ...state.loadedCoordinates,
+          [LOADINGS.MASSIFS_COORDINATES]: true
+        },
         error: initialState.error,
         massifsCoordinates: action.data
       };
