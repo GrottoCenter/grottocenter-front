@@ -3,6 +3,8 @@ import { fetchLoginSuccess, logout } from '@/actions/Login';
 import {
   mapFetch,
   isMapRateLimited,
+  getMapRateLimit,
+  getMapRateLimitMinutes,
   recordMapRateLimit,
   subscribeMapRateLimit,
   observeMapRateLimit,
@@ -30,6 +32,18 @@ afterEach(() => {
   _resetForTests();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+});
+
+it.each([
+  [null, 1],
+  [{ retryAt: NOW - 1000 }, 1],
+  [{ retryAt: NOW }, 1],
+  [{ retryAt: NOW + 1 }, 1],
+  [{ retryAt: NOW + 60000 }, 1],
+  [{ retryAt: NOW + 60001 }, 2],
+  [{ retryAt: NOW + 125000 }, 3]
+])('rounds the remaining minutes for %j to %i', (limit, minutes) => {
+  expect(getMapRateLimitMinutes(limit)).toBe(minutes);
 });
 
 it.each([200, 429])(
@@ -200,7 +214,7 @@ it('publishes remaining-minute changes and expiry with a single shared timer', (
   clock.mockRestore();
   vi.useFakeTimers();
   vi.setSystemTime(NOW);
-  const listener = vi.fn();
+  const listener = vi.fn(() => getMapRateLimitMinutes(getMapRateLimit()));
   const unsubscribe = subscribeMapRateLimit(listener);
   try {
     recordMapRateLimit({ retryAt: NOW + 125000 });
@@ -215,6 +229,9 @@ it('publishes remaining-minute changes and expiry with a single shared timer', (
     expect(vi.getTimerCount()).toBe(1);
     vi.advanceTimersByTime(60000);
     expect(listener).toHaveBeenCalledTimes(4);
+    expect(listener.mock.results.map(result => result.value)).toEqual([
+      3, 2, 1, 1
+    ]);
     expect(isMapRateLimited()).toBe(false);
     expect(vi.getTimerCount()).toBe(0);
   } finally {

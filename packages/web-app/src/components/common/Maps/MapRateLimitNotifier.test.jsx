@@ -79,9 +79,17 @@ it('offers login, closes the visitor warning on login and keeps a subsequent aut
   const deadline = getMapRateLimit().retryAt;
   act(() => store.dispatch(logout()));
   expect(getMapRateLimit().retryAt).toBe(deadline);
+  // Finish entering so dismissal can start its exit transition immediately.
+  await act(() => vi.advanceTimersByTimeAsync(1000));
   fireEvent.click(screen.getByRole('button', { name: 'Close' }));
   await act(() => vi.advanceTimersByTimeAsync(1000));
+  // Notistack starts its collapse after React commits the slide's exit.
+  await act(() => vi.advanceTimersByTimeAsync(1000));
+  // Let the collapse remove the dismissed snackbar before the timer tick.
+  await act(() => vi.advanceTimersByTimeAsync(1000));
+  expect(screen.queryByText(/Sign in or try again in/)).not.toBeInTheDocument();
   act(() => vi.advanceTimersByTime(60000));
+  expect(screen.queryByText(/Sign in or try again in/)).not.toBeInTheDocument();
   view.unmount();
   renderWithProviders(tree(), { messages: en, store });
   await act(async () => {});

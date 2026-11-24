@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import {
   claimMapRateLimitWarning,
   getMapRateLimit,
+  getMapRateLimitMinutes,
   subscribeMapRateLimit
 } from '@/api/mapClient';
 import { displayLoginDialog } from '@/actions/Login';
@@ -18,10 +19,7 @@ const SNACKBAR_KEY = 'map-rate-limit';
 const MapRateLimitMessage = () => {
   const { isAuth } = usePermissions();
   const limit = useSyncExternalStore(subscribeMapRateLimit, getMapRateLimit);
-  const minutes = Math.max(
-    1,
-    Math.ceil(((limit?.retryAt ?? 0) - Date.now()) / 60000)
-  );
+  const minutes = getMapRateLimitMinutes(limit);
   return (
     <FormattedMessage
       id={

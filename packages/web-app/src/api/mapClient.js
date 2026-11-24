@@ -1,9 +1,14 @@
 import store from '@/store';
 import { apiFetch } from './client';
 
+const MINUTE = 60000;
+
+export const getMapRateLimitMinutes = limit =>
+  Math.max(1, Math.ceil(((limit?.retryAt ?? 0) - Date.now()) / MINUTE));
+
 const getMapRateLimitDeadline = value => {
   const now = Date.now();
-  const fallback = { retryAt: now + 10 * 60 * 1000 };
+  const fallback = { retryAt: now + 10 * MINUTE };
   const text = value?.trim();
   if (!text) return fallback;
   const seconds = Number(text);
@@ -36,7 +41,7 @@ const notifyMapRateLimit = () => {
             rateLimit = { ...rateLimit };
             notifyMapRateLimit();
           },
-          remaining % 60000 || 60000
+          remaining % MINUTE || MINUTE
         )
       : null;
   listeners.forEach(listener => listener());
