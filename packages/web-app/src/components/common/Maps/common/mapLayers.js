@@ -74,7 +74,8 @@ const layers = [
     name: 'France - MNT LiDAR HD',
     role: LAYER_ROLE.OVERLAY,
     // IGN limits WMS raster to 40 requests/s per IP, causing missing tiles (429).
-    // Its WMTS image service is exempt from this rate limit.
+    // IGN documents its WMTS image service as exempt from this rate limit:
+    // https://cartes.gouv.fr/aide/fr/guides-utilisateur/utiliser-les-services-de-la-geoplateforme/limites-d-usage/
     type: LAYER_TYPE.WMTS,
     pane: PANES.HILLSHADE,
     defaultOn: false,

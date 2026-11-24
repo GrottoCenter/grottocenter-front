@@ -89,7 +89,10 @@ const createWMTSTileLayer = (layer, opacity = 1) => (
       new L.LatLngBounds(new L.LatLng(-90, -180), new L.LatLng(90, 180))
     }
     opacity={opacity}
-    errorTileUrl={ERROR_TILE_URL}
+    // Missing overlay data must leave the basemap visible.
+    errorTileUrl={
+      layer.role === LAYER_ROLE.OVERLAY ? L.Util.emptyImageUrl : ERROR_TILE_URL
+    }
     referrerPolicy={layer.referrerPolicy}
   />
 );
