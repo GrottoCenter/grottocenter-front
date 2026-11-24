@@ -1,9 +1,14 @@
 import store from '@/store';
 import { apiFetch } from './client';
 
+const MINUTE = 60000;
+
+export const getMapRateLimitMinutes = limit =>
+  Math.max(1, Math.ceil(((limit?.retryAt ?? 0) - Date.now()) / MINUTE));
+
 const getMapRateLimitDeadline = value => {
   const now = Date.now();
-  const fallback = { retryAt: now + 10 * 60 * 1000, hasServerDeadline: false };
+  const fallback = { retryAt: now + 10 * MINUTE };
   const text = value?.trim();
   if (!text) return fallback;
   const seconds = Number(text);
@@ -11,30 +16,34 @@ const getMapRateLimitDeadline = value => {
     ? now + seconds * 1000
     : Date.parse(text);
   if (!Number.isFinite(deadline) || seconds < 0) return fallback;
-  return { retryAt: Math.max(now + 1000, deadline), hasServerDeadline: true };
+  return { retryAt: Math.max(now + 1000, deadline) };
 };
 
 // The API's general quota is shared by IP across all geoloc endpoints. Keep
 // this deadline across map mounts and logout. A new session can try the higher
-// authenticated quota. CORS currently hides Retry-After in production, so
-// fall back to the full 10-minute quota window.
+// authenticated quota. Retry-After is exposed through CORS; the full 10-minute
+// quota window is only a fallback for missing or invalid headers.
 let rateLimit = null;
 let episode = 0;
 let announcedEpisode = 0;
-let expiryTimer = null;
+let updateTimer = null;
 const listeners = new Set();
 
-const scheduleExpiry = () => {
-  clearTimeout(expiryTimer);
+// One timer drives both the remaining-minute display and recovery at expiry.
+const notifyMapRateLimit = () => {
+  clearTimeout(updateTimer);
   const remaining = rateLimit.retryAt - Date.now();
-  if (remaining > 0) {
-    // Long server deadlines must not overflow the browser's timer range.
-    expiryTimer = setTimeout(scheduleExpiry, Math.min(remaining, 2147483647));
-    return;
-  }
-  expiryTimer = null;
-  // Retain the episode so the notifier can close its existing snackbar.
-  rateLimit = { ...rateLimit };
+  updateTimer =
+    remaining > 0
+      ? setTimeout(
+          () => {
+            // Keep the episode so dismissal survives ticks and expiry closes it.
+            rateLimit = { ...rateLimit };
+            notifyMapRateLimit();
+          },
+          remaining % MINUTE || MINUTE
+        )
+      : null;
   listeners.forEach(listener => listener());
 };
 
@@ -47,10 +56,8 @@ export const subscribeMapRateLimit = listener => {
 
 const resumeMapAfterLogin = () => {
   if (!rateLimit || rateLimit.retryAt <= Date.now()) return;
-  clearTimeout(expiryTimer);
-  expiryTimer = null;
   rateLimit = { ...rateLimit, retryAt: Date.now() };
-  listeners.forEach(listener => listener());
+  notifyMapRateLimit();
 };
 
 export const recordMapRateLimit = deadline => {
@@ -60,8 +67,7 @@ export const recordMapRateLimit = deadline => {
   if (isActive && rateLimit.retryAt >= deadline.retryAt) return;
   if (!isActive) episode += 1;
   rateLimit = { ...deadline, episode };
-  scheduleExpiry();
-  listeners.forEach(listener => listener());
+  notifyMapRateLimit();
 };
 
 // Installed by the application shell. Session and worker events belong to the
@@ -138,8 +144,8 @@ export const mapFetch = async (url, options) => {
 
 // Test-only reset of the shared deadline.
 export const _resetForTests = () => {
-  clearTimeout(expiryTimer);
-  expiryTimer = null;
+  clearTimeout(updateTimer);
+  updateTimer = null;
   rateLimit = null;
   episode = 0;
   announcedEpisode = 0;
