@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import { Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { withBase } from '@/utils/publicUrl';
 import AppLink from './AppLink';
 import { logoGC } from '../../conf/config';
-import { withBase } from '../../utils/publicUrl';
 
 // `color: inherit` so the wordmark takes the tone of whatever chrome hosts it
 // — white on the brown AppBar, primary.dark in the side menu — instead of
