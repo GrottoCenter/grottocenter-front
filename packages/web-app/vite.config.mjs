@@ -748,7 +748,7 @@ export default defineConfig(({ mode }) => {
               // here.
               urlPattern: ({ url, sameOrigin }) =>
                 sameOrigin &&
-                !url.pathname.includes('/screenshots/') &&
+                !/^\/(?:pr\/\d+\/)?screenshots\//.test(url.pathname) &&
                 /\.(?:jpe?g|gif|webp|avif)$/i.test(url.pathname),
               handler: 'CacheFirst',
               options: {

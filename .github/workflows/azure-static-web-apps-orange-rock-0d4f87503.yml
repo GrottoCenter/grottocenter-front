@@ -100,7 +100,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `Your stage site is ready: https://staging.grottocenter.org/pr/${context.issue.number}`
+              body: `Your stage site is ready: https://staging.grottocenter.org/pr/${context.issue.number}/`
             });
 
   close_pull_request_job:
