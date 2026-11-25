@@ -73,14 +73,17 @@ const layers = [
     id: 'fr_lidar_hillshade',
     name: 'France - MNT LiDAR HD',
     role: LAYER_ROLE.OVERLAY,
-    type: LAYER_TYPE.WMS,
+    // IGN limits WMS raster to 40 requests/s per IP, causing missing tiles (429).
+    // IGN documents its WMTS image service as exempt from this rate limit:
+    // https://cartes.gouv.fr/aide/fr/guides-utilisateur/utiliser-les-services-de-la-geoplateforme/limites-d-usage/
+    type: LAYER_TYPE.WMTS,
     pane: PANES.HILLSHADE,
     defaultOn: false,
     attribution:
       '<a target="_blank" href="https://www.ign.fr/">IGN-F/Geoportail</a>',
-    url: 'https://data.geopf.fr/wms-r/wms',
-    layers: 'IGNF_LIDAR-HD_MNT_ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW',
-    style: 'normal'
+    url: 'https://data.geopf.fr/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM_0_18&FORMAT=image/png&LAYER=IGNF_LIDAR-HD_MNT_ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+    maxNativeZoom: 18,
+    maxZoom: 22
   },
   {
     id: 'usgs_topo',

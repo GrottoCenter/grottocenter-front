@@ -76,6 +76,15 @@ const ERROR_TILE_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
     '</svg>'
 )}`;
 
+// Do not use L.Util.emptyImageUrl: Leaflet treats it as an aborted tile and
+// skips its loading lifecycle. This transparent GIF must load like a real tile.
+const TRANSPARENT_TILE_URL =
+  'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+// Missing overlay data must leave the basemap visible, for both WMS and WMTS.
+const getErrorTileUrl = layer =>
+  layer.role === LAYER_ROLE.OVERLAY ? TRANSPARENT_TILE_URL : ERROR_TILE_URL;
+
 const createWMTSTileLayer = (layer, opacity = 1) => (
   <TileLayer
     pane={layer.pane}
@@ -89,7 +98,7 @@ const createWMTSTileLayer = (layer, opacity = 1) => (
       new L.LatLngBounds(new L.LatLng(-90, -180), new L.LatLng(90, 180))
     }
     opacity={opacity}
-    errorTileUrl={ERROR_TILE_URL}
+    errorTileUrl={getErrorTileUrl(layer)}
     referrerPolicy={layer.referrerPolicy}
   />
 );
@@ -114,7 +123,7 @@ const createWMSTileLayer = (layer, opacity = 1) => {
       transparent={transparent}
       version={version}
       opacity={opacity}
-      errorTileUrl={ERROR_TILE_URL}
+      errorTileUrl={getErrorTileUrl(layer)}
     />
   );
 };
