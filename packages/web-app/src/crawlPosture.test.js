@@ -16,7 +16,9 @@ import { describe, expect, it } from 'vitest';
  *
  * Encodes: the block is a decision, not a default; loosening it must be a
  * visible, reviewed change to this test as well.
- * Covers: robots meta, `User-agent: *` group, and the allow-list of hubs.
+ * Covers: robots / crawler-specific metas, every robots.txt group (each must
+ * keep `Disallow: /`, and a `User-agent: *` group must exist), and the
+ * allow-list of hubs.
  * See https://github.com/GrottoCenter/grottocenter-front/issues/1500
  */
 
