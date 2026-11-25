@@ -31,7 +31,7 @@ update that runtime.
 
 ### Configuration
 
-By default the app uses the production API as backend. To change it, edit the `VITE_API_URL` variable in `packages/web-app/.env`.
+By default the app uses the production API as backend (set in `packages/web-app/.env`). To change it, override `VITE_API_URL` in `packages/web-app/.env.local`.
 
 `VITE_AI_URL` optionally overrides the PDF-analysis service base URL (default:
 `https://ai.grottocenter.org`). The main API must support the `documents` SSO
