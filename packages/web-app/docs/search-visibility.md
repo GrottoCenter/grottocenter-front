@@ -12,7 +12,7 @@ The two files that keep the SPA out of search indexes are:
 
 - `packages/web-app/index.html`: `<meta name="robots" content="noindex, nofollow" />`
 - `packages/web-app/public/robots.txt`: `User-agent: *` / `Disallow: /` (plus the
-  hub `Allow` lines once #1935 lands)
+  hub `Allow` lines once grottocenter-api#1935 lands)
 
 `src/crawlPosture.test.js` fails if either file drifts from this posture
 ([#1500](https://github.com/GrottoCenter/grottocenter-front/issues/1500)).
@@ -98,8 +98,8 @@ sounds reasonable on its own, so the reasoning is recorded here.
   every preview. It stays `Disallow: /` except for the few hub prefixes the
   generated pages are served at, which
   [grottocenter-api#1935](https://github.com/GrottoCenter/grottocenter-api/issues/1935)
-  adds and `src/crawlPosture.test.js` allow-lists exactly. Other clients get the
-  `noindex` shell at those addresses, so don't widen the allow-list to make the
+  adds; `src/crawlPosture.test.js` rejects any `Allow` line outside those hubs.
+  Other clients get the `noindex` shell at those addresses, so don't widen the allow-list to make the
   SPA crawlable.
 
 ### Serving the bot pages live from the Sails API
