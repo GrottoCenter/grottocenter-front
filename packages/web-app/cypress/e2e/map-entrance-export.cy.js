@@ -193,7 +193,10 @@ describe('Export all public entrances in the map bounds', () => {
         'equal',
         FILES[format]
       );
-      cy.get('.leaflet-container').should('have.focus');
+      // Downloads can blur the browser window without changing DOM focus.
+      cy.get('.leaflet-container').should(([map]) => {
+        expect(map.ownerDocument.activeElement).to.equal(map);
+      });
     });
   });
 
@@ -233,11 +236,17 @@ describe('Export all public entrances in the map bounds', () => {
       'Les filtres de taille, de qualité des données et d’intérêt sont ignorés.'
     );
     screenshot('mobile');
-    cy.get('[data-testid="map-export-dialog"]').then(dialog => {
-      const rect = dialog[0].getBoundingClientRect();
-      expect(rect.width).to.equal(360);
-      expect(rect.height).to.equal(720);
-      expect(dialog[0].scrollWidth).to.be.at.most(360);
+    cy.get('[data-testid="map-export-dialog"]').should(([dialog]) => {
+      const win = dialog.ownerDocument.defaultView;
+      const rect = dialog.getBoundingClientRect();
+      // Cypress's browser chrome can reduce the visual viewport below cy.viewport().
+      // StandardDialog follows that viewport, including keyboard-driven resizes.
+      expect(rect.width).to.be.closeTo(360, 1);
+      expect(rect.height).to.be.closeTo(
+        win.visualViewport?.height ?? win.innerHeight,
+        1
+      );
+      expect(dialog.scrollWidth).to.be.at.most(360);
     });
     cy.viewport(740, 360);
     cy.get('[data-testid="map-export-download"]').should('be.visible');

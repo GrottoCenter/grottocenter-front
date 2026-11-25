@@ -13,10 +13,7 @@ const { downloadBlob, enqueueSnackbar } = vi.hoisted(() => ({
   downloadBlob: vi.fn(),
   enqueueSnackbar: vi.fn()
 }));
-vi.mock(
-  '@/components/common/DocumentsList/utils/imageUtils',
-  async importOriginal => ({ ...(await importOriginal()), downloadBlob })
-);
+vi.mock('@/utils/download', () => ({ downloadBlob }));
 vi.mock('notistack', () => ({
   useSnackbar: () => ({ enqueueSnackbar, closeSnackbar: vi.fn() }),
   enqueueSnackbar

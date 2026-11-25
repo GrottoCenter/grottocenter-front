@@ -109,6 +109,69 @@ it.each(['gpx', 'kml', 'geojson'])(
 );
 
 it.each(['gpx', 'kml', 'geojson'])(
+  'accepts entrance links from other API environments in %s',
+  async format => {
+    await Promise.all(
+      [
+        'http://localhost:1337/ui/entrances/1',
+        'https://staging.grottocenter.org/ui/entrances/1/',
+        'https://fr.wikicaves.org/ui/entrances/1?language=fr'
+      ].map(url => {
+        const blob = file(examples[format].replace(link, url));
+        return expect(
+          prepareMapExportBlob([blob], format, bounds)
+        ).resolves.toBe(blob);
+      })
+    );
+  }
+);
+
+it.each([
+  'not a URL',
+  'https://grottocenter.org/ui/caves/1',
+  'https://grottocenter.org/ui/entrances/invalid',
+  'https://grottocenter.org/other/ui/entrances/1'
+])('rejects an invalid entrance link: %s', async url => {
+  await expect(
+    prepareMapExportBlob(
+      [file(examples.geojson.replace(link, url))],
+      'geojson',
+      bounds
+    )
+  ).rejects.toThrow('mapExport.invalidFile');
+});
+
+it.each(['gpx', 'kml', 'geojson'])(
+  'accepts rounding at each %s viewport edge but rejects larger deviations',
+  async format => {
+    const blob = file(examples[format]);
+    await Promise.all(
+      [
+        ['south', 1],
+        ['north', -1],
+        ['west', 1],
+        ['east', -1]
+      ].flatMap(([edge, direction]) => [
+        expect(
+          prepareMapExportBlob(
+            [blob],
+            format,
+            getMapExportBounds({ ...selection, [edge]: direction * 5e-7 })
+          )
+        ).resolves.toBe(blob),
+        expect(
+          prepareMapExportBlob(
+            [blob],
+            format,
+            getMapExportBounds({ ...selection, [edge]: direction * 2e-6 })
+          )
+        ).rejects.toThrow('mapExport.invalidFile')
+      ])
+    );
+  }
+);
+
+it.each(['gpx', 'kml', 'geojson'])(
   'combines both sides of the antimeridian into one %s document',
   async format => {
     const wrapped = getMapExportBounds({ ...selection, west: 170, east: 190 });
@@ -187,13 +250,18 @@ it('rejects missing XML coordinates instead of interpreting them as zero', async
 it('rejects duplicate entrance identifiers across the two antimeridian files', async () => {
   const wrapped = getMapExportBounds({ ...selection, west: 170, east: 190 });
   const data = JSON.parse(examples.geojson);
-  const blobs = [179, -179].map(longitude =>
+  const blobs = [179, -179].map((longitude, index) =>
     file(
       JSON.stringify({
         ...data,
         features: data.features.map(feature => ({
           ...feature,
-          geometry: { type: 'Point', coordinates: [longitude, 0] }
+          geometry: { type: 'Point', coordinates: [longitude, 0] },
+          properties: {
+            ...feature.properties,
+            grottocenterUrl:
+              index === 0 ? link : 'http://localhost:1337/ui/entrances/1/'
+          }
         }))
       })
     )

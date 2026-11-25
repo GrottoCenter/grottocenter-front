@@ -1,5 +1,8 @@
 export const MAX_MAP_EXPORT_ROWS = 10000;
 
+// Export serialization can round coordinates just beyond a viewport edge.
+const MAP_EXPORT_BOUNDS_TOLERANCE = 1e-6;
+
 const mapExportError = code => Object.assign(new Error(code), { code });
 
 // Capture plain values, never the live Leaflet map: GPS follow and compass
@@ -64,9 +67,7 @@ export const makeMapExportSearch = bounds => ({
 const readLinkedId = link => {
   try {
     const url = new URL(link);
-    if (url.protocol !== 'https:' || url.hostname !== 'grottocenter.org')
-      return null;
-    return /^\/ui\/entrances\/(\d+)$/.exec(url.pathname)?.[1] ?? null;
+    return /^\/ui\/entrances\/(\d+)\/?$/.exec(url.pathname)?.[1] ?? null;
   } catch {
     return null;
   }
@@ -148,10 +149,10 @@ const parseMapExportBlob = async (blob, format, bounds) => {
       point.id &&
       hasCoordinates(point) &&
       (point.name == null || typeof point.name === 'string') &&
-      point.latitude >= bounds.sw_lat &&
-      point.latitude <= bounds.ne_lat &&
-      point.longitude >= bounds.sw_lng &&
-      point.longitude <= bounds.ne_lng
+      point.latitude >= bounds.sw_lat - MAP_EXPORT_BOUNDS_TOLERANCE &&
+      point.latitude <= bounds.ne_lat + MAP_EXPORT_BOUNDS_TOLERANCE &&
+      point.longitude >= bounds.sw_lng - MAP_EXPORT_BOUNDS_TOLERANCE &&
+      point.longitude <= bounds.ne_lng + MAP_EXPORT_BOUNDS_TOLERANCE
   );
   if (!isValid) throw mapExportError('mapExport.invalidFile');
   return { document, elements, points };

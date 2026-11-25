@@ -1,5 +1,5 @@
 import { apiPostBlob } from '@/api/client';
-import { downloadBlob } from '@/components/common/DocumentsList/utils/imageUtils';
+import { downloadBlob } from '@/utils/download';
 import { advancedSearchExportUrl } from '../conf/apiRoutes';
 import { VALID_EXPORT_FORMATS } from '../conf/exportFormats';
 

@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import StandardDialog from '@/components/common/StandardDialog';
-import { downloadBlob } from '@/components/common/DocumentsList/utils/imageUtils';
+import { downloadBlob } from '@/utils/download';
 import { useNotification, useOnlineStatus } from '@/hooks';
 import { fetchAdvancedSearchExport } from '@/actions/Advancedsearch';
 import { EXPORT_FORMATS } from '@/conf/exportFormats';
