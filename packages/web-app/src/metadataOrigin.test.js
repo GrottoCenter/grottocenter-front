@@ -11,19 +11,28 @@ const APEX_ORIGIN = 'https://grottocenter.org';
 // Built by concatenation so this file does not trip its own scan below.
 const WWW_HOST = ['www', 'grottocenter', 'org'].join('.');
 
-// Directories that hold installed, generated or scratch files, never source.
-const SKIPPED_DIRECTORIES = new Set([
-  'node_modules',
+// Untracked scratch and generated locations, so the walk sees what CI sees.
+// Generic names are matched at any depth; everything else is anchored to its
+// real location (relative to packages/web-app) so a tracked directory that
+// happens to share a name, such as public/screenshots, is still scanned.
+const SKIPPED_NAMES = new Set(['node_modules', '.vite', '.nyc_output']);
+const SKIPPED_PATHS = new Set([
   'dist',
   'build',
   'coverage',
   'storybook-static',
-  '.local',
-  '.vite',
-  'screenshots',
-  'videos',
-  'downloads'
+  'cypress/downloads',
+  'cypress/screenshots',
+  'cypress/videos',
+  'cypress/fixtures/test-profile.json'
 ]);
+// Git-ignored local files: `.env*`, `*.local` (files or directories such as
+// `.local/`), `*.log` and `.eslintcache`.
+const isLocalFile = name =>
+  name.startsWith('.env') ||
+  name.endsWith('.local') ||
+  name.endsWith('.log') ||
+  name === '.eslintcache';
 
 // Paths (relative to packages/web-app, with `/` separators) allowed to mention
 // the www host, e.g. a doc explaining that www 301s to the apex. Keep it empty
@@ -43,14 +52,20 @@ const isApexUrl = value =>
   typeof value === 'string' &&
   (value === APEX_ORIGIN || value.startsWith(`${APEX_ORIGIN}/`));
 
+const toRelative = file =>
+  path.relative(WEB_APP_ROOT, file).split(path.sep).join('/');
+
+const isSkipped = (name, file) =>
+  SKIPPED_NAMES.has(name) ||
+  isLocalFile(name) ||
+  SKIPPED_PATHS.has(toRelative(file));
+
 const listFiles = directory =>
   readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
-    if (entry.isDirectory()) {
-      return SKIPPED_DIRECTORIES.has(entry.name)
-        ? []
-        : listFiles(path.join(directory, entry.name));
-    }
-    return entry.isFile() ? [path.join(directory, entry.name)] : [];
+    const child = path.join(directory, entry.name);
+    if (isSkipped(entry.name, child)) return [];
+    if (entry.isDirectory()) return listFiles(child);
+    return entry.isFile() ? [child] : [];
   });
 
 // Latin-1 maps every byte to one character, so binary files need no extension
@@ -90,8 +105,11 @@ describe('index.html metadata origin', () => {
  * generated-page helpers). The match is deliberately broader than metadata: any
  * textual mention, case-insensitive, fails, so a legitimate one is listed in
  * ALLOWED_FILES rather than the guard being disabled.
- * Covers: every file under packages/web-app outside SKIPPED_DIRECTORIES
- * (including index.html). Does not cover the rest of the repository.
+ * Covers: every file under packages/web-app outside the skipped scratch and
+ * git-ignored local locations (including index.html). Does not cover the rest
+ * of the repository. Other untracked files are scanned too, so a failure that
+ * only happens on one machine means cleaning that file, not extending
+ * ALLOWED_FILES.
  */
 describe('files under packages/web-app', () => {
   it('should not mention the www host', () => {
@@ -99,7 +117,7 @@ describe('files under packages/web-app', () => {
     expect(files.length).toBeGreaterThan(0);
 
     const offenders = files
-      .map(file => path.relative(WEB_APP_ROOT, file).split(path.sep).join('/'))
+      .map(file => toRelative(file))
       .filter(relative => !ALLOWED_FILES.includes(relative))
       .filter(relative => mentionsWwwHost(path.join(WEB_APP_ROOT, relative)));
 
