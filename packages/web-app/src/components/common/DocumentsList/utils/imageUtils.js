@@ -1,3 +1,4 @@
+import { fetchWithTrace } from '@/api/transport';
 import { downloadBlob } from '@/utils/download';
 
 export { downloadBlob };
@@ -78,7 +79,7 @@ export const decodeFileName = str => {
  */
 export const downloadFile = async (url, fileName) => {
   try {
-    const response = await fetch(url);
+    const response = await fetchWithTrace(url);
     if (!response.ok) throw new Error(response.statusText);
     downloadBlob(await response.blob(), fileName);
   } catch {

@@ -110,6 +110,7 @@ vi.mock('../../common/Maps/MapClusters/constants', async importOriginal => ({
 }));
 
 vi.mock('../../../conf/apiRoutes', () => ({
+  API_URL: window.location.origin,
   getMapEntrancesCoordinatesUrl: '/api/v1/geoloc/entrancesCoordinates',
   getMapEntrancesUrl: '/api/v1/geoloc/entrances'
 }));

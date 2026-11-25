@@ -1,3 +1,4 @@
+import { fetchWithTrace } from '@/api/transport';
 import { loginUrl, forgotPasswordUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 import getRouterBasename from '../utils/getRouterBasename';
@@ -119,7 +120,7 @@ export function postLogin(email, password) {
     let errorMessage = 'An unknown error occurred.';
     let responseStatus = 418;
     try {
-      const response = await fetch(loginUrl, {
+      const response = await fetchWithTrace(loginUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -173,7 +174,7 @@ export function postForgotPassword(email, onSuccess) {
     let errorMessage = 'An unknown error occurred.';
     let responseStatus = 418;
     try {
-      const response = await fetch(forgotPasswordUrl, {
+      const response = await fetchWithTrace(forgotPasswordUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })

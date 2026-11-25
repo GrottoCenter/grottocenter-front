@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import GCReducer from './reducers/GCReducer';
+import sessionTraceMiddleware from './api/sessionTraceMiddleware';
 import { SET_FILE } from './actions/Observations/importWizardTypes';
 
 // The store lives here rather than inside ApplicationShell so that code running
@@ -28,7 +29,7 @@ const store = configureStore({
         ignoredPaths: ['map', 'importWizard.file'],
         ignoredActions: [SET_FILE]
       }
-    })
+    }).concat(sessionTraceMiddleware)
 });
 
 export default store;

@@ -1,3 +1,4 @@
+import { fetchWithTrace } from '@/api/transport';
 import { getMapEntrancesUrl } from '../conf/apiRoutes';
 import { checkAndGetStatus, makeUrl } from './utils';
 
@@ -13,6 +14,6 @@ import { checkAndGetStatus, makeUrl } from './utils';
  * @returns {Promise<Array>} Array of entrances ({ id, name, latitude, longitude, ... }).
  */
 export const fetchNearbyEntrances = bounds =>
-  fetch(makeUrl(getMapEntrancesUrl, bounds))
+  fetchWithTrace(makeUrl(getMapEntrancesUrl, bounds))
     .then(checkAndGetStatus)
     .then(response => response.json());

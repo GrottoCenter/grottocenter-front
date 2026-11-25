@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchWithTrace } from '@/api/transport';
 
 import {
   loginUrl,
@@ -19,13 +20,13 @@ import {
 // authoritative for session state (JWT, dialog visibility), so the mutations
 // dispatch into Redux on success. This keeps the login flow single-sourced.
 
-// Small helper: raw fetch with an ad-hoc bearer (enrollment token during
+// Small helper: traced fetch with an ad-hoc bearer (enrollment token during
 // enroll/verify, or nothing for the mfaLogin retry). Bypasses api/client
 // on purpose — the auth header for these calls is not always the
 // standard `login.authorizationHeader` (enrollment token isn't stored in
 // authorizationHeader).
 const rawFetchJson = async (url, { method = 'POST', headers, body } = {}) => {
-  const response = await fetch(url, {
+  const response = await fetchWithTrace(url, {
     method,
     headers,
     body: body != null ? JSON.stringify(body) : undefined

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Typography, Skeleton, Box, Chip } from '@mui/material';
 import PropTypes from 'prop-types';
+import { fetchWithTrace } from '@/api/transport';
 import { regionsSearchUrl } from '../../../conf/apiRoutes';
 import SearchInput from '../../common/SearchInput';
 import AppLink from '../../common/AppLink';
@@ -31,7 +32,7 @@ import AppLink from '../../common/AppLink';
 const MAX_REGIONS_FETCH_LIMIT = 500; // ISO 3166-2 max is ~217 (UK); bounded by design
 
 const fetchAllRegions = async countryId => {
-  const response = await fetch(
+  const response = await fetchWithTrace(
     `${regionsSearchUrl}?query=${countryId}-&offset=0&limit=${MAX_REGIONS_FETCH_LIMIT}`,
     { method: 'POST' }
   );
