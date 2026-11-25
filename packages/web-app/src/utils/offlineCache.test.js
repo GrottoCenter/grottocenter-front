@@ -107,6 +107,10 @@ describe('rememberOfflineBaseline', () => {
 });
 
 describe('cache ownership', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('production only owns unsuffixed caches', () => {
     expect(isOwnedCache('api-get', '')).toBe(true);
     expect(isOwnedCache('api-get-pr-7', '')).toBe(false);
@@ -127,12 +131,11 @@ describe('cache ownership', () => {
       'api-get'
     ];
     const del = vi.fn().mockResolvedValue(true);
-    globalThis.caches = { keys: async () => names, delete: del };
+    vi.stubGlobal('caches', { keys: async () => names, delete: del });
     await clearOfflineData('-pr-7');
     expect(del.mock.calls.map(c => c[0])).toEqual(['api-get-pr-7']);
     await clearOfflineData('');
     expect(del.mock.calls.map(c => c[0])).toContain('api-get');
     expect(del.mock.calls.map(c => c[0])).not.toContain('api-get-pr-8');
-    delete globalThis.caches;
   });
 });
