@@ -1,5 +1,6 @@
 import { useIntl } from 'react-intl';
 import PWAPrompt from 'react-ios-pwa-prompt';
+import { withBase } from '@/utils/publicUrl';
 
 // iOS-only counterpart to the Play Store banner: Safari has no
 // beforeinstallprompt event, so the only way to install the PWA is via
@@ -15,7 +16,7 @@ const IosInstallPrompt = () => {
 
   return (
     <PWAPrompt
-      appIconPath="/apple-touch-icon.png"
+      appIconPath={withBase('/apple-touch-icon.png')}
       copyTitle={formatMessage({ id: 'Add Grottocenter to your Home Screen' })}
       copyDescription={formatMessage({
         id: 'Install Grottocenter to browse caves offline and in fullscreen, right in the field.'

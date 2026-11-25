@@ -4,6 +4,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
 import AliceCarousel from 'react-alice-carousel';
 import 'react-alice-carousel/lib/alice-carousel.css';
+import { withBase } from '@/utils/publicUrl';
 import AppLink from '../../components/common/AppLink';
 
 const PartnerVignette = styled(AppLink)(({ theme }) => ({
@@ -76,7 +77,7 @@ const PartnersCarousel = ({ fetch, partners, isFetching }) => {
     ? partners.map(({ id, pictureFileName, name }) => (
         <PartnerItem
           key={`partcs-${id}`}
-          imagePath={`/images/partners/${pictureFileName}`}
+          imagePath={withBase(`/images/partners/${pictureFileName}`)}
           name={name}
           to={`/ui/organizations/${id}`}
         />

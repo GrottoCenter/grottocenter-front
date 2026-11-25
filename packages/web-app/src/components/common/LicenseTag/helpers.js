@@ -5,6 +5,7 @@ import ccByNd from '@/assets/icons/cc/cc-by-nd.svg';
 import ccByNcSa from '@/assets/icons/cc/cc-by-nc-sa.svg';
 import ccByNcNd from '@/assets/icons/cc/cc-by-nc-nd.svg';
 import ccZero from '@/assets/icons/cc/cc-zero.svg';
+import { withBase } from '@/utils/publicUrl';
 
 // Official Creative Commons composite badges (Wikimedia Commons), keyed by the
 // dash-joined clause list. Every CC combination the API can return has a badge,
@@ -47,8 +48,8 @@ export const NON_CC_DESCRIPTIONS = {
 // `public/` assets and stay as plain URLs (no import) so the map remains a
 // pure data structure the tests can assert against without bundling assets.
 export const NON_CC_BADGES = {
-  ODBL: '/images/odbl.png',
-  'Licence Ouverte': '/images/licence-ouverte.svg'
+  ODBL: withBase('/images/odbl.png'),
+  'Licence Ouverte': withBase('/images/licence-ouverte.svg')
 };
 
 // Returns the ordered list of CC clause tokens for a license name, or null when

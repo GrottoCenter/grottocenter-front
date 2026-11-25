@@ -241,7 +241,7 @@
       // real (empty) translation file. It would mark the locale loaded forever,
       // so the retry on reconnect could never fire.
       intlBootstrap.initialFetchP = fetch(
-        `/lang/${intlBootstrap.initialLocale}.json`
+        `%BASE_URL%lang/${intlBootstrap.initialLocale}.json`
       )
         .then(r => r.json())
         .catch(() => null);

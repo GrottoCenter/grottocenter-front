@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import { Box, Button, Tooltip } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/GetApp';
 import { useIntl } from 'react-intl';
+import { withBase } from '@/utils/publicUrl';
 import AppLink from '../../common/AppLink';
 import { ENTRANCE, DOCUMENT } from './constants';
 
@@ -86,7 +87,7 @@ const ImportKarstlinkInfo = ({ selectType }) => {
         <Tooltip title={findOutLabel}>
           <KarstlinkLogoLink href={KARSTLINK_URL} aria-label={findOutLabel}>
             <KarstlinkLogo
-              src="/images/importCsv/karstlinkLogo.svg"
+              src={withBase('/images/importCsv/karstlinkLogo.svg')}
               alt="KarstLink"
             />
           </KarstlinkLogoLink>

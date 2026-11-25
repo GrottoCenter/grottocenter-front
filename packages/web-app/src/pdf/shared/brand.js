@@ -17,6 +17,7 @@ import category from '@/assets/icons/category.svg?raw';
 import country from '@/assets/icons/country.svg?raw';
 import organization from '@/assets/icons/organization.svg?raw';
 import divingCave from '@/assets/icons/diving-cave.svg?raw';
+import { withBase } from '@/utils/publicUrl';
 
 const sources = {
   country,
@@ -115,7 +116,7 @@ export const getPdfBrand = async (signal, palette) => {
     Object.entries(sources).map(([key, source]) => [key, parseBrandSvg(source)])
   );
   if (!logo) {
-    const response = await fetch('/logo.svg', { signal });
+    const response = await fetch(withBase('/logo.svg'), { signal });
     if (!response.ok) throw new Error(`Brand logo: HTTP ${response.status}`);
     logo = parseBrandSvg(await response.text());
   }

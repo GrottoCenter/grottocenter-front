@@ -19,6 +19,7 @@ import {
   durationStringToMinutes,
   formatDurationMinutes
 } from '@/utils/dateTimeDuration';
+import { withBase } from '@/utils/publicUrl';
 import CustomIcon from '../CustomIcon';
 import AppLink from '../AppLink';
 import { depthIcon, lengthIcon } from '../../../assets/icons';
@@ -107,7 +108,7 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
   return (
     <BgCard>
       <CardMedia
-        image={imageSrc || '/images/caves/gours.jpg'}
+        image={imageSrc || withBase('/images/caves/gours.jpg')}
         sx={{ position: 'absolute', inset: 0, height: '100%' }}
       />
       <Overlay />

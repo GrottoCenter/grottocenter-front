@@ -74,6 +74,9 @@ jobs:
         env:
           VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
           VITE_APP_VERSION: ${{ steps.version.outputs.value }}
+          # A preview lives under /pr/<number>/ on the shared staging origin.
+          # Empty for the production push, which keeps serving from /.
+          VITE_PREVIEW_PR: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || '' }}
       - name: Deploy built app
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1

@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 
+import { withBase } from '@/utils/publicUrl';
 import AppLink from '../common/AppLink';
 import InternationalizedLink from '../common/InternationalizedLink';
 import { wikiApiLinks, contactLinks } from '../../conf/externalLinks';
@@ -39,7 +40,7 @@ const Api = () => {
           <Grid size={{ xs: 12, md: 6 }} style={{ maxWidth: '400px' }}>
             <img
               style={{ width: '100%' }}
-              src="/images/network.png"
+              src={withBase('/images/network.png')}
               alt="internet network"
             />
           </Grid>

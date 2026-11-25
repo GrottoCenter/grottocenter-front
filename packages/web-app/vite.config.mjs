@@ -10,6 +10,7 @@ import serviceWorkerBuildGuard from './vite/serviceWorkerBuildGuard.mjs';
 import { mapDetailCacheKey } from './vite/mapDetailCacheKey.mjs';
 import { osmTileCachePlugin } from './vite/osmTileCachePlugin.mjs';
 import { mapRateLimitPlugin } from './vite/mapRateLimitPlugin.mjs';
+import { resolveCacheSuffix, resolvePreviewBase } from './vite/previewBase.mjs';
 
 const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -19,6 +20,15 @@ export default defineConfig(({ mode }) => {
   // matches whichever backend this build targets (prod, staging, local).
   const env = loadEnv(mode, process.cwd(), '');
   const shouldAnalyze = env.ANALYZE === 'true';
+  // `/` for production and local builds, `/pr/<number>/` for a PR preview. It
+  // prefixes every resource URL, the service worker scope and its cache names,
+  // so previews sharing the staging origin never answer for one another.
+  const base = resolvePreviewBase(env.VITE_PREVIEW_PR);
+  const cacheSuffix = resolveCacheSuffix(base);
+  // Same constraint as apiPattern below: the callbacks are serialised into the
+  // service worker, so the prefix has to travel inside a RegExp, not a closure.
+  const sameOriginPath = path =>
+    new RegExp(`^https?://[^/]+${escapeRegex(base)}${path}`);
   const apiOrigin = env.VITE_API_URL
     ? new NodeURL(env.VITE_API_URL).origin
     : null;
@@ -93,6 +103,7 @@ export default defineConfig(({ mode }) => {
     : null;
 
   return {
+    base,
     plugins: [
       // PDF components render in a worker, where the DOM-based refresh runtime cannot run.
       react({ exclude: [/node_modules/, /[\\/]src[\\/]pdf[\\/]/] }),
@@ -145,15 +156,15 @@ export default defineConfig(({ mode }) => {
           'shortcut-entrances.png'
         ],
         manifest: {
-          id: '/',
+          id: base,
           short_name: 'Grottocenter',
           name: 'Grottocenter',
           description: 'Share, understand and protect the underground world.',
           lang: 'en',
           dir: 'ltr',
           categories: ['education', 'navigation', 'travel'],
-          scope: '/',
-          start_url: '/',
+          scope: base,
+          start_url: base,
           display: 'standalone',
           theme_color: '#5d4037',
           background_color: '#5d4037',
@@ -174,7 +185,7 @@ export default defineConfig(({ mode }) => {
               name: 'Map',
               short_name: 'Map',
               description: 'Explore caves and entrances on the map',
-              url: '/ui/map',
+              url: `${base}ui/map`,
               icons: [
                 { src: 'shortcut-map.png', type: 'image/png', sizes: '96x96' }
               ]
@@ -183,7 +194,7 @@ export default defineConfig(({ mode }) => {
               name: 'Search entrances',
               short_name: 'Entrances',
               description: 'Search cave entrances',
-              url: '/ui/entrances',
+              url: `${base}ui/entrances`,
               icons: [
                 {
                   src: 'shortcut-entrances.png',
@@ -315,6 +326,9 @@ export default defineConfig(({ mode }) => {
           ]
         },
         workbox: {
+          // Prefixes the precache name for a preview only (empty in production,
+          // keeping `workbox-precache-v2-…`), so clearing one never touches another.
+          ...(cacheSuffix ? { cacheId: cacheSuffix.slice(1) } : {}),
           // Precache lang/*.json too — otherwise the initial locale fetch in
           // index.html fails offline and blocks the loader from clearing.
           globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,json}'],
@@ -342,17 +356,17 @@ export default defineConfig(({ mode }) => {
           // Take control of the page on the very first load so offline works
           // from the first visit (matches the previous CRA SW's clientsClaim()).
           clientsClaim: true,
-          navigateFallback: '/index.html',
+          navigateFallback: `${base}index.html`,
           // Keep in step with navigationFallback.exclude in
           // public/staticwebapp.config.json: the edge Worker serves these, and
           // the service worker must not answer them with the app shell.
           navigateFallbackDenylist: [
-            /^\/api/,
-            /^\/\.well-known/,
+            new RegExp(`^${escapeRegex(base)}api`),
+            new RegExp(`^${escapeRegex(base)}\\.well-known`),
             // Workbox tests pathname + search, so allow a query string.
-            /^\/robots\.txt(?:\?|$)/,
-            /^\/sitemap\.xml(?:\?|$)/,
-            /^\/sitemaps\//
+            new RegExp(`^${escapeRegex(base)}robots\\.txt(?:\\?|$)`),
+            new RegExp(`^${escapeRegex(base)}sitemap\\.xml(?:\\?|$)`),
+            new RegExp(`^${escapeRegex(base)}sitemaps/`)
           ],
           cleanupOutdatedCaches: true,
           runtimeCaching: [
@@ -365,7 +379,7 @@ export default defineConfig(({ mode }) => {
                 ),
               handler: 'CacheFirst',
               options: {
-                cacheName: 'pdf-export-runtime',
+                cacheName: `pdf-export-runtime${cacheSuffix}`,
                 expiration: { maxEntries: 12, purgeOnQuotaError: true },
                 cacheableResponse: { statuses: [200] }
               }
@@ -379,7 +393,7 @@ export default defineConfig(({ mode }) => {
                 /\/assets\/modelViewer-[^/]+\.js$/.test(url.pathname),
               handler: 'CacheFirst',
               options: {
-                cacheName: 'model-viewer-runtime',
+                cacheName: `model-viewer-runtime${cacheSuffix}`,
                 expiration: { maxEntries: 2, purgeOnQuotaError: true },
                 cacheableResponse: { statuses: [200] }
               }
@@ -393,7 +407,7 @@ export default defineConfig(({ mode }) => {
                 url.hostname === 'tile.openstreetmap.org',
               handler: 'CacheFirst',
               options: {
-                cacheName: 'osm-tiles',
+                cacheName: `osm-tiles${cacheSuffix}`,
                 expiration: {
                   maxEntries: 500,
                   maxAgeSeconds: 60 * 60 * 24 * 30
@@ -410,7 +424,7 @@ export default defineConfig(({ mode }) => {
               urlPattern: ({ url }) => /tile\.opentopomap\.org/.test(url.href),
               handler: 'CacheFirst',
               options: {
-                cacheName: 'opentopomap-tiles',
+                cacheName: `opentopomap-tiles${cacheSuffix}`,
                 expiration: {
                   maxEntries: 500,
                   maxAgeSeconds: 60 * 60 * 24 * 90
@@ -455,7 +469,7 @@ export default defineConfig(({ mode }) => {
               urlPattern: ({ url }) => url.hostname === 'flagcdn.com',
               handler: 'CacheFirst',
               options: {
-                cacheName: 'country-flags',
+                cacheName: `country-flags${cacheSuffix}`,
                 expiration: {
                   maxEntries: 500,
                   maxAgeSeconds: 60 * 60 * 24 * 180,
@@ -471,18 +485,17 @@ export default defineConfig(({ mode }) => {
                 url.origin === 'https://fonts.gstatic.com',
               handler: 'StaleWhileRevalidate',
               options: {
-                cacheName: 'google-fonts',
+                cacheName: `google-fonts${cacheSuffix}`,
                 expiration: { maxEntries: 20 }
               }
             },
             {
               // /lang/*.json — also covered by precache, but the runtime rule
               // lets new translations reach the app without a SW rebuild.
-              urlPattern: ({ url, sameOrigin }) =>
-                sameOrigin && /^\/lang\/[^/]+\.json$/.test(url.pathname),
+              urlPattern: sameOriginPath('lang/[^/]+\\.json$'),
               handler: 'StaleWhileRevalidate',
               options: {
-                cacheName: 'lang',
+                cacheName: `lang${cacheSuffix}`,
                 expiration: { maxEntries: 30 }
               }
             },
@@ -505,7 +518,7 @@ export default defineConfig(({ mode }) => {
                     urlPattern: bulkDailyCoordsPattern,
                     handler: 'StaleWhileRevalidate',
                     options: {
-                      cacheName: 'api-map-coords-daily',
+                      cacheName: `api-map-coords-daily${cacheSuffix}`,
                       plugins: [mapRateLimitPlugin],
                       expiration: {
                         maxEntries: 40,
@@ -527,7 +540,7 @@ export default defineConfig(({ mode }) => {
                     urlPattern: orgsBulkPattern,
                     handler: 'NetworkFirst',
                     options: {
-                      cacheName: 'api-map-orgs-bulk',
+                      cacheName: `api-map-orgs-bulk${cacheSuffix}`,
                       plugins: [mapRateLimitPlugin],
                       networkTimeoutSeconds: 3,
                       expiration: {
@@ -563,7 +576,7 @@ export default defineConfig(({ mode }) => {
                     urlPattern: mapTilePattern,
                     handler: 'StaleWhileRevalidate',
                     options: {
-                      cacheName: 'api-map-tiles',
+                      cacheName: `api-map-tiles${cacheSuffix}`,
                       expiration: {
                         maxEntries: 300,
                         maxAgeSeconds: 60 * 60 * 24 * 7,
@@ -608,7 +621,7 @@ export default defineConfig(({ mode }) => {
                     urlPattern: apiPattern,
                     handler: 'NetworkFirst',
                     options: {
-                      cacheName: 'api-get',
+                      cacheName: `api-get${cacheSuffix}`,
                       networkTimeoutSeconds: 5,
                       expiration: {
                         maxEntries: 200,
@@ -677,7 +690,7 @@ export default defineConfig(({ mode }) => {
               urlPattern: ({ url }) => url.hostname === 'flagcdn.com',
               handler: 'CacheFirst',
               options: {
-                cacheName: 'country-flags',
+                cacheName: `country-flags${cacheSuffix}`,
                 expiration: { maxEntries: 500, purgeOnQuotaError: true },
                 cacheableResponse: { statuses: [0, 200] }
               }
@@ -693,7 +706,7 @@ export default defineConfig(({ mode }) => {
                 url.pathname.includes('/thumbnails/'),
               handler: 'CacheFirst',
               options: {
-                cacheName: 'blob-thumbnails',
+                cacheName: `blob-thumbnails${cacheSuffix}`,
                 expiration: {
                   maxEntries: 400,
                   purgeOnQuotaError: true
@@ -711,7 +724,7 @@ export default defineConfig(({ mode }) => {
                 /\.blob\.core\.windows\.net$/.test(url.hostname),
               handler: 'CacheFirst',
               options: {
-                cacheName: 'blob-images-full',
+                cacheName: `blob-images-full${cacheSuffix}`,
                 expiration: {
                   maxEntries: 50,
                   purgeOnQuotaError: true
@@ -735,11 +748,11 @@ export default defineConfig(({ mode }) => {
               // here.
               urlPattern: ({ url, sameOrigin }) =>
                 sameOrigin &&
-                !url.pathname.startsWith('/screenshots/') &&
+                !url.pathname.includes('/screenshots/') &&
                 /\.(?:jpe?g|gif|webp|avif)$/i.test(url.pathname),
               handler: 'CacheFirst',
               options: {
-                cacheName: 'static-images',
+                cacheName: `static-images${cacheSuffix}`,
                 expiration: {
                   maxEntries: 60,
                   maxAgeSeconds: 60 * 60 * 24 * 30,
