@@ -1,6 +1,7 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { keyframes, styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
+import { withBase } from '@/utils/publicUrl';
 import GCLogo from '../../components/common/GCLogo';
 import AppLink from '../../components/common/AppLink';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
@@ -232,7 +233,9 @@ const Footer = () => {
                   links={facebookLink}
                   title={formatMessage({ id: 'Follow us on Facebook' })}>
                   <SocialImg
-                    src="/images/icons8/icons8-facebook-filled-100.png"
+                    src={withBase(
+                      '/images/icons8/icons8-facebook-filled-100.png'
+                    )}
                     alt={formatMessage({ id: 'Follow us on Facebook' })}
                   />
                 </InternationalizedLink>
@@ -242,7 +245,9 @@ const Footer = () => {
                   links={bloggerLinks}
                   title={formatMessage({ id: 'Grottocenter blog' })}>
                   <SocialImg
-                    src="/images/icons8/icons8-blogger-filled-100.png"
+                    src={withBase(
+                      '/images/icons8/icons8-blogger-filled-100.png'
+                    )}
                     alt={formatMessage({ id: 'Grottocenter blog' })}
                   />
                 </InternationalizedLink>
@@ -261,7 +266,9 @@ const Footer = () => {
                   links={githubLink}
                   title={formatMessage({ id: 'Grottocenter3 on GitHub' })}>
                   <SocialImg
-                    src="/images/icons8/icons8-github-filled-100.png"
+                    src={withBase(
+                      '/images/icons8/icons8-github-filled-100.png'
+                    )}
                     alt={formatMessage({ id: 'Grottocenter3 on GitHub' })}
                   />
                 </InternationalizedLink>
@@ -271,7 +278,9 @@ const Footer = () => {
                   to="/ui/api"
                   title={formatMessage({ id: 'Want to use our API?' })}>
                   <ApiImg
-                    src="/images/icons8/icons8-rest-api-filled-100.png"
+                    src={withBase(
+                      '/images/icons8/icons8-rest-api-filled-100.png'
+                    )}
                     alt={formatMessage({ id: 'Want to use our API?' })}
                   />
                 </AppLink>
@@ -281,7 +290,7 @@ const Footer = () => {
                   links={oaiLinks}
                   title={formatMessage({ id: 'OAI-PMH Server' })}>
                   <SocialImg
-                    src="/images/icons8/icons8-oai-filled-100.png"
+                    src={withBase('/images/icons8/icons8-oai-filled-100.png')}
                     alt={formatMessage({ id: 'OAI-PMH Server' })}
                   />
                 </InternationalizedLink>
@@ -291,7 +300,7 @@ const Footer = () => {
                   links={z3950Links}
                   title={formatMessage({ id: 'Z39.50 Server' })}>
                   <SocialImg
-                    src="/images/icons8/icons8-z3950-filled-100.png"
+                    src={withBase('/images/icons8/icons8-z3950-filled-100.png')}
                     alt={formatMessage({ id: 'Z39.50 Server' })}
                   />
                 </InternationalizedLink>
@@ -301,7 +310,9 @@ const Footer = () => {
                   links={uptimeLinks}
                   title={formatMessage({ id: 'Uptime status page' })}>
                   <SocialImg
-                    src="/images/icons8/icons8-uptime-filled-100.png"
+                    src={withBase(
+                      '/images/icons8/icons8-uptime-filled-100.png'
+                    )}
                     alt={formatMessage({ id: 'Uptime status page' })}
                   />
                 </InternationalizedLink>
@@ -314,7 +325,7 @@ const Footer = () => {
                   title={formatMessage({ id: 'Statistics' })}
                   aria-label={formatMessage({ id: 'Statistics' })}>
                   <SocialImg
-                    src="/images/icons8/statistics.svg"
+                    src={withBase('/images/icons8/statistics.svg')}
                     alt={formatMessage({ id: 'Statistics' })}
                   />
                 </PlainButton>

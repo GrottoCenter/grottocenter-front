@@ -1,4 +1,5 @@
 import isEmail from 'validator/lib/isEmail';
+import { withBase } from '@/utils/publicUrl';
 
 export const AVAILABLE_LANGUAGES = {
   ar: {
@@ -105,7 +106,7 @@ export const defaultCoord = { lat: 0, lng: 0 };
 export const defaultZoom = 2;
 export const focusZoom = 13;
 export const sideMenuWidth = '215px';
-export const logoGC = '/images/logo.svg';
+export const logoGC = withBase('/images/logo.svg');
 
 export const authTokenName = 'grottocenter_token';
 

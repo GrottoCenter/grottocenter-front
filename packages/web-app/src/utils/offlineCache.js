@@ -1,18 +1,27 @@
+import { getCacheSuffix } from './publicUrl';
+
+// Precache names contain `precache`: `workbox-precache-v2-…` for production,
+// `pr-<n>-precache-v2-…` for a preview (workbox `cacheId`, see vite.config.mjs).
+const isPrecache = name => /(^|-)precache(-|$)/.test(name);
+
+// Previews share one origin, so a build may only touch the caches it owns.
+// Preview runtime caches end with `-pr-<n>`; production names carry no suffix.
+export const isOwnedCache = (name, suffix = getCacheSuffix()) =>
+  suffix ? name.endsWith(suffix) : !/-pr-\d+$/.test(name);
+
 /**
- * Delete every runtime cache maintained by the service worker while keeping
- * the precache (app shell) intact — otherwise the app itself would stop
- * working offline. Precache entries live in caches whose name starts with
- * `workbox-precache`; everything else is a runtime cache defined by our
- * `runtimeCaching` rules (osm-tiles, api-get, blob-images, …). Enumerating
- * caches instead of hardcoding names means new runtime caches are covered
- * automatically as they're added to vite.config.mjs.
+ * Delete every runtime cache maintained by this build's service worker while
+ * keeping the precache (app shell) intact — otherwise the app itself would stop
+ * working offline. Enumerating caches instead of hardcoding names means new
+ * runtime caches are covered automatically as they're added to
+ * vite.config.mjs. Caches of other previews on the same origin are left alone.
  */
-export async function clearOfflineData() {
+export async function clearOfflineData(suffix = getCacheSuffix()) {
   if (typeof caches === 'undefined') return;
   const names = await caches.keys();
   await Promise.all(
     names
-      .filter(name => !name.startsWith('workbox-precache'))
+      .filter(name => !isPrecache(name) && isOwnedCache(name, suffix))
       .map(name => caches.delete(name))
   );
 }

@@ -13,9 +13,10 @@ import SyncProblemOutlined from '@mui/icons-material/SyncProblemOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { styled } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
+import { withBase } from '@/utils/publicUrl';
 import AppLink from '../AppLink';
 
-const DEFAULT_NEWS_IMAGE = '/images/homepage/news.jpg';
+const DEFAULT_NEWS_IMAGE = withBase('/images/homepage/news.jpg');
 
 const layoutSx = {
   display: 'flex',

@@ -1,4 +1,9 @@
-import { getOfflineDataUsage, rememberOfflineBaseline } from './offlineCache';
+import {
+  clearOfflineData,
+  getOfflineDataUsage,
+  isOwnedCache,
+  rememberOfflineBaseline
+} from './offlineCache';
 
 const BASELINE_KEY = 'offlineStorageBaseline';
 
@@ -98,5 +103,36 @@ describe('rememberOfflineBaseline', () => {
     });
     await rememberOfflineBaseline(2, 0);
     expect(localStorage.getItem(BASELINE_KEY)).toBeNull();
+  });
+});
+
+describe('cache ownership', () => {
+  it('production only owns unsuffixed caches', () => {
+    expect(isOwnedCache('api-get', '')).toBe(true);
+    expect(isOwnedCache('api-get-pr-7', '')).toBe(false);
+  });
+
+  it('a preview only owns its own caches', () => {
+    expect(isOwnedCache('api-get-pr-7', '-pr-7')).toBe(true);
+    expect(isOwnedCache('api-get-pr-8', '-pr-7')).toBe(false);
+    expect(isOwnedCache('api-get', '-pr-7')).toBe(false);
+  });
+
+  it('clearOfflineData spares precaches and other previews', async () => {
+    const names = [
+      'workbox-precache-v2-x',
+      'pr-7-precache-v2-x',
+      'api-get-pr-7',
+      'api-get-pr-8',
+      'api-get'
+    ];
+    const del = vi.fn().mockResolvedValue(true);
+    globalThis.caches = { keys: async () => names, delete: del };
+    await clearOfflineData('-pr-7');
+    expect(del.mock.calls.map(c => c[0])).toEqual(['api-get-pr-7']);
+    await clearOfflineData('');
+    expect(del.mock.calls.map(c => c[0])).toContain('api-get');
+    expect(del.mock.calls.map(c => c[0])).not.toContain('api-get-pr-8');
+    delete globalThis.caches;
   });
 });

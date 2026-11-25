@@ -1,3 +1,4 @@
+import { withBase } from '@/utils/publicUrl';
 import { checkAndGetStatus } from './utils';
 
 export const CHANGE_LOCALE = 'CHANGE_LOCALE';
@@ -40,7 +41,7 @@ export const changeLocale = locale => (dispatch, getState) => {
   }
 
   dispatch(changeLocaleAction());
-  return fetch(`/lang/${locale}.json`)
+  return fetch(withBase(`/lang/${locale}.json`))
     .then(checkAndGetStatus)
     .then(response => response.json())
     .then(data => dispatch(changeLocaleLoadSuccess(locale, data)))

@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import MapIcon from '@mui/icons-material/Map';
 import SearchIcon from '@mui/icons-material/Search';
 import { useIntl } from 'react-intl';
+import { withBase } from '@/utils/publicUrl';
 import { fseLinks, uisLinks } from '../../conf/externalLinks';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import GCLogo from '../../components/common/GCLogo';
@@ -10,7 +11,7 @@ import AttractiveButton from './AttractiveButton';
 
 const HeaderRoot = styled(Box)({
   width: '100%',
-  background: "url('/images/caves/topo.jpg') center top no-repeat",
+  background: `url('${withBase('/images/caves/topo.jpg')}') center top no-repeat`,
   backgroundSize: '220%',
   '@media (min-width: 550px)': { backgroundSize: '130%' },
   '@media (min-width: 1000px)': { backgroundSize: '100%' }
@@ -127,10 +128,10 @@ const Header = () => {
 
         <SupporterRow>
           <InternationalizedLink links={fseLinks}>
-            <SupporterLogo src="/images/FSE.svg" alt="Logo FSE" />
+            <SupporterLogo src={withBase('/images/FSE.svg')} alt="Logo FSE" />
           </InternationalizedLink>
           <InternationalizedLink links={uisLinks}>
-            <SupporterLogo src="/images/UIS.svg" alt="Logo UIS" />
+            <SupporterLogo src={withBase('/images/UIS.svg')} alt="Logo UIS" />
           </InternationalizedLink>
           <span>
             {formatMessage({
