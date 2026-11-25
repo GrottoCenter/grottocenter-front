@@ -135,3 +135,17 @@ it('preserves network and cancellation errors', async () => {
     fetchWithTrace('https://api.example.org/api/v1/account')
   ).rejects.toBe(error);
 });
+
+it('rejects malformed URLs through the promise instead of throwing synchronously', async () => {
+  const request = fetchWithTrace('https://[');
+  await expect(request).rejects.toMatchObject({ name: 'TypeError' });
+  expect(fetch).not.toHaveBeenCalled();
+});
+
+it('rejects invalid headers through the promise instead of throwing synchronously', async () => {
+  const request = fetchWithTrace('https://api.example.org/api/v1/account', {
+    headers: { 'invalid header': 'value' }
+  });
+  await expect(request).rejects.toMatchObject({ name: 'TypeError' });
+  expect(fetch).not.toHaveBeenCalled();
+});

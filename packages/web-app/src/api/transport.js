@@ -4,7 +4,7 @@ import { getSessionTraceId } from './sessionTraceId';
 // Transport only: callers retain their own authentication, parsing and errors.
 // Dynamic file URLs can point outside the API, so compare normalized origins
 // rather than trusting callers or matching hostname prefixes.
-export const fetchWithTrace = (input, options) => {
+export const fetchWithTrace = async (input, options) => {
   const url = input instanceof Request ? input.url : input;
   if (
     !API_URL ||

@@ -188,19 +188,30 @@ describe('session tracing on all client helpers', () => {
   });
 
   it.each([
-    ['GET', apiGet],
-    ['paginated GET', apiGetWithRange],
-    ['POST', url => apiPost(url, { value: 1 })],
-    ['POST with headers', url => apiPostWithHeaders(url, { value: 1 })],
-    ['PUT', url => apiPut(url, { value: 1 })],
-    ['PATCH', url => apiPatch(url, { value: 1 })],
-    ['DELETE', apiDelete],
-    ['multipart POST', url => apiPostForm(url, new FormData())],
-    ['multipart PUT', url => apiPutForm(url, new FormData())],
-    ['raw', apiFetch]
+    { name: 'GET', request: apiGet },
+    { name: 'paginated GET', request: apiGetWithRange },
+    { name: 'POST', request: url => apiPost(url, { value: 1 }) },
+    {
+      name: 'POST with headers',
+      request: url => apiPostWithHeaders(url, { value: 1 })
+    },
+    { name: 'PUT', request: url => apiPut(url, { value: 1 }) },
+    { name: 'PATCH', request: url => apiPatch(url, { value: 1 }) },
+    { name: 'DELETE', request: apiDelete },
+    {
+      name: 'multipart POST',
+      request: url => apiPostForm(url, new FormData()),
+      isMultipart: true
+    },
+    {
+      name: 'multipart PUT',
+      request: url => apiPutForm(url, new FormData()),
+      isMultipart: true
+    },
+    { name: 'raw', request: apiFetch }
   ])(
-    'traces anonymous and authenticated %s requests',
-    async (_name, request) => {
+    'traces anonymous and authenticated $name requests',
+    async ({ request, isMultipart = false }) => {
       vi.stubGlobal(
         'fetch',
         vi.fn().mockImplementation(async () => new Response('{}'))
@@ -218,7 +229,7 @@ describe('session tracing on all client helpers', () => {
       expect(nextHeaders.get('X-Trace-Id')).toBe(getSessionTraceId());
       expect(nextHeaders.get('X-Trace-Id')).not.toBe(anonymousId);
       expect(nextHeaders.get('Authorization')).toBe('Bearer session');
-      if (_name.startsWith('multipart')) {
+      if (isMultipart) {
         expect(nextHeaders.has('Content-Type')).toBe(false);
       }
     }
