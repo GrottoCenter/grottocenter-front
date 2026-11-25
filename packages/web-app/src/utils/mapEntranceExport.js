@@ -1,7 +1,8 @@
 export const MAX_MAP_EXPORT_ROWS = 10000;
 
 // Export serialization can round coordinates just beyond a viewport edge.
-const MAP_EXPORT_BOUNDS_TOLERANCE = 1e-6;
+// API serializers have no fixed decimal precision; allow five-decimal rounding.
+const MAP_EXPORT_BOUNDS_TOLERANCE = 1e-5;
 
 const mapExportError = code => Object.assign(new Error(code), { code });
 

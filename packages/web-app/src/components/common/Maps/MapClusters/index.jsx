@@ -327,10 +327,18 @@ const HydratedMap = ({
   };
   const handleExportClose = () => {
     setExportSelection(null);
-    requestAnimationFrame(() =>
-      map.getContainer().focus({ preventScroll: true })
-    );
   };
+
+  useEffect(() => {
+    if (!exportSelection) return undefined;
+    // Restore focus after React removes the dialog and its focus trap.
+    return () => {
+      requestAnimationFrame(() => {
+        const container = map.getContainer();
+        if (container.isConnected) container.focus({ preventScroll: true });
+      });
+    };
+  }, [exportSelection, map]);
 
   // moveend fires after ALL map movement has finished - including mobile inertia.
   useMapEvent('moveend', handleUpdate);

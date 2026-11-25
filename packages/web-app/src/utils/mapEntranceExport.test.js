@@ -142,7 +142,7 @@ it.each([
 });
 
 it.each(['gpx', 'kml', 'geojson'])(
-  'accepts rounding at each %s viewport edge but rejects larger deviations',
+  'accepts five-decimal rounding at each %s viewport edge but rejects larger deviations',
   async format => {
     const blob = file(examples[format]);
     await Promise.all(
@@ -156,14 +156,14 @@ it.each(['gpx', 'kml', 'geojson'])(
           prepareMapExportBlob(
             [blob],
             format,
-            getMapExportBounds({ ...selection, [edge]: direction * 5e-7 })
+            getMapExportBounds({ ...selection, [edge]: direction * 5e-6 })
           )
         ).resolves.toBe(blob),
         expect(
           prepareMapExportBlob(
             [blob],
             format,
-            getMapExportBounds({ ...selection, [edge]: direction * 2e-6 })
+            getMapExportBounds({ ...selection, [edge]: direction * 2e-5 })
           )
         ).rejects.toThrow('mapExport.invalidFile')
       ])
