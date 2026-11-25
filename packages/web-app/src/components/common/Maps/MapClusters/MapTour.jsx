@@ -31,6 +31,12 @@ const MapTour = ({ run, onEnd }) => {
         title: formatMessage({ id: 'Tour - Location' }),
         content: formatMessage({ id: 'Tour - Location description' }),
         position: 'left'
+      },
+      {
+        selector: '.leaflet-container',
+        title: formatMessage({ id: 'mapExport.title' }),
+        content: formatMessage({ id: 'mapExport.help' }),
+        position: 'center'
       }
     ],
     [formatMessage]

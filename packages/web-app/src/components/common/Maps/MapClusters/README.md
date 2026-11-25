@@ -38,6 +38,30 @@ path and their existing request URLs.
 
 ---
 
+## Entrance export
+
+Right-click or long-press the map and choose **Export entrances in this area…**.
+Keyboard users can focus the map and press Shift+F10 or the context-menu key.
+The public online dialog defaults to GPX, and also offers
+KML and GeoJSON. Its actions remain reachable in a narrow or landscape viewport.
+
+The dialog explicitly states that all public entrances in the captured map
+bounds are exported, ignoring size, data quality and interest filters. There is
+no count preview or identifier list: Download calls the existing export endpoint
+directly with latitude/longitude ranges and `isSensitive: false`. This keeps the
+Typesense request short regardless of the number of entrances. The export also
+works with the entrance layer hidden. It does not change the advanced-search form.
+Crossing the antimeridian uses two ranges merged into one file. Complete files
+are parsed and checked for valid points, links and bounds before downloading.
+Closing the dialog cancels pending work and prevents a late download.
+
+The API limits the export to 10,000 entrances; exceeding it asks the user to zoom.
+There is no frontend surface-area limit. Empty, offline, invalid files and failed
+requests have explicit feedback. Without a count preview, a syntactically valid
+but truncated server export cannot be detected.
+The shared map container disables leaflet-rotate's default right-button pitch
+dragging so it cannot intercept the context menu.
+
 ## Guided tour (`MapTour`)
 
 The tour launches automatically the first time a user opens the map. It uses two storage
