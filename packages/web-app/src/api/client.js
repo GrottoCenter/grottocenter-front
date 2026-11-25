@@ -104,6 +104,18 @@ const send =
  */
 export const apiPost = send('POST');
 
+/** POST JSON and return a downloadable file instead of parsing JSON. */
+export const apiPostBlob = async (url, body, { signal } = {}) => {
+  const response = await apiFetch(url, {
+    method: 'POST',
+    headers: jsonHeaders(),
+    body: JSON.stringify(body),
+    ...(signal && { signal })
+  });
+  await checkAndGetStatus(response);
+  return response.blob();
+};
+
 /** POST JSON and return its parsed body and readable response headers. */
 export const apiPostWithHeaders = send('POST', { includeHeaders: true });
 

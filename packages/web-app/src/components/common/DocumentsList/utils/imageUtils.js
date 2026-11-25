@@ -1,3 +1,7 @@
+import { downloadBlob } from '@/utils/download';
+
+export { downloadBlob };
+
 /**
  * Utility functions for handling image files in DocumentsList
  */
@@ -72,18 +76,6 @@ export const decodeFileName = str => {
  * @param {string} url      URL of the file to download
  * @param {string} fileName Suggested filename for the saved file
  */
-export const downloadBlob = (blob, fileName) => {
-  const blobUrl = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = blobUrl;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  // Revoke asynchronously to let the browser start the download first
-  setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-};
-
 export const downloadFile = async (url, fileName) => {
   try {
     const response = await fetch(url);

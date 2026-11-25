@@ -1,11 +1,12 @@
+import { apiPostBlob } from '@/api/client';
+import { downloadBlob } from '@/utils/download';
 import { advancedSearchExportUrl } from '../conf/apiRoutes';
 import { VALID_EXPORT_FORMATS } from '../conf/exportFormats';
-import { checkAndGetStatus } from './utils';
 
 // Advanced-search results migrated to React Query — see hooks/queries/useAdvancedSearch.js.
 // This file kept only the CSV/GeoJSON/GPX/KML export because it downloads a
 // Blob, not JSON, so it doesn't fit apiPost's parseJsonOr204 contract.
-export const downloadAdvancedSearchResults = async ({
+export const fetchAdvancedSearchExport = async ({
   query,
   entity,
   sort,
@@ -14,7 +15,8 @@ export const downloadAdvancedSearchResults = async ({
   includePendingDocuments = false,
   columns,
   columnsName,
-  format = 'csv'
+  format = 'csv',
+  signal
 }) => {
   const safeFormat = VALID_EXPORT_FORMATS.has(format) ? format : 'csv';
   const data = {
@@ -27,29 +29,21 @@ export const downloadAdvancedSearchResults = async ({
     columnsName,
     ...(includePendingDocuments && { includePendingDocuments: true })
   };
-  const requestOptions = {
-    method: 'POST',
-    body: JSON.stringify(data)
-  };
-
   const exportUrl = `${advancedSearchExportUrl}?format=${encodeURIComponent(safeFormat)}`;
+  return apiPostBlob(exportUrl, data, { signal });
+};
 
-  const blob = await fetch(exportUrl, requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => response.blob())
-    .catch(errorMessage => {
-      console.error('downloadAdvancedSearchResults error', data, errorMessage);
-    });
-
-  if (!blob) return;
-
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Grottocenter_search_export_${Math.trunc(Date.now() / 1000)}.${safeFormat}`;
-  document.body.appendChild(a);
-  a.click();
-
-  a.remove();
-  window.URL.revokeObjectURL(url);
+export const downloadAdvancedSearchResults = async options => {
+  try {
+    const blob = await fetchAdvancedSearchExport(options);
+    const format = VALID_EXPORT_FORMATS.has(options.format)
+      ? options.format
+      : 'csv';
+    downloadBlob(
+      blob,
+      `Grottocenter_search_export_${Math.trunc(Date.now() / 1000)}.${format}`
+    );
+  } catch (error) {
+    console.error('downloadAdvancedSearchResults error', error);
+  }
 };

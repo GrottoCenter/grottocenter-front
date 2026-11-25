@@ -18,17 +18,25 @@ import {
   LinearProgress,
   useMediaQuery
 } from '@mui/material';
-import { ContentCopy, LocationOn, Tune } from '@mui/icons-material';
+import {
+  ContentCopy,
+  FileDownload,
+  LocationOn,
+  Tune
+} from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import copyToClipboard from '@/utils/clipboard';
 import { matchesEntranceMarker } from '@/utils/entranceMapFilters';
 import useEntranceClusters from '@/hooks/useEntranceClusters';
 import useEntranceFilters from '@/hooks/useEntranceFilters';
+import useProjections from '@/hooks/queries/useProjections';
+import { captureMapExportSelection } from '@/utils/mapEntranceExport';
 import GeocodingControl from '../common/GeocodingControl';
 import MapTour from './MapTour';
 import DataDisplayControl, { layerTypes } from './DataDisplayControl';
 import FiltersControl from './FiltersControl';
+import MapExportDialog from './MapExportDialog';
 import {
   formatCoordinatesForCopy,
   formatWGS84
@@ -76,10 +84,6 @@ const DEFAULT_SELECTED_LAYERS = {
   [layerTypes.ORGANIZATIONS]: false
 };
 
-// Stable empty-array fallback for the projections selector — an inline `?? []`
-// would return a fresh reference each render and trip useSelector's Object.is
-// equality, forcing needless re-renders and a react-redux warning.
-const EMPTY_PROJECTIONS = [];
 const EMPTY_MARKER_LAYERS = [];
 
 const HydratedMap = ({
@@ -101,14 +105,13 @@ const HydratedMap = ({
   const isOnline = useOnlineStatus();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const projections = useSelector(
-    state => state.projections?.projections ?? EMPTY_PROJECTIONS
-  );
+  const projections = useProjections();
   const userId = useSelector(state => state.login.authTokenDecoded?.id ?? null);
   const [contextCoords, setContextCoords] = useState(null);
   const [contextMenuAnchor, setContextMenuAnchor] = useState(null);
   const [pendingEntranceUrl, setPendingEntranceUrl] = useState(null);
   const [formatMenuAnchor, setFormatMenuAnchor] = useState(null);
+  const [exportSelection, setExportSelection] = useState(null);
   const [preferred, setPref] = useCoordinatePreference();
   const isTouch = useMediaQuery('(pointer: coarse)');
 
@@ -179,6 +182,8 @@ const HydratedMap = ({
       ? 'Turn on entrances to apply saved filters'
       : 'Turn on entrances to enable filters';
   }
+
+  const exportDisabledReason = isOnline ? null : 'offlineActionUnavailable';
 
   // Marker-eligible layers currently selected — the set to fetch and render as
   // real markers whenever we're above MARKERS_LIMIT. Massifs never appear here
@@ -283,15 +288,57 @@ const HydratedMap = ({
   // Stable handler: react-leaflet's useMapEvent leaks the previous listener
   // whenever the callback identity changes, so an inline arrow would
   // accumulate one Leaflet listener per render.
-  const handleContextMenu = useCallback(e => {
-    e.originalEvent.preventDefault();
-    setContextCoords({ lat: e.latlng.lat, lng: e.latlng.lng });
-    setContextMenuAnchor({
-      top: e.originalEvent.clientY,
-      left: e.originalEvent.clientX
-    });
-  }, []);
+  const handleContextMenu = useCallback(
+    e => {
+      e.originalEvent?.preventDefault();
+      setContextCoords({ lat: e.latlng.lat, lng: e.latlng.lng });
+      const rect = map.getContainer().getBoundingClientRect();
+      setContextMenuAnchor({
+        top: e.originalEvent?.clientY ?? rect.top + rect.height / 2,
+        left: e.originalEvent?.clientX ?? rect.left + rect.width / 2
+      });
+    },
+    [map]
+  );
   useMapEvent('contextmenu', handleContextMenu);
+
+  useEffect(() => {
+    const container = map.getContainer();
+    const handleKeyDown = event => {
+      if (
+        event.target === container &&
+        (event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10'))
+      ) {
+        event.preventDefault();
+        map.fire('contextmenu', {
+          latlng: map.getCenter(),
+          originalEvent: event
+        });
+      }
+    };
+    container.addEventListener('keydown', handleKeyDown);
+    return () => container.removeEventListener('keydown', handleKeyDown);
+  }, [map]);
+
+  const handleExport = () => {
+    if (exportDisabledReason) return;
+    setExportSelection(captureMapExportSelection(map));
+    handleContextMenuClose();
+  };
+  const handleExportClose = () => {
+    setExportSelection(null);
+  };
+
+  useEffect(() => {
+    if (!exportSelection) return undefined;
+    // Restore focus after React removes the dialog and its focus trap.
+    return () => {
+      requestAnimationFrame(() => {
+        const container = map.getContainer();
+        if (container.isConnected) container.focus({ preventScroll: true });
+      });
+    };
+  }, [exportSelection, map]);
 
   // moveend fires after ALL map movement has finished - including mobile inertia.
   useMapEvent('moveend', handleUpdate);
@@ -425,7 +472,15 @@ const HydratedMap = ({
         onClose={handleContextMenuClose}
         anchorReference="anchorPosition"
         anchorPosition={contextMenuAnchor}
-        slotProps={{ paper: { sx: { minWidth: 260 } } }}>
+        slotProps={{
+          paper: { sx: { minWidth: 260, maxWidth: 'calc(100vw - 32px)' } },
+          list: {
+            disablePadding: true,
+            sx: {
+              '& .MuiMenuItem-root + .MuiDivider-root': { my: 0 }
+            }
+          }
+        }}>
         <ListSubheader
           disableSticky
           sx={{ lineHeight: '32px', fontWeight: 'bold' }}>
@@ -487,7 +542,31 @@ const HydratedMap = ({
             </ListItemText>
           </MenuItem>
         )}
+        <Divider />
+        <MenuItem
+          onClick={handleExport}
+          disabled={!!exportDisabledReason}
+          data-testid="map-export-action"
+          sx={{ minHeight: 44, whiteSpace: 'normal' }}>
+          <ListItemIcon>
+            <FileDownload fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary={formatMessage({ id: 'mapExport.action' })}
+            secondary={
+              exportDisabledReason
+                ? formatMessage({ id: exportDisabledReason })
+                : null
+            }
+          />
+        </MenuItem>
       </Menu>
+      {exportSelection && (
+        <MapExportDialog
+          selection={exportSelection}
+          onClose={handleExportClose}
+        />
+      )}
       <CRSMenu
         anchorEl={formatMenuAnchor}
         onClose={() => setFormatMenuAnchor(null)}
@@ -507,7 +586,21 @@ const MAP_TOUR_SESSION_KEY = `mapTourSeenThisSession_v${MAP_TOUR_VERSION}`;
 // Set VITE_DISABLE_MAP_TOUR=true in .env.local to prevent the tour from launching in dev.
 const MAP_TOUR_DISABLED = import.meta.env.VITE_DISABLE_MAP_TOUR === 'true';
 
-const Index = ({ center, zoom, mapRef, popupTarget = null, ...props }) => {
+const Index = ({
+  center,
+  zoom,
+  mapRef,
+  popupTarget = null,
+  entrances,
+  entranceMarkers,
+  networks,
+  networkMarkers,
+  organizations,
+  organizationMarkers,
+  massifs,
+  massifPolygons,
+  onUpdate
+}) => {
   const [runTour, setRunTour] = useState(
     () =>
       !MAP_TOUR_DISABLED &&
@@ -540,7 +633,18 @@ const Index = ({ center, zoom, mapRef, popupTarget = null, ...props }) => {
         isLocationControlAlways
         mapRef={mapRef}
         renderer={renderer}>
-        <HydratedMap {...props} popupTarget={popupTarget} />
+        <HydratedMap
+          entrances={entrances}
+          entranceMarkers={entranceMarkers}
+          networks={networks}
+          networkMarkers={networkMarkers}
+          organizations={organizations}
+          organizationMarkers={organizationMarkers}
+          massifs={massifs}
+          massifPolygons={massifPolygons}
+          onUpdate={onUpdate}
+          popupTarget={popupTarget}
+        />
       </CustomMapContainer>
       <MapTour run={runTour} onEnd={handleTourEnd} />
     </>

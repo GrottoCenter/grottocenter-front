@@ -4,6 +4,7 @@ import {
   apiFetch,
   apiGetWithRange,
   apiPost,
+  apiPostBlob,
   apiPostWithHeaders
 } from './client';
 
@@ -16,7 +17,7 @@ vi.mock('@/actions/Login', async importOriginal => {
   };
 });
 
-it.each(['GET', 'POST', 'POST with headers', 'raw'])(
+it.each(['GET', 'POST', 'POST blob', 'POST with headers', 'raw'])(
   'passes an AbortSignal through to a %s request',
   async method => {
     const controller = new AbortController();
@@ -34,6 +35,12 @@ it.each(['GET', 'POST', 'POST with headers', 'raw'])(
       const requests = {
         GET: () =>
           apiGetWithRange('/api/v1/documents', { signal: controller.signal }),
+        'POST blob': () =>
+          apiPostBlob(
+            '/api/v1/advanced-search',
+            {},
+            { signal: controller.signal }
+          ),
         POST: () =>
           apiPost(
             '/api/v1/advanced-search',

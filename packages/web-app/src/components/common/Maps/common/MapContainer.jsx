@@ -200,6 +200,8 @@ const CustomMapContainer = ({
 
   return (
     <Wrapper $wholePage={wholePage} sx={sx} data-testid="map-container">
+      {/* Reserve right-click for the context menu: leaflet-rotate otherwise
+          enables right-button pitch dragging by default. */}
       <MapContainer
         style={{ flex: '1 1 auto', minHeight: 0, width: '100%', ...style }}
         wholePage={wholePage}
@@ -213,6 +215,7 @@ const CustomMapContainer = ({
         rotateControl={false}
         touchRotate={false}
         shiftKeyRotate={false}
+        pitchDrag={false}
         ref={mapRefCallback}
         renderer={renderer || undefined}
         preferCanvas={!renderer}>
