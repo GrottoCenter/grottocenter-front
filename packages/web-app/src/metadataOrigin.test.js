@@ -23,16 +23,13 @@ const SKIPPED_PATHS = new Set([
   'storybook-static',
   'cypress/downloads',
   'cypress/screenshots',
-  'cypress/videos',
-  'cypress/fixtures/test-profile.json'
+  'cypress/videos'
 ]);
-// Git-ignored local files: `.env*`, `*.local` (files or directories such as
-// `.local/`), `*.log` and `.eslintcache`.
+// Git-ignored local files: `*.local` (files such as `.env.local`, or
+// directories such as `.local/`), `*.log` and `.eslintcache`. Never skip by
+// prefix: the tracked `.env` holds the app's hosts and must stay scanned.
 const isLocalFile = name =>
-  name.startsWith('.env') ||
-  name.endsWith('.local') ||
-  name.endsWith('.log') ||
-  name === '.eslintcache';
+  name.endsWith('.local') || name.endsWith('.log') || name === '.eslintcache';
 
 // Paths (relative to packages/web-app, with `/` separators) allowed to mention
 // the www host, e.g. a doc explaining that www 301s to the apex. Keep it empty
