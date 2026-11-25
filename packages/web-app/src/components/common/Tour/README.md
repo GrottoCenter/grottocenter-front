@@ -111,7 +111,7 @@ sessionStorage.removeItem('mapTourSeenThisSession_v1');
 
 Each tour defines its own keys (see the constants at the top of the page component that renders the
 tour). Alternatively, disable auto-launch entirely in dev without touching storage by setting
-`REACT_APP_DISABLE_MAP_TOUR=true` in `.env.local` — the tour will never start automatically but
+`VITE_DISABLE_MAP_TOUR=true` in `.env.local` — the tour will never start automatically but
 can still be triggered programmatically.
 
 ## Forcing a reset for all users (production)
