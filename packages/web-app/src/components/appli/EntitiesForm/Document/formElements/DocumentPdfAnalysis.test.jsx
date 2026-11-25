@@ -527,7 +527,8 @@ it.each([
 });
 
 it('shows the failed analysis reference and clears it during a retry and after success', async () => {
-  const traceId = '2f85616b-51be-4003-bc07-7d35ed5b72fa';
+  const traceId =
+    '019abb54-1234-7000-8000-0123456789ab.019abb54-5678-7000-8000-0123456789ab';
   fetch.mockResolvedValueOnce(
     new Response('{}', { status: 503, headers: { 'X-Trace-Id': traceId } })
   );

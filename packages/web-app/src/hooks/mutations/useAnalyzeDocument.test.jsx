@@ -171,17 +171,19 @@ it.each([undefined, '', '   ', 'not an id', '<invalid>', 'a'.repeat(129)])(
   }
 );
 
-it.each(['a', 'A_0-valid-id', 'a'.repeat(128)])(
-  'trims and forwards a valid token trace header (%j)',
-  async traceId => {
-    apiPostWithHeaders.mockResolvedValue(
-      tokenResponse('documents-token', `  ${traceId}  `)
-    );
-    const { result } = renderAnalysis();
-    await act(async () => result.current.mutateAsync(variables()));
-    expect(fetch.mock.calls[0][1].headers['X-Trace-Id']).toBe(traceId);
-  }
-);
+it.each([
+  'a',
+  'A_0-valid-id',
+  'a'.repeat(128),
+  '019abb54-1234-7000-8000-0123456789ab.019abb54-5678-7000-8000-0123456789ab'
+])('trims and forwards a valid token trace header (%j)', async traceId => {
+  apiPostWithHeaders.mockResolvedValue(
+    tokenResponse('documents-token', `  ${traceId}  `)
+  );
+  const { result } = renderAnalysis();
+  await act(async () => result.current.mutateAsync(variables()));
+  expect(fetch.mock.calls[0][1].headers['X-Trace-Id']).toBe(traceId);
+});
 
 it.each(['not an id', '<invalid>', 'a'.repeat(129)])(
   'discards an invalid trace header on either failed service (%j)',

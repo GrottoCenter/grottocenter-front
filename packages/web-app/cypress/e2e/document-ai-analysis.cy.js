@@ -1,5 +1,6 @@
 const summary = '[data-testid="document-description"] textarea';
-const traceId = '2f85616b-51be-4003-bc07-7d35ed5b72fa';
+const traceId =
+  '019abb54-1234-7000-8000-0123456789ab.019abb54-5678-7000-8000-0123456789ab';
 
 const openForm = () => {
   cy.visit('/entity/add/document', {
@@ -74,7 +75,9 @@ describe('PDF analysis during document creation and editing', () => {
     });
     cy.intercept('POST', '**/api/v1/sso/auth-token', request => {
       expect(request.body).to.deep.equal({ product: 'documents' });
-      expect(request.headers).not.to.have.property('x-trace-id');
+      expect(request.headers['x-trace-id']).to.match(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+      );
       request.reply({
         headers: {
           'X-Trace-Id': traceId,

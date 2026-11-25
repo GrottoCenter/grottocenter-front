@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 
+import { fetchWithTrace } from '@/api/transport';
 import EntitiesList from '../entitiesList/EntitiesList';
 import Alert from '../Alert';
 import ConfirmationDialog from '../ConfirmationDialog';
@@ -41,7 +42,7 @@ const RelatedCaves = ({
   const [pendingRemove, setPendingRemove] = useState(null);
 
   const fetchCaveIdFromEntrance = useCallback(async entranceId => {
-    const response = await fetch(`${getEntranceUrl}${entranceId}`);
+    const response = await fetchWithTrace(`${getEntranceUrl}${entranceId}`);
     const entranceData = await response.json();
     return entranceData.cave?.id;
   }, []);

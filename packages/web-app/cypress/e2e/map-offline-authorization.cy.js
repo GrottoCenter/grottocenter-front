@@ -4,6 +4,9 @@ const describeWithServiceWorker = Cypress.expose('serviceWorker')
   ? describe
   : describe.skip;
 
+const firstVisitId = '019abb54-1234-7000-8000-0123456789ab';
+const secondVisitId = '019abb54-5678-7000-8000-0123456789ab';
+
 // Workbox writes to Cache Storage after delivering the network response.
 const waitForCache = (win, name, predicate, deadline = Date.now() + 5000) =>
   win.caches
@@ -58,11 +61,14 @@ describeWithServiceWorker('Map detail offline cache isolation', () => {
         });
       }
     });
-    const fetchDetail = token =>
+    const fetchDetail = (token, traceId = firstVisitId) =>
       cy.window().then(win =>
         win
           .fetch(`${apiOrigin}/api/v1/entrances/${id}`, {
-            headers: token ? { Authorization: token } : {}
+            headers: {
+              ...(token && { Authorization: token }),
+              'X-Trace-Id': traceId
+            }
           })
           .then(response => response.json())
       );
@@ -88,7 +94,10 @@ describeWithServiceWorker('Map detail offline cache isolation', () => {
       `${apiOrigin}/api/v1/geoloc/entrancesCoordinates?offlineAuthTest=1`;
     cy.window().then(win =>
       win.fetch(coordinatesUrl(), {
-        headers: { Authorization: 'Bearer offline-a' }
+        headers: {
+          Authorization: 'Bearer offline-a',
+          'X-Trace-Id': firstVisitId
+        }
       })
     );
     cy.window().then(win =>
@@ -104,16 +113,20 @@ describeWithServiceWorker('Map detail offline cache isolation', () => {
       { method: 'GET', pathname: '/api/v1/geoloc/entrancesCoordinates' },
       { forceNetworkError: true }
     );
-    fetchDetail('Bearer offline-a')
+    // A new visit id must reuse the same cached resource for the same bearer.
+    fetchDetail('Bearer offline-a', secondVisitId)
       .its('name')
       .should('eq', 'Bearer offline-a');
-    fetchDetail('Bearer offline-b')
+    fetchDetail('Bearer offline-b', secondVisitId)
       .its('name')
       .should('eq', 'Bearer offline-b');
-    fetchDetail().its('name').should('eq', 'public');
+    fetchDetail(undefined, secondVisitId).its('name').should('eq', 'public');
     cy.window().then(async win => {
       const response = await win.fetch(coordinatesUrl(), {
-        headers: { Authorization: 'Bearer offline-b' }
+        headers: {
+          Authorization: 'Bearer offline-b',
+          'X-Trace-Id': secondVisitId
+        }
       });
       expect(await response.json()).to.deep.eq([]);
       let hasFailed = false;

@@ -1,11 +1,19 @@
 import store from '@/store';
 import { fetchLoginSuccess, logout, postLogout } from '@/actions/Login';
+import { accountUrl } from '@/conf/apiRoutes';
+import { getSessionTraceId } from './sessionTraceId';
 import {
   apiFetch,
+  apiGet,
   apiGetWithRange,
   apiPost,
   apiPostBlob,
-  apiPostWithHeaders
+  apiPostWithHeaders,
+  apiPut,
+  apiPatch,
+  apiDelete,
+  apiPostForm,
+  apiPutForm
 } from './client';
 
 vi.mock('@/actions/Login', async importOriginal => {
@@ -79,7 +87,8 @@ describe('JSON POST response headers', () => {
 
   it('returns the body and readable headers while preserving the regular POST contract', async () => {
     const data = { token: 'documents-token' };
-    const traceId = '2f85616b-51be-4003-bc07-7d35ed5b72fa';
+    const traceId =
+      '019abb54-1234-7000-8000-0123456789ab.019abb54-5678-7000-8000-0123456789ab';
     vi.stubGlobal(
       'fetch',
       vi.fn().mockImplementation(
@@ -170,6 +179,61 @@ describe('JSON POST response headers', () => {
     expect(failure).toMatchObject({ name: 'SyntaxError' });
     expect(failure.headers.get('X-Trace-Id')).toBe('sso-parse-failure');
   });
+});
+
+describe('session tracing on all client helpers', () => {
+  afterEach(() => {
+    store.dispatch(logout());
+    vi.unstubAllGlobals();
+  });
+
+  it.each([
+    { name: 'GET', request: apiGet },
+    { name: 'paginated GET', request: apiGetWithRange },
+    { name: 'POST', request: url => apiPost(url, { value: 1 }) },
+    {
+      name: 'POST with headers',
+      request: url => apiPostWithHeaders(url, { value: 1 })
+    },
+    { name: 'PUT', request: url => apiPut(url, { value: 1 }) },
+    { name: 'PATCH', request: url => apiPatch(url, { value: 1 }) },
+    { name: 'DELETE', request: apiDelete },
+    {
+      name: 'multipart POST',
+      request: url => apiPostForm(url, new FormData()),
+      isMultipart: true
+    },
+    {
+      name: 'multipart PUT',
+      request: url => apiPutForm(url, new FormData()),
+      isMultipart: true
+    },
+    { name: 'raw', request: apiFetch }
+  ])(
+    'traces anonymous and authenticated $name requests',
+    async ({ request, isMultipart = false }) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockImplementation(async () => new Response('{}'))
+      );
+      store.dispatch(logout());
+      const anonymousId = getSessionTraceId();
+      await request(accountUrl);
+      const firstHeaders = new Headers(fetch.mock.calls[0][1].headers);
+      expect(firstHeaders.get('X-Trace-Id')).toBe(anonymousId);
+      expect(firstHeaders.has('Authorization')).toBe(false);
+
+      store.dispatch(fetchLoginSuccess({ id: 1 }, 'session'));
+      await request(accountUrl);
+      const nextHeaders = new Headers(fetch.mock.calls[1][1].headers);
+      expect(nextHeaders.get('X-Trace-Id')).toBe(getSessionTraceId());
+      expect(nextHeaders.get('X-Trace-Id')).not.toBe(anonymousId);
+      expect(nextHeaders.get('Authorization')).toBe('Bearer session');
+      if (isMultipart) {
+        expect(nextHeaders.has('Content-Type')).toBe(false);
+      }
+    }
+  );
 });
 
 describe('raw authenticated transport', () => {

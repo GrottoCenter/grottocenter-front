@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { fetchWithTrace } from '@/api/transport';
 import { getCaveUrl } from '../conf/apiRoutes';
 
 // The entrance endpoint only exposes sibling entrance ids, so when we need the
@@ -22,7 +23,7 @@ export const useOtherEntranceName = (caveId, currentEntranceId, enabled) => {
     requestIdRef.current += 1;
     const requestId = requestIdRef.current;
     setName(null);
-    fetch(`${getCaveUrl}${caveId}`, { headers: authorizationHeader })
+    fetchWithTrace(`${getCaveUrl}${caveId}`, { headers: authorizationHeader })
       .then(response => response.json())
       .then(cave => {
         if (requestId !== requestIdRef.current) return;

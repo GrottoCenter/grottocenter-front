@@ -82,7 +82,9 @@ describe('useOpenBi', () => {
     const [url, options] = global.fetch.mock.calls[0];
     expect(url).toContain('/sso/auth-token');
     expect(options.method).toBe('POST');
-    expect(options.headers.Authorization).toBe('Bearer test-token');
+    expect(new Headers(options.headers).get('Authorization')).toBe(
+      'Bearer test-token'
+    );
     expect(JSON.parse(options.body)).toEqual({ product: 'superset' });
     expect(submitSpy).toHaveBeenCalledTimes(1);
     expect(mockWindow.close).not.toHaveBeenCalled();

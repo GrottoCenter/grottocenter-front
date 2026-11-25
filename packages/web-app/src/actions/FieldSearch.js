@@ -1,3 +1,4 @@
+import { fetchWithTrace } from '@/api/transport';
 import { fieldSearchUrl } from '../conf/apiRoutes';
 import { checkAndGetStatus } from './utils';
 
@@ -20,7 +21,7 @@ export const fetchFieldSearch = ({
     })
   };
 
-  return fetch(fieldSearchUrl, requestOptions)
+  return fetchWithTrace(fieldSearchUrl, requestOptions)
     .then(checkAndGetStatus)
     .then(response => response.json());
 };

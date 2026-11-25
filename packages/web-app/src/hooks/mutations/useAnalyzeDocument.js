@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 
 import { apiPostWithHeaders } from '@/api/client';
+import { fetchWithTrace } from '@/api/transport';
 import { checkAndGetStatus } from '@/actions/utils';
 import { postLogout } from '@/actions/Login';
 import { analyzeDocumentUrl, ssoAuthTokenUrl } from '@/conf/apiRoutes';
@@ -25,7 +26,7 @@ const loadAnalysisFile = async (file, signal) => {
   }
   // Hosted attachments are downloaded only after confirmation. Never forward
   // the Grottocenter session or SSO token to a file host.
-  const response = await fetch(file.completePath, {
+  const response = await fetchWithTrace(file.completePath, {
     signal,
     credentials: 'omit'
   });

@@ -43,3 +43,27 @@ it.each([
     `https://api.example.org/api/v1/${path}`
   );
 });
+
+it.each([null, 'alice-token'])(
+  'keeps the same cache key when the visit trace id changes (%s)',
+  async token => {
+    const url = 'https://api.example.org/api/v1/entrances/1';
+    const keys = await Promise.all(
+      [
+        '019abb54-1234-7000-8000-0123456789ab',
+        '019abb54-5678-7000-8000-0123456789ab'
+      ].map(traceId =>
+        cacheKey({
+          request: new Request(url, {
+            headers: {
+              ...(token && { Authorization: `Bearer ${token}` }),
+              'X-Trace-Id': traceId
+            }
+          })
+        })
+      )
+    );
+    expect(keys[0]).toBe(keys[1]);
+    expect(keys[0]).not.toContain('019abb54');
+  }
+);

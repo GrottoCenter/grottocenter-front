@@ -1,12 +1,12 @@
 import fc from 'fast-check';
 import { downloadAdvancedSearchResults } from './Advancedsearch';
 
-// The action calls the global `fetch` directly (isomorphic-fetch was removed
-// in Phase I3). Stub the global in beforeEach; restore in afterEach.
+// Stub the fetch used by the shared transport; restore it after each test.
 const mockFetch = vi.fn();
 
 // Mock apiRoutes
 vi.mock('../conf/apiRoutes', () => ({
+  API_URL: 'http://api',
   advancedSearchUrl: 'http://api/advanced-search',
   advancedSearchExportUrl: 'http://api/advanced-search/export'
 }));

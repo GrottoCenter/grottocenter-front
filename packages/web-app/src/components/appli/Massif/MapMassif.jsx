@@ -3,6 +3,7 @@ import { isMobile } from 'react-device-detect';
 import { GeoJSON, useMap, useMapEvent } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import L from 'leaflet';
+import { fetchWithTrace } from '@/api/transport';
 
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import ClusterLayer, {
@@ -98,7 +99,7 @@ const MapInternals = ({ massifBounds, massifId }) => {
       massif: massifId
     };
 
-    fetch(makeUrl(getMapEntrancesUrl, criteria), { signal })
+    fetchWithTrace(makeUrl(getMapEntrancesUrl, criteria), { signal })
       .then(r => (r.ok ? r.json() : []))
       .then(data => {
         if (!signal.aborted && Array.isArray(data)) markersRef.current(data);
@@ -134,7 +135,7 @@ const MapInternals = ({ massifBounds, massifId }) => {
     const sw = massifBounds.getSouthWest();
     const ne = massifBounds.getNorthEast();
     const controller = new AbortController();
-    fetch(
+    fetchWithTrace(
       makeUrl(getMapEntrancesCoordinatesUrl, {
         sw_lat: sw.lat,
         sw_lng: sw.lng,

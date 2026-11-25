@@ -6,10 +6,11 @@ import {
   QueryCache
 } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
+import { getSessionTraceId } from '@/api/sessionTraceId';
 
 import store from '../../store';
 import { postLogout } from '../../actions/Login';
-import { useMfaVerify, useMfaLogin, useMfaEnroll } from './useMfa';
+import { useMfaVerify, useMfaLogin, useMfaEnroll, useMfaReset } from './useMfa';
 
 // Redux store mock — used both by useMfa's raw fetch helper (reads
 // login.enrollmentToken and login.authorizationHeader) and by the query
@@ -83,8 +84,45 @@ describe('useMfa mutations (regression: 401 must not sign the user out)', () => 
   beforeEach(() => {
     queryClient = createProductionLikeQueryClient();
     mockDispatch.mockReset();
-    global.fetch = vi.fn();
+    vi.stubGlobal('fetch', vi.fn());
   });
+
+  afterEach(() => {
+    queryClient.clear();
+    vi.unstubAllGlobals();
+  });
+
+  it.each([
+    ['enroll', useMfaEnroll, undefined, 'Bearer enrollment-token-xyz'],
+    ['verify', useMfaVerify, '123456', 'Bearer enrollment-token-xyz'],
+    [
+      'login',
+      useMfaLogin,
+      { email: 'a@b.co', password: 'x', code: '123456' },
+      null
+    ],
+    ['reset', useMfaReset, 'password', 'Bearer session-token']
+  ])(
+    'traces MFA %s with its own authentication',
+    async (_name, hook, variables, bearer) => {
+      fetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          token: 'token',
+          secret: 'secret',
+          otpauthUri: 'uri'
+        })
+      });
+      const { result } = renderHook(hook, {
+        wrapper: makeWrapper(queryClient)
+      });
+      await act(async () => result.current.mutateAsync(variables));
+      const headers = new Headers(fetch.mock.calls[0][1].headers);
+      expect(headers.get('Authorization')).toBe(bearer);
+      expect(headers.get('X-Trace-Id')).toBe(getSessionTraceId());
+      expect(headers.get('Content-Type')).toBe('application/json');
+    }
+  );
 
   it('useMfaVerify: 401 with InvalidTotpCode does not dispatch postLogout', async () => {
     global.fetch.mockResolvedValue({

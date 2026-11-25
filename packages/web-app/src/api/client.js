@@ -1,6 +1,7 @@
 import store from '../store';
 import { postLogout } from '../actions/Login';
 import { checkAndGetStatus } from '../actions/utils';
+import { fetchWithTrace } from './transport';
 
 // Thin fetch wrapper for React Query's queryFn/mutationFn. Deliberately reuses
 // the existing conventions instead of inventing new ones: checkAndGetStatus
@@ -20,7 +21,10 @@ export const apiFetch = async (url, { headers, ...options } = {}) => {
   Object.entries(authHeaders()).forEach(([name, value]) => {
     requestHeaders.set(name, value);
   });
-  const response = await fetch(url, { ...options, headers: requestHeaders });
+  const response = await fetchWithTrace(url, {
+    ...options,
+    headers: requestHeaders
+  });
   const authorization = requestHeaders.get('Authorization');
   // Match QueryClient's session-loss flow without letting a late rejection of
   // an old request sign out a user who has since started a different session.
@@ -54,7 +58,7 @@ const parseJsonOr204 = async response => {
  * @returns {Promise<unknown>} parsed JSON body, or null on 204
  */
 export const apiGet = async url => {
-  const response = await fetch(url, { headers: authHeaders() });
+  const response = await fetchWithTrace(url, { headers: authHeaders() });
   await checkAndGetStatus(response);
   return parseJsonOr204(response);
 };
@@ -65,7 +69,7 @@ export const apiGet = async url => {
  * (notifications, documents queue, …).
  */
 export const apiGetWithRange = async (url, { signal } = {}) => {
-  const response = await fetch(url, {
+  const response = await fetchWithTrace(url, {
     headers: authHeaders(),
     ...(signal && { signal })
   });
@@ -84,7 +88,7 @@ const send =
       ...(signal && { signal })
     };
     if (body != null) init.body = JSON.stringify(body);
-    const response = await fetch(url, init);
+    const response = await fetchWithTrace(url, init);
     try {
       await checkAndGetStatus(response);
       const data = await parseJsonOr204(response);
@@ -134,7 +138,7 @@ export const apiDelete = send('DELETE');
 // Multipart FormData sends. The browser must set Content-Type itself so the
 // multipart boundary is included — never merge jsonHeaders() here.
 const sendFormData = method => async (url, formData) => {
-  const response = await fetch(url, {
+  const response = await fetchWithTrace(url, {
     method,
     body: formData,
     headers: authHeaders()
