@@ -1,10 +1,16 @@
 import entitiesConfig from './entitiesConfig';
-import { renderCell, SORT_FIELD_MAP } from './tableUtils';
+import {
+  applyColumnOrder,
+  applyColumnVisibility,
+  renderCell,
+  SORT_FIELD_MAP
+} from './tableUtils';
 
 describe('EntityTable field mappings', () => {
   it.each([
     ['authors', 'authorsSort', 'authors.nickname'],
-    ['entrances', 'entrancesSort', 'entrances']
+    ['entrances', 'entrancesSort', 'entrances'],
+    ['hasFiles', 'hasFiles', 'hasFiles']
   ])(
     'uses the document %s sort key without changing its export field',
     (field, sortField, exportField) => {
@@ -15,6 +21,44 @@ describe('EntityTable field mappings', () => {
       expect(column.sortable).toBe(true);
       expect(SORT_FIELD_MAP.documents[field]).toBe(sortField);
       expect(column.apiField ?? column.field).toBe(exportField);
+    }
+  );
+});
+
+describe('column preferences', () => {
+  const columns = [
+    { field: 'title', visible: true },
+    { field: 'authors', visible: true },
+    { field: 'hasFiles', visible: true }
+  ];
+
+  it('restores order, ignores obsolete/duplicate fields and keeps new columns', () => {
+    const ordered = applyColumnOrder(
+      columns,
+      JSON.stringify(['authors', 'removed', 'authors', 'title'])
+    );
+    expect(ordered.map(column => column.field)).toEqual([
+      'authors',
+      'title',
+      'hasFiles'
+    ]);
+    expect(columns.map(column => column.field)).toEqual([
+      'title',
+      'authors',
+      'hasFiles'
+    ]);
+    expect(applyColumnVisibility(ordered, '["title"]')).toEqual([
+      { field: 'authors', visible: false },
+      { field: 'title', visible: true },
+      { field: 'hasFiles', visible: false }
+    ]);
+  });
+
+  it.each([null, 'invalid', '{}', 'null', '42'])(
+    'ignores malformed stored preferences %s',
+    stored => {
+      expect(applyColumnOrder(columns, stored)).toEqual(columns);
+      expect(applyColumnVisibility(columns, stored)).toEqual(columns);
     }
   );
 });

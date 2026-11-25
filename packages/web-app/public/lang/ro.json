@@ -2769,6 +2769,8 @@
   "Syria": "Siria",
   "Syrian Arab Republic": "Republica Arabă Siriană",
   "Table view": "Vizualizare tabel",
+  "tableColumns.moveDown": "Mută {column} în jos",
+  "tableColumns.moveUp": "Mută {column} în sus",
   "Taiwan": "Taiwan",
   "Tajikistan": "Tadjikistan",
   "take all": "luați tot",

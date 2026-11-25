@@ -2769,6 +2769,8 @@
   "Syria": "Сирия",
   "Syrian Arab Republic": "Сирийската арабска република",
   "Table view": "Изглед таблица",
+  "tableColumns.moveDown": "Преместване на {column} надолу",
+  "tableColumns.moveUp": "Преместване на {column} нагоре",
   "Taiwan": "Тайван",
   "Tajikistan": "Таджикистан",
   "take all": "вземи всичко",

@@ -2769,6 +2769,8 @@
   "Syria": "シリア",
   "Syrian Arab Republic": "シリアアラブ共和国",
   "Table view": "テーブル表示",
+  "tableColumns.moveDown": "{column}を下に移動",
+  "tableColumns.moveUp": "{column}を上に移動",
   "Taiwan": "台湾",
   "Tajikistan": "タジキスタン",
   "take all": "すべて取得",

@@ -2769,6 +2769,8 @@
   "Syria": "Suriah",
   "Syrian Arab Republic": "Republik Arab Suriah",
   "Table view": "Tampilan tabel",
+  "tableColumns.moveDown": "Pindahkan {column} ke bawah",
+  "tableColumns.moveUp": "Pindahkan {column} ke atas",
   "Taiwan": "Taiwan",
   "Tajikistan": "Tajikistan",
   "take all": "ambil semua",

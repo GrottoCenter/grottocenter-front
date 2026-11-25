@@ -1,6 +1,6 @@
 const coordinateColumns = ['Latitude', 'Longitude', 'Altitude'];
-// The entrance search always includes its existing Massif column.
-const exportColumns = ['name', 'latitude', 'longitude', 'altitude', 'massifs'];
+// Export only the user's selected columns, in their displayed order.
+const exportColumns = ['name', 'latitude', 'longitude', 'altitude'];
 const results = [
   {
     id: 42,
@@ -24,9 +24,11 @@ const results = [
 const selectCoordinates = menuLabel => {
   cy.contains('button', menuLabel).click();
   coordinateColumns.forEach(label => {
-    cy.contains('[role="menuitem"]', new RegExp(`^${label}$`)).click();
+    cy.contains('label', new RegExp(`^${label}$`))
+      .find('input')
+      .check();
   });
-  cy.get('[role="menu"]').type('{esc}');
+  cy.get('body').type('{esc}');
 };
 
 const cellUnder = (row, header) =>
@@ -43,11 +45,7 @@ const assertCsvRequest = () => {
         : request.body;
     expect(body.entity).to.equal('entrances');
     expect(body.columns).to.deep.equal(exportColumns);
-    expect(body.columnsName).to.deep.equal([
-      'Name',
-      ...coordinateColumns,
-      'Massif'
-    ]);
+    expect(body.columnsName).to.deep.equal(['Name', ...coordinateColumns]);
   });
 };
 

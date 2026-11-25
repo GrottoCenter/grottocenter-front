@@ -48,10 +48,31 @@ export const renderCell = (doc, key, renderFn) => {
 export const applyColumnVisibility = (columns, storedVisibility) => {
   try {
     const visibleFields = JSON.parse(storedVisibility);
+    if (!Array.isArray(visibleFields)) return columns;
     return columns.map(col => ({
       ...col,
       visible: visibleFields.includes(col.field)
     }));
+  } catch {
+    return columns;
+  }
+};
+
+export const applyColumnOrder = (columns, storedOrder) => {
+  try {
+    const fields = JSON.parse(storedOrder);
+    if (!Array.isArray(fields)) return columns;
+    const remaining = new Map(columns.map(column => [column.field, column]));
+    const ordered = [];
+    fields.forEach(field => {
+      const column = remaining.get(field);
+      if (column) {
+        ordered.push(column);
+        remaining.delete(field);
+      }
+    });
+    // Ignore removed/duplicate fields and retain columns added after saving.
+    return [...ordered, ...remaining.values()];
   } catch {
     return columns;
   }

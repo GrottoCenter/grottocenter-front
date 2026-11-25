@@ -508,10 +508,26 @@ SearchSlider.propTypes = {
   )
 };
 
-export const SearchBooleanToggle = ({ label, onChange, value, icon }) => {
+export const SearchBooleanToggle = ({
+  label,
+  onChange,
+  value,
+  icon,
+  allLabel,
+  sx = {}
+}) => {
   const { formatMessage } = useIntl();
+  const options = [
+    { value: true, label: 'Yes' },
+    { value: false, label: 'No' }
+  ];
+  if (allLabel) options.unshift({ value: '', label: allLabel });
+  const selectedValue = value ?? '';
   return (
-    <FormControl sx={{ alignItems: 'center', mx: 1 }}>
+    <FormControl
+      role="group"
+      aria-label={formatMessage({ id: label })}
+      sx={{ alignItems: 'center', mx: 1, ...sx }}>
       <FormLabel
         sx={{
           mb: 0.5,
@@ -523,26 +539,28 @@ export const SearchBooleanToggle = ({ label, onChange, value, icon }) => {
       </FormLabel>
       <Box
         sx={{
-          display: 'flex'
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 0.5
         }}>
-        <Chip
-          label={formatMessage({ id: 'Yes' })}
-          size="small"
-          clickable
-          color={value === true ? 'primary' : 'default'}
-          variant={value === true ? 'filled' : 'outlined'}
-          icon={value === true ? <CheckIcon /> : undefined}
-          onClick={() => onChange(value === true ? null : true)}
-        />
-        <Chip
-          label={formatMessage({ id: 'No' })}
-          size="small"
-          clickable
-          color={value === false ? 'primary' : 'default'}
-          variant={value === false ? 'filled' : 'outlined'}
-          icon={value === false ? <CheckIcon /> : undefined}
-          onClick={() => onChange(value === false ? null : false)}
-        />
+        {options.map(option => {
+          const isSelected = selectedValue === option.value;
+          return (
+            <Chip
+              key={String(option.value)}
+              label={formatMessage({ id: option.label })}
+              size="small"
+              clickable
+              color={isSelected ? 'primary' : 'default'}
+              variant={isSelected ? 'filled' : 'outlined'}
+              icon={isSelected ? <CheckIcon /> : undefined}
+              aria-pressed={isSelected}
+              onClick={() =>
+                onChange(isSelected && !allLabel ? null : option.value)
+              }
+            />
+          );
+        })}
       </Box>
     </FormControl>
   );
@@ -552,7 +570,9 @@ SearchBooleanToggle.propTypes = {
   label: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-  icon: PropTypes.node
+  icon: PropTypes.node,
+  allLabel: PropTypes.string,
+  sx: sxPropType
 };
 
 export const SearchDivingTypes = ({ onChange, value, icon }) => (
@@ -600,6 +620,7 @@ export const SearchSelect = ({
       }}>
       <Select
         value={value}
+        inputProps={{ 'aria-label': formatMessage({ id: label }) }}
         onChange={event => onChange(event.target.value)}
         displayEmpty
         renderValue={v => {
@@ -638,7 +659,7 @@ SearchSelect.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.string,
   optionDescription: PropTypes.string.isRequired,
-  options: PropTypes.arrayOf(PropTypes.shape({})),
+  options: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.node)),
   onChange: PropTypes.func.isRequired,
   sx: sxPropType
 };

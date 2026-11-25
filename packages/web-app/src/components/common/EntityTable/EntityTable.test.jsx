@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -48,4 +49,58 @@ it('uses returned columns in both views without changing the shared config', () 
     screen.queryByRole('columnheader', { name: 'Added at' })
   ).not.toBeInTheDocument();
   expect(screen.queryByText('Modified date')).not.toBeInTheDocument();
+});
+
+it('persists column order independently of visibility and restores it on remount', () => {
+  localStorage.setItem('entityTable_documents_columns', '["title","hasFiles"]');
+  localStorage.setItem(
+    'entityTable_documents_columnOrder',
+    '["title","hasFiles"]'
+  );
+  const { unmount } = renderTable();
+  fireEvent.click(screen.getByRole('button', { name: 'Change columns' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Move Title down' }));
+  expect(
+    screen.getByRole('button', { name: 'Move File available up' })
+  ).toBeDisabled();
+  fireEvent.click(screen.getByRole('checkbox', { name: 'File available' }));
+  expect(
+    JSON.parse(localStorage.getItem('entityTable_documents_columns'))
+  ).toEqual(['title']);
+  expect(
+    JSON.parse(localStorage.getItem('entityTable_documents_columnOrder')).slice(
+      0,
+      2
+    )
+  ).toEqual(['hasFiles', 'title']);
+  fireEvent.click(screen.getByRole('checkbox', { name: 'File available' }));
+  fireEvent.keyDown(document.activeElement, { key: 'Escape' });
+  unmount();
+  renderTable();
+  const header = screen.getAllByRole('row')[0];
+  expect(
+    within(header)
+      .getAllByRole('columnheader')
+      .map(cell => cell.textContent)
+  ).toEqual(['File available', 'Title']);
+});
+
+it('moves a column with keyboard activation and retains focus on that control', async () => {
+  const user = userEvent.setup();
+  localStorage.setItem(
+    'entityTable_documents_columnOrder',
+    '["title","hasFiles"]'
+  );
+  renderTable();
+  await user.click(screen.getByRole('button', { name: 'Change columns' }));
+  const moveDown = screen.getByRole('button', { name: 'Move Title down' });
+  moveDown.focus();
+  await user.keyboard('{Enter}');
+  expect(
+    JSON.parse(localStorage.getItem('entityTable_documents_columnOrder')).slice(
+      0,
+      2
+    )
+  ).toEqual(['hasFiles', 'title']);
+  expect(moveDown).toHaveFocus();
 });

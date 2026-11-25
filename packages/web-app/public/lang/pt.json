@@ -2769,6 +2769,8 @@
   "Syria": "Síria",
   "Syrian Arab Republic": "Síria",
   "Table view": "Vista em tabela",
+  "tableColumns.moveDown": "Mover {column} para baixo",
+  "tableColumns.moveUp": "Mover {column} para cima",
   "Taiwan": "República da China",
   "Tajikistan": "Tajiquistão",
   "take all": "tomar tudo",
