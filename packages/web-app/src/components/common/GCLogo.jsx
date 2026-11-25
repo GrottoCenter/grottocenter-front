@@ -3,6 +3,7 @@ import { Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import AppLink from './AppLink';
 import { logoGC } from '../../conf/config';
+import { withBase } from '../../utils/publicUrl';
 
 // `color: inherit` so the wordmark takes the tone of whatever chrome hosts it
 // — white on the brown AppBar, primary.dark in the side menu — instead of
@@ -43,7 +44,7 @@ const GCLogo = ({
   const content = (
     <>
       <img
-        src={logoGC}
+        src={withBase(logoGC)}
         // Decorative once the wordmark is next to it: leaving the alt text in
         // would make a screen reader announce "Grottocenter" twice.
         alt={showWordmark ? '' : 'Grottocenter'}
