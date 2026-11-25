@@ -349,8 +349,9 @@ export default defineConfig(({ mode }) => {
           navigateFallbackDenylist: [
             /^\/api/,
             /^\/\.well-known/,
-            /^\/robots\.txt$/,
-            /^\/sitemap\.xml$/,
+            // Workbox tests pathname + search, so allow a query string.
+            /^\/robots\.txt(?:\?|$)/,
+            /^\/sitemap\.xml(?:\?|$)/,
             /^\/sitemaps\//
           ],
           cleanupOutdatedCaches: true,
