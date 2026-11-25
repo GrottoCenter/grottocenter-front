@@ -1,6 +1,7 @@
 # Search visibility
 
-**The SPA is permanently `noindex` and `Disallow: /`.** Search visibility does
+**The SPA is permanently `noindex` and `Disallow: /` (bar a few allowed hub
+prefixes, see below).** Search visibility does
 not come from this app. It comes from static HTML pages that the API generates
 nightly from a SQL view enforcing every disclosure rule, and uploads to static
 hosting. Tracking issue:
@@ -10,6 +11,12 @@ The two files that keep the SPA out of search indexes are:
 
 - `packages/web-app/index.html`: `<meta name="robots" content="noindex, nofollow" />`
 - `packages/web-app/public/robots.txt`: `User-agent: *` / `Disallow: /`
+
+`robots.txt` prevents crawling; the meta is a fallback for clients that fetch the
+HTML anyway. The two do not stack: a compliant crawler blocked by `Disallow: /`
+never downloads `index.html`, so it never sees the meta. Neither alone guarantees
+a URL is never listed, since a disallowed URL can still appear without a snippet
+when external sites link to it. Keep both; don't remove one as redundant.
 
 If you were asked to "add SEO to the front-end", read the rest of this page
 first. An earlier plan put the work in this repo and lost. Each rejected idea
@@ -79,7 +86,13 @@ sounds reasonable on its own, so the reasoning is recorded here.
   entrances. What stays hidden would then depend on discipline in every
   front-end change.
 - **Instead:** generated pages built from a whitelist, given only to verified
-  crawlers at the same address.
+  crawlers at the same address. There is no separate crawler `robots.txt`: the
+  tracked `public/robots.txt` is the only one, and it is the same for everyone and
+  every preview. It stays `Disallow: /` except for the few hub prefixes the
+  generated pages are served at
+  ([#1500](https://github.com/GrottoCenter/grottocenter-front/issues/1500)). Other
+  clients get the `noindex` shell at those addresses, so don't widen the
+  allow-list to make the SPA crawlable.
 
 ### Serving the bot pages live from the Sails API
 

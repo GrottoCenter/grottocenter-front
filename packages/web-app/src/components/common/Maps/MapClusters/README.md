@@ -65,7 +65,7 @@ The tour will launch again on the next page load.
 The variable is declared in `packages/web-app/.env` and defaults to `false`:
 
 ```env
-REACT_APP_DISABLE_MAP_TOUR=false
+VITE_DISABLE_MAP_TOUR=false
 ```
 
 Set it to `true` and restart the dev server to prevent the tour from launching regardless
