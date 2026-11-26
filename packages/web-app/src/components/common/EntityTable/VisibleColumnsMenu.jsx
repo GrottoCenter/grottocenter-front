@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -26,6 +26,15 @@ const VisibleColumnsMenu = ({
 }) => {
   const { formatMessage } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
+  const moveButtonRefs = useRef(new Map());
+  const pendingFocusRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (pendingFocusRef.current) {
+      moveButtonRefs.current.get(pendingFocusRef.current)?.focus();
+      pendingFocusRef.current = null;
+    }
+  }, [columns]);
 
   const handleColumnsChange = nextColumns => {
     setColumns(nextColumns);
@@ -50,6 +59,11 @@ const VisibleColumnsMenu = ({
     const nextColumns = [...columns];
     const [column] = nextColumns.splice(index, 1);
     nextColumns.splice(index + offset, 0, column);
+    if (index + offset === 0 || index + offset === columns.length - 1) {
+      // At a boundary, keep focus in this row on the enabled reverse action.
+      const direction = offset === -1 ? 'down' : 'up';
+      pendingFocusRef.current = `${column.field}-${direction}`;
+    }
     handleColumnsChange(nextColumns);
   };
 
@@ -121,6 +135,9 @@ const VisibleColumnsMenu = ({
               <IconButton
                 size="small"
                 disabled={index === 0}
+                ref={node => {
+                  moveButtonRefs.current.set(`${column.field}-up`, node);
+                }}
                 sx={{ width: 44, height: 44 }}
                 data-testid={`move-column-${column.field}-up`}
                 aria-label={formatMessage(
@@ -135,6 +152,9 @@ const VisibleColumnsMenu = ({
               <IconButton
                 size="small"
                 disabled={index === columns.length - 1}
+                ref={node => {
+                  moveButtonRefs.current.set(`${column.field}-down`, node);
+                }}
                 sx={{ width: 44, height: 44 }}
                 data-testid={`move-column-${column.field}-down`}
                 aria-label={formatMessage(

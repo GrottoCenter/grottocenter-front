@@ -166,6 +166,26 @@ describe('Document file availability and column preferences', () => {
     cy.screenshot('document-search-columns-mobile', { capture: 'fullPage' });
   });
 
+  it('keeps focus in the same row at both column-order boundaries', () => {
+    visitDocuments();
+    cy.wait('@search');
+    cy.contains('button', 'Change columns').click();
+    cy.get('[data-testid="move-column-hasFiles-up"]').click();
+    cy.get('[data-testid="move-column-hasFiles-up"]').should('be.disabled');
+    cy.get('[data-testid="move-column-hasFiles-down"]').should('be.focused');
+
+    cy.get('[data-testid^="column-option-"]')
+      .last()
+      .prev()
+      .within(() => {
+        cy.get('[data-testid$="-up"]').as('reverseMove', { type: 'static' });
+        cy.get('[data-testid$="-down"]').as('moveToBottom', { type: 'static' });
+      });
+    cy.get('@moveToBottom').click();
+    cy.get('@moveToBottom').should('be.disabled');
+    cy.get('@reverseMove').should('be.focused');
+  });
+
   it('keeps the French file filter inside advanced filters with a visible summary', () => {
     cy.viewport(390, 720);
     visitDocuments('fr');

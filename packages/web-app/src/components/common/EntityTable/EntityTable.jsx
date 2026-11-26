@@ -16,6 +16,7 @@ import {
   applyColumnOrder,
   applyColumnVisibility,
   getStoredRowsPerPage,
+  readPreference,
   renderCell
 } from './tableUtils';
 
@@ -36,10 +37,10 @@ const initColumns = (
   } else {
     const orderedColumns = applyColumnOrder(
       entityConfig.columns,
-      localStorage.getItem(`entityTable_${entityType}_columnOrder`)
+      readPreference(`entityTable_${entityType}_columnOrder`)
     );
     const storageKey = `entityTable_${entityType}_columns`;
-    const stored = localStorage.getItem(storageKey);
+    const stored = readPreference(storageKey);
     columns = stored
       ? applyColumnVisibility(orderedColumns, stored)
       : orderedColumns;

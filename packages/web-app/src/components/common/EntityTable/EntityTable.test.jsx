@@ -23,6 +23,39 @@ const renderTable = modifier =>
   );
 
 beforeEach(() => localStorage.clear());
+afterEach(() => vi.restoreAllMocks());
+
+it.each(['getItem', 'storage access'])(
+  'uses default columns and keeps controls working when %s is blocked',
+  blocked => {
+    const fail = () => {
+      throw new DOMException('Storage is blocked', 'SecurityError');
+    };
+    if (blocked === 'getItem') {
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(fail);
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(fail);
+    } else {
+      vi.spyOn(window, 'localStorage', 'get').mockImplementation(fail);
+    }
+
+    renderTable();
+    expect(screen.getByRole('columnheader', { name: 'Title' })).toBeVisible();
+    expect(
+      screen.getByRole('columnheader', { name: 'File available' })
+    ).toBeVisible();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Change columns' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Move Id down' }));
+    expect(
+      screen.getByRole('button', { name: 'Move Creator up' })
+    ).toBeDisabled();
+    const fileVisibility = screen.getByRole('checkbox', {
+      name: 'File available'
+    });
+    fireEvent.click(fileVisibility);
+    expect(fileVisibility).not.toBeChecked();
+  }
+);
 
 it('uses returned columns in both views without changing the shared config', () => {
   const originalColumns = entitiesConfig.documents.columns.map(column => ({
@@ -104,3 +137,38 @@ it('moves a column with keyboard activation and retains focus on that control', 
   ).toEqual(['hasFiles', 'title']);
   expect(moveDown).toHaveFocus();
 });
+
+it.each([
+  ['File available', 'up', 'down', '{Enter}'],
+  ['Title', 'down', 'up', ' ']
+])(
+  'focuses the reverse action after moving %s to the %s boundary',
+  async (label, direction, reverseDirection, key) => {
+    const user = userEvent.setup();
+    renderTable(columns =>
+      columns.filter(column => ['title', 'hasFiles'].includes(column.field))
+    );
+    await user.click(screen.getByRole('button', { name: 'Change columns' }));
+    const move = screen.getByRole('button', {
+      name: `Move ${label} ${direction}`
+    });
+    const reverse = screen.getByRole('button', {
+      name: `Move ${label} ${reverseDirection}`
+    });
+    expect(reverse).toBeDisabled();
+    move.focus();
+    await user.keyboard(key);
+    expect(move).toBeDisabled();
+    expect(reverse).toHaveFocus();
+    expect(
+      JSON.parse(localStorage.getItem('entityTable_documents_columnOrder'))
+    ).toEqual(['hasFiles', 'title']);
+
+    await user.keyboard(key);
+    expect(reverse).toBeDisabled();
+    expect(move).toHaveFocus();
+    expect(
+      JSON.parse(localStorage.getItem('entityTable_documents_columnOrder'))
+    ).toEqual(['title', 'hasFiles']);
+  }
+);

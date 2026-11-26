@@ -1,3 +1,6 @@
+import { render, screen } from '@testing-library/react';
+import { IntlProvider } from 'react-intl';
+import messages from '@/../public/lang/fr.json';
 import entitiesConfig from './entitiesConfig';
 import {
   applyColumnOrder,
@@ -92,6 +95,30 @@ describe('EntityTable numeric cells', () => {
     'renders a placeholder for %s',
     value => {
       expect(renderCell({ value }, 'value')).toBe('-');
+    }
+  );
+});
+
+describe('EntityTable shared boolean cells', () => {
+  it.each([
+    [true, 'Oui'],
+    [false, 'Non'],
+    [null, '-'],
+    [undefined, '-']
+  ])(
+    'renders %s with its translated label or a placeholder',
+    (value, label) => {
+      render(
+        <IntlProvider locale="fr" messages={messages}>
+          <div>{renderCell({ value }, 'value')}</div>
+        </IntlProvider>
+      );
+      if (typeof value === 'boolean') {
+        expect(screen.getByRole('img', { name: label })).toBeInTheDocument();
+      } else {
+        expect(screen.getByText(label)).toBeInTheDocument();
+        expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      }
     }
   );
 });

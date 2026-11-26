@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+import { useIntl } from 'react-intl';
 import BoolIcon from '../BoolIcon';
 import entitiesConfig from './entitiesConfig';
 
@@ -33,13 +35,27 @@ export const getObjectPath = (obj, path) => {
   return out;
 };
 
+const BooleanCell = ({ value }) => {
+  const { formatMessage } = useIntl();
+  return (
+    <BoolIcon
+      value={value}
+      titleAccess={formatMessage({ id: value ? 'Yes' : 'No' })}
+    />
+  );
+};
+
+BooleanCell.propTypes = {
+  value: PropTypes.bool.isRequired
+};
+
 export const renderCell = (doc, key, renderFn) => {
   const v = getObjectPath(doc, key);
   if (renderFn) {
     const rendered = renderFn(v, doc);
     return rendered != null ? rendered : '-';
   }
-  if (v === true || v === false) return <BoolIcon value={v} />;
+  if (v === true || v === false) return <BooleanCell value={v} />;
   if (typeof v === 'number') return Number.isFinite(v) ? v : '-';
   if (v) return v;
   return '-';
@@ -78,10 +94,18 @@ export const applyColumnOrder = (columns, storedOrder) => {
   }
 };
 
+export const readPreference = key => {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+
 export const getStoredRowsPerPage = (
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS
 ) => {
-  const stored = localStorage.getItem('entityTable_rowsPerPage');
+  const stored = readPreference('entityTable_rowsPerPage');
   if (stored) {
     const value = parseInt(stored, 10);
     if (pageSizeOptions.includes(value)) return value;

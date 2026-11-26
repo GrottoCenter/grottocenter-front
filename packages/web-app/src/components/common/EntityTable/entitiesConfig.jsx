@@ -15,7 +15,6 @@ import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
 import DocumentValidationBadge from '@/components/common/DocumentValidationBadge';
 import IconLabel from '@/components/common/IconLabel';
 import { isPersonType } from '@/utils/personTypes';
-import BoolIcon from '../BoolIcon';
 import AppLink from '../AppLink';
 import Translate from '../Translate';
 import DataQualityBadge from '../DataQualityBadge';
@@ -38,20 +37,6 @@ const DateTimeCell = ({ value }) => {
 
 DateTimeCell.propTypes = {
   value: PropTypes.string
-};
-
-const BooleanCell = ({ value }) => {
-  const { formatMessage } = useIntl();
-  return (
-    <BoolIcon
-      value={value}
-      titleAccess={formatMessage({ id: value ? 'Yes' : 'No' })}
-    />
-  );
-};
-
-BooleanCell.propTypes = {
-  value: PropTypes.bool.isRequired
 };
 
 const GuidelineScopeCell = ({ guideline }) => {
@@ -580,9 +565,7 @@ const documents = {
       visible: true,
       field: 'hasFiles',
       label: 'File available',
-      sortable: true,
-      render: value =>
-        typeof value === 'boolean' ? <BooleanCell value={value} /> : null
+      sortable: true
     },
     {
       visible: true,
