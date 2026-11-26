@@ -29,6 +29,7 @@ const DeletedEntities = lazy(() => import('./pages/DeletedEntities'));
 const OrganizationManagement = lazy(
   () => import('./pages/OrganizationManagement')
 );
+const AuthorManagement = lazy(() => import('./pages/AuthorManagement'));
 const ApiDoc = lazy(() => import('./pages/ApiDoc'));
 const DocumentDetails = lazy(() => import('./pages/DocumentDetails'));
 const DocumentManagement = lazy(() => import('./pages/DocumentManagement'));
@@ -104,6 +105,7 @@ const router = createBrowserRouter(
         element={<OrganizationManagement />}
       />
       <Route path="/ui/deleted-entities" element={<DeletedEntities />} />
+      <Route path="/ui/persons/management" element={<AuthorManagement />} />
       <Route path="/ui/admin/users" element={<ManageUsers />} />
       <Route path="/ui/entrances" element={<EntrancesSearchPage />} />
       <Route path="/ui/documents" element={<DocumentsSearchPage />} />

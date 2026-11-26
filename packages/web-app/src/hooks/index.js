@@ -153,6 +153,7 @@ export {
 } from './mutations/useMassifForm';
 export { useUpdateName } from './mutations/useUpdateName';
 export { usePerson } from './queries/usePerson';
+export { useAuthorDuplicateScan } from './queries/useAuthorDuplicateScan';
 export {
   useCreatePerson,
   useUpdatePerson,

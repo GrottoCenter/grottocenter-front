@@ -72,6 +72,7 @@ export const entranceKeys = {
 
 export const personKeys = {
   all: ['person'],
+  duplicates: ['person', 'authorDuplicates'],
   detail: detailKey('person')
 };
 

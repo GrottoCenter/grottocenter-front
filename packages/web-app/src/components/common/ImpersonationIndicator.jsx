@@ -18,6 +18,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { clearImpersonation, setImpersonatedRole } from '@/actions/Login';
 import { usePermissions } from '@/hooks';
 import { IMPERSONATABLE_ROLES } from '@/utils/impersonation';
+import RoleLabel from './RoleLabel';
 
 const ImpersonationIndicator = () => {
   const { formatMessage } = useIntl();
@@ -98,6 +99,7 @@ const ImpersonationIndicator = () => {
         <Select
           data-testid="impersonation-switch-select"
           value={impersonatedRole ?? ''}
+          renderValue={role => <RoleLabel roleName={role} />}
           onChange={handleRoleChange}
           disableUnderline
           inputProps={{ 'aria-label': switchLabel }}
@@ -115,7 +117,7 @@ const ImpersonationIndicator = () => {
           }}>
           {IMPERSONATABLE_ROLES.map(role => (
             <MenuItem key={role} value={role}>
-              {formatMessage({ id: role, defaultMessage: role })}
+              <RoleLabel roleName={role} />
             </MenuItem>
           ))}
         </Select>

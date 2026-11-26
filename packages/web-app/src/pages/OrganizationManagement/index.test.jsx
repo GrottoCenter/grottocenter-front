@@ -73,13 +73,13 @@ it('redirects the old deleted tab before the organization Moderator gate', async
 const openDuplicatesTab = () =>
   fireEvent.click(screen.getByRole('tab', { name: 'Duplicates' }));
 
-const keepOrganization = id =>
-  fireEvent.click(
-    within(screen.getByTestId(`duplicate-comparison-${id}`)).getByRole(
-      'button',
-      { name: 'Keep' }
-    )
-  );
+const keepOrganization = async id => {
+  const button = within(
+    screen.getByTestId(`duplicate-comparison-${id}`)
+  ).getByRole('button', { name: 'Keep' });
+  await waitFor(() => expect(button).toBeEnabled());
+  fireEvent.click(button);
+};
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -589,7 +589,7 @@ it('requires an explicit direction and confirms a soft delete with redirect only
   expect(
     screen.queryByRole('button', { name: /^Delete .* and redirect to/ })
   ).toBeNull();
-  keepOrganization(43);
+  await keepOrganization(43);
   const keptCard = screen.getByTestId('duplicate-comparison-43');
   const removedCard = screen.getByTestId('duplicate-comparison-42');
   expect(within(keptCard).getByRole('status')).toHaveTextContent('To keep');
@@ -717,9 +717,9 @@ it('offers one delete action per other organization in a larger group', async ()
   expect(
     screen.queryByRole('radiogroup', { name: 'Organization to remove' })
   ).toBeNull();
-  keepOrganization(42);
+  await keepOrganization(42);
   expect(screen.getAllByText('To keep')).toHaveLength(1);
-  keepOrganization(43);
+  await keepOrganization(43);
   expect(screen.getAllByText('To keep')).toHaveLength(1);
   const selected = within(screen.getByTestId('duplicate-comparison-43'));
   expect(selected.getByRole('status')).toHaveTextContent('To keep');
@@ -812,7 +812,7 @@ it('keeps completed groups in their original position until acknowledged', async
   const middleGroup = await screen.findByTestId('duplicate-group-3:4');
   const initialGroups = screen.getAllByTestId(/^duplicate-group-/);
   fireEvent.click(within(middleGroup).getByRole('button', { name: 'Compare' }));
-  keepOrganization(4);
+  await keepOrganization(4);
   const action = within(middleGroup).getByRole('button', {
     name: 'Delete Beta organization 2 (#3) and redirect to Beta organization 3 (#4)…'
   });
