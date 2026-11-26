@@ -13,8 +13,10 @@ import MobileToolbar from './MobileToolbar';
 import ToolbarActionButton from './ToolbarActionButton';
 import {
   SORT_FIELD_MAP,
+  applyColumnOrder,
   applyColumnVisibility,
   getStoredRowsPerPage,
+  readPreference,
   renderCell
 } from './tableUtils';
 
@@ -33,11 +35,15 @@ const initColumns = (
       visible: col.field === 'name'
     }));
   } else {
+    const orderedColumns = applyColumnOrder(
+      entityConfig.columns,
+      readPreference(`entityTable_${entityType}_columnOrder`)
+    );
     const storageKey = `entityTable_${entityType}_columns`;
-    const stored = localStorage.getItem(storageKey);
+    const stored = readPreference(storageKey);
     columns = stored
-      ? applyColumnVisibility(entityConfig.columns, stored)
-      : entityConfig.columns;
+      ? applyColumnVisibility(orderedColumns, stored)
+      : orderedColumns;
   }
   if (entityColumnsModifier) {
     columns = entityColumnsModifier(columns);
@@ -84,6 +90,8 @@ const EntityTable = ({
     setEntityColumns(
       initColumns(entityConfig, entityType, compact, entityColumnsModifier)
     );
+    // Column modifiers initialize preferences; changing their identity must not
+    // reset a user's visibility or order choices on every parent render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entityType, compact]);
 

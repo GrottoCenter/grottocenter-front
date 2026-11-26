@@ -563,6 +563,12 @@ const documents = {
     },
     {
       visible: true,
+      field: 'hasFiles',
+      label: 'File available',
+      sortable: true
+    },
+    {
+      visible: true,
       field: 'description',
       label: 'Description',
       sortable: false,

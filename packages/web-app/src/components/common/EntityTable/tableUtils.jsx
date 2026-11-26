@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+import { useIntl } from 'react-intl';
 import BoolIcon from '../BoolIcon';
 import entitiesConfig from './entitiesConfig';
 
@@ -33,13 +35,27 @@ export const getObjectPath = (obj, path) => {
   return out;
 };
 
+const BooleanCell = ({ value }) => {
+  const { formatMessage } = useIntl();
+  return (
+    <BoolIcon
+      value={value}
+      titleAccess={formatMessage({ id: value ? 'Yes' : 'No' })}
+    />
+  );
+};
+
+BooleanCell.propTypes = {
+  value: PropTypes.bool.isRequired
+};
+
 export const renderCell = (doc, key, renderFn) => {
   const v = getObjectPath(doc, key);
   if (renderFn) {
     const rendered = renderFn(v, doc);
     return rendered != null ? rendered : '-';
   }
-  if (v === true || v === false) return <BoolIcon value={v} />;
+  if (v === true || v === false) return <BooleanCell value={v} />;
   if (typeof v === 'number') return Number.isFinite(v) ? v : '-';
   if (v) return v;
   return '-';
@@ -48,6 +64,7 @@ export const renderCell = (doc, key, renderFn) => {
 export const applyColumnVisibility = (columns, storedVisibility) => {
   try {
     const visibleFields = JSON.parse(storedVisibility);
+    if (!Array.isArray(visibleFields)) return columns;
     return columns.map(col => ({
       ...col,
       visible: visibleFields.includes(col.field)
@@ -57,10 +74,46 @@ export const applyColumnVisibility = (columns, storedVisibility) => {
   }
 };
 
+export const applyColumnOrder = (columns, storedOrder) => {
+  try {
+    const fields = JSON.parse(storedOrder);
+    if (!Array.isArray(fields)) return columns;
+    const remaining = new Map(columns.map(column => [column.field, column]));
+    const ordered = [];
+    fields.forEach(field => {
+      const column = remaining.get(field);
+      if (column) {
+        ordered.push(column);
+        remaining.delete(field);
+      }
+    });
+    // Ignore removed/duplicate fields and retain columns added after saving.
+    return [...ordered, ...remaining.values()];
+  } catch {
+    return columns;
+  }
+};
+
+export const readPreference = key => {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+
+export const writePreference = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Preferences are optional: blocked/full storage must not break controls.
+  }
+};
+
 export const getStoredRowsPerPage = (
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS
 ) => {
-  const stored = localStorage.getItem('entityTable_rowsPerPage');
+  const stored = readPreference('entityTable_rowsPerPage');
   if (stored) {
     const value = parseInt(stored, 10);
     if (pageSizeOptions.includes(value)) return value;

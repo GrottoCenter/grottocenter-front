@@ -29,6 +29,7 @@ import {
   SearchNumberText,
   SearchTextAutocomplete,
   SearchSelect,
+  SearchBooleanToggle,
   SearchMatchAllFieldsToogle,
   SearchActionButtons,
   SearchFilterAccordion,
@@ -42,6 +43,7 @@ const FILTER_LABELS = {
   title: 'Title',
   description: 'Description',
   type: 'Document type',
+  hasFiles: 'File available',
   'subjects.code': 'Subjects',
   identifierType: 'Identifier type',
   identifier: 'Identifier',
@@ -69,6 +71,7 @@ const initialFilterState = {
   title: '',
   description: '',
   type: '',
+  hasFiles: '',
   'subjects.code': '',
   identifierType: '',
   identifier: '',
@@ -145,6 +148,7 @@ const DocumentSearch = ({
   const filterableKeys = [
     'title',
     'description',
+    'hasFiles',
     'subjects.code',
     'identifierType',
     'identifier',
@@ -219,7 +223,7 @@ const DocumentSearch = ({
           alignItems: { sm: 'center' },
           width: '100%'
         }}>
-        <Box sx={{ flex: 1 }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
           <SearchInput
             onChange={e => setQuery(e)}
             value={query}
@@ -241,24 +245,37 @@ const DocumentSearch = ({
         filterCount={advancedFilterCount}
         expanded={advancedExpanded}
         onExpandedChange={setAdvancedExpanded}>
-        <SearchFieldset title="Content">
-          <SearchText
-            label="Title"
-            onChange={e => updateFilter('title', e)}
-            value={filterState.title}
-          />
-          <SearchText
-            label="Description"
-            onChange={e => updateFilter('description', e)}
-            value={filterState.description}
-          />
-          <SearchSelect
-            label="Subjects"
-            optionDescription="All subjects"
-            options={sortedSubjectOptions}
-            onChange={e => updateFilter('subjects.code', e)}
-            value={filterState['subjects.code']}
-          />
+        <SearchFieldset title="Content" isMultiline>
+          <SearchFormContainer>
+            <SearchText
+              label="Title"
+              onChange={e => updateFilter('title', e)}
+              value={filterState.title}
+            />
+            <SearchText
+              label="Description"
+              onChange={e => updateFilter('description', e)}
+              value={filterState.description}
+            />
+            <SearchSelect
+              label="Subjects"
+              optionDescription="All subjects"
+              options={sortedSubjectOptions}
+              onChange={e => updateFilter('subjects.code', e)}
+              value={filterState['subjects.code']}
+            />
+          </SearchFormContainer>
+          {!lockedFilter.includes('hasFiles') && (
+            <Box sx={{ mt: 1 }}>
+              <SearchBooleanToggle
+                label="File available"
+                allLabel="All"
+                value={filterState.hasFiles}
+                onChange={value => updateFilter('hasFiles', value)}
+                sx={{ mx: 0, alignItems: 'flex-start' }}
+              />
+            </Box>
+          )}
         </SearchFieldset>
 
         <SearchFieldset title="Attributes" isMultiline>

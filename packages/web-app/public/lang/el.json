@@ -2797,6 +2797,8 @@
   "Syria": "Συρία",
   "Syrian Arab Republic": "Συρία",
   "Table view": "Προβολή πίνακα",
+  "tableColumns.moveDown": "Μετακίνηση του {column} προς τα κάτω",
+  "tableColumns.moveUp": "Μετακίνηση του {column} προς τα πάνω",
   "Taiwan": "Ταιβάν",
   "Tajikistan": "Τατζικιστάν",
   "take all": "πάρτε όλα",

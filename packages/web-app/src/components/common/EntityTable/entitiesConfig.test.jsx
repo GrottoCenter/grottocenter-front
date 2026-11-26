@@ -7,6 +7,37 @@ import messages from '../../../../public/lang/en.json';
 import entitiesConfig from './entitiesConfig';
 import { renderCell } from './tableUtils';
 
+it.each([
+  [true, 'Yes'],
+  [false, 'No'],
+  [undefined, '-'],
+  [null, '-']
+])(
+  'shows file availability %s without treating an unknown value as false',
+  (hasFiles, expected) => {
+    const column = entitiesConfig.documents.columns.find(
+      item => item.field === 'hasFiles'
+    );
+    render(
+      <IntlProvider locale="en" messages={messages}>
+        <div>
+          {renderCell(
+            { hasFiles, identifier: 'https://example.org/book.pdf' },
+            column.field,
+            column.render
+          )}
+        </div>
+      </IntlProvider>
+    );
+    if (typeof hasFiles === 'boolean') {
+      expect(screen.getByRole('img', { name: expected })).toBeInTheDocument();
+    } else {
+      expect(screen.getByText(expected)).toBeInTheDocument();
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    }
+  }
+);
+
 it('offers entrance coordinates as optional columns', () => {
   ['latitude', 'longitude', 'altitude'].forEach(field => {
     expect(

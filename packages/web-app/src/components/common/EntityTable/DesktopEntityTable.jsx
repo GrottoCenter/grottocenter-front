@@ -41,7 +41,8 @@ import {
   SORT_FIELD_MAP,
   TOOLBAR_ACTION_HEIGHT,
   getStoredRowsPerPage,
-  renderCell
+  renderCell,
+  writePreference
 } from './tableUtils';
 import Translate from '../Translate';
 
@@ -367,7 +368,7 @@ const DesktopEntityTable = ({
     if (isOffline) return;
     const nbRowPerPage = parseInt(event.target.value, 10);
     setRowsPerPage(nbRowPerPage);
-    localStorage.setItem('entityTable_rowsPerPage', nbRowPerPage);
+    writePreference('entityTable_rowsPerPage', nbRowPerPage);
     setPage(0);
     keepTableTopOnReload();
     if (onPageChange) onPageChange(0, nbRowPerPage);
