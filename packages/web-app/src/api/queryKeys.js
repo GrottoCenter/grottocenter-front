@@ -83,8 +83,25 @@ export const organizationKeys = {
 
 export const organizationManagementKeys = {
   all: ['organizationManagement'],
-  unclassified: ['organizationManagement', 'unclassified'],
-  duplicates: ['organizationManagement', 'duplicates']
+  duplicates: ['organizationManagement', 'duplicates'],
+  other: ['organizationManagement', 'other'],
+  conversionAudit: (id, accountId, analyzedAt) => [
+    'organizationManagement',
+    'conversionAudit',
+    normalizeId(id),
+    normalizeId(accountId),
+    analyzedAt
+  ]
+};
+
+// Temporary cleanup snapshot: entity mutations must not trigger a global scan.
+export const organizationConversionSessionKeys = {
+  all: ['organizationConversionSession'],
+  snapshot: (apiUrl, accountId) => [
+    'organizationConversionSession',
+    apiUrl,
+    normalizeId(accountId)
+  ]
 };
 
 export const countryKeys = {
