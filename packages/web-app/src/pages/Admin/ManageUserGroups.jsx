@@ -20,6 +20,7 @@ import AppLink from '../../components/common/AppLink';
 
 import PersonProperties from '../../components/common/Person/PersonProperties';
 import UserGroups from './UserGroups';
+import UserAccountDetails from './UserAccountDetails';
 
 const UserBlock = styled('div')`
   display: flex;
@@ -164,6 +165,9 @@ const ManageUserGroups = () => {
           <UserBlock>
             <FlexBlock style={{ flexBasis: '300px' }}>
               <PersonProperties person={selectedUser} />
+            </FlexBlock>
+            <FlexBlock style={{ flexBasis: '250px' }}>
+              <UserAccountDetails person={person} />
             </FlexBlock>
             <FlexBlock style={{ flexBasis: '200px' }}>
               <UserGroups
