@@ -128,20 +128,29 @@ describe('Author duplicate management', () => {
           );
         });
         cy.get('[data-testid="comparison-field-type"]').should('not.exist');
+        // MUI's icon test IDs are omitted from production builds. Assert the
+        // actions' accessible labels and SVGs in both development and CI.
         cy.get('[data-testid="preview-person-101"]')
           .should('be.visible')
-          .find('[data-testid="VisibilityIcon"]')
-          .should('exist');
+          .and('have.attr', 'aria-label', 'Preview — Marie Dupont (#101)')
+          .find('svg')
+          .should('be.visible');
         cy.get('[data-testid="open-person-101"]')
           .should('have.attr', 'target', '_blank')
-          .find('[data-testid="OpenInNewIcon"]')
-          .should('exist');
+          .and('have.attr', 'href', '/ui/persons/101')
+          .and(
+            'have.attr',
+            'aria-label',
+            'Open profile — Marie Dupont (#101) (Opens in a new tab)'
+          )
+          .find('svg')
+          .should('be.visible');
         cy.get(
           '[data-testid="author-comparison-101"] [data-testid="author-document-count"] strong'
         ).should('have.text', '25');
         cy.get(
-          '[data-testid="author-comparison-102"] [role="status"] [data-testid="CheckIcon"]'
-        ).should('exist');
+          '[data-testid="author-comparison-102"] [role="status"] svg'
+        ).should('be.visible');
         cy.contains('Documents: 25').should('be.visible');
         cy.contains('Documents: 3').should('be.visible');
         cy.get('[data-testid="author-comparison-102"] [role="status"]').should(
@@ -207,8 +216,13 @@ describe('Author duplicate management', () => {
     cy.get('[data-testid="author-comparison-101"]').within(() => {
       cy.get('a[href="/ui/persons/101/edit"]')
         .should('have.attr', 'target', '_blank')
-        .find('[data-testid="EditIcon"]')
-        .should('exist');
+        .and(
+          'have.attr',
+          'aria-label',
+          'Edit properties — Marie Dupont (#101) (Opens in a new tab)'
+        )
+        .find('svg')
+        .should('be.visible');
       cy.get('[data-testid="preview-person-101"]').click();
     });
     cy.get('[role="dialog"]')
