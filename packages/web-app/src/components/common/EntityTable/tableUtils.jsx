@@ -102,6 +102,14 @@ export const readPreference = key => {
   }
 };
 
+export const writePreference = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Preferences are optional: blocked/full storage must not break controls.
+  }
+};
+
 export const getStoredRowsPerPage = (
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS
 ) => {

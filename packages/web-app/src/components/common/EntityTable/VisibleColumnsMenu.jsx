@@ -13,6 +13,7 @@ import DatasetIcon from '@mui/icons-material/Dataset';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ToolbarActionButton from './ToolbarActionButton';
+import { writePreference } from './tableUtils';
 import Translate from '../Translate';
 
 const VisibleColumnsMenu = ({
@@ -39,20 +40,16 @@ const VisibleColumnsMenu = ({
   const handleColumnsChange = nextColumns => {
     setColumns(nextColumns);
     if (!entityType) return;
-    try {
-      localStorage.setItem(
-        `entityTable_${entityType}_columns`,
-        JSON.stringify(
-          nextColumns.filter(col => col.visible).map(col => col.field)
-        )
-      );
-      localStorage.setItem(
-        `entityTable_${entityType}_columnOrder`,
-        JSON.stringify(nextColumns.map(col => col.field))
-      );
-    } catch {
-      // Preferences are optional: blocked/full storage must not break controls.
-    }
+    writePreference(
+      `entityTable_${entityType}_columns`,
+      JSON.stringify(
+        nextColumns.filter(col => col.visible).map(col => col.field)
+      )
+    );
+    writePreference(
+      `entityTable_${entityType}_columnOrder`,
+      JSON.stringify(nextColumns.map(col => col.field))
+    );
   };
 
   const handleMove = (index, offset) => {

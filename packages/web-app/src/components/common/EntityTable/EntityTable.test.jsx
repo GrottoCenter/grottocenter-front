@@ -7,7 +7,7 @@ import messages from '@/../public/lang/en.json';
 import EntityTable from './EntityTable';
 import entitiesConfig from './entitiesConfig';
 
-const renderTable = modifier =>
+const renderTable = (modifier, { onPageChange, nbTotalRows = 1 } = {}) =>
   render(
     <MemoryRouter>
       <IntlProvider locale="en" messages={messages}>
@@ -16,7 +16,8 @@ const renderTable = modifier =>
           entityColumnsModifier={modifier}
           isLoading={false}
           pageRows={[{ id: 1, title: 'Document' }]}
-          nbTotalRows={1}
+          nbTotalRows={nbTotalRows}
+          onPageChange={onPageChange}
         />
       </IntlProvider>
     </MemoryRouter>
@@ -25,7 +26,7 @@ const renderTable = modifier =>
 beforeEach(() => localStorage.clear());
 afterEach(() => vi.restoreAllMocks());
 
-it.each(['getItem', 'storage access'])(
+it.each(['getItem', 'storage access', 'full storage'])(
   'uses default columns and keeps controls working when %s is blocked',
   blocked => {
     const fail = () => {
@@ -34,15 +35,35 @@ it.each(['getItem', 'storage access'])(
     if (blocked === 'getItem') {
       vi.spyOn(Storage.prototype, 'getItem').mockImplementation(fail);
       vi.spyOn(Storage.prototype, 'setItem').mockImplementation(fail);
-    } else {
+    } else if (blocked === 'storage access') {
       vi.spyOn(window, 'localStorage', 'get').mockImplementation(fail);
+    } else {
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new DOMException('Storage is full', 'QuotaExceededError');
+      });
     }
 
-    renderTable();
+    const onPageChange = vi.fn();
+    renderTable(undefined, { onPageChange, nbTotalRows: 1000 });
     expect(screen.getByRole('columnheader', { name: 'Title' })).toBeVisible();
     expect(
       screen.getByRole('columnheader', { name: 'File available' })
     ).toBeVisible();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    expect(onPageChange).toHaveBeenLastCalledWith(1, 20);
+    const pageSize = screen.getByRole('combobox', {
+      name: 'Results per page:'
+    });
+    fireEvent.mouseDown(pageSize);
+    fireEvent.click(screen.getByRole('option', { name: '100' }));
+    expect(pageSize).toHaveTextContent('100');
+    expect(screen.getByRole('textbox', { name: 'Go to page' })).toHaveValue(
+      '1'
+    );
+    expect(onPageChange).toHaveBeenLastCalledWith(0, 100);
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    expect(onPageChange).toHaveBeenLastCalledWith(1, 100);
 
     fireEvent.click(screen.getByRole('button', { name: 'Change columns' }));
     fireEvent.click(screen.getByRole('button', { name: 'Move Id down' }));
