@@ -20,7 +20,7 @@ import AppLink from '../../components/common/AppLink';
 
 import PersonProperties from '../../components/common/Person/PersonProperties';
 import UserGroups from './UserGroups';
-import UserAccountDetails from './UserAccountDetails';
+import UserAccountDetails, { hasAccountDetails } from './UserAccountDetails';
 
 const UserBlock = styled('div')`
   display: flex;
@@ -59,8 +59,12 @@ const ManageUserGroups = () => {
   const { formatMessage } = useIntl();
   const { onSuccess, onError } = useNotification();
   const debouncedInput = useDebounce(inputValue);
+  // staleTime 0: failed-login counters and last connection change outside this
+  // page, and an admin investigating a lockout needs the current values when
+  // re-selecting a user.
   const { data: person, isFetching: isPersonFetching } = usePerson(
-    selectedUser?.id
+    selectedUser?.id,
+    { staleTime: 0 }
   );
   const {
     data: quicksearchData,
@@ -166,9 +170,18 @@ const ManageUserGroups = () => {
             <FlexBlock style={{ flexBasis: '300px' }}>
               <PersonProperties person={selectedUser} />
             </FlexBlock>
-            <FlexBlock style={{ flexBasis: '250px' }}>
-              <UserAccountDetails person={person} />
-            </FlexBlock>
+            {hasAccountDetails(person) && (
+              // The cached person is returned while the refetch is in flight;
+              // dim it so stale counters do not look current.
+              <FlexBlock
+                aria-busy={isPersonFetching}
+                style={{
+                  flexBasis: '250px',
+                  opacity: isPersonFetching ? 0.5 : 1
+                }}>
+                <UserAccountDetails person={person} />
+              </FlexBlock>
+            )}
             <FlexBlock style={{ flexBasis: '200px' }}>
               <UserGroups
                 isLoading={isUpdateLoading || isBanLoading || isPersonFetching}
