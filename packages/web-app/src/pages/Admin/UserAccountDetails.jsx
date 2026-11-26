@@ -30,15 +30,35 @@ Row.propTypes = {
   children: PropTypes.node.isRequired
 };
 
+const ACCOUNT_FIELDS = [
+  'mail',
+  'pendingMail',
+  'mailIsValid',
+  'activated',
+  'mfaEnabled',
+  'dateInscription',
+  'dateLastConnection',
+  'connectionCounter',
+  'loginFailedAttempts',
+  'lastFailedLoginAt',
+  'totpFailedAttempts'
+];
+
 /**
- * Admin-only account state of the selected user. The API only returns these
- * fields to administrators, so each row is rendered only when its field is
- * present.
+ * Whether the person payload carries any admin-only account field. The API
+ * omits them for non-admin requesters, so the block has nothing to show then.
+ */
+export const hasAccountDetails = person =>
+  Boolean(person) && ACCOUNT_FIELDS.some(key => person[key] !== undefined);
+
+/**
+ * Admin-only account state of the selected user. Each row is rendered only
+ * when its field is present in the payload.
  */
 const UserAccountDetails = ({ person }) => {
   const { formatMessage, formatDate } = useIntl();
 
-  if (!person) return null;
+  if (!hasAccountDetails(person)) return null;
 
   const {
     mail,
@@ -100,6 +120,10 @@ const UserAccountDetails = ({ person }) => {
           {formatDateTime(dateInscription)}
         </Row>
       )}
+      {/* Unlike the other fields, null is meaningful here: for an admin the
+          API serializes a user who never logged in as `null` (see
+          grottocenter-api#2039). Fields it does not return at all are
+          omitted, hence the `undefined` check rather than a null check. */}
       {dateLastConnection !== undefined && (
         <Row label={formatMessage({ id: 'adminUserDetails.lastConnection' })}>
           {dateLastConnection === null

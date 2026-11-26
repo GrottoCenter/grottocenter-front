@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
-import UserAccountDetails from './UserAccountDetails';
+import UserAccountDetails, { hasAccountDetails } from './UserAccountDetails';
 
 const messages = {
   Email: 'Email',
@@ -21,6 +21,10 @@ const messages = {
   'adminUserDetails.lastFailedLogin': 'Last failed login',
   'adminUserDetails.failedMfa': 'Failed MFA attempts'
 };
+
+// Value shown under a row label, so assertions do not depend on other text
+// (e.g. a day number inside a formatted date) matching by accident.
+const valueOf = label => screen.getByText(label).parentElement.lastChild;
 
 const renderDetails = person =>
   render(
@@ -60,7 +64,24 @@ describe('UserAccountDetails', () => {
     expect(screen.getByTestId('admin-user-pending-mail')).toHaveTextContent(
       'new@b.org'
     );
-    expect(screen.getByText('12')).toBeInTheDocument();
+    expect(valueOf('Connections')).toHaveTextContent('12');
+    expect(valueOf('Failed login attempts')).toHaveTextContent('0');
+    expect(valueOf('Failed MFA attempts')).toHaveTextContent('0');
+    expect(valueOf('Last connection')).not.toBeEmptyDOMElement();
+  });
+
+  it('renders the registration and last failed login dates', () => {
+    renderDetails({
+      dateInscription: '2025-01-15T08:30:00Z',
+      lastFailedLoginAt: '2026-10-07T12:00:00Z'
+    });
+    expect(valueOf('Registered on')).not.toBeEmptyDOMElement();
+    expect(valueOf('Last failed login')).not.toBeEmptyDOMElement();
+  });
+
+  it('renders nothing when the payload carries no account field', () => {
+    const { container } = renderDetails({ id: 1, nickname: 'x' });
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('shows warning state and "Never" when no connection', () => {
@@ -78,5 +99,18 @@ describe('UserAccountDetails', () => {
     expect(
       screen.queryByTestId('admin-user-pending-mail')
     ).not.toBeInTheDocument();
+  });
+});
+
+describe('hasAccountDetails', () => {
+  it('is false without a person or without any account field', () => {
+    expect(hasAccountDetails(undefined)).toBe(false);
+    expect(hasAccountDetails({ id: 1 })).toBe(false);
+  });
+
+  it('is true when a field is present, even if falsy', () => {
+    expect(hasAccountDetails({ loginFailedAttempts: 0 })).toBe(true);
+    expect(hasAccountDetails({ dateLastConnection: null })).toBe(true);
+    expect(hasAccountDetails({ mfaEnabled: false })).toBe(true);
   });
 });
