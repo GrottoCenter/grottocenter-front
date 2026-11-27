@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useContext, useId } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -17,6 +17,7 @@ import {
 } from '@/components/common/LicenseTag/helpers';
 import FieldHelperText from '@/components/common/Form/FieldHelperText';
 import { findLicenseByName } from '@/hooks';
+import { DocumentFormContext } from '../Provider';
 import DocumentLicenseDeedLink from './DocumentLicenseDeedLink';
 
 const DocumentLicenseSelect = ({
@@ -30,10 +31,12 @@ const DocumentLicenseSelect = ({
   hasUnknownLicense = false
 }) => {
   const { formatMessage } = useIntl();
+  const { invalidField } = useContext(DocumentFormContext);
+  const needsLicense = hasUnknownLicense || invalidField === 'license';
   const id = useId();
   const licenseName = getLicenseName(value);
   const describedBy =
-    [description && `${id}-description`, hasUnknownLicense && `${id}-error`]
+    [description && `${id}-description`, needsLicense && `${id}-error`]
       .filter(Boolean)
       .join(' ') || undefined;
 
@@ -49,7 +52,7 @@ const DocumentLicenseSelect = ({
         variant="filled"
         fullWidth
         required
-        error={hasUnknownLicense}
+        error={needsLicense}
         disabled={disabled}
         sx={{ mt: description ? 0 : 1 }}>
         <InputLabel id={`${id}-label`}>
@@ -85,8 +88,8 @@ const DocumentLicenseSelect = ({
             </MenuItem>
           ))}
         </Select>
-        {hasUnknownLicense && (
-          <FormHelperText id={`${id}-error`}>
+        {needsLicense && (
+          <FormHelperText id={`${id}-error`} role="alert">
             {formatMessage({ id: 'Select a license' })}
           </FormHelperText>
         )}

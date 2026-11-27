@@ -25,6 +25,7 @@ const AdvancedDocumentMetadata = () => {
   const { formatMessage } = useIntl();
   const {
     document,
+    invalidField,
     lengthErrors,
     updateAttribute,
     allowEntityCreation = true
@@ -35,14 +36,15 @@ const AdvancedDocumentMetadata = () => {
     ['identifier', 'creatorComment'].includes(field)
   );
 
+  const revealIdentifier = invalidField === 'identifier';
   useEffect(() => {
-    if (hasLengthError) setIsExpanded(true);
-  }, [hasLengthError]);
+    if (hasLengthError || revealIdentifier) setIsExpanded(true);
+  }, [hasLengthError, revealIdentifier]);
 
   return (
     <Accordion
       data-testid="document-advanced-metadata"
-      expanded={isExpanded || hasLengthError}
+      expanded={isExpanded || hasLengthError || revealIdentifier}
       onChange={(_event, expanded) => setIsExpanded(expanded)}
       disableGutters
       elevation={0}
@@ -69,7 +71,7 @@ const AdvancedDocumentMetadata = () => {
           flexDirection: 'column',
           gap: 1.5
         }}>
-        <Box>
+        <Box data-document-field="identifier">
           <IdentifierEditor />
         </Box>
         <FormRow>
@@ -134,7 +136,7 @@ const AdvancedDocumentMetadata = () => {
         </Box>
 
         <StringInput
-          hasError={false}
+          data-document-field="creatorComment"
           helperText={formatMessage({
             id: 'Additional information about the document.'
           })}

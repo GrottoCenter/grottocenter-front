@@ -7,15 +7,7 @@ import {
   useRef
 } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Alert,
-  Box,
-  Button,
-  Skeleton,
-  Stack,
-  Typography,
-  useMediaQuery
-} from '@mui/material';
+import { Alert, Box, Skeleton, Stack, useMediaQuery } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +22,7 @@ import {
 import { DocumentFileErrorPropTypes } from '@/types/document.type';
 import { FormActionRow, FormContainer } from '../utils/FormContainers';
 import AdvancedDocumentMetadata from './AdvancedDocumentMetadata';
+import DocumentFieldError from './DocumentFieldError';
 import { DocumentFormContext, getIncompatibleFiles } from './Provider';
 import AddFileForm from './formElements/AddFileForm';
 import AuthorAndSharing from './formElements/AuthorAndSharing';
@@ -61,19 +54,6 @@ const typeLabels = {
   [DocumentTypes.AUTHORIZATION_TO_PUBLISH]: { date: 'Authorization date' }
 };
 
-const fieldLabels = {
-  type: 'Document type',
-  parent: 'Parent document',
-  authors: 'Authors',
-  files: 'Files',
-  pages: 'Pages',
-  issue: 'Periodical issue',
-  identifier: 'Identifier',
-  creatorComment: 'Comment',
-  sharing: 'documentForm.sharingBasis',
-  authorization: 'Authorization To Publish'
-};
-
 const FormContent = ({
   onCancel,
   isSubmitting = false,
@@ -83,8 +63,8 @@ const FormContent = ({
 }) => {
   const {
     document,
-    isFormValid,
-    blockingField,
+    invalidField,
+    validationAttempt,
     lengthErrors,
     isNewDocument,
     updateAttribute,
@@ -97,6 +77,7 @@ const FormContent = ({
   const rootRef = useRef(null);
   const firstFieldRef = useRef(null);
   const shouldRevealFirstField = useRef(false);
+  const focusedAttempt = useRef(null);
   const prefersReducedMotion = useMediaQuery(
     '(prefers-reduced-motion: reduce)'
   );
@@ -106,35 +87,35 @@ const FormContent = ({
     languages.find(language => language.part1 === locale)?.id ?? '000';
   const rules = getDocumentTypeRules(document.type);
   const labels = typeLabels[document.type] ?? {};
-  const blockedLabel = {
-    ...fieldLabels,
-    title: labels.title ?? 'Title',
-    date: labels.date ?? 'DatePublication',
-    license: rules.hasGrantedLicense ? 'documentForm.grantedLicense' : 'License'
-  }[blockingField];
-  const focusBlockedField = () => {
-    const destination = ['identifier', 'creatorComment'].includes(blockingField)
-      ? 'advanced'
-      : blockingField;
-    const field = rootRef.current?.querySelector(
-      `[data-document-field="${destination}"]`
-    );
+  useLayoutEffect(() => {
+    if (!invalidField || focusedAttempt.current === validationAttempt) return;
+    focusedAttempt.current = validationAttempt;
+    const root = rootRef.current;
+    const field =
+      root?.querySelector(`[data-document-field="${invalidField}"]`) ??
+      (invalidField === 'sharing'
+        ? root?.querySelector('[data-document-field="authors"]')
+        : null);
     const control =
-      field?.querySelector('input[role="combobox"]:not(:disabled)') ??
+      field?.querySelector('[data-validation-focus]') ??
       field?.querySelector(
-        'input:not([type="hidden"], [type="file"], :disabled), textarea, [tabindex="0"], button:not(:disabled)'
+        'input[aria-invalid="true"]:not([type="hidden"], [aria-hidden="true"], :disabled), textarea[aria-invalid="true"]:not(:disabled)'
+      ) ??
+      field?.querySelector(
+        '[role="combobox"]:not(:disabled, [aria-disabled="true"])'
+      ) ??
+      field?.querySelector('input[type="radio"]:checked:not(:disabled)') ??
+      field?.querySelector('input[type="radio"]:not(:disabled)') ??
+      field?.querySelector(
+        'input:not([type="hidden"], [type="file"], :disabled), textarea:not(:disabled), [tabindex="0"]:not([aria-disabled="true"]), button:not(:disabled)'
       );
-    (control ?? field)?.scrollIntoView?.({
+    const target = control ?? field;
+    target?.focus({ preventScroll: true });
+    target?.scrollIntoView?.({
       block: 'center',
-      behavior: prefersReducedMotion ? 'instant' : 'smooth'
+      behavior: 'instant'
     });
-    if (
-      destination === 'advanced' &&
-      control?.getAttribute('aria-expanded') === 'false'
-    )
-      control.click();
-    control?.focus({ preventScroll: true });
-  };
+  }, [invalidField, validationAttempt]);
   const incompatibleFiles = getIncompatibleFiles(document);
   const blockedByStoredRights =
     hasStoredAuthorization &&
@@ -171,6 +152,7 @@ const FormContent = ({
     <FormContainer
       ref={rootRef}
       sx={{
+        '& .MuiInputLabel-root.Mui-error': { color: 'error.dark' },
         '& .MuiAutocomplete-endAdornment button': {
           width: { xs: 44 },
           height: { xs: 44 }
@@ -192,8 +174,9 @@ const FormContent = ({
           )}
         </Alert>
       )}
-      <Box data-document-field="type">
+      <Box data-document-field="type" tabIndex={-1}>
         <DocumentTypeSelect onTypeChange={changeType} />
+        <DocumentFieldError field="type" label="Document type" />
       </Box>
       {lengthErrors.length > 0 && (
         <Alert severity="error" sx={{ mt: 1 }}>
@@ -223,6 +206,7 @@ const FormContent = ({
             {(rules.allowsFiles || incompatibleFiles.length > 0) && (
               <Box
                 data-document-field="files"
+                tabIndex={-1}
                 ref={rules.allowsFiles ? firstFieldRef : undefined}>
                 <AddFileForm
                   files={document.files}
@@ -233,6 +217,9 @@ const FormContent = ({
                   disabled={isSubmitting}
                   fileError={fileError}
                 />
+                {incompatibleFiles.length === 0 && (
+                  <DocumentFieldError field="files" label="Files" />
+                )}
               </Box>
             )}
             <Box
@@ -250,6 +237,11 @@ const FormContent = ({
                 data-testid="document-title"
                 data-document-field="title"
                 value={document.title}
+                errorText={
+                  invalidField === 'title' && !document.title?.trim()
+                    ? formatMessage({ id: 'A title is required.' })
+                    : undefined
+                }
                 maxLength={TEXT_LENGTH_LIMITS.TITLE}
                 onValueChange={value => updateAttribute('title', value)}
                 required
@@ -272,7 +264,7 @@ const FormContent = ({
               minRows={3}
             />
             {rules.parentType && (
-              <Box data-document-field="parent">
+              <Box data-document-field="parent" tabIndex={-1}>
                 <ParentDocumentSelect
                   labelText={formatMessage({ id: rules.parentType })}
                   searchLabelText={formatMessage({
@@ -323,46 +315,15 @@ const FormContent = ({
             )}
           </Stack>
           <AuthorAndSharing disabled={isSubmitting} />
-          {rules.hasAdvancedMetadata && (
-            <Box data-document-field="advanced">
-              <AdvancedDocumentMetadata />
-            </Box>
-          )}
+          {rules.hasAdvancedMetadata && <AdvancedDocumentMetadata />}
         </>
-      )}
-      {blockedLabel && !isSubmitting && (
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={0.5}
-          sx={{
-            mt: 2,
-            alignItems: { xs: 'flex-start', sm: 'center' },
-            justifyContent: 'flex-end'
-          }}>
-          <Typography variant="body2" color="text.secondary" role="status">
-            {formatMessage(
-              { id: 'documentForm.checkField' },
-              {
-                field: formatMessage({ id: blockedLabel })
-              }
-            )}
-          </Typography>
-          <Button
-            size="small"
-            type="button"
-            variant="text"
-            onClick={focusBlockedField}
-            sx={{ textTransform: 'none', minHeight: { xs: 44, sm: 32 } }}>
-            {formatMessage({ id: 'documentForm.goToField' })}
-          </Button>
-        </Stack>
       )}
       {submissionNotice}
       <FormActionRow
         submitTestId="document-submit"
         isNew={isNewDocument}
         isSubmitting={isSubmitting}
-        disabled={!isFormValid || isSubmissionBlocked}
+        disabled={isSubmissionBlocked}
         onCancel={onCancel || (() => navigate(-1))}
       />
     </FormContainer>

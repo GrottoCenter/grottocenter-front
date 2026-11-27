@@ -5,6 +5,7 @@ import {
   Box,
   FilledInput,
   FormControl,
+  FormHelperText,
   InputLabel,
   Typography
 } from '@mui/material';
@@ -14,6 +15,7 @@ import FieldHelperText from './FieldHelperText';
 const StringInput = ({
   characterLimit,
   endAdornment,
+  errorText,
   fullWidth = true,
   hasError = false,
   helperText,
@@ -37,6 +39,7 @@ const StringInput = ({
   const describedBy =
     [
       helperText && `${inputId}-help`,
+      errorText && `${inputId}-error`,
       isTooLong && `${inputId}-limit`,
       shouldShowCounter && `${inputId}-count`
     ]
@@ -60,7 +63,7 @@ const StringInput = ({
         variant="filled"
         fullWidth={fullWidth}
         required={required}
-        error={hasError || isTooLong}>
+        error={hasError || !!errorText || isTooLong}>
         <InputLabel htmlFor={inputId}>{valueName}</InputLabel>
         <FilledInput
           id={inputId}
@@ -72,11 +75,20 @@ const StringInput = ({
           required={required}
           type={type}
           value={inputValue}
-          error={hasError || isTooLong}
+          error={hasError || !!errorText || isTooLong}
           inputProps={limit === undefined ? undefined : { maxLength: limit }}
           {...props}
         />
       </FormControl>
+      {errorText && (
+        <FormHelperText
+          id={`${inputId}-error`}
+          error
+          role="alert"
+          sx={{ typography: 'body2' }}>
+          {errorText}
+        </FormHelperText>
+      )}
       {isTooLong && (
         <Typography
           id={`${inputId}-limit`}
@@ -104,6 +116,7 @@ const StringInput = ({
 
 StringInput.propTypes = {
   characterLimit: PropTypes.number,
+  errorText: PropTypes.node,
   endAdornment: PropTypes.node,
   fullWidth: PropTypes.bool,
   hasError: PropTypes.bool,

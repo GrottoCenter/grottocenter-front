@@ -63,6 +63,9 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
   const {
     document,
     isFormValid,
+    blockingField,
+    flagValidationError,
+    grantedPublicationLicense,
     isNewDocument,
     resetContext,
     selectParent,
@@ -97,7 +100,11 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
     : findLicenseByName(licenses, getLicenseName(storedLicense));
   const isWaitingForStoredLicense =
     preservesStoredLicense && !resolvedStoredLicense;
-  const canSubmit = isFormValid && !isWaitingForStoredLicense;
+  const isWaitingForGrant =
+    blockingField === 'authorization' && grantedPublicationLicense?.isLoading;
+  const isResolvingDocument =
+    isWaitingForStoredLicense || isWaitingForGrant || document.isParentPending;
+  const canSubmit = isFormValid && !isResolvingDocument;
   const isSubmitting = activeMutation.isPending;
   const errorMessages = activeMutation.error?.errorMessages ?? [];
 
@@ -132,7 +139,11 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
 
   const onFormSubmit = event => {
     event.preventDefault();
-    if (!canSubmit) return;
+    if (isSubmitting || isResolvingDocument) return;
+    if (!isFormValid) {
+      flagValidationError();
+      return;
+    }
 
     // A file is expected for this type but none is attached: ask for
     // confirmation so the user does not forget (they cannot add a file after
@@ -251,12 +262,13 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
             isNewDocument={isNewDocument}
           />
           <form
+            noValidate
             onSubmit={onFormSubmit}
             style={isSubmitting ? { opacity: '0.6' } : undefined}>
             <FormContent
               onCancel={onCancel}
               isSubmitting={isSubmitting}
-              isSubmissionBlocked={isWaitingForStoredLicense}
+              isSubmissionBlocked={isResolvingDocument}
               submissionNotice={
                 isWaitingForStoredLicense && (
                   <Alert

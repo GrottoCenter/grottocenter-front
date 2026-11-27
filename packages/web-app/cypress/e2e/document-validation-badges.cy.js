@@ -65,6 +65,13 @@ describe('Document validation badges in ordinary search', () => {
         .and('have.css', 'font-weight', '400')
         .and('have.class', 'MuiChip-colorInfo')
         .and('contain.text', 'En attente de re-validation');
+      cy.get('[data-testid="document-validation-badge"]').should(([badge]) => {
+        const styles = badge.ownerDocument.defaultView.getComputedStyle(badge);
+        expect(styles.borderTopColor).to.equal(styles.color);
+      });
+      cy.get('[data-testid="document-validation-badge"]')
+        .find('[data-testid="HourglassEmptyIcon"]')
+        .should('be.visible');
       cy.get('[data-testid="document-validation-badge"]')
         .parents('h1,h2,h3,h4,h5,h6')
         .should('not.exist');
@@ -94,9 +101,9 @@ describe('Document validation badges in ordinary search', () => {
         cy.visit('/documents/7');
       }
       cy.wait('@acceptedDocument');
-      cy.contains('h1', 'Currently accepted survey content').should(
-        'be.visible'
-      );
+      cy.contains('h1', 'Currently accepted survey content')
+        .should('be.visible')
+        .and('have.css', 'color', 'rgb(245, 124, 0)');
       cy.get('[data-testid="document-validation-badge"]').should(
         'have.length',
         1

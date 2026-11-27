@@ -58,7 +58,7 @@ const PageTitle = ({ title, icon, titleAdornment, subheader, actions }) => {
       <Row>
         <TitleGroup>
           {hasTitle ? (
-            <TitleHeading variant="h1" sx={{ color: 'secondary.dark' }}>
+            <TitleHeading variant="h1" color="secondary">
               {icon && <TitleIcon>{icon}</TitleIcon>}
               {title}
             </TitleHeading>

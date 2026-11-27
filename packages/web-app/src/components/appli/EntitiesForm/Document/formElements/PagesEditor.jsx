@@ -17,7 +17,11 @@ const PagesEditor = () => {
       valueName={formatMessage({ id: 'Pages (e.g. 10 or 10-12)' })}
       value={pages}
       maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_PAGES}
-      hasError={!isDocumentPagesFormatValid(pages)}
+      errorText={
+        !isDocumentPagesFormatValid(pages)
+          ? formatMessage({ id: 'Pages (e.g. 10 or 10-12)' })
+          : undefined
+      }
       onValueChange={value => {
         if (/^(\d+-?\d*)?$/.test(value)) updateAttribute('pages', value);
       }}

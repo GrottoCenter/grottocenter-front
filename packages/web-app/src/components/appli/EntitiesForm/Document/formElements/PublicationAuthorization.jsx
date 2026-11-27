@@ -10,7 +10,7 @@ import AuthorizationGrantedLicense from './AuthorizationGrantedLicense';
 
 const PublicationAuthorization = ({ disabled = false, required = true }) => {
   const { formatMessage } = useIntl();
-  const { document, hasStoredAuthorization, updateAttribute } =
+  const { document, hasStoredAuthorization, invalidField, updateAttribute } =
     useContext(DocumentFormContext);
   const [isReplacing, setIsReplacing] = useState(false);
   const search = useRef(null);
@@ -52,6 +52,9 @@ const PublicationAuthorization = ({ disabled = false, required = true }) => {
               if (value) closeSearch();
             }}
             required={required || hasStoredAuthorization}
+            showRequiredError={
+              invalidField === 'authorization' && !hasSelection
+            }
             disableClearable={hasStoredAuthorization}
             disabled={disabled}
           />

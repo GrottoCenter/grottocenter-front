@@ -24,7 +24,8 @@ const ParentDocumentSelect = ({
   searchLabelText
 }) => {
   const { formatMessage } = useIntl();
-  const { document, selectParent } = useContext(DocumentFormContext);
+  const { document, invalidField, selectParent } =
+    useContext(DocumentFormContext);
   const value = document.parent;
   const filter = useMemo(() => {
     const parentType = getParentDocumentType(document.type);
@@ -85,6 +86,14 @@ const ParentDocumentSelect = ({
             placeholder={searchLabelText}
             required={required && !value}
             hasError={hasError}
+            errorMessage={
+              invalidField === 'parent'
+                ? formatMessage(
+                    { id: 'documentForm.checkField' },
+                    { field: labelText }
+                  )
+                : undefined
+            }
             loading={isLoading}
             testId="document-parent-search"
             selectedIcon={

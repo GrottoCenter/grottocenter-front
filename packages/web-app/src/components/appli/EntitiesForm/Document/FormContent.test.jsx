@@ -34,14 +34,21 @@ vi.mock('@/components/appli/OrganizationSelect', () => ({
 }));
 vi.mock('./formElements/AddFileForm', () => ({ default: () => null }));
 
-const IntroduceLengthError = () => {
-  const { updateAttribute } = useContext(DocumentFormContext);
+const ValidationControls = () => {
+  const { updateAttribute, blockingField, flagValidationError } =
+    useContext(DocumentFormContext);
   return (
-    <button
-      type="button"
-      onClick={() => updateAttribute('identifier', 'x'.repeat(251))}>
-      Load oversized identifier
-    </button>
+    <>
+      <output data-testid="blocking-document-field">{blockingField}</output>
+      <button type="button" onClick={flagValidationError}>
+        Show validation error
+      </button>
+      <button
+        type="button"
+        onClick={() => updateAttribute('identifier', 'x'.repeat(251))}>
+        Load oversized identifier
+      </button>
+    </>
   );
 };
 
@@ -59,7 +66,7 @@ const renderForm = overrides =>
           ...overrides
         }}>
         <FormContent />
-        <IntroduceLengthError />
+        <ValidationControls />
       </DocumentFormProvider>
     </MemoryRouter>,
     { messages }
@@ -79,7 +86,9 @@ describe('Document advanced metadata length errors', () => {
       await waitFor(() =>
         expect(summary).toHaveAttribute('aria-expanded', 'true')
       );
-      expect(screen.getByRole('button', { name: 'Update' })).toBeDisabled();
+      expect(screen.getByTestId('blocking-document-field')).toHaveTextContent(
+        'identifier'
+      );
 
       const input = screen.getByRole('textbox', { name: 'Identifier' });
       input.focus();
@@ -92,13 +101,31 @@ describe('Document advanced metadata length errors', () => {
       expect(input).toHaveFocus();
       expect(input).toBeVisible();
       await waitFor(() =>
-        expect(screen.getByRole('button', { name: 'Update' })).toBeEnabled()
+        expect(
+          screen.getByTestId('blocking-document-field')
+        ).toBeEmptyDOMElement()
       );
 
       fireEvent.click(summary);
       expect(summary).toHaveAttribute('aria-expanded', 'false');
     }
   );
+});
+
+it('reveals and focuses an invalid identifier in the advanced section', () => {
+  renderForm({ identifier: '1234', identifierType: null });
+  const summary = screen.getByRole('button', { name: 'Advanced metadata' });
+  expect(summary).toHaveAttribute('aria-expanded', 'false');
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Show validation error' })
+  );
+  expect(summary).toHaveAttribute('aria-expanded', 'true');
+  expect(
+    screen.getByRole('combobox', { name: /Identifier Type/ })
+  ).toHaveFocus();
+  const identifier = screen.getByRole('textbox', { name: 'Identifier' });
+  fireEvent.change(identifier, { target: { value: '' } });
+  expect(summary).toHaveAttribute('aria-expanded', 'true');
 });
 
 describe('Document publication date visibility', () => {
@@ -142,9 +169,11 @@ describe('Document publication date visibility', () => {
     const input = await screen.findByRole('textbox', { name: /Event date/ });
     const nextYear = String(new Date().getFullYear() + 1);
     fireEvent.change(input, { target: { value: nextYear } });
-    expect(screen.getByRole('button', { name: 'Update' })).toBeEnabled();
+    expect(screen.getByTestId('blocking-document-field')).toBeEmptyDOMElement();
     fireEvent.change(input, { target: { value: `${nextYear}-02-30` } });
-    expect(screen.getByRole('button', { name: 'Update' })).toBeDisabled();
+    expect(screen.getByTestId('blocking-document-field')).toHaveTextContent(
+      'date'
+    );
   });
 });
 

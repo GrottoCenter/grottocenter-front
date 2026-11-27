@@ -122,7 +122,8 @@ const getBlockingField = (
   if (rules.requiresAuthor && !hasAuthors(document)) return 'authors';
   if (lengthErrors.length > 0) return lengthErrors[0].field;
   if (!isDocumentPagesFormatValid(payload.pages)) return 'pages';
-  if (payload.identifier && !payload.identifierType) return 'identifier';
+  if (Boolean(payload.identifier) !== Boolean(payload.identifierType))
+    return 'identifier';
   if (
     payload.identifierType?.regexp &&
     !new RegExp(payload.identifierType.regexp).test(payload.identifier)
@@ -183,6 +184,9 @@ export const DocumentFormContext = createContext({
   allowEntityCreation: true,
   isFormValid: true,
   blockingField: null,
+  validationAttempt: null,
+  invalidField: null,
+  flagValidationError: () => {},
   lengthErrors: [],
   updateAttribute: (_attributeName, _newValue) => {},
   selectParent: () => {},
@@ -388,6 +392,12 @@ const Provider = ({
   });
   const isFormValid = !blockingField;
   const [linkedEntrance, setLinkedEntrance] = useState(null);
+  const [validationAttempt, setValidationAttempt] = useState(null);
+  const invalidField =
+    validationAttempt?.field === blockingField ? blockingField : null;
+  const flagValidationError = useCallback(() => {
+    if (blockingField) setValidationAttempt({ field: blockingField });
+  }, [blockingField]);
 
   const updateAttribute = useCallback(
     (attributeName, newValue) => {
@@ -440,6 +450,7 @@ const Provider = ({
   );
 
   const resetContext = useCallback((overrides = {}) => {
+    setValidationAttempt(null);
     allowPhotoDatePrefillRef.current = true;
     attributeVersionsRef.current.datePublication =
       (attributeVersionsRef.current.datePublication ?? 0) + 1;
@@ -459,6 +470,9 @@ const Provider = ({
       allowEntityCreation,
       isFormValid,
       blockingField,
+      validationAttempt,
+      invalidField,
+      flagValidationError,
       lengthErrors,
       updateAttribute,
       selectParent,
@@ -476,6 +490,9 @@ const Provider = ({
       allowEntityCreation,
       isFormValid,
       blockingField,
+      validationAttempt,
+      invalidField,
+      flagValidationError,
       lengthErrors,
       updateAttribute,
       selectParent,

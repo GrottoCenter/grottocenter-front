@@ -212,8 +212,8 @@ describe('editing document publication rights', () => {
         screen.getByText(messages['documentForm.grantedLicenseScope'])
       ).toBeVisible();
       const submit = screen.getByTestId('document-submit');
-      expect(submit).toBeDisabled();
-      fireEvent.submit(submit.closest('form'));
+      expect(submit).toBeEnabled();
+      fireEvent.click(submit);
       const api = isNewDocument ? apiPostForm : apiPutForm;
       expect(api).not.toHaveBeenCalled();
 
@@ -255,8 +255,7 @@ describe('editing document publication rights', () => {
     it.each([42, '42'])('blocks a bare self-parent id: %j', async parent => {
       renderSubmission({ type, parent });
       const submit = screen.getByRole('button', { name: 'Update' });
-      expect(submit).toBeDisabled();
-      fireEvent.submit(submit.closest('form'));
+      fireEvent.click(submit);
       expect(apiPutForm).not.toHaveBeenCalled();
     });
   });
@@ -559,8 +558,8 @@ describe('editing document publication rights', () => {
     ).toBeVisible();
     expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
     const submit = screen.getByTestId('document-submit');
-    expect(submit).toBeDisabled();
-    fireEvent.submit(submit.closest('form'));
+    fireEvent.click(submit);
+    expect(screen.getByRole('button', { name: 'Retry' })).toHaveFocus();
     expect(apiPutForm).not.toHaveBeenCalled();
   });
 
@@ -595,7 +594,8 @@ describe('editing document publication rights', () => {
     await selectAuthorization(replacement.title);
     fireEvent.click(await screen.findByTestId('document-type-6'));
     await addFile(container);
-    expect(screen.getByTestId('document-submit')).toBeDisabled();
+    fireEvent.click(screen.getByTestId('document-submit'));
+    expect(apiPutForm).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId('document-type-4'));
     expect(
       screen.getByText(/Remove files this type cannot accept/)
@@ -761,22 +761,20 @@ describe('editing document publication rights', () => {
     expect(apiPutForm.mock.calls[0][1].get('license[id]')).toBe('2');
   });
 
-  it('explains a missing title and focuses its input from the actions', async () => {
+  it('focuses the missing title and describes the error on submit', async () => {
     renderSubmission({ title: '' });
     const submit = screen.getByTestId('document-submit');
-    expect(submit).toBeDisabled();
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Check Title before saving'
-    );
-    fireEvent.click(screen.getByRole('button', { name: 'Go to field' }));
-    expect(
-      screen.getByTestId('document-title').querySelector('input')
-    ).toHaveFocus();
+    const title = screen.getByTestId('document-title').querySelector('input');
+    expect(submit).toBeEnabled();
+    expect(screen.queryByText('A title is required.')).not.toBeInTheDocument();
+    fireEvent.click(submit);
+    expect(apiPutForm).not.toHaveBeenCalled();
+    expect(title).toHaveFocus();
+    expect(title).toHaveAttribute('aria-invalid', 'true');
+    expect(title).toHaveAccessibleDescription('A title is required.');
     enterTitle('Issue 42');
     await waitFor(() => expect(submit).toBeEnabled());
-    expect(
-      screen.queryByRole('button', { name: 'Go to field' })
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('A title is required.')).not.toBeInTheDocument();
   });
 
   it('applies CC-BY-SA when switching from a file license to declaring publication rights', async () => {
@@ -803,7 +801,8 @@ describe('editing document publication rights', () => {
     });
     await addFile(container);
     const submit = screen.getByTestId('document-submit');
-    expect(submit).toBeDisabled();
+    fireEvent.click(submit);
+    expect(apiPutForm).not.toHaveBeenCalled();
     expect(await screen.findByText('Select a license')).toBeVisible();
     await selectLicense(2);
     await waitFor(() => expect(submit).toBeEnabled());
@@ -884,7 +883,8 @@ describe('editing document publication rights', () => {
     await selectLicense(2);
     fireEvent.click(screen.getByTestId('document-author-other'));
     expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
-    expect(screen.getByTestId('document-submit')).toBeDisabled();
+    fireEvent.click(screen.getByTestId('document-submit'));
+    expect(apiPostForm).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId('publication-license-in-file'));
     expect(
       within(screen.getByTestId('document-license')).queryByRole('img')
@@ -927,7 +927,8 @@ describe('editing document publication rights', () => {
     fireEvent.click(helpButton);
     const guidance = screen.getByText(/check with the rights holder/);
     expect(guidance).toBeVisible();
-    expect(screen.getByTestId('document-submit')).toBeDisabled();
+    fireEvent.click(screen.getByTestId('document-submit'));
+    expect(apiPostForm).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId('publication-license-in-file'));
     const license = screen.getByTestId('document-license');
     expect(helpButton.compareDocumentPosition(license)).toBe(
@@ -936,7 +937,8 @@ describe('editing document publication rights', () => {
     expect(guidance.compareDocumentPosition(license)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING
     );
-    expect(screen.getByTestId('document-submit')).toBeDisabled();
+    fireEvent.click(screen.getByTestId('document-submit'));
+    expect(apiPostForm).not.toHaveBeenCalled();
     await selectLicense(2);
     fireEvent.click(screen.getByTestId('document-submit'));
     await waitFor(() => expect(apiPostForm).toHaveBeenCalledOnce());

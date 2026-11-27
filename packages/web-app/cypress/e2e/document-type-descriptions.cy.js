@@ -80,6 +80,30 @@ describe('Document type descriptions', () => {
     cy.focused().should('have.attr', 'data-testid', 'document-type-4');
   });
 
+  it('shows all types in one disclosure when editing on mobile', () => {
+    cy.viewport(390, 844);
+    cy.intercept('GET', '**/api/v1/documents/7', {
+      id: 7,
+      type: 'Book',
+      title: 'Book to edit',
+      files: [],
+      authors: [],
+      authorsOrganization: []
+    });
+    cy.visit('/documents/7/edit');
+    cy.get('[data-testid="document-change-type"]')
+      .should('have.attr', 'aria-expanded', 'false')
+      .click();
+    cy.get('[data-testid="document-other-types-toggle"]').should('not.exist');
+    cy.get('[data-testid="document-type-search"]').should('not.exist');
+    cy.get('[data-testid="document-type-2"]').should('be.visible').click();
+    cy.get('[data-testid="document-change-type"]').should(
+      'have.attr',
+      'aria-expanded',
+      'false'
+    );
+  });
+
   [390, 1280].forEach(width => {
     it(`shows descriptions without hover or clipped text at ${width}px`, () => {
       cy.viewport(width, 900);
@@ -212,13 +236,7 @@ describe('Document type descriptions', () => {
       );
       cy.get('[role="tooltip"]').should('not.exist');
       cy.screenshot(`document-type-descriptions-${width}`, SCREENSHOT_OPTIONS);
-      cy.get('[data-testid="document-type-search"] input').type(
-        'jeu de donnees'
-      );
-      cy.get('[data-testid="document-other-types"] [aria-pressed]').should(
-        'have.length',
-        1
-      );
+      cy.get('[data-testid="document-type-search"]').should('not.exist');
       cy.get('[data-testid="document-type-2"]').click();
       cy.get('[data-testid="document-other-types-toggle"]')
         .should('have.attr', 'aria-expanded', 'false')

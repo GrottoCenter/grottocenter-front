@@ -14,6 +14,7 @@ import {
 import { useUserProperties } from '@/hooks';
 import { getDocumentTypeRules } from '@/utils/documentTypeHelpers';
 import { FormSection } from '../../utils/FormContainers';
+import DocumentFieldError from '../DocumentFieldError';
 import { DocumentFormContext } from '../Provider';
 import AuthorsSection from './AuthorsSection';
 import CollectionPublicationRights from './CollectionPublicationRights';
@@ -25,8 +26,13 @@ import {
 
 const AuthorAndSharing = ({ disabled = false }) => {
   const { formatMessage } = useIntl();
-  const { document, isNewDocument, hasStoredAuthorization, updateAttribute } =
-    useContext(DocumentFormContext);
+  const {
+    document,
+    isNewDocument,
+    hasStoredAuthorization,
+    invalidField,
+    updateAttribute
+  } = useContext(DocumentFormContext);
   const { id, nickname } = useUserProperties();
   const [authorChoice, setAuthorChoice] = useState('');
   const addedMeByChoice = useRef(null);
@@ -47,6 +53,8 @@ const AuthorAndSharing = ({ disabled = false }) => {
   const selectedAuthor =
     authorChoice === 'me' && !hasCurrentUser ? 'other' : authorChoice;
   const showAuthors = !showQuestion || !!selectedAuthor;
+  const hasAuthorChoiceError =
+    !showAuthors && ['authors', 'sharing'].includes(invalidField);
   const ownWork = showQuestion && selectedAuthor === 'me';
 
   const chooseAuthor = event => {
@@ -88,7 +96,11 @@ const AuthorAndSharing = ({ disabled = false }) => {
       <Stack spacing={1.5} sx={{ maxWidth: '48rem' }}>
         <Stack spacing={1} data-document-field="authors">
           {showQuestion && (
-            <FormControl component="fieldset" required disabled={disabled}>
+            <FormControl
+              component="fieldset"
+              required
+              disabled={disabled}
+              error={hasAuthorChoiceError}>
               <FormLabel
                 component="legend"
                 id={authorQuestionId}
@@ -97,6 +109,10 @@ const AuthorAndSharing = ({ disabled = false }) => {
               </FormLabel>
               <RadioGroup
                 aria-labelledby={authorQuestionId}
+                aria-invalid={hasAuthorChoiceError || undefined}
+                aria-describedby={
+                  hasAuthorChoiceError ? `${authorQuestionId}-error` : undefined
+                }
                 value={selectedAuthor}
                 sx={{
                   flexDirection: { xs: 'column', sm: 'row' },
@@ -130,6 +146,13 @@ const AuthorAndSharing = ({ disabled = false }) => {
                   label={formatMessage({ id: 'documentForm.anotherAuthor' })}
                 />
               </RadioGroup>
+              {hasAuthorChoiceError && (
+                <DocumentFieldError
+                  field={invalidField}
+                  id={`${authorQuestionId}-error`}
+                  label="Authors"
+                />
+              )}
             </FormControl>
           )}
           {showAuthors && (

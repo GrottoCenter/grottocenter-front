@@ -104,6 +104,7 @@ describe('Photo capture date during document creation', () => {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
     cy.get('[data-testid="document-type-1"]').click();
+    cy.get('[data-testid="file-picker"]').should('be.enabled');
     cy.get('[data-testid="file-input"]').selectFile(
       'cypress/fixtures/photo-dates/capture.jpg',
       { force: true }
@@ -116,14 +117,24 @@ describe('Photo capture date during document creation', () => {
       'be.visible'
     );
     cy.get('[data-testid="publication-license-in-file"]').check();
-    cy.get('[data-testid="document-submit"]').should('be.disabled');
+    cy.get('[data-testid="document-submit"]').should('be.enabled').click();
+    cy.get('[data-testid="document-title"] input')
+      .should('be.focused')
+      .and('have.attr', 'aria-invalid', 'true');
+    cy.contains('[role="alert"]', 'A title is required.').should('be.visible');
+    cy.get('@createDocument.all').should('have.length', 0);
+    cy.get('[data-testid="document-title"] input').type(
+      'An archived photograph'
+    );
+    cy.get('[data-testid="document-submit"]').click();
+    cy.get('[data-testid="document-license"] [role="combobox"]').should(
+      'be.focused'
+    );
+    cy.contains('Select a license').should('be.visible');
     cy.get('[data-testid="document-license"] [role="combobox"]').click();
     cy.get('[data-testid="document-license-option-1"]').click();
     cy.contains('button', 'help me choose').click();
     cy.contains('check with the rights holder').should('be.visible');
-    cy.get('[data-testid="document-title"] input').type(
-      'An archived photograph'
-    );
     cy.get('[data-testid="document-submit"]').click();
     cy.wait('@createDocument')
       .its('request.body')

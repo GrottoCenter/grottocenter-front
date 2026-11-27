@@ -83,7 +83,8 @@ const PublicationDatePicker = ({
   label = null
 }) => {
   const { formatDate, formatMessage, locale } = useIntl();
-  const { document, updateAttribute } = useContext(DocumentFormContext);
+  const { document, invalidField, updateAttribute } =
+    useContext(DocumentFormContext);
   const [anchor, setAnchor] = useState(null);
   const [draft, setDraft] = useState(null);
   const [hasBlurred, setHasBlurred] = useState(false);
@@ -91,7 +92,8 @@ const PublicationDatePicker = ({
   const calendarLabel = formatMessage({ id: 'documentForm.calendar' });
   const { datePublication } = document;
   const invalid = !isDocumentDateValid(datePublication, allowFuture);
-  const hasError = hasBlurred && invalid;
+  const showFormatError = (hasBlurred || invalidField === 'date') && invalid;
+  const dateLabel = label ?? formatMessage({ id: 'DatePublication' });
   const language = locale.split('-')[0];
   const examples = formatMessage(
     { id: 'documentForm.dateExamples' },
@@ -110,6 +112,13 @@ const PublicationDatePicker = ({
       ? 'documentForm.dateInFuture'
       : 'Invalid Date Format'
   });
+  let errorText;
+  if (showFormatError) errorText = error;
+  else if (invalidField === 'date' && !datePublication)
+    errorText = formatMessage(
+      { id: 'documentForm.checkField' },
+      { field: dateLabel }
+    );
   const updateDate = value =>
     updateAttribute(
       'datePublication',
@@ -122,7 +131,7 @@ const PublicationDatePicker = ({
       data-testid="document-publication-date"
       data-document-field="date">
       <StringInput
-        valueName={label ?? formatMessage({ id: 'DatePublication' })}
+        valueName={dateLabel}
         value={draft ?? datePublication}
         required={required}
         onValueChange={value => {
@@ -133,8 +142,8 @@ const PublicationDatePicker = ({
           setDraft(null);
           setHasBlurred(true);
         }}
-        hasError={hasError}
-        helperText={hasError ? `${error}. ${examples}` : examples}
+        helperText={examples}
+        errorText={errorText}
         endAdornment={
           <InputAdornment position="end">
             <IconButton

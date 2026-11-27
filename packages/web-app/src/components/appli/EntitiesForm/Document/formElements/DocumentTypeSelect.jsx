@@ -9,10 +9,7 @@ import {
   CardContent,
   Grid,
   Skeleton,
-  TextField,
-  Typography,
-  useMediaQuery,
-  useTheme
+  Typography
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -214,13 +211,10 @@ TypeCard.propTypes = {
 
 const DocumentTypeSelect = ({ onTypeChange }) => {
   const { document, isNewDocument } = useContext(DocumentFormContext);
-  const { formatMessage, locale } = useIntl();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { formatMessage } = useIntl();
   const { data: documentTypes = [], isPending } = useDocumentTypes();
   const [othersOpen, setOthersOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
-  const [search, setSearch] = useState('');
   const catalogId = useId();
   const otherTypesId = useId();
   const catalogButton = useRef(null);
@@ -242,7 +236,6 @@ const DocumentTypeSelect = ({ onTypeChange }) => {
       restoreFocus.current = hasSummary ? catalogButton : othersButton;
     setCatalogOpen(false);
     setOthersOpen(false);
-    setSearch('');
     if (newDocType !== document.type) onTypeChange(newDocType, event);
   };
 
@@ -256,18 +249,6 @@ const DocumentTypeSelect = ({ onTypeChange }) => {
     );
 
   const selectedOther = others.find(dt => dt.name === document.type);
-  const canCollapseOthers = isMobile || others.length > 4;
-  const normalizeSearch = value =>
-    value.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase(locale);
-  const query = normalizeSearch(search.trim());
-  const filteredOthers = query
-    ? others.filter(dt => {
-        const description = TYPE_DESCRIPTIONS[dt.name] ?? dt.comment;
-        const name = formatMessage({ id: dt.name });
-        const details = description ? formatMessage({ id: description }) : '';
-        return normalizeSearch(`${name} ${details}`).includes(query);
-      })
-    : others;
   const SummaryIcon =
     DOCUMENT_TYPE_ICONS[document.type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
   const SelectedOtherIcon = selectedOther
@@ -307,11 +288,7 @@ const DocumentTypeSelect = ({ onTypeChange }) => {
           aria-expanded={catalogOpen}
           aria-controls={catalogId}
           data-testid="document-change-type"
-          onClick={() => {
-            setCatalogOpen(!catalogOpen);
-            setOthersOpen(!catalogOpen);
-            setSearch('');
-          }}
+          onClick={() => setCatalogOpen(open => !open)}
           sx={{
             justifyContent: 'space-between',
             gap: 1,
@@ -366,7 +343,7 @@ const DocumentTypeSelect = ({ onTypeChange }) => {
         </Grid>
         {others.length > 0 && (
           <Box sx={{ mt: 1 }}>
-            {canCollapseOthers && (
+            {isNewDocument && (
               <Button
                 ref={othersButton}
                 variant="outlined"
@@ -380,7 +357,7 @@ const DocumentTypeSelect = ({ onTypeChange }) => {
                   width: '100%',
                   textTransform: 'none',
                   alignItems: 'center',
-                  minHeight: theme.spacing(5.5),
+                  minHeight: 44,
                   gap: 0.5,
                   cursor: 'pointer',
                   border: '1px solid',
@@ -426,29 +403,10 @@ const DocumentTypeSelect = ({ onTypeChange }) => {
               id={otherTypesId}
               data-testid="document-other-types"
               sx={{
-                display: canCollapseOthers && !othersOpen ? 'none' : 'block'
+                display: isNewDocument && !othersOpen ? 'none' : 'block'
               }}>
-              {canCollapseOthers && (
-                <TextField
-                  fullWidth
-                  size="small"
-                  label={formatMessage({ id: 'Search' })}
-                  data-testid="document-type-search"
-                  value={search}
-                  onChange={event => setSearch(event.target.value)}
-                  sx={{ my: 0.5 }}
-                />
-              )}
-              {filteredOthers.length === 0 && (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ py: 1 }}>
-                  {formatMessage({ id: 'No results' })}
-                </Typography>
-              )}
               <Grid container spacing={0.5}>
-                {filteredOthers.map(dt => (
+                {others.map(dt => (
                   <Grid size={{ xs: 6, sm: 4, md: 3 }} key={dt.id}>
                     <TypeCard
                       docType={dt}

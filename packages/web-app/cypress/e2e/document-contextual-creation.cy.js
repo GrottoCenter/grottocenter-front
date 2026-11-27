@@ -128,7 +128,7 @@ describe('Contextual document creation', () => {
       );
       cy.wait(['@licenses', '@fileFormats', '@identifierTypes', '@subjects']);
       cy.get('@createDocument.all').should('have.length', 0);
-      cy.get('[data-testid="document-submit"]').should('be.disabled');
+      cy.get('[data-testid="document-submit"]').should('be.enabled');
       cy.get('[data-testid="document-title"] input')
         .should('have.value', type === 'Issue' ? parent.title : '')
         .type(type === 'Issue' ? ' - First issue' : `First ${label}`);

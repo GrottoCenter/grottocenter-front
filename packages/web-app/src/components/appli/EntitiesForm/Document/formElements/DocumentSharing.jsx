@@ -20,6 +20,7 @@ import {
   getLicenseName
 } from '@/components/common/LicenseTag/helpers';
 import { useLicenses, findLicenseByName } from '@/hooks';
+import DocumentFieldError from '../DocumentFieldError';
 import { DocumentFormContext } from '../Provider';
 import AuthorizationGrantedLicense from './AuthorizationGrantedLicense';
 import DocumentLicenseSelect from './DocumentLicenseSelect';
@@ -61,6 +62,7 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
     isNewDocument,
     hasStoredAuthorization,
     grantedPublicationLicense,
+    invalidField,
     updateAttribute
   } = useContext(DocumentFormContext);
   const [showHelp, setShowHelp] = useState(false);
@@ -130,6 +132,31 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
     );
   };
 
+  const sharingHelp = (
+    <Link
+      component="button"
+      type="button"
+      variant="body2"
+      aria-expanded={showHelp}
+      aria-controls={showHelp ? helpId : undefined}
+      sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0.5,
+        minHeight: { xs: 44, sm: 32 },
+        textAlign: 'start'
+      }}
+      onClick={() => setShowHelp(value => !value)}>
+      <HelpOutlineIcon fontSize="small" />
+      {formatMessage({ id: 'documentForm.sharingHelp' })}
+    </Link>
+  );
+  const sharingHelpContent = showHelp && (
+    <Alert id={helpId} severity="info">
+      {formatMessage({ id: 'documentForm.unknownRights' })}
+    </Alert>
+  );
+
   if (inherited) {
     return (
       <Alert severity="info" data-testid="document-inherited-sharing">
@@ -157,12 +184,31 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
         </Alert>
       )}
       {showChoices && isNewDocument && (
-        <FormControl component="fieldset" required disabled={disabled}>
-          <FormLabel component="legend" id={groupId} sx={{ fontWeight: 600 }}>
-            {formatMessage({ id: 'documentForm.sharingQuestion' })}
-          </FormLabel>
+        <FormControl
+          required
+          disabled={disabled}
+          error={invalidField === 'sharing'}>
+          <Stack
+            direction="row"
+            useFlexGap
+            spacing={{ xs: 0, sm: 2 }}
+            sx={{
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: { xs: 'flex-start', sm: 'space-between' }
+            }}>
+            <FormLabel component="span" id={groupId} sx={{ fontWeight: 600 }}>
+              {formatMessage({ id: 'documentForm.sharingQuestion' })}
+            </FormLabel>
+            {sharingHelp}
+          </Stack>
+          {sharingHelpContent}
           <RadioGroup
             aria-labelledby={groupId}
+            aria-invalid={invalidField === 'sharing' || undefined}
+            aria-describedby={
+              invalidField === 'sharing' ? `${groupId}-error` : undefined
+            }
             aria-required="true"
             value={option ?? ''}
             sx={{ gap: 0.5, mt: 0.5 }}
@@ -188,13 +234,25 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
               />
             ))}
           </RadioGroup>
+          <DocumentFieldError
+            field="sharing"
+            id={`${groupId}-error`}
+            message="documentForm.missingSharing"
+          />
         </FormControl>
+      )}
+      {!isNewDocument && showChoices && (
+        <Stack spacing={0.5} sx={{ alignItems: 'flex-start' }}>
+          {sharingHelp}
+          {sharingHelpContent}
+        </Stack>
       )}
       {!isNewDocument && !hasStoredAuthorization && (
         <TextField
           select
           fullWidth
           required
+          error={invalidField === 'sharing'}
           data-testid="document-sharing-basis"
           disabled={disabled}
           label={formatMessage({ id: 'documentForm.sharingBasis' })}
@@ -210,32 +268,6 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
             </MenuItem>
           ))}
         </TextField>
-      )}
-      {showChoices && (
-        <Stack spacing={0.5} sx={{ alignItems: 'flex-start' }}>
-          <Link
-            component="button"
-            type="button"
-            variant="body2"
-            aria-expanded={showHelp}
-            aria-controls={showHelp ? helpId : undefined}
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 0.5,
-              minHeight: { xs: 44, sm: 32 },
-              textAlign: 'start'
-            }}
-            onClick={() => setShowHelp(value => !value)}>
-            <HelpOutlineIcon fontSize="small" />
-            {formatMessage({ id: 'documentForm.sharingHelp' })}
-          </Link>
-          {showHelp && (
-            <Alert id={helpId} severity="info">
-              {formatMessage({ id: 'documentForm.unknownRights' })}
-            </Alert>
-          )}
-        </Stack>
       )}
       {(hasAuthorization || hasStoredAuthorization) && (
         <PublicationAuthorization disabled={disabled} />

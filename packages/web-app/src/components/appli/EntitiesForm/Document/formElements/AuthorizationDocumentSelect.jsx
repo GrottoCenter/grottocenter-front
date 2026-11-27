@@ -33,6 +33,7 @@ const AuthorizationDocumentSelect = ({
   value,
   onChange,
   inputRef,
+  showRequiredError = false,
   disabled = false,
   required = true,
   disableClearable = false
@@ -100,6 +101,11 @@ const AuthorizationDocumentSelect = ({
           label={formatMessage({ id: 'Authorization from authors' })}
           loading={isLoading}
           hasError={hasError}
+          errorMessage={
+            showRequiredError
+              ? formatMessage({ id: 'Select an authorization document' })
+              : undefined
+          }
           testId="authorization-document-search"
           selectedIcon={value && authorizationIcon}
         />
@@ -111,6 +117,7 @@ const AuthorizationDocumentSelect = ({
 AuthorizationDocumentSelect.propTypes = {
   disabled: PropTypes.bool,
   required: PropTypes.bool,
+  showRequiredError: PropTypes.bool,
   disableClearable: PropTypes.bool,
   inputRef: PropTypes.shape({
     current: PropTypes.shape({ focus: PropTypes.func })

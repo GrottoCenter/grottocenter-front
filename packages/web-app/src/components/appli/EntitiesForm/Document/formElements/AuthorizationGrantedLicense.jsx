@@ -16,7 +16,12 @@ const AuthorizationGrantedLicense = () => {
       <Alert
         severity="warning"
         action={
-          <Button type="button" color="inherit" size="small" onClick={retry}>
+          <Button
+            type="button"
+            color="inherit"
+            size="small"
+            onClick={retry}
+            data-validation-focus>
             {formatMessage({ id: 'Retry' })}
           </Button>
         }>

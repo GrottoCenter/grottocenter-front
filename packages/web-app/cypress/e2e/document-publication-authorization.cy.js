@@ -406,7 +406,7 @@ describe('Editing a document with publication authorization', () => {
     cy.visit('/documents/42/edit', {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
-    cy.get('[data-testid="document-submit"]').should('be.disabled');
+    cy.get('[data-testid="document-submit"]').should('be.enabled');
     cy.get('[data-testid="document-license"] [role="combobox"]').should(
       $select => {
         const guidance = $select[0].ownerDocument.getElementById(

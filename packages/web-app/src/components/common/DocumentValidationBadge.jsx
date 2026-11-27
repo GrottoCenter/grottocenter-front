@@ -1,6 +1,7 @@
 import { useIntl } from 'react-intl';
 import { Chip } from '@mui/material';
-import { darken } from '@mui/material/styles';
+import CloseIcon from '@mui/icons-material/Close';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 
 import { getDocumentValidationBadge } from '@/utils/documentValidationStatus';
 import { DocumentValidationStatusPropType } from '@/types/document.type';
@@ -9,6 +10,8 @@ const DocumentValidationBadge = ({ validationStatus }) => {
   const { formatMessage } = useIntl();
   const badge = getDocumentValidationBadge(validationStatus);
   if (!badge) return null;
+  const StatusIcon =
+    validationStatus === 'rejected' ? CloseIcon : HourglassEmptyIcon;
 
   return (
     <Chip
@@ -17,13 +20,11 @@ const DocumentValidationBadge = ({ validationStatus }) => {
       size="small"
       variant="outlined"
       color={badge.color}
+      icon={<StatusIcon />}
       label={formatMessage({ id: badge.label })}
       sx={{
-        // Keep the semantic outline while making small text readable on paper.
-        color: theme =>
-          theme.palette.mode === 'dark'
-            ? theme.palette[badge.color].light
-            : darken(theme.palette[badge.color].main, 0.3),
+        borderColor: 'currentColor',
+        '& .MuiChip-icon': { alignSelf: 'center' },
         height: 'auto',
         fontWeight: 'fontWeightRegular',
         maxWidth: '100%',

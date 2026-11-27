@@ -33,6 +33,7 @@ const AuthorsSection = ({ ownWork = false, showHelp = true }) => {
   const { formatMessage } = useIntl();
   const {
     document: doc,
+    invalidField,
     updateAttribute,
     allowEntityCreation = true
   } = useContext(DocumentFormContext);
@@ -219,6 +220,14 @@ const AuthorsSection = ({ ownWork = false, showHelp = true }) => {
             label={formatMessage({ id: 'Authors' })}
             required={requiresAuthor && value.length === 0}
             hasError={hasError}
+            errorMessage={
+              invalidField === 'authors'
+                ? formatMessage(
+                    { id: 'documentForm.checkField' },
+                    { field: formatMessage({ id: 'Authors' }) }
+                  )
+                : undefined
+            }
             loading={isLoading}
           />
         )}

@@ -12,6 +12,7 @@ import { useIntl } from 'react-intl';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { isPdfUrl } from '@/utils/pdfUrl';
 import PdfPageOffsetEditor from './PdfPageOffsetEditor';
+import DocumentFieldError from '../DocumentFieldError';
 
 import Translate from '../../../../common/Translate';
 import { DocumentFormContext } from '../Provider';
@@ -38,7 +39,8 @@ const IdentifierTypeContainer = styled('div')`
 const IdentifierEditor = () => {
   const { data: allIdentifierTypes = [] } = useIdentifierTypes();
   const { formatMessage } = useIntl();
-  const { document, updateAttribute } = useContext(DocumentFormContext);
+  const { document, invalidField, updateAttribute } =
+    useContext(DocumentFormContext);
   const identifierTypeLabel = useId();
 
   const identifierType = useMemo(() => {
@@ -97,7 +99,10 @@ const IdentifierEditor = () => {
             maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_IDENTIFIER}
             valueName={formatMessage({ id: 'Identifier' })}
             required={identifierType !== null}
-            hasError={identifierType !== null && !isRegexpValid}
+            hasError={
+              (identifierType !== null && !isRegexpValid) ||
+              (invalidField === 'identifier' && !document.identifier)
+            }
           />
         </IdentifierContainer>
 
@@ -152,6 +157,9 @@ const IdentifierEditor = () => {
           </Fade>
         )}
       </InlineWrapper>
+      {isRegexpValid && (
+        <DocumentFieldError field="identifier" label="Identifier" />
+      )}
       {identifierType?.id === 'url' && isPdfUrl(document.identifier) && (
         <PdfPageOffsetEditor
           key={document.identifier}
