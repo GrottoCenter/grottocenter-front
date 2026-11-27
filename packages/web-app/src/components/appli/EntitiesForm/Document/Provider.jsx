@@ -244,28 +244,44 @@ const createFormState = document => {
 
 // Restore the original parent and publication choices when undoing a switch
 // to Collection. The collection keeps its own draft across type changes.
-const changeDocumentType = (state, type) => {
+const changeDocumentType = (state, type, isNewDocument) => {
   const { document, collectionRights, preCollectionDraft } = state;
-  if (type === DocumentTypes.COLLECTION)
+  if (type === DocumentTypes.COLLECTION) {
+    const hasPrefilledTitle =
+      isNewDocument &&
+      document.type === DocumentTypes.ISSUE &&
+      !!document.title &&
+      document.title === document.parent?.title;
     return {
       ...state,
       preCollectionDraft: {
         ...getPublicationRights(document),
         type: document.type,
-        parent: document.parent
+        parent: document.parent,
+        ...(hasPrefilledTitle && { title: document.title })
       },
-      document: { ...document, ...collectionRights, type, parent: null }
+      document: {
+        ...document,
+        ...collectionRights,
+        type,
+        parent: null,
+        ...(hasPrefilledTitle && { title: '' })
+      }
     };
-  if (document.type === DocumentTypes.COLLECTION)
+  }
+  if (document.type === DocumentTypes.COLLECTION) {
+    const draft = preCollectionDraft?.type === type ? preCollectionDraft : null;
     return {
       document: {
         ...document,
-        ...(preCollectionDraft?.type === type ? preCollectionDraft : {}),
-        type
+        ...draft,
+        type,
+        title: document.title || draft?.title || ''
       },
       collectionRights: getCollectionPublicationRights(document),
       preCollectionDraft: null
     };
+  }
   return { ...state, document: { ...document, type } };
 };
 
@@ -295,6 +311,7 @@ const Provider = ({
   }, []);
   // The multipart API cannot clear a stored publication option.
   const hasStoredAuthorization = !!initialValues?.authorizationDocument?.id;
+  const isNewDocument = !initialValues;
   const attributeVersionsRef = useRef({});
   const allowPhotoDatePrefillRef = useRef(true);
   usePhotoDatePrefill({
@@ -307,8 +324,8 @@ const Provider = ({
     document,
     setDocument,
     attributeVersionsRef,
-    isNewDocument: !initialValues,
-    initialParent: !initialValues ? creationContext?.parent : null
+    isNewDocument,
+    initialParent: isNewDocument ? creationContext?.parent : null
   });
 
   const [isFormValid, setIsFormValid] = useState(false);
@@ -330,7 +347,7 @@ const Provider = ({
         setFormState(state =>
           newValue === state.document.type
             ? state
-            : changeDocumentType(state, newValue)
+            : changeDocumentType(state, newValue, isNewDocument)
         );
         return;
       }
@@ -349,14 +366,14 @@ const Provider = ({
         return { ...prevState, [attributeName]: newValue };
       });
     },
-    [setDocument]
+    [isNewDocument, setDocument]
   );
 
   useEffect(() => {
     setIsFormValid(
-      checkFormValidation(document, !initialValues, hasStoredAuthorization)
+      checkFormValidation(document, isNewDocument, hasStoredAuthorization)
     );
-  }, [document, initialValues, hasStoredAuthorization, setIsFormValid]);
+  }, [document, isNewDocument, hasStoredAuthorization, setIsFormValid]);
 
   const resetContext = useCallback((overrides = {}) => {
     allowPhotoDatePrefillRef.current = true;
@@ -370,7 +387,7 @@ const Provider = ({
   const contextValue = useMemo(
     () => ({
       document,
-      isNewDocument: !initialValues,
+      isNewDocument,
       hasStoredAuthorization,
       allowEntityCreation,
       isFormValid,
@@ -383,7 +400,7 @@ const Provider = ({
     }),
     [
       document,
-      initialValues,
+      isNewDocument,
       hasStoredAuthorization,
       allowEntityCreation,
       isFormValid,

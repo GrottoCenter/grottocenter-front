@@ -12,6 +12,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { apiGet, apiPost, apiPostForm, apiPutForm } from '@/api/client';
 import { referenceKeys } from '@/api/queryKeys';
 import {
+  getDocumentDetailsUrl,
   getLicensesUrl,
   putDocumentUrl,
   quickSearchUrl
@@ -388,6 +389,38 @@ describe('editing document publication rights', () => {
     expect(body.get('parent[id]')).toBe('41');
     expect(body.get('license[id]')).toBe('2');
     expect(body.get('authorizationDocument[id]')).toBe('99');
+  });
+
+  it('resets the prefilled issue title for Collection and restores it with the parent', async () => {
+    const getFormData = apiGet.getMockImplementation();
+    apiGet.mockImplementation(async url =>
+      url === `${getDocumentDetailsUrl}41`
+        ? initialDocument.parent
+        : getFormData(url)
+    );
+    apiPost.mockResolvedValue({ results: [initialDocument.parent] });
+    const user = userEvent.setup();
+    renderSubmission({}, { isNewDocument: true });
+
+    await user.click(await screen.findByTestId('document-type-3'));
+    await user.type(screen.getByTestId('document-parent-search'), 'Coll');
+    await user.click(await screen.findByRole('option', { name: /Collection/ }));
+    const title = () =>
+      screen.getByTestId('document-title').querySelector('input');
+    await waitFor(() => expect(title()).toHaveValue('Collection'));
+
+    await user.click(screen.getByTestId('document-type-4'));
+    expect(title()).toHaveValue('');
+    await user.click(screen.getByTestId('document-type-3'));
+    expect(title()).toHaveValue('Collection');
+    expect(screen.getByTestId('document-parent-search')).toHaveValue(
+      'Collection'
+    );
+
+    await user.clear(title());
+    await user.type(title(), 'Custom issue title');
+    await user.click(screen.getByTestId('document-type-4'));
+    expect(title()).toHaveValue('Custom issue title');
   });
 
   it('does not mark the stored collection license unknown when loading licenses fails', async () => {

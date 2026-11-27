@@ -8,6 +8,7 @@ import { useEntitySearch } from '@/hooks';
 import { DocumentTypes, hasSameDocumentId } from '@/utils/documentTypeHelpers';
 
 const DOCUMENTS = ['documents'];
+// Quick search excludes documents awaiting their first validation by default.
 const AUTHORIZATION_FILTER = { type: [DocumentTypes.AUTHORIZATION_TO_PUBLISH] };
 const isSameAuthorization = (option, selected) =>
   hasSameDocumentId(option.id, selected.id);
