@@ -485,7 +485,7 @@
   "authorDuplicates.sameFullName": "正規化した氏名が一致",
   "authorDuplicates.sameName": "姓と名が一致",
   "authorDuplicates.similarName": "姓または名が類似",
-  "authorDuplicates.success": "著者 {source} は削除され、参照は次の人物に移されました：",
+  "authorDuplicates.success": "著者 {source} は削除され、参照は {target} に移されました。",
   "authorDuplicates.title": "著者の管理",
   "authorDuplicates.unknownAuthor": "著者不明",
   "Authored documents": "著者となっている文書",

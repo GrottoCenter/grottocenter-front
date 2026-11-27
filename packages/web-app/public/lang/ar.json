@@ -485,7 +485,7 @@
   "authorDuplicates.sameFullName": "تطابق الاسم الكامل بعد التوحيد",
   "authorDuplicates.sameName": "تطابق الاسم الأول واسم العائلة",
   "authorDuplicates.similarName": "أسماء أولى أو أسماء عائلة متشابهة",
-  "authorDuplicates.success": "حُذف المؤلف {source} ونُقلت مراجعه إلى",
+  "authorDuplicates.success": "حُذف المؤلف {source} ونُقلت مراجعه إلى {target}.",
   "authorDuplicates.title": "إدارة المؤلفين",
   "authorDuplicates.unknownAuthor": "مؤلف مجهول",
   "Authored documents": "المستندات المؤلَّفة",

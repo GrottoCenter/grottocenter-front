@@ -10,9 +10,8 @@ import { usePermissions } from '@/hooks';
 import PersonProperties from '@/components/common/Person/PersonProperties';
 import StandardDialog from '@/components/common/StandardDialog';
 import FormSubmissionError from '@/components/common/FormSubmissionError';
-import DocumentReferences, {
-  DocumentReferencesSubheader
-} from '@/components/common/DocumentsList/OrganizationDocumentReferences';
+import DocumentsList from '@/components/common/DocumentsList/DocumentsList';
+import { DocumentReferencesSubheader } from '@/components/common/DocumentsList/OrganizationDocumentReferences';
 import { getPersonName } from '@/utils/personDuplicates';
 import { personShape } from './personShape';
 import PersonComparisonLabel from './PersonComparisonLabel';
@@ -42,10 +41,9 @@ export const PersonPreview = ({ person, onClose }) => {
             visibleCount={query.data.documents?.length ?? 0}
             totalCount={query.data.authoredCount ?? 0}
           />
-          <DocumentReferences
+          <DocumentsList
             documents={query.data.documents ?? []}
-            totalCount={query.data.authoredCount ?? 0}
-            searchFilter={{ 'authors.nickname': query.data.nickname ?? '' }}
+            showSort={false}
           />
         </Stack>
       )}

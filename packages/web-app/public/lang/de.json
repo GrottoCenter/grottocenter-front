@@ -485,7 +485,7 @@
   "authorDuplicates.sameFullName": "Gleicher normalisierter vollständiger Name",
   "authorDuplicates.sameName": "Gleicher Vor- und Nachname",
   "authorDuplicates.similarName": "Ähnliche Vor- oder Nachnamen",
-  "authorDuplicates.success": "Der Autor {source} wurde gelöscht und seine Referenzen wurden übertragen auf",
+  "authorDuplicates.success": "Der Autor {source} wurde gelöscht und seine Referenzen wurden auf {target} übertragen.",
   "authorDuplicates.title": "Autoren verwalten",
   "authorDuplicates.unknownAuthor": "Unbekannter Autor",
   "Authored documents": "Verfasste Dokumente",

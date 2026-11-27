@@ -485,7 +485,7 @@
   "authorDuplicates.sameFullName": "Nama lengkap yang dinormalisasi sama",
   "authorDuplicates.sameName": "Nama depan dan belakang sama",
   "authorDuplicates.similarName": "Nama depan atau belakang mirip",
-  "authorDuplicates.success": "Penulis {source} telah dihapus dan referensinya dipindahkan ke",
+  "authorDuplicates.success": "Penulis {source} telah dihapus dan referensinya dipindahkan ke {target}.",
   "authorDuplicates.title": "Kelola penulis",
   "authorDuplicates.unknownAuthor": "Penulis tidak dikenal",
   "Authored documents": "Dokumen yang ditulis",

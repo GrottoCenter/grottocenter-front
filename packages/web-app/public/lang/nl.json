@@ -485,7 +485,7 @@
   "authorDuplicates.sameFullName": "Dezelfde genormaliseerde volledige naam",
   "authorDuplicates.sameName": "Dezelfde voor- en achternaam",
   "authorDuplicates.similarName": "Vergelijkbare voor- of achternamen",
-  "authorDuplicates.success": "De auteur {source} is verwijderd en de verwijzingen zijn overgedragen aan",
+  "authorDuplicates.success": "De auteur {source} is verwijderd en de verwijzingen zijn overgedragen aan {target}.",
   "authorDuplicates.title": "Auteurs beheren",
   "authorDuplicates.unknownAuthor": "Onbekende auteur",
   "Authored documents": "Documenten als auteur",

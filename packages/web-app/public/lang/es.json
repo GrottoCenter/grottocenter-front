@@ -485,7 +485,7 @@
   "authorDuplicates.sameFullName": "Mismo nombre completo normalizado",
   "authorDuplicates.sameName": "Mismo nombre y apellido",
   "authorDuplicates.similarName": "Nombres o apellidos similares",
-  "authorDuplicates.success": "El autor {source} se eliminó y sus referencias se transfirieron a",
+  "authorDuplicates.success": "El autor {source} se eliminó y sus referencias se transfirieron a {target}.",
   "authorDuplicates.title": "Gestionar autores",
   "authorDuplicates.unknownAuthor": "Autor desconocido",
   "Authored documents": "Documentos de autoría",

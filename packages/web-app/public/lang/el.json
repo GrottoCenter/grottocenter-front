@@ -485,7 +485,7 @@
   "authorDuplicates.sameFullName": "Ίδιο κανονικοποιημένο πλήρες όνομα",
   "authorDuplicates.sameName": "Ίδιο όνομα και επώνυμο",
   "authorDuplicates.similarName": "Παρόμοια ονόματα ή επώνυμα",
-  "authorDuplicates.success": "Ο συγγραφέας {source} διαγράφηκε και οι αναφορές του μεταφέρθηκαν σε",
+  "authorDuplicates.success": "Ο συγγραφέας {source} διαγράφηκε και οι αναφορές του μεταφέρθηκαν σε {target}.",
   "authorDuplicates.title": "Διαχείριση συγγραφέων",
   "authorDuplicates.unknownAuthor": "Άγνωστος συγγραφέας",
   "Authored documents": "Έγγραφα με συγγραφέα τον οργανισμό",

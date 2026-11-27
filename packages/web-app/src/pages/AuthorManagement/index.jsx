@@ -156,14 +156,17 @@ const AuthorManagementContent = () => {
                   <Typography sx={{ fontWeight: 600 }}>
                     {formatMessage(
                       { id: 'authorDuplicates.success' },
-                      { source: `${getPersonName(source)} (#${source.id})` }
-                    )}{' '}
-                    <AppLink
-                      to={`/ui/persons/${target.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer">
-                      {getPersonName(target)} (#{target.id})
-                    </AppLink>
+                      {
+                        source: `${getPersonName(source)} (#${source.id})`,
+                        target: (
+                          <AppLink
+                            to={`/ui/persons/${target.id}`}
+                            openInNewTabDesktop>
+                            {getPersonName(target)} (#{target.id})
+                          </AppLink>
+                        )
+                      }
+                    )}
                   </Typography>
                 </DuplicateMergeResult>
               </Card>

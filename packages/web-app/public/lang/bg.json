@@ -485,7 +485,7 @@
   "authorDuplicates.sameFullName": "Еднакво нормализирано пълно име",
   "authorDuplicates.sameName": "Еднакви собствено и фамилно име",
   "authorDuplicates.similarName": "Подобни собствени или фамилни имена",
-  "authorDuplicates.success": "Авторът {source} е изтрит и препратките му са прехвърлени към",
+  "authorDuplicates.success": "Авторът {source} е изтрит и препратките му са прехвърлени към {target}.",
   "authorDuplicates.title": "Управление на авторите",
   "authorDuplicates.unknownAuthor": "Неизвестен автор",
   "Authored documents": "Авторски документи",

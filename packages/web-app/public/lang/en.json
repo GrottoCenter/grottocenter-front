@@ -485,7 +485,7 @@
   "authorDuplicates.sameFullName": "Same normalized full name",
   "authorDuplicates.sameName": "Same first and last names",
   "authorDuplicates.similarName": "Similar first or last names",
-  "authorDuplicates.success": "The author {source} was deleted and its references were transferred to",
+  "authorDuplicates.success": "The author {source} was deleted and its references were transferred to {target}.",
   "authorDuplicates.title": "Manage authors",
   "authorDuplicates.unknownAuthor": "Unknown author",
   "Authored documents": "Authored documents",

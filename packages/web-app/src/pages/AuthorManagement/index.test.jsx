@@ -12,7 +12,9 @@ import { useDeletePerson as useRealDeletePerson } from '@/hooks/mutations/usePer
 import { analyzePersonDuplicates } from '@/utils/analyzePersonDuplicates';
 import { findPersonDuplicates } from '@/utils/personDuplicates';
 import { renderWithProviders } from '@/test/renderWithProviders';
+import DocumentsList from '@/components/common/DocumentsList/DocumentsList';
 import messages from '@/../public/lang/en.json';
+import japaneseMessages from '@/../public/lang/ja.json';
 import AuthorManagement from './index';
 
 vi.mock('@/api/client', () => ({
@@ -32,6 +34,9 @@ vi.mock(
     DocumentReferencesSubheader: () => null
   })
 );
+vi.mock('@/components/common/DocumentsList/DocumentsList', () => ({
+  default: vi.fn(() => null)
+}));
 vi.mock('@/hooks', () => ({
   usePermissions: vi.fn(),
   useOnlineStatus: vi.fn(),
@@ -59,7 +64,7 @@ const people = [
 ];
 const getRequestedId = url =>
   new URL(url, 'https://example.org').pathname.split('/').pop();
-const renderManagement = () =>
+const renderManagement = (intlOptions = {}) =>
   renderWithProviders(
     <MemoryRouter initialEntries={['/ui/persons/management']}>
       <Routes>
@@ -67,7 +72,7 @@ const renderManagement = () =>
         <Route path="/ui/dashboard" element={<p>Dashboard</p>} />
       </Routes>
     </MemoryRouter>,
-    { messages }
+    { messages, ...intlOptions }
   );
 const analyze = async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
@@ -141,6 +146,65 @@ it('blocks unauthorized users before mounting any queries', async () => {
   renderManagement();
   expect(await screen.findByText('Dashboard')).toBeVisible();
   expect(apiPost).not.toHaveBeenCalled();
+});
+
+it('reports a page eleven rejection without showing partial matches and allows retrying', async () => {
+  apiPost.mockImplementation((_url, { page }) => {
+    if (page === 11) {
+      return Promise.reject(
+        Object.assign(new Error('Search result window exceeded'), {
+          status: 400,
+          body: { message: 'Search result window exceeded' }
+        })
+      );
+    }
+    return Promise.resolve({
+      results: Array.from({ length: 1000 }, (_, index) => ({
+        ...people[0],
+        id: String((page - 1) * 1000 + index + 1)
+      })),
+      totalResults: 11000
+    });
+  });
+  renderManagement();
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
+  expect(
+    await screen.findByText('Search result window exceeded')
+  ).toBeVisible();
+  expect(apiPost).toHaveBeenCalledTimes(11);
+  expect(analyzePersonDuplicates).not.toHaveBeenCalled();
+  expect(screen.queryByTestId('author-pair-101:102')).toBeNull();
+  expect(screen.queryByText(/scanned ·/)).toBeNull();
+  expect(screen.getByRole('button', { name: 'Analyze' })).toBeEnabled();
+  apiPost.mockResolvedValue({ results: people, totalResults: 2 });
+  await analyze();
+  expect(screen.queryByText('Search result window exceeded')).toBeNull();
+});
+
+it('previews only the selected profile documents without an ambiguous search link', async () => {
+  const documents = [{ id: 201, title: 'Selected author document' }];
+  apiGet.mockImplementation(url =>
+    Promise.resolve({
+      ...people.find(person => String(person.id) === getRequestedId(url)),
+      documents
+    })
+  );
+  renderManagement();
+  await compare();
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Preview — Marie Dupont (#101)' })
+  );
+  const dialog = await screen.findByRole('dialog');
+  expect(
+    within(dialog).getByRole('heading', { name: 'Documents (25)' })
+  ).toBeVisible();
+  expect(DocumentsList).toHaveBeenCalledWith(
+    expect.objectContaining({ documents, showSort: false }),
+    undefined
+  );
+  expect(
+    within(dialog).queryByRole('link', { name: 'See all documents' })
+  ).toBeNull();
 });
 
 it('loads details on comparison, uses the real document count and fixes a caver destination', async () => {
@@ -255,6 +319,34 @@ it('rereads both people, sends one author-to-caver delete and keeps a success li
   expect(
     within(screen.getByTestId('author-merge-success-101')).getByRole('link')
   ).toHaveAttribute('href', '/ui/persons/102');
+});
+
+it('places the destination link inside the translated Japanese success sentence', async () => {
+  renderManagement({ locale: 'ja', messages: japaneseMessages });
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: japaneseMessages['duplicates.analyze']
+    })
+  );
+  const pair = await screen.findByTestId('author-pair-101:102');
+  fireEvent.click(
+    within(pair).getByRole('button', {
+      name: japaneseMessages['duplicates.compare']
+    })
+  );
+  const mergeLabel = japaneseMessages['authorDuplicates.merge'];
+  await waitFor(() =>
+    expect(within(pair).getByRole('button', { name: mergeLabel })).toBeEnabled()
+  );
+  fireEvent.click(within(pair).getByRole('button', { name: mergeLabel }));
+  const dialog = await screen.findByRole('dialog');
+  fireEvent.click(within(dialog).getByRole('button', { name: mergeLabel }));
+  const receipt = await screen.findByTestId('author-merge-success-101');
+  const link = within(receipt).getByRole('link');
+  expect(link).toHaveAttribute('href', '/ui/persons/102');
+  expect(link.parentElement).toHaveTextContent(
+    '著者 Marie Dupont (#101) は削除され、参照は Marie D. (#102) に移されました。'
+  );
 });
 
 it('lets the moderator choose which of two authors to keep', async () => {

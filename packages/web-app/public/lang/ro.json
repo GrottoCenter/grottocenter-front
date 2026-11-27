@@ -485,7 +485,7 @@
   "authorDuplicates.sameFullName": "Același nume complet normalizat",
   "authorDuplicates.sameName": "Același prenume și nume",
   "authorDuplicates.similarName": "Prenume sau nume asemănătoare",
-  "authorDuplicates.success": "Autorul {source} a fost șters, iar referințele sale au fost transferate către",
+  "authorDuplicates.success": "Autorul {source} a fost șters, iar referințele sale au fost transferate către {target}.",
   "authorDuplicates.title": "Gestionați autorii",
   "authorDuplicates.unknownAuthor": "Autor necunoscut",
   "Authored documents": "Documente în calitate de autor",

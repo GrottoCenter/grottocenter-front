@@ -485,7 +485,7 @@
   "authorDuplicates.sameFullName": "Mateix nom complet normalitzat",
   "authorDuplicates.sameName": "Mateix nom i cognom",
   "authorDuplicates.similarName": "Noms o cognoms semblants",
-  "authorDuplicates.success": "L’autor {source} s’ha eliminat i les seves referències s’han transferit a",
+  "authorDuplicates.success": "L’autor {source} s’ha eliminat i les seves referències s’han transferit a {target}.",
   "authorDuplicates.title": "Gestionar autors",
   "authorDuplicates.unknownAuthor": "Autor desconegut",
   "Authored documents": "Documents d'autoria",
