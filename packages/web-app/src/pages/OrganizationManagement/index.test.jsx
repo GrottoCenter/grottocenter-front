@@ -13,6 +13,10 @@ import {
 import { useNotification } from '@/hooks/useNotification';
 import OrganizationManagement from './index';
 
+vi.mock('./AuthorConversion', () => ({
+  default: () => <div data-testid="author-conversion-section" />
+}));
+
 vi.mock('@/api/client', () => ({
   apiGet: vi.fn(),
   apiGetWithRange: vi.fn(),
@@ -117,112 +121,6 @@ beforeEach(() => {
   });
 });
 
-it('scans until unclassified organizations are found, without showing typed ones', async () => {
-  renderManagement();
-
-  expect(
-    await screen.findByRole('button', {
-      name: 'View organization Old publisher'
-    })
-  ).toBeInTheDocument();
-  expect(apiPost).toHaveBeenCalledTimes(2);
-  expect(
-    screen.getByText('Organizations scanned: 101 of 101')
-  ).toBeInTheDocument();
-  expect(screen.queryByText('Classified 0')).not.toBeInTheDocument();
-});
-
-it('opens the existing complete organization in a modal from the eye button', async () => {
-  useOrganization.mockReturnValue({
-    data: { ...first, name: 'Old club', cavers: [{ id: 1 }] },
-    isFetching: false,
-    isPaused: false
-  });
-  renderManagement();
-
-  fireEvent.click(
-    await screen.findByRole('button', { name: 'View organization Old club' })
-  );
-  expect(screen.getByRole('dialog')).toContainElement(
-    screen.getByTestId('full-organization')
-  );
-  expect(screen.getByTestId('full-organization')).toHaveTextContent(
-    'Preview: Old club'
-  );
-  fireEvent.click(screen.getByRole('button', { name: 'close' }));
-  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-  expect(
-    screen.getByRole('button', { name: 'View organization Old club' })
-  ).toBeInTheDocument();
-});
-
-it('sends the selected type with all existing editable fields', async () => {
-  const mutateAsync = vi
-    .fn()
-    .mockResolvedValue({ ...first, type: 'SPELEOLOGY' });
-  useUpdateOrganization.mockReturnValue({ mutateAsync });
-  renderManagement();
-
-  const row = await screen.findByTestId('organization-row-42');
-  const editLink = within(row).getByRole('link', {
-    name: 'Edit organization Old club (opens in a new tab)'
-  });
-  expect(editLink).toHaveAttribute('href', '/ui/organizations/42/edit');
-  expect(editLink).toHaveAttribute('target', '_blank');
-  expect(editLink).toHaveAttribute('rel', 'noopener noreferrer');
-  expect(editLink.parentElement).toBe(
-    within(row).getByRole('button', { name: 'View organization Old club' })
-      .parentElement
-  );
-  expect(
-    within(row)
-      .getByRole('button', { name: 'Save' })
-      .querySelector('[data-testid="SaveIcon"]')
-  ).toBeInTheDocument();
-  fireEvent.mouseDown(within(row).getByRole('combobox'));
-  fireEvent.click(screen.getByRole('option', { name: 'Caving group' }));
-  fireEvent.click(within(row).getByRole('button', { name: 'Save' }));
-
-  await waitFor(() =>
-    expect(mutateAsync).toHaveBeenCalledWith({
-      id: '42',
-      type: 'SPELEOLOGY',
-      address: '1 rue du Club',
-      city: 'Millau',
-      country: { id: 'FR' },
-      county: 'Aveyron',
-      customMessage: 'A club',
-      latitude: 44.1,
-      longitude: 3.1,
-      mail: 'club@example.org',
-      postalCode: '12100',
-      region: 'Occitanie',
-      url: 'https://example.org',
-      yearBirth: 1978
-    })
-  );
-  await waitFor(() =>
-    expect(screen.queryByTestId('organization-row-42')).toBeNull()
-  );
-});
-
-it('does not overwrite a type set by another editor', async () => {
-  const mutateAsync = vi.fn();
-  useUpdateOrganization.mockReturnValue({ mutateAsync });
-  apiGet.mockResolvedValue({ ...first, type: 'RESEARCH' });
-  renderManagement();
-
-  const row = await screen.findByTestId('organization-row-42');
-  fireEvent.mouseDown(within(row).getByRole('combobox'));
-  fireEvent.click(screen.getByRole('option', { name: 'Publisher' }));
-  fireEvent.click(within(row).getByRole('button', { name: 'Save' }));
-
-  expect(
-    await within(row).findByText(messages['Organization already classified'])
-  ).toBeInTheDocument();
-  expect(mutateAsync).not.toHaveBeenCalled();
-});
-
 it('keeps non-moderators out and never requests the list', async () => {
   usePermissions.mockReturnValue({ isAuth: true, isModerator: false });
   renderManagement();
@@ -231,7 +129,7 @@ it('keeps non-moderators out and never requests the list', async () => {
   expect(apiPost).not.toHaveBeenCalled();
 });
 
-it('starts duplicate analysis only on request and reuses already loaded pages', async () => {
+it('starts duplicate analysis only on request and scans all organizations', async () => {
   const duplicate = {
     ...second,
     name: 'Old club',
@@ -250,7 +148,7 @@ it('starts duplicate analysis only on request and reuses already loaded pages', 
   );
   renderManagement();
 
-  await waitFor(() => expect(apiPost).toHaveBeenCalledTimes(2));
+  expect(apiPost).not.toHaveBeenCalled();
   openDuplicatesTab();
   const section = await screen.findByRole('region', {
     name: 'Duplicates'
@@ -676,7 +574,7 @@ it('requires an explicit direction and confirms a soft delete with redirect only
     'MuiButton-outlined',
     'MuiButton-colorSuccess'
   );
-  fireEvent.click(screen.getByRole('tab', { name: 'To classify' }));
+  fireEvent.click(screen.getByRole('tab', { name: 'Other organizations' }));
   openDuplicatesTab();
   expect(screen.getByTestId('duplicate-success-42')).toBeInTheDocument();
   fireEvent.click(acknowledge);
@@ -824,7 +722,7 @@ it('keeps completed groups in their original position until acknowledged', async
   const success = await screen.findByTestId('duplicate-success-3');
   expect(middleGroup).toContainElement(success);
   expect(screen.getAllByTestId(/^duplicate-group-/)).toEqual(initialGroups);
-  fireEvent.click(screen.getByRole('tab', { name: 'To classify' }));
+  fireEvent.click(screen.getByRole('tab', { name: 'Other organizations' }));
   openDuplicatesTab();
   expect(screen.getAllByTestId(/^duplicate-group-/)).toEqual(initialGroups);
   fireEvent.click(within(success).getByRole('button', { name: 'Got it' }));
@@ -833,35 +731,6 @@ it('keeps completed groups in their original position until acknowledged', async
     initialGroups[0],
     initialGroups[2]
   ]);
-});
-
-it('loads at least 50 unclassified organizations then waits for Load more', async () => {
-  const unclassified = Array.from({ length: 100 }, (_, i) => ({
-    id: String(i + 1),
-    name: `Unclassified ${i}`,
-    type: null
-  }));
-  apiPost.mockImplementation((_url, { page }) => {
-    let results;
-    if (page === 1) {
-      results = [...unclassified.slice(0, 30), ...typed.slice(0, 70)];
-    } else if (page === 2) {
-      results = [...unclassified.slice(30, 55), ...typed.slice(0, 75)];
-    } else {
-      results = [...unclassified.slice(55), ...typed.slice(0, 55)];
-    }
-    return Promise.resolve({ results, totalResults: 300 });
-  });
-  renderManagement();
-
-  await waitFor(() => expect(apiPost).toHaveBeenCalledTimes(2));
-  expect(screen.getAllByTestId(/^organization-row-/)).toHaveLength(50);
-  expect(screen.queryByTestId('organization-row-56')).toBeNull();
-  const loadMore = screen.getByRole('button', { name: 'Load more' });
-  expect(loadMore).toHaveClass('MuiButton-outlined', 'MuiButton-fullWidth');
-  fireEvent.click(loadMore);
-  await waitFor(() => expect(apiPost).toHaveBeenCalledTimes(3));
-  expect(screen.getAllByTestId(/^organization-row-/)).toHaveLength(100);
 });
 
 it('shows ten duplicate groups at a time with a full-width load-more button', async () => {
@@ -974,9 +843,9 @@ it('keeps an in-flight duplicate scan running when switching tabs', async () => 
     name: 'Duplicates'
   });
   const classifyTab = tabs.getByRole('tab', {
-    name: 'To classify'
+    name: 'Other organizations'
   });
-  await screen.findByTestId('organization-row-1');
+  expect(apiPost).not.toHaveBeenCalled();
   fireEvent.click(duplicatesTab);
   // The classification tab keeps 50 MUI rows mounted while hidden. Scope
   // queries to the scan controls to avoid repeatedly traversing those rows.
