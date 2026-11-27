@@ -1,17 +1,14 @@
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, IconButton, Tooltip } from '@mui/material';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import EditIcon from '@mui/icons-material/Edit';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import AppLink from '@/components/common/AppLink';
+import EntityActionButtons from '@/components/common/EntityActionButtons';
 
 const OrganizationActionButtons = ({
   organization,
   onPreview,
   showIdInLabel = false,
   showOpenLink = false,
-  showEditLink = true
+  showEditLink = true,
+  isDisabled = false
 }) => {
   const { formatMessage } = useIntl();
   const name = showIdInLabel
@@ -28,41 +25,31 @@ const OrganizationActionButtons = ({
   );
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-      <Tooltip title={label}>
-        <IconButton
-          aria-label={label}
-          data-testid={`preview-organization-${organization.id}`}
-          onClick={() => onPreview(organization.id)}>
-          <VisibilityIcon />
-        </IconButton>
-      </Tooltip>
-      {showEditLink && (
-        <Tooltip title={editLabel}>
-          <IconButton
-            component={AppLink}
-            to={`/ui/organizations/${organization.id}/edit`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={editLabel}>
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-      {showOpenLink && (
-        <Tooltip title={openLabel}>
-          <IconButton
-            component={AppLink}
-            to={`/ui/organizations/${organization.id}`}
-            data-testid={`open-organization-${organization.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={openLabel}>
-            <OpenInNewIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Box>
+    <EntityActionButtons
+      preview={{
+        label,
+        testId: `preview-organization-${organization.id}`,
+        onClick: () => onPreview(organization.id)
+      }}
+      edit={
+        showEditLink
+          ? {
+              to: `/ui/organizations/${organization.id}/edit`,
+              label: editLabel
+            }
+          : null
+      }
+      open={
+        showOpenLink
+          ? {
+              to: `/ui/organizations/${organization.id}`,
+              label: openLabel,
+              testId: `open-organization-${organization.id}`
+            }
+          : null
+      }
+      isDisabled={isDisabled}
+    />
   );
 };
 
@@ -74,7 +61,8 @@ OrganizationActionButtons.propTypes = {
   onPreview: PropTypes.func.isRequired,
   showIdInLabel: PropTypes.bool,
   showOpenLink: PropTypes.bool,
-  showEditLink: PropTypes.bool
+  showEditLink: PropTypes.bool,
+  isDisabled: PropTypes.bool
 };
 
 export default OrganizationActionButtons;

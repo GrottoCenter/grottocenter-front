@@ -2,20 +2,10 @@ import { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useQueries } from '@tanstack/react-query';
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CircularProgress,
-  LinearProgress,
-  Stack,
-  Typography
-} from '@mui/material';
+import { Alert, Box, Button, Card, Stack, Typography } from '@mui/material';
 import CompareIcon from '@mui/icons-material/Compare';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import CloseIcon from '@mui/icons-material/Close';
-import CheckIcon from '@mui/icons-material/Check';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 
 import { apiGet } from '@/api/client';
@@ -26,7 +16,14 @@ import { useDeleteOrganization, useOnlineStatus } from '@/hooks';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import FormSubmissionError from '@/components/common/FormSubmissionError';
 import StandardDialog from '@/components/common/StandardDialog';
+import DuplicateScanControls from '@/components/common/DuplicateScanControls';
+import DuplicateComparisonPanel, {
+  ComparisonField,
+  COMPARISON_GRID_SX,
+  COMPARISON_ACTIONS_SX
+} from '@/components/common/DuplicateComparisonPanel';
 import AppLink from '@/components/common/AppLink';
+import DuplicateMergeResult from '@/components/common/DuplicateMergeResult';
 import { findOrganizationDuplicates } from '@/utils/organizationDuplicates';
 import { getOrganizationTypeLabelId } from '@/utils/organizationTypes';
 import OrganizationActionButtons from './OrganizationActionButtons';
@@ -54,14 +51,6 @@ const RESULT_FORMATTERS = {
       {chunks}
     </Typography>
   )
-};
-
-const GROUP_ACTIONS_SX = {
-  display: { xs: 'grid', sm: 'flex' },
-  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-  flexWrap: 'wrap',
-  gap: 1,
-  '& > button': { minWidth: 0 }
 };
 
 const COMPARISON_FIELDS = [
@@ -99,7 +88,8 @@ const Comparison = ({
   query,
   differingFields,
   onPreview,
-  selection,
+  onKeep,
+  isDisabled,
   deleteAction = null,
   isKept = false
 }) => {
@@ -108,70 +98,36 @@ const Comparison = ({
   const values = data ? getComparisonValues(data) : null;
 
   return (
-    <Box
-      data-testid={`duplicate-comparison-${organization.id}`}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        minWidth: 0,
-        p: { xs: 1, sm: 1.5 },
-        border: 2,
-        borderColor: isKept ? 'success.main' : 'divider',
-        borderRadius: 1
-      }}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 0.5,
-          alignItems: 'center'
-        }}>
-        <Typography
-          variant="h5"
-          component="h3"
-          sx={{ flexGrow: 1, minWidth: 0, overflowWrap: 'anywhere' }}>
-          {organization.name} (#{organization.id})
-        </Typography>
+    <DuplicateComparisonPanel
+      testId={`duplicate-comparison-${organization.id}`}
+      title={`${organization.name} (#${organization.id})`}
+      headerActions={
         <OrganizationActionButtons
           organization={organization}
           onPreview={onPreview}
           showIdInLabel
           showOpenLink
+          isDisabled={isDisabled}
         />
-      </Box>
-      {isPending && <CircularProgress size={20} />}
-      {error && <FormSubmissionError error={error} />}
-      {data && (
-        <Stack
-          spacing={0.5}
-          sx={{ mt: 1, flexGrow: 1, overflowWrap: 'anywhere' }}>
-          {COMPARISON_FIELDS.map(({ key, label }) => (
-            <Typography
-              key={key}
-              data-testid={`comparison-field-${key}`}
-              sx={{
-                px: 0.5,
-                py: 0.25,
-                borderRadius: 0.5,
-                bgcolor: differingFields.has(key)
-                  ? 'action.hover'
-                  : 'transparent'
-              }}>
-              {label && `${formatMessage({ id: label })}: `}
-              <Box component={differingFields.has(key) ? 'strong' : 'span'}>
-                {key === 'type'
-                  ? formatMessage({ id: values[key] })
-                  : values[key]}
-              </Box>
-            </Typography>
-          ))}
-        </Stack>
-      )}
-      <Stack spacing={1} sx={{ mt: 2 }}>
-        {selection}
-        {deleteAction}
-      </Stack>
-    </Box>
+      }
+      isPending={isPending}
+      error={error}
+      onRetry={() => query.refetch()}
+      isKept={isKept}
+      onKeep={onKeep}
+      isDisabled={isDisabled}
+      deleteAction={deleteAction}>
+      {data &&
+        COMPARISON_FIELDS.map(({ key, label }) => (
+          <ComparisonField
+            key={key}
+            testId={`comparison-field-${key}`}
+            label={label ? formatMessage({ id: label }) : null}
+            isDifferent={differingFields.has(key)}>
+            {key === 'type' ? formatMessage({ id: values[key] }) : values[key]}
+          </ComparisonField>
+        ))}
+    </DuplicateComparisonPanel>
   );
 };
 
@@ -179,7 +135,8 @@ Comparison.propTypes = {
   organization: organizationShape.isRequired,
   differingFields: PropTypes.instanceOf(Set).isRequired,
   onPreview: PropTypes.func.isRequired,
-  selection: PropTypes.node.isRequired,
+  onKeep: PropTypes.func.isRequired,
+  isDisabled: PropTypes.bool.isRequired,
   deleteAction: PropTypes.node,
   isKept: PropTypes.bool,
   query: PropTypes.shape({
@@ -201,6 +158,7 @@ Comparison.propTypes = {
       managedMassifs: PropTypes.arrayOf(PropTypes.shape({}))
     }),
     isPending: PropTypes.bool,
+    refetch: PropTypes.func,
     error: PropTypes.shape({})
   }).isRequired
 };
@@ -286,12 +244,7 @@ const DuplicateComparison = ({
       <Stack
         role="group"
         aria-label={formatMessage({ id: 'duplicates.keep' })}
-        sx={{
-          display: 'grid',
-          gridTemplateColumns:
-            'repeat(auto-fit, minmax(min(100%, 18rem), 1fr))',
-          gap: { xs: 1, sm: 2 }
-        }}>
+        sx={COMPARISON_GRID_SX}>
         {group.organizations.map((org, index) => {
           const isKept = String(org.id) === targetId;
           return (
@@ -302,32 +255,8 @@ const DuplicateComparison = ({
               differingFields={differingFields}
               onPreview={onPreview}
               isKept={isKept}
-              selection={
-                isKept ? (
-                  <Box
-                    role="status"
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 1,
-                      py: 0.75,
-                      color: 'success.main'
-                    }}>
-                    <CheckIcon fontSize="small" />
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {formatMessage({ id: 'duplicates.kept' })}
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Button
-                    variant="outlined"
-                    disabled={isBusy}
-                    onClick={() => onTargetChange(String(org.id))}>
-                    {formatMessage({ id: 'duplicates.keepAction' })}
-                  </Button>
-                )
-              }
+              onKeep={() => onTargetChange(String(org.id))}
+              isDisabled={isBusy}
               deleteAction={
                 target &&
                 !isKept && (
@@ -355,7 +284,7 @@ const DuplicateComparison = ({
           );
         })}
       </Stack>
-      <Box sx={{ ...GROUP_ACTIONS_SX, mt: 2 }}>{actions}</Box>
+      <Box sx={{ ...COMPARISON_ACTIONS_SX, mt: 2 }}>{actions}</Box>
       {error && <FormSubmissionError error={error} />}
       <StandardDialog
         open={isConfirming}
@@ -415,44 +344,32 @@ DuplicateComparison.propTypes = {
 const DuplicateResult = ({ source, target, onAcknowledge }) => {
   const { formatMessage } = useIntl();
   return (
-    <Box
-      role="status"
-      data-testid={`duplicate-success-${source.id}`}
-      sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-      <Stack
-        spacing={1}
-        sx={{ flexGrow: 1, minWidth: 0, overflowWrap: 'anywhere' }}>
-        {formatMessage(
-          { id: 'duplicates.redirectSuccess' },
-          {
-            source: (
-              <AppLink
-                to={`/ui/organizations/${source.id}`}
-                target="_blank"
-                rel="noopener noreferrer">
-                {source.name} (#{source.id})
-              </AppLink>
-            ),
-            target: (
-              <AppLink
-                to={`/ui/organizations/${target.id}`}
-                target="_blank"
-                rel="noopener noreferrer">
-                {target.name} (#{target.id})
-              </AppLink>
-            ),
-            ...RESULT_FORMATTERS
-          }
-        )}
-      </Stack>
-      <Button
-        variant="outlined"
-        color="success"
-        sx={{ flexShrink: 0 }}
-        onClick={onAcknowledge}>
-        {formatMessage({ id: 'duplicates.acknowledge' })}
-      </Button>
-    </Box>
+    <DuplicateMergeResult
+      testId={`duplicate-success-${source.id}`}
+      onAcknowledge={onAcknowledge}>
+      {formatMessage(
+        { id: 'duplicates.redirectSuccess' },
+        {
+          source: (
+            <AppLink
+              to={`/ui/organizations/${source.id}`}
+              target="_blank"
+              rel="noopener noreferrer">
+              {source.name} (#{source.id})
+            </AppLink>
+          ),
+          target: (
+            <AppLink
+              to={`/ui/organizations/${target.id}`}
+              target="_blank"
+              rel="noopener noreferrer">
+              {target.name} (#{target.id})
+            </AppLink>
+          ),
+          ...RESULT_FORMATTERS
+        }
+      )}
+    </DuplicateMergeResult>
   );
 };
 
@@ -561,7 +478,7 @@ const DuplicateGroup = ({
               );
             })}
           {!isExpanded && (
-            <Box sx={{ ...GROUP_ACTIONS_SX, mt: 1 }}>{actions}</Box>
+            <Box sx={{ ...COMPARISON_ACTIONS_SX, mt: 1 }}>{actions}</Box>
           )}
           {isExpanded && (
             <DuplicateComparison
@@ -695,57 +612,19 @@ const DuplicatesSection = ({
         sx={{ mb: 2 }}>
         {formatMessage({ id: 'duplicates.ignoreNotice' })}
       </Typography>
-      {isLoading && (
-        <Box sx={{ mb: 2 }}>
-          <Typography>
-            {formatMessage(
-              { id: 'Organizations scanned: {loaded} of {total}' },
-              progress
-            )}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-            <LinearProgress
-              variant={progress.total > 0 ? 'determinate' : 'indeterminate'}
-              value={
-                progress.total > 0
-                  ? Math.min(100, (progress.loaded / progress.total) * 100)
-                  : undefined
-              }
-              sx={{ flexGrow: 1, minWidth: 0 }}
-            />
-            <Button variant="outlined" color="error" onClick={onCancel}>
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-          </Box>
-        </Box>
-      )}
-      {hasStarted && !isLoading && !hasCompleted && !error && (
-        <Typography>
-          {formatMessage({ id: 'duplicates.cancelledScan' })}
-        </Typography>
-      )}
-      {!isLoading && (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            flexWrap: 'wrap',
-            gap: 1,
-            mb: 2
-          }}>
-          <Button onClick={onAnalyze} disabled={!isOnline}>
-            {formatMessage({ id: 'duplicates.analyze' })}
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            disabled={!hasIgnored}
-            onClick={() => setIgnored(new Set())}>
-            {formatMessage({ id: 'duplicates.showIgnored' })}
-          </Button>
-        </Box>
-      )}
-      {error && <FormSubmissionError error={error} />}
+      <DuplicateScanControls
+        isLoading={isLoading}
+        hasStarted={hasStarted}
+        hasCompleted={hasCompleted}
+        progress={progress}
+        progressMessageId="Organizations scanned: {loaded} of {total}"
+        error={error}
+        isOnline={isOnline}
+        hasIgnored={hasIgnored}
+        onAnalyze={onAnalyze}
+        onCancel={onCancel}
+        onShowIgnored={() => setIgnored(new Set())}
+      />
       {hasCompleted && (
         <Typography
           variant="body2"

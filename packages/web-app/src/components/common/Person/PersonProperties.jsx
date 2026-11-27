@@ -2,15 +2,15 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Chip, Typography } from '@mui/material';
 
+import RoleChip from '../RoleChip';
 import PersonType from './PersonType';
 
 const PersonProperties = ({ person }) => {
   const { formatMessage } = useIntl();
 
-  const groups = (person.groups ?? [])
-    .filter(g => g.name)
-    .map(g => formatMessage({ id: g.name }))
-    .join(', ');
+  const groups = [
+    ...new Set((person.groups ?? []).map(g => g.name).filter(Boolean))
+  ];
 
   const detailRows = [
     {
@@ -50,8 +50,21 @@ const PersonProperties = ({ person }) => {
         label: formatMessage({ id: 'Language' }),
         value: person.language
       },
-    groups && { label: formatMessage({ id: 'Groups' }), value: groups },
-    person.mail && { label: formatMessage({ id: 'Mail' }), value: person.mail },
+    groups.length > 0 && {
+      label: formatMessage({ id: 'Groups' }),
+      value: (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+          {groups.map(role => (
+            <RoleChip key={role} roleName={role} />
+          ))}
+        </Box>
+      )
+    },
+    person.type !== 'AUTHOR' &&
+      person.mail && {
+        label: formatMessage({ id: 'Mail' }),
+        value: person.mail
+      },
     {
       label: formatMessage({ id: 'Id' }),
       value: `${person.id}`,

@@ -12,6 +12,7 @@ import {
   Typography
 } from '@mui/material';
 
+import RoleChip from '@/components/common/RoleChip';
 import GROUPS from '../../helpers/GroupHelper';
 
 const SpacedButton = styled(Button)`
@@ -94,7 +95,7 @@ const UserGroups = ({
               disabled={isLoading}
             />
           }
-          label={formatMessage({ id: g.name })}
+          label={<RoleChip roleName={g.name} />}
           style={{ display: 'block' }}
         />
       ))}

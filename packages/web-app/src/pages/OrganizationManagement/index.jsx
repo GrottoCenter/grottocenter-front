@@ -1,10 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import {
-  useInfiniteQuery,
-  useQuery,
-  useQueryClient
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useIntl } from 'react-intl';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -46,6 +42,8 @@ import {
   ORGANIZATION_TYPE_VALUES
 } from '@/utils/organizationTypes';
 import { useNotification } from '@/hooks/useNotification';
+import { useDuplicateScan } from '@/hooks/queries/useDuplicateScan';
+import { scanSearchPages } from '@/utils/scanSearchPages';
 import DuplicatesSection from './DuplicatesSection';
 import OrganizationActionButtons from './OrganizationActionButtons';
 
@@ -264,10 +262,6 @@ const OrganizationManagementContent = () => {
   const [savedIds, setSavedIds] = useState(() => new Set());
   const [deletedIds, setDeletedIds] = useState(() => new Set());
   const [visibleLimit, setVisibleLimit] = useState(CLASSIFICATION_BATCH_SIZE);
-  const [scanStarted, setScanStarted] = useState(false);
-  const [scanCompleted, setScanCompleted] = useState(false);
-  const [scanProgress, setScanProgress] = useState({ loaded: 0, total: 0 });
-  const scanRun = useRef(0);
   const canAccess = isAuth && isModerator;
   const {
     data,
@@ -287,40 +281,26 @@ const OrganizationManagementContent = () => {
     staleTime: STALE.VOLATILE,
     gcTime: 60 * 1000
   });
-  const scan = useQuery({
+  const {
+    query: scan,
+    hasStarted: scanStarted,
+    hasCompleted: scanCompleted,
+    progress: scanProgress,
+    analyze: handleAnalyze,
+    cancel: handleCancelScan
+  } = useDuplicateScan({
     queryKey: organizationManagementKeys.duplicates,
-    enabled: false,
-    retry: false,
-    gcTime: 60 * 1000,
-    queryFn: async ({ signal }) => {
-      const cachedPages =
-        queryClient.getQueryData(organizationManagementKeys.unclassified)
-          ?.pages ?? [];
-      const allOrganizations = cachedPages.flatMap(page => page.results);
-      let scanned = allOrganizations.length;
-      let total = cachedPages[0]?.totalResults ?? 0;
-      let pageNumber = cachedPages.length + 1;
-      setScanProgress({ loaded: scanned, total });
-      while (pageNumber === 1 || scanned < total) {
-        signal.throwIfAborted();
-        // Requests are sequential so cancellation stops before the next page.
-        // eslint-disable-next-line no-await-in-loop
-        const page = await getOrganizationsPage({
-          pageParam: pageNumber,
-          signal
-        });
-        signal.throwIfAborted();
-        total = page.totalResults;
-        if (!page.results.length && scanned < total) {
-          throw new Error(formatMessage({ id: 'duplicates.incompleteScan' }));
-        }
-        allOrganizations.push(...page.results);
-        scanned += page.results.length;
-        setScanProgress({ loaded: scanned, total });
-        pageNumber += 1;
-      }
-      return allOrganizations;
-    }
+    enabled: canAccess && isOnline,
+    load: ({ signal, onProgress }) =>
+      scanSearchPages({
+        getPage: getOrganizationsPage,
+        signal,
+        onProgress,
+        initialPages:
+          queryClient.getQueryData(organizationManagementKeys.unclassified)
+            ?.pages ?? [],
+        incompleteMessage: formatMessage({ id: 'duplicates.incompleteScan' })
+      })
   });
 
   useEffect(() => {
@@ -362,37 +342,6 @@ const OrganizationManagementContent = () => {
     isError,
     fetchNextPage
   ]);
-
-  useEffect(
-    () => () => {
-      scanRun.current += 1;
-      queryClient.cancelQueries({
-        queryKey: organizationManagementKeys.duplicates,
-        exact: true
-      });
-    },
-    [queryClient]
-  );
-
-  const handleAnalyze = async () => {
-    if (scan.isFetching || !isOnline) return;
-    const currentRun = ++scanRun.current;
-    setScanStarted(true);
-    setScanCompleted(false);
-    setScanProgress({ loaded: 0, total: 0 });
-    const result = await scan.refetch();
-    if (currentRun === scanRun.current && result.isSuccess) {
-      setScanCompleted(true);
-    }
-  };
-
-  const handleCancelScan = () => {
-    scanRun.current += 1;
-    queryClient.cancelQueries({
-      queryKey: organizationManagementKeys.duplicates,
-      exact: true
-    });
-  };
 
   const handleSave = async (id, type) => {
     if (!isOnline || savingId != null) return;

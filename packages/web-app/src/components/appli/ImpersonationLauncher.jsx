@@ -8,7 +8,6 @@ import {
   Card,
   CardActions,
   CardContent,
-  Chip,
   FormControl,
   InputLabel,
   MenuItem,
@@ -17,6 +16,8 @@ import {
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
+import RoleChip from '@/components/common/RoleChip';
+import RoleLabel from '@/components/common/RoleLabel';
 import { setImpersonatedRole } from '@/actions/Login';
 import { usePermissions } from '@/hooks';
 import { IMPERSONATABLE_ROLES } from '@/utils/impersonation';
@@ -42,11 +43,13 @@ const ImpersonationLauncher = () => {
   return (
     <Card variant="outlined">
       <CardContent sx={{ position: 'relative', p: 2, pt: 3 }}>
-        <Chip
-          variant="outlined"
-          size="small"
-          label={formatMessage({ id: 'Administrator' })}
-          sx={{ position: 'absolute', top: 8, right: 8 }}
+        <RoleChip
+          roleName="Administrator"
+          sx={theme => ({
+            position: 'absolute',
+            top: theme.spacing(1),
+            right: theme.spacing(1)
+          })}
         />
         <Box
           sx={{
@@ -104,7 +107,7 @@ const ImpersonationLauncher = () => {
             onChange={handleSelectChange}>
             {IMPERSONATABLE_ROLES.map(role => (
               <MenuItem key={role} value={role}>
-                {formatMessage({ id: role, defaultMessage: role })}
+                <RoleLabel roleName={role} />
               </MenuItem>
             ))}
           </Select>

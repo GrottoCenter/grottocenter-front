@@ -1,12 +1,4 @@
-const normalize = value =>
-  typeof value === 'string'
-    ? value
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/[^\p{L}\p{N}]+/gu, ' ')
-        .trim()
-    : '';
+import { normalizeName as normalize, nameTrigrams } from './nameSimilarity';
 
 const normalizeUrl = value => {
   if (!value) return '';
@@ -26,15 +18,6 @@ const normalizedName = value =>
   ).replace(/\bed\b/g, 'editions');
 
 const SIMILARITY_THRESHOLD = 0.8;
-
-const nameTrigrams = name => {
-  const characters = [...name];
-  return new Set(
-    characters
-      .slice(0, -2)
-      .map((_, index) => characters.slice(index, index + 3).join(''))
-  );
-};
 
 export const findOrganizationDuplicates = organizations => {
   const byId = new Map(organizations.map(org => [String(org.id), org]));

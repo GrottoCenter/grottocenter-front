@@ -10,7 +10,6 @@ import {
   CardActionArea,
   CardActions,
   CardContent,
-  Chip,
   CircularProgress,
   Typography
 } from '@mui/material';
@@ -24,6 +23,8 @@ import BusinessIcon from '@mui/icons-material/Business';
 import PermMediaIcon from '@mui/icons-material/PermMedia';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
+import AuthorIcon from '@/components/common/AuthorIcon';
+import RoleChip from '@/components/common/RoleChip';
 
 import {
   useDbExport,
@@ -102,13 +103,13 @@ const ToolCard = ({
         to={to}
         aria-label={`${title} — ${roleLabel}`}>
         <CardContent sx={{ position: 'relative', p: 2, pt: 3 }}>
-          <Chip
-            variant="outlined"
-            size="small"
-            label={roleLabel}
-            sx={{ position: 'absolute', top: 8, right: 8 }}
-          />
-          <Box sx={{ mb: 0.5, display: 'flex' }}>
+          <Box
+            sx={{
+              mb: 0.5,
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 1
+            }}>
             {showBadge ? (
               <Badge
                 overlap="rectangular"
@@ -120,6 +121,19 @@ const ToolCard = ({
             ) : (
               iconNode
             )}
+            <Box
+              sx={{
+                display: 'flex',
+                flex: 1,
+                minWidth: 0,
+                flexWrap: 'wrap',
+                justifyContent: 'flex-end',
+                gap: 0.5
+              }}>
+              {roleIds.map(role => (
+                <RoleChip key={role} roleName={role} />
+              ))}
+            </Box>
           </Box>
           <Typography
             variant="subtitle1"
@@ -167,11 +181,13 @@ const DBExportCard = ({ dbExport = null, isLoading = false }) => {
   return (
     <Card variant="outlined">
       <CardContent sx={{ position: 'relative', p: 2, pt: 3 }}>
-        <Chip
-          variant="outlined"
-          size="small"
-          label={formatMessage({ id: 'Leader' })}
-          sx={{ position: 'absolute', top: 8, right: 8 }}
+        <RoleChip
+          roleName="Leader"
+          sx={theme => ({
+            position: 'absolute',
+            top: theme.spacing(1),
+            right: theme.spacing(1)
+          })}
         />
         <Box
           sx={{
@@ -337,6 +353,15 @@ const Dashboard = () => {
                       })}
                       roleIds={['Moderator']}
                       to="/ui/organizations/management"
+                    />
+                    <ToolCard
+                      icon={<AuthorIcon />}
+                      title={formatMessage({ id: 'Authors' })}
+                      description={formatMessage({
+                        id: 'authorDuplicates.title'
+                      })}
+                      roleIds={['Moderator']}
+                      to="/ui/persons/management"
                     />
                     <ToolCard
                       icon={<PermMediaIcon />}
