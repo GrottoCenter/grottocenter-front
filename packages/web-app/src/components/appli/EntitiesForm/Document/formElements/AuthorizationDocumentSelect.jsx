@@ -1,8 +1,16 @@
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Autocomplete, CircularProgress, TextField } from '@mui/material';
+import { Autocomplete } from '@mui/material';
 
-import { useDocuments } from '@/hooks';
+import EntityAutocompleteInput from '@/components/common/AutoCompleteSearch/EntityAutocompleteInput';
+import { AUTOCOMPLETE_MIN_CHARACTERS } from '@/conf/config';
+import { useEntitySearch } from '@/hooks';
+import { DocumentTypes, hasSameDocumentId } from '@/utils/documentTypeHelpers';
+
+const DOCUMENTS = ['documents'];
+const AUTHORIZATION_FILTER = { type: [DocumentTypes.AUTHORIZATION_TO_PUBLISH] };
+const isSameAuthorization = (option, selected) =>
+  hasSameDocumentId(option.id, selected.id);
 
 const AuthorizationDocumentSelect = ({
   value,
@@ -12,39 +20,59 @@ const AuthorizationDocumentSelect = ({
   disableClearable = false
 }) => {
   const { formatMessage } = useIntl();
-  const { data, isLoading } = useDocuments({
-    isValidated: true,
-    documentType: 'Authorization To Publish'
-  });
+  const { inputValue, setInputValue, results, isLoading, hasError } =
+    useEntitySearch(DOCUMENTS, {
+      enabled: !disabled,
+      filter: AUTHORIZATION_FILTER
+    });
+  const options =
+    value && !results.some(option => isSameAuthorization(option, value))
+      ? [value, ...results]
+      : results;
+  const emptyText =
+    inputValue.trim().length >= AUTOCOMPLETE_MIN_CHARACTERS
+      ? formatMessage({ id: 'No results' })
+      : formatMessage(
+          { id: 'Type at least {nbOfChars} character(s)' },
+          { nbOfChars: AUTOCOMPLETE_MIN_CHARACTERS }
+        );
 
   return (
     <Autocomplete
       disabled={disabled}
       disableClearable={disableClearable}
       loading={isLoading}
-      options={data?.documents ?? []}
+      loadingText={formatMessage({ id: 'Loading ...' })}
+      noOptionsText={
+        hasError
+          ? formatMessage({ id: 'entityCreation.searchFailed' })
+          : emptyText
+      }
+      options={options}
+      filterSelectedOptions
+      filterOptions={available => available}
+      getOptionKey={doc => doc.id}
       getOptionLabel={doc => doc.title ?? ''}
-      isOptionEqualToValue={(option, val) => option.id === val.id}
+      isOptionEqualToValue={isSameAuthorization}
       value={value ?? null}
-      onChange={(_, newValue) => onChange(newValue)}
+      onInputChange={(_, text, reason) =>
+        setInputValue(reason === 'input' ? text : '')
+      }
+      onChange={(_, selection) =>
+        onChange(
+          selection
+            ? { id: Number(selection.id), title: selection.title }
+            : null
+        )
+      }
       renderInput={params => (
-        <TextField
-          {...params}
-          variant="filled"
+        <EntityAutocompleteInput
+          params={params}
           required={required && !disabled}
           label={formatMessage({ id: 'Authorization from authors' })}
-          slotProps={{
-            ...params.slotProps,
-            input: {
-              ...params.slotProps.input,
-              endAdornment: (
-                <>
-                  {isLoading && <CircularProgress size={16} />}
-                  {params.slotProps.input.endAdornment}
-                </>
-              )
-            }
-          }}
+          loading={isLoading}
+          hasError={hasError}
+          testId="authorization-document-search"
         />
       )}
     />

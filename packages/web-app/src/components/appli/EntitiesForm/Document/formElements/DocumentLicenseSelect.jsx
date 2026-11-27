@@ -11,7 +11,10 @@ import {
 } from '@mui/material';
 
 import LicenseTag from '@/components/common/LicenseTag';
-import { getLicenseName } from '@/components/common/LicenseTag/helpers';
+import {
+  DEFAULT_DOCUMENT_LICENSE,
+  getLicenseName
+} from '@/components/common/LicenseTag/helpers';
 import AppLink from '@/components/common/AppLink';
 import { findLicenseByName } from '@/hooks';
 
@@ -72,7 +75,7 @@ const DocumentLicenseSelect = ({
               data-testid={`document-license-option-${license.id}`}>
               <LicenseTag
                 license={license}
-                recommended={license.name === 'CC-BY-SA'}
+                recommended={license.name === DEFAULT_DOCUMENT_LICENSE}
               />
             </MenuItem>
           ))}

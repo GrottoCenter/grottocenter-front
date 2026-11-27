@@ -42,7 +42,6 @@ vi.mock('@/hooks', () => ({
   }),
   useLicenses: () => ({ data: [] }),
   useUserProperties: () => ({ id: 1 }),
-  useDocuments: () => ({ data: [] }),
   findLicenseByName: () => null
 }));
 

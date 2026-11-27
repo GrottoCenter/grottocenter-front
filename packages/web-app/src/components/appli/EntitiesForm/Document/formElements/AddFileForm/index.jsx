@@ -11,7 +11,10 @@ import {
   RadioGroup
 } from '@mui/material';
 
-import { getLicenseName } from '@/components/common/LicenseTag/helpers';
+import {
+  DEFAULT_DOCUMENT_LICENSE,
+  getLicenseName
+} from '@/components/common/LicenseTag/helpers';
 import InternationalizedLink from '@/components/common/InternationalizedLink';
 import { licenceLinks } from '@/conf/externalLinks';
 import { MAX_SIZE_OF_UPLOADED_FILES } from '@/conf/config';
@@ -42,8 +45,6 @@ import DocumentPdfAnalysis from '../DocumentPdfAnalysis';
 import PanoramaDisplayEditor from '../PanoramaDisplayEditor';
 import AuthorizationDocumentSelect from '../AuthorizationDocumentSelect';
 import DocumentLicenseSelect from '../DocumentLicenseSelect';
-
-const DEFAULT_LICENSE = 'CC-BY-SA';
 
 const AddFileForm = ({
   files,
@@ -120,8 +121,8 @@ const AddFileForm = ({
     // Other options preserve existing names, including unknown legacy values.
     const licenseName =
       option === AUTHORIZATION_FROM_AUTHOR
-        ? DEFAULT_LICENSE
-        : documentLicenseName || DEFAULT_LICENSE;
+        ? DEFAULT_DOCUMENT_LICENSE
+        : documentLicenseName || DEFAULT_DOCUMENT_LICENSE;
     const selected = findLicenseByName(licenses, licenseName);
     if (selected && selected.id !== documentLicenseId) setLicense(selected);
   }, [
@@ -348,7 +349,7 @@ const AddFileForm = ({
                       values={{
                         license: (
                           <InternationalizedLink links={licenceLinks}>
-                            CC-BY-SA
+                            {DEFAULT_DOCUMENT_LICENSE}
                           </InternationalizedLink>
                         )
                       }}

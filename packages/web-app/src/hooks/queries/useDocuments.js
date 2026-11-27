@@ -15,8 +15,7 @@ const selectList = ({ data, contentRange }) => {
 };
 
 /**
- * Paginated documents list. Used by the moderator validation queue and by the
- * AddFileForm to fetch the "Authorization To Publish" documents. The criteria
+ * Paginated documents list. Used by the moderator validation queue. The criteria
  * shape (isValidated, documentType, limit, skip) matches the legacy thunk so
  * the API call is identical.
  */

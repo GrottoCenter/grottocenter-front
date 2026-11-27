@@ -11,18 +11,16 @@ import DocumentLicenseSelect from './DocumentLicenseSelect';
 const CollectionPublicationRights = ({ disabled = false }) => {
   const { document, hasStoredAuthorization, updateAttribute } =
     useContext(DocumentFormContext);
-  const { data: licenses = [], isLoading } = useLicenses();
+  const { data: licenses, isLoading } = useLicenses();
   const licenseName = getLicenseName(document.license);
   const licenseId = document.license?.id;
   const hasAuthorization = !!document.authorizationDocument?.id;
-  const hasUnknownLicense =
-    !isLoading && !!licenseName && !findLicenseByName(licenses, licenseName);
+  const resolvedLicense = findLicenseByName(licenses, licenseName);
 
   useEffect(() => {
-    const resolved = findLicenseByName(licenses, licenseName);
-    if (resolved && resolved.id !== licenseId)
-      updateAttribute('license', resolved);
-  }, [licenses, licenseName, licenseId, updateAttribute]);
+    if (resolvedLicense && resolvedLicense.id !== licenseId)
+      updateAttribute('license', resolvedLicense);
+  }, [resolvedLicense, licenseId, updateAttribute]);
 
   return (
     <Box data-testid="collection-publication-rights" sx={{ mb: 2 }}>
@@ -39,7 +37,7 @@ const CollectionPublicationRights = ({ disabled = false }) => {
           onChange={value => updateAttribute('license', value)}
           licenses={licenses}
           isLoading={isLoading}
-          hasUnknownLicense={hasUnknownLicense}
+          hasUnknownLicense={!!licenses && !!licenseName && !resolvedLicense}
           disabled={disabled}
         />
       )}

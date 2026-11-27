@@ -56,6 +56,17 @@ const mockParentSearch = () =>
     });
   });
 
+const mockAuthorizationSearch = () =>
+  cy.intercept('POST', '**/api/v1/search', request => {
+    const matches = request.body.query === 'Publication';
+    if (matches) request.alias = 'authorizationSearch';
+    request.reply({
+      body: {
+        results: matches ? [{ ...permission, id: String(permission.id) }] : []
+      }
+    });
+  });
+
 describe('Editing a document with publication authorization', () => {
   beforeEach(() => {
     cy.viewport(1280, 1000);
@@ -69,9 +80,6 @@ describe('Editing a document with publication authorization', () => {
       'parent'
     );
     cy.intercept('GET', '**/api/v1/documents/99', { body: permission });
-    cy.intercept('GET', '**/api/v1/documents?*', {
-      body: { documents: [permission] }
-    });
     cy.intercept('GET', '**/api/v1/languages*', {
       body: { languages: [{ id: 'eng', part1: 'en', refName: 'English' }] }
     });
@@ -120,6 +128,7 @@ describe('Editing a document with publication authorization', () => {
 
   it('associates optional collection rights without offering files or author declarations', () => {
     cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
+    mockAuthorizationSearch();
     cy.intercept('GET', '**/api/v1/documents/types*', {
       body: {
         documentTypes: [
@@ -151,11 +160,18 @@ describe('Editing a document with publication authorization', () => {
     cy.get('[data-testid="publication-author-rights"]').should('not.exist');
     cy.get('[data-testid="publication-authorization"]').should('not.exist');
     cy.get('[data-testid="document-submit"]').should('be.enabled');
-    cy.get(
-      '[data-testid="collection-publication-rights"] input[role="combobox"]'
-    )
-      .should('not.have.attr', 'required')
-      .click();
+    cy.get('[data-testid="authorization-document-search"]').should(
+      'not.have.attr',
+      'required'
+    );
+    cy.get('[data-testid="authorization-document-search"]').type('Publication');
+    cy.wait('@authorizationSearch')
+      .its('request.body')
+      .should('deep.equal', {
+        entities: ['documents'],
+        query: 'Publication',
+        filter: { type: ['Authorization To Publish'] }
+      });
     cy.contains('[role="option"]', permission.title).click();
     cy.get('[data-testid="document-submit"]').should('be.disabled');
     cy.get('[data-testid="document-license"] [role="combobox"]').click();

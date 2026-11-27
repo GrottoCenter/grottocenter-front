@@ -191,16 +191,27 @@ export const DocumentFormContext = createContext({
   setLinkedEntrance: () => {}
 });
 
-const getCollectionPublicationRights = ({
+const getPublicationRights = ({
   license = null,
-  authorizationDocument = null
+  authorizationDocument = null,
+  selectOptionAuthorizationDocument = null
 }) => ({
   license,
   authorizationDocument,
-  selectOptionAuthorizationDocument: authorizationDocument?.id
-    ? DOCUMENT_AUTHORIZE_TO_PUBLISH
-    : null
+  selectOptionAuthorizationDocument
 });
+
+const getCollectionPublicationRights = document => {
+  const { authorizationDocument, license } = getPublicationRights(document);
+  const hasAuthorization = !!authorizationDocument?.id;
+  return {
+    license: hasAuthorization ? license : null,
+    authorizationDocument,
+    selectOptionAuthorizationDocument: hasAuthorization
+      ? DOCUMENT_AUTHORIZE_TO_PUBLISH
+      : null
+  };
+};
 
 const normalizeInitialValues = values => {
   if (!values) return {};
@@ -215,11 +226,47 @@ const normalizeInitialValues = values => {
       option ??
       (values.authorizationDocument?.id ? DOCUMENT_AUTHORIZE_TO_PUBLISH : null),
     files: (files ?? []).map(f => ({ ...f, state: f.state ?? IS_INTACT })),
-    authorsOrganization: authorsOrganization ?? [],
-    ...(values.type === DocumentTypes.COLLECTION
-      ? getCollectionPublicationRights(values)
-      : {})
+    authorsOrganization: authorsOrganization ?? []
   };
+};
+
+const createFormState = document => {
+  const collectionRights = getCollectionPublicationRights(document);
+  return {
+    document:
+      document.type === DocumentTypes.COLLECTION
+        ? { ...document, ...collectionRights }
+        : document,
+    collectionRights,
+    preCollectionDraft: null
+  };
+};
+
+// Restore the original parent and publication choices when undoing a switch
+// to Collection. The collection keeps its own draft across type changes.
+const changeDocumentType = (state, type) => {
+  const { document, collectionRights, preCollectionDraft } = state;
+  if (type === DocumentTypes.COLLECTION)
+    return {
+      ...state,
+      preCollectionDraft: {
+        ...getPublicationRights(document),
+        type: document.type,
+        parent: document.parent
+      },
+      document: { ...document, ...collectionRights, type, parent: null }
+    };
+  if (document.type === DocumentTypes.COLLECTION)
+    return {
+      document: {
+        ...document,
+        ...(preCollectionDraft?.type === type ? preCollectionDraft : {}),
+        type
+      },
+      collectionRights: getCollectionPublicationRights(document),
+      preCollectionDraft: null
+    };
+  return { ...state, document: { ...document, type } };
 };
 
 const Provider = ({
@@ -228,20 +275,26 @@ const Provider = ({
   creationContext,
   allowEntityCreation = true
 }) => {
-  const [document, setDocument] = useState({
-    ...defaultDocAttributes,
-    ...(!initialValues && creationContext
-      ? { type: creationContext.type }
-      : {}),
-    ...normalizeInitialValues(initialValues)
-  });
+  const [formState, setFormState] = useState(() =>
+    createFormState({
+      ...defaultDocAttributes,
+      ...(!initialValues && creationContext
+        ? { type: creationContext.type }
+        : {}),
+      ...normalizeInitialValues(initialValues)
+    })
+  );
+  const { document } = formState;
+  const setDocument = useCallback(update => {
+    setFormState(state => {
+      const nextDocument = update(state.document);
+      return nextDocument === state.document
+        ? state
+        : { ...state, document: nextDocument };
+    });
+  }, []);
   // The multipart API cannot clear a stored publication option.
   const hasStoredAuthorization = !!initialValues?.authorizationDocument?.id;
-  // Other document types may clear authorization or apply a default license.
-  // Keep the collection's draft independent until the form is reset.
-  const collectionPublicationRightsRef = useRef(
-    getCollectionPublicationRights(document)
-  );
   const attributeVersionsRef = useRef({});
   const allowPhotoDatePrefillRef = useRef(true);
   usePhotoDatePrefill({
@@ -273,19 +326,15 @@ const Provider = ({
         allowPhotoDatePrefillRef.current = false;
       attributeVersionsRef.current[attributeName] =
         (attributeVersionsRef.current[attributeName] ?? 0) + 1;
+      if (attributeName === 'type') {
+        setFormState(state =>
+          newValue === state.document.type
+            ? state
+            : changeDocumentType(state, newValue)
+        );
+        return;
+      }
       setDocument(prevState => {
-        if (attributeName === 'type' && newValue !== prevState.type) {
-          if (prevState.type === DocumentTypes.COLLECTION)
-            collectionPublicationRightsRef.current =
-              getCollectionPublicationRights(prevState);
-          if (newValue === DocumentTypes.COLLECTION)
-            return {
-              ...prevState,
-              ...collectionPublicationRightsRef.current,
-              type: newValue,
-              parent: null
-            };
-        }
         if (
           attributeName === 'authorizationDocument' &&
           prevState.type === DocumentTypes.COLLECTION
@@ -309,24 +358,14 @@ const Provider = ({
     );
   }, [document, initialValues, hasStoredAuthorization, setIsFormValid]);
 
-  const resetContext = useCallback(
-    (overrides = {}) => {
-      allowPhotoDatePrefillRef.current = true;
-      attributeVersionsRef.current.datePublication =
-        (attributeVersionsRef.current.datePublication ?? 0) + 1;
-      attributeVersionsRef.current.parent =
-        (attributeVersionsRef.current.parent ?? 0) + 1;
-      const nextDocument = { ...defaultDocAttributes, ...overrides };
-      collectionPublicationRightsRef.current =
-        getCollectionPublicationRights(nextDocument);
-      setDocument(
-        nextDocument.type === DocumentTypes.COLLECTION
-          ? { ...nextDocument, ...collectionPublicationRightsRef.current }
-          : nextDocument
-      );
-    },
-    [setDocument]
-  );
+  const resetContext = useCallback((overrides = {}) => {
+    allowPhotoDatePrefillRef.current = true;
+    attributeVersionsRef.current.datePublication =
+      (attributeVersionsRef.current.datePublication ?? 0) + 1;
+    attributeVersionsRef.current.parent =
+      (attributeVersionsRef.current.parent ?? 0) + 1;
+    setFormState(createFormState({ ...defaultDocAttributes, ...overrides }));
+  }, []);
 
   const contextValue = useMemo(
     () => ({

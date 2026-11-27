@@ -7,6 +7,8 @@ import ccByNcNd from '@/assets/icons/cc/cc-by-nc-nd.svg';
 import ccZero from '@/assets/icons/cc/cc-zero.svg';
 import { withBase } from '@/utils/publicUrl';
 
+export const DEFAULT_DOCUMENT_LICENSE = 'CC-BY-SA';
+
 // Official Creative Commons composite badges (Wikimedia Commons), keyed by the
 // dash-joined clause list. Every CC combination the API can return has a badge,
 // so a Creative Commons license always renders as a badge (never the fallback).
