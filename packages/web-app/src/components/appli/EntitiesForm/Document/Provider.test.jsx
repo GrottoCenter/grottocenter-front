@@ -32,6 +32,35 @@ const PublicationOption = () => {
   return <span>{document.selectOptionAuthorizationDocument ?? 'unset'}</span>;
 };
 
+const PublicationControls = () => {
+  const { document, updateAttribute, resetContext } =
+    useContext(DocumentFormContext);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => {
+          updateAttribute('authorizationDocument', { id: 99 });
+          updateAttribute('license', { id: 2, name: 'CC-BY' });
+        }}>
+        Set publication rights
+      </button>
+      <button
+        type="button"
+        onClick={() => updateAttribute('authorizationDocument', null)}>
+        Clear authorization
+      </button>
+      <button type="button" onClick={() => resetContext()}>
+        Reset document
+      </button>
+      <output data-testid="publication-license">
+        {document.license?.name}
+      </output>
+      <PublicationOption />
+    </>
+  );
+};
+
 const DocumentTypeSelector = () => {
   const { updateAttribute } = useContext(DocumentFormContext);
   return (
@@ -222,6 +251,42 @@ describe('DocumentFormProvider length validation', () => {
 });
 
 describe('DocumentFormProvider publication authorization', () => {
+  it('rejects removal of an authorization that was stored when editing began', async () => {
+    render(
+      <DocumentFormProvider
+        initialValues={{
+          ...validDocument,
+          type: DocumentTypes.COLLECTION,
+          authorizationDocument: { id: 99 },
+          license: { id: 2, name: 'CC-BY' }
+        }}>
+        <DocumentTypeSelector />
+        <PublicationControls />
+      </DocumentFormProvider>
+    );
+    await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Clear authorization'));
+    await waitFor(() =>
+      expect(screen.getByText('invalid')).toBeInTheDocument()
+    );
+  });
+
+  it('discards the previous collection rights draft when the form is reset', () => {
+    render(
+      <DocumentFormProvider>
+        <DocumentTypeSelector />
+        <PublicationControls />
+      </DocumentFormProvider>
+    );
+    fireEvent.click(screen.getByText(DocumentTypes.COLLECTION));
+    fireEvent.click(screen.getByText('Set publication rights'));
+    fireEvent.click(screen.getByText(DocumentTypes.BOOK));
+    fireEvent.click(screen.getByText('Reset document'));
+    fireEvent.click(screen.getByText(DocumentTypes.COLLECTION));
+    expect(screen.getByText('unset')).toBeInTheDocument();
+    expect(screen.getByTestId('publication-license')).toBeEmptyDOMElement();
+  });
+
   it('accepts a collection without authorization or license', async () => {
     renderValidation({
       ...validDocument,

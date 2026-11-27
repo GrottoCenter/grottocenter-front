@@ -120,6 +120,14 @@ describe('Editing a document with publication authorization', () => {
 
   it('associates optional collection rights without offering files or author declarations', () => {
     cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
+    cy.intercept('GET', '**/api/v1/documents/types*', {
+      body: {
+        documentTypes: [
+          { id: 4, name: 'Collection' },
+          { id: 5, name: 'Image' }
+        ]
+      }
+    });
     cy.intercept('GET', '**/api/v1/documents/42', {
       body: {
         ...document,
@@ -132,6 +140,13 @@ describe('Editing a document with publication authorization', () => {
     cy.visit('/documents/42/edit', {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
+    cy.get('[data-testid="document-type-5"]').click();
+    cy.get('[data-testid="file-dropzone"]').should(
+      'have.attr',
+      'aria-disabled',
+      'false'
+    );
+    cy.get('[data-testid="document-type-4"]').click();
     cy.get('[data-testid="file-dropzone"]').should('not.exist');
     cy.get('[data-testid="publication-author-rights"]').should('not.exist');
     cy.get('[data-testid="publication-authorization"]').should('not.exist');

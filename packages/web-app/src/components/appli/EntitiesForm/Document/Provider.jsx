@@ -85,7 +85,11 @@ export const getDocumentLengthErrors = document => {
     }));
 };
 
-const checkFormValidation = (document, isNewDocument) => {
+const checkFormValidation = (
+  document,
+  isNewDocument,
+  hasStoredAuthorization
+) => {
   let isValid = true;
 
   const payload = filterDocumentPayload(document);
@@ -147,8 +151,11 @@ const checkFormValidation = (document, isNewDocument) => {
   const requiresAuthorization =
     document.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH;
   const isCollection = document.type === DocumentTypes.COLLECTION;
-  if (isCollection && document.authorizationDocument) {
-    if (!document.authorizationDocument.id || !document.license?.id)
+  if (
+    isCollection &&
+    (document.authorizationDocument || hasStoredAuthorization)
+  ) {
+    if (!document.authorizationDocument?.id || !document.license?.id)
       isValid = false;
     if (
       document.selectOptionAuthorizationDocument !==
@@ -173,6 +180,7 @@ const checkFormValidation = (document, isNewDocument) => {
 export const DocumentFormContext = createContext({
   document: defaultDocAttributes,
   isNewDocument: true,
+  hasStoredAuthorization: false,
   allowEntityCreation: true,
   isFormValid: true,
   lengthErrors: [],
@@ -181,6 +189,17 @@ export const DocumentFormContext = createContext({
   resetContext: () => {},
   linkedEntrance: null,
   setLinkedEntrance: () => {}
+});
+
+const getCollectionPublicationRights = ({
+  license = null,
+  authorizationDocument = null
+}) => ({
+  license,
+  authorizationDocument,
+  selectOptionAuthorizationDocument: authorizationDocument?.id
+    ? DOCUMENT_AUTHORIZE_TO_PUBLISH
+    : null
 });
 
 const normalizeInitialValues = values => {
@@ -196,7 +215,10 @@ const normalizeInitialValues = values => {
       option ??
       (values.authorizationDocument?.id ? DOCUMENT_AUTHORIZE_TO_PUBLISH : null),
     files: (files ?? []).map(f => ({ ...f, state: f.state ?? IS_INTACT })),
-    authorsOrganization: authorsOrganization ?? []
+    authorsOrganization: authorsOrganization ?? [],
+    ...(values.type === DocumentTypes.COLLECTION
+      ? getCollectionPublicationRights(values)
+      : {})
   };
 };
 
@@ -213,6 +235,13 @@ const Provider = ({
       : {}),
     ...normalizeInitialValues(initialValues)
   });
+  // The multipart API cannot clear a stored publication option.
+  const hasStoredAuthorization = !!initialValues?.authorizationDocument?.id;
+  // Other document types may clear authorization or apply a default license.
+  // Keep the collection's draft independent until the form is reset.
+  const collectionPublicationRightsRef = useRef(
+    getCollectionPublicationRights(document)
+  );
   const attributeVersionsRef = useRef({});
   const allowPhotoDatePrefillRef = useRef(true);
   usePhotoDatePrefill({
@@ -244,17 +273,41 @@ const Provider = ({
         allowPhotoDatePrefillRef.current = false;
       attributeVersionsRef.current[attributeName] =
         (attributeVersionsRef.current[attributeName] ?? 0) + 1;
-      setDocument(prevState => ({
-        ...prevState,
-        [attributeName]: newValue
-      }));
+      setDocument(prevState => {
+        if (attributeName === 'type' && newValue !== prevState.type) {
+          if (prevState.type === DocumentTypes.COLLECTION)
+            collectionPublicationRightsRef.current =
+              getCollectionPublicationRights(prevState);
+          if (newValue === DocumentTypes.COLLECTION)
+            return {
+              ...prevState,
+              ...collectionPublicationRightsRef.current,
+              type: newValue,
+              parent: null
+            };
+        }
+        if (
+          attributeName === 'authorizationDocument' &&
+          prevState.type === DocumentTypes.COLLECTION
+        )
+          return {
+            ...prevState,
+            ...getCollectionPublicationRights({
+              ...prevState,
+              authorizationDocument: newValue
+            })
+          };
+        return { ...prevState, [attributeName]: newValue };
+      });
     },
     [setDocument]
   );
 
   useEffect(() => {
-    setIsFormValid(checkFormValidation(document, !initialValues));
-  }, [document, initialValues, setIsFormValid]);
+    setIsFormValid(
+      checkFormValidation(document, !initialValues, hasStoredAuthorization)
+    );
+  }, [document, initialValues, hasStoredAuthorization, setIsFormValid]);
 
   const resetContext = useCallback(
     (overrides = {}) => {
@@ -263,7 +316,14 @@ const Provider = ({
         (attributeVersionsRef.current.datePublication ?? 0) + 1;
       attributeVersionsRef.current.parent =
         (attributeVersionsRef.current.parent ?? 0) + 1;
-      setDocument({ ...defaultDocAttributes, ...overrides });
+      const nextDocument = { ...defaultDocAttributes, ...overrides };
+      collectionPublicationRightsRef.current =
+        getCollectionPublicationRights(nextDocument);
+      setDocument(
+        nextDocument.type === DocumentTypes.COLLECTION
+          ? { ...nextDocument, ...collectionPublicationRightsRef.current }
+          : nextDocument
+      );
     },
     [setDocument]
   );
@@ -272,6 +332,7 @@ const Provider = ({
     () => ({
       document,
       isNewDocument: !initialValues,
+      hasStoredAuthorization,
       allowEntityCreation,
       isFormValid,
       lengthErrors,
@@ -284,6 +345,7 @@ const Provider = ({
     [
       document,
       initialValues,
+      hasStoredAuthorization,
       allowEntityCreation,
       isFormValid,
       lengthErrors,

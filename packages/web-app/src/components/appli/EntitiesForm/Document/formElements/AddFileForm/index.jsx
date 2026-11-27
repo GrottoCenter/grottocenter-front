@@ -84,7 +84,6 @@ const AddFileForm = ({
 
   const isParentAuthForced =
     document.parent !== null && document.authorizationDocument !== null;
-  const isAuthForced = isParentAuthForced;
 
   const extensions =
     acceptConfig?.extensions ??
@@ -318,7 +317,7 @@ const AddFileForm = ({
               sx={{
                 fontSize: '0.875rem'
               }}>
-              {isAuthForced
+              {isParentAuthForced
                 ? formatMessage({
                     id: 'The licensing type of the document has been deduced from the parent document'
                   })
@@ -329,7 +328,7 @@ const AddFileForm = ({
               onChange={e => updateOption(e.target.value)}>
               <FormControlLabel
                 value={AUTHORIZATION_FROM_AUTHOR}
-                disabled={isAuthForced}
+                disabled={isParentAuthForced}
                 control={
                   <Radio
                     size="small"
@@ -360,7 +359,7 @@ const AddFileForm = ({
               />
               <FormControlLabel
                 value={LICENSE_IN_FILE}
-                disabled={isAuthForced}
+                disabled={isParentAuthForced}
                 control={<Radio size="small" />}
                 label={formatMessage({
                   id: 'The license is written in the files'
@@ -368,7 +367,7 @@ const AddFileForm = ({
               />
               <FormControlLabel
                 value={DOCUMENT_AUTHORIZE_TO_PUBLISH}
-                disabled={isAuthForced}
+                disabled={isParentAuthForced}
                 control={
                   <Radio
                     size="small"
@@ -388,7 +387,7 @@ const AddFileForm = ({
             <AuthorizationDocumentSelect
               value={document.authorizationDocument}
               onChange={setAuthorizationDocument}
-              disabled={isAuthForced}
+              disabled={isParentAuthForced}
             />
           )}
 
