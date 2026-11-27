@@ -324,6 +324,12 @@ export const auditOrganization = async (
   if (libraryCount) blockers.push({ key: 'library', count: libraryCount });
   if (blockers.length) return { organization, blockers, documents: [] };
 
+  // The uncapped DB count is authoritative. Once transfers leave it empty,
+  // a name search would only re-read stale hits or unrelated homonyms.
+  if (organization.authoredCount === 0) {
+    return { organization, blockers, documents: [] };
+  }
+
   const matches = await readSearch(
     { 'authorsOrganization.name': organization.name },
     signal

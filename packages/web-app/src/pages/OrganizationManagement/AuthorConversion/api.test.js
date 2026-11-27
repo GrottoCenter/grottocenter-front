@@ -193,13 +193,45 @@ it('checks library IDs on the document detail even when search only returns a na
 });
 
 it('ignores similarly named organizations when checking documents', async () => {
-  organization.authoredCount = 0;
   documents = [
-    makeDocument({ authorsOrganization: [{ id: 99, name: organization.name }] })
+    makeDocument(),
+    makeDocument({
+      id: 102,
+      authorsOrganization: [{ id: 99, name: organization.name }]
+    })
   ];
   const result = await audit();
   expect(result.blockers).toEqual([]);
+  expect(result.documents).toEqual([documents[0]]);
+});
+
+it('skips homonymous author search results when the database count is zero', async () => {
+  organization = makeOrganization({ id: 1022, name: 'AA' });
+  apiPost.mockImplementation(async (_url, body) => {
+    if (body.filter['authorsOrganization.name']) {
+      throw new Error('Would load 2413 documents belonging to AA #938');
+    }
+    return { results: [], totalResults: 0 };
+  });
+  const result = await auditOrganization(1022, { snapshot });
   expect(result.documents).toEqual([]);
+  expect(result.blockers).toEqual([]);
+  expect(apiPost).toHaveBeenCalledTimes(1);
+  expect(apiPost.mock.calls[0][1].filter).toEqual({ 'library.name': 'AA' });
+  expect(apiGet).toHaveBeenCalledTimes(1);
+});
+
+it('still blocks library holdings when the authored document count is zero', async () => {
+  organization.authoredCount = 0;
+  documents[0].library = { id: 42 };
+  apiPost.mockResolvedValue({
+    results: [{ id: '101', library: { name: organization.name } }],
+    totalResults: 1
+  });
+  expect((await audit()).blockers).toContainEqual({
+    key: 'library',
+    count: 1
+  });
 });
 
 it('refuses an incomplete search rather than relying on the ten-document preview', async () => {

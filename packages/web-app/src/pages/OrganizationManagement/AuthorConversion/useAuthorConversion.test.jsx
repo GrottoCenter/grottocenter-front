@@ -178,6 +178,51 @@ it('never deletes again after a committed archive with a lost response', async (
   expect(deletion).toHaveBeenCalledTimes(1);
 });
 
+it.each([false, true])(
+  'resumes 111 completed transfers without searching homonyms (concurrent edit: %s)',
+  async hasConcurrentEdit => {
+    documents = Array.from({ length: 111 }, (_, index) =>
+      makeDocument({ id: index + 1 })
+    );
+    const journal = makeJournal(
+      makeOrganization({ name: 'AA' }),
+      person,
+      documents
+    );
+    saveJournal(1, {
+      ...journal,
+      documents: journal.documents.map(entry => ({ ...entry, done: true }))
+    });
+    documents = documents.map(document => ({
+      ...document,
+      authors: [...document.authors, { id: person.id }],
+      authorsOrganization: []
+    }));
+    if (hasConcurrentEdit) documents[110].authors.push({ id: 999 });
+    apiPost.mockImplementation(async (_url, body) => {
+      if (body.filter['authorsOrganization.name']) {
+        throw new Error('Would load 2413 documents belonging to another AA');
+      }
+      return { results: [], totalResults: 0 };
+    });
+    renderProbe();
+    await start();
+    if (hasConcurrentEdit) {
+      await screen.findByText('organizationConversion.documentChanged');
+      expect(deletion).not.toHaveBeenCalled();
+      expect(readJournal(1).stage).toBe('transferring');
+    } else {
+      await screen.findByText('success');
+      expect(deletion).toHaveBeenCalledTimes(1);
+      expect(readJournal(1).stage).toBe('complete');
+    }
+    expect(apiPut).not.toHaveBeenCalled();
+    expect(
+      apiPost.mock.calls.every(([, body]) => body.filter['library.name'])
+    ).toBe(true);
+  }
+);
+
 it('blocks changing the target after a conversion has started', async () => {
   saveJournal(1, makeJournal(makeOrganization(), person, documents));
   renderProbe({ ...person, id: 99 });
