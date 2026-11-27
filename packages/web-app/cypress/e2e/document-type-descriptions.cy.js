@@ -56,7 +56,7 @@ describe('Document type descriptions', () => {
     cy.loginAs();
   });
 
-  it('reveals the next field after a pointer selection and keeps keyboard focus on the type', () => {
+  it('reveals the next field after a pointer selection and keeps featured types keyboard accessible', () => {
     cy.viewport(390, 667);
     cy.visit('/entity/add/document');
     cy.get('[data-testid="document-other-types-toggle"]').click();
@@ -64,9 +64,14 @@ describe('Document type descriptions', () => {
     cy.get('[data-testid="document-type-18"]').click();
     cy.get('[data-testid="file-picker"]').should(expectFieldInView);
 
+    cy.get('[data-testid="document-other-types-toggle"]').click();
     cy.get('[data-testid="document-type-3"]').click();
     cy.get('[data-testid="document-title"] input').should(expectFieldInView);
-    cy.focused().should('have.attr', 'data-testid', 'document-type-3');
+    cy.get('[data-testid="document-other-types-toggle"]').should(
+      'have.attr',
+      'aria-expanded',
+      'false'
+    );
 
     cy.get('[data-testid="document-type-4"]').focus();
     cy.focused().should('have.attr', 'data-testid', 'document-type-4');
@@ -118,31 +123,34 @@ describe('Document type descriptions', () => {
       cy.screenshot(`document-types-initial-${width}`, SCREENSHOT_OPTIONS);
       cy.get('[data-testid="document-other-types-toggle"]').click();
 
-      cy.get('#document-other-types [aria-pressed]').should(cards => {
-        const names = Array.from(
-          cards,
-          card =>
-            card.querySelector('[data-testid="document-type-name"]').textContent
-        );
-        expect(names).to.deep.equal([
-          'Article',
-          'Livre',
-          'Collection',
-          'Numéro',
-          'Texte',
-          'Carte',
-          'Données topographiques',
-          'Jeu de données',
-          'Vidéo',
-          'Audio',
-          'Ressource interactive',
-          'Logiciel',
-          'Objet physique',
-          'Évènement',
-          'Service',
-          'Autorisation de publication'
-        ]);
-      });
+      cy.get('[data-testid="document-other-types"] [aria-pressed]').should(
+        cards => {
+          const names = Array.from(
+            cards,
+            card =>
+              card.querySelector('[data-testid="document-type-name"]')
+                .textContent
+          );
+          expect(names).to.deep.equal([
+            'Article',
+            'Livre',
+            'Collection',
+            'Numéro',
+            'Texte',
+            'Carte',
+            'Données topographiques',
+            'Jeu de données',
+            'Vidéo',
+            'Audio',
+            'Ressource interactive',
+            'Logiciel',
+            'Objet physique',
+            'Évènement',
+            'Service',
+            'Autorisation de publication'
+          ]);
+        }
+      );
 
       documentTypes.forEach(docType => {
         cy.get(`[data-testid="document-type-${docType.id}"]`).scrollIntoView();
@@ -204,24 +212,22 @@ describe('Document type descriptions', () => {
       );
       cy.get('[role="tooltip"]').should('not.exist');
       cy.screenshot(`document-type-descriptions-${width}`, SCREENSHOT_OPTIONS);
+      cy.get('[data-testid="document-type-search"] input').type(
+        'jeu de donnees'
+      );
+      cy.get('[data-testid="document-other-types"] [aria-pressed]').should(
+        'have.length',
+        1
+      );
       cy.get('[data-testid="document-type-2"]').click();
-      cy.get('[data-testid="document-type-2"]')
-        .should('have.attr', 'aria-pressed', 'true')
-        .find('[data-testid="document-type-selected"]')
-        .should('be.visible');
-      if (width < 600) {
-        cy.get('[data-testid="document-other-types-toggle"]')
-          .should('have.attr', 'aria-expanded', 'true')
-          .and('contain.text', 'Jeu de données')
-          .click();
-        cy.get('[data-testid="document-other-types-toggle"]')
-          .should('have.attr', 'aria-expanded', 'false')
-          .and('contain.text', 'Jeu de données');
-        cy.get('[data-testid="document-type-2"]').should('not.be.visible');
-        cy.get('[data-testid="document-other-types-toggle"]').click();
-      }
+      cy.get('[data-testid="document-other-types-toggle"]')
+        .should('have.attr', 'aria-expanded', 'false')
+        .and('contain.text', 'Jeu de données');
+      cy.get('[data-testid="document-type-2"]').should('not.be.visible');
+      cy.get('[data-testid="document-other-types-toggle"]').click();
       cy.get('[data-testid="document-type-2"]')
         .should('be.visible')
+        .and('have.attr', 'aria-pressed', 'true')
         .find('[data-testid="document-type-name"]')
         .should(([name]) => {
           expect(

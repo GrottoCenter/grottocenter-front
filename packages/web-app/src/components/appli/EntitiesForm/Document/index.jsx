@@ -257,22 +257,29 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
               onCancel={onCancel}
               isSubmitting={isSubmitting}
               isSubmissionBlocked={isWaitingForStoredLicense}
+              submissionNotice={
+                isWaitingForStoredLicense && (
+                  <Alert
+                    severity={isFetchingLicenses ? 'info' : 'error'}
+                    sx={{ mt: 2 }}
+                    action={
+                      !isFetchingLicenses && (
+                        <Button type="button" onClick={() => reloadLicenses()}>
+                          {formatMessage({ id: 'Retry' })}
+                        </Button>
+                      )
+                    }>
+                    {formatMessage({
+                      id: isFetchingLicenses
+                        ? 'Loading ...'
+                        : 'Error, the document data you are looking for is not available.'
+                    })}
+                  </Alert>
+                )
+              }
               fileError={activeMutation.error?.fileError}
             />
           </form>
-          {isWaitingForStoredLicense && !isFetchingLicenses && (
-            <Alert
-              severity="error"
-              action={
-                <Button onClick={() => reloadLicenses()}>
-                  {formatMessage({ id: 'Retry' })}
-                </Button>
-              }>
-              {formatMessage({
-                id: 'Error, the document data you are looking for is not available.'
-              })}
-            </Alert>
-          )}
 
           <ConfirmationDialog
             open={isMissingFileDialogOpen}

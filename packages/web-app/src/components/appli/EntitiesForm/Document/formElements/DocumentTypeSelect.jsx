@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -7,9 +7,9 @@ import {
   Card,
   CardActionArea,
   CardContent,
-  Collapse,
   Grid,
   Skeleton,
+  TextField,
   Typography,
   useMediaQuery,
   useTheme
@@ -213,26 +213,37 @@ TypeCard.propTypes = {
 };
 
 const DocumentTypeSelect = ({ onTypeChange }) => {
-  const { document } = useContext(DocumentFormContext);
-  const { formatMessage } = useIntl();
+  const { document, isNewDocument } = useContext(DocumentFormContext);
+  const { formatMessage, locale } = useIntl();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { data: documentTypes = [], isPending } = useDocumentTypes();
   const [othersOpen, setOthersOpen] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const catalogId = useId();
+  const otherTypesId = useId();
+  const catalogButton = useRef(null);
+  const othersButton = useRef(null);
+  const restoreFocus = useRef(null);
+  const hasSummary = !isNewDocument && document.type !== DocumentTypes.UNKNOWN;
+  const showCatalog = !hasSummary || catalogOpen;
 
-  useEffect(() => {
-    if (
-      isMobile &&
-      document.type !== -1 &&
-      !FEATURED_TYPES.includes(document.type)
-    ) {
-      setOthersOpen(true);
-    }
-  }, [document.type, isMobile]);
+  useLayoutEffect(() => {
+    restoreFocus.current?.current?.focus({ preventScroll: true });
+    restoreFocus.current = null;
+  }, [catalogOpen, othersOpen]);
 
   const handleSelect = (newDocType, event) => {
-    if (newDocType === document.type) return;
-    onTypeChange(newDocType, event);
+    if (
+      event.detail === 0 &&
+      (hasSummary || (othersOpen && !FEATURED_TYPES.includes(newDocType)))
+    )
+      restoreFocus.current = hasSummary ? catalogButton : othersButton;
+    setCatalogOpen(false);
+    setOthersOpen(false);
+    setSearch('');
+    if (newDocType !== document.type) onTypeChange(newDocType, event);
   };
 
   const featured = documentTypes.filter(dt => FEATURED_TYPES.includes(dt.name));
@@ -246,6 +257,19 @@ const DocumentTypeSelect = ({ onTypeChange }) => {
 
   const selectedOther = others.find(dt => dt.name === document.type);
   const canCollapseOthers = isMobile || others.length > 4;
+  const normalizeSearch = value =>
+    value.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase(locale);
+  const query = normalizeSearch(search.trim());
+  const filteredOthers = query
+    ? others.filter(dt => {
+        const description = TYPE_DESCRIPTIONS[dt.name] ?? dt.comment;
+        const name = formatMessage({ id: dt.name });
+        const details = description ? formatMessage({ id: description }) : '';
+        return normalizeSearch(`${name} ${details}`).includes(query);
+      })
+    : others;
+  const SummaryIcon =
+    DOCUMENT_TYPE_ICONS[document.type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
   const SelectedOtherIcon = selectedOther
     ? (DOCUMENT_TYPE_ICONS[selectedOther.name] ?? DOCUMENT_TYPE_FALLBACK_ICON)
     : null;
@@ -273,93 +297,171 @@ const DocumentTypeSelect = ({ onTypeChange }) => {
         {formatMessage({ id: 'Document type' })}
         {' *'}
       </Typography>
-      <Grid
-        container
-        spacing={0.5}
-        sx={{
-          alignItems: 'stretch'
-        }}>
-        {featured.map(dt => (
-          <Grid size={4} key={dt.id}>
-            <TypeCard
-              isFeatured
-              docType={dt}
-              selected={document.type === dt.name}
-              onClick={event => handleSelect(dt.name, event)}
-            />
-          </Grid>
-        ))}
-      </Grid>
-      {others.length > 0 && (
-        <Box sx={{ mt: 1 }}>
-          {canCollapseOthers && (
-            <Button
-              variant="outlined"
-              color="inherit"
-              data-testid="document-other-types-toggle"
-              aria-expanded={othersOpen}
-              aria-controls="document-other-types"
-              onClick={() => setOthersOpen(o => !o)}
+      {hasSummary && (
+        <Button
+          ref={catalogButton}
+          fullWidth
+          variant="outlined"
+          color="inherit"
+          type="button"
+          aria-expanded={catalogOpen}
+          aria-controls={catalogId}
+          data-testid="document-change-type"
+          onClick={() => {
+            setCatalogOpen(!catalogOpen);
+            setOthersOpen(!catalogOpen);
+            setSearch('');
+          }}
+          sx={{
+            justifyContent: 'space-between',
+            gap: 1,
+            minHeight: 48,
+            textTransform: 'none',
+            borderColor: 'divider',
+            textAlign: 'start',
+            mb: catalogOpen ? 1 : 0
+          }}>
+          <Box
+            component="span"
+            sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+            <SummaryIcon color="primary" fontSize="small" />
+            <Typography component="span" variant="body2" fontWeight={600}>
+              {formatMessage({ id: document.type })}
+            </Typography>
+          </Box>
+          <Box
+            component="span"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.5,
+              color: 'primary.main'
+            }}>
+            {formatMessage({ id: 'documentForm.changeType' })}
+            {catalogOpen ? (
+              <ExpandLessIcon fontSize="small" />
+            ) : (
+              <ExpandMoreIcon fontSize="small" />
+            )}
+          </Box>
+        </Button>
+      )}
+      <Box id={catalogId} sx={{ display: showCatalog ? 'block' : 'none' }}>
+        <Grid
+          container
+          spacing={0.5}
+          sx={{
+            alignItems: 'stretch'
+          }}>
+          {featured.map(dt => (
+            <Grid size={4} key={dt.id}>
+              <TypeCard
+                isFeatured
+                docType={dt}
+                selected={document.type === dt.name}
+                onClick={event => handleSelect(dt.name, event)}
+              />
+            </Grid>
+          ))}
+        </Grid>
+        {others.length > 0 && (
+          <Box sx={{ mt: 1 }}>
+            {canCollapseOthers && (
+              <Button
+                ref={othersButton}
+                variant="outlined"
+                color="inherit"
+                data-testid="document-other-types-toggle"
+                aria-expanded={othersOpen}
+                aria-controls={otherTypesId}
+                onClick={() => setOthersOpen(o => !o)}
+                sx={{
+                  display: 'flex',
+                  width: '100%',
+                  textTransform: 'none',
+                  alignItems: 'center',
+                  minHeight: theme.spacing(5.5),
+                  gap: 0.5,
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: selectedOther ? 'primary.main' : 'divider',
+                  color: selectedOther ? 'primary.main' : 'text.primary',
+                  boxShadow: 'none',
+                  borderRadius: 1,
+                  px: 1,
+                  py: 0.5,
+                  bgcolor: selectedOther
+                    ? 'action.selected'
+                    : 'background.paper',
+                  '&:hover': {
+                    borderColor: selectedOther
+                      ? 'primary.main'
+                      : 'text.secondary',
+                    bgcolor: 'action.hover'
+                  },
+                  userSelect: 'none',
+                  mb: 0.5
+                }}>
+                {SelectedOtherIcon && <SelectedOtherIcon fontSize="small" />}
+                <Typography
+                  variant="body2"
+                  sx={{ flex: 1, textAlign: 'start' }}>
+                  {formatMessage({ id: selectedOther?.name ?? 'Other types' })}
+                </Typography>
+                {othersOpen ? (
+                  <ExpandLessIcon
+                    fontSize="small"
+                    sx={{ color: 'text.secondary' }}
+                  />
+                ) : (
+                  <ExpandMoreIcon
+                    fontSize="small"
+                    sx={{ color: 'text.secondary' }}
+                  />
+                )}
+              </Button>
+            )}
+
+            <Box
+              id={otherTypesId}
+              data-testid="document-other-types"
               sx={{
-                display: 'flex',
-                width: '100%',
-                textTransform: 'none',
-                alignItems: 'center',
-                minHeight: theme.spacing(5.5),
-                gap: 0.5,
-                cursor: 'pointer',
-                border: '1px solid',
-                borderColor: selectedOther ? 'primary.main' : 'divider',
-                color: selectedOther ? 'primary.main' : 'text.primary',
-                boxShadow: 'none',
-                borderRadius: 1,
-                px: 1,
-                py: 0.5,
-                bgcolor: selectedOther ? 'action.selected' : 'background.paper',
-                '&:hover': {
-                  borderColor: selectedOther
-                    ? 'primary.main'
-                    : 'text.secondary',
-                  bgcolor: 'action.hover'
-                },
-                userSelect: 'none',
-                mb: 0.5
+                display: canCollapseOthers && !othersOpen ? 'none' : 'block'
               }}>
-              {SelectedOtherIcon && <SelectedOtherIcon fontSize="small" />}
-              <Typography variant="body2" sx={{ flex: 1, textAlign: 'start' }}>
-                {formatMessage({ id: selectedOther?.name ?? 'Other types' })}
-              </Typography>
-              {othersOpen ? (
-                <ExpandLessIcon
-                  fontSize="small"
-                  sx={{ color: 'text.secondary' }}
-                />
-              ) : (
-                <ExpandMoreIcon
-                  fontSize="small"
-                  sx={{ color: 'text.secondary' }}
+              {canCollapseOthers && (
+                <TextField
+                  fullWidth
+                  size="small"
+                  label={formatMessage({ id: 'Search' })}
+                  data-testid="document-type-search"
+                  value={search}
+                  onChange={event => setSearch(event.target.value)}
+                  sx={{ my: 0.5 }}
                 />
               )}
-            </Button>
-          )}
-
-          <Collapse
-            id="document-other-types"
-            in={!canCollapseOthers || othersOpen}>
-            <Grid container spacing={0.5}>
-              {others.map(dt => (
-                <Grid size={{ xs: 6, sm: 4, md: 3 }} key={dt.id}>
-                  <TypeCard
-                    docType={dt}
-                    selected={document.type === dt.name}
-                    onClick={event => handleSelect(dt.name, event)}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </Collapse>
-        </Box>
-      )}
+              {filteredOthers.length === 0 && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ py: 1 }}>
+                  {formatMessage({ id: 'No results' })}
+                </Typography>
+              )}
+              <Grid container spacing={0.5}>
+                {filteredOthers.map(dt => (
+                  <Grid size={{ xs: 6, sm: 4, md: 3 }} key={dt.id}>
+                    <TypeCard
+                      docType={dt}
+                      selected={document.type === dt.name}
+                      onClick={event => handleSelect(dt.name, event)}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };

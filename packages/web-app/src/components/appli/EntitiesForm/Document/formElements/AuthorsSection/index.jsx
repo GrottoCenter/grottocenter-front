@@ -29,7 +29,7 @@ const isFallbackAuthor = author =>
 
 const stripType = ({ _type, ...rest }) => rest;
 
-const AuthorsSection = ({ ownWork = false }) => {
+const AuthorsSection = ({ ownWork = false, showHelp = true }) => {
   const { formatMessage } = useIntl();
   const {
     document: doc,
@@ -149,7 +149,7 @@ const AuthorsSection = ({ ownWork = false }) => {
 
   return (
     <Box ref={wrapperRef} data-testid="document-authors">
-      {!ownWork && (
+      {!ownWork && showHelp && (
         <FieldHelperText>
           {formatMessage({ id: 'entityCreation.authorsHelp' })}
         </FieldHelperText>
@@ -226,7 +226,6 @@ const AuthorsSection = ({ ownWork = false }) => {
       {!ownWork && (
         <Stack
           direction="row"
-          justifyContent="space-between"
           useFlexGap
           spacing={0.5}
           sx={{ mt: 0.5, flexWrap: 'wrap' }}>
@@ -291,6 +290,9 @@ const AuthorsSection = ({ ownWork = false }) => {
   );
 };
 
-AuthorsSection.propTypes = { ownWork: PropTypes.bool };
+AuthorsSection.propTypes = {
+  ownWork: PropTypes.bool,
+  showHelp: PropTypes.bool
+};
 
 export default AuthorsSection;

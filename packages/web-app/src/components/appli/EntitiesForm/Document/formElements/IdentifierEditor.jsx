@@ -1,4 +1,4 @@
-import { useContext, useMemo } from 'react';
+import { useContext, useId, useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import {
   Fade,
@@ -27,18 +27,19 @@ const InlineWrapper = styled('div')`
 
 const IdentifierContainer = styled('div')`
   flex: 12;
-  min-width: 300px;
+  min-width: min(100%, 300px);
 `;
 
 const IdentifierTypeContainer = styled('div')`
   flex: 5;
-  min-width: 200px;
+  min-width: min(100%, 200px);
 `;
 
 const IdentifierEditor = () => {
   const { data: allIdentifierTypes = [] } = useIdentifierTypes();
   const { formatMessage } = useIntl();
   const { document, updateAttribute } = useContext(DocumentFormContext);
+  const identifierTypeLabel = useId();
 
   const identifierType = useMemo(() => {
     if (!document.identifierType) return null;
@@ -116,10 +117,11 @@ const IdentifierEditor = () => {
                 required={document.identifier}
                 fullWidth
                 error={!identifierType}>
-                <InputLabel htmlFor="identifier-type">
+                <InputLabel id={identifierTypeLabel}>
                   <Translate>Identifier Type</Translate>
                 </InputLabel>
                 <Select
+                  labelId={identifierTypeLabel}
                   value={identifierType?.id ?? -1}
                   onChange={event =>
                     handleIdentifierTypeChange(event.target.value)

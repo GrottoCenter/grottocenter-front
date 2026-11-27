@@ -32,6 +32,7 @@ const isSameAuthorization = (option, selected) =>
 const AuthorizationDocumentSelect = ({
   value,
   onChange,
+  inputRef,
   disabled = false,
   required = true,
   disableClearable = false
@@ -94,6 +95,7 @@ const AuthorizationDocumentSelect = ({
       renderInput={params => (
         <EntityAutocompleteInput
           params={params}
+          inputRef={inputRef}
           required={required && !disabled}
           label={formatMessage({ id: 'Authorization from authors' })}
           loading={isLoading}
@@ -110,6 +112,9 @@ AuthorizationDocumentSelect.propTypes = {
   disabled: PropTypes.bool,
   required: PropTypes.bool,
   disableClearable: PropTypes.bool,
+  inputRef: PropTypes.shape({
+    current: PropTypes.shape({ focus: PropTypes.func })
+  }),
   value: PropTypes.shape({ id: PropTypes.number, title: PropTypes.string }),
   onChange: PropTypes.func.isRequired
 };

@@ -27,7 +27,7 @@ const AuthorizationGrantedLicense = () => {
   return (
     <Stack spacing={0.5} data-testid="authorization-granted-license">
       <Typography variant="body2" color="text.secondary">
-        {formatMessage({ id: 'documentForm.licenseFromAuthorization' })}
+        {formatMessage({ id: 'documentForm.grantedLicense' })}
       </Typography>
       <LicenseTag license={license} />
       {license.url && <DocumentLicenseDeedLink url={license.url} />}

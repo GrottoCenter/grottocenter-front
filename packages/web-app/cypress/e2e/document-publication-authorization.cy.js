@@ -32,19 +32,21 @@ const licenses = [
   { id: 2, name: 'CC-BY', url: 'https://creativecommons.org/licenses/by/4.0/' }
 ];
 
-const addFile = () =>
-  cy
-    .get('[data-testid="file-dropzone"]')
-    .should('have.attr', 'aria-disabled', 'false')
-    .find('input[type="file"]')
-    .selectFile(
-      {
-        contents: Cypress.Buffer.from('%PDF-1.4 test'),
-        fileName: 'issue.pdf',
-        mimeType: 'application/pdf'
-      },
-      { force: true }
-    );
+const addFile = () => {
+  cy.get('[data-testid="file-dropzone"]').should(
+    'have.attr',
+    'aria-disabled',
+    'false'
+  );
+  cy.get('[data-testid="file-input"]').selectFile(
+    {
+      contents: Cypress.Buffer.from('%PDF-1.4 test'),
+      fileName: 'issue.pdf',
+      mimeType: 'application/pdf'
+    },
+    { force: true }
+  );
+};
 
 const expectMultipartValue = (body, field, value) => {
   expect(body).to.include(`name="${field}"\r\n\r\n${value}\r\n`);
@@ -115,9 +117,8 @@ describe('Editing a document with publication authorization', () => {
     cy.wait('@formats');
     addFile();
     cy.get('[data-testid="selected-file-issue.pdf"]').should('be.visible');
-    cy.get('[data-testid="document-sharing-basis"] [role="combobox"]')
-      .should('contain.text', 'Publication authorization on Grottocenter')
-      .and('not.have.attr', 'aria-disabled', 'true');
+    cy.get('[data-testid="document-sharing-basis"]').should('not.exist');
+    cy.contains('button', 'Replace authorization').should('be.enabled');
     cy.get('[data-testid="document-inherited-sharing"]').should('not.exist');
     cy.wait('@licenses');
     cy.get('[data-testid="document-submit"]').should('be.enabled').click();
@@ -154,12 +155,14 @@ describe('Editing a document with publication authorization', () => {
     cy.visit('/documents/42/edit', {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
+    cy.get('[data-testid="document-change-type"]').click();
     cy.get('[data-testid="document-type-5"]').click();
     cy.get('[data-testid="file-dropzone"]').should(
       'have.attr',
       'aria-disabled',
       'false'
     );
+    cy.get('[data-testid="document-change-type"]').click();
     cy.get('[data-testid="document-type-4"]').click();
     cy.get('[data-testid="file-dropzone"]').should('not.exist');
     cy.get('[data-testid="publication-author-rights"]').should('not.exist');
@@ -230,9 +233,8 @@ describe('Editing a document with publication authorization', () => {
     cy.contains('[role="option"]', 'Test collection').click();
     cy.wait('@parent');
     addFile();
-    cy.get('[data-testid="document-sharing-basis"] [role="combobox"]')
-      .should('contain.text', 'Publication authorization on Grottocenter')
-      .and('not.have.attr', 'aria-disabled', 'true');
+    cy.get('[data-testid="document-sharing-basis"]').should('not.exist');
+    cy.contains('button', 'Replace authorization').should('be.enabled');
     cy.get('[data-testid="document-inherited-sharing"]').should('not.exist');
     cy.get('[data-testid="document-submit"]').should('be.enabled').click();
     cy.wait('@save').then(({ request }) => {

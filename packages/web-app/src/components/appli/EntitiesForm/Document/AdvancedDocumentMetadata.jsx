@@ -10,9 +10,8 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import OrganizationSelect from '@/components/appli/OrganizationSelect';
 import StringInput from '@/components/common/Form/StringInput';
-import Translate from '@/components/common/Translate';
 import InternationalizedLink from '@/components/common/InternationalizedLink';
-import { wikiBBSLinks, wikiBBSChaptersLinks } from '@/conf/externalLinks';
+import { wikiBBSChaptersLinks } from '@/conf/externalLinks';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 import { getDefaultOrganizationType } from '@/utils/organizationTypes';
 import { getDocumentTypeRules } from '@/utils/documentTypeHelpers';
@@ -122,30 +121,16 @@ const AdvancedDocumentMetadata = () => {
         </Box>
 
         <Box>
-          <Typography
-            variant="caption"
-            sx={{ color: 'text.secondary', display: 'block' }}>
-            <InternationalizedLink links={wikiBBSLinks}>
-              <Translate>
-                Speleological Abstracts (SA)/Bulletin bibliographique
-                spéléologique (BBS) in french
-              </Translate>
-            </InternationalizedLink>
-            <Translate>
-              which is the annual summary of worldwide speleological literature,
-              is directly integrated in Grottocenter. Choose one or more
-              subjects from those defined by the SA/BBS, from
-            </Translate>{' '}
-            <InternationalizedLink links={wikiBBSChaptersLinks}>
-              <Translate>this list</Translate>
-            </InternationalizedLink>
-            .
-          </Typography>
           <MultipleSubjectsSelect
             computeHasError={() => false}
             contextValueName="subjects"
             labelName="BBS subjects"
           />
+          <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
+            <InternationalizedLink links={wikiBBSChaptersLinks}>
+              {formatMessage({ id: 'documentForm.bbsSubjectList' })}
+            </InternationalizedLink>
+          </Typography>
         </Box>
 
         <StringInput

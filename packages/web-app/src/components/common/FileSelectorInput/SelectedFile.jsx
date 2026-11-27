@@ -101,8 +101,8 @@ const SelectedFile = ({
                 aria-label={`${formatMessage({ id: 'fileSelector.open' })} ${file.fileName}`}
                 data-testid="open-selected-file"
                 sx={{
-                  minWidth: 32,
-                  height: 32,
+                  minWidth: { xs: 44, sm: 32 },
+                  height: { xs: 44, sm: 32 },
                   p: 0.5
                 }}>
                 <OpenInNewIcon sx={{ fontSize: 18 }} />
@@ -122,7 +122,11 @@ const SelectedFile = ({
                   data-testid="remove-selected-file"
                   disabled={disabled}
                   onClick={() => onRemove(file.fileName, file)}
-                  sx={{ minWidth: 32, height: 32, p: 0.5 }}>
+                  sx={{
+                    minWidth: { xs: 44, sm: 32 },
+                    height: { xs: 44, sm: 32 },
+                    p: 0.5
+                  }}>
                   <DeleteOutlinedIcon sx={{ fontSize: 18 }} />
                 </Button>
               </Box>

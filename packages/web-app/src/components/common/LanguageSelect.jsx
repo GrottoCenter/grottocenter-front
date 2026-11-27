@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import PropTypes from 'prop-types';
 import {
   FormControl,
@@ -18,14 +19,22 @@ const LanguageSelect = ({
   error = false,
   onBlur,
   inputRef,
-  helperText
+  helperText,
+  variant = 'standard'
 }) => {
   const { data: languages = [], isSuccess: isLoaded } = useLanguages();
+  const id = useId();
 
   return (
-    <FormControl variant="standard" fullWidth required={required} error={error}>
-      <InputLabel shrink>{label ?? <Translate>Language</Translate>}</InputLabel>
+    <FormControl variant={variant} fullWidth required={required} error={error}>
+      <InputLabel id={`${id}-label`} shrink>
+        {label ?? <Translate>Language</Translate>}
+      </InputLabel>
       <Select
+        labelId={`${id}-label`}
+        inputProps={{
+          'aria-describedby': helperText ? `${id}-help` : undefined
+        }}
         value={isLoaded ? (value ?? '000') : '000'}
         onChange={e => onChange(e.target.value)}
         onBlur={onBlur}
@@ -45,7 +54,7 @@ const LanguageSelect = ({
         ))}
       </Select>
       {helperText && (
-        <FormHelperText>
+        <FormHelperText id={`${id}-help`}>
           <Translate>{helperText}</Translate>
         </FormHelperText>
       )}
@@ -62,7 +71,8 @@ LanguageSelect.propTypes = {
   error: PropTypes.bool,
   onBlur: PropTypes.func,
   inputRef: PropTypes.func,
-  helperText: PropTypes.string
+  helperText: PropTypes.string,
+  variant: PropTypes.oneOf(['standard', 'filled'])
 };
 
 export default LanguageSelect;

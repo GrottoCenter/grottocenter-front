@@ -45,6 +45,7 @@ const DocumentLicenseSelect = ({
         </FieldHelperText>
       )}
       <FormControl
+        data-document-field="license"
         variant="filled"
         fullWidth
         required

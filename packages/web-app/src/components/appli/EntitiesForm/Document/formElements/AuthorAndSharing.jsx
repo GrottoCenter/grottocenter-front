@@ -86,43 +86,56 @@ const AuthorAndSharing = ({ disabled = false }) => {
           : undefined
       }>
       <Stack spacing={1.5} sx={{ maxWidth: '48rem' }}>
-        {showQuestion && (
-          <FormControl component="fieldset" required disabled={disabled}>
-            <FormLabel component="legend" id={authorQuestionId}>
-              {formatMessage({ id: 'documentForm.authorQuestion' })}
-            </FormLabel>
-            <RadioGroup
-              aria-labelledby={authorQuestionId}
-              value={selectedAuthor}
-              onChange={chooseAuthor}>
-              <FormControlLabel
-                value="me"
-                control={
-                  <Radio
-                    size="small"
-                    slotProps={{
-                      input: { 'data-testid': 'document-author-me' }
-                    }}
-                  />
-                }
-                label={formatMessage({ id: 'documentForm.me' })}
-              />
-              <FormControlLabel
-                value="other"
-                control={
-                  <Radio
-                    size="small"
-                    slotProps={{
-                      input: { 'data-testid': 'document-author-other' }
-                    }}
-                  />
-                }
-                label={formatMessage({ id: 'documentForm.anotherAuthor' })}
-              />
-            </RadioGroup>
-          </FormControl>
-        )}
-        {showAuthors && <AuthorsSection ownWork={ownWork} />}
+        <Stack spacing={1} data-document-field="authors">
+          {showQuestion && (
+            <FormControl component="fieldset" required disabled={disabled}>
+              <FormLabel
+                component="legend"
+                id={authorQuestionId}
+                sx={{ fontWeight: 600 }}>
+                {formatMessage({ id: 'documentForm.authorQuestion' })}
+              </FormLabel>
+              <RadioGroup
+                aria-labelledby={authorQuestionId}
+                value={selectedAuthor}
+                sx={{
+                  flexDirection: { xs: 'column', sm: 'row' },
+                  gap: { xs: 0, sm: 2 }
+                }}
+                onChange={chooseAuthor}>
+                <FormControlLabel
+                  value="me"
+                  control={
+                    <Radio
+                      sx={{ minWidth: 44, minHeight: 44 }}
+                      size="small"
+                      slotProps={{
+                        input: { 'data-testid': 'document-author-me' }
+                      }}
+                    />
+                  }
+                  label={formatMessage({ id: 'documentForm.me' })}
+                />
+                <FormControlLabel
+                  value="other"
+                  control={
+                    <Radio
+                      sx={{ minWidth: 44, minHeight: 44 }}
+                      size="small"
+                      slotProps={{
+                        input: { 'data-testid': 'document-author-other' }
+                      }}
+                    />
+                  }
+                  label={formatMessage({ id: 'documentForm.anotherAuthor' })}
+                />
+              </RadioGroup>
+            </FormControl>
+          )}
+          {showAuthors && (
+            <AuthorsSection ownWork={ownWork} showHelp={!showQuestion} />
+          )}
+        </Stack>
         {rules.hasCollectionSharing && (
           <>
             <Divider />

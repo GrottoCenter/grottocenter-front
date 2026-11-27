@@ -14,6 +14,13 @@ const files = [
   }
 ];
 
+const expectBookFormats = formats => {
+  expect(formats.text()).to.include('jpg');
+  expect(formats.text()).to.include('pdf');
+  expect(formats.text()).to.include('png');
+  expect(formats.text()).not.to.include('zip');
+};
+
 describe('Document attachment list', () => {
   beforeEach(() => {
     cy.disableServiceWorker();
@@ -92,8 +99,9 @@ describe('Document attachment list', () => {
         cy.get('[data-testid="accepted-formats-toggle"]').click();
         cy.get('@acceptedFormats').should('have.attr', 'open');
         cy.get('@acceptedFormats')
-          .contains('jpg, pdf, png, zip')
-          .should('be.visible');
+          .contains(/\bpdf\b/)
+          .should('be.visible')
+          .should(expectBookFormats);
         cy.get('[data-testid="accepted-formats-toggle"]').click();
         cy.get('@acceptedFormats').should('not.have.attr', 'open');
         cy.get('[data-testid="file-picker"]').should(([button]) => {
@@ -102,8 +110,9 @@ describe('Document attachment list', () => {
       } else {
         cy.get('[data-testid="accepted-formats-toggle"]').should('not.exist');
         cy.get('[data-testid="file-dropzone"]')
-          .contains('jpg, pdf, png, zip')
-          .should('be.visible');
+          .contains(/\bpdf\b/)
+          .should('be.visible')
+          .should(expectBookFormats);
       }
       cy.get(`[data-testid="selected-file-${files[0].fileName}"]`).within(
         () => {
@@ -111,6 +120,17 @@ describe('Document attachment list', () => {
             .should('have.attr', 'href', files[0].completePath)
             .and('have.attr', 'target', '_blank');
           cy.get('[data-testid="remove-selected-file"]').should('be.visible');
+          if (label === 'mobile') {
+            cy.get(
+              '[data-testid="open-selected-file"], [data-testid="remove-selected-file"]'
+            ).should(buttons => {
+              [...buttons].forEach(button => {
+                const bounds = button.getBoundingClientRect();
+                expect(bounds.width).to.be.at.least(44);
+                expect(bounds.height).to.be.at.least(44);
+              });
+            });
+          }
           cy.get('[data-testid="selected-file-name"]')
             .should('have.text', files[0].fileName)
             .and('be.visible');

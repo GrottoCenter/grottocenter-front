@@ -301,13 +301,13 @@ const FileSelectorInput = ({
 
   return (
     <Stack>
+      {inputEl}
       <DropZone
         {...rootProps}
         $isDragging={isDragActive}
         $isDragAccept={isDragAccept}
         $isDragReject={isDragReject}
         data-testid="file-dropzone">
-        {inputEl}
         <CloudUploadIcon
           sx={{
             fontSize: 40,
@@ -324,23 +324,19 @@ const FileSelectorInput = ({
           {t('Drag and drop files here', 'Drag and drop a file here')}
         </Typography>
         <Typography
-          variant="caption"
+          component="span"
+          variant="body2"
           sx={{
-            color: 'text.disabled',
-            display: 'block'
+            display: 'inline-block',
+            mt: 1,
+            px: 1.25,
+            py: 0.5,
+            border: 1,
+            borderRadius: 1,
+            color: disabled ? 'text.disabled' : 'primary.main'
           }}>
-          {formatMessage({ id: 'or' })}
-        </Typography>
-        <Button
-          size="small"
-          variant="outlined"
-          disabled={disabled}
-          aria-hidden="true"
-          tabIndex={-1}
-          type="button"
-          sx={{ mt: 0.5, pointerEvents: 'none', textTransform: 'none' }}>
           {t('Choose files', 'Choose a file')}
-        </Button>
+        </Typography>
         {extensionsList}
       </DropZone>
       {selectedFiles}

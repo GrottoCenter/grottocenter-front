@@ -7,7 +7,15 @@ import {
   useRef
 } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Box, Skeleton, Stack, useMediaQuery } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Skeleton,
+  Stack,
+  Typography,
+  useMediaQuery
+} from '@mui/material';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -53,15 +61,30 @@ const typeLabels = {
   [DocumentTypes.AUTHORIZATION_TO_PUBLISH]: { date: 'Authorization date' }
 };
 
+const fieldLabels = {
+  type: 'Document type',
+  parent: 'Parent document',
+  authors: 'Authors',
+  files: 'Files',
+  pages: 'Pages',
+  issue: 'Periodical issue',
+  identifier: 'Identifier',
+  creatorComment: 'Comment',
+  sharing: 'documentForm.sharingBasis',
+  authorization: 'Authorization To Publish'
+};
+
 const FormContent = ({
   onCancel,
   isSubmitting = false,
   isSubmissionBlocked = false,
+  submissionNotice,
   fileError
 }) => {
   const {
     document,
     isFormValid,
+    blockingField,
     lengthErrors,
     isNewDocument,
     updateAttribute,
@@ -71,6 +94,7 @@ const FormContent = ({
   } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
+  const rootRef = useRef(null);
   const firstFieldRef = useRef(null);
   const shouldRevealFirstField = useRef(false);
   const prefersReducedMotion = useMediaQuery(
@@ -82,6 +106,35 @@ const FormContent = ({
     languages.find(language => language.part1 === locale)?.id ?? '000';
   const rules = getDocumentTypeRules(document.type);
   const labels = typeLabels[document.type] ?? {};
+  const blockedLabel = {
+    ...fieldLabels,
+    title: labels.title ?? 'Title',
+    date: labels.date ?? 'DatePublication',
+    license: rules.hasGrantedLicense ? 'documentForm.grantedLicense' : 'License'
+  }[blockingField];
+  const focusBlockedField = () => {
+    const destination = ['identifier', 'creatorComment'].includes(blockingField)
+      ? 'advanced'
+      : blockingField;
+    const field = rootRef.current?.querySelector(
+      `[data-document-field="${destination}"]`
+    );
+    const control =
+      field?.querySelector('input[role="combobox"]:not(:disabled)') ??
+      field?.querySelector(
+        'input:not([type="hidden"], [type="file"], :disabled), textarea, [tabindex="0"], button:not(:disabled)'
+      );
+    (control ?? field)?.scrollIntoView?.({
+      block: 'center',
+      behavior: prefersReducedMotion ? 'instant' : 'smooth'
+    });
+    if (
+      destination === 'advanced' &&
+      control?.getAttribute('aria-expanded') === 'false'
+    )
+      control.click();
+    control?.focus({ preventScroll: true });
+  };
   const incompatibleFiles = getIncompatibleFiles(document);
   const blockedByStoredRights =
     hasStoredAuthorization &&
@@ -115,7 +168,22 @@ const FormContent = ({
   }, [document.mainLanguage, isNewDocument, userLanguageId, updateAttribute]);
 
   return (
-    <FormContainer>
+    <FormContainer
+      ref={rootRef}
+      sx={{
+        '& .MuiAutocomplete-endAdornment button': {
+          width: { xs: 44 },
+          height: { xs: 44 }
+        },
+        '& .MuiAutocomplete-hasPopupIcon .MuiFilledInput-root.MuiAutocomplete-inputRoot, & .MuiAutocomplete-hasClearIcon .MuiFilledInput-root.MuiAutocomplete-inputRoot':
+          {
+            paddingInlineEnd: { xs: 7 }
+          },
+        '& .MuiAutocomplete-hasPopupIcon.MuiAutocomplete-hasClearIcon .MuiFilledInput-root.MuiAutocomplete-inputRoot':
+          {
+            paddingInlineEnd: { xs: 12.5 }
+          }
+      }}>
       {linkedEntrance && (
         <Alert severity="info" sx={{ mb: 2 }}>
           {formatMessage(
@@ -124,7 +192,9 @@ const FormContent = ({
           )}
         </Alert>
       )}
-      <DocumentTypeSelect onTypeChange={changeType} />
+      <Box data-document-field="type">
+        <DocumentTypeSelect onTypeChange={changeType} />
+      </Box>
       {lengthErrors.length > 0 && (
         <Alert severity="error" sx={{ mt: 1 }}>
           {lengthErrors.map(({ field, label, limit, count }) => (
@@ -151,7 +221,9 @@ const FormContent = ({
               </Alert>
             )}
             {(rules.allowsFiles || incompatibleFiles.length > 0) && (
-              <Box ref={rules.allowsFiles ? firstFieldRef : undefined}>
+              <Box
+                data-document-field="files"
+                ref={rules.allowsFiles ? firstFieldRef : undefined}>
                 <AddFileForm
                   files={document.files}
                   setFiles={files => updateAttribute('files', files)}
@@ -176,12 +248,14 @@ const FormContent = ({
               <StringInput
                 valueName={formatMessage({ id: labels.title ?? 'Title' })}
                 data-testid="document-title"
+                data-document-field="title"
                 value={document.title}
                 maxLength={TEXT_LENGTH_LIMITS.TITLE}
                 onValueChange={value => updateAttribute('title', value)}
                 required
               />
               <LanguageSelect
+                variant="filled"
                 value={document.mainLanguage}
                 onChange={value => updateAttribute('mainLanguage', value)}
                 label={formatMessage({ id: 'Document main language' })}
@@ -198,16 +272,19 @@ const FormContent = ({
               minRows={3}
             />
             {rules.parentType && (
-              <ParentDocumentSelect
-                labelText={formatMessage({ id: rules.parentType })}
-                searchLabelText={formatMessage({
-                  id: 'Search for a document...'
-                })}
-                required
-              />
+              <Box data-document-field="parent">
+                <ParentDocumentSelect
+                  labelText={formatMessage({ id: rules.parentType })}
+                  searchLabelText={formatMessage({
+                    id: 'Search for a document...'
+                  })}
+                  required
+                />
+              </Box>
             )}
             {rules.hasIssueNumber && (
               <StringInput
+                data-document-field="issue"
                 valueName={formatMessage({ id: 'Periodical issue' })}
                 helperText={formatMessage({
                   id: 'Use the same wording that is used on the document: Vol.12, Number 15, No.158...'
@@ -217,7 +294,11 @@ const FormContent = ({
                 onValueChange={value => updateAttribute('issue', value)}
               />
             )}
-            {rules.hasPages && <PagesEditor />}
+            {rules.hasPages && (
+              <Box data-document-field="pages">
+                <PagesEditor />
+              </Box>
+            )}
             {rules.hasDate && (
               <Suspense fallback={<Skeleton height={60} />}>
                 <PublicationDatePicker
@@ -242,9 +323,41 @@ const FormContent = ({
             )}
           </Stack>
           <AuthorAndSharing disabled={isSubmitting} />
-          {rules.hasAdvancedMetadata && <AdvancedDocumentMetadata />}
+          {rules.hasAdvancedMetadata && (
+            <Box data-document-field="advanced">
+              <AdvancedDocumentMetadata />
+            </Box>
+          )}
         </>
       )}
+      {blockedLabel && !isSubmitting && (
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={0.5}
+          sx={{
+            mt: 2,
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            justifyContent: 'flex-end'
+          }}>
+          <Typography variant="body2" color="text.secondary" role="status">
+            {formatMessage(
+              { id: 'documentForm.checkField' },
+              {
+                field: formatMessage({ id: blockedLabel })
+              }
+            )}
+          </Typography>
+          <Button
+            size="small"
+            type="button"
+            variant="text"
+            onClick={focusBlockedField}
+            sx={{ textTransform: 'none', minHeight: { xs: 44, sm: 32 } }}>
+            {formatMessage({ id: 'documentForm.goToField' })}
+          </Button>
+        </Stack>
+      )}
+      {submissionNotice}
       <FormActionRow
         submitTestId="document-submit"
         isNew={isNewDocument}
@@ -259,6 +372,7 @@ const FormContent = ({
 FormContent.propTypes = {
   fileError: DocumentFileErrorPropTypes,
   isSubmissionBlocked: PropTypes.bool,
+  submissionNotice: PropTypes.node,
   onCancel: PropTypes.func,
   isSubmitting: PropTypes.bool
 };

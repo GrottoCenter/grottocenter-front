@@ -72,7 +72,7 @@ const DocumentEdit = ({
 
   return (
     <Layout
-      title={formatMessage({ id: 'BBS document submission form' })}
+      title={formatMessage({ id: 'Edit document' })}
       content={
         <DocumentSubmission
           allowEntityCreation={allowEntityCreation}

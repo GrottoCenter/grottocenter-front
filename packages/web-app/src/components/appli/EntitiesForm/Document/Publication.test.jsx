@@ -125,6 +125,10 @@ const openAdvancedMetadata = () => {
 
 const selectAuthorization = async (title = permission.title, query = title) => {
   const user = userEvent.setup();
+  const replace = screen.queryByRole('button', {
+    name: 'Replace authorization'
+  });
+  if (replace) fireEvent.click(replace);
   const input = screen.getByTestId('authorization-document-search');
   if (input.closest('[data-testid="document-advanced-metadata"]'))
     openAdvancedMetadata();
@@ -261,15 +265,14 @@ describe('editing document publication rights', () => {
     const { container, onSuccess } = renderSubmission();
     await addFile(container);
 
-    const sharing = screen.getByRole('combobox', { name: /Sharing basis/ });
-    expect(sharing).toHaveTextContent(
-      messages['documentForm.recordedPermission']
-    );
-    expect(sharing).not.toHaveAttribute('aria-disabled', 'true');
+    expect(
+      screen.queryByTestId('document-sharing-basis')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Replace authorization' })
+    ).toBeEnabled();
     expect(screen.queryByTestId('document-inherited-sharing')).toBeNull();
-    expect(screen.getByTestId('authorization-document-search')).toHaveValue(
-      permission.title
-    );
+    expect(screen.getByText(permission.title)).toBeVisible();
     expect(screen.getByText('Original author')).toBeInTheDocument();
     expect(
       await screen.findByTestId('authorization-granted-license')
@@ -442,8 +445,9 @@ describe('editing document publication rights', () => {
     );
     fireEvent.click(screen.getByTestId('document-type-4'));
     fireEvent.click(
-      within(screen.getByTestId('collection-publication-rights')).getByTitle(
-        'Clear'
+      within(screen.getByTestId('collection-publication-rights')).getByRole(
+        'button',
+        { name: 'Remove' }
       )
     );
     const submit = screen.getByRole('button', { name: 'Update' });
@@ -565,7 +569,9 @@ describe('editing document publication rights', () => {
     apiPost.mockResolvedValue({ results: [replacement] });
     renderSubmission({ type: 'Collection', parent: null });
     const rights = screen.getByTestId('collection-publication-rights');
-    expect(within(rights).queryByTitle('Clear')).not.toBeInTheDocument();
+    expect(
+      within(rights).queryByRole('button', { name: 'Remove' })
+    ).not.toBeInTheDocument();
     const submit = screen.getByRole('button', { name: 'Update' });
     await waitFor(() => expect(submit).toBeEnabled());
     await selectAuthorization(replacement.title);
@@ -596,10 +602,10 @@ describe('editing document publication rights', () => {
     ).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Remove issue.pdf' }));
     const rights = within(screen.getByTestId('collection-publication-rights'));
+    expect(rights.getByText(replacement.title)).toBeVisible();
     expect(
-      rights.getByRole('combobox', { name: 'Authorization from authors' })
-    ).toHaveValue(replacement.title);
-    expect(rights.queryByTitle('Clear')).not.toBeInTheDocument();
+      rights.queryByRole('button', { name: 'Remove' })
+    ).not.toBeInTheDocument();
     const submit = screen.getByTestId('document-submit');
     await waitFor(() => expect(submit).toBeEnabled());
     fireEvent.click(submit);
@@ -753,6 +759,24 @@ describe('editing document publication rights', () => {
     fireEvent.click(submit);
     await waitFor(() => expect(apiPutForm).toHaveBeenCalledOnce());
     expect(apiPutForm.mock.calls[0][1].get('license[id]')).toBe('2');
+  });
+
+  it('explains a missing title and focuses its input from the actions', async () => {
+    renderSubmission({ title: '' });
+    const submit = screen.getByTestId('document-submit');
+    expect(submit).toBeDisabled();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Check Title before saving'
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Go to field' }));
+    expect(
+      screen.getByTestId('document-title').querySelector('input')
+    ).toHaveFocus();
+    enterTitle('Issue 42');
+    await waitFor(() => expect(submit).toBeEnabled());
+    expect(
+      screen.queryByRole('button', { name: 'Go to field' })
+    ).not.toBeInTheDocument();
   });
 
   it('applies CC-BY-SA when switching from a file license to declaring publication rights', async () => {

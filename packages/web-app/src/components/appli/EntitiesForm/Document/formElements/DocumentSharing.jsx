@@ -1,6 +1,7 @@
 import { useContext, useEffect, useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined';
 import {
   Alert,
   FormControl,
@@ -20,9 +21,9 @@ import {
 } from '@/components/common/LicenseTag/helpers';
 import { useLicenses, findLicenseByName } from '@/hooks';
 import { DocumentFormContext } from '../Provider';
-import AuthorizationDocumentSelect from './AuthorizationDocumentSelect';
 import AuthorizationGrantedLicense from './AuthorizationGrantedLicense';
 import DocumentLicenseSelect from './DocumentLicenseSelect';
+import PublicationAuthorization from './PublicationAuthorization';
 import {
   AUTHORIZATION_FROM_AUTHOR,
   DOCUMENT_AUTHORIZE_TO_PUBLISH,
@@ -81,6 +82,7 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
   });
   const hasValidOption = editChoices.some(([value]) => value === option);
   const isOwnWork = isNewDocument && ownWork && !hasAuthorization;
+  const showChoices = !ownWork && !hasStoredAuthorization;
   const licenseName = getLicenseName(document.license);
   const resolvedLicense = findLicenseByName(licenses, licenseName);
   const defaultLicense = findLicenseByName(licenses, DEFAULT_DOCUMENT_LICENSE);
@@ -148,25 +150,22 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
   }
 
   return (
-    <Stack spacing={1.25} sx={{ maxWidth: '42rem' }}>
+    <Stack spacing={1.25} data-document-field="sharing">
       {!isNewDocument && document.files.some(file => file.state === IS_NEW) && (
         <Alert severity="info">
           {formatMessage({ id: 'documentForm.newFileSharing' })}
         </Alert>
       )}
-      {hasStoredAuthorization && (
-        <Typography variant="body2" color="text.secondary">
-          {formatMessage({ id: 'documentForm.keepAuthorization' })}
-        </Typography>
-      )}
-      {!ownWork && isNewDocument && (
+      {showChoices && isNewDocument && (
         <FormControl component="fieldset" required disabled={disabled}>
-          <FormLabel component="legend" id={groupId}>
+          <FormLabel component="legend" id={groupId} sx={{ fontWeight: 600 }}>
             {formatMessage({ id: 'documentForm.sharingQuestion' })}
           </FormLabel>
           <RadioGroup
             aria-labelledby={groupId}
+            aria-required="true"
             value={option ?? ''}
+            sx={{ gap: 0.5, mt: 0.5 }}
             onChange={event => selectOption(event.target.value)}>
             {thirdPartyChoices.map(([value, label, testId]) => (
               <FormControlLabel
@@ -175,16 +174,23 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
                 control={
                   <Radio
                     size="small"
+                    sx={{ minWidth: 44, minHeight: 44 }}
                     slotProps={{ input: { 'data-testid': testId } }}
                   />
                 }
+                sx={{
+                  mx: 0,
+                  pr: 1,
+                  borderRadius: 1,
+                  bgcolor: option === value ? 'action.selected' : undefined
+                }}
                 label={formatMessage({ id: label })}
               />
             ))}
           </RadioGroup>
         </FormControl>
       )}
-      {!isNewDocument && (
+      {!isNewDocument && !hasStoredAuthorization && (
         <TextField
           select
           fullWidth
@@ -199,20 +205,13 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
             formatMessage({ id: 'documentForm.missingSharing' })
           }>
           {editChoices.map(([value, label, testId]) => (
-            <MenuItem
-              key={value}
-              value={value}
-              data-testid={testId}
-              disabled={
-                hasStoredAuthorization &&
-                value !== DOCUMENT_AUTHORIZE_TO_PUBLISH
-              }>
+            <MenuItem key={value} value={value} data-testid={testId}>
               {formatMessage({ id: label })}
             </MenuItem>
           ))}
         </TextField>
       )}
-      {!ownWork && (
+      {showChoices && (
         <Stack spacing={0.5} sx={{ alignItems: 'flex-start' }}>
           <Link
             component="button"
@@ -220,7 +219,15 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
             variant="body2"
             aria-expanded={showHelp}
             aria-controls={showHelp ? helpId : undefined}
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.5,
+              minHeight: { xs: 44, sm: 32 },
+              textAlign: 'start'
+            }}
             onClick={() => setShowHelp(value => !value)}>
+            <HelpOutlineIcon fontSize="small" />
             {formatMessage({ id: 'documentForm.sharingHelp' })}
           </Link>
           {showHelp && (
@@ -230,20 +237,11 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
           )}
         </Stack>
       )}
-      {hasAuthorization && (
-        <>
-          <AuthorizationDocumentSelect
-            value={document.authorizationDocument}
-            onChange={value => updateAttribute('authorizationDocument', value)}
-            disableClearable={hasStoredAuthorization}
-            disabled={disabled}
-          />
-          {document.authorizationDocument?.id && (
-            <AuthorizationGrantedLicense />
-          )}
-        </>
+      {(hasAuthorization || hasStoredAuthorization) && (
+        <PublicationAuthorization disabled={disabled} />
       )}
       {!hasAuthorization &&
+        !hasStoredAuthorization &&
         (isOwnWork ||
           (hasValidOption && (!isNewDocument || !isRightsHolder))) && (
           <DocumentLicenseSelect

@@ -96,19 +96,20 @@ const sharingOptions = [
   DOCUMENT_AUTHORIZE_TO_PUBLISH
 ];
 
-const checkFormValidation = (
+const getBlockingField = (
   document,
-  { isNewDocument, hasStoredAuthorization, initialType }
+  { isNewDocument, hasStoredAuthorization, initialType, lengthErrors }
 ) => {
   const rules = getDocumentTypeRules(document.type);
   const payload = filterDocumentPayload(document);
-  if (!rules.hasType || !document.title?.trim()) return false;
-  if (rules.requiresDate && !document.datePublication) return false;
+  if (!rules.hasType) return 'type';
+  if (!document.title?.trim()) return 'title';
+  if (rules.requiresDate && !document.datePublication) return 'date';
   if (
     rules.hasDate &&
     !isDocumentDateValid(document.datePublication, rules.requiresDate)
   )
-    return false;
+    return 'date';
   if (
     rules.parentType &&
     (!document.parent?.id ||
@@ -116,19 +117,20 @@ const checkFormValidation = (
       (document.parent.type && document.parent.type !== rules.parentType) ||
       isDocumentSelfParent(document))
   )
-    return false;
-  if (document.isParentPending) return false;
-  if (rules.requiresAuthor && !hasAuthors(document)) return false;
-  if (getDocumentLengthErrors(document).length > 0) return false;
-  if (!isDocumentPagesFormatValid(payload.pages)) return false;
-  if (payload.identifier && !payload.identifierType) return false;
+    return 'parent';
+  if (document.isParentPending) return 'parent';
+  if (rules.requiresAuthor && !hasAuthors(document)) return 'authors';
+  if (lengthErrors.length > 0) return lengthErrors[0].field;
+  if (!isDocumentPagesFormatValid(payload.pages)) return 'pages';
+  if (payload.identifier && !payload.identifierType) return 'identifier';
   if (
     payload.identifierType?.regexp &&
     !new RegExp(payload.identifierType.regexp).test(payload.identifier)
   )
-    return false;
-  if (!isPdfPageOffsetValid(payload.identifierPdfPageOffset)) return false;
-  if (getIncompatibleFiles(document).length > 0) return false;
+    return 'identifier';
+  if (!isPdfPageOffsetValid(payload.identifierPdfPageOffset))
+    return 'identifier';
+  if (getIncompatibleFiles(document).length > 0) return 'files';
   if (
     rules.allowsFiles &&
     document.files.some(
@@ -140,7 +142,7 @@ const checkFormValidation = (
             TEXT_LENGTH_LIMITS.FILE_NAME)
     )
   )
-    return false;
+    return 'files';
 
   const hasFiles =
     rules.allowsFiles && document.files.some(file => file.state !== IS_DELETED);
@@ -152,21 +154,24 @@ const checkFormValidation = (
     !rules.hasCollectionSharing &&
     !rules.hasFileSharing
   )
-    return false;
+    return 'type';
   if (rules.hasCollectionSharing) {
-    return (
-      !(hasStoredAuthorization || document.authorizationDocument) ||
-      (hasAuthorization &&
-        !!document.license?.id &&
-        option === DOCUMENT_AUTHORIZE_TO_PUBLISH)
-    );
+    if (!(hasStoredAuthorization || document.authorizationDocument))
+      return null;
+    return hasAuthorization &&
+      document.license?.id &&
+      option === DOCUMENT_AUTHORIZE_TO_PUBLISH
+      ? null
+      : 'authorization';
   }
-  if (rules.hasGrantedLicense) return !!document.license?.id;
-  if (rules.hasFileSharing && (hasAuthorization || hasStoredAuthorization))
-    return hasAuthorization && !!document.license?.id;
-  if (!rules.hasFileSharing || !hasFiles) return true;
-  if (!sharingOptions.includes(option) || !document.license?.id) return false;
-  return option !== DOCUMENT_AUTHORIZE_TO_PUBLISH || hasAuthorization;
+  if (rules.hasGrantedLicense) return document.license?.id ? null : 'license';
+  if (rules.hasFileSharing && (hasAuthorization || hasStoredAuthorization)) {
+    return hasAuthorization && document.license?.id ? null : 'authorization';
+  }
+  if (!rules.hasFileSharing || !hasFiles) return null;
+  if (!sharingOptions.includes(option)) return 'sharing';
+  if (option === DOCUMENT_AUTHORIZE_TO_PUBLISH) return 'authorization';
+  return document.license?.id ? null : 'license';
 };
 
 export const DocumentFormContext = createContext({
@@ -177,6 +182,7 @@ export const DocumentFormContext = createContext({
   initialType: null,
   allowEntityCreation: true,
   isFormValid: true,
+  blockingField: null,
   lengthErrors: [],
   updateAttribute: (_attributeName, _newValue) => {},
   selectParent: () => {},
@@ -370,16 +376,18 @@ const Provider = ({
     initialParent: isNewDocument ? creationContext?.parent : null
   });
 
-  const isFormValid = checkFormValidation(document, {
-    isNewDocument,
-    hasStoredAuthorization,
-    initialType
-  });
-  const [linkedEntrance, setLinkedEntrance] = useState(null);
   const lengthErrors = useMemo(
     () => getDocumentLengthErrors(document),
     [document]
   );
+  const blockingField = getBlockingField(document, {
+    isNewDocument,
+    hasStoredAuthorization,
+    initialType,
+    lengthErrors
+  });
+  const isFormValid = !blockingField;
+  const [linkedEntrance, setLinkedEntrance] = useState(null);
 
   const updateAttribute = useCallback(
     (attributeName, newValue) => {
@@ -450,6 +458,7 @@ const Provider = ({
       storedLicense,
       allowEntityCreation,
       isFormValid,
+      blockingField,
       lengthErrors,
       updateAttribute,
       selectParent,
@@ -466,6 +475,7 @@ const Provider = ({
       storedLicense,
       allowEntityCreation,
       isFormValid,
+      blockingField,
       lengthErrors,
       updateAttribute,
       selectParent,

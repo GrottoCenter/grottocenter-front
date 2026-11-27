@@ -286,7 +286,7 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
             type="button"
             size="small"
             variant="outlined"
-            color="secondary"
+            color="primary"
             startIcon={<AutoAwesomeOutlined sx={{ fontSize: 18 }} />}
             aria-label={actionLabel}
             disabled={disabled}
@@ -294,8 +294,8 @@ const PdfAnalysisRequest = ({ file, disabled }) => {
             data-testid="document-ai-analyze"
             sx={{
               textTransform: 'none',
-              minWidth: { xs: 32, sm: 'auto' },
-              height: 32,
+              minWidth: { xs: 44, sm: 'auto' },
+              height: { xs: 44, sm: 32 },
               px: { xs: 0.5, sm: 1.5 },
               py: 0.5,
               whiteSpace: 'nowrap',
