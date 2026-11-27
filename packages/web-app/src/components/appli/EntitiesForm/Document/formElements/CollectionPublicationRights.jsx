@@ -23,7 +23,7 @@ const CollectionPublicationRights = ({ disabled = false }) => {
   }, [resolvedLicense, licenseId, updateAttribute]);
 
   return (
-    <Box data-testid="collection-publication-rights" sx={{ mb: 2 }}>
+    <Box data-testid="collection-publication-rights">
       <AuthorizationDocumentSelect
         value={document.authorizationDocument}
         onChange={value => updateAttribute('authorizationDocument', value)}

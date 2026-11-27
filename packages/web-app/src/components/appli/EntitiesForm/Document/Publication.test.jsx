@@ -107,9 +107,16 @@ const addFile = async container => {
   await screen.findByTestId('selected-file-issue.pdf');
 };
 
+const openAdvancedMetadata = () => {
+  const toggle = screen.getByRole('button', { name: 'Advanced metadata' });
+  if (toggle.getAttribute('aria-expanded') === 'false') fireEvent.click(toggle);
+};
+
 const selectAuthorization = async (title = permission.title, query = title) => {
   const user = userEvent.setup();
   const input = screen.getByTestId('authorization-document-search');
+  if (input.closest('[data-testid="document-advanced-metadata"]'))
+    openAdvancedMetadata();
   await user.clear(input);
   await user.type(input, query);
   await user.click(await screen.findByRole('option', { name: title }));
@@ -238,6 +245,7 @@ describe('editing document publication rights', () => {
       license: null,
       authorizationDocument: null
     });
+    openAdvancedMetadata();
     const rights = screen.getByTestId('collection-publication-rights');
     expect(
       within(rights).getByRole('combobox', {
@@ -259,7 +267,40 @@ describe('editing document publication rights', () => {
     expect(body.has('authorizationDocument[id]')).toBe(false);
     expect(body.has('option')).toBe(false);
     expect(body.has('files')).toBe(false);
+    expect(body.get('authors[0][id]')).toBe('1');
   });
+
+  it.each([false, true])(
+    'creates a collection without authors (after starting from an image: %s)',
+    async startedFromImage => {
+      renderSubmission({}, { isNewDocument: true });
+      const collectionType = await screen.findByTestId('document-type-4');
+      if (startedFromImage) {
+        fireEvent.click(screen.getByTestId('document-type-5'));
+        await screen.findByTestId('document-author-persons-1');
+      }
+      fireEvent.click(collectionType);
+      openAdvancedMetadata();
+      const authors = within(screen.getByTestId('document-authors'));
+      expect(authors.getByRole('combobox')).not.toBeRequired();
+      expect(authors.queryByTestId('document-author-persons-1')).toBeNull();
+      fireEvent.change(
+        screen.getByTestId('document-title').querySelector('input'),
+        { target: { value: 'New collection' } }
+      );
+      fireEvent.change(
+        screen.getByTestId('document-description').querySelector('textarea'),
+        { target: { value: 'Collection summary' } }
+      );
+      const submit = screen.getByTestId('document-submit');
+      await waitFor(() => expect(submit).toBeEnabled());
+      fireEvent.click(submit);
+      await waitFor(() => expect(apiPostForm).toHaveBeenCalledOnce());
+      const body = apiPostForm.mock.calls[0][1];
+      expect(body.get('authors')).toBe('[]');
+      expect(body.get('authorsOrganization')).toBe('[]');
+    }
+  );
 
   it('requires an explicit license when attaching an authorization to a collection', async () => {
     renderSubmission({
@@ -374,6 +415,7 @@ describe('editing document publication rights', () => {
     expect(
       screen.queryByTestId('document-parent-search')
     ).not.toBeInTheDocument();
+    openAdvancedMetadata();
     const license = await screen.findByTestId('document-license');
     fireEvent.mouseDown(license.querySelector('[role="combobox"]'));
     fireEvent.click(await screen.findByTestId('document-license-option-1'));
@@ -433,6 +475,7 @@ describe('editing document publication rights', () => {
       type: 'Collection',
       parent: null
     });
+    openAdvancedMetadata();
     await waitFor(() =>
       expect(queryClient.getQueryState(referenceKeys.licenses())?.status).toBe(
         'error'

@@ -72,7 +72,8 @@ const AddFileForm = ({
     enabled: showAuthorization
   });
   const currentUser = useUserProperties();
-  const { document, updateAttribute } = useContext(DocumentFormContext);
+  const { document, updateAttribute, prefillAuthor } =
+    useContext(DocumentFormContext);
 
   const parentId = document.parent?.id ?? null;
   const [correctedLicenseParentId, setCorrectedLicenseParentId] = useState();
@@ -148,10 +149,8 @@ const AddFileForm = ({
     // authorization form. Co-authors added manually are intentional and kept.
     if (newOption === DOCUMENT_AUTHORIZE_TO_PUBLISH) {
       if (authorsIsOnlyMe) updateAttribute('authors', []);
-    } else if (document.authors.length === 0) {
-      updateAttribute('authors', [
-        { id: currentUser.id, nickname: currentUser.nickname }
-      ]);
+    } else {
+      prefillAuthor(currentUser);
     }
   };
 

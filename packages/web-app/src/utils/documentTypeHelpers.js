@@ -174,6 +174,7 @@ export const DOCUMENT_TYPE_ACCEPT = {
 
 const isUnknown = docType => docType === DocumentTypes.UNKNOWN;
 const isCollection = docType => docType === DocumentTypes.COLLECTION;
+export const requiresDocumentAuthor = docType => !isCollection(docType);
 const isIssue = docType => docType === DocumentTypes.ISSUE;
 const isArticle = docType => docType === DocumentTypes.ARTICLE;
 const isImage = docType => docType === DocumentTypes.IMAGE;

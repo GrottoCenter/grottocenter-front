@@ -160,6 +160,31 @@ describe('Editing a document with publication authorization', () => {
     cy.get('[data-testid="publication-author-rights"]').should('not.exist');
     cy.get('[data-testid="publication-authorization"]').should('not.exist');
     cy.get('[data-testid="document-submit"]').should('be.enabled');
+    cy.get('[data-testid="document-description"]').should($description => {
+      const advanced = $description[0].ownerDocument.querySelector(
+        '[data-testid="document-advanced-metadata"]'
+      );
+      expect($description[0].compareDocumentPosition(advanced)).to.equal(
+        Node.DOCUMENT_POSITION_FOLLOWING
+      );
+    });
+    cy.get('[data-testid="document-advanced-metadata"]')
+      .contains('button', 'Advanced metadata')
+      .click();
+    cy.get('[data-testid="collection-publication-rights"]').should($rights => {
+      expect(
+        $rights[0].previousElementSibling.getAttribute('data-testid')
+      ).to.equal('document-authors');
+      expect(
+        $rights[0].nextElementSibling.querySelector(
+          '[data-testid="document-editor"]'
+        )
+      ).not.to.equal(null);
+    });
+    cy.get('[data-testid="document-authors"] input[role="combobox"]').should(
+      'not.have.attr',
+      'required'
+    );
     cy.get('[data-testid="authorization-document-search"]').should(
       'not.have.attr',
       'required'
@@ -172,7 +197,13 @@ describe('Editing a document with publication authorization', () => {
         query: 'Publication',
         filter: { type: ['Authorization To Publish'] }
       });
+    cy.contains('[role="option"]', permission.title)
+      .find('[data-testid="authorization-type-icon"]')
+      .should('be.visible');
     cy.contains('[role="option"]', permission.title).click();
+    cy.get('[data-testid="collection-publication-rights"]')
+      .find('[data-testid="authorization-type-icon"]')
+      .should('be.visible');
     cy.get('[data-testid="document-submit"]').should('be.disabled');
     cy.get('[data-testid="document-license"] [role="combobox"]').click();
     cy.get('[data-testid="document-license-option-2"]').click();

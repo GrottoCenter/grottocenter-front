@@ -12,8 +12,9 @@ import { isPdfPageOffsetValid } from '@/utils/pdfUrl';
 import {
   DocumentTypes,
   filterDocumentPayload,
-  isDocumentSelfParent
-} from '../../../../utils/documentTypeHelpers';
+  isDocumentSelfParent,
+  requiresDocumentAuthor
+} from '@/utils/documentTypeHelpers';
 import {
   IS_INTACT,
   IS_DELETED,
@@ -85,6 +86,9 @@ export const getDocumentLengthErrors = document => {
     }));
 };
 
+const hasAuthors = document =>
+  document.authors.length > 0 || document.authorsOrganization.length > 0;
+
 const checkFormValidation = (
   document,
   isNewDocument,
@@ -136,7 +140,7 @@ const checkFormValidation = (
   )
     isValid = false;
 
-  if (document.authors.length + document.authorsOrganization.length === 0)
+  if (requiresDocumentAuthor(document.type) && !hasAuthors(document))
     isValid = false;
   if (!isDocumentPagesFormatValid(payload.pages)) isValid = false;
   if (payload.identifier && !payload.identifierType) isValid = false;
@@ -185,6 +189,7 @@ export const DocumentFormContext = createContext({
   isFormValid: true,
   lengthErrors: [],
   updateAttribute: (_attributeName, _newValue) => {},
+  prefillAuthor: () => {},
   selectParent: () => {},
   resetContext: () => {},
   linkedEntrance: null,
@@ -200,6 +205,12 @@ const getPublicationRights = ({
   authorizationDocument,
   selectOptionAuthorizationDocument
 });
+
+const AUTHOR_SELECTION = {
+  UNTOUCHED: 'untouched',
+  SUGGESTED: 'suggested',
+  EDITED: 'edited'
+};
 
 const getCollectionPublicationRights = document => {
   const { authorizationDocument, license } = getPublicationRights(document);
@@ -238,6 +249,7 @@ const createFormState = document => {
         ? { ...document, ...collectionRights }
         : document,
     collectionRights,
+    authorSelection: AUTHOR_SELECTION.UNTOUCHED,
     preCollectionDraft: null
   };
 };
@@ -247,6 +259,8 @@ const createFormState = document => {
 const changeDocumentType = (state, type, isNewDocument) => {
   const { document, collectionRights, preCollectionDraft } = state;
   if (type === DocumentTypes.COLLECTION) {
+    const hasSuggestedAuthor =
+      state.authorSelection === AUTHOR_SELECTION.SUGGESTED;
     const hasPrefilledTitle =
       isNewDocument &&
       document.type === DocumentTypes.ISSUE &&
@@ -254,6 +268,9 @@ const changeDocumentType = (state, type, isNewDocument) => {
       document.title === document.parent?.title;
     return {
       ...state,
+      authorSelection: hasSuggestedAuthor
+        ? AUTHOR_SELECTION.UNTOUCHED
+        : state.authorSelection,
       preCollectionDraft: {
         ...getPublicationRights(document),
         type: document.type,
@@ -265,6 +282,7 @@ const changeDocumentType = (state, type, isNewDocument) => {
         ...collectionRights,
         type,
         parent: null,
+        ...(hasSuggestedAuthor && { authors: [] }),
         ...(hasPrefilledTitle && { title: '' })
       }
     };
@@ -272,6 +290,7 @@ const changeDocumentType = (state, type, isNewDocument) => {
   if (document.type === DocumentTypes.COLLECTION) {
     const draft = preCollectionDraft?.type === type ? preCollectionDraft : null;
     return {
+      ...state,
       document: {
         ...document,
         ...draft,
@@ -343,30 +362,54 @@ const Provider = ({
         allowPhotoDatePrefillRef.current = false;
       attributeVersionsRef.current[attributeName] =
         (attributeVersionsRef.current[attributeName] ?? 0) + 1;
-      if (attributeName === 'type') {
-        setFormState(state =>
-          newValue === state.document.type
+      setFormState(state => {
+        const current = state.document;
+        if (attributeName === 'type')
+          return newValue === current.type
             ? state
-            : changeDocumentType(state, newValue, isNewDocument)
-        );
-        return;
-      }
-      setDocument(prevState => {
-        if (
+            : changeDocumentType(state, newValue, isNewDocument);
+
+        const editsAuthors =
+          attributeName === 'authors' ||
+          attributeName === 'authorsOrganization';
+        const updatesCollectionAuthorization =
           attributeName === 'authorizationDocument' &&
-          prevState.type === DocumentTypes.COLLECTION
-        )
-          return {
-            ...prevState,
-            ...getCollectionPublicationRights({
-              ...prevState,
-              authorizationDocument: newValue
-            })
-          };
-        return { ...prevState, [attributeName]: newValue };
+          current.type === DocumentTypes.COLLECTION;
+        const nextDocument = { ...current, [attributeName]: newValue };
+        return {
+          ...state,
+          ...(editsAuthors && { authorSelection: AUTHOR_SELECTION.EDITED }),
+          document: updatesCollectionAuthorization
+            ? {
+                ...nextDocument,
+                ...getCollectionPublicationRights(nextDocument)
+              }
+            : nextDocument
+        };
       });
     },
-    [isNewDocument, setDocument]
+    [isNewDocument]
+  );
+
+  const prefillAuthor = useCallback(
+    ({ id, nickname }, { onlyIfUntouched = false } = {}) => {
+      if (!id) return;
+      setFormState(state => {
+        if (
+          !requiresDocumentAuthor(state.document.type) ||
+          hasAuthors(state.document) ||
+          (onlyIfUntouched &&
+            state.authorSelection !== AUTHOR_SELECTION.UNTOUCHED)
+        )
+          return state;
+        return {
+          ...state,
+          authorSelection: AUTHOR_SELECTION.SUGGESTED,
+          document: { ...state.document, authors: [{ id, nickname }] }
+        };
+      });
+    },
+    []
   );
 
   useEffect(() => {
@@ -393,6 +436,7 @@ const Provider = ({
       isFormValid,
       lengthErrors,
       updateAttribute,
+      prefillAuthor,
       selectParent,
       resetContext,
       linkedEntrance,
@@ -406,6 +450,7 @@ const Provider = ({
       isFormValid,
       lengthErrors,
       updateAttribute,
+      prefillAuthor,
       selectParent,
       resetContext,
       linkedEntrance

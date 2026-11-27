@@ -1,15 +1,31 @@
+import { createElement } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Autocomplete } from '@mui/material';
 
 import EntityAutocompleteInput from '@/components/common/AutoCompleteSearch/EntityAutocompleteInput';
+import IconLabel from '@/components/common/IconLabel';
 import { AUTOCOMPLETE_MIN_CHARACTERS } from '@/conf/config';
 import { useEntitySearch } from '@/hooks';
-import { DocumentTypes, hasSameDocumentId } from '@/utils/documentTypeHelpers';
+import {
+  DocumentTypes,
+  getDocumentTypeIcon,
+  hasSameDocumentId
+} from '@/utils/documentTypeHelpers';
 
 const DOCUMENTS = ['documents'];
 // Quick search excludes documents awaiting their first validation by default.
 const AUTHORIZATION_FILTER = { type: [DocumentTypes.AUTHORIZATION_TO_PUBLISH] };
+const AuthorizationIcon = getDocumentTypeIcon(
+  DocumentTypes.AUTHORIZATION_TO_PUBLISH
+);
+const authorizationIcon = (
+  <AuthorizationIcon
+    color="primary"
+    fontSize="small"
+    data-testid="authorization-type-icon"
+  />
+);
 const isSameAuthorization = (option, selected) =>
   hasSameDocumentId(option.id, selected.id);
 
@@ -54,6 +70,15 @@ const AuthorizationDocumentSelect = ({
       filterOptions={available => available}
       getOptionKey={doc => doc.id}
       getOptionLabel={doc => doc.title ?? ''}
+      renderOption={(props, doc) =>
+        createElement(
+          'li',
+          props,
+          <IconLabel icon={authorizationIcon} alignToFirstLine>
+            {doc.title}
+          </IconLabel>
+        )
+      }
       isOptionEqualToValue={isSameAuthorization}
       value={value ?? null}
       onInputChange={(_, text, reason) =>
@@ -74,6 +99,7 @@ const AuthorizationDocumentSelect = ({
           loading={isLoading}
           hasError={hasError}
           testId="authorization-document-search"
+          selectedIcon={value && authorizationIcon}
         />
       )}
     />
