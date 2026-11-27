@@ -57,9 +57,10 @@ const buildDocumentFormData = docAttributes => {
   const hasRetainedFile = files.some(file => file.state !== IS_DELETED);
   const includesSharing =
     rules.hasCollectionSharing ||
-    (rules.hasFileSharing &&
-      (hasRetainedFile || docAttributes.inheritedPublicationRights));
-  if (includesSharing && option) {
+    (rules.hasFileSharing && (hasRetainedFile || authorizationDocument?.id));
+  if (rules.hasGrantedLicense) {
+    attributes.license = license;
+  } else if (includesSharing && option) {
     attributes.license = license;
     attributes.option = option;
     if (option === DOCUMENT_AUTHORIZE_TO_PUBLISH)

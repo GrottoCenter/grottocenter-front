@@ -133,7 +133,8 @@ beforeEach(() => {
         ]
       };
     if (url.includes('/licenses')) return { licenses: [license] };
-    if (url === `${getDocumentDetailsUrl}90`) return permission;
+    if (url === `${getDocumentDetailsUrl}90`)
+      return { ...permission, license: license.name, isValidated: true };
     if (url === `${getDocumentDetailsUrl}11`)
       return { ...secondParent, mainLanguage: 'eng' };
     return details;
@@ -209,7 +210,12 @@ it.each([
 );
 
 it('transmits collection rights through a newly saved issue to a new article without files', async () => {
-  const collection = { ...details, id: 12, type: 'Collection' };
+  const collection = {
+    ...details,
+    id: 12,
+    type: 'Collection',
+    license: 'CC-BY-SA'
+  };
   let savedIssue;
   const defaultGet = apiGet.getMockImplementation();
   apiGet.mockImplementation(url => {
@@ -242,18 +248,18 @@ it('transmits collection rights through a newly saved issue to a new article wit
     );
 
   const issueForm = renderCreation('Issue', { id: 12 });
-  await waitFor(() =>
-    expect(getDocument().authorizationDocument).toEqual(permission)
-  );
-  await userEvent.setup().click(screen.getByRole('button', { name: 'Save' }));
+  const issueSubmit = screen.getByRole('button', { name: 'Save' });
+  await waitFor(() => expect(issueSubmit).toBeEnabled());
+  expect(getDocument().authorizationDocument.id).toBe(permission.id);
+  await userEvent.setup().click(issueSubmit);
   await waitFor(() => expect(savedIssue).toBeDefined());
   issueForm.unmount();
 
   renderCreation('Article', { id: savedIssue.id });
-  await waitFor(() =>
-    expect(getDocument().authorizationDocument).toEqual(permission)
-  );
-  await userEvent.setup().click(screen.getByRole('button', { name: 'Save' }));
+  const articleSubmit = screen.getByRole('button', { name: 'Save' });
+  await waitFor(() => expect(articleSubmit).toBeEnabled());
+  expect(getDocument().authorizationDocument.id).toBe(permission.id);
+  await userEvent.setup().click(articleSubmit);
   await waitFor(() => expect(apiPostForm).toHaveBeenCalledTimes(2));
   for (const [, body] of apiPostForm.mock.calls) {
     expect(body.get('authorizationDocument[id]')).toBe('90');

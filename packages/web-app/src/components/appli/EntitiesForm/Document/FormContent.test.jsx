@@ -14,6 +14,7 @@ import FormContent from './FormContent';
 vi.mock('@/hooks', () => ({
   useLanguages: () => ({ data: [] }),
   useLicenses: () => ({ data: [] }),
+  findLicenseByName: () => undefined,
   useIdentifierTypes: () => ({ data: [] }),
   useOnlineStatus: () => true
 }));

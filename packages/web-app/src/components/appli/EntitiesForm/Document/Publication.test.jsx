@@ -9,14 +9,17 @@ import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import { apiGet, apiPost, apiPostForm, apiPutForm } from '@/api/client';
-import { referenceKeys } from '@/api/queryKeys';
+import { documentKeys, referenceKeys } from '@/api/queryKeys';
 import {
   getDocumentDetailsUrl,
   getLicensesUrl,
   putDocumentUrl,
   quickSearchUrl
 } from '@/conf/apiRoutes';
-import { renderWithProviders } from '@/test/renderWithProviders';
+import {
+  createTestQueryClient,
+  renderWithProviders
+} from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
 import DocumentSubmission from './index';
 import {
@@ -36,6 +39,12 @@ vi.mock('@/api/client', () => ({
 }));
 
 const permission = { id: 99, title: 'Publication permission' };
+const permissionDetails = {
+  ...permission,
+  type: 'Authorization To Publish',
+  isValidated: true,
+  license: 'CC-BY'
+};
 const ccBy = {
   id: 2,
   name: 'CC-BY',
@@ -57,7 +66,7 @@ const initialDocument = {
 
 const renderSubmission = (
   overrides = {},
-  { isNewDocument = false, persistedDocument } = {}
+  { isNewDocument = false, persistedDocument, queryClient } = {}
 ) => {
   const onSuccess = vi.fn();
   const router = createMemoryRouter([
@@ -76,6 +85,7 @@ const renderSubmission = (
   ]);
   const rendered = renderWithProviders(<RouterProvider router={router} />, {
     messages,
+    queryClient,
     preloadedState: {
       login: {
         authTokenDecoded: {
@@ -147,13 +157,17 @@ describe('editing document publication rights', () => {
     vi.clearAllMocks();
     apiGet.mockImplementation(async url => {
       if (url === getLicensesUrl) return { licenses: [ccBy, ccBySa] };
+      if (url === `${getDocumentDetailsUrl}99`) return permissionDetails;
+      if (url === `${getDocumentDetailsUrl}100`)
+        return { ...permissionDetails, id: 100, license: ccBySa.name };
       return {
         languages: [{ id: 'eng', part1: 'en', refName: 'English' }],
         documentTypes: [
           { id: 3, name: 'Issue' },
           { id: 4, name: 'Collection' },
           { id: 5, name: 'Image' },
-          { id: 6, name: 'Book' }
+          { id: 6, name: 'Book' },
+          { id: 20, name: 'Authorization To Publish' }
         ],
         fileFormats: [{ mimeType: 'application/pdf', extension: 'pdf' }],
         identifierTypes: [],
@@ -166,6 +180,52 @@ describe('editing document publication rights', () => {
     apiPostForm.mockResolvedValue({ id: 43 });
     apiPutForm.mockResolvedValue({ id: 42 });
   });
+
+  it.each([true, false])(
+    'requires and submits a granted license on a publication authorization (creation: %s)',
+    async isNewDocument => {
+      renderSubmission(
+        {
+          ...permissionDetails,
+          id: 42,
+          parent: null,
+          license: null,
+          authorizationDocument: null
+        },
+        { isNewDocument }
+      );
+      if (isNewDocument) {
+        fireEvent.click(await screen.findByTestId('document-type-20'));
+        enterTitle('Permission letter');
+        fireEvent.click(
+          screen.getByRole('button', { name: 'Add me as an author' })
+        );
+      }
+      expect(
+        screen.getByRole('combobox', { name: 'Granted license' })
+      ).toHaveAttribute('aria-required', 'true');
+      expect(
+        screen.getByText(messages['documentForm.grantedLicenseScope'])
+      ).toBeVisible();
+      const submit = screen.getByTestId('document-submit');
+      expect(submit).toBeDisabled();
+      fireEvent.submit(submit.closest('form'));
+      const api = isNewDocument ? apiPostForm : apiPutForm;
+      expect(api).not.toHaveBeenCalled();
+
+      await selectLicense(2);
+      await waitFor(() => expect(submit).toBeEnabled());
+      fireEvent.click(submit);
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Submit anyway' })
+      );
+      await waitFor(() => expect(api).toHaveBeenCalledOnce());
+      const body = api.mock.calls[0][1];
+      expect(body.get('license[id]')).toBe('2');
+      expect(body.has('option')).toBe(false);
+      expect(body.has('authorizationDocument[id]')).toBe(false);
+    }
+  );
 
   describe.each(['Article', 'Issue'])('%s parent normalization', type => {
     it.each([{ id: 41 }, 41, '41'])(
@@ -197,7 +257,7 @@ describe('editing document publication rights', () => {
     });
   });
 
-  it('submits a new file with the stored license and inferred authorization without reselecting the parent', async () => {
+  it('submits a new file with the granted license and inferred authorization without reselecting the parent', async () => {
     const { container, onSuccess } = renderSubmission();
     await addFile(container);
 
@@ -212,8 +272,9 @@ describe('editing document publication rights', () => {
     );
     expect(screen.getByText('Original author')).toBeInTheDocument();
     expect(
-      screen.getByTestId('document-license').querySelector('[role="combobox"]')
-    ).not.toHaveAttribute('aria-describedby');
+      await screen.findByTestId('authorization-granted-license')
+    ).toBeVisible();
+    expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
 
     const submit = screen.getByRole('button', { name: 'Update' });
     await waitFor(() => expect(submit).toBeEnabled());
@@ -294,7 +355,15 @@ describe('editing document publication rights', () => {
     }
   );
 
-  it('requires an explicit license when attaching an authorization to a collection', async () => {
+  it('waits for the granted license before saving a collection', async () => {
+    let resolveGrant;
+    const grant = new Promise(resolve => {
+      resolveGrant = resolve;
+    });
+    const defaultGet = apiGet.getMockImplementation();
+    apiGet.mockImplementation(url =>
+      url === `${getDocumentDetailsUrl}99` ? grant : defaultGet(url)
+    );
     renderSubmission({
       type: 'Collection',
       parent: null,
@@ -311,10 +380,11 @@ describe('editing document publication rights', () => {
     await waitFor(() => expect(submit).toBeDisabled());
     fireEvent.submit(submit.closest('form'));
     expect(apiPutForm).not.toHaveBeenCalled();
-    fireEvent.mouseDown(
-      screen.getByTestId('document-license').querySelector('[role="combobox"]')
-    );
-    fireEvent.click(await screen.findByTestId('document-license-option-2'));
+    await act(async () => resolveGrant(permissionDetails));
+    expect(
+      await screen.findByTestId('authorization-granted-license')
+    ).toBeVisible();
+    expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
     await waitFor(() => expect(submit).toBeEnabled());
     fireEvent.click(submit);
     await waitFor(() => expect(apiPutForm).toHaveBeenCalledOnce());
@@ -341,7 +411,10 @@ describe('editing document publication rights', () => {
       Node.DOCUMENT_POSITION_FOLLOWING
     );
     await selectAuthorization();
-    await selectLicense(2);
+    expect(
+      await screen.findByTestId('authorization-granted-license')
+    ).toBeVisible();
+    expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
     const submit = screen.getByTestId('document-submit');
     await waitFor(() => expect(submit).toBeEnabled());
     fireEvent.click(submit);
@@ -359,10 +432,7 @@ describe('editing document publication rights', () => {
       authorizationDocument: null
     });
     await selectAuthorization();
-    fireEvent.mouseDown(
-      screen.getByTestId('document-license').querySelector('[role="combobox"]')
-    );
-    fireEvent.click(await screen.findByTestId('document-license-option-2'));
+    await screen.findByTestId('authorization-granted-license');
     fireEvent.click(await screen.findByTestId('document-type-5'));
     await waitFor(() =>
       expect(screen.getByTestId('file-dropzone')).toHaveAttribute(
@@ -408,15 +478,14 @@ describe('editing document publication rights', () => {
   });
 
   it('restores the issue parent and publication choices after visiting Collection', async () => {
-    renderSubmission({ license: ccBy });
+    renderSubmission({ license: ccBy, authorizationDocument: null });
     fireEvent.click(await screen.findByTestId('document-type-4'));
     expect(
       screen.queryByTestId('document-parent-search')
     ).not.toBeInTheDocument();
     openAdvancedMetadata();
-    const license = await screen.findByTestId('document-license');
-    fireEvent.mouseDown(license.querySelector('[role="combobox"]'));
-    fireEvent.click(await screen.findByTestId('document-license-option-1'));
+    await selectAuthorization();
+    await screen.findByTestId('authorization-granted-license');
     fireEvent.click(screen.getByTestId('document-type-3'));
     expect(screen.getByTestId('document-parent-search')).toHaveValue(
       'Collection'
@@ -463,7 +532,7 @@ describe('editing document publication rights', () => {
     expect(title()).toHaveValue('Custom issue title');
   });
 
-  it('does not mark the stored collection license unknown when loading licenses fails', async () => {
+  it('blocks a linked collection when its granted license cannot be resolved', async () => {
     const getFormData = apiGet.getMockImplementation();
     apiGet.mockImplementation(async url => {
       if (url === getLicensesUrl) throw new Error('Licenses unavailable');
@@ -479,12 +548,16 @@ describe('editing document publication rights', () => {
         'error'
       )
     );
-    expect(screen.queryByText('Select a license')).not.toBeInTheDocument();
     expect(
-      within(screen.getByTestId('document-license')).getByRole('img', {
-        name: 'CC-BY'
-      })
-    ).toBeInTheDocument();
+      await screen.findByText(
+        messages['documentForm.unavailableGrantedLicense']
+      )
+    ).toBeVisible();
+    expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
+    const submit = screen.getByTestId('document-submit');
+    expect(submit).toBeDisabled();
+    fireEvent.submit(submit.closest('form'));
+    expect(apiPutForm).not.toHaveBeenCalled();
   });
 
   it('preserves stored collection rights and permits replacement but not removal', async () => {
@@ -496,11 +569,12 @@ describe('editing document publication rights', () => {
     const submit = screen.getByRole('button', { name: 'Update' });
     await waitFor(() => expect(submit).toBeEnabled());
     await selectAuthorization(replacement.title);
+    await waitFor(() => expect(submit).toBeEnabled());
     fireEvent.click(submit);
     await waitFor(() => expect(apiPutForm).toHaveBeenCalledOnce());
     const body = apiPutForm.mock.calls[0][1];
     expect(body.get('authorizationDocument[id]')).toBe('100');
-    expect(body.get('license[id]')).toBe('2');
+    expect(body.get('license[id]')).toBe('1');
     expect(body.get('option')).toBe(DOCUMENT_AUTHORIZE_TO_PUBLISH);
     expect(body.has('files')).toBe(false);
   });
@@ -532,7 +606,7 @@ describe('editing document publication rights', () => {
     await waitFor(() => expect(apiPutForm).toHaveBeenCalledOnce());
     const body = apiPutForm.mock.calls[0][1];
     expect(body.get('authorizationDocument[id]')).toBe('100');
-    expect(body.get('license[id]')).toBe('2');
+    expect(body.get('license[id]')).toBe('1');
     expect(body.get('option')).toBe(DOCUMENT_AUTHORIZE_TO_PUBLISH);
     expect(body.has('files')).toBe(false);
   });
@@ -572,16 +646,8 @@ describe('editing document publication rights', () => {
       }
       await selectAuthorization();
       const submit = screen.getByTestId('document-submit');
-      await waitFor(() => expect(submit).toBeDisabled());
-      fireEvent.submit(submit.closest('form'));
-      expect(apiPostForm).not.toHaveBeenCalled();
-      expect(apiPutForm).not.toHaveBeenCalled();
-      fireEvent.mouseDown(
-        screen
-          .getByTestId('document-license')
-          .querySelector('[role="combobox"]')
-      );
-      fireEvent.click(await screen.findByTestId('document-license-option-2'));
+      await screen.findByTestId('authorization-granted-license');
+      expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
       await waitFor(() => expect(submit).toBeEnabled());
       fireEvent.click(submit);
       const api = isNewDocument ? apiPostForm : apiPutForm;
@@ -632,42 +698,43 @@ describe('editing document publication rights', () => {
   });
 
   it.each([false, true])(
-    'allows explicit correction of an unknown stored license (existing file: %s)',
+    'refreshes the granted license on edit (existing attachment: %s)',
     async hasExistingFile => {
-      const { container } = renderSubmission({
-        license: 'Historical license',
-        files: hasExistingFile ? [{ id: 10, fileName: 'issue.pdf' }] : []
+      const queryClient = createTestQueryClient();
+      queryClient.setQueryData(documentKeys.detail(99), permissionDetails);
+      let resolveGrant;
+      const grant = new Promise(resolve => {
+        resolveGrant = resolve;
       });
-      if (!hasExistingFile) await addFile(container);
-      expect(await screen.findByText('Select a license')).toBeInTheDocument();
-      expect(screen.getByText('Historical license')).toBeInTheDocument();
-      expect(
-        screen.getByRole('combobox', { name: /Sharing basis/ })
-      ).not.toHaveAttribute('aria-disabled', 'true');
-      const licenseSelect = screen
-        .getByTestId('document-license')
-        .querySelector('[role="combobox"]');
-      expect(licenseSelect).toHaveAccessibleDescription('Select a license');
-      const submit = screen.getByRole('button', { name: 'Update' });
+      const defaultGet = apiGet.getMockImplementation();
+      apiGet.mockImplementation(url =>
+        url === `${getDocumentDetailsUrl}99` ? grant : defaultGet(url)
+      );
+      renderSubmission(
+        {
+          license: ccBy.name,
+          files: hasExistingFile ? [{ id: 10, fileName: 'issue.pdf' }] : []
+        },
+        { queryClient }
+      );
+      const submit = screen.getByTestId('document-submit');
       expect(submit).toBeDisabled();
       fireEvent.submit(submit.closest('form'));
       expect(apiPutForm).not.toHaveBeenCalled();
 
-      fireEvent.mouseDown(
-        screen
-          .getByTestId('document-license')
-          .querySelector('[role="combobox"]')
+      await act(async () =>
+        resolveGrant({ ...permissionDetails, license: ccBySa.name })
       );
-      fireEvent.click(await screen.findByTestId('document-license-option-2'));
+      const readOnly = await screen.findByTestId(
+        'authorization-granted-license'
+      );
+      expect(
+        within(readOnly).getByRole('img', { name: ccBySa.name })
+      ).toBeVisible();
+      expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
       await waitFor(() => expect(submit).toBeEnabled());
-      expect(screen.queryByText('Select a license')).not.toBeInTheDocument();
-      expect(licenseSelect).not.toHaveAttribute('aria-disabled', 'true');
-      expect(licenseSelect).not.toHaveAttribute('aria-describedby');
-      expect(licenseSelect).toHaveAccessibleName('License');
-      fireEvent.mouseDown(licenseSelect);
-      fireEvent.click(await screen.findByTestId('document-license-option-1'));
       fireEvent.click(submit);
-      await waitFor(() => expect(apiPutForm).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(apiPutForm).toHaveBeenCalledOnce());
       const body = apiPutForm.mock.calls[0][1];
       expect(body.get('license[id]')).toBe('1');
       expect(body.get('authorizationDocument[id]')).toBe('99');
@@ -705,7 +772,11 @@ describe('editing document publication rights', () => {
   });
 
   it('requires correction for a missing saved license instead of silently choosing CC BY-SA', async () => {
-    const { container } = renderSubmission({ license: null });
+    const { container } = renderSubmission({
+      license: null,
+      authorizationDocument: null,
+      option: LICENSE_IN_FILE
+    });
     await addFile(container);
     const submit = screen.getByTestId('document-submit');
     expect(submit).toBeDisabled();
@@ -717,7 +788,7 @@ describe('editing document publication rights', () => {
     expect(apiPutForm.mock.calls[0][1].get('license[id]')).toBe('2');
   });
 
-  it('suggests CC BY-SA and lets the author confirm a different license', async () => {
+  it('starts with CC BY-SA and saves the author’s chosen license directly', async () => {
     const { container } = renderSubmission({}, { isNewDocument: true });
     fireEvent.click(await screen.findByTestId('document-type-6'));
     await addFile(container);
@@ -732,28 +803,74 @@ describe('editing document publication rights', () => {
         name: messages.Caver
       })
     ).toBeVisible();
-    const confirm = screen.getByRole('checkbox', {
-      name: /I confirm I can publish/
-    });
-    expect(confirm).not.toBeChecked();
-    expect(screen.getByTestId('document-submit')).toBeDisabled();
     expect(
       await within(screen.getByTestId('document-license')).findByRole('img', {
         name: 'CC-BY-SA'
       })
     ).toBeVisible();
-    fireEvent.click(confirm);
-    expect(screen.getByTestId('document-submit')).toBeEnabled();
+    expect(
+      screen.queryByTestId('publication-author-rights')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {
+        name: messages['documentForm.existingPermission']
+      })
+    ).not.toBeInTheDocument();
+    const submit = screen.getByTestId('document-submit');
+    await waitFor(() => expect(submit).toBeEnabled());
     await selectLicense(2);
-    expect(confirm).not.toBeChecked();
-    expect(screen.getByTestId('document-submit')).toBeDisabled();
-    fireEvent.click(confirm);
-    fireEvent.click(screen.getByTestId('document-submit'));
+    expect(submit).toBeEnabled();
+    fireEvent.click(submit);
     await waitFor(() => expect(apiPostForm).toHaveBeenCalledOnce());
     const body = apiPostForm.mock.calls[0][1];
     expect(body.get('authors[0][id]')).toBe('1');
     expect(body.get('option')).toBe(AUTHORIZATION_FROM_AUTHOR);
     expect(body.get('license[id]')).toBe('2');
+  });
+
+  it('shows the authors field and its actions whenever there are no files', async () => {
+    const { container } = renderSubmission({}, { isNewDocument: true });
+    fireEvent.click(await screen.findByTestId('document-type-6'));
+    expect(screen.queryByTestId('document-author-me')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'Authors' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByTestId('document-authors')).toBeVisible();
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Add me as an author' })
+    );
+    await addFile(container);
+    fireEvent.click(screen.getByTestId('document-author-me'));
+    fireEvent.click(screen.getByRole('button', { name: 'Remove issue.pdf' }));
+    expect(screen.queryByTestId('document-author-me')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
+    expect(screen.getByTestId('document-author-persons-1')).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Unknown author' })
+    ).toBeVisible();
+  });
+
+  it('drops the self-publishing choice when switching to another author', async () => {
+    const { container } = renderSubmission({}, { isNewDocument: true });
+    fireEvent.click(await screen.findByTestId('document-type-6'));
+    enterTitle('A cave book');
+    await addFile(container);
+    fireEvent.click(screen.getByTestId('document-author-me'));
+    await selectLicense(2);
+    fireEvent.click(screen.getByTestId('document-author-other'));
+    expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
+    expect(screen.getByTestId('document-submit')).toBeDisabled();
+    fireEvent.click(screen.getByTestId('publication-license-in-file'));
+    expect(
+      within(screen.getByTestId('document-license')).queryByRole('img')
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('document-author-me'));
+    expect(
+      await within(screen.getByTestId('document-license')).findByRole('img', {
+        name: 'CC-BY-SA'
+      })
+    ).toBeVisible();
   });
 
   it('gives inline help and requires an explicit license for a file credited to someone else', async () => {

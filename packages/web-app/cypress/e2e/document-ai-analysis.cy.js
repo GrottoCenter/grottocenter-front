@@ -151,7 +151,7 @@ describe('PDF analysis during document creation and editing', () => {
         .first()
         .should('have.value', 'Suggested summary')
         .type(' corrected');
-      cy.get('[data-testid="publication-author-rights"]').check();
+      cy.get('[data-testid="document-author-me"]').check();
       cy.get('[data-testid="document-submit"]').should('be.enabled').click();
       cy.wait('@createDocument').then(({ request }) => {
         expect(request.body).to.include(

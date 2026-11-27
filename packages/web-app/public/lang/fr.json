@@ -1076,7 +1076,7 @@
   "documentForm.sharingQuestion": "Comment ces fichiers peuvent-ils être partagés ?",
   "documentForm.surveyDescription": "Description des données topographiques",
   "documentForm.unavailableGrantedLicense": "La licence accordée par cette autorisation est indisponible.",
-  "documentForm.unknownRights": "Sélectionnez la licence indiquée dans les fichiers, ou l’autorisation enregistrée et sa licence. En cas de doute, vérifiez auprès du titulaire des droits avant l’envoi.",
+  "documentForm.unknownRights": "Sélectionnez la licence indiquée dans les fichiers ou l’autorisation de publication enregistrée. En cas de doute, vérifiez auprès du titulaire des droits avant l’envoi.",
   "documentManagement.analyzeAll": "Analyser tout",
   "documentManagement.continue": "Continuer l’analyse",
   "documentManagement.emptyBatch": "Aucun document correspondant trouvé pour le moment. Continuez l’analyse pour vérifier davantage de documents.",

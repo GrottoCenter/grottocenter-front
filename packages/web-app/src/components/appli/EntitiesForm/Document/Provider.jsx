@@ -18,6 +18,7 @@ import {
   DOCUMENT_AUTHORIZE_TO_PUBLISH
 } from './formElements/AddFileForm/FileHelpers';
 import { defaultDocumentValuesTypes } from './types';
+import useGrantedPublicationLicense from './useGrantedPublicationLicense';
 import useParentDocumentSelection from './useParentDocumentSelection';
 import usePhotoDatePrefill from './usePhotoDatePrefill';
 
@@ -160,10 +161,11 @@ const checkFormValidation = (
         option === DOCUMENT_AUTHORIZE_TO_PUBLISH)
     );
   }
+  if (rules.hasGrantedLicense) return !!document.license?.id;
+  if (rules.hasFileSharing && (hasAuthorization || hasStoredAuthorization))
+    return hasAuthorization && !!document.license?.id;
   if (!rules.hasFileSharing || !hasFiles) return true;
   if (!sharingOptions.includes(option) || !document.license?.id) return false;
-  if (hasStoredAuthorization && option !== DOCUMENT_AUTHORIZE_TO_PUBLISH)
-    return false;
   return option !== DOCUMENT_AUTHORIZE_TO_PUBLISH || hasAuthorization;
 };
 
@@ -171,6 +173,7 @@ export const DocumentFormContext = createContext({
   document: defaultDocAttributes,
   isNewDocument: true,
   hasStoredAuthorization: false,
+  grantedPublicationLicense: null,
   initialType: null,
   allowEntityCreation: true,
   isFormValid: true,
@@ -318,7 +321,25 @@ const Provider = ({
       ...normalizeInitialValues(initialValues)
     })
   );
-  const { document } = formState;
+  const { document: draft } = formState;
+  const rules = getDocumentTypeRules(draft.type);
+  const authorizationId =
+    rules.hasFileSharing || rules.hasCollectionSharing
+      ? draft.authorizationDocument?.id
+      : undefined;
+  const grantedPublicationLicense =
+    useGrantedPublicationLicense(authorizationId);
+  const document = useMemo(
+    () =>
+      authorizationId
+        ? {
+            ...draft,
+            license: grantedPublicationLicense.license ?? null,
+            selectOptionAuthorizationDocument: DOCUMENT_AUTHORIZE_TO_PUBLISH
+          }
+        : draft,
+    [authorizationId, draft, grantedPublicationLicense.license]
+  );
   const setDocument = useCallback(update => {
     setFormState(state => {
       const nextDocument = update(state.document);
@@ -336,13 +357,13 @@ const Provider = ({
   const attributeVersionsRef = useRef({});
   const allowPhotoDatePrefillRef = useRef(true);
   usePhotoDatePrefill({
-    document,
+    document: draft,
     setDocument,
     attributeVersionsRef,
     allowPrefillRef: allowPhotoDatePrefillRef
   });
   const selectParent = useParentDocumentSelection({
-    document,
+    document: draft,
     setDocument,
     attributeVersionsRef,
     isNewDocument,
@@ -370,15 +391,32 @@ const Provider = ({
         (attributeVersionsRef.current[attributeName] ?? 0) + 1;
       setFormState(state => {
         const current = state.document;
-        if (attributeName === 'type')
-          return newValue === current.type
-            ? state
-            : changeDocumentType(state, newValue, isNewDocument);
+        if (attributeName === 'type') {
+          if (newValue === current.type) return state;
+          const next = changeDocumentType(state, newValue, isNewDocument);
+          if (
+            getDocumentTypeRules(newValue).hasGrantedLicense ||
+            (getDocumentTypeRules(current.type).hasGrantedLicense &&
+              !getDocumentTypeRules(newValue).hasCollectionSharing)
+          ) {
+            return {
+              ...next,
+              document: { ...next.document, ...getPublicationRights({}) }
+            };
+          }
+          return next;
+        }
 
         const updatesCollectionAuthorization =
           attributeName === 'authorizationDocument' &&
           current.type === DocumentTypes.COLLECTION;
         const nextDocument = { ...current, [attributeName]: newValue };
+        if (
+          attributeName === 'authorizationDocument' &&
+          newValue?.id !== current.authorizationDocument?.id
+        ) {
+          nextDocument.inheritedPublicationRights = null;
+        }
         return {
           ...state,
           document: updatesCollectionAuthorization
@@ -407,6 +445,7 @@ const Provider = ({
       document,
       isNewDocument,
       hasStoredAuthorization,
+      grantedPublicationLicense,
       initialType,
       storedLicense,
       allowEntityCreation,
@@ -422,6 +461,7 @@ const Provider = ({
       document,
       isNewDocument,
       hasStoredAuthorization,
+      grantedPublicationLicense,
       initialType,
       storedLicense,
       allowEntityCreation,

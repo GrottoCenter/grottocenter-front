@@ -27,6 +27,7 @@ import AddFileForm from './formElements/AddFileForm';
 import AuthorAndSharing from './formElements/AuthorAndSharing';
 import DocumentRegions from './formElements/DocumentRegions';
 import DocumentTypeSelect from './formElements/DocumentTypeSelect';
+import GrantedLicenseField from './formElements/GrantedLicenseField';
 import PagesEditor from './formElements/PagesEditor';
 import ParentDocumentSelect from './formElements/ParentDocumentSelect';
 
@@ -229,6 +230,9 @@ const FormContent = ({
               </Suspense>
             )}
             {rules.requiresDate && <DocumentRegions />}
+            {rules.hasGrantedLicense && (
+              <GrantedLicenseField disabled={isSubmitting} />
+            )}
             {blockedByStoredRights && (
               <Alert severity="warning">
                 {formatMessage({

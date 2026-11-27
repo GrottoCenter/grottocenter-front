@@ -114,6 +114,23 @@ beforeEach(() => {
   });
 });
 
+it('describes the granted license on an authorization without attachments', () => {
+  useDocument.mockReturnValue({
+    data: {
+      ...document,
+      type: 'Authorization To Publish',
+      license: 'CC-BY-SA',
+      files: []
+    }
+  });
+  renderPage();
+  expect(screen.getByText('Granted license')).toBeVisible();
+  expect(screen.getByRole('img', { name: 'CC-BY-SA' })).toBeVisible();
+  expect(
+    screen.getByText(messages['documentForm.grantedLicenseScope'])
+  ).toBeVisible();
+});
+
 it.each([
   ['Collection', 'Issue'],
   ['Issue', 'Article']

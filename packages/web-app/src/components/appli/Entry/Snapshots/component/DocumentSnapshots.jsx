@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import DocumentValidationBadge from '@/components/common/DocumentValidationBadge';
 import { DocumentValidationStatusPropType } from '@/types/document.type';
+import { documentTypeHelpers } from '@/utils/documentTypeHelpers';
 import { Property } from '../../../../common/Properties';
 import { HighLightsLine } from '../../../../common/Highlights';
 import intactDescription from '../../../../../types/intactDescription.type';
@@ -89,7 +90,13 @@ const DocumentSnapshots = ({ document, previous }) => {
       )}
       {show(license, previous?.license) && (
         <Property
-          label={formatMessage({ id: 'License' })}
+          label={formatMessage({
+            id: documentTypeHelpers.isAuthorizationToPublish(
+              type ?? previous?.type
+            )
+              ? 'documentForm.grantedLicense'
+              : 'License'
+          })}
           value={
             <HighLightsLine
               newText={license ?? undefined}

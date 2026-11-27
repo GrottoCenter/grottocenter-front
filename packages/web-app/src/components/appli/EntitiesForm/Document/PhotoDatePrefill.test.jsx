@@ -11,6 +11,7 @@ import { IS_INTACT, IS_NEW } from './formElements/AddFileForm/FileHelpers';
 
 vi.mock('@/utils/photoDate', () => ({ readPhotoDate: vi.fn() }));
 vi.mock('./useParentDocumentSelection', () => ({ default: () => vi.fn() }));
+vi.mock('./useGrantedPublicationLicense', () => ({ default: () => ({}) }));
 
 let context;
 const FormState = () => {

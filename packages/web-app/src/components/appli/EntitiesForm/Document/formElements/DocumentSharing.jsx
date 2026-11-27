@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
   Alert,
-  Button,
-  Checkbox,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -16,7 +14,6 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import LicenseTag from '@/components/common/LicenseTag';
 import {
   DEFAULT_DOCUMENT_LICENSE,
   getLicenseName
@@ -24,6 +21,7 @@ import {
 import { useLicenses, findLicenseByName } from '@/hooks';
 import { DocumentFormContext } from '../Provider';
 import AuthorizationDocumentSelect from './AuthorizationDocumentSelect';
+import AuthorizationGrantedLicense from './AuthorizationGrantedLicense';
 import DocumentLicenseSelect from './DocumentLicenseSelect';
 import {
   AUTHORIZATION_FROM_AUTHOR,
@@ -57,34 +55,49 @@ const editChoices = [
 
 const DocumentSharing = ({ ownWork = false, disabled = false }) => {
   const { formatMessage } = useIntl();
-  const { document, isNewDocument, hasStoredAuthorization, updateAttribute } =
-    useContext(DocumentFormContext);
-  const { data: licenses, isLoading, isError } = useLicenses();
-  const [showAlternatives, setShowAlternatives] = useState(false);
+  const {
+    document,
+    isNewDocument,
+    hasStoredAuthorization,
+    grantedPublicationLicense,
+    updateAttribute
+  } = useContext(DocumentFormContext);
   const [showHelp, setShowHelp] = useState(false);
   const groupId = useId();
   const helpId = useId();
   const option = document.selectOptionAuthorizationDocument;
-  const inherited = !!document.inheritedPublicationRights;
+  const inherited =
+    document.inheritedPublicationRights &&
+    (grantedPublicationLicense?.license ||
+      grantedPublicationLicense?.isLoading);
   const isRightsHolder = option === AUTHORIZATION_FROM_AUTHOR;
   const hasAuthorization = option === DOCUMENT_AUTHORIZE_TO_PUBLISH;
+  const {
+    data: licenses,
+    isLoading,
+    isError
+  } = useLicenses({
+    enabled: !hasAuthorization
+  });
   const hasValidOption = editChoices.some(([value]) => value === option);
-  const isOwnWork =
-    isNewDocument &&
-    ownWork &&
-    !showAlternatives &&
-    (!option || isRightsHolder);
+  const isOwnWork = isNewDocument && ownWork && !hasAuthorization;
   const licenseName = getLicenseName(document.license);
   const resolvedLicense = findLicenseByName(licenses, licenseName);
   const defaultLicense = findLicenseByName(licenses, DEFAULT_DOCUMENT_LICENSE);
   const unknownLicense = !!licenses && !!licenseName && !resolvedLicense;
 
   useEffect(() => {
-    if (inherited) return;
+    if (hasAuthorization || document.isParentPending) return;
     if (isNewDocument && !isOwnWork && isRightsHolder) {
       updateAttribute('selectOptionAuthorizationDocument', null);
       updateAttribute('license', null);
       return;
+    }
+    if (isOwnWork && !isRightsHolder) {
+      updateAttribute(
+        'selectOptionAuthorizationDocument',
+        AUTHORIZATION_FROM_AUTHOR
+      );
     }
     const selected =
       resolvedLicense ?? (isOwnWork && !licenseName ? defaultLicense : null);
@@ -93,8 +106,9 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
     }
   }, [
     defaultLicense,
+    document.isParentPending,
     document.license?.id,
-    inherited,
+    hasAuthorization,
     isNewDocument,
     isOwnWork,
     isRightsHolder,
@@ -114,19 +128,6 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
     );
   };
 
-  const toggleAlternatives = () => {
-    selectOption(null);
-    setShowHelp(false);
-    setShowAlternatives(isOwnWork);
-  };
-
-  const selectLicense = value => {
-    if (isOwnWork && isRightsHolder && value?.id !== document.license?.id) {
-      updateAttribute('selectOptionAuthorizationDocument', null);
-    }
-    updateAttribute('license', value);
-  };
-
   if (inherited) {
     return (
       <Alert severity="info" data-testid="document-inherited-sharing">
@@ -140,7 +141,7 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
           <Typography variant="body2">
             {document.authorizationDocument?.title}
           </Typography>
-          <LicenseTag license={document.license} />
+          <AuthorizationGrantedLicense />
         </Stack>
       </Alert>
     );
@@ -158,7 +159,7 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
           {formatMessage({ id: 'documentForm.keepAuthorization' })}
         </Typography>
       )}
-      {!isOwnWork && isNewDocument && (
+      {!ownWork && isNewDocument && (
         <FormControl component="fieldset" required disabled={disabled}>
           <FormLabel component="legend" id={groupId}>
             {formatMessage({ id: 'documentForm.sharingQuestion' })}
@@ -211,7 +212,7 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
           ))}
         </TextField>
       )}
-      {!isOwnWork && (
+      {!ownWork && (
         <Stack spacing={0.5} sx={{ alignItems: 'flex-start' }}>
           <Link
             component="button"
@@ -230,80 +231,45 @@ const DocumentSharing = ({ ownWork = false, disabled = false }) => {
         </Stack>
       )}
       {hasAuthorization && (
-        <AuthorizationDocumentSelect
-          value={document.authorizationDocument}
-          onChange={value => updateAttribute('authorizationDocument', value)}
-          disableClearable={hasStoredAuthorization}
-          disabled={disabled}
-        />
+        <>
+          <AuthorizationDocumentSelect
+            value={document.authorizationDocument}
+            onChange={value => updateAttribute('authorizationDocument', value)}
+            disableClearable={hasStoredAuthorization}
+            disabled={disabled}
+          />
+          {document.authorizationDocument?.id && (
+            <AuthorizationGrantedLicense />
+          )}
+        </>
       )}
-      {(isOwnWork ||
-        (hasValidOption && (!isNewDocument || !isRightsHolder))) && (
-        <DocumentLicenseSelect
-          value={document.license}
-          onChange={selectLicense}
-          licenses={licenses}
-          isLoading={isLoading}
-          hasUnknownLicense={unknownLicense || (!isNewDocument && !licenseName)}
-          disabled={disabled}
-        />
-      )}
-      {isOwnWork && licenseName === DEFAULT_DOCUMENT_LICENSE && (
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ maxWidth: '70ch' }}>
-          {formatMessage({ id: 'documentForm.ccBySaReuse' })}
-        </Typography>
-      )}
-      {isOwnWork && (
-        <FormControlLabel
-          disabled={disabled}
-          required
-          control={
-            <Checkbox
-              slotProps={{
-                input: { 'data-testid': 'publication-author-rights' }
-              }}
-              checked={isRightsHolder}
-              onChange={event =>
-                updateAttribute(
-                  'selectOptionAuthorizationDocument',
-                  event.target.checked ? AUTHORIZATION_FROM_AUTHOR : null
-                )
-              }
-            />
-          }
-          label={formatMessage({ id: 'documentForm.rightsHolder' })}
-        />
-      )}
-      {document.files.filter(file => file.state !== IS_DELETED).length > 1 && (
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ maxWidth: '70ch' }}>
-          {formatMessage({ id: 'documentForm.allFiles' })}
-        </Typography>
-      )}
-      {isError && (
+      {!hasAuthorization &&
+        (isOwnWork ||
+          (hasValidOption && (!isNewDocument || !isRightsHolder))) && (
+          <DocumentLicenseSelect
+            value={document.license}
+            onChange={value => updateAttribute('license', value)}
+            licenses={licenses}
+            isLoading={isLoading}
+            hasUnknownLicense={
+              unknownLicense || (!isNewDocument && !licenseName)
+            }
+            disabled={disabled}
+          />
+        )}
+      {!ownWork &&
+        document.files.filter(file => file.state !== IS_DELETED).length > 1 && (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ maxWidth: '70ch' }}>
+            {formatMessage({ id: 'documentForm.allFiles' })}
+          </Typography>
+        )}
+      {isError && !hasAuthorization && (
         <Alert severity="error">
           {formatMessage({ id: 'entityCreation.searchFailed' })}
         </Alert>
-      )}
-      {isNewDocument && ownWork && (
-        <Button
-          type="button"
-          size="small"
-          variant="text"
-          sx={{ alignSelf: 'flex-start', textTransform: 'none' }}
-          onClick={toggleAlternatives}
-          disabled={disabled}>
-          {formatMessage({
-            id: isOwnWork
-              ? 'documentForm.existingPermission'
-              : 'documentForm.backToOwnWork'
-          })}
-        </Button>
       )}
     </Stack>
   );

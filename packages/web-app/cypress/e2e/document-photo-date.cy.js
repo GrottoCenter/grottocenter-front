@@ -44,7 +44,8 @@ describe('Photo capture date during document creation', () => {
       });
       cy.get('[data-testid="document-type-1"]', { timeout: 30000 }).click();
       cy.get(dateField).should('be.visible');
-      cy.get('[data-testid="document-authors"]').should('not.exist');
+      cy.get('[data-testid="document-authors"]').should('be.visible');
+      cy.get('[data-testid="document-author-me"]').should('not.exist');
       cy.get('[data-testid="file-input"]').should($files => {
         const title = $files[0].ownerDocument.querySelector(
           '[data-testid="document-title"]'
@@ -76,17 +77,16 @@ describe('Photo capture date during document creation', () => {
       cy.get('[data-testid="selected-file-second.jpg"]').should('be.visible');
       cy.get(dateField).find('input').should('have.value', '2016-02-29');
       cy.get('[data-testid="document-author-me"]').check();
-      cy.get('[data-testid="publication-author-rights"]').should(
-        'not.be.checked'
-      );
-      cy.get('[data-testid="document-submit"]').should('be.disabled');
-      cy.get('[data-testid="publication-author-rights"]').scrollIntoView({
+      cy.get('[data-testid="publication-author-rights"]').should('not.exist');
+      cy.get('[data-testid="document-license"]')
+        .find('img[alt="CC-BY-SA"]')
+        .should('be.visible');
+      cy.get('[data-testid="document-license"]').scrollIntoView({
         offset: { top: -270, left: 0 }
       });
       cy.screenshot(`photo-author-and-sharing-${width}`, {
         capture: 'viewport'
       });
-      cy.get('[data-testid="publication-author-rights"]').check();
       cy.get('[data-testid="document-submit"]').should('be.enabled').click();
       cy.wait('@createDocument').then(({ request }) => {
         expect(request.body).to.include(

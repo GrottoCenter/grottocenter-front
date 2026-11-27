@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -5,7 +6,6 @@ import {
   FormControl,
   FormHelperText,
   InputLabel,
-  Link,
   MenuItem,
   Select
 } from '@mui/material';
@@ -15,8 +15,9 @@ import {
   DEFAULT_DOCUMENT_LICENSE,
   getLicenseName
 } from '@/components/common/LicenseTag/helpers';
-import AppLink from '@/components/common/AppLink';
+import FieldHelperText from '@/components/common/Form/FieldHelperText';
 import { findLicenseByName } from '@/hooks';
+import DocumentLicenseDeedLink from './DocumentLicenseDeedLink';
 
 const DocumentLicenseSelect = ({
   value,
@@ -24,36 +25,39 @@ const DocumentLicenseSelect = ({
   licenses = [],
   isLoading = false,
   disabled = false,
-  isInherited = false,
+  label = 'License',
+  description,
   hasUnknownLicense = false
 }) => {
   const { formatMessage } = useIntl();
+  const id = useId();
   const licenseName = getLicenseName(value);
+  const describedBy =
+    [description && `${id}-description`, hasUnknownLicense && `${id}-error`]
+      .filter(Boolean)
+      .join(' ') || undefined;
 
   return (
     <>
+      {description && (
+        <FieldHelperText id={`${id}-description`}>
+          {description}
+        </FieldHelperText>
+      )}
       <FormControl
         variant="filled"
         fullWidth
         required
         error={hasUnknownLicense}
         disabled={disabled}
-        sx={{ mt: 1 }}>
-        <InputLabel id="document-license-label">
-          {formatMessage({
-            id: isInherited
-              ? 'The license of the document has been deduced from the parent document'
-              : 'License'
-          })}
+        sx={{ mt: description ? 0 : 1 }}>
+        <InputLabel id={`${id}-label`}>
+          {formatMessage({ id: label })}
         </InputLabel>
         <Select
-          labelId="document-license-label"
+          labelId={`${id}-label`}
           data-testid="document-license"
-          inputProps={
-            hasUnknownLicense
-              ? { 'aria-describedby': 'document-license-help' }
-              : undefined
-          }
+          inputProps={{ 'aria-describedby': describedBy }}
           value={licenseName}
           renderValue={() => <LicenseTag license={value} />}
           onChange={e => onChange(findLicenseByName(licenses, e.target.value))}>
@@ -81,21 +85,12 @@ const DocumentLicenseSelect = ({
           ))}
         </Select>
         {hasUnknownLicense && (
-          <FormHelperText id="document-license-help">
+          <FormHelperText id={`${id}-error`}>
             {formatMessage({ id: 'Select a license' })}
           </FormHelperText>
         )}
       </FormControl>
-      {value?.url && (
-        <Link
-          component={AppLink}
-          href={value.url}
-          variant="caption"
-          color="primary"
-          sx={{ display: 'inline-block', mt: 0.5 }}>
-          {formatMessage({ id: 'See the full license' })}
-        </Link>
-      )}
+      {value?.url && <DocumentLicenseDeedLink url={value.url} />}
     </>
   );
 };
@@ -115,7 +110,8 @@ DocumentLicenseSelect.propTypes = {
   ),
   isLoading: PropTypes.bool,
   disabled: PropTypes.bool,
-  isInherited: PropTypes.bool,
+  label: PropTypes.string,
+  description: PropTypes.string,
   hasUnknownLicense: PropTypes.bool
 };
 

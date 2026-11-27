@@ -16,6 +16,11 @@ import DocumentFormProvider, {
 
 // Validation is independent of the server-backed parent selection mechanism.
 vi.mock('./useParentDocumentSelection', () => ({ default: () => vi.fn() }));
+vi.mock('./useGrantedPublicationLicense', () => ({
+  default: id => ({
+    license: id === 99 ? { id: 2, name: 'CC-BY' } : undefined
+  })
+}));
 
 const ValidationState = () => {
   const { isFormValid } = useContext(DocumentFormContext);
@@ -306,7 +311,7 @@ describe('DocumentFormProvider publication authorization', () => {
       renderValidation({
         ...validDocument,
         type: DocumentTypes.COLLECTION,
-        authorizationDocument: { id: 99 },
+        authorizationDocument: { id: 100 },
         license
       });
       await waitFor(() =>
@@ -357,7 +362,7 @@ describe('DocumentFormProvider publication authorization', () => {
   );
 
   it.each([AUTHORIZATION_FROM_AUTHOR, LICENSE_IN_FILE])(
-    'preserves the explicit option %s',
+    'uses an attached authorization in place of the saved option %s',
     option => {
       render(
         <DocumentFormProvider
@@ -369,7 +374,9 @@ describe('DocumentFormProvider publication authorization', () => {
           <PublicationOption />
         </DocumentFormProvider>
       );
-      expect(screen.getByText(option)).toBeInTheDocument();
+      expect(
+        screen.getByText(DOCUMENT_AUTHORIZE_TO_PUBLISH)
+      ).toBeInTheDocument();
     }
   );
 
@@ -388,7 +395,8 @@ describe('DocumentFormProvider publication authorization', () => {
       renderValidation({
         ...validDocument,
         license,
-        authorizationDocument: { id: 99, title: 'Permission' },
+        authorizationDocument: null,
+        option: LICENSE_IN_FILE,
         files: [{ fileName: 'issue.pdf' }]
       });
       await waitFor(() =>
@@ -416,14 +424,16 @@ describe('DocumentFormProvider publication authorization', () => {
     await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
   });
 
-  it('does not require a license for an authorization document', async () => {
+  it('requires a granted license for an authorization document', async () => {
     renderValidation({
       ...validDocument,
       type: DocumentTypes.AUTHORIZATION_TO_PUBLISH,
       license: null,
       files: [{ fileName: 'permission.pdf' }]
     });
-    await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('invalid')).toBeInTheDocument()
+    );
   });
 });
 

@@ -18,11 +18,14 @@ import { DocumentFormContext } from '../Provider';
 import AuthorsSection from './AuthorsSection';
 import CollectionPublicationRights from './CollectionPublicationRights';
 import DocumentSharing from './DocumentSharing';
-import { IS_DELETED } from './AddFileForm/FileHelpers';
+import {
+  AUTHORIZATION_FROM_AUTHOR,
+  IS_DELETED
+} from './AddFileForm/FileHelpers';
 
 const AuthorAndSharing = ({ disabled = false }) => {
   const { formatMessage } = useIntl();
-  const { document, isNewDocument, updateAttribute } =
+  const { document, isNewDocument, hasStoredAuthorization, updateAttribute } =
     useContext(DocumentFormContext);
   const { id, nickname } = useUserProperties();
   const [authorChoice, setAuthorChoice] = useState('');
@@ -31,17 +34,35 @@ const AuthorAndSharing = ({ disabled = false }) => {
   const rules = getDocumentTypeRules(document.type);
   const hasFiles =
     rules.allowsFiles && document.files.some(file => file.state !== IS_DELETED);
-  const showSharing = rules.hasFileSharing && hasFiles;
-  const showQuestion = isNewDocument && rules.requiresAuthor && !!id;
-  const showAuthors = !showQuestion || !!authorChoice;
+  const showSharing =
+    rules.hasFileSharing &&
+    (hasFiles ||
+      hasStoredAuthorization ||
+      !!document.authorizationDocument?.id);
+  const showQuestion =
+    isNewDocument && rules.hasFileSharing && hasFiles && !!id;
   const hasCurrentUser = document.authors.some(
     author => String(author.id) === String(id)
   );
-  const ownWork = authorChoice === 'me' && hasCurrentUser;
+  const selectedAuthor =
+    authorChoice === 'me' && !hasCurrentUser ? 'other' : authorChoice;
+  const showAuthors = !showQuestion || !!selectedAuthor;
+  const ownWork = showQuestion && selectedAuthor === 'me';
 
   const chooseAuthor = event => {
     const choice = event.target.value;
     setAuthorChoice(choice);
+    const option = document.selectOptionAuthorizationDocument;
+    if (
+      choice === 'me' &&
+      option &&
+      option !== AUTHORIZATION_FROM_AUTHOR &&
+      !document.inheritedPublicationRights
+    ) {
+      updateAttribute('authorizationDocument', null);
+      updateAttribute('selectOptionAuthorizationDocument', null);
+      updateAttribute('license', null);
+    }
     if (choice === 'me' && !hasCurrentUser) {
       const author = { id, nickname };
       addedMeByChoice.current = author;
@@ -62,7 +83,7 @@ const AuthorAndSharing = ({ disabled = false }) => {
       title={
         showSharing || rules.hasCollectionSharing
           ? 'documentForm.authorAndSharing'
-          : 'Authors'
+          : undefined
       }>
       <Stack spacing={1.5} sx={{ maxWidth: '48rem' }}>
         {showQuestion && (
@@ -72,7 +93,7 @@ const AuthorAndSharing = ({ disabled = false }) => {
             </FormLabel>
             <RadioGroup
               aria-labelledby={authorQuestionId}
-              value={authorChoice}
+              value={selectedAuthor}
               onChange={chooseAuthor}>
               <FormControlLabel
                 value="me"

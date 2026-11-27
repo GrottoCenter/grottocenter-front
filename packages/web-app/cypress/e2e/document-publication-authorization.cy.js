@@ -2,7 +2,9 @@ const authorizationOption = 'Authorization present in Grottocenter';
 const permission = {
   id: 99,
   type: 'Authorization To Publish',
-  title: 'Publication permission'
+  title: 'Publication permission',
+  isValidated: true,
+  license: 'CC-BY'
 };
 const collection = {
   id: 41,
@@ -27,7 +29,7 @@ const document = {
 };
 const licenses = [
   { id: 1, name: 'CC-BY-SA' },
-  { id: 2, name: 'CC-BY' }
+  { id: 2, name: 'CC-BY', url: 'https://creativecommons.org/licenses/by/4.0/' }
 ];
 
 const addFile = () =>
@@ -79,7 +81,9 @@ describe('Editing a document with publication authorization', () => {
     cy.intercept('GET', '**/api/v1/documents/41', { body: collection }).as(
       'parent'
     );
-    cy.intercept('GET', '**/api/v1/documents/99', { body: permission });
+    cy.intercept('GET', '**/api/v1/documents/99', { body: permission }).as(
+      'grant'
+    );
     cy.intercept('GET', '**/api/v1/languages*', {
       body: { languages: [{ id: 'eng', part1: 'en', refName: 'English' }] }
     });
@@ -101,7 +105,7 @@ describe('Editing a document with publication authorization', () => {
     cy.loginAs({ nickname: 'Original author' });
   });
 
-  it('saves the file and original license without reselecting the parent', () => {
+  it('saves the file and granted license without reselecting the parent', () => {
     cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } }).as(
       'licenses'
     );
@@ -198,9 +202,11 @@ describe('Editing a document with publication authorization', () => {
     cy.get('[data-testid="collection-publication-rights"]')
       .find('[data-testid="authorization-type-icon"]')
       .should('be.visible');
-    cy.get('[data-testid="document-submit"]').should('be.disabled');
-    cy.get('[data-testid="document-license"] [role="combobox"]').click();
-    cy.get('[data-testid="document-license-option-2"]').click();
+    cy.wait('@grant');
+    cy.get('[data-testid="authorization-granted-license"]')
+      .find('img[alt="CC-BY"]')
+      .should('be.visible');
+    cy.get('[data-testid="document-license"]').should('not.exist');
     cy.get('[data-testid="document-submit"]').should('be.enabled').click();
     cy.wait('@save').then(({ request }) => {
       expectMultipartValue(request.body, 'license[id]', '2');
@@ -359,46 +365,72 @@ describe('Editing a document with publication authorization', () => {
     });
   });
 
-  it('allows correcting an unknown stored license without applying the parent?s license', () => {
+  it('refreshes the license from the authorization on mobile', () => {
+    cy.viewport(390, 667);
     cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
-    cy.intercept('GET', '**/api/v1/documents/42', {
-      body: { ...document, license: 'Historical license' }
-    });
-    cy.intercept('GET', '**/api/v1/documents/41', {
-      body: { ...collection, license: 'CC-BY' }
-    }).as('parentWithLicense');
-    mockParentSearch();
+    cy.intercept('GET', '**/api/v1/documents/99', {
+      body: { ...permission, license: 'CC-BY-SA' }
+    }).as('updatedGrant');
     cy.visit('/documents/42/edit', {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
     });
-    cy.wait('@formats');
-    cy.get('[data-testid="document-parent-search"]').clear();
-    cy.get('[data-testid="document-parent-search"]').type('Test coll');
-    cy.wait('@parentSearch');
-    cy.contains('[role="option"]', 'Test collection').click();
-    cy.wait('@parentWithLicense');
-    addFile();
-    cy.get('[data-testid="document-sharing-basis"] [role="combobox"]')
-      .should('contain.text', 'Publication authorization on Grottocenter')
-      .and('not.have.attr', 'aria-disabled', 'true');
-    cy.get('[data-testid="document-inherited-sharing"]').should('not.exist');
-    cy.get('[data-testid="document-submit"]').should('be.disabled');
-    cy.get('[data-testid="document-license"]')
-      .should('contain', 'Historical license')
-      .click();
-    cy.get('[data-testid="document-license-option-2"]').click();
-    cy.get('[data-testid="document-license"]')
-      .find('[role="combobox"]')
-      .should('not.have.attr', 'aria-disabled', 'true')
-      .and('not.have.attr', 'aria-describedby');
-    cy.get('[data-testid="document-license"]')
-      .find('[role="combobox"]')
-      .click();
-    cy.get('[data-testid="document-license-option-1"]').click();
+    cy.wait('@updatedGrant');
+    cy.get('[data-testid="authorization-granted-license"]').scrollIntoView();
+    cy.get('[data-testid="authorization-granted-license"]')
+      .find('img[alt="CC-BY-SA"]')
+      .should('be.visible');
+    cy.get('[data-testid="document-license"]').should('not.exist');
     cy.get('[data-testid="document-submit"]').should('be.enabled').click();
     cy.wait('@save').then(({ request }) => {
       expectMultipartValue(request.body, 'license[id]', '1');
       expectMultipartValue(request.body, 'authorizationDocument[id]', '99');
+    });
+  });
+
+  it('shows the scope before the granted license and marks the external link', () => {
+    cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
+    cy.intercept('GET', '**/api/v1/documents/types*', {
+      body: { documentTypes: [{ id: 20, name: 'Authorization To Publish' }] }
+    });
+    cy.intercept('GET', '**/api/v1/documents/42', {
+      body: {
+        ...document,
+        type: permission.type,
+        parent: null,
+        authorizationDocument: null,
+        license: null
+      }
+    });
+    cy.visit('/documents/42/edit', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.get('[data-testid="document-submit"]').should('be.disabled');
+    cy.get('[data-testid="document-license"] [role="combobox"]').should(
+      $select => {
+        const guidance = $select[0].ownerDocument.getElementById(
+          $select.attr('aria-describedby')
+        );
+        expect(guidance.textContent).to.include(
+          'documents covered by this publication authorization'
+        );
+        expect(guidance.compareDocumentPosition($select[0])).to.equal(
+          Node.DOCUMENT_POSITION_FOLLOWING
+        );
+      }
+    );
+    cy.get('[data-testid="document-license"] [role="combobox"]').click();
+    cy.get('[data-testid="document-license-option-2"]').click();
+    cy.contains('a', 'See the full license').as('licenseDeed');
+    cy.get('@licenseDeed').should('have.attr', 'target', '_blank');
+    cy.get('@licenseDeed')
+      .find('[data-testid="OpenInNewIcon"]')
+      .should('be.visible');
+    cy.get('[data-testid="document-submit"]').should('be.enabled').click();
+    cy.contains('[role="dialog"] button', 'Submit anyway').click();
+    cy.wait('@save').then(({ request }) => {
+      expectMultipartValue(request.body, 'license[id]', '2');
+      expect(request.body).not.to.include('name="authorizationDocument[id]"');
+      expect(request.body).not.to.include('name="option"');
     });
   });
 });

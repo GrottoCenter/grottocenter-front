@@ -15,7 +15,7 @@ describe('document parent safeguards', () => {
   });
 
   describe('document payload metadata', () => {
-    it('omits ordinary publication rights from a publication authorization record', () => {
+    it('retains the granted license on a publication authorization record', () => {
       expect(
         filterDocumentPayload({
           type: DocumentTypes.AUTHORIZATION_TO_PUBLISH,
@@ -28,6 +28,7 @@ describe('document parent safeguards', () => {
         })
       ).toEqual({
         type: DocumentTypes.AUTHORIZATION_TO_PUBLISH,
+        license: { id: 2 },
         files: [{ id: 7 }]
       });
     });

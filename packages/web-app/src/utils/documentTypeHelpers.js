@@ -334,6 +334,7 @@ export const getDocumentTypeRules = type => {
       hasType && !isEvent(type) && !isAuthorizationToPublish(type),
     hasFileSharing: allowsFiles && !isAuthorizationToPublish(type),
     hasCollectionSharing: isCollection(type),
+    hasGrantedLicense: isAuthorizationToPublish(type),
     allowAiAnalysis:
       allowsFiles && !isAuthorizationToPublish(type) && !isSimpleMedia(type)
   };
@@ -373,6 +374,7 @@ export const filterDocumentPayload = docAttributes => {
     ...(rules.hasFileSharing || rules.hasCollectionSharing
       ? PUBLICATION_PAYLOAD_FIELDS
       : []),
+    ...(rules.hasGrantedLicense ? ['license'] : []),
     ...(rules.hasAdvancedMetadata ? ADVANCED_PAYLOAD_FIELDS : []),
     ...(rules.requiresDate ? ['iso3166'] : []),
     ...(rules.parentType ? ['library', 'parent'] : []),

@@ -1,23 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { apiGet } from '@/api/client';
-import { documentKeys } from '@/api/queryKeys';
-import { getDocumentDetailsUrl } from '@/conf/apiRoutes';
-import { STALE } from '@/conf/queryClient';
-import { useLanguages, useLicenses, findLicenseByName } from '@/hooks';
-import { getLicenseName } from '@/components/common/LicenseTag/helpers';
+import { documentQueryOptions } from '@/api/documentQueryOptions';
+import { useLanguages } from '@/hooks';
 import {
   DocumentTypes,
   getParentDocumentType
 } from '@/utils/documentTypeHelpers';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './formElements/AddFileForm/FileHelpers';
-
-const fetchDocumentDetail = (queryClient, id) =>
-  queryClient.fetchQuery({
-    queryKey: documentKeys.detail(id),
-    queryFn: () => apiGet(`${getDocumentDetailsUrl}${id}`),
-    staleTime: STALE.STANDARD
-  });
 
 // Only an explicit parent selection inherits metadata. Merely displaying an
 // existing document's parent must not overwrite its edited fields.
@@ -30,7 +19,6 @@ const useParentDocumentSelection = ({
 }) => {
   const queryClient = useQueryClient();
   const { data: languages, refetch: fetchLanguages } = useLanguages();
-  const { data: licenses, refetch: fetchLicenses } = useLicenses();
   const selectionVersionRef = useRef(0);
   const { type } = document;
   const isMountedRef = useRef(false);
@@ -88,10 +76,9 @@ const useParentDocumentSelection = ({
       };
 
       try {
-        const [details, languageResult, licenseResult] = await Promise.all([
-          fetchDocumentDetail(queryClient, selection.id),
-          languages ? { data: languages } : fetchLanguages(),
-          licenses ? { data: licenses } : fetchLicenses()
+        const [details, languageResult] = await Promise.all([
+          queryClient.fetchQuery(documentQueryOptions(selection.id)),
+          languages ? { data: languages } : fetchLanguages()
         ]);
         if (!isCurrent()) return;
 
@@ -128,30 +115,12 @@ const useParentDocumentSelection = ({
         }
         applyAttributes(attributes);
 
-        const authorizationId = details.authorizationDocument?.id;
-        const license = findLicenseByName(
-          licenseResult.data,
-          getLicenseName(details.license)
-        );
-        // The API stores the result of copying rights, without provenance.
-        // Only lock rights copied from a verified parent in this session.
+        // Copy the link only. The form resolves the granted license from the
+        // authorization, which can have changed since the parent was saved.
         if (
           !isNewDocument ||
-          !authorizationId ||
-          !license?.id ||
+          !details.authorizationDocument?.id ||
           details.option !== DOCUMENT_AUTHORIZE_TO_PUBLISH
-        )
-          return;
-
-        const authorization = await fetchDocumentDetail(
-          queryClient,
-          authorizationId
-        );
-        if (
-          !isCurrent() ||
-          authorization.isDeleted ||
-          authorization.isValidated === false ||
-          authorization.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH
         )
           return;
 
@@ -172,8 +141,7 @@ const useParentDocumentSelection = ({
             return current;
           return {
             ...current,
-            license,
-            authorizationDocument: authorization,
+            authorizationDocument: details.authorizationDocument,
             selectOptionAuthorizationDocument: DOCUMENT_AUTHORIZE_TO_PUBLISH,
             inheritedPublicationRights: {
               previous: {
@@ -208,9 +176,7 @@ const useParentDocumentSelection = ({
       attributeVersionsRef,
       queryClient,
       languages,
-      licenses,
-      fetchLanguages,
-      fetchLicenses
+      fetchLanguages
     ]
   );
 

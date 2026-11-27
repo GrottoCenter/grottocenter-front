@@ -1,6 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Breadcrumbs, Divider, Skeleton, Typography } from '@mui/material';
+import {
+  Box,
+  Breadcrumbs,
+  Divider,
+  Skeleton,
+  Stack,
+  Typography
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -436,7 +443,8 @@ const Document = ({
     ];
   }, [documentData, formatMessage]);
 
-  const { isCollection, isIssue, isEvent } = documentTypeHelpers;
+  const { isCollection, isIssue, isEvent, isAuthorizationToPublish } =
+    documentTypeHelpers;
   const canCreateChild =
     permissions.isAuth &&
     !!documentData &&
@@ -446,6 +454,7 @@ const Document = ({
     !deleteMutation.isPending;
   const hasLinkedEntities = linkedEntities.length > 0;
   const docType = documentData?.type;
+  const hasGrantedLicense = isAuthorizationToPublish(docType);
   const childType = isCollection(docType)
     ? DocumentTypes.ISSUE
     : DocumentTypes.ARTICLE;
@@ -832,19 +841,36 @@ const Document = ({
                           label={formatMessage({ id: 'Issue' })}
                           value={documentData.issue}
                         />
-                        {/* License only applies to attached files, not to the paper document itself */}
-                        {allFiles.length > 0 && documentData.license && (
-                          <DetailItem
-                            label={formatMessage({ id: 'License' })}
-                            value={
-                              <LicenseBadge
-                                license={licenseObject}
-                                linkToDeed
-                                size={40}
-                              />
-                            }
-                          />
-                        )}
+                        {documentData.license &&
+                          (hasGrantedLicense || allFiles.length > 0) && (
+                            <DetailItem
+                              label={formatMessage({
+                                id: hasGrantedLicense
+                                  ? 'documentForm.grantedLicense'
+                                  : 'License'
+                              })}
+                              value={
+                                <Stack
+                                  spacing={0.5}
+                                  sx={{ alignItems: 'flex-start' }}>
+                                  <LicenseBadge
+                                    license={licenseObject}
+                                    linkToDeed
+                                    size={40}
+                                  />
+                                  {hasGrantedLicense && (
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary">
+                                      {formatMessage({
+                                        id: 'documentForm.grantedLicenseScope'
+                                      })}
+                                    </Typography>
+                                  )}
+                                </Stack>
+                              }
+                            />
+                          )}
                         <DetailItem
                           fullWidth
                           label={formatMessage({ id: 'Parent document' })}

@@ -82,7 +82,11 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
   const rules = getDocumentTypeRules(document.type);
   const hasFile = document.files.some(file => file.state !== IS_DELETED);
   const preservesStoredLicense =
-    !isNewDocument && rules.hasFileSharing && !hasFile && !!storedLicense;
+    !isNewDocument &&
+    rules.hasFileSharing &&
+    !hasFile &&
+    !document.authorizationDocument?.id &&
+    !!storedLicense;
   const {
     data: licenses,
     isFetching: isFetchingLicenses,

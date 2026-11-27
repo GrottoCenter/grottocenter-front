@@ -2,6 +2,7 @@ import {
   IS_DELETED,
   IS_MODIFIED
 } from '@/components/appli/EntitiesForm/Document/formElements/AddFileForm/FileHelpers';
+import { documentTypeHelpers } from './documentTypeHelpers';
 import { getSubjectCode } from './subjectHelpers';
 
 // This determines whether the moderation preview shows a diff, not its status.
@@ -178,7 +179,13 @@ export const getDocumentChanges = (current, proposed) => {
     if (!Object.hasOwn(proposed, field)) return [];
     const oldText = String(current[field] ?? '');
     const newText = String(proposed[field] ?? '');
-    return oldText === newText ? [] : [{ field, label, oldText, newText }];
+    if (oldText === newText) return [];
+    const changeLabel =
+      field === 'license' &&
+      documentTypeHelpers.isAuthorizationToPublish(preview.type)
+        ? 'documentForm.grantedLicense'
+        : label;
+    return [{ field, label: changeLabel, oldText, newText }];
   });
 
   COLLECTION_FIELDS.forEach(({ field, label, identity, text }) => {
