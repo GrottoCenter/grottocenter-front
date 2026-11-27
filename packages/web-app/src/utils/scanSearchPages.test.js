@@ -7,15 +7,19 @@ const makeOptions = extra => ({
   ...extra
 });
 
-it('continues after cached pages and reports the complete scan', async () => {
+it('loads each page and reports the complete scan', async () => {
   const options = makeOptions({
-    initialPages: [{ results: [{ id: 1 }], totalResults: 2 }],
     getPage: vi
       .fn()
-      .mockResolvedValue({ results: [{ id: 2 }], totalResults: 2 })
+      .mockResolvedValueOnce({ results: [{ id: 1 }], totalResults: 2 })
+      .mockResolvedValueOnce({ results: [{ id: 2 }], totalResults: 2 })
   });
   expect(await scanSearchPages(options)).toEqual([{ id: 1 }, { id: 2 }]);
-  expect(options.getPage).toHaveBeenCalledWith({
+  expect(options.getPage).toHaveBeenNthCalledWith(1, {
+    pageParam: 1,
+    signal: options.signal
+  });
+  expect(options.getPage).toHaveBeenNthCalledWith(2, {
     pageParam: 2,
     signal: options.signal
   });

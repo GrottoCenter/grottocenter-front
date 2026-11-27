@@ -47,7 +47,7 @@ describe('Organization duplicate processing', () => {
       { body: { results: organizations, totalResults: organizations.length } }
     );
     cy.loginAs({ groups: ['User', 'Moderator'] });
-    cy.visit('/organizations/management?tab=duplicates', {
+    cy.visit('/organizations/management', {
       onBeforeLoad: win => {
         win.localStorage.setItem('selectedLanguage', 'en');
         win.localStorage.removeItem('organizationManagement.ignoredDuplicates');
@@ -111,7 +111,7 @@ describe('Organization duplicate processing', () => {
         }
       ).as('deleteOrganization');
       cy.loginAs({ groups: ['User', 'Moderator'] });
-      cy.visit('/organizations/management?tab=duplicates', {
+      cy.visit('/organizations/management', {
         onBeforeLoad: win => {
           win.localStorage.setItem('selectedLanguage', 'en');
           win.localStorage.removeItem(
@@ -119,7 +119,12 @@ describe('Organization duplicate processing', () => {
           );
         }
       });
-      cy.contains('button', 'Analyze', { timeout: 15000 }).click();
+      cy.contains('h1', 'Organization management', { timeout: 15000 }).should(
+        'be.visible'
+      );
+      cy.contains('h2', 'Probable duplicates').should('be.visible');
+      cy.get('[role="tablist"]').should('not.exist');
+      cy.contains('button', 'Analyze').click();
       expectGroupOrder();
       cy.get('[data-testid="duplicate-summary-1"]')
         .should('contain.text', 'Members: 0')
@@ -147,12 +152,6 @@ describe('Organization duplicate processing', () => {
           doc.documentElement.clientWidth
         );
       });
-      if (width < 600) {
-        cy.get('#page-tab-1').should('have.text', 'Duplicates');
-        cy.get('[data-testid="page-tab-label-1"]').should($label => {
-          expect(parseFloat(getComputedStyle($label[0]).fontSize)).to.equal(9);
-        });
-      }
       cy.screenshot(`organization-duplicates-list-${width}`, {
         capture: 'viewport'
       });
