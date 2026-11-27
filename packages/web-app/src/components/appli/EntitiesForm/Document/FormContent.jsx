@@ -39,6 +39,7 @@ import IdentifierEditor from './formElements/IdentifierEditor';
 import AuthorsSection from './formElements/AuthorsSection';
 import { FormActionRow, FormContainer, FormRow } from '../utils/FormContainers';
 import AddFileForm from './formElements/AddFileForm';
+import CollectionPublicationRights from './formElements/CollectionPublicationRights';
 import StringInput from '../../../common/Form/StringInput';
 import Translate from '../../../common/Translate';
 import InternationalizedLink from '../../../common/InternationalizedLink';
@@ -307,6 +308,9 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
         !isEvent(docType) &&
         !isAuthorizationToPublish(docType) && (
           <Box sx={{ mt: 1 }}>
+            {isCollection(docType) && (
+              <CollectionPublicationRights disabled={isSubmitting} />
+            )}
             {!isCollection(docType) && (
               <>
                 {filesIntro}

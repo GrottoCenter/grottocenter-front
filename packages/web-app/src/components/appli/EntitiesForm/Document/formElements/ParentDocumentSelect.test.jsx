@@ -4,7 +4,8 @@ import NewspaperIcon from '@mui/icons-material/Newspaper';
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { apiGet, apiPost } from '@/api/client';
+import { apiGet, apiPost, apiPostForm } from '@/api/client';
+import { useCreateDocument } from '@/hooks/mutations/useDocumentForm';
 import { getDocumentDetailsUrl } from '@/conf/apiRoutes';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import messages from '@/../public/lang/en.json';
@@ -12,7 +13,11 @@ import DocumentFormProvider, { DocumentFormContext } from '../Provider';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './AddFileForm/FileHelpers';
 import ParentDocumentSelect from './ParentDocumentSelect';
 
-vi.mock('@/api/client', () => ({ apiGet: vi.fn(), apiPost: vi.fn() }));
+vi.mock('@/api/client', () => ({
+  apiGet: vi.fn(),
+  apiPost: vi.fn(),
+  apiPostForm: vi.fn()
+}));
 
 const license = { id: 2, name: 'CC-BY' };
 const permission = {
@@ -53,6 +58,28 @@ const Form = () => {
         required
       />
       <output data-testid="document-state">{JSON.stringify(document)}</output>
+    </>
+  );
+};
+
+const CreationForm = () => {
+  const { document } = useContext(DocumentFormContext);
+  const mutation = useCreateDocument();
+  return (
+    <>
+      <Form />
+      <button
+        type="button"
+        onClick={() =>
+          mutation.mutate({
+            ...document,
+            title: document.title || 'New article',
+            description: 'New contribution',
+            authors: [{ id: 1 }]
+          })
+        }>
+        Save
+      </button>
     </>
   );
 };
@@ -185,6 +212,62 @@ it.each([
     );
   }
 );
+
+it('transmits collection rights through a newly saved issue to a new article without files', async () => {
+  const collection = { ...details, id: 12, type: 'Collection' };
+  let savedIssue;
+  const defaultGet = apiGet.getMockImplementation();
+  apiGet.mockImplementation(url => {
+    if (url === `${getDocumentDetailsUrl}12`)
+      return Promise.resolve(collection);
+    if (url === `${getDocumentDetailsUrl}42`)
+      return Promise.resolve(savedIssue);
+    return defaultGet(url);
+  });
+  apiPostForm.mockImplementation(async (_url, body) => {
+    const saved = {
+      id: body.get('type') === 'Issue' ? 42 : 43,
+      type: body.get('type'),
+      title: body.get('title'),
+      license: body.get('license[name]'),
+      authorizationDocument: {
+        id: Number(body.get('authorizationDocument[id]'))
+      }
+    };
+    if (saved.type === 'Issue') savedIssue = saved;
+    return { document: saved };
+  });
+  const renderCreation = (type, parent) =>
+    renderWithProviders(
+      <DocumentFormProvider creationContext={{ type, parent }}>
+        <CreationForm />
+      </DocumentFormProvider>,
+      { messages }
+    );
+
+  const issueForm = renderCreation('Issue', { id: 12 });
+  await waitFor(() =>
+    expect(getDocument().authorizationDocument).toEqual(permission)
+  );
+  await userEvent.setup().click(screen.getByRole('button', { name: 'Save' }));
+  await waitFor(() => expect(savedIssue).toBeDefined());
+  issueForm.unmount();
+
+  renderCreation('Article', { id: savedIssue.id });
+  await waitFor(() =>
+    expect(getDocument().authorizationDocument).toEqual(permission)
+  );
+  await userEvent.setup().click(screen.getByRole('button', { name: 'Save' }));
+  await waitFor(() => expect(apiPostForm).toHaveBeenCalledTimes(2));
+  for (const [, body] of apiPostForm.mock.calls) {
+    expect(body.get('authorizationDocument[id]')).toBe('90');
+    expect(body.get('license[id]')).toBe('2');
+    expect(body.get('option')).toBe(DOCUMENT_AUTHORIZE_TO_PUBLISH);
+    expect(body.has('files')).toBe(false);
+  }
+  expect(apiPostForm.mock.calls[0][1].get('parent[id]')).toBe('12');
+  expect(apiPostForm.mock.calls[1][1].get('parent[id]')).toBe('42');
+});
 
 it('ignores a pending detail response after the parent is cleared', async () => {
   const defaultGet = apiGet.getMockImplementation();

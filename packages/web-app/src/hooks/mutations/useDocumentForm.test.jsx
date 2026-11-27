@@ -9,7 +9,8 @@ import {
   IS_INTACT,
   IS_DELETED,
   IS_MODIFIED,
-  IS_NEW
+  IS_NEW,
+  DOCUMENT_AUTHORIZE_TO_PUBLISH
 } from '@/components/appli/EntitiesForm/Document/formElements/AddFileForm/FileHelpers';
 import { useCreateDocument, useUpdateDocument } from './useDocumentForm';
 
@@ -40,6 +41,35 @@ describe('document PDF pagination uploads', () => {
     apiPostForm.mockResolvedValue({ document: { id: 42 } });
     apiPutForm.mockResolvedValue({ id: 42 });
   });
+
+  it.each([
+    ['creation', useCreateDocument, apiPostForm],
+    ['update', useUpdateDocument, apiPutForm]
+  ])(
+    'sends collection rights without any file on %s',
+    async (_label, hook, api) => {
+      const { result } = renderMutation(hook);
+      await act(async () =>
+        result.current.mutateAsync({
+          id: 42,
+          type: DocumentTypes.COLLECTION,
+          license: { id: 2, name: 'CC-BY' },
+          authorizationDocument: { id: 99 },
+          selectOptionAuthorizationDocument: DOCUMENT_AUTHORIZE_TO_PUBLISH,
+          files: [newFile('excluded.pdf')]
+        })
+      );
+      const formData = api.mock.calls[0][1];
+      expect(formData.get('license[id]')).toBe('2');
+      expect(formData.get('authorizationDocument[id]')).toBe('99');
+      expect(formData.get('option')).toBe(DOCUMENT_AUTHORIZE_TO_PUBLISH);
+      expect(formData.has('selectOptionAuthorizationDocument')).toBe(false);
+      expect(formData.has('files')).toBe(false);
+      expect(
+        [...formData.keys()].some(key => key.startsWith('newFilesMetadata'))
+      ).toBe(false);
+    }
+  );
 
   it.each([
     ['creation', useCreateDocument, apiPostForm],

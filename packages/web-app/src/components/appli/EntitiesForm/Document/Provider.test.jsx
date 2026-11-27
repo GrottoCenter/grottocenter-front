@@ -222,6 +222,53 @@ describe('DocumentFormProvider length validation', () => {
 });
 
 describe('DocumentFormProvider publication authorization', () => {
+  it('accepts a collection without authorization or license', async () => {
+    renderValidation({
+      ...validDocument,
+      type: DocumentTypes.COLLECTION,
+      authorizationDocument: null,
+      license: null
+    });
+    await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
+  });
+
+  it.each([null, 'CC-BY', { name: 'CC-BY' }])(
+    'rejects a collection authorization without a resolved license: %j',
+    async license => {
+      renderValidation({
+        ...validDocument,
+        type: DocumentTypes.COLLECTION,
+        authorizationDocument: { id: 99 },
+        license
+      });
+      await waitFor(() =>
+        expect(screen.getByText('invalid')).toBeInTheDocument()
+      );
+    }
+  );
+
+  it('accepts collection rights without a file', async () => {
+    renderValidation({
+      ...validDocument,
+      type: DocumentTypes.COLLECTION,
+      authorizationDocument: { id: 99 },
+      license: { id: 2, name: 'CC-BY' }
+    });
+    await waitFor(() => expect(screen.getByText('valid')).toBeInTheDocument());
+  });
+
+  it('rejects a collection authorization without an id', async () => {
+    renderValidation({
+      ...validDocument,
+      type: DocumentTypes.COLLECTION,
+      authorizationDocument: { title: 'Unresolved permission' },
+      license: { id: 2, name: 'CC-BY' }
+    });
+    await waitFor(() =>
+      expect(screen.getByText('invalid')).toBeInTheDocument()
+    );
+  });
+
   it.each([null, { id: 41, title: 'Collection' }])(
     'deduces the missing option from an authorization (parent: %j)',
     parent => {

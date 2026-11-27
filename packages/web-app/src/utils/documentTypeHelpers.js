@@ -237,12 +237,12 @@ const BASE_PAYLOAD_FIELDS = [
   'authorsOrganization'
 ];
 const LANGUAGE_PAYLOAD_FIELDS = ['mainLanguage', 'mainLanguageName'];
-const FILE_PAYLOAD_FIELDS = [
-  'files',
+const PUBLICATION_PAYLOAD_FIELDS = [
   'license',
   'selectOptionAuthorizationDocument',
   'authorizationDocument'
 ];
+const FILE_PAYLOAD_FIELDS = ['files', ...PUBLICATION_PAYLOAD_FIELDS];
 const ADVANCED_PAYLOAD_FIELDS = [
   'datePublication',
   'identifier',
@@ -278,6 +278,7 @@ export const filterDocumentPayload = docAttributes => {
       ...BASE_PAYLOAD_FIELDS,
       ...LANGUAGE_PAYLOAD_FIELDS,
       ...ADVANCED_PAYLOAD_FIELDS,
+      ...PUBLICATION_PAYLOAD_FIELDS,
       'description',
       'library'
     ]);

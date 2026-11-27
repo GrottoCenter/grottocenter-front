@@ -118,6 +118,43 @@ describe('Editing a document with publication authorization', () => {
     });
   });
 
+  it('associates optional collection rights without offering files or author declarations', () => {
+    cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
+    cy.intercept('GET', '**/api/v1/documents/42', {
+      body: {
+        ...document,
+        type: 'Collection',
+        parent: null,
+        license: null,
+        authorizationDocument: null
+      }
+    });
+    cy.visit('/documents/42/edit', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.get('[data-testid="file-dropzone"]').should('not.exist');
+    cy.get('[data-testid="publication-author-rights"]').should('not.exist');
+    cy.get('[data-testid="publication-authorization"]').should('not.exist');
+    cy.get('[data-testid="document-submit"]').should('be.enabled');
+    cy.get(
+      '[data-testid="collection-publication-rights"] input[role="combobox"]'
+    )
+      .should('not.have.attr', 'required')
+      .click();
+    cy.contains('[role="option"]', permission.title).click();
+    cy.get('[data-testid="document-submit"]').should('be.disabled');
+    cy.get('[data-testid="document-license"] [role="combobox"]').click();
+    cy.get('[data-testid="document-license-option-2"]').click();
+    cy.get('[data-testid="document-submit"]').should('be.enabled').click();
+    cy.wait('@save').then(({ request }) => {
+      expectMultipartValue(request.body, 'license[id]', '2');
+      expectMultipartValue(request.body, 'authorizationDocument[id]', '99');
+      expectMultipartValue(request.body, 'option', authorizationOption);
+      expect(request.body).not.to.include('name="files"');
+      expect(request.body).not.to.include('filename=');
+    });
+  });
+
   it('keeps publication inheritance working when selecting the parent', () => {
     cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
     mockParentSearch();

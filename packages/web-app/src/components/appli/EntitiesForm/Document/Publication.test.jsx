@@ -1,5 +1,11 @@
 import { useMemo, useState } from 'react';
-import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  screen,
+  waitFor,
+  within
+} from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import { apiGet, apiGetWithRange, apiPutForm } from '@/api/client';
@@ -198,6 +204,126 @@ describe('editing document publication rights', () => {
     expect(body.get('authors[0][id]')).toBe('1');
     expect(body.get('files').name).toBe('issue.pdf');
     await waitFor(() => expect(onSuccess).toHaveBeenCalled());
+  });
+
+  it('allows a collection without authorization and hides file publication choices', async () => {
+    renderSubmission({
+      type: 'Collection',
+      parent: null,
+      license: null,
+      authorizationDocument: null
+    });
+    const rights = screen.getByTestId('collection-publication-rights');
+    expect(
+      within(rights).getByRole('combobox', {
+        name: 'Authorization from authors'
+      })
+    ).not.toBeRequired();
+    expect(screen.queryByTestId('file-dropzone')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('publication-author-rights')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('publication-authorization')
+    ).not.toBeInTheDocument();
+    const submit = screen.getByRole('button', { name: 'Update' });
+    await waitFor(() => expect(submit).toBeEnabled());
+    fireEvent.click(submit);
+    await waitFor(() => expect(apiPutForm).toHaveBeenCalledOnce());
+    const body = apiPutForm.mock.calls[0][1];
+    expect(body.has('authorizationDocument[id]')).toBe(false);
+    expect(body.has('option')).toBe(false);
+    expect(body.has('files')).toBe(false);
+  });
+
+  it('requires an explicit license when attaching an authorization to a collection', async () => {
+    renderSubmission({
+      type: 'Collection',
+      parent: null,
+      license: null,
+      authorizationDocument: null
+    });
+    const select = screen.getByRole('combobox', {
+      name: 'Authorization from authors'
+    });
+    fireEvent.mouseDown(select);
+    fireEvent.click(
+      await screen.findByRole('option', { name: permission.title })
+    );
+    const submit = screen.getByRole('button', { name: 'Update' });
+    await waitFor(() => expect(submit).toBeDisabled());
+    fireEvent.submit(submit.closest('form'));
+    expect(apiPutForm).not.toHaveBeenCalled();
+    fireEvent.mouseDown(
+      screen.getByTestId('document-license').querySelector('[role="combobox"]')
+    );
+    fireEvent.click(await screen.findByTestId('document-license-option-2'));
+    await waitFor(() => expect(submit).toBeEnabled());
+    fireEvent.click(submit);
+    await waitFor(() => expect(apiPutForm).toHaveBeenCalledOnce());
+    const body = apiPutForm.mock.calls[0][1];
+    expect(body.get('license[id]')).toBe('2');
+    expect(body.get('authorizationDocument[id]')).toBe('99');
+    expect(body.get('option')).toBe(DOCUMENT_AUTHORIZE_TO_PUBLISH);
+    expect(body.has('files')).toBe(false);
+  });
+
+  it('can clear an authorization selected on a previously unauthorized collection', async () => {
+    renderSubmission({
+      type: 'Collection',
+      parent: null,
+      license: null,
+      authorizationDocument: null
+    });
+    fireEvent.mouseDown(
+      screen.getByRole('combobox', { name: 'Authorization from authors' })
+    );
+    fireEvent.click(
+      await screen.findByRole('option', { name: permission.title })
+    );
+    fireEvent.click(
+      within(screen.getByTestId('collection-publication-rights')).getByTitle(
+        'Clear'
+      )
+    );
+    const submit = screen.getByRole('button', { name: 'Update' });
+    await waitFor(() => expect(submit).toBeEnabled());
+    expect(screen.queryByTestId('document-license')).not.toBeInTheDocument();
+    fireEvent.click(submit);
+    await waitFor(() => expect(apiPutForm).toHaveBeenCalledOnce());
+    expect(apiPutForm.mock.calls[0][1].has('authorizationDocument[id]')).toBe(
+      false
+    );
+    expect(apiPutForm.mock.calls[0][1].has('option')).toBe(false);
+  });
+
+  it('preserves stored collection rights and permits replacement but not removal', async () => {
+    const replacement = { id: 100, title: 'Replacement permission' };
+    apiGetWithRange.mockResolvedValue({
+      data: { documents: [permission, replacement] }
+    });
+    renderSubmission({ type: 'Collection', parent: null });
+    const rights = screen.getByTestId('collection-publication-rights');
+    expect(
+      within(rights).queryByRole('button', { name: 'Clear' })
+    ).not.toBeInTheDocument();
+    const submit = screen.getByRole('button', { name: 'Update' });
+    await waitFor(() => expect(submit).toBeEnabled());
+    fireEvent.mouseDown(
+      within(rights).getByRole('combobox', {
+        name: 'Authorization from authors'
+      })
+    );
+    fireEvent.click(
+      await screen.findByRole('option', { name: replacement.title })
+    );
+    fireEvent.click(submit);
+    await waitFor(() => expect(apiPutForm).toHaveBeenCalledOnce());
+    const body = apiPutForm.mock.calls[0][1];
+    expect(body.get('authorizationDocument[id]')).toBe('100');
+    expect(body.get('license[id]')).toBe('2');
+    expect(body.get('option')).toBe(DOCUMENT_AUTHORIZE_TO_PUBLISH);
+    expect(body.has('files')).toBe(false);
   });
 
   it('preserves the existing photo date when saving other metadata', async () => {

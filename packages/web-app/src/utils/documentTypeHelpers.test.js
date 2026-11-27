@@ -14,6 +14,23 @@ describe('document parent safeguards', () => {
   });
 
   describe('document payload metadata', () => {
+    it('retains collection publication rights but never attachments', () => {
+      const rights = {
+        license: { id: 2, name: 'CC-BY' },
+        authorizationDocument: { id: 99 },
+        selectOptionAuthorizationDocument:
+          'Authorization present in Grottocenter'
+      };
+      expect(
+        filterDocumentPayload({
+          type: DocumentTypes.COLLECTION,
+          ...rights,
+          files: [{ id: 10 }],
+          parent: { id: 11 }
+        })
+      ).toEqual({ type: DocumentTypes.COLLECTION, ...rights });
+    });
+
     it.each([DocumentTypes.IMAGE, DocumentTypes.BOOK])(
       'omits issue and pages for %s when their inputs are not displayed',
       type => {

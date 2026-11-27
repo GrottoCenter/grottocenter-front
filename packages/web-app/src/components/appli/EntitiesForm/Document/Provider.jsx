@@ -146,7 +146,16 @@ const checkFormValidation = (document, isNewDocument) => {
   const hasVisibleFile = document.files.some(f => f.state !== IS_DELETED);
   const requiresAuthorization =
     document.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH;
-  if (requiresAuthorization && hasVisibleFile) {
+  const isCollection = document.type === DocumentTypes.COLLECTION;
+  if (isCollection && document.authorizationDocument) {
+    if (!document.authorizationDocument.id || !document.license?.id)
+      isValid = false;
+    if (
+      document.selectOptionAuthorizationDocument !==
+      DOCUMENT_AUTHORIZE_TO_PUBLISH
+    )
+      isValid = false;
+  } else if (!isCollection && requiresAuthorization && hasVisibleFile) {
     if (!document.selectOptionAuthorizationDocument) isValid = false;
     // The API expects license[id], not the name returned by document details.
     if (!document.license?.id) isValid = false;
