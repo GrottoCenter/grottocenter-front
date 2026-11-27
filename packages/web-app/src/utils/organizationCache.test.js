@@ -1,5 +1,5 @@
 import { createTestQueryClient } from '@/test/renderWithProviders';
-import { organizationManagementKeys } from '@/api/queryKeys';
+import { organizationKeys } from '@/api/queryKeys';
 import {
   invalidateOrganizationCaches,
   subscribeOrganizationMapChanges
@@ -22,22 +22,18 @@ it('invalidates embedded references and refreshes map subscribers, without clear
     { entities: ['documents', 'entrances'] }
   ];
   const accountKey = ['account', 'current'];
-  const managementKeys = [
-    organizationManagementKeys.unclassified,
-    organizationManagementKeys.duplicates
-  ];
-  [
+  const invalidatedKeys = [
     orgKey,
     documentKey,
     searchKey,
     quickKey,
-    accountKey,
-    ...managementKeys
-  ].forEach(key => client.setQueryData(key, {}));
+    organizationKeys.duplicates
+  ];
+  [...invalidatedKeys, accountKey].forEach(key => client.setQueryData(key, {}));
   const listener = vi.fn();
   const unsubscribe = subscribeOrganizationMapChanges(listener);
   invalidateOrganizationCaches(client);
-  [orgKey, documentKey, searchKey, quickKey, ...managementKeys].forEach(key =>
+  invalidatedKeys.forEach(key =>
     expect(client.getQueryState(key).isInvalidated).toBe(true)
   );
   expect(client.getQueryState(accountKey).isInvalidated).toBe(false);

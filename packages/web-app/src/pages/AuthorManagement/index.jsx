@@ -81,10 +81,10 @@ const AuthorManagementContent = () => {
       />
       <Card
         component="section"
-        aria-label={formatMessage({ id: 'authorDuplicates.heading' })}
+        aria-label={formatMessage({ id: 'duplicates.heading' })}
         sx={{ minWidth: 0, p: { xs: 1.5, sm: 2 } }}>
         <Typography variant="h2" sx={{ mb: 1 }}>
-          {formatMessage({ id: 'authorDuplicates.heading' })}
+          {formatMessage({ id: 'duplicates.heading' })}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           {formatMessage({ id: 'authorDuplicates.notice' })}

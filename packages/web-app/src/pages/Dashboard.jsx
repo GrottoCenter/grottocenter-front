@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
@@ -78,6 +78,7 @@ const ToolCard = ({
   to
 }) => {
   const { formatMessage } = useIntl();
+  const descriptionId = useId();
   const roleLabel = roleIds.map(id => formatMessage({ id })).join(' / ');
   const hasCounter = typeof count === 'number';
   const showBadge = hasCounter && (isLoading || isError || count > 0);
@@ -101,7 +102,8 @@ const ToolCard = ({
         component={AppLink}
         nativeButton={false}
         to={to}
-        aria-label={`${title} — ${roleLabel}`}>
+        aria-label={`${title} — ${roleLabel}`}
+        aria-describedby={descriptionId}>
         <CardContent sx={{ position: 'relative', p: 2, pt: 3 }}>
           <Box
             sx={{
@@ -143,6 +145,7 @@ const ToolCard = ({
             {title}
           </Typography>
           <Typography
+            id={descriptionId}
             variant="body2"
             sx={{
               color: 'text.secondary'
@@ -349,7 +352,7 @@ const Dashboard = () => {
                       icon={<BusinessIcon />}
                       title={formatMessage({ id: 'Organizations' })}
                       description={formatMessage({
-                        id: 'Organization management description'
+                        id: 'duplicates.heading'
                       })}
                       roleIds={['Moderator']}
                       to="/ui/organizations/management"

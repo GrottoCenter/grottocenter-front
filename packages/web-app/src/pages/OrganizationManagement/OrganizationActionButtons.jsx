@@ -5,15 +5,10 @@ import EntityActionButtons from '@/components/common/EntityActionButtons';
 const OrganizationActionButtons = ({
   organization,
   onPreview,
-  showIdInLabel = false,
-  showOpenLink = false,
-  showEditLink = true,
   isDisabled = false
 }) => {
   const { formatMessage } = useIntl();
-  const name = showIdInLabel
-    ? `${organization.name} (#${organization.id})`
-    : organization.name;
+  const name = `${organization.name} (#${organization.id})`;
   const label = formatMessage({ id: 'View organization {name}' }, { name });
   const editLabel = formatMessage(
     { id: 'Edit organization {name} in new tab' },
@@ -31,23 +26,15 @@ const OrganizationActionButtons = ({
         testId: `preview-organization-${organization.id}`,
         onClick: () => onPreview(organization.id)
       }}
-      edit={
-        showEditLink
-          ? {
-              to: `/ui/organizations/${organization.id}/edit`,
-              label: editLabel
-            }
-          : null
-      }
-      open={
-        showOpenLink
-          ? {
-              to: `/ui/organizations/${organization.id}`,
-              label: openLabel,
-              testId: `open-organization-${organization.id}`
-            }
-          : null
-      }
+      edit={{
+        to: `/ui/organizations/${organization.id}/edit`,
+        label: editLabel
+      }}
+      open={{
+        to: `/ui/organizations/${organization.id}`,
+        label: openLabel,
+        testId: `open-organization-${organization.id}`
+      }}
       isDisabled={isDisabled}
     />
   );
@@ -59,9 +46,6 @@ OrganizationActionButtons.propTypes = {
     name: PropTypes.string.isRequired
   }).isRequired,
   onPreview: PropTypes.func.isRequired,
-  showIdInLabel: PropTypes.bool,
-  showOpenLink: PropTypes.bool,
-  showEditLink: PropTypes.bool,
   isDisabled: PropTypes.bool
 };
 

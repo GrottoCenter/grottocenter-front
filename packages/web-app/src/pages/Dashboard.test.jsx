@@ -55,9 +55,14 @@ it('shows moderators an accessible Guidelines link', () => {
     'href',
     '/ui/guidelines'
   );
-  expect(
-    screen.getByRole('link', { name: /^Organizations —/ })
-  ).toHaveAttribute('href', '/ui/organizations/management');
+  const organizationsLink = screen.getByRole('link', {
+    name: /^Organizations —/
+  });
+  expect(organizationsLink).toHaveAttribute(
+    'href',
+    '/ui/organizations/management'
+  );
+  expect(organizationsLink).toHaveAccessibleDescription('Probable duplicates');
   expect(screen.getByRole('link', { name: /^Documents —/ })).toHaveAttribute(
     'href',
     '/ui/documents/management'

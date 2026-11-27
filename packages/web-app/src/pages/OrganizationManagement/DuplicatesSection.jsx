@@ -8,11 +8,12 @@ import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 
-import { apiGet } from '@/api/client';
+import { apiGet, apiPost } from '@/api/client';
 import { organizationKeys } from '@/api/queryKeys';
-import { getOrganizationUrl } from '@/conf/apiRoutes';
+import { advancedSearchUrl, getOrganizationUrl } from '@/conf/apiRoutes';
 import { STALE } from '@/conf/queryClient';
 import { useDeleteOrganization, useOnlineStatus } from '@/hooks';
+import { useDuplicateScan } from '@/hooks/queries/useDuplicateScan';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import FormSubmissionError from '@/components/common/FormSubmissionError';
 import StandardDialog from '@/components/common/StandardDialog';
@@ -26,6 +27,7 @@ import AppLink from '@/components/common/AppLink';
 import DuplicateMergeResult from '@/components/common/DuplicateMergeResult';
 import { findOrganizationDuplicates } from '@/utils/organizationDuplicates';
 import { getOrganizationTypeLabelId } from '@/utils/organizationTypes';
+import { scanSearchPages } from '@/utils/scanSearchPages';
 import OrganizationActionButtons from './OrganizationActionButtons';
 
 const organizationShape = PropTypes.shape({
@@ -105,8 +107,6 @@ const Comparison = ({
         <OrganizationActionButtons
           organization={organization}
           onPreview={onPreview}
-          showIdInLabel
-          showOpenLink
           isDisabled={isDisabled}
         />
       }
@@ -539,21 +539,35 @@ DuplicateGroup.propTypes = {
 
 const IGNORED_DUPLICATES_KEY = 'organizationManagement.ignoredDuplicates';
 
-const DuplicatesSection = ({
-  organizations,
-  deletedIds,
-  isLoading,
-  hasStarted,
-  hasCompleted,
-  progress,
-  error,
-  onAnalyze,
-  onCancel,
-  isOnline,
-  onPreview,
-  onDeleted
-}) => {
+const getOrganizationsPage = ({ pageParam, signal }) =>
+  apiPost(
+    advancedSearchUrl,
+    {
+      entity: 'organizations',
+      query: '',
+      filter: {},
+      matchAllFields: true,
+      page: pageParam,
+      size: 100
+    },
+    { signal }
+  );
+
+const DuplicatesSection = ({ onPreview }) => {
   const { formatMessage } = useIntl();
+  const isOnline = useOnlineStatus();
+  const { query, hasStarted, hasCompleted, progress, analyze, cancel } =
+    useDuplicateScan({
+      queryKey: organizationKeys.duplicates,
+      enabled: isOnline,
+      load: ({ signal, onProgress }) =>
+        scanSearchPages({
+          getPage: getOrganizationsPage,
+          signal,
+          onProgress,
+          incompleteMessage: formatMessage({ id: 'duplicates.incompleteScan' })
+        })
+    });
   const [ignored, setIgnored] = useLocalStorage(
     IGNORED_DUPLICATES_KEY,
     new Set(),
@@ -562,8 +576,10 @@ const DuplicatesSection = ({
       deserialize: value => new Set(value.split(',').filter(Boolean))
     }
   );
+  const [deletedIds, setDeletedIds] = useState(() => new Set());
   const [visibleCount, setVisibleCount] = useState(10);
   const [completed, setCompleted] = useState([]);
+  const { data: organizations, error, isFetching } = query;
   const allGroups = useMemo(
     () => (hasCompleted ? findOrganizationDuplicates(organizations) : []),
     [hasCompleted, organizations]
@@ -591,15 +607,18 @@ const DuplicatesSection = ({
 
   const handleDeleted = (groupKey, source, target) => {
     setCompleted(previous => [...previous, { groupKey, source, target }]);
-    onDeleted(source.id);
+    setDeletedIds(previous => new Set(previous).add(String(source.id)));
   };
 
   return (
-    <Box
+    <Card
       component="section"
-      aria-label={formatMessage({ id: 'duplicates.heading' })}
-      sx={{ minWidth: 0 }}>
-      <Typography variant="h2" sx={{ mb: 1 }}>
+      aria-labelledby="organization-duplicates-heading"
+      sx={{ minWidth: 0, p: { xs: 1.5, sm: 2 } }}>
+      <Typography
+        id="organization-duplicates-heading"
+        variant="h2"
+        sx={{ mb: 1 }}>
         {formatMessage({ id: 'duplicates.heading' })}
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
@@ -613,39 +632,38 @@ const DuplicatesSection = ({
         {formatMessage({ id: 'duplicates.ignoreNotice' })}
       </Typography>
       <DuplicateScanControls
-        isLoading={isLoading}
+        isLoading={isFetching}
         hasStarted={hasStarted}
         hasCompleted={hasCompleted}
         progress={progress}
         progressMessageId="Organizations scanned: {loaded} of {total}"
-        error={error}
+        error={hasStarted && !isFetching ? error : null}
         isOnline={isOnline}
         hasIgnored={hasIgnored}
-        onAnalyze={onAnalyze}
-        onCancel={onCancel}
+        onAnalyze={analyze}
+        onCancel={cancel}
         onShowIgnored={() => setIgnored(new Set())}
       />
-      {hasCompleted && (
-        <Typography
-          variant="body2"
-          data-testid="duplicate-scan-summary"
-          sx={{ mb: 2 }}>
-          {formatMessage(
-            { id: 'duplicates.scanComplete' },
-            {
-              count: progress.loaded,
-              suggestions: candidates.filter(
-                group => group.organizations.length > 1
-              ).length
-            }
-          )}
-        </Typography>
-      )}
-      {hasCompleted && candidates.length === 0 && (
-        <Alert severity="info">
-          {formatMessage({ id: 'duplicates.noCandidates' })}
-        </Alert>
-      )}
+      <Box aria-live="polite">
+        {hasCompleted && (
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            {formatMessage(
+              { id: 'duplicates.scanComplete' },
+              {
+                count: progress.loaded,
+                suggestions: candidates.filter(
+                  group => group.organizations.length > 1
+                ).length
+              }
+            )}
+          </Typography>
+        )}
+        {hasCompleted && candidates.length === 0 && (
+          <Alert severity="info">
+            {formatMessage({ id: 'duplicates.noCandidates' })}
+          </Alert>
+        )}
+      </Box>
       {candidates.slice(0, visibleCount).map(group => (
         <DuplicateGroup
           key={group.key}
@@ -670,26 +688,12 @@ const DuplicatesSection = ({
           {formatMessage({ id: 'Load more' })}
         </Button>
       )}
-    </Box>
+    </Card>
   );
 };
 
 DuplicatesSection.propTypes = {
-  organizations: PropTypes.arrayOf(organizationShape).isRequired,
-  deletedIds: PropTypes.instanceOf(Set).isRequired,
-  isLoading: PropTypes.bool.isRequired,
-  hasStarted: PropTypes.bool.isRequired,
-  hasCompleted: PropTypes.bool.isRequired,
-  progress: PropTypes.shape({
-    loaded: PropTypes.number.isRequired,
-    total: PropTypes.number.isRequired
-  }).isRequired,
-  error: PropTypes.shape({}),
-  onAnalyze: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  isOnline: PropTypes.bool.isRequired,
-  onPreview: PropTypes.func.isRequired,
-  onDeleted: PropTypes.func.isRequired
+  onPreview: PropTypes.func.isRequired
 };
 
 export default DuplicatesSection;

@@ -1,17 +1,15 @@
 // Sequential reads let cancellation stop before issuing the next page.
-// Callers decide whether to reuse pages and how strictly to validate a scan.
 export const scanSearchPages = async ({
   getPage,
   signal,
   onProgress,
-  initialPages = [],
   requireUniqueIds = false,
   incompleteMessage
 }) => {
-  const records = initialPages.flatMap(page => page.results);
-  let total = initialPages[0]?.totalResults ?? 0;
-  let pageNumber = initialPages.length + 1;
-  const ids = new Set(records.map(record => String(record.id)));
+  const records = [];
+  let total = 0;
+  let pageNumber = 1;
+  const ids = new Set();
   onProgress({ loaded: records.length, total });
   while (pageNumber === 1 || records.length < total) {
     signal.throwIfAborted();
