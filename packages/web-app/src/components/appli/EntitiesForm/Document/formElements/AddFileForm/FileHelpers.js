@@ -1,4 +1,3 @@
-import { isNil } from 'ramda';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
 
 // Those constants represent the state of the file.
@@ -28,6 +27,11 @@ export const validateAndBuildFileEntries = (
 ) => {
   const filesArray = Array.from(newFiles);
   const errors = [];
+  const names = new Set(
+    existingFiles
+      .filter(file => file.state !== IS_DELETED)
+      .map(file => file.fileName)
+  );
   const entries = filesArray
     .filter(file => {
       if (file.name) {
@@ -53,7 +57,6 @@ export const validateAndBuildFileEntries = (
           );
           return false;
         }
-        const name = file.name.slice(0, dotIndex);
         const ext = file.name.slice(dotIndex + 1);
         if (
           allowedExtensions &&
@@ -70,14 +73,16 @@ export const validateAndBuildFileEntries = (
           );
           return false;
         }
-        return isNil(
-          existingFiles.find(
-            existing =>
-              existing.name === name &&
-              existing.extension === ext &&
-              existing.state === IS_NEW
-          )
-        );
+        if (names.has(file.name)) {
+          errors.push(
+            formatMessage(
+              { id: 'documentForm.duplicateFile' },
+              { file: file.name }
+            )
+          );
+          return false;
+        }
+        names.add(file.name);
       }
       return true;
     })

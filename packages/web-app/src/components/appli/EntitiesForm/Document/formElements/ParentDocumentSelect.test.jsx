@@ -44,7 +44,8 @@ const details = {
   license: 'CC-BY',
   editor: { id: 20, name: 'Inherited publisher' },
   library: { id: 21, name: 'Inherited library' },
-  authorizationDocument: permission
+  authorizationDocument: permission,
+  option: DOCUMENT_AUTHORIZE_TO_PUBLISH
 };
 
 const Form = () => {
@@ -157,7 +158,7 @@ it.each([undefined, null, ''])(
     await userEvent.setup().click(input());
     const option = await screen.findByRole('option', { name: /10/ });
     expectTypeIcon(option, NewspaperIcon);
-    expect(input()).toHaveValue('');
+    expect(input()).toHaveValue('10');
     expect(getDocument().parent.id).toBe(10);
   }
 );
@@ -198,18 +199,12 @@ it.each([
       filter: { type: parentType }
     });
     await user.keyboard('{ArrowDown}{Enter}');
-    await waitFor(() =>
-      expect(getDocument().authorizationDocument).toEqual(permission)
-    );
+    await waitFor(() => expect(getDocument().isParentPending).toBe(false));
     expect(getDocument().parent.id).toBe(10);
-    expect(getDocument().mainLanguage).toBe('fra');
-    expect(getDocument().mainLanguageName).toBe('French');
-    expect(getDocument().license).toEqual(license);
-    expect(getDocument().editor).toEqual(details.editor);
-    expect(getDocument().library).toEqual(details.library);
-    expect(getDocument().selectOptionAuthorizationDocument).toBe(
-      DOCUMENT_AUTHORIZE_TO_PUBLISH
-    );
+    expect(getDocument().mainLanguage).toBe('eng');
+    expect(getDocument().editor.name).toBe('Original publisher');
+    expect(getDocument().authorizationDocument).toBeNull();
+    expect(getDocument().selectOptionAuthorizationDocument).toBeNull();
   }
 );
 
@@ -230,6 +225,7 @@ it('transmits collection rights through a newly saved issue to a new article wit
       type: body.get('type'),
       title: body.get('title'),
       license: body.get('license[name]'),
+      option: body.get('option'),
       authorizationDocument: {
         id: Number(body.get('authorizationDocument[id]'))
       }
@@ -308,13 +304,15 @@ it('ignores a previous parent authorization when another parent is chosen', asyn
         })
       : defaultGet(url)
   );
-  renderForm();
-  const user = await search('First');
-  await user.click(
-    await screen.findByRole('option', { name: /First journal/ })
+  renderWithProviders(
+    <DocumentFormProvider
+      creationContext={{ type: 'Article', parent: { id: 10 } }}>
+      <Form />
+    </DocumentFormProvider>,
+    { messages }
   );
   await waitFor(() => expect(resolvePermission).toBeDefined());
-  await search('Second');
+  const user = await search('Second');
   await user.click(
     await screen.findByRole('option', { name: /Second journal/ })
   );

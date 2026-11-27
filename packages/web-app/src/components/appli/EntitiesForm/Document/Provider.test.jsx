@@ -75,6 +75,9 @@ const DocumentTypeSelector = () => {
           </button>
         )
       )}
+      <button type="button" onClick={() => updateAttribute('files', [])}>
+        Remove files
+      </button>
       <ValidationState />
     </>
   );
@@ -426,7 +429,7 @@ describe('DocumentFormProvider publication authorization', () => {
 
 describe('DocumentFormProvider PDF pagination validation', () => {
   it.each([DocumentTypes.COLLECTION, DocumentTypes.EVENT])(
-    'ignores an invalid file offset when switching to %s and validates it again on return',
+    'requires removal of attachments when switching to %s',
     async type => {
       render(
         <DocumentFormProvider
@@ -444,14 +447,9 @@ describe('DocumentFormProvider PDF pagination validation', () => {
       expect(screen.getByText('invalid')).toBeInTheDocument();
 
       fireEvent.click(screen.getByRole('button', { name: type }));
-      await waitFor(() =>
-        expect(screen.getByText('valid')).toBeInTheDocument()
-      );
-
-      fireEvent.click(screen.getByRole('button', { name: DocumentTypes.BOOK }));
-      await waitFor(() =>
-        expect(screen.getByText('invalid')).toBeInTheDocument()
-      );
+      expect(screen.getByText('invalid')).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'Remove files' }));
+      expect(screen.getByText('valid')).toBeInTheDocument();
     }
   );
 });

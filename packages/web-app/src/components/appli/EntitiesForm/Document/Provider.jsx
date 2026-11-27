@@ -1,24 +1,20 @@
-import {
-  useState,
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef
-} from 'react';
+import { useState, createContext, useCallback, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
+import { isDocumentDateValid } from '@/utils/documentDate';
 import { isPdfPageOffsetValid } from '@/utils/pdfUrl';
 import {
   DocumentTypes,
   filterDocumentPayload,
-  isDocumentSelfParent,
-  requiresDocumentAuthor
+  getDocumentTypeRules,
+  isDocumentSelfParent
 } from '@/utils/documentTypeHelpers';
 import {
   IS_INTACT,
   IS_DELETED,
   IS_NEW,
+  AUTHORIZATION_FROM_AUTHOR,
+  LICENSE_IN_FILE,
   DOCUMENT_AUTHORIZE_TO_PUBLISH
 } from './formElements/AddFileForm/FileHelpers';
 import { defaultDocumentValuesTypes } from './types';
@@ -36,7 +32,7 @@ export const defaultDocAttributes = {
   authorsOrganization: [],
   editor: null,
   library: null,
-  type: -1,
+  type: DocumentTypes.UNKNOWN,
   title: '',
   description: '',
   subjects: [],
@@ -61,13 +57,6 @@ export function isDocumentPagesFormatValid(pages) {
   return false;
 }
 
-const DESCRIPTION_OPTIONAL_TYPES = [
-  DocumentTypes.IMAGE,
-  DocumentTypes.TOPOGRAPHIC_DRAWING,
-  DocumentTypes.EVENT,
-  DocumentTypes.AUTHORIZATION_TO_PUBLISH
-];
-
 export const getDocumentLengthErrors = document => {
   const payload = filterDocumentPayload(document);
   return [
@@ -89,107 +78,104 @@ export const getDocumentLengthErrors = document => {
 const hasAuthors = document =>
   document.authors.length > 0 || document.authorsOrganization.length > 0;
 
+export const getIncompatibleFiles = document => {
+  const { allowsFiles, accept } = getDocumentTypeRules(document.type);
+  return document.files.filter(file => {
+    if (file.state === IS_DELETED) return false;
+    if (!allowsFiles) return true;
+    if (file.state !== IS_NEW || !accept) return false;
+    const extension = (file.fileName ?? file.file?.name)?.split('.').at(-1);
+    return !accept.extensions.includes(extension?.toLowerCase());
+  });
+};
+
+const sharingOptions = [
+  AUTHORIZATION_FROM_AUTHOR,
+  LICENSE_IN_FILE,
+  DOCUMENT_AUTHORIZE_TO_PUBLISH
+];
+
 const checkFormValidation = (
   document,
-  isNewDocument,
-  hasStoredAuthorization
+  { isNewDocument, hasStoredAuthorization, initialType }
 ) => {
-  let isValid = true;
-
+  const rules = getDocumentTypeRules(document.type);
   const payload = filterDocumentPayload(document);
-  if (!isPdfPageOffsetValid(payload.identifierPdfPageOffset)) isValid = false;
+  if (!rules.hasType || !document.title?.trim()) return false;
+  if (rules.requiresDate && !document.datePublication) return false;
   if (
-    (payload.files ?? []).some(
-      file =>
-        file.state !== IS_DELETED && !isPdfPageOffsetValid(file.pdfPageOffset)
-    )
+    rules.hasDate &&
+    !isDocumentDateValid(document.datePublication, rules.requiresDate)
   )
-    isValid = false;
-  if (getDocumentLengthErrors(document).length > 0) isValid = false;
+    return false;
   if (
+    rules.parentType &&
+    (!document.parent?.id ||
+      (isNewDocument && !document.parent.title) ||
+      (document.parent.type && document.parent.type !== rules.parentType) ||
+      isDocumentSelfParent(document))
+  )
+    return false;
+  if (document.isParentPending) return false;
+  if (rules.requiresAuthor && !hasAuthors(document)) return false;
+  if (getDocumentLengthErrors(document).length > 0) return false;
+  if (!isDocumentPagesFormatValid(payload.pages)) return false;
+  if (payload.identifier && !payload.identifierType) return false;
+  if (
+    payload.identifierType?.regexp &&
+    !new RegExp(payload.identifierType.regexp).test(payload.identifier)
+  )
+    return false;
+  if (!isPdfPageOffsetValid(payload.identifierPdfPageOffset)) return false;
+  if (getIncompatibleFiles(document).length > 0) return false;
+  if (
+    rules.allowsFiles &&
     document.files.some(
       file =>
-        file.state === IS_NEW &&
-        Math.max(file.fileName?.length ?? 0, file.file?.name?.length ?? 0) >
-          TEXT_LENGTH_LIMITS.FILE_NAME
+        (file.state !== IS_DELETED &&
+          !isPdfPageOffsetValid(file.pdfPageOffset)) ||
+        (file.state === IS_NEW &&
+          Math.max(file.fileName?.length ?? 0, file.file?.name?.length ?? 0) >
+            TEXT_LENGTH_LIMITS.FILE_NAME)
     )
   )
-    isValid = false;
+    return false;
 
-  if (!document.title) isValid = false;
+  const hasFiles =
+    rules.allowsFiles && document.files.some(file => file.state !== IS_DELETED);
+  const option = document.selectOptionAuthorizationDocument;
+  const hasAuthorization = !!document.authorizationDocument?.id;
   if (
-    !DESCRIPTION_OPTIONAL_TYPES.includes(document.type) &&
-    !document.description
+    hasStoredAuthorization &&
+    document.type !== initialType &&
+    !rules.hasCollectionSharing &&
+    !rules.hasFileSharing
   )
-    isValid = false;
-  if (document.type === DocumentTypes.EVENT && !document.datePublication)
-    isValid = false;
-  if (
-    (document.type === DocumentTypes.ISSUE ||
-      document.type === DocumentTypes.ARTICLE) &&
-    // Existing and pending details may omit the parent's title. Creation must
-    // still resolve URL-only parents before allowing submission.
-    (isNewDocument ? !document.parent?.title : !document.parent)
-  )
-    isValid = false;
-
-  if (
-    (document.type === DocumentTypes.ISSUE ||
-      document.type === DocumentTypes.ARTICLE) &&
-    isDocumentSelfParent(document)
-  )
-    isValid = false;
-
-  if (requiresDocumentAuthor(document.type) && !hasAuthors(document))
-    isValid = false;
-  if (!isDocumentPagesFormatValid(payload.pages)) isValid = false;
-  if (payload.identifier && !payload.identifierType) isValid = false;
-  if (isValid && payload.identifierType?.regexp)
-    isValid = new RegExp(payload.identifierType.regexp).test(
-      payload.identifier
+    return false;
+  if (rules.hasCollectionSharing) {
+    return (
+      !(hasStoredAuthorization || document.authorizationDocument) ||
+      (hasAuthorization &&
+        !!document.license?.id &&
+        option === DOCUMENT_AUTHORIZE_TO_PUBLISH)
     );
-  // Files flagged as deleted still remain in the array but are no longer
-  // visible, so the licensing/authorization fields are only required when at
-  // least one file is actually kept.
-  const hasVisibleFile = document.files.some(f => f.state !== IS_DELETED);
-  const requiresAuthorization =
-    document.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH;
-  const isCollection = document.type === DocumentTypes.COLLECTION;
-  if (
-    isCollection &&
-    (document.authorizationDocument || hasStoredAuthorization)
-  ) {
-    if (!document.authorizationDocument?.id || !document.license?.id)
-      isValid = false;
-    if (
-      document.selectOptionAuthorizationDocument !==
-      DOCUMENT_AUTHORIZE_TO_PUBLISH
-    )
-      isValid = false;
-  } else if (!isCollection && requiresAuthorization && hasVisibleFile) {
-    if (!document.selectOptionAuthorizationDocument) isValid = false;
-    // The API expects license[id], not the name returned by document details.
-    if (!document.license?.id) isValid = false;
-    if (
-      document.selectOptionAuthorizationDocument ===
-        DOCUMENT_AUTHORIZE_TO_PUBLISH &&
-      !document.authorizationDocument
-    )
-      isValid = false;
   }
-
-  return !!isValid;
+  if (!rules.hasFileSharing || !hasFiles) return true;
+  if (!sharingOptions.includes(option) || !document.license?.id) return false;
+  if (hasStoredAuthorization && option !== DOCUMENT_AUTHORIZE_TO_PUBLISH)
+    return false;
+  return option !== DOCUMENT_AUTHORIZE_TO_PUBLISH || hasAuthorization;
 };
 
 export const DocumentFormContext = createContext({
   document: defaultDocAttributes,
   isNewDocument: true,
   hasStoredAuthorization: false,
+  initialType: null,
   allowEntityCreation: true,
   isFormValid: true,
   lengthErrors: [],
   updateAttribute: (_attributeName, _newValue) => {},
-  prefillAuthor: () => {},
   selectParent: () => {},
   resetContext: () => {},
   linkedEntrance: null,
@@ -206,12 +192,6 @@ const getPublicationRights = ({
   selectOptionAuthorizationDocument
 });
 
-const AUTHOR_SELECTION = {
-  UNTOUCHED: 'untouched',
-  SUGGESTED: 'suggested',
-  EDITED: 'edited'
-};
-
 const getCollectionPublicationRights = document => {
   const { authorizationDocument, license } = getPublicationRights(document);
   const hasAuthorization = !!authorizationDocument?.id;
@@ -226,7 +206,7 @@ const getCollectionPublicationRights = document => {
 
 const normalizeInitialValues = values => {
   if (!values) return {};
-  const { option, files, authorsOrganization, ...rest } = values;
+  const { option, files, authors, authorsOrganization, ...rest } = values;
   return {
     ...rest,
     parent:
@@ -237,6 +217,7 @@ const normalizeInitialValues = values => {
       option ??
       (values.authorizationDocument?.id ? DOCUMENT_AUTHORIZE_TO_PUBLISH : null),
     files: (files ?? []).map(f => ({ ...f, state: f.state ?? IS_INTACT })),
+    authors: authors ?? [],
     authorsOrganization: authorsOrganization ?? []
   };
 };
@@ -249,7 +230,6 @@ const createFormState = document => {
         ? { ...document, ...collectionRights }
         : document,
     collectionRights,
-    authorSelection: AUTHOR_SELECTION.UNTOUCHED,
     preCollectionDraft: null
   };
 };
@@ -258,31 +238,31 @@ const createFormState = document => {
 // to Collection. The collection keeps its own draft across type changes.
 const changeDocumentType = (state, type, isNewDocument) => {
   const { document, collectionRights, preCollectionDraft } = state;
+  const keepParent =
+    getDocumentTypeRules(document.type).parentType ===
+    getDocumentTypeRules(type).parentType;
+  const hasPrefilledTitle =
+    isNewDocument &&
+    document.type === DocumentTypes.ISSUE &&
+    !!document.title &&
+    document.title === document.parent?.title;
   if (type === DocumentTypes.COLLECTION) {
-    const hasSuggestedAuthor =
-      state.authorSelection === AUTHOR_SELECTION.SUGGESTED;
-    const hasPrefilledTitle =
-      isNewDocument &&
-      document.type === DocumentTypes.ISSUE &&
-      !!document.title &&
-      document.title === document.parent?.title;
     return {
       ...state,
-      authorSelection: hasSuggestedAuthor
-        ? AUTHOR_SELECTION.UNTOUCHED
-        : state.authorSelection,
       preCollectionDraft: {
         ...getPublicationRights(document),
         type: document.type,
-        parent: document.parent,
+        parent: document.isParentPending ? null : document.parent,
+        inheritedPublicationRights: document.inheritedPublicationRights,
         ...(hasPrefilledTitle && { title: document.title })
       },
       document: {
         ...document,
         ...collectionRights,
+        inheritedPublicationRights: null,
+        isParentPending: false,
         type,
         parent: null,
-        ...(hasSuggestedAuthor && { authors: [] }),
         ...(hasPrefilledTitle && { title: '' })
       }
     };
@@ -293,7 +273,10 @@ const changeDocumentType = (state, type, isNewDocument) => {
       ...state,
       document: {
         ...document,
+        ...getPublicationRights(draft ?? {}),
+        inheritedPublicationRights: null,
         ...draft,
+        isParentPending: false,
         type,
         title: document.title || draft?.title || ''
       },
@@ -301,12 +284,28 @@ const changeDocumentType = (state, type, isNewDocument) => {
       preCollectionDraft: null
     };
   }
-  return { ...state, document: { ...document, type } };
+  return {
+    ...state,
+    document: {
+      ...document,
+      ...(keepParent
+        ? {}
+        : {
+            ...document.inheritedPublicationRights?.previous,
+            parent: null,
+            ...(hasPrefilledTitle && { title: '' }),
+            isParentPending: false,
+            inheritedPublicationRights: null
+          }),
+      type
+    }
+  };
 };
 
 const Provider = ({
   children,
   initialValues,
+  persistedDocument,
   creationContext,
   allowEntityCreation = true
 }) => {
@@ -329,8 +328,11 @@ const Provider = ({
     });
   }, []);
   // The multipart API cannot clear a stored publication option.
-  const hasStoredAuthorization = !!initialValues?.authorizationDocument?.id;
+  const hasStoredAuthorization = !!(persistedDocument ?? initialValues)
+    ?.authorizationDocument?.id;
+  const initialType = (persistedDocument ?? initialValues)?.type ?? null;
   const isNewDocument = !initialValues;
+  const storedLicense = initialValues?.license ?? persistedDocument?.license;
   const attributeVersionsRef = useRef({});
   const allowPhotoDatePrefillRef = useRef(true);
   usePhotoDatePrefill({
@@ -347,7 +349,11 @@ const Provider = ({
     initialParent: isNewDocument ? creationContext?.parent : null
   });
 
-  const [isFormValid, setIsFormValid] = useState(false);
+  const isFormValid = checkFormValidation(document, {
+    isNewDocument,
+    hasStoredAuthorization,
+    initialType
+  });
   const [linkedEntrance, setLinkedEntrance] = useState(null);
   const lengthErrors = useMemo(
     () => getDocumentLengthErrors(document),
@@ -369,16 +375,12 @@ const Provider = ({
             ? state
             : changeDocumentType(state, newValue, isNewDocument);
 
-        const editsAuthors =
-          attributeName === 'authors' ||
-          attributeName === 'authorsOrganization';
         const updatesCollectionAuthorization =
           attributeName === 'authorizationDocument' &&
           current.type === DocumentTypes.COLLECTION;
         const nextDocument = { ...current, [attributeName]: newValue };
         return {
           ...state,
-          ...(editsAuthors && { authorSelection: AUTHOR_SELECTION.EDITED }),
           document: updatesCollectionAuthorization
             ? {
                 ...nextDocument,
@@ -390,33 +392,6 @@ const Provider = ({
     },
     [isNewDocument]
   );
-
-  const prefillAuthor = useCallback(
-    ({ id, nickname }, { onlyIfUntouched = false } = {}) => {
-      if (!id) return;
-      setFormState(state => {
-        if (
-          !requiresDocumentAuthor(state.document.type) ||
-          hasAuthors(state.document) ||
-          (onlyIfUntouched &&
-            state.authorSelection !== AUTHOR_SELECTION.UNTOUCHED)
-        )
-          return state;
-        return {
-          ...state,
-          authorSelection: AUTHOR_SELECTION.SUGGESTED,
-          document: { ...state.document, authors: [{ id, nickname }] }
-        };
-      });
-    },
-    []
-  );
-
-  useEffect(() => {
-    setIsFormValid(
-      checkFormValidation(document, isNewDocument, hasStoredAuthorization)
-    );
-  }, [document, isNewDocument, hasStoredAuthorization, setIsFormValid]);
 
   const resetContext = useCallback((overrides = {}) => {
     allowPhotoDatePrefillRef.current = true;
@@ -432,11 +407,12 @@ const Provider = ({
       document,
       isNewDocument,
       hasStoredAuthorization,
+      initialType,
+      storedLicense,
       allowEntityCreation,
       isFormValid,
       lengthErrors,
       updateAttribute,
-      prefillAuthor,
       selectParent,
       resetContext,
       linkedEntrance,
@@ -446,11 +422,12 @@ const Provider = ({
       document,
       isNewDocument,
       hasStoredAuthorization,
+      initialType,
+      storedLicense,
       allowEntityCreation,
       isFormValid,
       lengthErrors,
       updateAttribute,
-      prefillAuthor,
       selectParent,
       resetContext,
       linkedEntrance
@@ -467,6 +444,7 @@ const Provider = ({
 Provider.propTypes = {
   children: PropTypes.node.isRequired,
   initialValues: defaultDocumentValuesTypes,
+  persistedDocument: defaultDocumentValuesTypes,
   creationContext: PropTypes.shape({
     type: PropTypes.oneOf([DocumentTypes.ARTICLE, DocumentTypes.ISSUE])
       .isRequired,

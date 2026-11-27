@@ -1,60 +1,29 @@
-import { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useIntl, FormattedMessage } from 'react-intl';
-import { isEmpty, remove } from 'ramda';
-import {
-  Box,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup
-} from '@mui/material';
-
-import {
-  DEFAULT_DOCUMENT_LICENSE,
-  getLicenseName
-} from '@/components/common/LicenseTag/helpers';
-import InternationalizedLink from '@/components/common/InternationalizedLink';
-import { licenceLinks } from '@/conf/externalLinks';
+import { useIntl } from 'react-intl';
 import { MAX_SIZE_OF_UPLOADED_FILES } from '@/conf/config';
 import { canSetPanorama } from '@/utils/documentPanorama';
 import { DocumentFileErrorPropTypes } from '@/types/document.type';
-import {
-  useUserProperties,
-  useFileFormats,
-  useLicenses,
-  findLicenseByName
-} from '../../../../../../hooks';
+import { useFileFormats } from '@/hooks';
 import ErrorsList from './ErrorsList';
 import {
   IS_DELETED,
   IS_NEW,
   IS_MODIFIED,
-  AUTHORIZATION_FROM_AUTHOR,
-  LICENSE_IN_FILE,
-  DOCUMENT_AUTHORIZE_TO_PUBLISH,
   validateAndBuildFileEntries
 } from './FileHelpers';
 import FileSelectorInput, {
   REJECTION_REASONS
 } from '../../../../../common/FileSelectorInput';
-import { DocumentFormContext } from '../../Provider';
 import PdfPageOffsetEditor from '../PdfPageOffsetEditor';
 import DocumentPdfAnalysis from '../DocumentPdfAnalysis';
 import PanoramaDisplayEditor from '../PanoramaDisplayEditor';
-import AuthorizationDocumentSelect from '../AuthorizationDocumentSelect';
-import DocumentLicenseSelect from '../DocumentLicenseSelect';
 
 const AddFileForm = ({
   files,
   setFiles,
-  option,
-  setOption,
-  setLicense,
-  setAuthorizationDocument,
   acceptConfig = null,
-  showAuthorization = true,
+  allowFileAdd = true,
   allowAiAnalysis = false,
   disabled = false,
   fileError
@@ -66,27 +35,6 @@ const AddFileForm = ({
     extensions: backendExtensions,
     isLoading
   } = useFileFormats();
-  // Fetched only where the authorization block is shown; React Query keeps the
-  // call site unconditional and skips the request until then.
-  const { data: licenses, isLoading: licensesLoading } = useLicenses({
-    enabled: showAuthorization
-  });
-  const currentUser = useUserProperties();
-  const { document, updateAttribute, prefillAuthor } =
-    useContext(DocumentFormContext);
-
-  const parentId = document.parent?.id ?? null;
-  const [correctedLicenseParentId, setCorrectedLicenseParentId] = useState();
-  const prevParentIdRef = useRef(parentId);
-  useEffect(() => {
-    if (prevParentIdRef.current === parentId) return;
-    prevParentIdRef.current = parentId;
-    setCorrectedLicenseParentId(undefined);
-  }, [parentId]);
-
-  const isParentAuthForced =
-    document.parent !== null && document.authorizationDocument !== null;
-
   const extensions =
     acceptConfig?.extensions ??
     backendExtensions.filter(e => e !== null).map(e => e.trim());
@@ -102,57 +50,7 @@ const AddFileForm = ({
   ]
     .filter(Boolean)
     .join(',');
-  const showAuthDocSelect = option === DOCUMENT_AUTHORIZE_TO_PUBLISH;
-  const visibleFiles = files.filter(f => f.state !== IS_DELETED);
-
-  const documentLicenseName = getLicenseName(document.license);
-  const documentLicenseId = document.license?.id;
-  const hasUnknownLicense =
-    !licensesLoading &&
-    !!licenses &&
-    !!documentLicenseName &&
-    !findLicenseByName(licenses, documentLicenseName);
-  const isLicenseForced =
-    isParentAuthForced &&
-    !hasUnknownLicense &&
-    correctedLicenseParentId !== parentId;
-  useEffect(() => {
-    if (!showAuthorization || !licenses) return;
-    // Declaring publication rights applies the license promised by the radio.
-    // Other options preserve existing names, including unknown legacy values.
-    const licenseName =
-      option === AUTHORIZATION_FROM_AUTHOR
-        ? DEFAULT_DOCUMENT_LICENSE
-        : documentLicenseName || DEFAULT_DOCUMENT_LICENSE;
-    const selected = findLicenseByName(licenses, licenseName);
-    if (selected && selected.id !== documentLicenseId) setLicense(selected);
-  }, [
-    showAuthorization,
-    licenses,
-    option,
-    documentLicenseName,
-    documentLicenseId,
-    setLicense
-  ]);
-
-  const updateOption = newOption => {
-    setOption(newOption);
-    setAuthorizationDocument(null);
-
-    if (!currentUser.id) return;
-    const authorsIsOnlyMe =
-      document.authors.length === 1 &&
-      document.authors[0].id === currentUser.id;
-
-    // When switching to AUTHORIZE_TO_PUBLISH, remove the author only if it is
-    // solely the current user — a solo pre-fill that has no real meaning on an
-    // authorization form. Co-authors added manually are intentional and kept.
-    if (newOption === DOCUMENT_AUTHORIZE_TO_PUBLISH) {
-      if (authorsIsOnlyMe) updateAttribute('authors', []);
-    } else {
-      prefillAuthor(currentUser);
-    }
-  };
+  const visibleFiles = files.filter(file => file.state !== IS_DELETED);
 
   // react-dropzone dispatches accepted and rejected files through two separate
   // callbacks within a single onDrop event. React 18 batches the two setErrors
@@ -175,7 +73,7 @@ const AddFileForm = ({
       formatMessage,
       acceptConfig?.extensions
     );
-    setErrors(isEmpty(errorsList) ? [] : errorsList);
+    setErrors(errorsList);
     setFiles([...files, ...entries]);
   };
 
@@ -216,17 +114,15 @@ const AddFileForm = ({
     setErrors(prev => (shouldAppend ? [...prev, ...messages] : messages));
   };
 
-  const removeFile = fileName => {
-    const index = files.findIndex(f => f.fileName === fileName);
-    if (index === -1) return;
-    const newFiles = [...files];
-    const target = newFiles[index];
+  const removeFile = (_fileName, target) => {
     if (target.state === IS_NEW) {
-      setFiles(remove(index, 1, newFiles));
+      setFiles(files.filter(file => file !== target));
     } else {
-      target.previousState = target.state;
-      target.state = IS_DELETED;
-      setFiles(newFiles);
+      setFiles(
+        files.map(file =>
+          file === target ? { ...file, state: IS_DELETED } : file
+        )
+      );
     }
   };
 
@@ -302,111 +198,11 @@ const AddFileForm = ({
         accept={accept}
         extensions={extensions}
         maxSize={MAX_SIZE_OF_UPLOADED_FILES}
-        disabled={isLoading || disabled}
-        renderFileDetails={renderFileDetails}
+        allowFileAdd={allowFileAdd}
+        disabled={(allowFileAdd && isLoading) || disabled}
+        renderFileDetails={allowFileAdd ? renderFileDetails : undefined}
         renderFileActions={renderFileActions}
       />
-      {showAuthorization && visibleFiles.length > 0 && (
-        <Box sx={{ mt: 1 }}>
-          <FormControl
-            component="fieldset"
-            required
-            sx={{ display: 'block', mt: 1 }}>
-            <FormLabel
-              component="legend"
-              sx={{
-                fontSize: '0.875rem'
-              }}>
-              {isParentAuthForced
-                ? formatMessage({
-                    id: 'The licensing type of the document has been deduced from the parent document'
-                  })
-                : formatMessage({ id: 'Licensing type' })}
-            </FormLabel>
-            <RadioGroup
-              value={option ?? ''}
-              onChange={e => updateOption(e.target.value)}>
-              <FormControlLabel
-                value={AUTHORIZATION_FROM_AUTHOR}
-                disabled={isParentAuthForced}
-                control={
-                  <Radio
-                    size="small"
-                    slotProps={{
-                      input: { 'data-testid': 'publication-author-rights' }
-                    }}
-                  />
-                }
-                label={
-                  <>
-                    {formatMessage({
-                      id: 'I hold the publication rights for this content'
-                    })}
-                    {' ('}
-                    <FormattedMessage
-                      id="license {license} applies"
-                      values={{
-                        license: (
-                          <InternationalizedLink links={licenceLinks}>
-                            {DEFAULT_DOCUMENT_LICENSE}
-                          </InternationalizedLink>
-                        )
-                      }}
-                    />
-                    )
-                  </>
-                }
-              />
-              <FormControlLabel
-                value={LICENSE_IN_FILE}
-                disabled={isParentAuthForced}
-                control={<Radio size="small" />}
-                label={formatMessage({
-                  id: 'The license is written in the files'
-                })}
-              />
-              <FormControlLabel
-                value={DOCUMENT_AUTHORIZE_TO_PUBLISH}
-                disabled={isParentAuthForced}
-                control={
-                  <Radio
-                    size="small"
-                    slotProps={{
-                      input: { 'data-testid': 'publication-authorization' }
-                    }}
-                  />
-                }
-                label={formatMessage({
-                  id: 'There is an authorization to publish from the author on Grottocenter'
-                })}
-              />
-            </RadioGroup>
-          </FormControl>
-
-          {showAuthDocSelect && (
-            <AuthorizationDocumentSelect
-              value={document.authorizationDocument}
-              onChange={setAuthorizationDocument}
-              disabled={isParentAuthForced}
-            />
-          )}
-
-          {option && option !== AUTHORIZATION_FROM_AUTHOR && (
-            <DocumentLicenseSelect
-              value={document.license}
-              onChange={value => {
-                if (hasUnknownLicense) setCorrectedLicenseParentId(parentId);
-                setLicense(value);
-              }}
-              licenses={licenses}
-              isLoading={licensesLoading}
-              hasUnknownLicense={hasUnknownLicense}
-              disabled={isLicenseForced}
-              isInherited={isLicenseForced}
-            />
-          )}
-        </Box>
-      )}
       <ErrorsList errors={errors} />
     </>
   );
@@ -414,6 +210,7 @@ const AddFileForm = ({
 
 AddFileForm.propTypes = {
   allowAiAnalysis: PropTypes.bool,
+  allowFileAdd: PropTypes.bool,
   disabled: PropTypes.bool,
   fileError: DocumentFileErrorPropTypes,
   acceptConfig: PropTypes.shape({
@@ -421,12 +218,7 @@ AddFileForm.propTypes = {
     mime: PropTypes.string.isRequired
   }),
   files: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  setFiles: PropTypes.func.isRequired,
-  showAuthorization: PropTypes.bool,
-  option: PropTypes.string,
-  setOption: PropTypes.func,
-  setLicense: PropTypes.func,
-  setAuthorizationDocument: PropTypes.func
+  setFiles: PropTypes.func.isRequired
 };
 
 export default AddFileForm;

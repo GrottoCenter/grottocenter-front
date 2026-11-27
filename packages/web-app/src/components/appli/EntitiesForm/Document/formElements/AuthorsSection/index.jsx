@@ -1,5 +1,8 @@
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Chip } from '@mui/material';
+import { useContext, useId, useMemo, useRef, useState } from 'react';
+import { Box, Button, Chip, Menu, MenuItem, Stack } from '@mui/material';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
+import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import FieldHelperText from '@/components/common/Form/FieldHelperText';
 import RelatedEntityDialog from '@/components/appli/EntitiesForm/RelatedEntityDialog';
@@ -8,53 +11,54 @@ import EntityAutocompleteInput from '@/components/common/AutoCompleteSearch/Enti
 import DocumentAuthorLabel from '@/components/common/DocumentAuthorLabel';
 import { entityOptionForSelector } from '@/helpers/Entity';
 import { useEntitySearch, useUserProperties } from '@/hooks';
+import { PROTECTED_AUTHOR_LABEL_IDS } from '@/utils/personConstants';
+import { DEFAULT_PERSON_TYPE } from '@/utils/personTypes';
 import { useRestoreFieldFocus } from '@/hooks/useRestoreFieldFocus';
 import { AUTOCOMPLETE_MIN_CHARACTERS } from '@/conf/config';
 import { requiresDocumentAuthor } from '@/utils/documentTypeHelpers';
 import { DocumentFormContext } from '@/components/appli/EntitiesForm/Document/Provider';
-import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../AddFileForm/FileHelpers';
 
 const MIXED_ENTITIES = ['persons', 'organizations'];
 
 const getOptionLabel = option =>
   (option._type === 'organizations' ? option.name : option.nickname) || '';
 
+const isFallbackAuthor = author =>
+  author?._type === 'persons' &&
+  Object.hasOwn(PROTECTED_AUTHOR_LABEL_IDS, author.id);
+
 const stripType = ({ _type, ...rest }) => rest;
 
-const AuthorsSection = () => {
+const AuthorsSection = ({ ownWork = false }) => {
   const { formatMessage } = useIntl();
   const {
     document: doc,
-    isNewDocument,
     updateAttribute,
-    prefillAuthor,
     allowEntityCreation = true
   } = useContext(DocumentFormContext);
   const { id, nickname } = useUserProperties();
   const requiresAuthor = requiresDocumentAuthor(doc.type);
-  const authorizationOption = doc.selectOptionAuthorizationDocument;
-  useEffect(() => {
-    if (
-      isNewDocument &&
-      requiresAuthor &&
-      authorizationOption !== DOCUMENT_AUTHORIZE_TO_PUBLISH
-    )
-      prefillAuthor({ id, nickname }, { onlyIfUntouched: true });
-  }, [
-    isNewDocument,
-    requiresAuthor,
-    authorizationOption,
-    id,
-    nickname,
-    prefillAuthor
-  ]);
-
   const value = useMemo(
     () => [
-      ...doc.authors.map(a => ({ ...a, _type: 'persons' })),
+      ...doc.authors.map(author => {
+        const option = { ...author, _type: 'persons' };
+        if (isFallbackAuthor(option)) {
+          return {
+            ...option,
+            nickname: formatMessage({
+              id: PROTECTED_AUTHOR_LABEL_IDS[author.id]
+            }),
+            type: 'AUTHOR'
+          };
+        }
+        if (id != null && String(author.id) === String(id)) {
+          return { ...option, type: DEFAULT_PERSON_TYPE };
+        }
+        return option;
+      }),
       ...doc.authorsOrganization.map(o => ({ ...o, _type: 'organizations' }))
     ],
-    [doc.authors, doc.authorsOrganization]
+    [doc.authors, doc.authorsOrganization, formatMessage, id]
   );
 
   const {
@@ -67,22 +71,48 @@ const AuthorsSection = () => {
   } = useEntitySearch(MIXED_ENTITIES);
 
   const [creation, setCreation] = useState(null);
+  const [fallbackAnchor, setFallbackAnchor] = useState(null);
+  const fallbackButtonId = useId();
+  const fallbackMenuId = useId();
   const inputRef = useRef(null);
   const wrapperRef = useRef(null);
   useRestoreFieldFocus(creation !== null, inputRef, wrapperRef);
 
   const applyValue = newValue => {
+    const knownAuthors = newValue.filter(author => !isFallbackAuthor(author));
+    const selected = knownAuthors.length ? knownAuthors : newValue;
     updateAttribute(
       'authors',
-      newValue.filter(v => v._type === 'persons').map(stripType)
+      selected.filter(v => v._type === 'persons').map(stripType)
     );
     updateAttribute(
       'authorsOrganization',
-      newValue.filter(v => v._type === 'organizations').map(stripType)
+      selected.filter(v => v._type === 'organizations').map(stripType)
     );
   };
 
-  const handleChange = (_event, newValue) => applyValue(newValue);
+  const hasPerson = personId =>
+    doc.authors.some(author => String(author.id) === String(personId));
+
+  const handleChange = (_event, newValue, reason, details) => {
+    if (reason === 'selectOption' && isFallbackAuthor(details?.option)) {
+      applyValue([details.option]);
+    } else {
+      applyValue(newValue);
+    }
+  };
+
+  const selectFallback = (personId, label) => {
+    applyValue([
+      {
+        id: Number(personId),
+        nickname: formatMessage({ id: label }),
+        _type: 'persons'
+      }
+    ]);
+    setInputValue('');
+    setFallbackAnchor(null);
+  };
 
   const handleInputChange = (_event, newValue, reason) => {
     setInputValue(reason === 'reset' || reason === 'clear' ? '' : newValue);
@@ -119,9 +149,11 @@ const AuthorsSection = () => {
 
   return (
     <Box ref={wrapperRef} data-testid="document-authors">
-      <FieldHelperText>
-        {formatMessage({ id: 'entityCreation.authorsHelp' })}
-      </FieldHelperText>
+      {!ownWork && (
+        <FieldHelperText>
+          {formatMessage({ id: 'entityCreation.authorsHelp' })}
+        </FieldHelperText>
+      )}
 
       <CreatableAutocomplete
         clearOnBlur={false}
@@ -191,6 +223,62 @@ const AuthorsSection = () => {
           />
         )}
       />
+      {!ownWork && (
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          useFlexGap
+          spacing={0.5}
+          sx={{ mt: 0.5, flexWrap: 'wrap' }}>
+          {id && !hasPerson(id) && (
+            <Button
+              type="button"
+              size="small"
+              variant="text"
+              startIcon={<PersonAddOutlinedIcon />}
+              sx={{ textTransform: 'none', minHeight: { xs: 44, sm: 36 } }}
+              onClick={() =>
+                applyValue([...value, { id, nickname, _type: 'persons' }])
+              }>
+              {formatMessage({ id: 'documentForm.addMe' })}
+            </Button>
+          )}
+          <Button
+            id={fallbackButtonId}
+            type="button"
+            size="small"
+            variant="text"
+            color="inherit"
+            startIcon={<HelpOutlineOutlinedIcon />}
+            aria-haspopup="menu"
+            aria-controls={fallbackAnchor ? fallbackMenuId : undefined}
+            aria-expanded={!!fallbackAnchor}
+            onClick={event => setFallbackAnchor(event.currentTarget)}
+            sx={{
+              marginInlineStart: 'auto',
+              textTransform: 'none',
+              minHeight: { xs: 44, sm: 36 }
+            }}>
+            {formatMessage({ id: 'authorDuplicates.unknownAuthor' })}
+          </Button>
+          <Menu
+            id={fallbackMenuId}
+            anchorEl={fallbackAnchor}
+            open={!!fallbackAnchor}
+            onClose={() => setFallbackAnchor(null)}
+            slotProps={{ list: { 'aria-labelledby': fallbackButtonId } }}>
+            {Object.entries(PROTECTED_AUTHOR_LABEL_IDS).map(
+              ([personId, label]) => (
+                <MenuItem
+                  key={personId}
+                  onClick={() => selectFallback(personId, label)}>
+                  {formatMessage({ id: label })}
+                </MenuItem>
+              )
+            )}
+          </Menu>
+        </Stack>
+      )}
       {allowEntityCreation && creation && (
         <RelatedEntityDialog
           entityType={creation.entityType}
@@ -202,5 +290,7 @@ const AuthorsSection = () => {
     </Box>
   );
 };
+
+AuthorsSection.propTypes = { ownWork: PropTypes.bool };
 
 export default AuthorsSection;

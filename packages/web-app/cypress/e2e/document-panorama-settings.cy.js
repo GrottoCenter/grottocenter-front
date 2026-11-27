@@ -204,6 +204,7 @@ describe('Panorama attachment settings', () => {
     }).click();
     cy.get('[data-testid="document-title"] input').type('Cave panorama');
     upload(['auto.jpg', 'on.jpg', 'off.jpg']);
+    cy.get('[data-testid="document-author-me"]').check();
     cy.get('[data-testid="publication-author-rights"]').check();
     cy.get('[data-testid="selected-file-on.jpg"]').within(() => {
       cy.get('[data-testid="panorama-display-toggle"]').click();

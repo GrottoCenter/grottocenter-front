@@ -76,6 +76,7 @@ const DocumentEdit = ({
       content={
         <DocumentSubmission
           allowEntityCreation={allowEntityCreation}
+          persistedDocument={requireUpdate ? currentQuery.data : undefined}
           initialValues={
             requireUpdate
               ? prepareDocumentEdit(currentQuery.data, details)

@@ -32,7 +32,6 @@ const useParentDocumentSelection = ({
   const { data: languages, refetch: fetchLanguages } = useLanguages();
   const { data: licenses, refetch: fetchLicenses } = useLicenses();
   const selectionVersionRef = useRef(0);
-  const previousTypeRef = useRef(document.type);
   const { type } = document;
   const isMountedRef = useRef(false);
   const isInitializedRef = useRef(false);
@@ -43,20 +42,6 @@ const useParentDocumentSelection = ({
       isMountedRef.current = false;
     };
   }, []);
-
-  useEffect(() => {
-    if (previousTypeRef.current !== document.type) {
-      selectionVersionRef.current += 1;
-      if (isNewDocument && previousTypeRef.current === DocumentTypes.ISSUE) {
-        setDocument(current =>
-          current.title && current.title === current.parent?.title
-            ? { ...current, title: '' }
-            : current
-        );
-      }
-      previousTypeRef.current = document.type;
-    }
-  }, [document.type, isNewDocument, setDocument]);
 
   const selectParent = useCallback(
     async selection => {
@@ -72,16 +57,16 @@ const useParentDocumentSelection = ({
         ...current,
         parent: selection,
         ...(!selection && shouldPrefillTitle ? { title: '' } : {}),
-        authorizationDocument:
-          current.parent?.id === selection?.id
-            ? current.authorizationDocument
-            : null
+        ...current.inheritedPublicationRights?.previous,
+        inheritedPublicationRights: null,
+        isParentPending: !!selection
       }));
       if (!selection) return;
 
       const isCurrent = () =>
         isMountedRef.current &&
         version === selectionVersionRef.current &&
+        attributeVersions.type === attributeVersionsRef.current.type &&
         attributeVersions.parent === attributeVersionsRef.current.parent;
       // A late inheritance response must not overwrite fields edited meanwhile.
       const applyAttributes = attributes => {
@@ -102,7 +87,6 @@ const useParentDocumentSelection = ({
         });
       };
 
-      let hasResolvedParent = false;
       try {
         const [details, languageResult, licenseResult] = await Promise.all([
           fetchDocumentDetail(queryClient, selection.id),
@@ -119,7 +103,6 @@ const useParentDocumentSelection = ({
           applyAttributes({ parent: null });
           return;
         }
-        hasResolvedParent = true;
 
         const attributes = {
           parent: { ...selection, title: details.title, type: details.type }
@@ -128,42 +111,92 @@ const useParentDocumentSelection = ({
           attributes.title = details.title;
         // Contextual links may only supply an ID. Resolve the selector's label
         // through the same detail request used for inheritance.
-        if (typeof details.mainLanguage === 'string' && details.mainLanguage) {
+        if (
+          isNewDocument &&
+          typeof details.mainLanguage === 'string' &&
+          details.mainLanguage
+        ) {
           attributes.mainLanguage = details.mainLanguage;
           attributes.mainLanguageName =
             languageResult.data?.find(
               language => language.id === details.mainLanguage
             )?.refName ?? details.mainLanguage;
         }
-        if (details.license) {
-          attributes.license =
-            findLicenseByName(
-              licenseResult.data,
-              getLicenseName(details.license)
-            ) ?? details.license;
+        if (isNewDocument) {
+          attributes.editor = details.editor ?? null;
+          attributes.library = details.library ?? null;
         }
-        attributes.editor = details.editor ?? null;
-        attributes.library = details.library ?? null;
-        attributes.selectOptionAuthorizationDocument =
-          details.authorizationDocument ? DOCUMENT_AUTHORIZE_TO_PUBLISH : null;
         applyAttributes(attributes);
-        if (details.authorizationDocument) {
-          const authorization = await fetchDocumentDetail(
-            queryClient,
-            details.authorizationDocument.id
-          );
-          if (!isCurrent()) return;
-          applyAttributes({ authorizationDocument: authorization });
-        } else {
-          applyAttributes({ authorizationDocument: null });
-        }
+
+        const authorizationId = details.authorizationDocument?.id;
+        const license = findLicenseByName(
+          licenseResult.data,
+          getLicenseName(details.license)
+        );
+        // The API stores the result of copying rights, without provenance.
+        // Only lock rights copied from a verified parent in this session.
+        if (
+          !isNewDocument ||
+          !authorizationId ||
+          !license?.id ||
+          details.option !== DOCUMENT_AUTHORIZE_TO_PUBLISH
+        )
+          return;
+
+        const authorization = await fetchDocumentDetail(
+          queryClient,
+          authorizationId
+        );
+        if (
+          !isCurrent() ||
+          authorization.isDeleted ||
+          authorization.isValidated === false ||
+          authorization.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH
+        )
+          return;
+
+        setDocument(current => {
+          if (
+            !isCurrent() ||
+            current.type !== type ||
+            current.parent?.id !== selection.id ||
+            [
+              'license',
+              'authorizationDocument',
+              'selectOptionAuthorizationDocument'
+            ].some(
+              field =>
+                attributeVersions[field] !== attributeVersionsRef.current[field]
+            )
+          )
+            return current;
+          return {
+            ...current,
+            license,
+            authorizationDocument: authorization,
+            selectOptionAuthorizationDocument: DOCUMENT_AUTHORIZE_TO_PUBLISH,
+            inheritedPublicationRights: {
+              previous: {
+                license: current.license,
+                authorizationDocument: current.authorizationDocument,
+                selectOptionAuthorizationDocument:
+                  current.selectOptionAuthorizationDocument
+              }
+            }
+          };
+        });
       } catch (error) {
         if (!isCurrent()) return;
         console.error('Error fetching parent document details:', error);
-        // Preserve a visible selection, including a resolved parent whose
-        // authorization request failed, but never keep an invisible URL ID.
-        if (!hasResolvedParent && !selection.title)
-          applyAttributes({ parent: null });
+        if (!selection.title) applyAttributes({ parent: null });
+      } finally {
+        if (isCurrent()) {
+          setDocument(current =>
+            current.type === type
+              ? { ...current, isParentPending: false }
+              : current
+          );
+        }
       }
     },
     [

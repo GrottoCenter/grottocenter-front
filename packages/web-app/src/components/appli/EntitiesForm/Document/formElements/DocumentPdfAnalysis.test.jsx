@@ -190,7 +190,7 @@ it('explains AI and all limits before requesting authorization or uploading', ()
   );
 });
 
-it('explicitly selects summary and date and synchronizes the mounted date precision', async () => {
+it('explicitly selects summary and date and updates the mounted date input', async () => {
   renderForm();
   fireEvent.click(screen.getByText('Set existing date'));
   fireEvent.change(screen.getByLabelText('Summary'), {
@@ -212,8 +212,8 @@ it('explicitly selects summary and date and synchronizes the mounted date precis
   expect(screen.getByTestId('publication-date')).toHaveTextContent('2010');
   await waitFor(() =>
     expect(
-      screen.getByRole('button', { name: 'Year', exact: true })
-    ).toHaveAttribute('aria-pressed', 'true')
+      screen.getByRole('textbox', { name: 'Publication date' })
+    ).toHaveValue('2010')
   );
   await waitFor(() =>
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()

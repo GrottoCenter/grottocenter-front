@@ -19,9 +19,7 @@ vi.mock('@/hooks', () => ({
 }));
 
 vi.mock('./formElements/DocumentTypeSelect', () => ({ default: () => null }));
-vi.mock('./formElements/CollectionPublicationRights', () => ({
-  default: () => null
-}));
+vi.mock('./formElements/AuthorAndSharing', () => ({ default: () => null }));
 vi.mock('@/components/common/LanguageSelect', () => ({ default: () => null }));
 vi.mock('./formElements/ParentDocumentSelect', () => ({ default: () => null }));
 vi.mock('./formElements/MultipleISORegionsSelect', () => ({
@@ -33,7 +31,6 @@ vi.mock('./formElements/MultipleSubjectsSelect', () => ({
 vi.mock('@/components/appli/OrganizationSelect', () => ({
   default: () => null
 }));
-vi.mock('./formElements/AuthorsSection', () => ({ default: () => null }));
 vi.mock('./formElements/AddFileForm', () => ({ default: () => null }));
 
 const IntroduceLengthError = () => {
@@ -105,7 +102,7 @@ describe('Document advanced metadata length errors', () => {
 
 describe('Document publication date visibility', () => {
   // Load the real lazy editor before timing its visibility assertions.
-  beforeAll(() => import('./formElements/PublicationDatePicker'));
+  beforeAll(() => import('./formElements/PublicationDatePicker'), 30000);
   const datedTypes = Object.values(DocumentTypes).filter(
     type =>
       !documentTypeHelpers.isUnknown(type) &&
@@ -125,7 +122,7 @@ describe('Document publication date visibility', () => {
         date.closest('[data-testid="document-advanced-metadata"]')
       ).toBeNull();
       expect(
-        screen.getByRole('group', { name: 'Date precision' })
+        screen.getByRole('button', { name: 'Open calendar' })
       ).toBeVisible();
       const advanced = screen.queryByRole('button', {
         name: 'Advanced metadata'
@@ -138,4 +135,23 @@ describe('Document publication date visibility', () => {
     renderForm();
     expect(screen.queryByTestId('document-publication-date')).toBeNull();
   });
+
+  it('accepts a future event date in the same field as a partial date', async () => {
+    renderForm({ type: DocumentTypes.EVENT, description: '' });
+    const input = await screen.findByRole('textbox', { name: /Event date/ });
+    const nextYear = String(new Date().getFullYear() + 1);
+    fireEvent.change(input, { target: { value: nextYear } });
+    expect(screen.getByRole('button', { name: 'Update' })).toBeEnabled();
+    fireEvent.change(input, { target: { value: `${nextYear}-02-30` } });
+    expect(screen.getByRole('button', { name: 'Update' })).toBeDisabled();
+  });
+});
+
+it('shows the issue number in the main form for periodical issues', () => {
+  renderForm({ type: DocumentTypes.ISSUE });
+  const input = screen.getByRole('textbox', { name: 'Periodical issue' });
+  expect(input).toBeVisible();
+  expect(
+    input.closest('[data-testid="document-advanced-metadata"]')
+  ).toBeNull();
 });

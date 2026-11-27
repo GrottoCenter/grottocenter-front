@@ -60,7 +60,6 @@ const UploadForm = ({ type, initialFiles = [], fileError }) => {
             files={files}
             setFiles={setFiles}
             acceptConfig={DOCUMENT_TYPE_ACCEPT[type] ?? null}
-            showAuthorization={false}
             fileError={fileError}
           />
           <output data-testid="file-values">{JSON.stringify(files)}</output>
@@ -307,10 +306,10 @@ describe('document uploads', () => {
 
     await user.upload(
       container.querySelector('input[type="file"]'),
-      new File(['obj'], 'object.obj', { type: 'model/obj' })
+      new File(['csv'], 'table.csv', { type: 'text/csv' })
     );
     expect(
-      await screen.findByText('The file type is not accepted: object.obj.')
+      await screen.findByText('The file type is not accepted: table.csv.')
     ).toBeInTheDocument();
     expect(
       screen.queryByText('The file type is not accepted: scan.stl.')

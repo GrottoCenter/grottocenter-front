@@ -111,9 +111,10 @@ describe('Editing a document with publication authorization', () => {
     cy.wait('@formats');
     addFile();
     cy.get('[data-testid="selected-file-issue.pdf"]').should('be.visible');
-    cy.get('[data-testid="publication-authorization"]')
-      .should('be.checked')
-      .and('be.disabled');
+    cy.get('[data-testid="document-sharing-basis"] [role="combobox"]')
+      .should('contain.text', 'Publication authorization on Grottocenter')
+      .and('not.have.attr', 'aria-disabled', 'true');
+    cy.get('[data-testid="document-inherited-sharing"]').should('not.exist');
     cy.wait('@licenses');
     cy.get('[data-testid="document-submit"]').should('be.enabled').click();
     cy.wait('@save').then(({ request }) => {
@@ -168,19 +169,12 @@ describe('Editing a document with publication authorization', () => {
         Node.DOCUMENT_POSITION_FOLLOWING
       );
     });
-    cy.get('[data-testid="document-advanced-metadata"]')
-      .contains('button', 'Advanced metadata')
-      .click();
-    cy.get('[data-testid="collection-publication-rights"]').should($rights => {
-      expect(
-        $rights[0].previousElementSibling.getAttribute('data-testid')
-      ).to.equal('document-authors');
-      expect(
-        $rights[0].nextElementSibling.querySelector(
-          '[data-testid="document-editor"]'
-        )
-      ).not.to.equal(null);
-    });
+    cy.get('[data-testid="collection-publication-rights"]').should(
+      'be.visible'
+    );
+    cy.get('[data-testid="document-advanced-metadata"] button')
+      .first()
+      .should('have.attr', 'aria-expanded', 'false');
     cy.get('[data-testid="document-authors"] input[role="combobox"]').should(
       'not.have.attr',
       'required'
@@ -217,7 +211,7 @@ describe('Editing a document with publication authorization', () => {
     });
   });
 
-  it('keeps publication inheritance working when selecting the parent', () => {
+  it('preserves the document?s own rights when a parent is reselected', () => {
     cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
     mockParentSearch();
     cy.visit('/documents/42/edit', {
@@ -230,9 +224,10 @@ describe('Editing a document with publication authorization', () => {
     cy.contains('[role="option"]', 'Test collection').click();
     cy.wait('@parent');
     addFile();
-    cy.get('[data-testid="publication-authorization"]')
-      .should('be.checked')
-      .and('be.disabled');
+    cy.get('[data-testid="document-sharing-basis"] [role="combobox"]')
+      .should('contain.text', 'Publication authorization on Grottocenter')
+      .and('not.have.attr', 'aria-disabled', 'true');
+    cy.get('[data-testid="document-inherited-sharing"]').should('not.exist');
     cy.get('[data-testid="document-submit"]').should('be.enabled').click();
     cy.wait('@save').then(({ request }) => {
       expectMultipartValue(request.body, 'license[id]', '2');
@@ -319,11 +314,11 @@ describe('Editing a document with publication authorization', () => {
           .click({ scrollBehavior: 'center' });
         cy.get('[data-testid="document-editor"] input[role="combobox"]').should(
           'have.value',
-          'Inherited publisher'
+          ''
         );
         cy.get(
           '[data-testid="document-library"] input[role="combobox"]'
-        ).should('have.value', 'Inherited library');
+        ).should('have.value', '');
         cy.get('[data-testid="document-editor"] input[role="combobox"]').then(
           $editor => {
             const editorHeight =
@@ -364,11 +359,14 @@ describe('Editing a document with publication authorization', () => {
     });
   });
 
-  it('allows correcting an unknown license inherited when selecting a parent', () => {
+  it('allows correcting an unknown stored license without applying the parent?s license', () => {
     cy.intercept('GET', '**/api/v1/licenses', { body: { licenses } });
+    cy.intercept('GET', '**/api/v1/documents/42', {
+      body: { ...document, license: 'Historical license' }
+    });
     cy.intercept('GET', '**/api/v1/documents/41', {
-      body: { ...collection, license: 'Historical license' }
-    }).as('unknownParent');
+      body: { ...collection, license: 'CC-BY' }
+    }).as('parentWithLicense');
     mockParentSearch();
     cy.visit('/documents/42/edit', {
       onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
@@ -378,11 +376,12 @@ describe('Editing a document with publication authorization', () => {
     cy.get('[data-testid="document-parent-search"]').type('Test coll');
     cy.wait('@parentSearch');
     cy.contains('[role="option"]', 'Test collection').click();
-    cy.wait('@unknownParent');
+    cy.wait('@parentWithLicense');
     addFile();
-    cy.get('[data-testid="publication-authorization"]')
-      .should('be.checked')
-      .and('be.disabled');
+    cy.get('[data-testid="document-sharing-basis"] [role="combobox"]')
+      .should('contain.text', 'Publication authorization on Grottocenter')
+      .and('not.have.attr', 'aria-disabled', 'true');
+    cy.get('[data-testid="document-inherited-sharing"]').should('not.exist');
     cy.get('[data-testid="document-submit"]').should('be.disabled');
     cy.get('[data-testid="document-license"]')
       .should('contain', 'Historical license')

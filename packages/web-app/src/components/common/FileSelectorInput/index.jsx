@@ -119,6 +119,7 @@ const FileSelectorInput = ({
   files = [],
   onFilesAdd,
   onFileRemove,
+  allowFileAdd = true,
   onFileRejections,
   accept,
   extensions,
@@ -263,6 +264,8 @@ const FileSelectorInput = ({
   // path is bypassed by useDropzone when the ref-less input is present).
   const inputEl = <input {...getInputProps({ 'data-testid': 'file-input' })} />;
 
+  if (!allowFileAdd) return selectedFiles;
+
   if (isMobile) {
     // The touch layout is picker-only, so it intentionally omits drop handlers.
     return (
@@ -357,6 +360,7 @@ FileSelectorInput.propTypes = {
   ),
   onFilesAdd: PropTypes.func.isRequired,
   onFileRemove: PropTypes.func,
+  allowFileAdd: PropTypes.bool,
   onFileRejections: PropTypes.func,
   accept: PropTypes.oneOfType([
     PropTypes.string,

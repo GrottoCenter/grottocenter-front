@@ -12,19 +12,25 @@ import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
 import ConfirmationDialog from '@/components/common/ConfirmationDialog';
+import { getLicenseName } from '@/components/common/LicenseTag/helpers';
+import {
+  documentTypeHelpers,
+  getDocumentTypeRules
+} from '@/utils/documentTypeHelpers';
 import {
   useEntrance,
+  useLicenses,
+  findLicenseByName,
   useLinkDocumentToEntrance,
   usePermissions,
   useCreateDocument,
   useUpdateDocument
 } from '../../../../hooks';
-import { documentTypeHelpers } from '../../../../utils/documentTypeHelpers';
 import { displayLoginDialog } from '../../../../actions/Login';
 
 import DocumentFormProvider, { DocumentFormContext } from './Provider';
 import { defaultDocumentValuesTypes } from './types';
-import FromContent from './FormContent';
+import FormContent from './FormContent';
 import DocumentSubmissionDialog from './DocumentSubmissionDialog';
 import DocumentSubmissionSuccess from './DocumentSubmissionSuccess';
 import { IS_DELETED } from './formElements/AddFileForm/FileHelpers';
@@ -52,13 +58,15 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
-  const { isArticle, isFileExpected } = documentTypeHelpers;
+  const { isArticle } = documentTypeHelpers;
   const [searchParams] = useSearchParams();
   const {
     document,
     isFormValid,
     isNewDocument,
     resetContext,
+    selectParent,
+    storedLicense,
     setLinkedEntrance,
     linkedEntrance
   } = useContext(DocumentFormContext);
@@ -71,6 +79,21 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
   const createMutation = useCreateDocument();
   const updateMutation = useUpdateDocument();
   const activeMutation = isNewDocument ? createMutation : updateMutation;
+  const rules = getDocumentTypeRules(document.type);
+  const hasFile = document.files.some(file => file.state !== IS_DELETED);
+  const preservesStoredLicense =
+    !isNewDocument && rules.hasFileSharing && !hasFile && !!storedLicense;
+  const {
+    data: licenses,
+    isFetching: isFetchingLicenses,
+    refetch: reloadLicenses
+  } = useLicenses({ enabled: preservesStoredLicense && !storedLicense?.id });
+  const resolvedStoredLicense = storedLicense?.id
+    ? storedLicense
+    : findLicenseByName(licenses, getLicenseName(storedLicense));
+  const isWaitingForStoredLicense =
+    preservesStoredLicense && !resolvedStoredLicense;
+  const canSubmit = isFormValid && !isWaitingForStoredLicense;
   const isSubmitting = activeMutation.isPending;
   const errorMessages = activeMutation.error?.errorMessages ?? [];
 
@@ -94,21 +117,24 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
   }, [linkedEntranceData, entranceIdParam, linkedEntrance, setLinkedEntrance]);
 
   const submitDocument = () => {
-    if (!isFormValid) return;
+    if (!canSubmit) return;
     if (isNewDocument) createMutation.mutate(document);
-    else updateMutation.mutate(document);
+    else
+      updateMutation.mutate({
+        ...document,
+        storedLicense: resolvedStoredLicense
+      });
   };
 
   const onFormSubmit = event => {
     event.preventDefault();
-    if (!isFormValid) return;
+    if (!canSubmit) return;
 
     // A file is expected for this type but none is attached: ask for
     // confirmation so the user does not forget (they cannot add a file after
     // submission until a moderator validates the document). Files flagged as
     // deleted still remain in the array, so they must be excluded from the count.
-    const hasFile = document.files.some(f => f.state !== IS_DELETED);
-    if (isFileExpected(document.type) && !hasFile) {
+    if (rules.expectFile && !hasFile) {
       setMissingFileDialogOpen(true);
       return;
     }
@@ -141,9 +167,10 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
       parent: document.parent,
       datePublication: document.datePublication
     });
+    if (document.parent) selectParent(document.parent);
   };
 
-  const createdDocument = createMutation.data;
+  const createdDocument = createMutation.data?.document;
   useEffect(() => {
     if (!activeMutation.isSuccess) return;
     setDocSubmittedWithSuccess(true);
@@ -188,6 +215,7 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
         <DocumentSubmissionSuccess
           isArticle={isArticle(document.type)}
           isNewDocument={isNewDocument}
+          failedFiles={createMutation.data?.failedFiles}
           onSubmitAnotherArticle={onSubmitAnotherArticle}
           onSubmitAnotherDocument={onSubmitAnotherDocument}
           onFinish={() => navigate(-1)}
@@ -221,12 +249,26 @@ export const DocumentSubmission = ({ onCancel, onSuccess }) => {
           <form
             onSubmit={onFormSubmit}
             style={isSubmitting ? { opacity: '0.6' } : undefined}>
-            <FromContent
+            <FormContent
               onCancel={onCancel}
               isSubmitting={isSubmitting}
+              isSubmissionBlocked={isWaitingForStoredLicense}
               fileError={activeMutation.error?.fileError}
             />
           </form>
+          {isWaitingForStoredLicense && !isFetchingLicenses && (
+            <Alert
+              severity="error"
+              action={
+                <Button onClick={() => reloadLicenses()}>
+                  {formatMessage({ id: 'Retry' })}
+                </Button>
+              }>
+              {formatMessage({
+                id: 'Error, the document data you are looking for is not available.'
+              })}
+            </Alert>
+          )}
 
           <ConfirmationDialog
             open={isMissingFileDialogOpen}
@@ -269,12 +311,14 @@ DocumentSubmission.propTypes = {
 // - DocumentEdit to edit a existing document (with initialValues)
 const HydratedDocumentSubmission = ({
   initialValues,
+  persistedDocument,
   onCancel,
   onSuccess,
   allowEntityCreation = true
 }) => (
   <DocumentFormProvider
     initialValues={initialValues}
+    persistedDocument={persistedDocument}
     allowEntityCreation={allowEntityCreation}>
     <DocumentSubmission onCancel={onCancel} onSuccess={onSuccess} />
   </DocumentFormProvider>
@@ -283,6 +327,7 @@ const HydratedDocumentSubmission = ({
 HydratedDocumentSubmission.propTypes = {
   allowEntityCreation: PropTypes.bool,
   initialValues: defaultDocumentValuesTypes,
+  persistedDocument: defaultDocumentValuesTypes,
   onCancel: PropTypes.func,
   onSuccess: PropTypes.func
 };

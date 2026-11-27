@@ -97,6 +97,10 @@ export const prepareDocumentEdit = (current, proposed) => {
   const preview = prepareDocumentPreview(current, proposed);
   return {
     ...preview,
+    option: proposed.option ?? current.option,
+    license: proposed.license ?? current.license,
+    authorizationDocument:
+      proposed.authorizationDocument ?? current.authorizationDocument,
     files: [
       ...preview.files.map(file => ({
         ...file,
@@ -129,6 +133,7 @@ const TEXT_FIELDS = [
   ['pages', 'Pages'],
   ['issue', 'Issue'],
   ['license', 'License'],
+  ['option', 'Licensing type'],
   ['mainLanguage', 'Title and description language']
 ];
 
@@ -198,6 +203,7 @@ export const getDocumentChanges = (current, proposed) => {
 
   [
     ['parent', 'Parent document'],
+    ['authorizationDocument', 'Authorization from authors'],
     ['editor', 'Editor'],
     ['library', 'Library']
   ].forEach(([field, label]) => {

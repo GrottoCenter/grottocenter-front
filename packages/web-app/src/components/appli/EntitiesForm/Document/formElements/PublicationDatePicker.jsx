@@ -1,190 +1,92 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import {
-  Box,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { Box, IconButton, InputAdornment, Popover } from '@mui/material';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { DateCalendar, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { set as setDate } from 'date-fns';
-
+import StringInput from '@/components/common/Form/StringInput';
+import {
+  getDocumentDate,
+  isDocumentDateValid,
+  toDocumentDate
+} from '@/utils/documentDate';
 import { DocumentFormContext } from '../Provider';
-import Translate from '../../../../common/Translate';
 
-const GRANULARITY = {
-  YEAR: 'year',
-  YEAR_MONTH: 'year_month',
-  FULL: 'full'
-};
+const MIN_DATE = new Date(1000, 0, 1);
 
-const VIEWS = {
-  [GRANULARITY.YEAR]: ['year'],
-  [GRANULARITY.YEAR_MONTH]: ['year', 'month'],
-  [GRANULARITY.FULL]: ['year', 'month', 'day']
-};
-
-const FORMATS = {
-  [GRANULARITY.YEAR]: 'yyyy',
-  [GRANULARITY.YEAR_MONTH]: 'MM/yyyy',
-  [GRANULARITY.FULL]: 'dd/MM/yyyy'
-};
-
-const getDateFromString = dateString => {
-  if (!dateString) return null;
-  const parts = dateString.split('-');
-  return setDate(new Date(), {
-    year: parts[0],
-    month: parts.length > 1 ? parts[1] - 1 : 0,
-    date: parts.length > 2 ? parts[2] : 1
-  });
-};
-
-const getGranularityFromString = dateString => {
-  if (!dateString) return GRANULARITY.YEAR;
-  const parts = dateString.split('-');
-  if (parts.length === 3) return GRANULARITY.FULL;
-  if (parts.length === 2) return GRANULARITY.YEAR_MONTH;
-  return GRANULARITY.YEAR;
-};
-
-const PublicationDatePicker = ({ required = false, label = null }) => {
+const PublicationDatePicker = ({
+  required = false,
+  allowFuture = false,
+  label = null
+}) => {
   const { formatMessage } = useIntl();
   const { document, updateAttribute } = useContext(DocumentFormContext);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const [granularity, setGranularity] = useState(
-    getGranularityFromString(document.datePublication)
-  );
-
-  // An applied AI date can change precision while this editor is mounted.
-  // An empty field retains the selected precision, including after manual clearing.
-  useEffect(() => {
-    if (document.datePublication) {
-      setGranularity(getGranularityFromString(document.datePublication));
-    }
-  }, [document.datePublication]);
-
-  const handleGranularityChange = (_, newGranularity) => {
-    if (!newGranularity) return;
-    setGranularity(newGranularity);
-    if (document.datePublication) updateAttribute('datePublication', '');
-  };
-
-  const handleDateChange = newDate => {
-    if (!newDate) {
-      updateAttribute('datePublication', '');
-      return;
-    }
-    const year = newDate.getFullYear();
-    const month = newDate.getMonth() + 1;
-    const day = newDate.getDate();
-    const mm = month < 10 ? `0${month}` : month;
-    const dd = day < 10 ? `0${day}` : day;
-
-    if (granularity === GRANULARITY.YEAR) {
-      updateAttribute('datePublication', String(year));
-    } else if (granularity === GRANULARITY.YEAR_MONTH) {
-      updateAttribute('datePublication', `${year}-${mm}`);
-    } else {
-      updateAttribute('datePublication', `${year}-${mm}-${dd}`);
-    }
-  };
-
-  const granularityOptions = [
-    {
-      value: GRANULARITY.YEAR,
-      label: formatMessage({ id: 'Year' })
-    },
-    {
-      value: GRANULARITY.YEAR_MONTH,
-      label: isMobile
-        ? formatMessage({ id: 'Year + Month short' })
-        : formatMessage({ id: 'Year & Month' })
-    },
-    {
-      value: GRANULARITY.FULL,
-      label: isMobile
-        ? formatMessage({ id: 'Full Date short' })
-        : formatMessage({ id: 'Full Date' })
-    }
-  ];
+  const [anchor, setAnchor] = useState(null);
+  const [hasBlurred, setHasBlurred] = useState(false);
+  const calendarId = useId();
+  const calendarLabel = formatMessage({ id: 'documentForm.calendar' });
+  const { datePublication } = document;
+  const invalid = !isDocumentDateValid(datePublication, allowFuture);
+  const hasError = hasBlurred && invalid;
+  const updateDate = value => updateAttribute('datePublication', value.trim());
 
   return (
-    <Box sx={{ mt: 1 }} data-testid="document-publication-date">
-      <Box sx={{ mb: 0.5 }}>
-        <Typography
-          variant="body2"
-          sx={{
-            color: 'text.secondary'
-          }}>
-          {label ?? (
-            <Translate>
-              Publication date (refer to the date indicated on the document if
-              any)
-            </Translate>
-          )}
-          {required && (
-            <Box
-              component="span"
-              aria-hidden
-              sx={{
-                color: 'error.main'
-              }}>
-              *
-            </Box>
-          )}
-        </Typography>
-      </Box>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <ToggleButtonGroup
-          value={granularity}
-          exclusive
-          onChange={handleGranularityChange}
-          size="small"
-          aria-label={formatMessage({ id: 'Date precision' })}
-          sx={{ display: 'flex', width: '100%', mb: 0.25 }}>
-          {granularityOptions.map(opt => (
-            <ToggleButton key={opt.value} value={opt.value} sx={{ flex: 1 }}>
-              {opt.label}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
-
-        <DatePicker
-          format={FORMATS[granularity]}
-          views={VIEWS[granularity]}
-          openTo={VIEWS[granularity][0]}
-          value={getDateFromString(document.datePublication)}
-          onChange={handleDateChange}
-          minDate={new Date('1000-01-01')}
-          disableFuture
-          slotProps={{
-            textField: {
-              fullWidth: true,
-              required,
-              error: required && !document.datePublication,
-              sx: {
-                '& .MuiOutlinedInput-root': {
-                  borderTopLeftRadius: 0,
-                  borderTopRightRadius: 0
-                }
-              }
-            }
-          }}
-        />
-      </LocalizationProvider>
+    <Box sx={{ maxWidth: '36rem' }} data-testid="document-publication-date">
+      <StringInput
+        valueName={label ?? formatMessage({ id: 'DatePublication' })}
+        value={datePublication}
+        required={required}
+        onValueChange={updateDate}
+        onBlur={() => setHasBlurred(true)}
+        hasError={hasError}
+        helperText={formatMessage({
+          id: hasError ? 'Invalid Date Format' : 'documentForm.dateExamples'
+        })}
+        endAdornment={
+          <InputAdornment position="end">
+            <IconButton
+              type="button"
+              aria-label={calendarLabel}
+              aria-haspopup="dialog"
+              aria-expanded={!!anchor}
+              aria-controls={anchor ? calendarId : undefined}
+              onClick={event => setAnchor(event.currentTarget)}>
+              <CalendarTodayIcon fontSize="small" />
+            </IconButton>
+          </InputAdornment>
+        }
+      />
+      <Popover
+        id={calendarId}
+        open={!!anchor}
+        anchorEl={anchor}
+        onClose={() => setAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        slotProps={{ paper: { role: 'dialog', 'aria-label': calendarLabel } }}>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DateCalendar
+            autoFocus
+            value={invalid ? null : getDocumentDate(datePublication)}
+            minDate={MIN_DATE}
+            disableFuture={!allowFuture}
+            onChange={(date, selectionState) => {
+              if (!date || selectionState !== 'finish') return;
+              updateDate(toDocumentDate(date));
+              setAnchor(null);
+            }}
+            sx={{ maxWidth: '100%' }}
+          />
+        </LocalizationProvider>
+      </Popover>
     </Box>
   );
 };
 
 PublicationDatePicker.propTypes = {
-  label: PropTypes.node,
+  allowFuture: PropTypes.bool,
+  label: PropTypes.string,
   required: PropTypes.bool
 };
 

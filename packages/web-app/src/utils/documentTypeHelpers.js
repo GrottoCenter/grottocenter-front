@@ -90,22 +90,48 @@ export const filterParentDocumentResults = (documents, currentDocumentId) =>
   );
 
 // Per-type file restrictions. null = unrestricted (backend-provided list applies).
+const IMAGE_EXTENSIONS = [
+  'bmp',
+  'eps',
+  'gif',
+  'jpeg',
+  'jpg',
+  'pcx',
+  'png',
+  'svg',
+  'tif',
+  'tiff',
+  'xcf'
+];
+const PUBLICATION_EXTENSIONS = [
+  ...IMAGE_EXTENSIONS,
+  'doc',
+  'docx',
+  'epub',
+  'odt',
+  'pdf',
+  'rtf',
+  'txt'
+];
+const DATA_EXTENSIONS = [
+  'csv',
+  'gz',
+  'json',
+  'ods',
+  'rdf',
+  'txt',
+  'xls',
+  'xlsx',
+  'xml',
+  'zip'
+];
+const fileFormats = extensions => ({ mime: '', extensions });
+const publicationFormats = fileFormats(PUBLICATION_EXTENSIONS);
+
 export const DOCUMENT_TYPE_ACCEPT = {
   [DocumentTypes.IMAGE]: {
     mime: 'image/*',
-    extensions: [
-      'bmp',
-      'eps',
-      'gif',
-      'jpeg',
-      'jpg',
-      'pcx',
-      'png',
-      'svg',
-      'tif',
-      'tiff',
-      'xcf'
-    ]
+    extensions: IMAGE_EXTENSIONS
   },
   [DocumentTypes.TOPOGRAPHIC_DRAWING]: {
     mime: 'image/*,application/pdf',
@@ -124,10 +150,60 @@ export const DOCUMENT_TYPE_ACCEPT = {
       'xcf'
     ]
   },
-  [DocumentTypes.AUTHORIZATION_TO_PUBLISH]: {
-    mime: 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/*',
-    extensions: ['pdf', 'doc', 'docx', 'odt', 'txt', 'jpg', 'jpeg', 'png']
-  },
+  [DocumentTypes.AUTHORIZATION_TO_PUBLISH]: publicationFormats,
+  [DocumentTypes.ARTICLE]: publicationFormats,
+  [DocumentTypes.BOOK]: publicationFormats,
+  [DocumentTypes.ISSUE]: publicationFormats,
+  [DocumentTypes.TEXT]: publicationFormats,
+  [DocumentTypes.REPORT]: fileFormats([
+    ...PUBLICATION_EXTENSIONS,
+    'ppt',
+    'pptx',
+    'zip'
+  ]),
+  [DocumentTypes.STILL_IMAGE]: fileFormats(IMAGE_EXTENSIONS),
+  [DocumentTypes.PHYSICAL_OBJECT]: fileFormats([
+    ...IMAGE_EXTENSIONS,
+    'glb',
+    'gltf',
+    'obj',
+    'pdf'
+  ]),
+  [DocumentTypes.DATASET]: fileFormats(DATA_EXTENSIONS),
+  [DocumentTypes.MAP]: fileFormats([
+    ...IMAGE_EXTENSIONS,
+    'dxf',
+    'gpx',
+    'kml',
+    'kmz',
+    'pdf',
+    'shp',
+    'zip'
+  ]),
+  [DocumentTypes.INTERACTIVE_RESOURCE]: fileFormats([
+    ...IMAGE_EXTENSIONS,
+    'avi',
+    'glb',
+    'gltf',
+    'gz',
+    'mp4',
+    'obj',
+    'pdf',
+    'zip'
+  ]),
+  [DocumentTypes.SERVICE]: fileFormats([
+    ...new Set([...PUBLICATION_EXTENSIONS, ...DATA_EXTENSIONS])
+  ]),
+  [DocumentTypes.SOFTWARE]: fileFormats([
+    'gz',
+    'h++',
+    'json',
+    'pdf',
+    'pl',
+    'txt',
+    'xml',
+    'zip'
+  ]),
   // Only the formats actually present in the backend file-formats table are
   // advertised — a broad 'audio/*' / 'video/*' would let users pick formats the
   // server rejects on upload (aac, flac, wav, mkv, mov, webm, wmv…).
@@ -154,16 +230,23 @@ export const DOCUMENT_TYPE_ACCEPT = {
       'gz',
       'jpeg',
       'jpg',
+      'kml',
+      'kmz',
       'lox',
+      'obj',
       'pcx',
       'pdf',
       'png',
+      'shp',
       'svg',
+      'taz',
       'th',
       'th2',
       'thconfig',
       'tif',
       'tiff',
+      'trk',
+      'tro',
       'xcf',
       'xvi',
       'xyz',
@@ -207,7 +290,10 @@ const FILE_EXPECTED_TYPES = new Set([
   DocumentTypes.SOUND,
   DocumentTypes.PHYSICAL_OBJECT,
   DocumentTypes.MAP,
-  DocumentTypes.DATASET
+  DocumentTypes.DATASET,
+  DocumentTypes.TOPOGRAPHIC_DATA,
+  DocumentTypes.INTERACTIVE_RESOURCE,
+  DocumentTypes.AUTHORIZATION_TO_PUBLISH
 ]);
 const isFileExpected = docType => FILE_EXPECTED_TYPES.has(docType);
 const isOther = docType =>
@@ -230,22 +316,36 @@ export const documentTypeHelpers = {
   isUnknown
 };
 
-const BASE_PAYLOAD_FIELDS = [
-  'id',
-  'type',
-  'title',
-  'authors',
-  'authorsOrganization'
-];
-const LANGUAGE_PAYLOAD_FIELDS = ['mainLanguage', 'mainLanguageName'];
+export const getDocumentTypeRules = type => {
+  const hasType = !isUnknown(type) && !!type;
+  const allowsFiles = hasType && !isEvent(type) && !isCollection(type);
+  return {
+    hasType,
+    allowsFiles,
+    expectFile: isFileExpected(type),
+    accept: DOCUMENT_TYPE_ACCEPT[type] ?? null,
+    requiresAuthor: requiresDocumentAuthor(type),
+    parentType: getParentDocumentType(type),
+    hasPages: isArticle(type),
+    hasIssueNumber: isIssue(type),
+    hasDate: hasType && !isCollection(type),
+    requiresDate: isEvent(type),
+    hasAdvancedMetadata:
+      hasType && !isEvent(type) && !isAuthorizationToPublish(type),
+    hasFileSharing: allowsFiles && !isAuthorizationToPublish(type),
+    hasCollectionSharing: isCollection(type),
+    allowAiAnalysis:
+      allowsFiles && !isAuthorizationToPublish(type) && !isSimpleMedia(type)
+  };
+};
+
 const PUBLICATION_PAYLOAD_FIELDS = [
   'license',
   'selectOptionAuthorizationDocument',
   'authorizationDocument'
 ];
-const FILE_PAYLOAD_FIELDS = ['files', ...PUBLICATION_PAYLOAD_FIELDS];
+
 const ADVANCED_PAYLOAD_FIELDS = [
-  'datePublication',
   'identifier',
   'identifierType',
   'identifierPdfPageOffset',
@@ -255,61 +355,34 @@ const ADVANCED_PAYLOAD_FIELDS = [
   'creatorComment'
 ];
 
-/**
- * Strips docAttributes down to the fields relevant to the given document type.
- * Field groups mirror the conditional rendering in FormContent.jsx — keep in sync
- * when adding or removing form fields.
- * UNKNOWN (-1) falls through to the else branch (full set) intentionally: the form
- * is not submittable without a type so no filtering is needed.
- */
 export const filterDocumentPayload = docAttributes => {
-  const { type = DocumentTypes.UNKNOWN } = docAttributes ?? {};
-  let allowedFields;
-
-  if (isEvent(type)) {
-    allowedFields = new Set([
-      ...BASE_PAYLOAD_FIELDS,
-      ...LANGUAGE_PAYLOAD_FIELDS,
-      'description',
-      'datePublication',
-      'iso3166'
-    ]);
-  } else if (isCollection(type)) {
-    allowedFields = new Set([
-      ...BASE_PAYLOAD_FIELDS,
-      ...LANGUAGE_PAYLOAD_FIELDS,
-      ...ADVANCED_PAYLOAD_FIELDS,
-      ...PUBLICATION_PAYLOAD_FIELDS,
-      'description',
-      'library'
-    ]);
-  } else if (isAuthorizationToPublish(type)) {
-    // FILE_PAYLOAD_FIELDS is included for structural consistency, but FormContent.jsx
-    // renders <AddFileForm showAuthorization={false} /> for this type, so
-    // license and selectOptionAuthorizationDocument are never user-editable here —
-    // they will be null and skipped by buildFormData.
-    allowedFields = new Set([
-      ...BASE_PAYLOAD_FIELDS,
-      ...LANGUAGE_PAYLOAD_FIELDS,
-      ...FILE_PAYLOAD_FIELDS,
-      'description',
-      'datePublication'
-    ]);
-  } else {
-    allowedFields = new Set([
-      ...BASE_PAYLOAD_FIELDS,
-      ...LANGUAGE_PAYLOAD_FIELDS,
-      ...FILE_PAYLOAD_FIELDS,
-      ...ADVANCED_PAYLOAD_FIELDS,
-      'description',
-      'library',
-      'parent',
-      ...(isArticle(type) ? ['pages'] : []),
-      ...(isIssue(type) ? ['issue'] : [])
-    ]);
-  }
+  const rules = getDocumentTypeRules(
+    docAttributes?.type ?? DocumentTypes.UNKNOWN
+  );
+  const allowedFields = new Set([
+    'id',
+    'type',
+    'title',
+    'description',
+    'authors',
+    'authorsOrganization',
+    'mainLanguage',
+    'mainLanguageName',
+    ...(rules.hasDate ? ['datePublication'] : []),
+    ...(rules.allowsFiles ? ['files'] : []),
+    ...(rules.hasFileSharing || rules.hasCollectionSharing
+      ? PUBLICATION_PAYLOAD_FIELDS
+      : []),
+    ...(rules.hasAdvancedMetadata ? ADVANCED_PAYLOAD_FIELDS : []),
+    ...(rules.requiresDate ? ['iso3166'] : []),
+    ...(rules.parentType ? ['library', 'parent'] : []),
+    ...(rules.hasPages ? ['pages'] : []),
+    ...(rules.hasIssueNumber ? ['issue'] : [])
+  ]);
 
   return Object.fromEntries(
-    Object.entries(docAttributes).filter(([key]) => allowedFields.has(key))
+    Object.entries(docAttributes ?? {}).filter(([key]) =>
+      allowedFields.has(key)
+    )
   );
 };

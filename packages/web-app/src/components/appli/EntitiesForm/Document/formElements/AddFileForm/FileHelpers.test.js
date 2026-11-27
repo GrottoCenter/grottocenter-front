@@ -72,4 +72,22 @@ describe('validateAndBuildFileEntries', () => {
     expect(result.entries).toEqual([]);
     expect(result.errors).toEqual(['form.fileNameTooLong: 200']);
   });
+
+  it('rejects duplicates already attached or repeated in the same selection', () => {
+    const result = validateAndBuildFileEntries(
+      [
+        new File(['a'], 'old.pdf'),
+        new File(['b'], 'new.pdf'),
+        new File(['c'], 'new.pdf')
+      ],
+      [{ fileName: 'old.pdf' }],
+      createIntl({ locale: 'en', messages }).formatMessage
+    );
+
+    expect(result.entries.map(file => file.fileName)).toEqual(['new.pdf']);
+    expect(result.errors).toEqual([
+      'A file named old.pdf is already attached.',
+      'A file named new.pdf is already attached.'
+    ]);
+  });
 });

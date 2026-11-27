@@ -133,6 +133,7 @@ describe('Contextual document creation', () => {
         .should('have.value', type === 'Issue' ? parent.title : '')
         .type(type === 'Issue' ? ' - First issue' : `First ${label}`);
       cy.get('textarea').first().type('A new contribution');
+      cy.get('[data-testid="document-author-other"]').check();
       cy.get('[data-testid="document-authors"] input[role="combobox"]').type(
         'Test'
       );

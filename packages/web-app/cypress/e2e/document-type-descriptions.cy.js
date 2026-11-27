@@ -8,6 +8,23 @@ const SCREENSHOT_OPTIONS = {
   disableTimersAndAnimations: false
 };
 
+const expectFieldInView = ([field]) => {
+  const win = field.ownerDocument.defaultView;
+  const bounds = field.getBoundingClientRect();
+  let scrollContainer = field.parentElement;
+  while (
+    scrollContainer &&
+    !/auto|scroll/.test(win.getComputedStyle(scrollContainer).overflowY)
+  ) {
+    scrollContainer = scrollContainer.parentElement;
+  }
+  const scrollBounds = scrollContainer?.getBoundingClientRect();
+  expect(bounds.top).to.be.at.least(Math.max(0, scrollBounds?.top ?? 0) - 1);
+  expect(bounds.bottom).to.be.at.most(
+    Math.min(win.innerHeight, scrollBounds?.bottom ?? win.innerHeight) + 1
+  );
+};
+
 describe('Document type descriptions', () => {
   beforeEach(() => {
     cy.disableServiceWorker();
@@ -37,6 +54,25 @@ describe('Document type descriptions', () => {
       );
     });
     cy.loginAs();
+  });
+
+  it('reveals the next field after a pointer selection and keeps keyboard focus on the type', () => {
+    cy.viewport(390, 667);
+    cy.visit('/entity/add/document');
+    cy.get('[data-testid="document-other-types-toggle"]').click();
+
+    cy.get('[data-testid="document-type-18"]').click();
+    cy.get('[data-testid="file-picker"]').should(expectFieldInView);
+
+    cy.get('[data-testid="document-type-3"]').click();
+    cy.get('[data-testid="document-title"] input').should(expectFieldInView);
+    cy.focused().should('have.attr', 'data-testid', 'document-type-3');
+
+    cy.get('[data-testid="document-type-4"]').focus();
+    cy.focused().should('have.attr', 'data-testid', 'document-type-4');
+    cy.press(Cypress.Keyboard.Keys.SPACE);
+    cy.focused().should('have.attr', 'aria-pressed', 'true');
+    cy.focused().should('have.attr', 'data-testid', 'document-type-4');
   });
 
   [390, 1280].forEach(width => {
@@ -80,9 +116,7 @@ describe('Document type descriptions', () => {
         });
       });
       cy.screenshot(`document-types-initial-${width}`, SCREENSHOT_OPTIONS);
-      if (width < 600) {
-        cy.get('[data-testid="document-other-types-toggle"]').click();
-      }
+      cy.get('[data-testid="document-other-types-toggle"]').click();
 
       cy.get('#document-other-types [aria-pressed]').should(cards => {
         const names = Array.from(

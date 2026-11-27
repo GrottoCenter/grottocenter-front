@@ -44,9 +44,12 @@ describe('Photo capture date during document creation', () => {
       });
       cy.get('[data-testid="document-type-1"]', { timeout: 30000 }).click();
       cy.get(dateField).should('be.visible');
-      cy.get('[data-testid="document-authors"]').should($authors => {
-        const date = $authors[0].ownerDocument.querySelector(dateField);
-        expect($authors[0].compareDocumentPosition(date)).to.equal(
+      cy.get('[data-testid="document-authors"]').should('not.exist');
+      cy.get('[data-testid="file-input"]').should($files => {
+        const title = $files[0].ownerDocument.querySelector(
+          '[data-testid="document-title"]'
+        );
+        expect($files[0].compareDocumentPosition(title)).to.equal(
           Node.DOCUMENT_POSITION_FOLLOWING
         );
       });
@@ -54,17 +57,15 @@ describe('Photo capture date during document creation', () => {
         .find('[aria-expanded]')
         .should('have.attr', 'aria-expanded', 'false');
       cy.get('[data-testid="document-title"] input').type('Entrance photo');
-      cy.get(dateField).find('button[value="full"]').click();
       cy.get('[data-testid="file-input"]').selectFile(
         'cypress/fixtures/photo-dates/capture.jpg',
         { force: true }
       );
-      cy.get(dateField).find('input').should('have.value', '29/02/2012');
-      cy.get(dateField).find('[role="spinbutton"][aria-label="Year"]').click();
-      cy.get(dateField)
-        .find('[role="spinbutton"][aria-label="Year"]')
-        .type('2016');
-      cy.get(dateField).find('input').should('have.value', '29/02/2016');
+      cy.get(dateField).find('input').should('have.value', '2012-02-29');
+      cy.get(dateField).find('input').clear();
+      cy.get(dateField).find('input').type('2016-02-29');
+      cy.get(dateField).find('input').blur();
+      cy.get(dateField).find('input').should('have.value', '2016-02-29');
 
       cy.fixture('photo-dates/capture.jpg', null).then(contents => {
         cy.get('[data-testid="file-input"]').selectFile(
@@ -73,7 +74,18 @@ describe('Photo capture date during document creation', () => {
         );
       });
       cy.get('[data-testid="selected-file-second.jpg"]').should('be.visible');
-      cy.get(dateField).find('input').should('have.value', '29/02/2016');
+      cy.get(dateField).find('input').should('have.value', '2016-02-29');
+      cy.get('[data-testid="document-author-me"]').check();
+      cy.get('[data-testid="publication-author-rights"]').should(
+        'not.be.checked'
+      );
+      cy.get('[data-testid="document-submit"]').should('be.disabled');
+      cy.get('[data-testid="publication-author-rights"]').scrollIntoView({
+        offset: { top: -270, left: 0 }
+      });
+      cy.screenshot(`photo-author-and-sharing-${width}`, {
+        capture: 'viewport'
+      });
       cy.get('[data-testid="publication-author-rights"]').check();
       cy.get('[data-testid="document-submit"]').should('be.enabled').click();
       cy.wait('@createDocument').then(({ request }) => {
@@ -84,5 +96,37 @@ describe('Photo capture date during document creation', () => {
         expect(request.body).to.include('filename="second.jpg"');
       });
     });
+  });
+
+  it('guides third-party sharing and keeps fallback authors in a secondary menu on mobile', () => {
+    cy.viewport(390, 720);
+    cy.visit('/entity/add/document', {
+      onBeforeLoad: win => win.localStorage.setItem('selectedLanguage', 'en')
+    });
+    cy.get('[data-testid="document-type-1"]').click();
+    cy.get('[data-testid="file-input"]').selectFile(
+      'cypress/fixtures/photo-dates/capture.jpg',
+      { force: true }
+    );
+    cy.get('[data-testid="document-author-other"]').check();
+    cy.get('[data-testid="publication-author-rights"]').should('not.exist');
+    cy.contains('button', 'Unknown author').click();
+    cy.contains('[role="menuitem"]', 'Multiple unknown authors').click();
+    cy.get('[data-testid="document-author-persons-41378"]').should(
+      'be.visible'
+    );
+    cy.get('[data-testid="publication-license-in-file"]').check();
+    cy.get('[data-testid="document-submit"]').should('be.disabled');
+    cy.get('[data-testid="document-license"] [role="combobox"]').click();
+    cy.get('[data-testid="document-license-option-1"]').click();
+    cy.contains('button', 'help me choose').click();
+    cy.contains('check with the rights holder').should('be.visible');
+    cy.get('[data-testid="document-title"] input').type(
+      'An archived photograph'
+    );
+    cy.get('[data-testid="document-submit"]').click();
+    cy.wait('@createDocument')
+      .its('request.body')
+      .should('include', 'name="authors[0][id]"\r\n\r\n41378\r\n');
   });
 });

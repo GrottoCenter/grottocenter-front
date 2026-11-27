@@ -2,6 +2,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { getDocumentPanoramaError } from '@/utils/documentPanorama';
 import {
+  filterDocumentPayload,
+  getDocumentTypeRules
+} from '@/utils/documentTypeHelpers';
+import {
   postDocumentUrl,
   putDocumentUrl,
   putDocumentyWithNewEntitiesUrl
@@ -9,8 +13,8 @@ import {
 import { apiPostForm, apiPutForm, apiPut } from '../../api/client';
 import { documentKeys, entranceKeys } from '../../api/queryKeys';
 import { buildFormData } from '../../actions/Document/utils';
-import { filterDocumentPayload } from '../../utils/documentTypeHelpers';
 import {
+  DOCUMENT_AUTHORIZE_TO_PUBLISH,
   IS_DELETED,
   IS_MODIFIED,
   IS_NEW
@@ -42,14 +46,42 @@ const buildDocErrorMessages = (verb, error) => {
 
 const buildDocumentFormData = docAttributes => {
   const filtered = filterDocumentPayload(docAttributes);
-  const { files = [], selectOptionAuthorizationDocument, ...rest } = filtered;
-  const attributes = { ...rest, option: selectOptionAuthorizationDocument };
+  const rules = getDocumentTypeRules(docAttributes.type);
+  const {
+    files = [],
+    selectOptionAuthorizationDocument: option,
+    license,
+    authorizationDocument,
+    ...attributes
+  } = filtered;
+  const hasRetainedFile = files.some(file => file.state !== IS_DELETED);
+  const includesSharing =
+    rules.hasCollectionSharing ||
+    (rules.hasFileSharing &&
+      (hasRetainedFile || docAttributes.inheritedPublicationRights));
+  if (includesSharing && option) {
+    attributes.license = license;
+    attributes.option = option;
+    if (option === DOCUMENT_AUTHORIZE_TO_PUBLISH)
+      attributes.authorizationDocument = authorizationDocument;
+  } else if (rules.hasFileSharing && docAttributes.id) {
+    // The API substitutes CC BY-SA for an omitted license. Keep the stored
+    // license in file-free edits where the sharing controls are hidden.
+    attributes.license = docAttributes.storedLicense ?? license;
+  }
   if (Object.hasOwn(attributes, 'identifierPdfPageOffset')) {
     attributes.identifierPdfPageOffset ??= '';
   }
   const formData = new FormData();
   buildFormData(formData, attributes);
-  return { formData, files };
+  return {
+    formData,
+    files: rules.allowsFiles
+      ? files
+      : (docAttributes.files ?? []).filter(
+          file => file.id && file.state === IS_DELETED
+        )
+  };
 };
 
 const appendNewFiles = (formData, files) => {
@@ -85,10 +117,19 @@ export const useCreateDocument = () => {
   return useMutation({
     mutationFn: async docAttributes => {
       const { formData, files } = buildDocumentFormData(docAttributes);
-      appendNewFiles(formData, files);
+      appendNewFiles(
+        formData,
+        files.filter(file => file.state !== IS_DELETED)
+      );
       try {
         const body = await apiPostForm(postDocumentUrl, formData);
-        return body?.document;
+        return {
+          document: body?.document,
+          failedFiles:
+            body?.status?.errorCode === 'FileNotImported'
+              ? (body.status.content ?? []).map(file => file.fileName)
+              : []
+        };
       } catch (err) {
         err.fileError = getDocumentPanoramaError(err, files);
         err.errorMessages = buildDocErrorMessages('create', err);

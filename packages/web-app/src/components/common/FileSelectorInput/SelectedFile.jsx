@@ -121,7 +121,7 @@ const SelectedFile = ({
                   aria-label={`${formatMessage({ id: 'Remove' })} ${file.fileName}`}
                   data-testid="remove-selected-file"
                   disabled={disabled}
-                  onClick={() => onRemove(file.fileName)}
+                  onClick={() => onRemove(file.fileName, file)}
                   sx={{ minWidth: 32, height: 32, p: 0.5 }}>
                   <DeleteOutlinedIcon sx={{ fontSize: 18 }} />
                 </Button>

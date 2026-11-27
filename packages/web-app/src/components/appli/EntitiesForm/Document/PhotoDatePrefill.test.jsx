@@ -1,11 +1,5 @@
 import { useContext } from 'react';
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor
-} from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
 import messages from '@/../public/lang/en.json';
@@ -55,7 +49,7 @@ it('prefills an empty date when a new photo is attached', async () => {
   await expectDate('2012-02-29');
 });
 
-it('prefills after selecting full-date precision on an empty field', async () => {
+it('shows the inferred precision after prefilling the date', async () => {
   render(
     <IntlProvider locale="en" messages={messages}>
       <DocumentFormProvider initialValues={{ type: DocumentTypes.IMAGE }}>
@@ -64,9 +58,11 @@ it('prefills after selecting full-date precision on an empty field', async () =>
       </DocumentFormProvider>
     </IntlProvider>
   );
-  fireEvent.click(screen.getByRole('button', { name: 'Full Date' }));
   setFiles([photo('capture.jpg')]);
   await expectDate('2012-02-29');
+  expect(screen.getByRole('textbox', { name: 'Publication date' })).toHaveValue(
+    '2012-02-29'
+  );
 });
 
 it.each(['2010', '2010-04', '2010-04-15'])(

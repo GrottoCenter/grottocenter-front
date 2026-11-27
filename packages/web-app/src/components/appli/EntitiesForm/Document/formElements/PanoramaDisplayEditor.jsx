@@ -37,7 +37,7 @@ const PanoramaDisplayEditor = ({ value, onChange, isNew = false, error }) => {
             />
           }
           sx={{ textTransform: 'none', minHeight: 32, py: 0.25 }}>
-          {formatMessage({ id: 'panorama.display' })}
+          {formatMessage({ id: 'documentForm.displayOptions' })}
         </Button>
       </Box>
       {error && (

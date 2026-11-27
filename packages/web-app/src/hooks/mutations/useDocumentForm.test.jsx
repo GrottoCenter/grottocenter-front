@@ -42,6 +42,48 @@ describe('document PDF pagination uploads', () => {
     apiPutForm.mockResolvedValue({ id: 42 });
   });
 
+  it('keeps the created document and exposes rejected attachments from a partial upload', async () => {
+    apiPostForm.mockResolvedValue({
+      document: { id: 42 },
+      status: {
+        errorCode: 'FileNotImported',
+        content: [{ fileName: 'cover.jpg' }]
+      }
+    });
+    const { result } = renderMutation(useCreateDocument);
+    let response;
+    await act(async () => {
+      response = await result.current.mutateAsync({ type: DocumentTypes.BOOK });
+    });
+    expect(response).toEqual({
+      document: { id: 42 },
+      failedFiles: ['cover.jpg']
+    });
+  });
+
+  it('keeps existing attachment removals when changing to a type without files', async () => {
+    const { result } = renderMutation(useUpdateDocument);
+    await act(async () =>
+      result.current.mutateAsync({
+        id: 42,
+        type: DocumentTypes.EVENT,
+        files: [
+          { id: 5, fileName: 'guide.pdf', state: IS_DELETED },
+          newFile('draft.pdf')
+        ],
+        selectOptionAuthorizationDocument: DOCUMENT_AUTHORIZE_TO_PUBLISH,
+        authorizationDocument: { id: 99 },
+        license: { id: 1 }
+      })
+    );
+    const body = apiPutForm.mock.calls[0][1];
+    expect(body.get('deletedFiles[0][id]')).toBe('5');
+    expect(body.has('option')).toBe(false);
+    expect(body.has('license[id]')).toBe(false);
+    expect(body.has('authorizationDocument[id]')).toBe(false);
+    expect(body.has('files')).toBe(false);
+  });
+
   it.each([
     ['creation', useCreateDocument, apiPostForm],
     ['update', useUpdateDocument, apiPutForm]

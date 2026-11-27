@@ -350,7 +350,9 @@ describe('FileSelectorInput', () => {
       name: 'Remove existing.txt'
     });
     await userEvent.click(removeButton);
-    expect(onFileRemove).toHaveBeenCalledWith('existing.txt');
+    expect(onFileRemove).toHaveBeenCalledWith('existing.txt', {
+      fileName: 'existing.txt'
+    });
   });
 
   test('opens existing files in a new tab and keeps actions out of the picker', async () => {

@@ -254,7 +254,7 @@ describe('Author duplicate management', () => {
 
   [
     { id: 33, label: 'Unknown author', width: 320 },
-    { id: 41378, label: 'Multiple authors', width: 1280 }
+    { id: 41378, label: 'Multiple unknown authors', width: 1280 }
   ].forEach(({ id, label, width }) => {
     it(`protects #${id} and permits merging an author into it`, () => {
       const protectedAuthor = { ...people[0], id, nickname: label };

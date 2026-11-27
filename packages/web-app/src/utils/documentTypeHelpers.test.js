@@ -2,6 +2,7 @@ import {
   DocumentTypes,
   filterDocumentPayload,
   filterParentDocumentResults,
+  getDocumentTypeRules,
   hasSameDocumentId,
   isDocumentSelfParent
 } from './documentTypeHelpers';
@@ -14,6 +15,22 @@ describe('document parent safeguards', () => {
   });
 
   describe('document payload metadata', () => {
+    it('omits ordinary publication rights from a publication authorization record', () => {
+      expect(
+        filterDocumentPayload({
+          type: DocumentTypes.AUTHORIZATION_TO_PUBLISH,
+          license: { id: 2 },
+          authorizationDocument: { id: 99 },
+          selectOptionAuthorizationDocument:
+            'Authorization present in Grottocenter',
+          files: [{ id: 7 }],
+          parent: { id: 3 }
+        })
+      ).toEqual({
+        type: DocumentTypes.AUTHORIZATION_TO_PUBLISH,
+        files: [{ id: 7 }]
+      });
+    });
     it('retains collection publication rights but never attachments', () => {
       const rights = {
         license: { id: 2, name: 'CC-BY' },
@@ -79,5 +96,26 @@ describe('document parent safeguards', () => {
       results[0],
       results[2]
     ]);
+  });
+});
+
+describe('document attachment rules', () => {
+  it.each([
+    DocumentTypes.TOPOGRAPHIC_DATA,
+    DocumentTypes.INTERACTIVE_RESOURCE,
+    DocumentTypes.AUTHORIZATION_TO_PUBLISH
+  ])(
+    'allows a submission without a file but warns before submitting %s',
+    type =>
+      expect(getDocumentTypeRules(type)).toMatchObject({
+        allowsFiles: true,
+        expectFile: true
+      })
+  );
+
+  it('allows a book file or a cover image', () => {
+    expect(getDocumentTypeRules(DocumentTypes.BOOK).accept.extensions).toEqual(
+      expect.arrayContaining(['pdf', 'jpeg', 'png'])
+    );
   });
 });

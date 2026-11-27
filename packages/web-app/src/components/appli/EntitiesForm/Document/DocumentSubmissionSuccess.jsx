@@ -14,6 +14,7 @@ const CenteredBlock = styled('div')`
 const DocumentSubmissionSuccess = ({
   isArticle,
   isNewDocument,
+  failedFiles = [],
   onSubmitAnotherArticle,
   onSubmitAnotherDocument,
   onFinish
@@ -31,6 +32,14 @@ const DocumentSubmissionSuccess = ({
             })}`
           : formatMessage({ id: 'Document successfully updated.' })}
       </Alert>
+      {failedFiles.length > 0 && (
+        <Alert severity="warning" sx={{ mt: 1, textAlign: 'start' }}>
+          {formatMessage(
+            { id: 'documentForm.failedFiles' },
+            { files: failedFiles.join(', ') }
+          )}
+        </Alert>
+      )}
 
       {isNewDocument && (
         <Box
@@ -94,6 +103,7 @@ const DocumentSubmissionSuccess = ({
 DocumentSubmissionSuccess.propTypes = {
   isArticle: PropTypes.bool.isRequired,
   isNewDocument: PropTypes.bool.isRequired,
+  failedFiles: PropTypes.arrayOf(PropTypes.string),
   // Only called for articles; keeping it required ensures every form
   // integration wires the complete repeat-submission workflow.
   onSubmitAnotherArticle: PropTypes.func.isRequired,

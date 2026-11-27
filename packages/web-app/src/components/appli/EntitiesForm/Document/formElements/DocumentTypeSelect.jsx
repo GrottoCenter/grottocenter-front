@@ -21,13 +21,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {
   DocumentTypes,
   DOCUMENT_TYPE_ICONS,
-  DOCUMENT_TYPE_FALLBACK_ICON,
-  documentTypeHelpers
+  DOCUMENT_TYPE_FALLBACK_ICON
 } from '../../../../../utils/documentTypeHelpers';
 import { DocumentFormContext } from '../Provider';
 import { useDocumentTypes } from '../../../../../hooks';
-
-const { isArticle, isIssue } = documentTypeHelpers;
 
 const FEATURED_TYPES = [
   DocumentTypes.IMAGE,
@@ -215,9 +212,8 @@ TypeCard.propTypes = {
   isFeatured: PropTypes.bool
 };
 
-const DocumentTypeSelect = () => {
-  const { document, updateAttribute, selectParent } =
-    useContext(DocumentFormContext);
+const DocumentTypeSelect = ({ onTypeChange }) => {
+  const { document } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -225,21 +221,18 @@ const DocumentTypeSelect = () => {
   const [othersOpen, setOthersOpen] = useState(false);
 
   useEffect(() => {
-    if (document.type !== -1 && !FEATURED_TYPES.includes(document.type)) {
+    if (
+      isMobile &&
+      document.type !== -1 &&
+      !FEATURED_TYPES.includes(document.type)
+    ) {
       setOthersOpen(true);
     }
-  }, [document.type]);
+  }, [document.type, isMobile]);
 
-  const handleSelect = newDocType => {
+  const handleSelect = (newDocType, event) => {
     if (newDocType === document.type) return;
-    updateAttribute('type', newDocType);
-    if (
-      newDocType !== DocumentTypes.COLLECTION &&
-      !isArticle(newDocType) &&
-      !isIssue(newDocType)
-    ) {
-      selectParent(null);
-    }
+    onTypeChange(newDocType, event);
   };
 
   const featured = documentTypes.filter(dt => FEATURED_TYPES.includes(dt.name));
@@ -252,6 +245,7 @@ const DocumentTypeSelect = () => {
     );
 
   const selectedOther = others.find(dt => dt.name === document.type);
+  const canCollapseOthers = isMobile || others.length > 4;
   const SelectedOtherIcon = selectedOther
     ? (DOCUMENT_TYPE_ICONS[selectedOther.name] ?? DOCUMENT_TYPE_FALLBACK_ICON)
     : null;
@@ -277,9 +271,7 @@ const DocumentTypeSelect = () => {
         component="p"
         sx={{ mb: 0.5, color: 'text.secondary' }}>
         {formatMessage({ id: 'Document type' })}
-        <Box component="span" sx={{ color: 'error.main', ml: 0.5 }}>
-          *
-        </Box>
+        {' *'}
       </Typography>
       <Grid
         container
@@ -293,14 +285,14 @@ const DocumentTypeSelect = () => {
               isFeatured
               docType={dt}
               selected={document.type === dt.name}
-              onClick={() => handleSelect(dt.name)}
+              onClick={event => handleSelect(dt.name, event)}
             />
           </Grid>
         ))}
       </Grid>
       {others.length > 0 && (
         <Box sx={{ mt: 1 }}>
-          {isMobile && (
+          {canCollapseOthers && (
             <Button
               variant="outlined"
               color="inherit"
@@ -313,6 +305,7 @@ const DocumentTypeSelect = () => {
                 width: '100%',
                 textTransform: 'none',
                 alignItems: 'center',
+                minHeight: theme.spacing(5.5),
                 gap: 0.5,
                 cursor: 'pointer',
                 border: '1px solid',
@@ -336,16 +329,6 @@ const DocumentTypeSelect = () => {
               <Typography variant="body2" sx={{ flex: 1, textAlign: 'start' }}>
                 {formatMessage({ id: selectedOther?.name ?? 'Other types' })}
               </Typography>
-              <Typography
-                variant="caption"
-                sx={{
-                  bgcolor: 'action.selected',
-                  borderRadius: 10,
-                  px: 0.5,
-                  fontWeight: 600
-                }}>
-                {others.length}
-              </Typography>
               {othersOpen ? (
                 <ExpandLessIcon
                   fontSize="small"
@@ -360,14 +343,16 @@ const DocumentTypeSelect = () => {
             </Button>
           )}
 
-          <Collapse id="document-other-types" in={isMobile ? othersOpen : true}>
+          <Collapse
+            id="document-other-types"
+            in={!canCollapseOthers || othersOpen}>
             <Grid container spacing={0.5}>
               {others.map(dt => (
                 <Grid size={{ xs: 6, sm: 4, md: 3 }} key={dt.id}>
                   <TypeCard
                     docType={dt}
                     selected={document.type === dt.name}
-                    onClick={() => handleSelect(dt.name)}
+                    onClick={event => handleSelect(dt.name, event)}
                   />
                 </Grid>
               ))}
@@ -378,5 +363,7 @@ const DocumentTypeSelect = () => {
     </Box>
   );
 };
+
+DocumentTypeSelect.propTypes = { onTypeChange: PropTypes.func.isRequired };
 
 export default DocumentTypeSelect;

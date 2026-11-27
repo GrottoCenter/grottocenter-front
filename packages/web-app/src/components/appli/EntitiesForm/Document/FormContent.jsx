@@ -1,64 +1,63 @@
-import React, {
-  useCallback,
+import {
+  lazy,
+  Suspense,
   useContext,
   useEffect,
-  useState,
-  Suspense
+  useLayoutEffect,
+  useRef
 } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Alert,
-  Box,
-  Skeleton,
-  Typography
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
+import { Alert, Box, Skeleton, Stack, useMediaQuery } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import OrganizationSelect from '@/components/appli/OrganizationSelect';
+import LanguageSelect from '@/components/common/LanguageSelect';
+import StringInput from '@/components/common/Form/StringInput';
+import { useLanguages } from '@/hooks';
 import { TEXT_LENGTH_LIMITS } from '@/utils/textLengthLimits';
-import { getDefaultOrganizationType } from '@/utils/organizationTypes';
+import {
+  DocumentTypes,
+  getDocumentTypeRules
+} from '@/utils/documentTypeHelpers';
 import { DocumentFileErrorPropTypes } from '@/types/document.type';
-
-import { useLanguages } from '../../../../hooks';
-
-import { DocumentFormContext } from './Provider';
-
-import DocumentTypeSelect from './formElements/DocumentTypeSelect';
-import LanguageSelect from '../../../common/LanguageSelect';
-import ParentDocumentSelect from './formElements/ParentDocumentSelect';
-import MultipleISORegionsSelect from './formElements/MultipleISORegionsSelect';
-import MultipleSubjectsSelect from './formElements/MultipleSubjectsSelect';
-import PagesEditor from './formElements/PagesEditor';
-import IdentifierEditor from './formElements/IdentifierEditor';
-import AuthorsSection from './formElements/AuthorsSection';
-import { FormActionRow, FormContainer, FormRow } from '../utils/FormContainers';
+import { FormActionRow, FormContainer } from '../utils/FormContainers';
+import AdvancedDocumentMetadata from './AdvancedDocumentMetadata';
+import { DocumentFormContext, getIncompatibleFiles } from './Provider';
 import AddFileForm from './formElements/AddFileForm';
-import CollectionPublicationRights from './formElements/CollectionPublicationRights';
-import StringInput from '../../../common/Form/StringInput';
-import Translate from '../../../common/Translate';
-import InternationalizedLink from '../../../common/InternationalizedLink';
-import {
-  wikiBBSLinks,
-  wikiBBSChaptersLinks
-} from '../../../../conf/externalLinks';
-import {
-  documentTypeHelpers,
-  DOCUMENT_TYPE_ACCEPT
-} from '../../../../utils/documentTypeHelpers';
+import AuthorAndSharing from './formElements/AuthorAndSharing';
+import DocumentRegions from './formElements/DocumentRegions';
+import DocumentTypeSelect from './formElements/DocumentTypeSelect';
+import PagesEditor from './formElements/PagesEditor';
+import ParentDocumentSelect from './formElements/ParentDocumentSelect';
 
-const PublicationDatePicker = React.lazy(
+const PublicationDatePicker = lazy(
   () => import('./formElements/PublicationDatePicker')
 );
 
-const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
-  const [isAdditionalInfoExpanded, setIsAdditionalInfoExpanded] =
-    useState(false);
+const typeLabels = {
+  [DocumentTypes.IMAGE]: {
+    description: 'documentForm.imageDescription',
+    date: 'documentForm.photoDate'
+  },
+  [DocumentTypes.TOPOGRAPHIC_DRAWING]: {
+    description: 'documentForm.drawingDescription'
+  },
+  [DocumentTypes.TOPOGRAPHIC_DATA]: {
+    description: 'documentForm.surveyDescription'
+  },
+  [DocumentTypes.EVENT]: {
+    title: 'documentForm.eventName',
+    date: 'Event date'
+  },
+  [DocumentTypes.AUTHORIZATION_TO_PUBLISH]: { date: 'Authorization date' }
+};
+
+const FormContent = ({
+  onCancel,
+  isSubmitting = false,
+  isSubmissionBlocked = false,
+  fileError
+}) => {
   const {
     document,
     isFormValid,
@@ -66,87 +65,53 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
     isNewDocument,
     updateAttribute,
     linkedEntrance,
-    allowEntityCreation = true
+    hasStoredAuthorization,
+    initialType
   } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
-
-  const {
-    isCollection,
-    isArticle,
-    isAuthorizationToPublish,
-    isEvent,
-    isIssue,
-    isSimpleMedia,
-    isUnknown
-  } = documentTypeHelpers;
-
+  const firstFieldRef = useRef(null);
+  const shouldRevealFirstField = useRef(false);
+  const prefersReducedMotion = useMediaQuery(
+    '(prefers-reduced-motion: reduce)'
+  );
   const locale = useSelector(state => state.intl.locale);
   const { data: languages = [] } = useLanguages();
-  const userLanguageId = languages.find(l => l.part1 === locale)?.id ?? '000';
-  const hasAdditionalInfoLengthError = lengthErrors.some(({ field }) =>
-    ['identifier', 'issue', 'creatorComment'].includes(field)
-  );
+  const userLanguageId =
+    languages.find(language => language.part1 === locale)?.id ?? '000';
+  const rules = getDocumentTypeRules(document.type);
+  const labels = typeLabels[document.type] ?? {};
+  const incompatibleFiles = getIncompatibleFiles(document);
+  const blockedByStoredRights =
+    hasStoredAuthorization &&
+    document.type !== initialType &&
+    !rules.hasFileSharing &&
+    !rules.hasCollectionSharing;
 
-  useEffect(() => {
-    if (hasAdditionalInfoLengthError) setIsAdditionalInfoExpanded(true);
-  }, [hasAdditionalInfoLengthError]);
-
-  useEffect(() => {
-    if (document.mainLanguage === '000' && userLanguageId !== '000')
-      updateAttribute('mainLanguage', userLanguageId);
-  }, [document.mainLanguage, userLanguageId, updateAttribute]);
-
-  const docType = document.type;
-  const isCollectionForm = isCollection(docType);
-  const needsCollectionLicense =
-    isCollectionForm &&
-    !!document.authorizationDocument?.id &&
-    !document.license;
-  const simple = isSimpleMedia(docType);
-  const acceptConfig = DOCUMENT_TYPE_ACCEPT[docType] ?? null;
-
-  const setLicense = useCallback(
-    newLicense => updateAttribute('license', newLicense),
-    [updateAttribute]
-  );
-
-  const addFileFormProps = {
-    fileError,
-    acceptConfig,
-    files: document.files,
-    setFiles: newFiles => updateAttribute('files', newFiles),
-    option: document.selectOptionAuthorizationDocument,
-    setOption: newOption =>
-      updateAttribute('selectOptionAuthorizationDocument', newOption),
-    setLicense,
-    setAuthorizationDocument: newDoc =>
-      updateAttribute('authorizationDocument', newDoc)
+  const changeType = (type, event) => {
+    shouldRevealFirstField.current = event.detail > 0;
+    updateAttribute('type', type);
   };
 
-  const filesIntro = (
-    <Typography
-      variant="body2"
-      sx={{
-        color: 'text.secondary',
-        mt: 1,
-        mb: 0.5
-      }}>
-      {formatMessage({
-        id: 'You can create a document that contains one or several files at once.'
-      })}
-    </Typography>
-  );
+  useLayoutEffect(() => {
+    if (!shouldRevealFirstField.current) return;
+    shouldRevealFirstField.current = false;
+    firstFieldRef.current?.scrollIntoView?.({
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: prefersReducedMotion ? 'instant' : 'smooth'
+    });
+  }, [document.type, prefersReducedMotion]);
 
-  const actionRow = (
-    <FormActionRow
-      submitTestId="document-submit"
-      isNew={isNewDocument}
-      isSubmitting={isSubmitting}
-      disabled={!isFormValid}
-      onCancel={onCancel || (() => navigate(-1))}
-    />
-  );
+  useEffect(() => {
+    if (
+      isNewDocument &&
+      document.mainLanguage === '000' &&
+      userLanguageId !== '000'
+    ) {
+      updateAttribute('mainLanguage', userLanguageId);
+    }
+  }, [document.mainLanguage, isNewDocument, userLanguageId, updateAttribute]);
 
   return (
     <FormContainer>
@@ -158,400 +123,140 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
           )}
         </Alert>
       )}
-      <DocumentTypeSelect />
+      <DocumentTypeSelect onTypeChange={changeType} />
       {lengthErrors.length > 0 && (
         <Alert severity="error" sx={{ mt: 1 }}>
           {lengthErrors.map(({ field, label, limit, count }) => (
             <Box key={field}>
-              {formatMessage({ id: label })}:{' '}
+              {formatMessage({ id: label })}{' '}
               {formatMessage({ id: 'form.maxLength' }, { limit, count })}
             </Box>
           ))}
         </Alert>
       )}
-      {!isUnknown(docType) && simple && (
-        /* Simplified layout for Image / Topographic Drawing — no sections */
-        <Box sx={{ mt: 1 }}>
-          <FormRow>
-            <StringInput
-              onValueChange={value => updateAttribute('title', value)}
-              data-testid="document-title"
-              value={document.title}
-              maxLength={TEXT_LENGTH_LIMITS.TITLE}
-              valueName={formatMessage({ id: 'Title' })}
-              required
-            />
-            <LanguageSelect
-              value={
-                document.mainLanguage === '000'
-                  ? userLanguageId
-                  : document.mainLanguage
-              }
-              onChange={id => updateAttribute('mainLanguage', id)}
-              label={formatMessage({ id: 'Document main language' })}
-              required
-            />
-          </FormRow>
-          <StringInput
-            multiline
-            minRows={4}
-            onValueChange={value => updateAttribute('description', value)}
-            value={document.description}
-            valueName={formatMessage({ id: 'Description' })}
-          />
-          {filesIntro}
-          <AddFileForm {...addFileFormProps} />
-        </Box>
-      )}
-      {!isUnknown(docType) && isEvent(docType) && (
-        /* Event layout: Title, Language, Description (optional), Event date, ISO location */
-        <Box sx={{ mt: 1 }}>
-          <FormRow>
-            <StringInput
-              onValueChange={value => updateAttribute('title', value)}
-              data-testid="document-title"
-              value={document.title}
-              maxLength={TEXT_LENGTH_LIMITS.TITLE}
-              valueName={formatMessage({ id: 'Title' })}
-              required
-            />
-            <LanguageSelect
-              value={
-                document.mainLanguage === '000'
-                  ? userLanguageId
-                  : document.mainLanguage
-              }
-              onChange={id => updateAttribute('mainLanguage', id)}
-              label={formatMessage({ id: 'Document main language' })}
-            />
-          </FormRow>
-          <StringInput
-            multiline
-            minRows={4}
-            onValueChange={value => updateAttribute('description', value)}
-            value={document.description}
-            valueName={formatMessage({ id: 'Description' })}
-          />
-          <Suspense
-            fallback={
-              <>
-                <Skeleton width={125} />
-                <Skeleton width={75} />
-              </>
-            }>
-            <PublicationDatePicker
-              required
-              label={formatMessage({ id: 'Event date' })}
-            />
-          </Suspense>
-          <MultipleISORegionsSelect
-            computeHasError={() => false}
-            contextValueName="iso3166"
-            helperText={formatMessage({
-              id: 'If the document relates to one or more countries or regions.'
-            })}
-            labelName="ISO countries or regions"
-            required={false}
-          />
-        </Box>
-      )}
-      {!isUnknown(docType) && isAuthorizationToPublish(docType) && (
-        /* Authorization To Publish layout: Title, Language, Description (optional), Date, Files (no license) */
-        <Box sx={{ mt: 1 }}>
-          <FormRow>
-            <StringInput
-              onValueChange={value => updateAttribute('title', value)}
-              data-testid="document-title"
-              value={document.title}
-              maxLength={TEXT_LENGTH_LIMITS.TITLE}
-              valueName={formatMessage({ id: 'Title' })}
-              required
-            />
-            <LanguageSelect
-              value={
-                document.mainLanguage === '000'
-                  ? userLanguageId
-                  : document.mainLanguage
-              }
-              onChange={id => updateAttribute('mainLanguage', id)}
-              label={formatMessage({ id: 'Document main language' })}
-            />
-          </FormRow>
-          <StringInput
-            multiline
-            minRows={4}
-            onValueChange={value => updateAttribute('description', value)}
-            value={document.description}
-            valueName={formatMessage({ id: 'Description' })}
-          />
-          <Suspense
-            fallback={
-              <>
-                <Skeleton width={125} />
-                <Skeleton width={75} />
-              </>
-            }>
-            <PublicationDatePicker
-              label={formatMessage({ id: 'Authorization date' })}
-            />
-          </Suspense>
-          {filesIntro}
-          <AddFileForm {...addFileFormProps} showAuthorization={false} />
-        </Box>
-      )}
-      {!isUnknown(docType) &&
-        !simple &&
-        !isEvent(docType) &&
-        !isAuthorizationToPublish(docType) && (
-          <Box sx={{ mt: 1 }}>
-            {!isCollectionForm && (
-              <>
-                {filesIntro}
-                <AddFileForm
-                  {...addFileFormProps}
-                  allowAiAnalysis
-                  disabled={isSubmitting}
-                />
-              </>
+      {rules.hasType && (
+        <>
+          <Stack spacing={1.5} sx={{ mt: 2 }}>
+            {incompatibleFiles.length > 0 && (
+              <Alert severity="warning">
+                {formatMessage(
+                  { id: 'documentForm.incompatibleFiles' },
+                  {
+                    files: incompatibleFiles
+                      .map(file => file.fileName)
+                      .join(', ')
+                  }
+                )}
+              </Alert>
             )}
-
-            <FormRow>
+            {(rules.allowsFiles || incompatibleFiles.length > 0) && (
+              <Box ref={rules.allowsFiles ? firstFieldRef : undefined}>
+                <AddFileForm
+                  files={document.files}
+                  setFiles={files => updateAttribute('files', files)}
+                  acceptConfig={rules.accept}
+                  allowFileAdd={rules.allowsFiles}
+                  allowAiAnalysis={rules.allowAiAnalysis}
+                  disabled={isSubmitting}
+                  fileError={fileError}
+                />
+              </Box>
+            )}
+            <Box
+              ref={rules.allowsFiles ? undefined : firstFieldRef}
+              sx={{
+                display: 'grid',
+                gap: 1.5,
+                gridTemplateColumns: {
+                  xs: 'minmax(0, 1fr)',
+                  sm: 'minmax(0, 2fr) minmax(0, 1fr)'
+                }
+              }}>
               <StringInput
+                valueName={formatMessage({ id: labels.title ?? 'Title' })}
                 data-testid="document-title"
-                helperText={formatMessage({
-                  id: 'Copy the title of the text as it is. In its absence, put a fictitious title between [].'
-                })}
-                onValueChange={value => updateAttribute('title', value)}
                 value={document.title}
                 maxLength={TEXT_LENGTH_LIMITS.TITLE}
-                valueName={formatMessage({ id: 'Title' })}
+                onValueChange={value => updateAttribute('title', value)}
                 required
               />
               <LanguageSelect
-                value={
-                  document.mainLanguage === '000'
-                    ? userLanguageId
-                    : document.mainLanguage
-                }
-                onChange={id => updateAttribute('mainLanguage', id)}
+                value={document.mainLanguage}
+                onChange={value => updateAttribute('mainLanguage', value)}
                 label={formatMessage({ id: 'Document main language' })}
               />
-            </FormRow>
-
+            </Box>
             <StringInput
-              helperText={formatMessage({
-                id: 'Make a precise sentence that is pleasant to read and uses keywords.'
-              })}
               data-testid="document-description"
-              multiline
-              minRows={4}
-              onValueChange={value => updateAttribute('description', value)}
-              required
+              valueName={formatMessage({
+                id: labels.description ?? 'Description'
+              })}
               value={document.description}
-              valueName={formatMessage({ id: 'Summary of document content' })}
+              onValueChange={value => updateAttribute('description', value)}
+              multiline
+              minRows={3}
             />
-
-            {(isArticle(docType) || isIssue(docType)) && (
+            {rules.parentType && (
               <ParentDocumentSelect
-                helperContent={
-                  <Translate>
-                    The parent document is the document that contains the
-                    document you are submitting (an article has a periodical
-                    issue as its parent document, a periodical issue has a
-                    periodical as its parent document).
-                  </Translate>
-                }
-                labelText={formatMessage({ id: 'Parent document' })}
-                required
+                labelText={formatMessage({ id: rules.parentType })}
                 searchLabelText={formatMessage({
                   id: 'Search for a document...'
                 })}
+                required
               />
             )}
-
-            {isArticle(docType) && <PagesEditor />}
-          </Box>
-        )}
-      {!isUnknown(docType) && !isCollectionForm && (
-        <Box sx={{ mt: 2 }}>
-          <AuthorsSection />
-          {!isEvent(docType) && !isAuthorizationToPublish(docType) && (
-            <Box sx={{ mt: 1.5, maxWidth: '28rem' }}>
-              <Suspense fallback={<Skeleton height={100} />}>
-                <PublicationDatePicker />
-              </Suspense>
-            </Box>
-          )}
-        </Box>
-      )}
-      {!isUnknown(docType) &&
-        !isEvent(docType) &&
-        !isAuthorizationToPublish(docType) && (
-          <Accordion
-            data-testid="document-advanced-metadata"
-            expanded={
-              isAdditionalInfoExpanded ||
-              hasAdditionalInfoLengthError ||
-              needsCollectionLicense
-            }
-            onChange={(_event, expanded) =>
-              setIsAdditionalInfoExpanded(expanded)
-            }
-            disableGutters
-            elevation={0}
-            sx={{
-              mt: 2,
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 1,
-              '&:before': { display: 'none' }
-            }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: 'text.secondary'
-                }}>
-                {formatMessage({ id: 'Advanced metadata' })}
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails
-              sx={{
-                pt: 0.25,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 1.5
-              }}>
-              <Box>
-                <IdentifierEditor />
-              </Box>
-              {isCollectionForm && <AuthorsSection />}
-              {isCollectionForm && (
-                <CollectionPublicationRights disabled={isSubmitting} />
-              )}
-
-              <FormRow>
-                <Box
-                  sx={{ width: '100%', minWidth: 0 }}
-                  data-testid="document-editor">
-                  <OrganizationSelect
-                    value={document.editor}
-                    onChange={organization =>
-                      updateAttribute('editor', organization)
-                    }
-                    allowCreation={allowEntityCreation}
-                    defaultType={getDefaultOrganizationType('editor')}
-                    creationTestId="create-editor-search-button"
-                    helperContent={formatMessage({
-                      id: 'entityCreation.editorHelp'
-                    })}
-                    label={formatMessage({ id: 'Editor' })}
-                    placeholder={formatMessage({
-                      id: 'Search for an editor...'
-                    })}
-                  />
-                </Box>
-
-                {(isIssue(docType) || isArticle(docType)) && (
-                  <Box
-                    sx={{ width: '100%', minWidth: 0 }}
-                    data-testid="document-library">
-                    <OrganizationSelect
-                      value={document.library}
-                      onChange={organization =>
-                        updateAttribute('library', organization)
-                      }
-                      allowCreation={allowEntityCreation}
-                      defaultType={getDefaultOrganizationType('library')}
-                      creationTestId="create-library-search-button"
-                      helperContent={formatMessage({
-                        id: 'entityCreation.libraryHelp'
-                      })}
-                      label={formatMessage({ id: 'Library' })}
-                      placeholder={formatMessage({
-                        id: 'Search for a library...'
-                      })}
-                    />
-                  </Box>
-                )}
-              </FormRow>
-
-              {isIssue(docType) && (
-                <StringInput
-                  helperText={formatMessage({
-                    id: 'Use the same wording that is used on the document: Vol.12, Number 15, No.158...'
-                  })}
-                  multiline={false}
-                  onValueChange={newValue => updateAttribute('issue', newValue)}
-                  value={document.issue ?? ''}
-                  maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_ISSUE}
-                  valueName={formatMessage({ id: 'Periodical issue' })}
-                />
-              )}
-
-              <Box>
-                <MultipleISORegionsSelect
-                  computeHasError={() => false}
-                  contextValueName="iso3166"
-                  helperText={formatMessage({
-                    id: 'If the document relates to one or more countries or regions.'
-                  })}
-                  labelName="ISO countries or regions"
-                  required={false}
-                />
-              </Box>
-
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{ color: 'text.secondary', display: 'block' }}>
-                  <InternationalizedLink links={wikiBBSLinks}>
-                    <Translate>
-                      Speleological Abstracts (SA)/Bulletin bibliographique
-                      spéléologique (BBS) in french
-                    </Translate>
-                  </InternationalizedLink>
-                  <Translate>
-                    which is the annual summary of worldwide speleological
-                    literature, is directly integrated in Grottocenter. Choose
-                    one or more subjects from those defined by the SA/BBS, from
-                  </Translate>{' '}
-                  <InternationalizedLink links={wikiBBSChaptersLinks}>
-                    <Translate>this list</Translate>
-                  </InternationalizedLink>
-                  .
-                </Typography>
-                <MultipleSubjectsSelect
-                  computeHasError={() => false}
-                  contextValueName="subjects"
-                  labelName="BBS subjects"
-                />
-              </Box>
-
+            {rules.hasIssueNumber && (
               <StringInput
-                hasError={false}
+                valueName={formatMessage({ id: 'Periodical issue' })}
                 helperText={formatMessage({
-                  id: 'Additional information about the document.'
+                  id: 'Use the same wording that is used on the document: Vol.12, Number 15, No.158...'
                 })}
-                onValueChange={newValue =>
-                  updateAttribute('creatorComment', newValue)
-                }
-                value={document.creatorComment ?? ''}
-                maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_COMMENT}
-                valueName={formatMessage({ id: 'Comment' })}
+                maxLength={TEXT_LENGTH_LIMITS.DOCUMENT_ISSUE}
+                value={document.issue}
+                onValueChange={value => updateAttribute('issue', value)}
               />
-            </AccordionDetails>
-          </Accordion>
-        )}
-      {actionRow}
+            )}
+            {rules.hasPages && <PagesEditor />}
+            {rules.hasDate && (
+              <Suspense fallback={<Skeleton height={60} />}>
+                <PublicationDatePicker
+                  required={rules.requiresDate}
+                  allowFuture={rules.requiresDate}
+                  label={formatMessage({
+                    id: labels.date ?? 'DatePublication'
+                  })}
+                />
+              </Suspense>
+            )}
+            {rules.requiresDate && <DocumentRegions />}
+            {blockedByStoredRights && (
+              <Alert severity="warning">
+                {formatMessage({
+                  id: 'documentForm.incompatibleAuthorization'
+                })}
+              </Alert>
+            )}
+          </Stack>
+          <AuthorAndSharing disabled={isSubmitting} />
+          {rules.hasAdvancedMetadata && <AdvancedDocumentMetadata />}
+        </>
+      )}
+      <FormActionRow
+        submitTestId="document-submit"
+        isNew={isNewDocument}
+        isSubmitting={isSubmitting}
+        disabled={!isFormValid || isSubmissionBlocked}
+        onCancel={onCancel || (() => navigate(-1))}
+      />
     </FormContainer>
   );
 };
 
-export default FormContent;
-
 FormContent.propTypes = {
   fileError: DocumentFileErrorPropTypes,
+  isSubmissionBlocked: PropTypes.bool,
   onCancel: PropTypes.func,
   isSubmitting: PropTypes.bool
 };
+
+export default FormContent;

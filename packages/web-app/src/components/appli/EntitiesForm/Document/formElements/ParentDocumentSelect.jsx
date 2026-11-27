@@ -15,7 +15,7 @@ import {
 import { DocumentFormContext } from '../Provider';
 
 const DOCUMENTS = ['documents'];
-const getDocumentName = document => document.title || '';
+const getDocumentName = document => document.title || String(document.id);
 
 const ParentDocumentSelect = ({
   helperContent,

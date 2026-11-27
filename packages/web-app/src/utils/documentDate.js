@@ -1,19 +1,25 @@
-import { format, isMatch } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 
-const DATE_FORMATS = { 4: 'yyyy', 7: 'yyyy-MM', 10: 'yyyy-MM-dd' };
+export const getDocumentDate = value => {
+  if (!/^\d{4}(?:-\d{2}(?:-\d{2})?)?$/.test(value ?? '')) return null;
+  const date = parseISO(value);
+  return isValid(date) && date.getFullYear() >= 1000 ? date : null;
+};
+
+export const toDocumentDate = date => format(date, 'yyyy-MM-dd');
+
+export const isDocumentDateValid = (
+  value,
+  allowFuture = false,
+  now = new Date()
+) => {
+  if (!value) return true;
+  const date = getDocumentDate(value);
+  return !!date && (allowFuture || value <= toDocumentDate(now));
+};
 
 export const normalizePublicationDate = value => {
   if (typeof value !== 'string') return null;
   const date = value.trim();
-  const pattern = DATE_FORMATS[date.length];
-  if (
-    !pattern ||
-    !/^\d{4}(-\d{2}){0,2}$/.test(date) ||
-    !isMatch(date, pattern) ||
-    date < '1000' ||
-    date > format(new Date(), 'yyyy-MM-dd')
-  ) {
-    return null;
-  }
-  return date;
+  return date && isDocumentDateValid(date) ? date : null;
 };
