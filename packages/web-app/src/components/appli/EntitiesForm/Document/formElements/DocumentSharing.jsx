@@ -47,7 +47,7 @@ const thirdPartyChoices = [
 const editChoices = [
   [
     AUTHORIZATION_FROM_AUTHOR,
-    'I hold the publication rights for this content',
+    'documentForm.publishedByAuthor',
     'publication-author-rights'
   ],
   ...thirdPartyChoices
