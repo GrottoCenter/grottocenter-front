@@ -173,7 +173,7 @@ it('reports a page eleven rejection without showing partial matches and allows r
   ).toBeVisible();
   expect(apiPost).toHaveBeenCalledTimes(11);
   expect(analyzePersonDuplicates).not.toHaveBeenCalled();
-  expect(screen.queryByTestId('author-pair-101:102')).toBeNull();
+  expect(screen.queryAllByTestId(/^author-pair-/)).toHaveLength(0);
   expect(screen.queryByText(/scanned ·/)).toBeNull();
   expect(screen.getByRole('button', { name: 'Analyze' })).toBeEnabled();
   apiPost.mockResolvedValue({ results: people, totalResults: 2 });

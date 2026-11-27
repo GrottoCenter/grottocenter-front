@@ -227,8 +227,7 @@ describe('Author duplicate management', () => {
     });
     cy.get('[role="dialog"]')
       .should('contain.text', 'Marie Dupont')
-      .and('contain.text', 'Documents')
-      .and('contain.text', '25');
+      .and('contain.text', 'Documents (25)');
     cy.get('[role="dialog"]').contains('See all documents').should('not.exist');
     cy.get('[role="dialog"] [aria-label="close"]').click();
     cy.get('[role="dialog"]').should('not.exist');
