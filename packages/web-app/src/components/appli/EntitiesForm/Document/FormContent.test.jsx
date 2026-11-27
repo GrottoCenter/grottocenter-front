@@ -19,6 +19,9 @@ vi.mock('@/hooks', () => ({
 }));
 
 vi.mock('./formElements/DocumentTypeSelect', () => ({ default: () => null }));
+vi.mock('./formElements/CollectionPublicationRights', () => ({
+  default: () => null
+}));
 vi.mock('@/components/common/LanguageSelect', () => ({ default: () => null }));
 vi.mock('./formElements/ParentDocumentSelect', () => ({ default: () => null }));
 vi.mock('./formElements/MultipleISORegionsSelect', () => ({

@@ -10,6 +10,7 @@ import { entityOptionForSelector } from '@/helpers/Entity';
 import { useEntitySearch, useUserProperties } from '@/hooks';
 import { useRestoreFieldFocus } from '@/hooks/useRestoreFieldFocus';
 import { AUTOCOMPLETE_MIN_CHARACTERS } from '@/conf/config';
+import { requiresDocumentAuthor } from '@/utils/documentTypeHelpers';
 import { DocumentFormContext } from '@/components/appli/EntitiesForm/Document/Provider';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../AddFileForm/FileHelpers';
 
@@ -26,32 +27,27 @@ const AuthorsSection = () => {
     document: doc,
     isNewDocument,
     updateAttribute,
+    prefillAuthor,
     allowEntityCreation = true
   } = useContext(DocumentFormContext);
-  const currentUser = useUserProperties();
-  const hasPrefilledRef = useRef(false);
-
-  // Convenience prefill for a brand new document only: never attribute
-  // authorship to whoever edits an existing one. A document is validly authored
-  // by at least one person OR one organization, so an existing organization
-  // author is enough to leave the field alone.
+  const { id, nickname } = useUserProperties();
+  const requiresAuthor = requiresDocumentAuthor(doc.type);
+  const authorizationOption = doc.selectOptionAuthorizationDocument;
   useEffect(() => {
     if (
-      hasPrefilledRef.current ||
-      !isNewDocument ||
-      !currentUser.id ||
-      doc.authors.length > 0 ||
-      doc.authorsOrganization.length > 0 ||
-      doc.selectOptionAuthorizationDocument === DOCUMENT_AUTHORIZE_TO_PUBLISH
+      isNewDocument &&
+      requiresAuthor &&
+      authorizationOption !== DOCUMENT_AUTHORIZE_TO_PUBLISH
     )
-      return;
-    hasPrefilledRef.current = true;
-    updateAttribute('authors', [
-      { id: currentUser.id, nickname: currentUser.nickname }
-    ]);
-    // doc author collections and updateAttribute are stable; currentUser.id guards async hydration
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.id, isNewDocument, doc.selectOptionAuthorizationDocument]);
+      prefillAuthor({ id, nickname }, { onlyIfUntouched: true });
+  }, [
+    isNewDocument,
+    requiresAuthor,
+    authorizationOption,
+    id,
+    nickname,
+    prefillAuthor
+  ]);
 
   const value = useMemo(
     () => [
@@ -122,7 +118,7 @@ const AuthorsSection = () => {
         );
 
   return (
-    <Box ref={wrapperRef} data-testid="document-authors" sx={{ mt: 2 }}>
+    <Box ref={wrapperRef} data-testid="document-authors">
       <FieldHelperText>
         {formatMessage({ id: 'entityCreation.authorsHelp' })}
       </FieldHelperText>
@@ -189,7 +185,7 @@ const AuthorsSection = () => {
             params={params}
             inputRef={inputRef}
             label={formatMessage({ id: 'Authors' })}
-            required={value.length === 0}
+            required={requiresAuthor && value.length === 0}
             hasError={hasError}
             loading={isLoading}
           />

@@ -3,25 +3,18 @@ import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import { isEmpty, remove } from 'ramda';
 import {
-  Autocomplete,
   Box,
-  CircularProgress,
   FormControl,
   FormControlLabel,
-  FormHelperText,
   FormLabel,
-  InputLabel,
-  Link,
-  MenuItem,
   Radio,
-  RadioGroup,
-  Select,
-  TextField
+  RadioGroup
 } from '@mui/material';
 
-import LicenseTag from '@/components/common/LicenseTag';
-import { getLicenseName } from '@/components/common/LicenseTag/helpers';
-import AppLink from '@/components/common/AppLink';
+import {
+  DEFAULT_DOCUMENT_LICENSE,
+  getLicenseName
+} from '@/components/common/LicenseTag/helpers';
 import InternationalizedLink from '@/components/common/InternationalizedLink';
 import { licenceLinks } from '@/conf/externalLinks';
 import { MAX_SIZE_OF_UPLOADED_FILES } from '@/conf/config';
@@ -31,7 +24,6 @@ import {
   useUserProperties,
   useFileFormats,
   useLicenses,
-  useDocuments,
   findLicenseByName
 } from '../../../../../../hooks';
 import ErrorsList from './ErrorsList';
@@ -51,56 +43,8 @@ import { DocumentFormContext } from '../../Provider';
 import PdfPageOffsetEditor from '../PdfPageOffsetEditor';
 import DocumentPdfAnalysis from '../DocumentPdfAnalysis';
 import PanoramaDisplayEditor from '../PanoramaDisplayEditor';
-
-const DEFAULT_LICENSE = 'CC-BY-SA';
-
-const AuthDocSelect = ({ value, onChange, disabled = false }) => {
-  const { formatMessage } = useIntl();
-  const { data, isLoading } = useDocuments({
-    isValidated: true,
-    documentType: 'Authorization To Publish'
-  });
-  const authDocs = data?.documents ?? [];
-
-  return (
-    <Autocomplete
-      disabled={disabled}
-      loading={isLoading}
-      options={authDocs}
-      getOptionLabel={doc => doc.title ?? ''}
-      isOptionEqualToValue={(option, val) => option.id === val.id}
-      value={value ?? null}
-      onChange={(_, newValue) => onChange(newValue)}
-      renderInput={params => (
-        <TextField
-          {...params}
-          variant="filled"
-          required={!disabled}
-          label={formatMessage({ id: 'Authorization from authors' })}
-          slotProps={{
-            ...params.slotProps,
-
-            input: {
-              ...params.slotProps.input,
-              endAdornment: (
-                <>
-                  {isLoading && <CircularProgress size={16} />}
-                  {params.slotProps.input.endAdornment}
-                </>
-              )
-            }
-          }}
-        />
-      )}
-    />
-  );
-};
-
-AuthDocSelect.propTypes = {
-  disabled: PropTypes.bool,
-  value: PropTypes.shape({ id: PropTypes.number, title: PropTypes.string }),
-  onChange: PropTypes.func.isRequired
-};
+import AuthorizationDocumentSelect from '../AuthorizationDocumentSelect';
+import DocumentLicenseSelect from '../DocumentLicenseSelect';
 
 const AddFileForm = ({
   files,
@@ -128,7 +72,8 @@ const AddFileForm = ({
     enabled: showAuthorization
   });
   const currentUser = useUserProperties();
-  const { document, updateAttribute } = useContext(DocumentFormContext);
+  const { document, updateAttribute, prefillAuthor } =
+    useContext(DocumentFormContext);
 
   const parentId = document.parent?.id ?? null;
   const [correctedLicenseParentId, setCorrectedLicenseParentId] = useState();
@@ -141,7 +86,6 @@ const AddFileForm = ({
 
   const isParentAuthForced =
     document.parent !== null && document.authorizationDocument !== null;
-  const isAuthForced = isParentAuthForced;
 
   const extensions =
     acceptConfig?.extensions ??
@@ -178,8 +122,8 @@ const AddFileForm = ({
     // Other options preserve existing names, including unknown legacy values.
     const licenseName =
       option === AUTHORIZATION_FROM_AUTHOR
-        ? DEFAULT_LICENSE
-        : documentLicenseName || DEFAULT_LICENSE;
+        ? DEFAULT_DOCUMENT_LICENSE
+        : documentLicenseName || DEFAULT_DOCUMENT_LICENSE;
     const selected = findLicenseByName(licenses, licenseName);
     if (selected && selected.id !== documentLicenseId) setLicense(selected);
   }, [
@@ -205,10 +149,8 @@ const AddFileForm = ({
     // authorization form. Co-authors added manually are intentional and kept.
     if (newOption === DOCUMENT_AUTHORIZE_TO_PUBLISH) {
       if (authorsIsOnlyMe) updateAttribute('authors', []);
-    } else if (document.authors.length === 0) {
-      updateAttribute('authors', [
-        { id: currentUser.id, nickname: currentUser.nickname }
-      ]);
+    } else {
+      prefillAuthor(currentUser);
     }
   };
 
@@ -375,7 +317,7 @@ const AddFileForm = ({
               sx={{
                 fontSize: '0.875rem'
               }}>
-              {isAuthForced
+              {isParentAuthForced
                 ? formatMessage({
                     id: 'The licensing type of the document has been deduced from the parent document'
                   })
@@ -386,7 +328,7 @@ const AddFileForm = ({
               onChange={e => updateOption(e.target.value)}>
               <FormControlLabel
                 value={AUTHORIZATION_FROM_AUTHOR}
-                disabled={isAuthForced}
+                disabled={isParentAuthForced}
                 control={
                   <Radio
                     size="small"
@@ -406,7 +348,7 @@ const AddFileForm = ({
                       values={{
                         license: (
                           <InternationalizedLink links={licenceLinks}>
-                            CC-BY-SA
+                            {DEFAULT_DOCUMENT_LICENSE}
                           </InternationalizedLink>
                         )
                       }}
@@ -417,7 +359,7 @@ const AddFileForm = ({
               />
               <FormControlLabel
                 value={LICENSE_IN_FILE}
-                disabled={isAuthForced}
+                disabled={isParentAuthForced}
                 control={<Radio size="small" />}
                 label={formatMessage({
                   id: 'The license is written in the files'
@@ -425,7 +367,7 @@ const AddFileForm = ({
               />
               <FormControlLabel
                 value={DOCUMENT_AUTHORIZE_TO_PUBLISH}
-                disabled={isAuthForced}
+                disabled={isParentAuthForced}
                 control={
                   <Radio
                     size="small"
@@ -442,86 +384,26 @@ const AddFileForm = ({
           </FormControl>
 
           {showAuthDocSelect && (
-            <AuthDocSelect
+            <AuthorizationDocumentSelect
               value={document.authorizationDocument}
               onChange={setAuthorizationDocument}
-              disabled={isAuthForced}
+              disabled={isParentAuthForced}
             />
           )}
 
           {option && option !== AUTHORIZATION_FROM_AUTHOR && (
-            <>
-              <FormControl
-                variant="filled"
-                fullWidth
-                required
-                error={hasUnknownLicense}
-                disabled={isLicenseForced}
-                sx={{ mt: 1 }}>
-                <InputLabel id="document-license-label">
-                  {isLicenseForced
-                    ? formatMessage({
-                        id: 'The license of the document has been deduced from the parent document'
-                      })
-                    : formatMessage({ id: 'License' })}
-                </InputLabel>
-                <Select
-                  labelId="document-license-label"
-                  data-testid="document-license"
-                  inputProps={
-                    hasUnknownLicense
-                      ? { 'aria-describedby': 'document-license-help' }
-                      : undefined
-                  }
-                  value={documentLicenseName}
-                  renderValue={() => <LicenseTag license={document.license} />}
-                  onChange={e => {
-                    if (hasUnknownLicense)
-                      setCorrectedLicenseParentId(parentId);
-                    setLicense(findLicenseByName(licenses, e.target.value));
-                  }}>
-                  {/* Keep the current value in range while loading and when
-                      a legacy license is absent from the reference list. */}
-                  {documentLicenseName &&
-                    !findLicenseByName(licenses, documentLicenseName) && (
-                      <MenuItem disabled value={documentLicenseName}>
-                        <LicenseTag license={document.license} />
-                      </MenuItem>
-                    )}
-                  {licensesLoading && (
-                    <MenuItem disabled>
-                      <CircularProgress size={16} />
-                    </MenuItem>
-                  )}
-                  {(licenses ?? []).map(l => (
-                    <MenuItem
-                      key={l.id}
-                      value={l.name}
-                      data-testid={`document-license-option-${l.id}`}>
-                      <LicenseTag
-                        license={l}
-                        recommended={l.name === DEFAULT_LICENSE}
-                      />
-                    </MenuItem>
-                  ))}
-                </Select>
-                {hasUnknownLicense && (
-                  <FormHelperText id="document-license-help">
-                    {formatMessage({ id: 'Select a license' })}
-                  </FormHelperText>
-                )}
-              </FormControl>
-              {document.license?.url && (
-                <Link
-                  component={AppLink}
-                  href={document.license.url}
-                  variant="caption"
-                  color="primary"
-                  sx={{ display: 'inline-block', mt: 0.5 }}>
-                  {formatMessage({ id: 'See the full license' })}
-                </Link>
-              )}
-            </>
+            <DocumentLicenseSelect
+              value={document.license}
+              onChange={value => {
+                if (hasUnknownLicense) setCorrectedLicenseParentId(parentId);
+                setLicense(value);
+              }}
+              licenses={licenses}
+              isLoading={licensesLoading}
+              hasUnknownLicense={hasUnknownLicense}
+              disabled={isLicenseForced}
+              isInherited={isLicenseForced}
+            />
           )}
         </Box>
       )}

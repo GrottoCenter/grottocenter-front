@@ -39,6 +39,7 @@ import IdentifierEditor from './formElements/IdentifierEditor';
 import AuthorsSection from './formElements/AuthorsSection';
 import { FormActionRow, FormContainer, FormRow } from '../utils/FormContainers';
 import AddFileForm from './formElements/AddFileForm';
+import CollectionPublicationRights from './formElements/CollectionPublicationRights';
 import StringInput from '../../../common/Form/StringInput';
 import Translate from '../../../common/Translate';
 import InternationalizedLink from '../../../common/InternationalizedLink';
@@ -97,6 +98,11 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
   }, [document.mainLanguage, userLanguageId, updateAttribute]);
 
   const docType = document.type;
+  const isCollectionForm = isCollection(docType);
+  const needsCollectionLicense =
+    isCollectionForm &&
+    !!document.authorizationDocument?.id &&
+    !document.license;
   const simple = isSimpleMedia(docType);
   const acceptConfig = DOCUMENT_TYPE_ACCEPT[docType] ?? null;
 
@@ -140,14 +146,6 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
       disabled={!isFormValid}
       onCancel={onCancel || (() => navigate(-1))}
     />
-  );
-
-  const publicationDateField = (
-    <Box sx={{ mt: 2, maxWidth: '28rem' }}>
-      <Suspense fallback={<Skeleton height={100} />}>
-        <PublicationDatePicker />
-      </Suspense>
-    </Box>
   );
 
   return (
@@ -203,7 +201,6 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
           />
           {filesIntro}
           <AddFileForm {...addFileFormProps} />
-          {publicationDateField}
         </Box>
       )}
       {!isUnknown(docType) && isEvent(docType) && (
@@ -307,7 +304,7 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
         !isEvent(docType) &&
         !isAuthorizationToPublish(docType) && (
           <Box sx={{ mt: 1 }}>
-            {!isCollection(docType) && (
+            {!isCollectionForm && (
               <>
                 {filesIntro}
                 <AddFileForm
@@ -373,17 +370,30 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
             )}
 
             {isArticle(docType) && <PagesEditor />}
-
-            {!isCollection(docType) && publicationDateField}
           </Box>
         )}
-      {!isUnknown(docType) && <AuthorsSection />}
+      {!isUnknown(docType) && !isCollectionForm && (
+        <Box sx={{ mt: 2 }}>
+          <AuthorsSection />
+          {!isEvent(docType) && !isAuthorizationToPublish(docType) && (
+            <Box sx={{ mt: 1.5, maxWidth: '28rem' }}>
+              <Suspense fallback={<Skeleton height={100} />}>
+                <PublicationDatePicker />
+              </Suspense>
+            </Box>
+          )}
+        </Box>
+      )}
       {!isUnknown(docType) &&
         !isEvent(docType) &&
         !isAuthorizationToPublish(docType) && (
           <Accordion
             data-testid="document-advanced-metadata"
-            expanded={isAdditionalInfoExpanded || hasAdditionalInfoLengthError}
+            expanded={
+              isAdditionalInfoExpanded ||
+              hasAdditionalInfoLengthError ||
+              needsCollectionLicense
+            }
             onChange={(_event, expanded) =>
               setIsAdditionalInfoExpanded(expanded)
             }
@@ -405,8 +415,20 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
                 {formatMessage({ id: 'Advanced metadata' })}
               </Typography>
             </AccordionSummary>
-            <AccordionDetails sx={{ pt: 0.25 }}>
-              <IdentifierEditor />
+            <AccordionDetails
+              sx={{
+                pt: 0.25,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1.5
+              }}>
+              <Box>
+                <IdentifierEditor />
+              </Box>
+              {isCollectionForm && <AuthorsSection />}
+              {isCollectionForm && (
+                <CollectionPublicationRights disabled={isSubmitting} />
+              )}
 
               <FormRow>
                 <Box
@@ -467,44 +489,44 @@ const FormContent = ({ onCancel, isSubmitting = false, fileError }) => {
                 />
               )}
 
-              <MultipleISORegionsSelect
-                computeHasError={() => false}
-                contextValueName="iso3166"
-                helperText={formatMessage({
-                  id: 'If the document relates to one or more countries or regions.'
-                })}
-                labelName="ISO countries or regions"
-                required={false}
-              />
+              <Box>
+                <MultipleISORegionsSelect
+                  computeHasError={() => false}
+                  contextValueName="iso3166"
+                  helperText={formatMessage({
+                    id: 'If the document relates to one or more countries or regions.'
+                  })}
+                  labelName="ISO countries or regions"
+                  required={false}
+                />
+              </Box>
 
-              <Typography
-                variant="caption"
-                sx={{
-                  color: 'text.secondary',
-                  display: 'block',
-                  mt: 0.5
-                }}>
-                <InternationalizedLink links={wikiBBSLinks}>
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'text.secondary', display: 'block' }}>
+                  <InternationalizedLink links={wikiBBSLinks}>
+                    <Translate>
+                      Speleological Abstracts (SA)/Bulletin bibliographique
+                      spéléologique (BBS) in french
+                    </Translate>
+                  </InternationalizedLink>
                   <Translate>
-                    Speleological Abstracts (SA)/Bulletin bibliographique
-                    spéléologique (BBS) in french
-                  </Translate>
-                </InternationalizedLink>
-                <Translate>
-                  which is the annual summary of worldwide speleological
-                  literature, is directly integrated in Grottocenter. Choose one
-                  or more subjects from those defined by the SA/BBS, from
-                </Translate>{' '}
-                <InternationalizedLink links={wikiBBSChaptersLinks}>
-                  <Translate>this list</Translate>
-                </InternationalizedLink>
-                .
-              </Typography>
-              <MultipleSubjectsSelect
-                computeHasError={() => false}
-                contextValueName="subjects"
-                labelName="BBS subjects"
-              />
+                    which is the annual summary of worldwide speleological
+                    literature, is directly integrated in Grottocenter. Choose
+                    one or more subjects from those defined by the SA/BBS, from
+                  </Translate>{' '}
+                  <InternationalizedLink links={wikiBBSChaptersLinks}>
+                    <Translate>this list</Translate>
+                  </InternationalizedLink>
+                  .
+                </Typography>
+                <MultipleSubjectsSelect
+                  computeHasError={() => false}
+                  contextValueName="subjects"
+                  labelName="BBS subjects"
+                />
+              </Box>
 
               <StringInput
                 hasError={false}

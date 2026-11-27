@@ -233,7 +233,11 @@ const DocumentTypeSelect = () => {
   const handleSelect = newDocType => {
     if (newDocType === document.type) return;
     updateAttribute('type', newDocType);
-    if (!isArticle(newDocType) && !isIssue(newDocType)) {
+    if (
+      newDocType !== DocumentTypes.COLLECTION &&
+      !isArticle(newDocType) &&
+      !isIssue(newDocType)
+    ) {
       selectParent(null);
     }
   };

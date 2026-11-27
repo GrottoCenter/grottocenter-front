@@ -12,8 +12,9 @@ import { isPdfPageOffsetValid } from '@/utils/pdfUrl';
 import {
   DocumentTypes,
   filterDocumentPayload,
-  isDocumentSelfParent
-} from '../../../../utils/documentTypeHelpers';
+  isDocumentSelfParent,
+  requiresDocumentAuthor
+} from '@/utils/documentTypeHelpers';
 import {
   IS_INTACT,
   IS_DELETED,
@@ -85,7 +86,14 @@ export const getDocumentLengthErrors = document => {
     }));
 };
 
-const checkFormValidation = (document, isNewDocument) => {
+const hasAuthors = document =>
+  document.authors.length > 0 || document.authorsOrganization.length > 0;
+
+const checkFormValidation = (
+  document,
+  isNewDocument,
+  hasStoredAuthorization
+) => {
   let isValid = true;
 
   const payload = filterDocumentPayload(document);
@@ -132,7 +140,7 @@ const checkFormValidation = (document, isNewDocument) => {
   )
     isValid = false;
 
-  if (document.authors.length + document.authorsOrganization.length === 0)
+  if (requiresDocumentAuthor(document.type) && !hasAuthors(document))
     isValid = false;
   if (!isDocumentPagesFormatValid(payload.pages)) isValid = false;
   if (payload.identifier && !payload.identifierType) isValid = false;
@@ -146,7 +154,19 @@ const checkFormValidation = (document, isNewDocument) => {
   const hasVisibleFile = document.files.some(f => f.state !== IS_DELETED);
   const requiresAuthorization =
     document.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH;
-  if (requiresAuthorization && hasVisibleFile) {
+  const isCollection = document.type === DocumentTypes.COLLECTION;
+  if (
+    isCollection &&
+    (document.authorizationDocument || hasStoredAuthorization)
+  ) {
+    if (!document.authorizationDocument?.id || !document.license?.id)
+      isValid = false;
+    if (
+      document.selectOptionAuthorizationDocument !==
+      DOCUMENT_AUTHORIZE_TO_PUBLISH
+    )
+      isValid = false;
+  } else if (!isCollection && requiresAuthorization && hasVisibleFile) {
     if (!document.selectOptionAuthorizationDocument) isValid = false;
     // The API expects license[id], not the name returned by document details.
     if (!document.license?.id) isValid = false;
@@ -164,15 +184,45 @@ const checkFormValidation = (document, isNewDocument) => {
 export const DocumentFormContext = createContext({
   document: defaultDocAttributes,
   isNewDocument: true,
+  hasStoredAuthorization: false,
   allowEntityCreation: true,
   isFormValid: true,
   lengthErrors: [],
   updateAttribute: (_attributeName, _newValue) => {},
+  prefillAuthor: () => {},
   selectParent: () => {},
   resetContext: () => {},
   linkedEntrance: null,
   setLinkedEntrance: () => {}
 });
+
+const getPublicationRights = ({
+  license = null,
+  authorizationDocument = null,
+  selectOptionAuthorizationDocument = null
+}) => ({
+  license,
+  authorizationDocument,
+  selectOptionAuthorizationDocument
+});
+
+const AUTHOR_SELECTION = {
+  UNTOUCHED: 'untouched',
+  SUGGESTED: 'suggested',
+  EDITED: 'edited'
+};
+
+const getCollectionPublicationRights = document => {
+  const { authorizationDocument, license } = getPublicationRights(document);
+  const hasAuthorization = !!authorizationDocument?.id;
+  return {
+    license: hasAuthorization ? license : null,
+    authorizationDocument,
+    selectOptionAuthorizationDocument: hasAuthorization
+      ? DOCUMENT_AUTHORIZE_TO_PUBLISH
+      : null
+  };
+};
 
 const normalizeInitialValues = values => {
   if (!values) return {};
@@ -191,19 +241,96 @@ const normalizeInitialValues = values => {
   };
 };
 
+const createFormState = document => {
+  const collectionRights = getCollectionPublicationRights(document);
+  return {
+    document:
+      document.type === DocumentTypes.COLLECTION
+        ? { ...document, ...collectionRights }
+        : document,
+    collectionRights,
+    authorSelection: AUTHOR_SELECTION.UNTOUCHED,
+    preCollectionDraft: null
+  };
+};
+
+// Restore the original parent and publication choices when undoing a switch
+// to Collection. The collection keeps its own draft across type changes.
+const changeDocumentType = (state, type, isNewDocument) => {
+  const { document, collectionRights, preCollectionDraft } = state;
+  if (type === DocumentTypes.COLLECTION) {
+    const hasSuggestedAuthor =
+      state.authorSelection === AUTHOR_SELECTION.SUGGESTED;
+    const hasPrefilledTitle =
+      isNewDocument &&
+      document.type === DocumentTypes.ISSUE &&
+      !!document.title &&
+      document.title === document.parent?.title;
+    return {
+      ...state,
+      authorSelection: hasSuggestedAuthor
+        ? AUTHOR_SELECTION.UNTOUCHED
+        : state.authorSelection,
+      preCollectionDraft: {
+        ...getPublicationRights(document),
+        type: document.type,
+        parent: document.parent,
+        ...(hasPrefilledTitle && { title: document.title })
+      },
+      document: {
+        ...document,
+        ...collectionRights,
+        type,
+        parent: null,
+        ...(hasSuggestedAuthor && { authors: [] }),
+        ...(hasPrefilledTitle && { title: '' })
+      }
+    };
+  }
+  if (document.type === DocumentTypes.COLLECTION) {
+    const draft = preCollectionDraft?.type === type ? preCollectionDraft : null;
+    return {
+      ...state,
+      document: {
+        ...document,
+        ...draft,
+        type,
+        title: document.title || draft?.title || ''
+      },
+      collectionRights: getCollectionPublicationRights(document),
+      preCollectionDraft: null
+    };
+  }
+  return { ...state, document: { ...document, type } };
+};
+
 const Provider = ({
   children,
   initialValues,
   creationContext,
   allowEntityCreation = true
 }) => {
-  const [document, setDocument] = useState({
-    ...defaultDocAttributes,
-    ...(!initialValues && creationContext
-      ? { type: creationContext.type }
-      : {}),
-    ...normalizeInitialValues(initialValues)
-  });
+  const [formState, setFormState] = useState(() =>
+    createFormState({
+      ...defaultDocAttributes,
+      ...(!initialValues && creationContext
+        ? { type: creationContext.type }
+        : {}),
+      ...normalizeInitialValues(initialValues)
+    })
+  );
+  const { document } = formState;
+  const setDocument = useCallback(update => {
+    setFormState(state => {
+      const nextDocument = update(state.document);
+      return nextDocument === state.document
+        ? state
+        : { ...state, document: nextDocument };
+    });
+  }, []);
+  // The multipart API cannot clear a stored publication option.
+  const hasStoredAuthorization = !!initialValues?.authorizationDocument?.id;
+  const isNewDocument = !initialValues;
   const attributeVersionsRef = useRef({});
   const allowPhotoDatePrefillRef = useRef(true);
   usePhotoDatePrefill({
@@ -216,8 +343,8 @@ const Provider = ({
     document,
     setDocument,
     attributeVersionsRef,
-    isNewDocument: !initialValues,
-    initialParent: !initialValues ? creationContext?.parent : null
+    isNewDocument,
+    initialParent: isNewDocument ? creationContext?.parent : null
   });
 
   const [isFormValid, setIsFormValid] = useState(false);
@@ -235,38 +362,81 @@ const Provider = ({
         allowPhotoDatePrefillRef.current = false;
       attributeVersionsRef.current[attributeName] =
         (attributeVersionsRef.current[attributeName] ?? 0) + 1;
-      setDocument(prevState => ({
-        ...prevState,
-        [attributeName]: newValue
-      }));
+      setFormState(state => {
+        const current = state.document;
+        if (attributeName === 'type')
+          return newValue === current.type
+            ? state
+            : changeDocumentType(state, newValue, isNewDocument);
+
+        const editsAuthors =
+          attributeName === 'authors' ||
+          attributeName === 'authorsOrganization';
+        const updatesCollectionAuthorization =
+          attributeName === 'authorizationDocument' &&
+          current.type === DocumentTypes.COLLECTION;
+        const nextDocument = { ...current, [attributeName]: newValue };
+        return {
+          ...state,
+          ...(editsAuthors && { authorSelection: AUTHOR_SELECTION.EDITED }),
+          document: updatesCollectionAuthorization
+            ? {
+                ...nextDocument,
+                ...getCollectionPublicationRights(nextDocument)
+              }
+            : nextDocument
+        };
+      });
     },
-    [setDocument]
+    [isNewDocument]
+  );
+
+  const prefillAuthor = useCallback(
+    ({ id, nickname }, { onlyIfUntouched = false } = {}) => {
+      if (!id) return;
+      setFormState(state => {
+        if (
+          !requiresDocumentAuthor(state.document.type) ||
+          hasAuthors(state.document) ||
+          (onlyIfUntouched &&
+            state.authorSelection !== AUTHOR_SELECTION.UNTOUCHED)
+        )
+          return state;
+        return {
+          ...state,
+          authorSelection: AUTHOR_SELECTION.SUGGESTED,
+          document: { ...state.document, authors: [{ id, nickname }] }
+        };
+      });
+    },
+    []
   );
 
   useEffect(() => {
-    setIsFormValid(checkFormValidation(document, !initialValues));
-  }, [document, initialValues, setIsFormValid]);
+    setIsFormValid(
+      checkFormValidation(document, isNewDocument, hasStoredAuthorization)
+    );
+  }, [document, isNewDocument, hasStoredAuthorization, setIsFormValid]);
 
-  const resetContext = useCallback(
-    (overrides = {}) => {
-      allowPhotoDatePrefillRef.current = true;
-      attributeVersionsRef.current.datePublication =
-        (attributeVersionsRef.current.datePublication ?? 0) + 1;
-      attributeVersionsRef.current.parent =
-        (attributeVersionsRef.current.parent ?? 0) + 1;
-      setDocument({ ...defaultDocAttributes, ...overrides });
-    },
-    [setDocument]
-  );
+  const resetContext = useCallback((overrides = {}) => {
+    allowPhotoDatePrefillRef.current = true;
+    attributeVersionsRef.current.datePublication =
+      (attributeVersionsRef.current.datePublication ?? 0) + 1;
+    attributeVersionsRef.current.parent =
+      (attributeVersionsRef.current.parent ?? 0) + 1;
+    setFormState(createFormState({ ...defaultDocAttributes, ...overrides }));
+  }, []);
 
   const contextValue = useMemo(
     () => ({
       document,
-      isNewDocument: !initialValues,
+      isNewDocument,
+      hasStoredAuthorization,
       allowEntityCreation,
       isFormValid,
       lengthErrors,
       updateAttribute,
+      prefillAuthor,
       selectParent,
       resetContext,
       linkedEntrance,
@@ -274,11 +444,13 @@ const Provider = ({
     }),
     [
       document,
-      initialValues,
+      isNewDocument,
+      hasStoredAuthorization,
       allowEntityCreation,
       isFormValid,
       lengthErrors,
       updateAttribute,
+      prefillAuthor,
       selectParent,
       resetContext,
       linkedEntrance

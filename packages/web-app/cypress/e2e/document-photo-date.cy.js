@@ -44,6 +44,12 @@ describe('Photo capture date during document creation', () => {
       });
       cy.get('[data-testid="document-type-1"]', { timeout: 30000 }).click();
       cy.get(dateField).should('be.visible');
+      cy.get('[data-testid="document-authors"]').should($authors => {
+        const date = $authors[0].ownerDocument.querySelector(dateField);
+        expect($authors[0].compareDocumentPosition(date)).to.equal(
+          Node.DOCUMENT_POSITION_FOLLOWING
+        );
+      });
       cy.get('[data-testid="document-advanced-metadata"]')
         .find('[aria-expanded]')
         .should('have.attr', 'aria-expanded', 'false');
